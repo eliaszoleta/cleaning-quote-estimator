@@ -101,24 +101,34 @@ app.get('/health', (req, res) => res.json({ status: 'ok', service: 'CleanCalc AP
 
 // ─── DB connectivity check ────────────────────────────────────────────────────
 app.get('/api/debug/db', async (req, res) => {
+  const { createClient } = require('@supabase/supabase-js');
   const supabaseUrl = process.env.SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const result = {
     supabase_url_set: !!supabaseUrl,
     service_key_set: !!serviceKey,
-    service_key_looks_valid: serviceKey ? serviceKey.startsWith('eyJ') && serviceKey !== '<your service_role key>' : false,
+    service_key_looks_valid: serviceKey ? serviceKey.startsWith('eyJ') : false,
   };
-  if (result.service_key_looks_valid) {
+  if (supabaseUrl && serviceKey) {
+    const sb = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+    // Test read
     try {
-      const axios = require('axios');
-      const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` };
-      const r = await axios.get(`${supabaseUrl}/rest/v1/cleaning_company_configs?select=company_id&limit=1`, { headers, timeout: 5000 });
-      result.supabase_read = 'ok';
-      result.row_count = r.data.length;
-    } catch (err) {
-      result.supabase_read = 'failed';
-      result.supabase_error = err.response?.data || err.message;
-    }
+      const { data, error } = await sb.from('cleaning_company_configs').select('company_id').limit(3);
+      if (error) { result.read = 'error'; result.read_error = error.message; }
+      else { result.read = 'ok'; result.row_count = data.length; }
+    } catch (e) { result.read = 'exception'; result.read_error = e.message; }
+    // Test write (upsert a canary row, then delete it)
+    const testId = '__debug_test__';
+    try {
+      const { error: we } = await sb.from('cleaning_company_configs')
+        .upsert({ company_id: testId, config: { test: true }, updated_at: new Date().toISOString() }, { onConflict: 'company_id' });
+      if (we) { result.write = 'error'; result.write_error = we.message; }
+      else {
+        result.write = 'ok';
+        await sb.from('cleaning_company_configs').delete().eq('company_id', testId);
+        result.cleanup = 'ok';
+      }
+    } catch (e) { result.write = 'exception'; result.write_error = e.message; }
   }
   res.json(result);
 });
