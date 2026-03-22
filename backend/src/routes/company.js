@@ -53,6 +53,8 @@ router.put('/:id', async (req, res) => {
     const merged = { ...existing, ...updates };
     // Never allow subscription to be overwritten from client
     merged.subscription = existing.subscription || DEFAULT_COMPANY_CONFIG.subscription;
+    console.log('[PUT company] updates.services keys:', updates.services ? Object.keys(updates.services) : 'none');
+    console.log('[PUT company] merged.services.homeResidential:', JSON.stringify(merged.services?.homeResidential));
     await saveCompanyConfig(id, merged);
     res.json({ success: true, data: merged });
   } catch (err) {

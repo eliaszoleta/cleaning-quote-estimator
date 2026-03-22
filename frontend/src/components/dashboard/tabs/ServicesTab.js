@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning', icon: '🏠' },
@@ -18,9 +18,11 @@ export default function ServicesTab({ config, saveConfig, saving, saved }) {
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
   const [customQuestions, setCustomQuestions] = useState([]);
+  const initialized = useRef(false);
 
   useEffect(() => {
-    if (config) {
+    if (config && !initialized.current) {
+      initialized.current = true;
       setServices(config.services || {});
       setEnableLeadCapture(config.enableLeadCapture !== false);
       setCustomQuestions(config.customLeadQuestions || []);

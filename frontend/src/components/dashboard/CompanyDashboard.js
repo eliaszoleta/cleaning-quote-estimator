@@ -42,7 +42,8 @@ export default function CompanyDashboard({ user, onLogout }) {
 
   useEffect(() => {
     loadSubStatus();
-  }, [user.id, config]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id]);
 
   const loadSubStatus = async () => {
     try {
