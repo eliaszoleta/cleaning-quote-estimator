@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Copy, Check, Eye, EyeOff, RotateCcw, AlertTriangle, Lightbulb } from 'lucide-react';
 
 export default function APIKeysTab({ config, saveConfig, saving }) {
   const [apiKey, setApiKey] = useState('');
@@ -34,41 +35,59 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
 
   return (
     <div style={{ maxWidth: 640 }}>
-      <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>API Access</h2>
-      <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28 }}>Use your API key to pull leads directly into your CRM.</p>
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>API Access</h2>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Use your API key to pull leads directly into your CRM.</p>
+      </div>
 
       {/* Key card */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '24px 28px', marginBottom: 24 }}>
-        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 16 }}>Your API Key</div>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>Your API Key</div>
 
         {apiKey ? (
           <div>
-            <div style={{ background: '#0f172a', borderRadius: 8, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-              <code style={{ color: '#7dd3fc', fontFamily: "'Menlo','Monaco',monospace", fontSize: 13, wordBreak: 'break-all' }}>
+            <div style={{ background: '#0f172a', borderRadius: 8, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+              <code style={{ color: '#7dd3fc', fontFamily: "'Menlo','Monaco',monospace", fontSize: 12.5, wordBreak: 'break-all', flex: 1 }}>
                 {revealed ? apiKey : maskedKey}
               </code>
-              <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                <button onClick={() => setRevealed(r => !r)} style={{ background: '#1e293b', color: '#94a3b8', border: 'none', padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+              <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                <button
+                  onClick={() => setRevealed(r => !r)}
+                  title={revealed ? 'Hide key' : 'Reveal key'}
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#1e293b', color: '#94a3b8', border: 'none', padding: '6px 11px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+                >
+                  {revealed ? <EyeOff size={13} /> : <Eye size={13} />}
                   {revealed ? 'Hide' : 'Reveal'}
                 </button>
-                <button onClick={copyKey} style={{ background: copied ? '#16a34a' : '#2563eb', color: 'white', border: 'none', padding: '6px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
-                  {copied ? '✓ Copied' : 'Copy'}
+                <button
+                  onClick={copyKey}
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, background: copied ? '#16a34a' : '#2563eb', color: 'white', border: 'none', padding: '6px 11px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'background 0.15s' }}
+                >
+                  {copied ? <><Check size={13} /> Copied</> : <><Copy size={13} /> Copy</>}
                 </button>
               </div>
             </div>
-            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 16 }}>
-              ⚠ Treat this key like a password. Don't expose it in client-side code or public repositories.
-            </p>
-            <button onClick={() => { if (window.confirm('Generate a new key? Your old key will stop working immediately.')) generateKey(); }}
+
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 14 }}>
+              <AlertTriangle size={13} color="#d97706" style={{ marginTop: 2, flexShrink: 0 }} />
+              <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
+                Treat this key like a password. Don't expose it in client-side code or public repositories.
+              </p>
+            </div>
+
+            <button
+              onClick={() => { if (window.confirm('Generate a new key? Your old key will stop working immediately.')) generateKey(); }}
               disabled={generating || saving}
-              style={{ padding: '9px 18px', border: '1px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#374151' }}>
-              {generating ? 'Generating…' : '↺ Rotate Key'}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: generating || saving ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: 13, color: '#374151', opacity: generating || saving ? 0.6 : 1 }}
+            >
+              <RotateCcw size={13} /> {generating ? 'Generating…' : 'Rotate Key'}
             </button>
           </div>
         ) : (
           <div>
             <p style={{ fontSize: 14, color: '#64748b', marginBottom: 16 }}>No API key generated yet.</p>
-            <button onClick={generateKey} disabled={generating} style={{ padding: '11px 24px', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
+            <button onClick={generateKey} disabled={generating}
+              style={{ padding: '10px 22px', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
               {generating ? 'Generating…' : 'Generate API Key →'}
             </button>
           </div>
@@ -76,65 +95,32 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
       </div>
 
       {/* Docs */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '24px 28px', marginBottom: 24 }}>
-        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 16 }}>API Reference</div>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>API Reference</div>
 
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, color: '#374151' }}>List Leads</div>
-          <div style={{ background: '#0f172a', borderRadius: 8, padding: '14px 18px', overflow: 'auto' }}>
-            <code style={{ color: '#7dd3fc', fontFamily: "'Menlo','Monaco',monospace", fontSize: 12, whiteSpace: 'pre' }}>
-{`GET /api/leads
-X-API-Key: your_api_key
-
-# Optional query params:
-?limit=100          # Max 1,000
-?since=2025-01-01   # ISO date filter`}
-            </code>
+        {[
+          { label: 'List Leads', color: '#7dd3fc', code: `GET /api/leads\nX-API-Key: your_api_key\n\n# Optional query params:\n?limit=100          # Max 1,000\n?since=2025-01-01   # ISO date filter` },
+          { label: 'Response Format', color: '#86efac', code: `{\n  "success": true,\n  "count": 42,\n  "data": [\n    {\n      "id": "uuid",\n      "name": "Jane Smith",\n      "email": "jane@example.com",\n      "phone": "(555) 000-0000",\n      "service_type": "home_residential",\n      "estimated_price_low": 150,\n      "estimated_price_high": 220,\n      "created_at": "2025-01-15T14:30:00Z"\n    }\n  ]\n}` },
+          { label: 'cURL Example', color: '#fde68a', code: `curl https://api.cleaningcalculator.app/api/leads \\\n  -H "X-API-Key: ${apiKey || 'your_api_key_here'}"` },
+        ].map(({ label, color, code }) => (
+          <div key={label} style={{ marginBottom: 18 }}>
+            <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 7, color: '#374151' }}>{label}</div>
+            <div style={{ background: '#0f172a', borderRadius: 8, padding: '13px 16px', overflow: 'auto' }}>
+              <code style={{ color, fontFamily: "'Menlo','Monaco',monospace", fontSize: 12, whiteSpace: 'pre', display: 'block' }}>{code}</code>
+            </div>
           </div>
-        </div>
-
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, color: '#374151' }}>Response Format</div>
-          <div style={{ background: '#0f172a', borderRadius: 8, padding: '14px 18px', overflow: 'auto' }}>
-            <code style={{ color: '#86efac', fontFamily: "'Menlo','Monaco',monospace", fontSize: 12, whiteSpace: 'pre' }}>
-{`{
-  "success": true,
-  "count": 42,
-  "data": [
-    {
-      "id": "uuid",
-      "name": "Jane Smith",
-      "email": "jane@example.com",
-      "phone": "(555) 000-0000",
-      "service_type": "home_residential",
-      "state": "TX",
-      "zip": "78701",
-      "estimated_price_low": 150,
-      "estimated_price_high": 220,
-      "timeline": "week",
-      "service_details": { ... },
-      "created_at": "2025-01-15T14:30:00Z"
-    }
-  ]
-}`}
-            </code>
-          </div>
-        </div>
-
-        <div>
-          <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, color: '#374151' }}>cURL Example</div>
-          <div style={{ background: '#0f172a', borderRadius: 8, padding: '14px 18px', overflow: 'auto' }}>
-            <code style={{ color: '#fde68a', fontFamily: "'Menlo','Monaco',monospace", fontSize: 12, whiteSpace: 'pre' }}>
-{`curl https://api.cleaningcalculator.app/api/leads \\
-  -H "X-API-Key: ${apiKey || 'your_api_key_here'}"`}
-            </code>
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '16px 20px' }}>
-        <div style={{ fontWeight: 700, fontSize: 14, color: '#15803d', marginBottom: 4 }}>💡 Zapier & Make Integration</div>
-        <p style={{ fontSize: 13, color: '#166534' }}>Use the Webhooks by Zapier action or Make's HTTP module to poll /api/leads and push new leads to HubSpot, Salesforce, Google Sheets, or any CRM.</p>
+      {/* Tip */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '14px 18px' }}>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Lightbulb size={16} color="#16a34a" />
+        </div>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: 13, color: '#15803d', marginBottom: 3 }}>Zapier & Make Integration</div>
+          <p style={{ fontSize: 13, color: '#166534', margin: 0 }}>Use the Webhooks by Zapier action or Make's HTTP module to poll /api/leads and push new leads to HubSpot, Salesforce, Google Sheets, or any CRM.</p>
+        </div>
       </div>
     </div>
   );

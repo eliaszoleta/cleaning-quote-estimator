@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Copy, Check, ExternalLink } from 'lucide-react';
 
 const SITE_URL = process.env.REACT_APP_SITE_URL || 'https://cleaningcalculator.app';
 
@@ -44,49 +45,30 @@ export default function EmbedTab({ config, user }) {
 
   return (
     <div>
-      <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Embed Your Widget</h2>
-      <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28 }}>Paste the code below anywhere on your website to embed your branded calculator.</p>
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Embed Your Widget</h2>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Paste the code below anywhere on your website to embed your branded calculator.</p>
+      </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <EmbedCard title="Standard iFrame" badge="Recommended" desc="Works on any website. Paste inside your page's HTML." code={iframeCode} onCopy={() => copy(iframeCode, 'iframe')} copied={copied === 'iframe'} />
+        <EmbedCard title="JavaScript Snippet" desc="Dynamically injects the widget. Good for CMS platforms." code={scriptCode} onCopy={() => copy(scriptCode, 'script')} copied={copied === 'script'} />
+        <EmbedCard title="WordPress Shortcode" desc="Install the CleanCalc WordPress plugin, then paste this shortcode." code={wordpressCode} onCopy={() => copy(wordpressCode, 'wp')} copied={copied === 'wp'} />
 
-        <EmbedCard
-          title="Standard iFrame (recommended)"
-          desc="Works on any website. Paste inside your page's HTML."
-          code={iframeCode}
-          onCopy={() => copy(iframeCode, 'iframe')}
-          copied={copied === 'iframe'}
-        />
-
-        <EmbedCard
-          title="JavaScript Snippet"
-          desc="Dynamically injects the widget. Good for CMS platforms."
-          code={scriptCode}
-          onCopy={() => copy(scriptCode, 'script')}
-          copied={copied === 'script'}
-        />
-
-        <EmbedCard
-          title="WordPress Shortcode"
-          desc="Install the CleanCalc WordPress plugin, then paste this shortcode."
-          code={wordpressCode}
-          onCopy={() => copy(wordpressCode, 'wp')}
-          copied={copied === 'wp'}
-        />
-
-        {/* Instructions */}
-        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '24px 28px' }}>
-          <h3 style={{ fontWeight: 700, fontSize: 16, marginBottom: 16, color: '#0f172a' }}>Installation Guide</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+        {/* Installation Guide */}
+        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>Installation Guide</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 12 }}>
             {[
-              { platform: 'Wix', steps: ['Go to Edit Site', 'Add an Embed element', 'Paste the iFrame code'] },
-              { platform: 'Squarespace', steps: ['Add a Code Block', 'Switch to HTML mode', 'Paste the iFrame code'] },
-              { platform: 'WordPress', steps: ['Open Gutenberg editor', 'Add a Custom HTML block', 'Paste the iFrame code'] },
+              { platform: 'Wix',            steps: ['Go to Edit Site', 'Add an Embed element', 'Paste the iFrame code'] },
+              { platform: 'Squarespace',    steps: ['Add a Code Block', 'Switch to HTML mode', 'Paste the iFrame code'] },
+              { platform: 'WordPress',      steps: ['Open Gutenberg editor', 'Add a Custom HTML block', 'Paste the iFrame code'] },
               { platform: 'Weebly / Duda', steps: ['Add Embed Code element', 'Paste iFrame in the box', 'Publish your changes'] },
             ].map(({ platform, steps }) => (
-              <div key={platform} style={{ background: '#f8fafc', borderRadius: 8, padding: 16 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10 }}>{platform}</div>
-                <ol style={{ paddingLeft: 18, margin: 0 }}>
-                  {steps.map(s => <li key={s} style={{ fontSize: 13, color: '#374151', marginBottom: 6 }}>{s}</li>)}
+              <div key={platform} style={{ background: '#f8fafc', borderRadius: 8, padding: '14px 16px' }}>
+                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10, color: '#0f172a' }}>{platform}</div>
+                <ol style={{ paddingLeft: 16, margin: 0 }}>
+                  {steps.map(s => <li key={s} style={{ fontSize: 12.5, color: '#64748b', marginBottom: 5 }}>{s}</li>)}
                 </ol>
               </div>
             ))}
@@ -94,12 +76,18 @@ export default function EmbedTab({ config, user }) {
         </div>
 
         {/* Preview link */}
-        <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '20px 24px' }}>
-          <div style={{ fontWeight: 700, fontSize: 15, color: '#1e40af', marginBottom: 6 }}>Preview your widget</div>
-          <p style={{ fontSize: 13, color: '#1d4ed8', marginBottom: 12 }}>See exactly how it looks before embedding on your site.</p>
-          <a href={`/embed?company=${companyId}`} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#2563eb', color: 'white', padding: '10px 20px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
-            Open Widget Preview ↗
+        <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f8fafc)', border: '1px solid #bfdbfe', borderRadius: 12, padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14 }}>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: '#1e40af', marginBottom: 4 }}>Preview your widget</div>
+            <p style={{ fontSize: 13, color: '#3b82f6', margin: 0 }}>See exactly how it looks before embedding on your site.</p>
+          </div>
+          <a
+            href={`/embed?company=${companyId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#2563eb', color: 'white', padding: '10px 18px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 13 }}
+          >
+            Open Preview <ExternalLink size={13} />
           </a>
         </div>
       </div>
@@ -107,19 +95,32 @@ export default function EmbedTab({ config, user }) {
   );
 }
 
-function EmbedCard({ title, desc, code, onCopy, copied }) {
+function EmbedCard({ title, badge, desc, code, onCopy, copied }) {
   return (
-    <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
-      <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <div style={{ fontWeight: 700, fontSize: 15 }}>{title}</div>
-          <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>{desc}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontWeight: 700, fontSize: 14 }}>{title}</span>
+            {badge && <span style={{ fontSize: 11, fontWeight: 700, background: '#eff6ff', color: '#2563eb', padding: '2px 7px', borderRadius: 20 }}>{badge}</span>}
+          </div>
+          <div style={{ fontSize: 12.5, color: '#94a3b8', marginTop: 2 }}>{desc}</div>
         </div>
-        <button onClick={onCopy} style={{ padding: '8px 18px', background: copied ? '#16a34a' : '#0f172a', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13, flexShrink: 0, marginLeft: 16 }}>
-          {copied ? '✓ Copied!' : 'Copy Code'}
+        <button
+          onClick={onCopy}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '7px 14px',
+            background: copied ? '#16a34a' : '#0f172a',
+            color: 'white', border: 'none', borderRadius: 7,
+            cursor: 'pointer', fontWeight: 600, fontSize: 12.5,
+            flexShrink: 0, marginLeft: 14, transition: 'background 0.15s',
+          }}
+        >
+          {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy Code</>}
         </button>
       </div>
-      <div style={{ background: '#0f172a', padding: '16px 20px', overflowX: 'auto' }}>
+      <div style={{ background: '#0f172a', padding: '14px 18px', overflowX: 'auto' }}>
         <code style={{ fontFamily: "'Menlo','Monaco',monospace", fontSize: 12, color: '#7dd3fc', whiteSpace: 'pre', display: 'block' }}>
           {code}
         </code>
