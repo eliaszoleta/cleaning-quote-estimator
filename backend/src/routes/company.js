@@ -56,10 +56,12 @@ router.put('/:id', async (req, res) => {
     const merged = { ...existing, ...updates };
     // Never allow subscription to be overwritten from client
     merged.subscription = existing.subscription || DEFAULT_COMPANY_CONFIG.subscription;
-    const svcStatesIn = Object.entries(updates.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ');
+    const bodyKeys = Object.keys(updates).join(',');
+    const svcStatesIn = Object.entries(updates.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') || '(none)';
     const svcStatesMerged = Object.entries(merged.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ');
-    console.log(`[PUT config] user=${id} | received: ${svcStatesIn}`);
-    console.log(`[PUT config] user=${id} | merged:   ${svcStatesMerged}`);
+    console.log(`[PUT config] user=${id} | body_keys: ${bodyKeys}`);
+    console.log(`[PUT config] user=${id} | received services: ${svcStatesIn}`);
+    console.log(`[PUT config] user=${id} | merged services:   ${svcStatesMerged}`);
     await saveCompanyConfig(id, merged);
     console.log(`[PUT config] user=${id} | saved ok`);
     res.json({ success: true, data: merged });
