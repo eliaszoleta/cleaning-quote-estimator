@@ -2,9 +2,10 @@ const API_URL = process.env.REACT_APP_API_URL || '';
 
 async function apiFetch(path, options = {}) {
   const url = API_URL ? `${API_URL}${path}` : path;
+  const { headers: optHeaders, ...restOptions } = options;
   const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options,
+    ...restOptions,
+    headers: { 'Content-Type': 'application/json', ...(optHeaders || {}) },
   });
   const data = await res.json();
   if (!res.ok || !data.success) throw new Error(data.error || `Request failed (${res.status})`);
