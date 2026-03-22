@@ -1,4 +1,4 @@
-const axios = require('axios');
+const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const path = require('path');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
@@ -9,29 +9,14 @@ const SERVICE_KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
 // File fallback for local dev without Supabase
 const DATA_FILE = path.join(__dirname, '../../data/company-configs.json');
 
-function dbHeaders() {
-  const key = SERVICE_KEY();
-  return {
-    apikey: key,
-    Authorization: `Bearer ${key}`,
-    'Content-Type': 'application/json',
-  };
-}
-
-async function dbGet(companyId) {
-  const res = await axios.get(
-    `${SUPABASE_URL}/rest/v1/cleaning_company_configs?company_id=eq.${encodeURIComponent(companyId)}&select=config&limit=1`,
-    { headers: dbHeaders() }
-  );
-  return res.data?.[0]?.config || null;
-}
-
-async function dbUpsert(companyId, config) {
-  await axios.post(
-    `${SUPABASE_URL}/rest/v1/cleaning_company_configs`,
-    { company_id: companyId, config, updated_at: new Date().toISOString() },
-    { headers: { ...dbHeaders(), Prefer: 'resolution=merge-duplicates' } }
-  );
+let _supabase = null;
+function getSupabase() {
+  if (!_supabase && SUPABASE_URL && SERVICE_KEY()) {
+    _supabase = createClient(SUPABASE_URL, SERVICE_KEY(), {
+      auth: { persistSession: false },
+    });
+  }
+  return _supabase;
 }
 
 // File fallback helpers
@@ -52,19 +37,47 @@ function fileSave(map) {
 const fileCache = fileLoad();
 
 async function getCompanyConfig(companyId) {
-  if (SERVICE_KEY()) {
-    return (await dbGet(companyId)) || null;
+  const sb = getSupabase();
+  if (sb) {
+    const { data, error } = await sb
+      .from('cleaning_company_configs')
+      .select('config')
+      .eq('company_id', companyId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[companyConfig] GET error:', error.message, error.code);
+      throw new Error(error.message);
+    }
+    console.log(`[companyConfig] GET company_id=${companyId} found=${!!data}`);
+    return data?.config || null;
   }
+
+  console.log('[companyConfig] GET using file cache (no Supabase)');
   return fileCache.get(companyId) || null;
 }
 
 async function saveCompanyConfig(companyId, config) {
-  if (SERVICE_KEY()) {
-    await dbUpsert(companyId, config);
-  } else {
-    fileCache.set(companyId, config);
-    fileSave(fileCache);
+  const sb = getSupabase();
+  if (sb) {
+    const { error } = await sb
+      .from('cleaning_company_configs')
+      .upsert(
+        { company_id: companyId, config, updated_at: new Date().toISOString() },
+        { onConflict: 'company_id' }
+      );
+
+    if (error) {
+      console.error('[companyConfig] SAVE error:', error.message, error.code);
+      throw new Error(error.message);
+    }
+    console.log(`[companyConfig] SAVE ok company_id=${companyId}`);
+    return;
   }
+
+  console.log('[companyConfig] SAVE using file cache (no Supabase)');
+  fileCache.set(companyId, config);
+  fileSave(fileCache);
 }
 
 module.exports = { getCompanyConfig, saveCompanyConfig, DEFAULT_COMPANY_CONFIG };
