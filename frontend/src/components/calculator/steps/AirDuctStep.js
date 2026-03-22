@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AlertTriangle, Square } from 'lucide-react';
 import StepWrapper from './StepWrapper';
 
 export default function AirDuctStep({ value, onBack, onNext, primaryColor }) {
@@ -47,7 +48,7 @@ export default function AirDuctStep({ value, onBack, onNext, primaryColor }) {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {[['sanitizing','UV Sanitizing'],['dryer_vent','Dryer Vent (bundle)'],['coil_cleaning','Coil Cleaning'],['filter_replacement','Filter Replacement']].map(([id,label]) => (
             <button key={id} onClick={() => toggleExtra(id)} style={{ padding: '8px 14px', borderRadius: 20, border: `2px solid ${extras.includes(id) ? primaryColor : '#e2e8f0'}`, background: extras.includes(id) ? `${primaryColor}15` : 'white', color: extras.includes(id) ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
-              {extras.includes(id) ? '✓ ' : ''}{label}
+              {label}
             </button>
           ))}
         </div>
@@ -56,7 +57,7 @@ export default function AirDuctStep({ value, onBack, onNext, primaryColor }) {
       <Section label="Mold concern">
         <button onClick={() => setMoldSuspected(!moldSuspected)} style={{ padding: '14px 20px', borderRadius: 10, border: `2px solid ${moldSuspected ? '#dc2626' : '#e2e8f0'}`, background: moldSuspected ? '#fff1f2' : 'white', cursor: 'pointer', textAlign: 'left', width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700, color: moldSuspected ? '#dc2626' : '#374151' }}>
-            <span style={{ fontSize: 20 }}>{moldSuspected ? '⚠️' : '☐'}</span>
+            <span style={{ display: 'flex' }}>{moldSuspected ? <AlertTriangle size={18} color="#dc2626" /> : <Square size={18} color="#94a3b8" />}</span>
             I suspect mold or musty odors in my ductwork
           </div>
           <div style={{ fontSize: 12, color: '#64748b', marginTop: 6, paddingLeft: 30 }}>

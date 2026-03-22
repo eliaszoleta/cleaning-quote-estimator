@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Siren } from 'lucide-react';
 import StepWrapper from './StepWrapper';
 
 export default function WaterDamageStep({ value, onBack, onNext, primaryColor }) {
@@ -20,7 +21,7 @@ export default function WaterDamageStep({ value, onBack, onNext, primaryColor })
 
       {isUrgent && (
         <div style={{ background: '#fff1f2', border: '2px solid #fca5a5', borderRadius: 8, padding: '12px 16px', marginBottom: 24 }}>
-          <div style={{ fontWeight: 700, color: '#dc2626', fontSize: 15 }}>🚨 Emergency — Call a restoration company NOW</div>
+          <div style={{ fontWeight: 700, color: '#dc2626', fontSize: 15, display: 'flex', alignItems: 'center', gap: 7 }}><Siren size={15} /> Emergency — Call a restoration company NOW</div>
           <div style={{ fontSize: 13, color: '#7f1d1d', marginTop: 4 }}>The longer you wait, the more damage spreads. Most restoration companies offer 24/7 emergency service. This estimate is a rough guide — get a professional on-site immediately.</div>
         </div>
       )}
@@ -65,7 +66,7 @@ export default function WaterDamageStep({ value, onBack, onNext, primaryColor })
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {[['first_floor','First Floor'],['second_floor','Second Floor'],['basement','Basement'],['crawl_space','Crawl Space'],['multiple','Multiple Floors']].map(([id,label]) => (
             <button key={id} onClick={() => toggleArea(id)} style={{ padding: '9px 16px', borderRadius: 20, border: `2px solid ${areas.includes(id) ? primaryColor : '#e2e8f0'}`, background: areas.includes(id) ? `${primaryColor}15` : 'white', color: areas.includes(id) ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
-              {areas.includes(id) ? '✓ ' : ''}{label}
+              {label}
             </button>
           ))}
         </div>
@@ -82,10 +83,10 @@ export default function WaterDamageStep({ value, onBack, onNext, primaryColor })
       <Section label="Insurance & contents">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button onClick={() => setHasInsurance(!hasInsurance)} style={{ padding: '10px 16px', borderRadius: 8, border: `2px solid ${hasInsurance ? primaryColor : '#e2e8f0'}`, background: hasInsurance ? `${primaryColor}10` : 'white', color: hasInsurance ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            {hasInsurance ? '✓ ' : ''}I have homeowner's insurance
+            I have homeowner's insurance
           </button>
           <button onClick={() => setContentsDamaged(!contentsDamaged)} style={{ padding: '10px 16px', borderRadius: 8, border: `2px solid ${contentsDamaged ? primaryColor : '#e2e8f0'}`, background: contentsDamaged ? `${primaryColor}10` : 'white', color: contentsDamaged ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            {contentsDamaged ? '✓ ' : ''}Furniture / contents also damaged
+            Furniture / contents also damaged
           </button>
         </div>
       </Section>

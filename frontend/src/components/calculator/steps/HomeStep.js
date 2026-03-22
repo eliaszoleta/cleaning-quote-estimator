@@ -147,7 +147,7 @@ export default function HomeStep({ value, onBack, onNext, primaryColor }) {
                 cursor: 'pointer', fontWeight: 600, fontSize: 13,
               }}
             >
-              {extras.includes(ex.id) ? '✓ ' : ''}{ex.label}
+              {ex.label}
             </button>
           ))}
         </div>

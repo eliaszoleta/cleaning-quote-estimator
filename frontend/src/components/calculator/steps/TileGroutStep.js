@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import StepWrapper from './StepWrapper';
 
 export default function TileGroutStep({ value, onBack, onNext, primaryColor }) {
@@ -28,7 +29,7 @@ export default function TileGroutStep({ value, onBack, onNext, primaryColor }) {
           ))}
         </div>
         {(tileType === 'natural_stone' || tileType === 'travertine') && (
-          <p style={{ fontSize: 12, color: '#d97706', marginTop: 6 }}>⚠ Natural stone requires specialized cleaning products — costs 30–40% more than ceramic.</p>
+          <p style={{ fontSize: 12, color: '#d97706', marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={12} /> Natural stone requires specialized cleaning products — costs 30–40% more than ceramic.</p>
         )}
       </Section>
 
@@ -44,7 +45,7 @@ export default function TileGroutStep({ value, onBack, onNext, primaryColor }) {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {[['deep_clean','Deep Clean & Scrub'],['grout_sealing','Grout Sealing'],['grout_recoloring','Grout Recoloring'],['caulk_replacement','Caulk Replacement']].map(([id,label]) => (
             <button key={id} onClick={() => toggleService(id)} style={{ padding: '9px 16px', borderRadius: 20, border: `2px solid ${services.includes(id) ? primaryColor : '#e2e8f0'}`, background: services.includes(id) ? `${primaryColor}15` : 'white', color: services.includes(id) ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
-              {services.includes(id) ? '✓ ' : ''}{label}
+              {label}
             </button>
           ))}
         </div>
@@ -64,7 +65,7 @@ export default function TileGroutStep({ value, onBack, onNext, primaryColor }) {
             { key: 'hardWater', val: hardWater, set: setHardWater, label: 'Hard water deposits' },
           ].map(({ key, val, set, label }) => (
             <button key={key} onClick={() => set(!val)} style={{ padding: '9px 16px', borderRadius: 20, border: `2px solid ${val ? primaryColor : '#e2e8f0'}`, background: val ? `${primaryColor}15` : 'white', color: val ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
-              {val ? '✓ ' : ''}{label}
+              {label}
             </button>
           ))}
         </div>

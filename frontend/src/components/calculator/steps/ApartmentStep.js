@@ -88,7 +88,7 @@ export default function ApartmentStep({ value, onBack, onNext, primaryColor }) {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {EXTRAS.map(ex => (
             <button key={ex.id} onClick={() => toggleExtra(ex.id)} style={{ padding: '8px 14px', borderRadius: 20, border: `2px solid ${extras.includes(ex.id) ? primaryColor : '#e2e8f0'}`, background: extras.includes(ex.id) ? `${primaryColor}15` : 'white', color: extras.includes(ex.id) ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
-              {extras.includes(ex.id) ? '✓ ' : ''}{ex.label}
+              {ex.label}
             </button>
           ))}
         </div>

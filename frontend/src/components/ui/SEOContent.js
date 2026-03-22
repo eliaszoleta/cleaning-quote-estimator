@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check } from 'lucide-react';
 
 const FAQ = [
   { q: 'How much does house cleaning cost in 2025?', a: 'The average house cleaning cost in 2025 is $120–$250 for a standard clean of a 1,500–2,500 sq ft home. Prices vary widely by state — California and New York average $160–$300, while Texas and Florida average $110–$200.' },
@@ -20,6 +21,18 @@ const STATES_DATA = [
   { state: 'Washington', avg: '$140–$250', note: 'Seattle/Bellevue among highest in nation' },
   { state: 'Colorado', avg: '$130–$230', note: 'Growing market, rates rising rapidly' },
   { state: 'Arizona', avg: '$105–$185', note: 'Lower cost market, growing population' },
+];
+
+const SERVICES = [
+  { Icon: Home,          title: 'House Cleaning',           range: '$120 – $250', detail: 'per visit, standard clean', href: '/?service=home_residential', facts: ['Prices based on sq footage & bedrooms', 'Deep clean costs 1.5–2× more', 'Recurring discounts up to 15%'] },
+  { Icon: Building2,     title: 'Apartment Cleaning',       range: '$85 – $200',  detail: 'per visit',                href: '/?service=apartment',         facts: ['Studio to 4+ bedroom', 'Move-in/out cleans cost more', 'Vacant units 10–15% cheaper'] },
+  { Icon: Building,      title: 'Commercial Cleaning',      range: '$200 – $2,000+', detail: 'per month',            href: '/?service=commercial',        facts: ['Priced per sq ft per visit', 'Frequency heavily affects cost', 'Medical/restaurant rates higher'] },
+  { Icon: Layers,        title: 'Carpet Cleaning',          range: '$100 – $300', detail: 'whole home',              href: '/?service=carpet',            facts: ['$25–$75 per room', 'Steam cleaning most effective', 'Pet odor treatment extra'] },
+  { Icon: Wind,          title: 'Air Duct Cleaning',        range: '$300 – $700', detail: 'per system',              href: '/?service=air_duct',          facts: ['Recommended every 3–5 years', 'More vents = higher cost', 'Mold treatment costs more'] },
+  { Icon: Flame,         title: 'Dryer Vent Cleaning',      range: '$100 – $200', detail: 'per dryer',               href: '/?service=dryer_vent',        facts: ['Prevents fire hazard', 'Annual cleaning recommended', 'Clogs cost $50–$100 extra'] },
+  { Icon: Grid3x3,       title: 'Tile & Grout Cleaning',   range: '$175 – $450', detail: 'per project',              href: '/?service=tile_grout',        facts: ['Natural stone costs more', 'Sealing adds $1–$2/sq ft', 'Recoloring transforms appearance'] },
+  { Icon: AlertTriangle, title: 'Mold Remediation',         range: '$500 – $6,000+', detail: 'requires inspection', href: '/?service=mold_remediation',  facts: ['In-person inspection required', 'Fix moisture source first', 'Air testing adds $200–$500'] },
+  { Icon: Droplets,      title: 'Water Damage Restoration', range: '$1,500 – $8,000+', detail: 'emergency service', href: '/?service=water_damage',      facts: ['Act within 24–48 hours', 'Category 3 (sewage) costs most', "Homeowner's insurance may cover"] },
 ];
 
 export default function SEOContent() {
@@ -47,37 +60,38 @@ export default function SEOContent() {
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 24px' }}>
 
           {/* Services grid */}
-          <div style={{ textAlign: 'center', marginBottom: 60 }}>
-            <h2 style={{ fontSize: 34, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>
+          <div style={{ textAlign: 'center', marginBottom: 52 }}>
+            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.5px' }}>
               Cleaning Cost Estimates for Every Service
             </h2>
-            <p style={{ fontSize: 18, color: '#64748b', maxWidth: 600, margin: '0 auto' }}>
+            <p style={{ fontSize: 17, color: '#64748b', maxWidth: 580, margin: '0 auto' }}>
               CleanCalc covers 9 cleaning and restoration services with ZIP-code specific pricing across all 50 states.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20, marginBottom: 80 }}>
-            {[
-              { icon: '🏠', title: 'House Cleaning', range: '$120 – $250', detail: 'per visit, standard clean', href: '/?service=home_residential', facts: ['Prices based on sq footage & bedrooms', 'Deep clean costs 1.5–2× more', 'Recurring discounts up to 15%'] },
-              { icon: '🏢', title: 'Apartment Cleaning', range: '$85 – $200', detail: 'per visit', href: '/?service=apartment', facts: ['Studio to 4+ bedroom', 'Move-in/out cleans cost more', 'Vacant units 10–15% cheaper'] },
-              { icon: '🏬', title: 'Commercial Cleaning', range: '$200 – $2,000+', detail: 'per month', href: '/?service=commercial', facts: ['Priced per sq ft per visit', 'Frequency heavily affects cost', 'Medical/restaurant rates higher'] },
-              { icon: '🪣', title: 'Carpet Cleaning', range: '$100 – $300', detail: 'whole home', href: '/?service=carpet', facts: ['$25–$75 per room', 'Steam cleaning most effective', 'Pet odor treatment extra'] },
-              { icon: '💨', title: 'Air Duct Cleaning', range: '$300 – $700', detail: 'per system', href: '/?service=air_duct', facts: ['Recommended every 3–5 years', 'More vents = higher cost', 'Mold treatment costs more'] },
-              { icon: '🔥', title: 'Dryer Vent Cleaning', range: '$100 – $200', detail: 'per dryer', href: '/?service=dryer_vent', facts: ['Prevents fire hazard', 'Annual cleaning recommended', 'Clogs cost $50–$100 extra'] },
-              { icon: '🔲', title: 'Tile & Grout Cleaning', range: '$175 – $450', detail: 'per project', href: '/?service=tile_grout', facts: ['Natural stone costs more', 'Sealing adds $1–$2/sq ft', 'Recoloring transforms appearance'] },
-              { icon: '⚠️', title: 'Mold Remediation', range: '$500 – $6,000+', detail: 'requires inspection', href: '/?service=mold_remediation', facts: ['In-person inspection required', 'Fix moisture source first', 'Air testing adds $200–$500'] },
-              { icon: '💧', title: 'Water Damage Restoration', range: '$1,500 – $8,000+', detail: 'emergency service', href: '/?service=water_damage', facts: ['Act within 24–48 hours', 'Category 3 (sewage) costs most', "Homeowner's insurance may cover"] },
-            ].map(s => (
-              <a key={s.title} href={s.href} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 30px rgba(37,99,235,0.12)'; e.currentTarget.style.borderColor = '#2563eb'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)'; e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'none'; }}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16, marginBottom: 80 }}>
+            {SERVICES.map(({ Icon, title, range, detail, href, facts }) => (
+              <a
+                key={title} href={href}
+                style={{ display: 'block', background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, padding: '22px 20px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 28px rgba(37,99,235,0.11)'; e.currentTarget.style.borderColor = '#2563eb'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.querySelector('.svc-icon').style.background = '#2563eb'; e.currentTarget.querySelector('.svc-icon').style.color = 'white'; }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'none'; e.currentTarget.querySelector('.svc-icon').style.background = '#f1f5f9'; e.currentTarget.querySelector('.svc-icon').style.color = '#475569'; }}
               >
-                <div style={{ fontSize: 32, marginBottom: 10 }}>{s.icon}</div>
-                <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>{s.title}</h3>
-                <div style={{ fontSize: 20, fontWeight: 900, color: '#2563eb', marginBottom: 2 }}>{s.range}</div>
-                <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>{s.detail}</div>
-                <ul style={{ listStyle: 'none', padding: 0 }}>
-                  {s.facts.map(f => <li key={f} style={{ fontSize: 13, color: '#475569', marginBottom: 4, display: 'flex', gap: 6 }}><span style={{ color: '#16a34a' }}>✓</span>{f}</li>)}
+                <div
+                  className="svc-icon"
+                  style={{ width: 40, height: 40, borderRadius: 10, background: '#f1f5f9', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, transition: 'all 0.2s' }}
+                >
+                  <Icon size={19} strokeWidth={1.8} />
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', marginBottom: 3 }}>{title}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: '#2563eb', marginBottom: 2, letterSpacing: '-0.3px' }}>{range}</div>
+                <div style={{ fontSize: 12.5, color: '#64748b', marginBottom: 14 }}>{detail}</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {facts.map(f => (
+                    <li key={f} style={{ fontSize: 13, color: '#475569', marginBottom: 5, display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                      <Check size={13} color="#16a34a" style={{ flexShrink: 0, marginTop: 1 }} />{f}
+                    </li>
+                  ))}
                 </ul>
               </a>
             ))}
@@ -85,41 +99,41 @@ export default function SEOContent() {
 
           {/* State pricing table */}
           <div style={{ marginBottom: 80 }}>
-            <h2 style={{ fontSize: 30, fontWeight: 800, color: '#0f172a', textAlign: 'center', marginBottom: 12 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
               House Cleaning Costs by State
             </h2>
-            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 36 }}>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, marginBottom: 32 }}>
               Average price for standard cleaning of a 2,000 sq ft home.
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
               {STATES_DATA.map(s => (
-                <div key={s.state} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f8fafc', borderRadius: 10, padding: '14px 18px', border: '1px solid #f1f5f9' }}>
+                <div key={s.state} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f8fafc', borderRadius: 10, padding: '13px 16px', border: '1px solid #f1f5f9' }}>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{s.state}</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{s.state}</div>
                     <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{s.note}</div>
                   </div>
-                  <div style={{ fontWeight: 800, fontSize: 16, color: '#2563eb', whiteSpace: 'nowrap', marginLeft: 12 }}>{s.avg}</div>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: '#2563eb', whiteSpace: 'nowrap', marginLeft: 12 }}>{s.avg}</div>
                 </div>
               ))}
             </div>
-            <p style={{ textAlign: 'center', fontSize: 13, color: '#94a3b8', marginTop: 16 }}>
+            <p style={{ textAlign: 'center', fontSize: 12.5, color: '#94a3b8', marginTop: 14 }}>
               Prices vary. <a href="/" style={{ color: '#2563eb' }}>Use the calculator above</a> for a ZIP-code specific estimate.
             </p>
           </div>
 
           {/* FAQ */}
           <div>
-            <h2 style={{ fontSize: 30, fontWeight: 800, color: '#0f172a', textAlign: 'center', marginBottom: 40 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 36, letterSpacing: '-0.3px' }}>
               Frequently Asked Questions
             </h2>
-            <div style={{ maxWidth: 820, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ maxWidth: 820, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {FAQ.map(({ q, a }) => (
-                <details key={q} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
-                  <summary style={{ padding: '18px 24px', fontWeight: 700, fontSize: 16, color: '#0f172a', cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <details key={q} style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
+                  <summary style={{ padding: '16px 22px', fontWeight: 600, fontSize: 15, color: '#0f172a', cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {q}
-                    <span style={{ fontSize: 20, color: '#2563eb', flexShrink: 0, marginLeft: 12 }}>+</span>
+                    <span style={{ fontSize: 18, color: '#2563eb', flexShrink: 0, marginLeft: 12, fontWeight: 400 }}>+</span>
                   </summary>
-                  <div style={{ padding: '0 24px 18px', fontSize: 15, color: '#374151', lineHeight: 1.7 }}>{a}</div>
+                  <div style={{ padding: '0 22px 16px', fontSize: 14.5, color: '#374151', lineHeight: 1.7 }}>{a}</div>
                 </details>
               ))}
             </div>

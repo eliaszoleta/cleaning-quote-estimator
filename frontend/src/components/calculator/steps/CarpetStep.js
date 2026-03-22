@@ -64,7 +64,7 @@ export default function CarpetStep({ value, onBack, onNext, primaryColor }) {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {[['area_rug','Area Rug'],['scotchgard','Scotchgard Protection'],['deodorizer','Deodorizer'],['pet_treatment','Pet Odor Treatment']].map(([id,label]) => (
             <button key={id} onClick={() => toggleExtra(id)} style={{ padding: '8px 14px', borderRadius: 20, border: `2px solid ${extras.includes(id) ? primaryColor : '#e2e8f0'}`, background: extras.includes(id) ? `${primaryColor}15` : 'white', color: extras.includes(id) ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
-              {extras.includes(id) ? '✓ ' : ''}{label}
+              {label}
             </button>
           ))}
         </div>
