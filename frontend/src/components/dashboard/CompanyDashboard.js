@@ -170,7 +170,11 @@ export default function CompanyDashboard({ user, onLogout }) {
               {error}
             </div>
           )}
-          {TABS[activeTab] || <div style={{ color: '#64748b' }}>Tab not found.</div>}
+          {Object.entries(TABS).map(([id, tab]) => (
+            <div key={id} style={{ display: id === activeTab ? 'block' : 'none' }}>
+              {tab}
+            </div>
+          ))}
         </main>
       </div>
     </div>
