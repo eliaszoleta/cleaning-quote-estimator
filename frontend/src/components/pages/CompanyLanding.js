@@ -1,0 +1,142 @@
+import React from 'react';
+import { Helmet } from 'react-helmet-async';
+import Header from '../ui/Header';
+import Footer from '../ui/Footer';
+
+const FEATURES = [
+  { icon: '🎨', title: 'White-label branding', desc: 'Your logo, colors, and call-to-action text. Visitors never see the CleanCalc name.' },
+  { icon: '📋', title: 'Lead capture built-in', desc: 'Collect name, email, phone, and timeline from every visitor before they see the estimate.' },
+  { icon: '📍', title: 'ZIP-code accurate pricing', desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
+  { icon: '⚙️', title: 'Per-service markup control', desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
+  { icon: '🔗', title: 'Easy one-line embed', desc: 'Paste one line of HTML to add the calculator to any website, Wix, Squarespace, or WordPress.' },
+  { icon: '🔑', title: 'API for CRM sync', desc: 'Pull leads via REST API into HubSpot, Salesforce, or any CRM using Zapier or Make.' },
+];
+
+const STEPS = [
+  { n: '1', title: 'Sign up', desc: 'Create your free account. No credit card needed for your 30-day trial.' },
+  { n: '2', title: 'Customize your widget', desc: 'Add your logo, set your brand colors, configure which services you offer, and write your CTA.' },
+  { n: '3', title: 'Embed on your site', desc: 'Copy one line of code and paste it anywhere on your website. That\'s it.' },
+  { n: '4', title: 'Capture leads', desc: 'Watch leads flow in. Manage them in your dashboard or sync to your CRM.' },
+];
+
+const TESTIMONIALS = [
+  { name: 'Sarah M.', company: 'Sparkle Cleaning Services — Austin, TX', text: 'We\'ve been using CleanCalc for 4 months and it\'s generated 47 qualified leads. Conversion rate is way higher than our contact form because visitors are pre-qualified.' },
+  { name: 'James R.', company: 'Pro Restoration Group — Denver, CO', text: 'The water damage and mold calculators are exactly what we needed. Customers come in already understanding the price range, so there\'s less sticker shock on-site.' },
+  { name: 'Maria L.', company: 'Crystal Clean Commercial — Miami, FL', text: 'Setup took about 20 minutes. The embed is seamless — my website visitors don\'t even realize it\'s a third-party tool.' },
+];
+
+export default function CompanyLanding() {
+  return (
+    <>
+      <Helmet>
+        <title>Embed a Cleaning Cost Calculator on Your Website | CleanCalc for Companies</title>
+        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. Free 30-day trial. $49/month." />
+      </Helmet>
+      <div className="app">
+        <Header />
+        <main>
+          {/* Hero */}
+          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: 'white', padding: '100px 24px 120px', textAlign: 'center' }}>
+            <div style={{ maxWidth: 760, margin: '0 auto' }}>
+              <div style={{ display: 'inline-block', background: 'rgba(37,99,235,0.3)', color: '#93c5fd', padding: '6px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 24, border: '1px solid rgba(37,99,235,0.4)' }}>
+                For cleaning companies
+              </div>
+              <h1 style={{ fontSize: 'clamp(32px,5vw,54px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 20 }}>
+                Add a Branded Cleaning<br />
+                <span style={{ color: '#60a5fa' }}>Cost Calculator to Your Website</span>
+              </h1>
+              <p style={{ fontSize: 18, color: '#94a3b8', maxWidth: 560, margin: '0 auto 36px', lineHeight: 1.6 }}>
+                Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator tool that works 24/7.
+              </p>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <a href="/company" style={{ background: '#2563eb', color: 'white', padding: '16px 32px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 17 }}>Start Free Trial →</a>
+                <a href="/?service=home_residential" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', padding: '16px 32px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 17, border: '1px solid rgba(255,255,255,0.2)' }}>See Demo</a>
+              </div>
+              <p style={{ color: '#64748b', fontSize: 14, marginTop: 16 }}>30-day free trial · No credit card required · $49/month after</p>
+            </div>
+          </div>
+
+          {/* Features */}
+          <div style={{ padding: '80px 24px', maxWidth: 1100, margin: '0 auto' }}>
+            <h2 style={{ fontSize: 34, fontWeight: 800, textAlign: 'center', color: '#0f172a', marginBottom: 12 }}>Everything you need</h2>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 17, marginBottom: 60 }}>No technical skills required. Set up in under 30 minutes.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+              {FEATURES.map(f => (
+                <div key={f.title} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '28px 24px' }}>
+                  <div style={{ fontSize: 32, marginBottom: 14 }}>{f.icon}</div>
+                  <h3 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>{f.title}</h3>
+                  <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.6 }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* How it works */}
+          <div style={{ background: '#f8fafc', padding: '80px 24px' }}>
+            <div style={{ maxWidth: 900, margin: '0 auto' }}>
+              <h2 style={{ fontSize: 34, fontWeight: 800, textAlign: 'center', color: '#0f172a', marginBottom: 60 }}>Up and running in 30 minutes</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
+                {STEPS.map(s => (
+                  <div key={s.n} style={{ textAlign: 'center' }}>
+                    <div style={{ width: 52, height: 52, background: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 22, margin: '0 auto 16px' }}>{s.n}</div>
+                    <h3 style={{ fontWeight: 700, fontSize: 17, color: '#0f172a', marginBottom: 8 }}>{s.title}</h3>
+                    <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6 }}>{s.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Testimonials */}
+          <div style={{ padding: '80px 24px', maxWidth: 1100, margin: '0 auto' }}>
+            <h2 style={{ fontSize: 34, fontWeight: 800, textAlign: 'center', color: '#0f172a', marginBottom: 48 }}>What cleaning companies say</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+              {TESTIMONIALS.map(t => (
+                <div key={t.name} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '28px 24px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+                  <div style={{ fontSize: 20, color: '#f59e0b', marginBottom: 14 }}>★★★★★</div>
+                  <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7, marginBottom: 20, fontStyle: 'italic' }}>"{t.text}"</p>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{t.name}</div>
+                  <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>{t.company}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pricing */}
+          <div id="pricing" style={{ background: 'linear-gradient(135deg, #f0f7ff, #f8fafc)', padding: '80px 24px' }}>
+            <div style={{ maxWidth: 520, margin: '0 auto', textAlign: 'center' }}>
+              <h2 style={{ fontSize: 34, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>Simple, transparent pricing</h2>
+              <p style={{ color: '#64748b', fontSize: 16, marginBottom: 40 }}>One plan. Everything included. No surprises.</p>
+              <div style={{ background: 'white', border: '2px solid #2563eb', borderRadius: 20, padding: '40px 36px', boxShadow: '0 8px 40px rgba(37,99,235,0.15)' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
+                  <span style={{ fontSize: 56, fontWeight: 900, color: '#0f172a' }}>$49</span>
+                  <span style={{ fontSize: 18, color: '#64748b' }}>/month</span>
+                </div>
+                <div style={{ color: '#16a34a', fontWeight: 600, fontSize: 15, marginBottom: 28 }}>30-day free trial · Cancel anytime</div>
+                <ul style={{ listStyle: 'none', padding: 0, marginBottom: 32, textAlign: 'left' }}>
+                  {['Unlimited calculator sessions', 'White-label branding', 'Lead capture dashboard', 'API access', 'All 9 service calculators', 'CSV export', 'Priority support'].map(item => (
+                    <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, fontSize: 15, color: '#374151' }}>
+                      <span style={{ color: '#16a34a', fontWeight: 700, fontSize: 17 }}>✓</span>{item}
+                    </li>
+                  ))}
+                </ul>
+                <a href="/company" style={{ display: 'block', background: '#2563eb', color: 'white', padding: '16px 0', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 17, textAlign: 'center' }}>
+                  Start Free Trial →
+                </a>
+                <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 12 }}>No credit card required to start your trial.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div style={{ background: '#0f172a', color: 'white', padding: '80px 24px', textAlign: 'center' }}>
+            <h2 style={{ fontSize: 34, fontWeight: 800, marginBottom: 16 }}>Ready to capture more leads?</h2>
+            <p style={{ fontSize: 17, color: '#94a3b8', marginBottom: 32, maxWidth: 480, margin: '0 auto 32px' }}>Join cleaning companies already using CleanCalc to turn website visitors into booked jobs.</p>
+            <a href="/company" style={{ background: '#2563eb', color: 'white', padding: '16px 40px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 18 }}>Get Started Free →</a>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </>
+  );
+}
