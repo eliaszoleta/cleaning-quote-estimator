@@ -20,9 +20,9 @@ const CLEANING_TYPES = [
 
 const FREQUENCY = [
   { id: 'one_time', label: 'One-Time' },
-  { id: 'weekly', label: 'Weekly', discount: '15% off' },
-  { id: 'biweekly', label: 'Bi-Weekly', discount: '10% off' },
-  { id: 'monthly', label: 'Monthly', discount: '5% off' },
+  { id: 'weekly', label: 'Weekly', discount: '20% off' },
+  { id: 'biweekly', label: 'Bi-Weekly', discount: '15% off' },
+  { id: 'monthly', label: 'Monthly', discount: '10% off' },
 ];
 
 const EXTRAS = [

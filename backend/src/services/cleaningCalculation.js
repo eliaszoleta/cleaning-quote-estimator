@@ -589,7 +589,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
   const cfg = companyConfig?.services?.moldRemediation || {};
   const markup = cfg.markup || 1.0;
 
-  let range = { ...MOLD_PRICE_RANGES[affectedSize] } || { ...MOLD_PRICE_RANGES.medium };
+  let range = { ...(MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium) };
   range = applyMultiplier(range, stateMultiplier * markup);
 
   if (propertyType === 'commercial') {
@@ -620,7 +620,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     serviceType: 'mold_remediation',
     totalLow: range.low,
     totalHigh: range.high,
-    basePrice: (MOLD_PRICE_RANGES[affectedSize].low + MOLD_PRICE_RANGES[affectedSize].high) / 2,
+    basePrice: ((MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium).low + (MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium).high) / 2,
     adjustments,
     unit: 'flat',
     recurringMonthlyLow: null,
@@ -653,9 +653,11 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
 
   const catMult = WATER_CATEGORY_MULTIPLIERS[waterCategory] || WATER_CATEGORY_MULTIPLIERS.clean;
 
-  // Base: extraction + drying
-  let range = applyMultiplier({ ...WATER_DAMAGE_RANGES.extraction_drying }, catMult.low);
-  range = { low: Math.round(range.low * catMult.low), high: Math.round(range.high * catMult.high) };
+  // Base: extraction + drying — apply category multiplier asymmetrically (low/high)
+  let range = {
+    low: Math.round(WATER_DAMAGE_RANGES.extraction_drying.low * catMult.low),
+    high: Math.round(WATER_DAMAGE_RANGES.extraction_drying.high * catMult.high),
+  };
   range = applyMultiplier(range, stateMultiplier * markup);
 
   const adjustments = [{ label: 'Water extraction + drying (3–5 days)', low: WATER_DAMAGE_RANGES.extraction_drying.low, high: WATER_DAMAGE_RANGES.extraction_drying.high }];

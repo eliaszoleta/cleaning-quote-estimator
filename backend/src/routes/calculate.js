@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { calculateCleaning } = require('../services/cleaningCalculation');
 const { STATE_PRICING_MULTIPLIERS, STATE_AVERAGE_HOME_CLEANING_COST, STATE_NAMES } = require('../config/defaults');
-const { getCompanyConfig } = require('./company');
+const { getCompanyConfig } = require('../services/companyConfig');
 const { saveLead } = require('./leads');
 
 const VALID_SERVICE_TYPES = [

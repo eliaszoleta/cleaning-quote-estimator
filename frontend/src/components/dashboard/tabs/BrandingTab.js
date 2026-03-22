@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
 
 export default function BrandingTab({ config, saveConfig, saving, saved }) {
@@ -7,22 +7,26 @@ export default function BrandingTab({ config, saveConfig, saving, saved }) {
     ctaHeadline: '', ctaSubtext: '', ctaButtonText: '', ctaPhone: '', ctaButtonUrl: '',
     fontFamily: 'Inter', frameHeight: '700', borderRadius: '12',
   });
+  const initialized = useRef(false);
 
   useEffect(() => {
-    if (config) setForm({
-      companyName: config.companyName || '',
-      logo: config.logo || '',
-      primaryColor: config.primaryColor || '#2563eb',
-      accentColor: config.accentColor || '#16a34a',
-      ctaHeadline: config.ctaHeadline || '',
-      ctaSubtext: config.ctaSubtext || '',
-      ctaButtonText: config.ctaButtonText || '',
-      ctaPhone: config.ctaPhone || '',
-      ctaButtonUrl: config.ctaButtonUrl || '',
-      fontFamily: config.fontFamily || 'Inter',
-      frameHeight: String(config.frameHeight || '700'),
-      borderRadius: String(config.borderRadius || '12'),
-    });
+    if (config && !initialized.current) {
+      initialized.current = true;
+      setForm({
+        companyName: config.companyName || '',
+        logo: config.logo || '',
+        primaryColor: config.primaryColor || '#2563eb',
+        accentColor: config.accentColor || '#16a34a',
+        ctaHeadline: config.ctaHeadline || '',
+        ctaSubtext: config.ctaSubtext || '',
+        ctaButtonText: config.ctaButtonText || '',
+        ctaPhone: config.ctaPhone || '',
+        ctaButtonUrl: config.ctaButtonUrl || '',
+        fontFamily: config.fontFamily || 'Inter',
+        frameHeight: String(config.frameHeight || '700'),
+        borderRadius: String(config.borderRadius || '12'),
+      });
+    }
   }, [config]);
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
