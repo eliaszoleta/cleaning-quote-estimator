@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
 
-export default function BrandingTab({ config, onStateChange }) {
+const BrandingTab = forwardRef(function BrandingTab({ config }, ref) {
   const [form, setForm] = useState({
     companyName: '', logo: '', primaryColor: '#2563eb', accentColor: '#16a34a',
     ctaHeadline: '', ctaSubtext: '', ctaButtonText: '', ctaPhone: '', ctaButtonUrl: '',
@@ -29,9 +29,8 @@ export default function BrandingTab({ config, onStateChange }) {
     }
   }, [config]);
 
-  useEffect(() => {
-    if (!initialized.current) return;
-    if (onStateChange) onStateChange({
+  useImperativeHandle(ref, () => ({
+    getData: () => ({
       companyName: form.companyName,
       logo: form.logo,
       primaryColor: form.primaryColor,
@@ -44,9 +43,8 @@ export default function BrandingTab({ config, onStateChange }) {
       fontFamily: form.fontFamily,
       frameHeight: parseInt(form.frameHeight) || 700,
       borderRadius: parseInt(form.borderRadius) || 12,
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form]);
+    }),
+  }), [form]);
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
@@ -140,7 +138,9 @@ export default function BrandingTab({ config, onStateChange }) {
       </div>
     </div>
   );
-}
+});
+
+export default BrandingTab;
 
 function Card({ title, children }) {
   return (

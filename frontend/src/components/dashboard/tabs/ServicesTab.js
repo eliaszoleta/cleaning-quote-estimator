@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 
 const SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning', icon: '🏠' },
@@ -14,7 +14,7 @@ const SERVICES = [
 
 const DEFAULT_SERVICE = { enabled: true, markup: 1.0, minimumCharge: null };
 
-export default function ServicesTab({ config, onStateChange }) {
+const ServicesTab = forwardRef(function ServicesTab({ config }, ref) {
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
   const [customQuestions, setCustomQuestions] = useState([]);
@@ -29,11 +29,9 @@ export default function ServicesTab({ config, onStateChange }) {
     }
   }, [config]);
 
-  useEffect(() => {
-    if (!initialized.current) return;
-    if (onStateChange) onStateChange({ services, enableLeadCapture, customLeadQuestions: customQuestions });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [services, enableLeadCapture, customQuestions]);
+  useImperativeHandle(ref, () => ({
+    getData: () => ({ services, enableLeadCapture, customLeadQuestions: customQuestions }),
+  }), [services, enableLeadCapture, customQuestions]);
 
   const getSvc = (id) => ({ ...DEFAULT_SERVICE, ...(services[id] || {}) });
   const setSvc = (id, key, val) => setServices(prev => ({ ...prev, [id]: { ...getSvc(id), [key]: val } }));
@@ -151,4 +149,6 @@ export default function ServicesTab({ config, onStateChange }) {
       </div>
     </div>
   );
-}
+});
+
+export default ServicesTab;
