@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { AlertCircle, MapPin, BarChart3, ShieldOff, Zap } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
 import ServiceSelect from './steps/ServiceSelect';
 import LocationStep from './steps/LocationStep';
@@ -211,8 +212,8 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
           {/* Error */}
           {error && (
-            <div style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '12px 24px', color: '#dc2626', fontSize: 14 }}>
-              ⚠ {error}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '11px 24px', color: '#dc2626', fontSize: 13.5 }}>
+              <AlertCircle size={15} /> {error}
             </div>
           )}
 
@@ -253,9 +254,16 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
         {/* Trust bar */}
         {!embedded && currentStep === 'service' && (
-          <div style={{ maxWidth: 720, margin: '24px auto 0', display: 'flex', justifyContent: 'center', gap: 32, flexWrap: 'wrap' }}>
-            {['🏠 All 50 states', '📊 9 service types', '🔒 No email required', '⚡ Instant results'].map(t => (
-              <span key={t} style={{ fontSize: 13, color: '#64748b', fontWeight: 500 }}>{t}</span>
+          <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', gap: 28, flexWrap: 'wrap' }}>
+            {[
+              { Icon: MapPin,    label: 'All 50 states' },
+              { Icon: BarChart3, label: '9 service types' },
+              { Icon: ShieldOff, label: 'No email required' },
+              { Icon: Zap,       label: 'Instant results' },
+            ].map(({ Icon, label }) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#64748b', fontWeight: 500 }}>
+                <Icon size={14} color="#94a3b8" /> {label}
+              </div>
             ))}
           </div>
         )}

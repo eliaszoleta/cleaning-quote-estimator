@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { MapPin, AlertTriangle, Zap, Phone, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
 
 export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset }) {
@@ -21,7 +22,6 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
   const companyName = companyConfig?.companyName || null;
 
   const urgColor = urgencyColor(urgencyLevel);
-  const isRecurring = unit === 'per_month' || recurringMonthlyLow;
   const isHighState = stateMultiplier >= 1.15;
   const isLowState = stateMultiplier <= 0.85;
 
@@ -57,57 +57,66 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
           {/* Result card */}
-          <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: embedded ? 'none' : '0 8px 40px rgba(0,0,0,0.10)', border: embedded ? 'none' : '1px solid #e2e8f0', marginBottom: 24 }}>
+          <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: embedded ? 'none' : '0 8px 40px rgba(0,0,0,0.10)', border: embedded ? 'none' : '1px solid #e2e8f0', marginBottom: 20 }}>
 
             {/* Header */}
-            <div style={{ background: headerBg, padding: '32px 40px', color: 'white' }}>
-              <div style={{ fontSize: 13, fontWeight: 600, opacity: 0.85, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                {serviceTypeLabel(serviceType)} Estimate • {stateName}
+            <div style={{ background: headerBg, padding: '28px 32px', color: 'white' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.8, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                {serviceTypeLabel(serviceType)} Estimate · {stateName}
               </div>
-              <div style={{ fontSize: 'clamp(36px, 8vw, 52px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 8 }}>
+              <div style={{ fontSize: 'clamp(32px, 8vw, 48px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 8, letterSpacing: '-1px' }}>
                 {formatPrice(totalLow)} – {formatPrice(totalHigh)}
               </div>
-              <div style={{ fontSize: 14, opacity: 0.85 }}>
+              <div style={{ fontSize: 13.5, opacity: 0.85 }}>
                 {unit === 'per_month' ? 'per month' : 'per visit'}
                 {isHighState && ` · ${stateName} is a higher-cost market`}
                 {isLowState && ` · ${stateName} is a lower-cost market`}
               </div>
 
-              {/* Recurring savings callout */}
               {recurringMonthlyLow && unit !== 'per_month' && (
-                <div style={{ marginTop: 16, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '12px 16px', display: 'inline-block' }}>
-                  <span style={{ fontWeight: 700 }}>Recurring: {formatPrice(recurringMonthlyLow)} – {formatPrice(recurringMonthlyHigh)}/visit</span>
-                  {recurringAnnualSavings && <span style={{ opacity: 0.9 }}> · Save ~{formatPrice(recurringAnnualSavings)}/year</span>}
+                <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '10px 14px', display: 'inline-block' }}>
+                  <span style={{ fontWeight: 700, fontSize: 13.5 }}>Recurring: {formatPrice(recurringMonthlyLow)} – {formatPrice(recurringMonthlyHigh)}/visit</span>
+                  {recurringAnnualSavings && <span style={{ opacity: 0.9, fontSize: 13 }}> · Save ~{formatPrice(recurringAnnualSavings)}/year</span>}
                 </div>
               )}
             </div>
 
             {/* Body */}
-            <div style={{ padding: '28px 32px' }}>
+            <div style={{ padding: '24px 28px' }}>
 
-              {/* Disclaimer (critical/high) */}
+              {/* Disclaimer */}
               {disclaimer && (
-                <div style={{ background: urgencyLevel === 'critical' ? '#fef2f2' : '#fffbeb', border: `1px solid ${urgencyLevel === 'critical' ? '#fecaca' : '#fde68a'}`, borderRadius: 10, padding: '14px 18px', marginBottom: 24 }}>
-                  <div style={{ fontWeight: 700, color: urgColor, marginBottom: 4, fontSize: 14 }}>
-                    {urgencyLevel === 'critical' ? '⚠ Important Notice' : '⚡ Heads Up'}
+                <div style={{ background: urgencyLevel === 'critical' ? '#fef2f2' : '#fffbeb', border: `1px solid ${urgencyLevel === 'critical' ? '#fecaca' : '#fde68a'}`, borderRadius: 10, padding: '13px 16px', marginBottom: 20, display: 'flex', gap: 10 }}>
+                  <div style={{ flexShrink: 0, marginTop: 1 }}>
+                    {urgencyLevel === 'critical'
+                      ? <AlertTriangle size={16} color="#dc2626" />
+                      : <Zap size={16} color="#d97706" />
+                    }
                   </div>
-                  <p style={{ fontSize: 13, color: urgencyLevel === 'critical' ? '#7f1d1d' : '#78350f', lineHeight: 1.6 }}>{disclaimer}</p>
+                  <div>
+                    <div style={{ fontWeight: 700, color: urgColor, marginBottom: 3, fontSize: 13 }}>
+                      {urgencyLevel === 'critical' ? 'Important Notice' : 'Heads Up'}
+                    </div>
+                    <p style={{ fontSize: 13, color: urgencyLevel === 'critical' ? '#7f1d1d' : '#78350f', lineHeight: 1.6, margin: 0 }}>{disclaimer}</p>
+                  </div>
                 </div>
               )}
 
               {/* Price breakdown */}
-              <div style={{ marginBottom: 24 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#374151', marginBottom: 12 }}>Price breakdown</h3>
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Price breakdown</div>
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
                   {adjustments.map((adj, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', borderBottom: i < adjustments.length - 1 ? '1px solid #f8fafc' : 'none', fontSize: 14, background: i % 2 === 0 ? 'white' : '#fafafa' }}>
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', borderBottom: i < adjustments.length - 1 ? '1px solid #f8fafc' : 'none', fontSize: 13.5, background: i % 2 === 0 ? 'white' : '#fafafa' }}>
                       <span style={{ color: '#374151', textTransform: 'capitalize' }}>{adj.label}</span>
                       <span style={{ fontWeight: 600, color: (adj.low < 0 || adj.high < 0) ? '#16a34a' : '#0f172a' }}>
-                        {adj.low < 0 ? `−${formatPrice(Math.abs(adj.low))} – −${formatPrice(Math.abs(adj.high))}` : (adj.low === 0 && adj.high === 0 ? 'Included' : formatPriceRange(adj.low, adj.high))}
+                        {adj.low < 0
+                          ? `−${formatPrice(Math.abs(adj.low))} – −${formatPrice(Math.abs(adj.high))}`
+                          : (adj.low === 0 && adj.high === 0 ? 'Included' : formatPriceRange(adj.low, adj.high))}
                       </span>
                     </div>
                   ))}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 16px', background: '#f8fafc', borderTop: '2px solid #e2e8f0', fontWeight: 700, fontSize: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '13px 14px', background: '#f8fafc', borderTop: '1.5px solid #e2e8f0', fontWeight: 700, fontSize: 15 }}>
                     <span>Estimated total</span>
                     <span style={{ color: primaryColor }}>{formatPriceRange(totalLow, totalHigh)}</span>
                   </div>
@@ -116,11 +125,11 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
               {/* Key factors */}
               {keyFactors.length > 0 && (
-                <div style={{ marginBottom: 24 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#374151', marginBottom: 12 }}>Key factors in your estimate</h3>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Key factors in your estimate</div>
+                  <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
                     {keyFactors.map((f, i) => (
-                      <div key={i} style={{ background: '#f1f5f9', borderRadius: 8, padding: '8px 14px', fontSize: 13 }}>
+                      <div key={i} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 7, padding: '6px 12px', fontSize: 12.5 }}>
                         <span style={{ color: '#64748b' }}>{f.label}: </span>
                         <span style={{ fontWeight: 600, color: '#0f172a', textTransform: 'capitalize' }}>{f.impact}</span>
                       </div>
@@ -130,35 +139,39 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
               )}
 
               {/* State cost context */}
-              <div style={{ background: '#f0f7ff', borderRadius: 10, padding: '14px 18px', marginBottom: 24, fontSize: 13, color: '#1e40af' }}>
-                <span style={{ fontWeight: 700 }}>📍 {stateName} market info: </span>
-                {stateMultiplier > 1.05 && `Prices in ${stateName} run ${Math.round((stateMultiplier - 1) * 100)}% above the national average due to higher cost of living and labor.`}
-                {stateMultiplier < 0.95 && `Prices in ${stateName} run ${Math.round((1 - stateMultiplier) * 100)}% below the national average, making this a lower-cost market.`}
-                {stateMultiplier >= 0.95 && stateMultiplier <= 1.05 && `${stateName} is close to the national average for cleaning service costs.`}
+              <div style={{ background: '#f0f7ff', borderRadius: 10, padding: '13px 16px', marginBottom: 20, fontSize: 13, color: '#1e40af', display: 'flex', gap: 9, alignItems: 'flex-start' }}>
+                <MapPin size={14} style={{ marginTop: 2, flexShrink: 0 }} />
+                <span>
+                  <strong>{stateName} market: </strong>
+                  {stateMultiplier > 1.05 && `Prices in ${stateName} run ${Math.round((stateMultiplier - 1) * 100)}% above the national average due to higher cost of living and labor.`}
+                  {stateMultiplier < 0.95 && `Prices in ${stateName} run ${Math.round((1 - stateMultiplier) * 100)}% below the national average, making this a lower-cost market.`}
+                  {stateMultiplier >= 0.95 && stateMultiplier <= 1.05 && `${stateName} is close to the national average for cleaning service costs.`}
+                </span>
               </div>
 
               {/* CTA */}
-              <div style={{ background: embedded && companyName ? `${primaryColor}08` : '#f8fafc', border: `1px solid ${embedded && companyName ? primaryColor + '30' : '#e2e8f0'}`, borderRadius: 12, padding: '20px 24px' }}>
-                {companyName && <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 4 }}>Ready to book with {companyName}?</div>}
-                {!companyName && <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 4 }}>Ready to get real quotes?</div>}
-                <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16 }}>
+              <div style={{ background: embedded && companyName ? `${primaryColor}08` : '#f8fafc', border: `1px solid ${embedded && companyName ? primaryColor + '28' : '#e2e8f0'}`, borderRadius: 12, padding: '18px 20px' }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>
+                  {companyName ? `Ready to book with ${companyName}?` : 'Ready to get real quotes?'}
+                </div>
+                <p style={{ fontSize: 13, color: '#64748b', marginBottom: 14, margin: '4px 0 14px' }}>
                   {companyName ? 'Contact us for a free, no-obligation on-site quote.' : 'Compare quotes from vetted local cleaning professionals.'}
                 </p>
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap' }}>
                   {ctaButtonUrl && (
                     <a href={ctaButtonUrl} target="_blank" rel="noopener noreferrer"
-                      style={{ background: primaryColor, color: 'white', padding: '12px 24px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
+                      style={{ background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
                       {ctaButtonText}
                     </a>
                   )}
                   {ctaPhone && (
                     <a href={`tel:${ctaPhone}`}
-                      style={{ background: '#16a34a', color: 'white', padding: '12px 24px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
-                      📞 Call {ctaPhone}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#16a34a', color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
+                      <Phone size={14} /> Call {ctaPhone}
                     </a>
                   )}
                   {!ctaButtonUrl && !ctaPhone && (
-                    <a href="/" style={{ background: primaryColor, color: 'white', padding: '12px 24px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
+                    <a href="/" style={{ background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
                       {ctaButtonText}
                     </a>
                   )}
@@ -168,24 +181,24 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
           </div>
 
           {/* Action buttons */}
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onReset} style={{ padding: '11px 22px', border: '2px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 14, color: '#374151' }}>
-              ← New Estimate
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={onReset} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, color: '#374151' }}>
+              <ArrowLeft size={14} /> New Estimate
             </button>
             {!embedded && (
-              <button onClick={handleShare} style={{ padding: '11px 22px', border: '2px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 14, color: '#374151' }}>
-                {shared ? '✓ Copied!' : '🔗 Share Results'}
+              <button onClick={handleShare} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, color: '#374151' }}>
+                {shared ? <><Check size={14} /> Copied!</> : <><Share2 size={14} /> Share Results</>}
               </button>
             )}
             {!embedded && (
-              <button onClick={() => window.print()} style={{ padding: '11px 22px', border: '2px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 14, color: '#374151' }}>
-                🖨 Print
+              <button onClick={() => window.print()} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, color: '#374151' }}>
+                <Printer size={14} /> Print
               </button>
             )}
           </div>
 
           {!embedded && (
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#94a3b8', marginTop: 20, maxWidth: 560, margin: '20px auto 0' }}>
+            <p style={{ textAlign: 'center', fontSize: 11.5, color: '#94a3b8', marginTop: 16, maxWidth: 520, margin: '16px auto 0' }}>
               These estimates are for informational purposes only. Actual prices vary. Always get multiple quotes from licensed, insured professionals.
             </p>
           )}

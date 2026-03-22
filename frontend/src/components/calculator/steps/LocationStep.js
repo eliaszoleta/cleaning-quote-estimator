@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ArrowLeft, MapPin } from 'lucide-react';
 
 const US_STATES = [
   ['AL','Alabama'],['AK','Alaska'],['AZ','Arizona'],['AR','Arkansas'],['CA','California'],
@@ -27,39 +28,34 @@ export default function LocationStep({ value, onBack, onNext, primaryColor }) {
   };
 
   const inputStyle = {
-    width: '100%',
-    padding: '14px 16px',
-    fontSize: 18,
-    border: '2px solid #e2e8f0',
-    borderRadius: 10,
-    outline: 'none',
-    marginTop: 8,
-    letterSpacing: 2,
+    width: '100%', padding: '13px 14px', fontSize: 16,
+    border: '1.5px solid #e2e8f0', borderRadius: 10,
+    outline: 'none', marginTop: 6, letterSpacing: 2, background: 'white',
   };
 
   return (
     <div>
-      <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Where is the property?</h2>
-      <p style={{ color: '#64748b', fontSize: 15, marginBottom: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
+        <div style={{ width: 36, height: 36, borderRadius: 9, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <MapPin size={17} color="#2563eb" />
+        </div>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.2px' }}>Where is the property?</h2>
+      </div>
+      <p style={{ color: '#64748b', fontSize: 13.5, marginBottom: 22 }}>
         Prices vary significantly by location. We use this to give you an accurate local estimate.
       </p>
 
       {/* Mode toggle */}
-      <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 10, padding: 4, marginBottom: 24, width: 'fit-content' }}>
+      <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 9, padding: 3, marginBottom: 20, width: 'fit-content' }}>
         {[['zip', 'ZIP Code'], ['state', 'State']].map(([m, label]) => (
           <button
-            key={m}
-            onClick={() => setMode(m)}
+            key={m} onClick={() => setMode(m)}
             style={{
-              padding: '8px 20px',
-              borderRadius: 8,
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: 600,
-              fontSize: 14,
+              padding: '7px 18px', borderRadius: 7, border: 'none', cursor: 'pointer',
+              fontWeight: 600, fontSize: 13.5,
               background: mode === m ? 'white' : 'transparent',
               color: mode === m ? '#0f172a' : '#64748b',
-              boxShadow: mode === m ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+              boxShadow: mode === m ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
               transition: 'all 0.15s',
             }}
           >
@@ -70,12 +66,9 @@ export default function LocationStep({ value, onBack, onNext, primaryColor }) {
 
       {mode === 'zip' ? (
         <div>
-          <label style={{ fontSize: 14, fontWeight: 600, color: '#374151' }}>ZIP Code</label>
+          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>ZIP Code</label>
           <input
-            type="text"
-            inputMode="numeric"
-            maxLength={5}
-            value={zip}
+            type="text" inputMode="numeric" maxLength={5} value={zip}
             onChange={e => setZip(e.target.value.replace(/\D/g, '').slice(0, 5))}
             placeholder="e.g. 90210"
             style={inputStyle}
@@ -84,44 +77,33 @@ export default function LocationStep({ value, onBack, onNext, primaryColor }) {
             onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
             autoFocus
           />
-          {zip && zip.length < 5 && (
-            <p style={{ color: '#94a3b8', fontSize: 13, marginTop: 6 }}>Enter 5 digits</p>
-          )}
+          {zip && zip.length < 5 && <p style={{ color: '#94a3b8', fontSize: 12.5, marginTop: 5 }}>Enter all 5 digits</p>}
         </div>
       ) : (
         <div>
-          <label style={{ fontSize: 14, fontWeight: 600, color: '#374151' }}>State</label>
+          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>State</label>
           <select
-            value={state}
-            onChange={e => setState(e.target.value)}
-            style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer', background: 'white' }}
+            value={state} onChange={e => setState(e.target.value)}
+            style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer' }}
             onFocus={e => { e.target.style.borderColor = primaryColor; }}
             onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
           >
             <option value="">Select your state…</option>
-            {US_STATES.map(([abbr, name]) => (
-              <option key={abbr} value={abbr}>{name}</option>
-            ))}
+            {US_STATES.map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
           </select>
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 12, marginTop: 32 }}>
+      <div style={{ display: 'flex', gap: 10, marginTop: 28, paddingTop: 20, borderTop: '1px solid #f1f5f9' }}>
         <button
           onClick={onBack}
-          style={{ padding: '14px 24px', border: '2px solid #e2e8f0', borderRadius: 10, background: 'white', cursor: 'pointer', fontSize: 15, fontWeight: 600, color: '#64748b' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '13px 20px', border: '1.5px solid #e2e8f0', borderRadius: 10, background: 'white', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#64748b' }}
         >
-          ← Back
+          <ArrowLeft size={15} /> Back
         </button>
         <button
-          onClick={handleNext}
-          disabled={!canContinue}
-          style={{
-            flex: 1, padding: '14px 24px', borderRadius: 10, border: 'none', cursor: canContinue ? 'pointer' : 'not-allowed',
-            fontSize: 15, fontWeight: 700, color: 'white',
-            background: canContinue ? primaryColor : '#94a3b8',
-            transition: 'all 0.15s',
-          }}
+          onClick={handleNext} disabled={!canContinue}
+          style={{ flex: 1, padding: '13px 20px', borderRadius: 10, border: 'none', cursor: canContinue ? 'pointer' : 'not-allowed', fontSize: 14, fontWeight: 700, color: 'white', background: canContinue ? primaryColor : '#cbd5e1', transition: 'all 0.15s' }}
         >
           Continue →
         </button>
