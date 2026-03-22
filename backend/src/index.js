@@ -29,6 +29,8 @@ app.use('/api/leads', publicCors);
 // Dashboard CORS — restricted to known origins
 const dashboardOrigins = [
   'http://localhost:3000',
+  'https://cleanestimator.com',
+  'https://www.cleanestimator.com',
   /\.vercel\.app$/,
   process.env.FRONTEND_URL,
 ].filter(Boolean);
