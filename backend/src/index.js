@@ -99,6 +99,30 @@ app.use('/api/company-leads', requireAuth, leadsRouter);
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'CleanCalc API', version: '1.0.0' }));
 
+// ─── DB connectivity check ────────────────────────────────────────────────────
+app.get('/api/debug/db', async (req, res) => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const result = {
+    supabase_url_set: !!supabaseUrl,
+    service_key_set: !!serviceKey,
+    service_key_looks_valid: serviceKey ? serviceKey.startsWith('eyJ') && serviceKey !== '<your service_role key>' : false,
+  };
+  if (result.service_key_looks_valid) {
+    try {
+      const axios = require('axios');
+      const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` };
+      const r = await axios.get(`${supabaseUrl}/rest/v1/cleaning_company_configs?select=company_id&limit=1`, { headers, timeout: 5000 });
+      result.supabase_read = 'ok';
+      result.row_count = r.data.length;
+    } catch (err) {
+      result.supabase_read = 'failed';
+      result.supabase_error = err.response?.data || err.message;
+    }
+  }
+  res.json(result);
+});
+
 // ─── 404 handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => res.status(404).json({ success: false, error: 'Not found' }));
 
