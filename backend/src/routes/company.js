@@ -13,6 +13,7 @@ router.get('/:id', async (req, res) => {
 
   try {
     let config = await getCompanyConfig(id);
+    console.log(`[GET config] user=${id} found=${!!config} services_keys=${config ? Object.keys(config.services || {}).join(',') : 'none'} homeResidential_enabled=${config?.services?.homeResidential?.enabled}`);
     if (!config) {
       // First login — create default config with trial start
       config = {
@@ -54,7 +55,9 @@ router.put('/:id', async (req, res) => {
     const merged = { ...existing, ...updates };
     // Never allow subscription to be overwritten from client
     merged.subscription = existing.subscription || DEFAULT_COMPANY_CONFIG.subscription;
+    console.log(`[PUT config] user=${id} saving homeResidential_enabled=${merged?.services?.homeResidential?.enabled}`);
     await saveCompanyConfig(id, merged);
+    console.log(`[PUT config] user=${id} save complete`);
     res.json({ success: true, data: merged });
   } catch (err) {
     console.error('PUT company config error:', err.message);
