@@ -10,9 +10,9 @@ const authRouter = require('./routes/auth');
 const subscriptionRouter = require('./routes/subscription');
 const leadsRouter = require('./routes/leads');
 const { requireAuth } = require('./middleware/auth');
-const { computeSubscriptionStatus } = require('./routes/subscription');
+const { computeSubscriptionStatus } = require('./services/subscriptionStatus');
 const { DEFAULT_COMPANY_CONFIG } = require('./config/defaults');
-const { getCompanyConfig } = require('./routes/company');
+const { getCompanyConfig } = require('./services/companyConfig');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
