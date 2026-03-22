@@ -13,7 +13,8 @@ router.get('/:id', async (req, res) => {
 
   try {
     let config = await getCompanyConfig(id);
-    console.log(`[GET config] user=${id} found=${!!config} services_keys=${config ? Object.keys(config.services || {}).join(',') : 'none'} homeResidential_enabled=${config?.services?.homeResidential?.enabled}`);
+    const svcStates = config ? Object.entries(config.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') : 'none';
+    console.log(`[GET config] user=${id} found=${!!config} | ${svcStates}`);
     if (!config) {
       // First login — create default config with trial start
       config = {
@@ -55,9 +56,12 @@ router.put('/:id', async (req, res) => {
     const merged = { ...existing, ...updates };
     // Never allow subscription to be overwritten from client
     merged.subscription = existing.subscription || DEFAULT_COMPANY_CONFIG.subscription;
-    console.log(`[PUT config] user=${id} saving homeResidential_enabled=${merged?.services?.homeResidential?.enabled}`);
+    const svcStatesIn = Object.entries(updates.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ');
+    const svcStatesMerged = Object.entries(merged.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ');
+    console.log(`[PUT config] user=${id} | received: ${svcStatesIn}`);
+    console.log(`[PUT config] user=${id} | merged:   ${svcStatesMerged}`);
     await saveCompanyConfig(id, merged);
-    console.log(`[PUT config] user=${id} save complete`);
+    console.log(`[PUT config] user=${id} | saved ok`);
     res.json({ success: true, data: merged });
   } catch (err) {
     console.error('PUT company config error:', err.message);
