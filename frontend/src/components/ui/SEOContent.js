@@ -66,7 +66,7 @@ export default function SEOContent() {
               { icon: '🔥', title: 'Dryer Vent Cleaning', range: '$100 – $200', detail: 'per dryer', href: '/?service=dryer_vent', facts: ['Prevents fire hazard', 'Annual cleaning recommended', 'Clogs cost $50–$100 extra'] },
               { icon: '🔲', title: 'Tile & Grout Cleaning', range: '$175 – $450', detail: 'per project', href: '/?service=tile_grout', facts: ['Natural stone costs more', 'Sealing adds $1–$2/sq ft', 'Recoloring transforms appearance'] },
               { icon: '⚠️', title: 'Mold Remediation', range: '$500 – $6,000+', detail: 'requires inspection', href: '/?service=mold_remediation', facts: ['In-person inspection required', 'Fix moisture source first', 'Air testing adds $200–$500'] },
-              { icon: '💧', title: 'Water Damage Restoration', range: '$1,500 – $8,000+', detail: 'emergency service', href: '/?service=water_damage', facts: ['Act within 24–48 hours', 'Category 3 (sewage) costs most', 'Homeowner's insurance may cover'] },
+              { icon: '💧', title: 'Water Damage Restoration', range: '$1,500 – $8,000+', detail: 'emergency service', href: '/?service=water_damage', facts: ['Act within 24–48 hours', 'Category 3 (sewage) costs most', "Homeowner's insurance may cover"] },
             ].map(s => (
               <a key={s.title} href={s.href} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}
                 onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 30px rgba(37,99,235,0.12)'; e.currentTarget.style.borderColor = '#2563eb'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
