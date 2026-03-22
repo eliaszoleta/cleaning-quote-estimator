@@ -31,6 +31,7 @@ router.get('/:id', async (req, res) => {
       };
       await saveCompanyConfig(id, config);
     }
+    res.set('Cache-Control', 'no-store');
     res.json({ success: true, data: config });
   } catch (err) {
     console.error('GET company config error:', err.message);
