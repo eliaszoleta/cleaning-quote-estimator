@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
 import { supabase } from '../../lib/supabase';
@@ -23,14 +23,25 @@ const NAV = [
 export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [subStatus, setSubStatus] = useState(null);
-  const brandingRef = useRef(null);
-  const servicesRef = useRef(null);
+  const [localConfig, setLocalConfig] = useState(null);
   const { config, loading, saving, saved, error, saveConfig } = useCompanyConfig(user.id);
 
+  // Initialize localConfig once from the fetched config (never reinitialize after that)
+  const localConfigReady = useRef(false);
+  useEffect(() => {
+    if (config && !localConfigReady.current) {
+      localConfigReady.current = true;
+      setLocalConfig({ ...config });
+    }
+  }, [config]);
+
+  // Tabs call this to update any slice of localConfig
+  const update = useCallback((partial) => {
+    setLocalConfig(prev => prev ? { ...prev, ...partial } : { ...partial });
+  }, []);
+
   const handleGlobalSave = () => {
-    const brandingData = brandingRef.current?.getData() || {};
-    const servicesData = servicesRef.current?.getData() || {};
-    saveConfig({ ...brandingData, ...servicesData });
+    if (localConfig) saveConfig(localConfig);
   };
 
   // Parse tab from URL
@@ -94,8 +105,8 @@ export default function CompanyDashboard({ user, onLogout }) {
 
   const TABS = {
     overview: <OverviewTab {...tabProps} />,
-    branding: <BrandingTab ref={brandingRef} config={config} />,
-    services: <ServicesTab ref={servicesRef} config={config} />,
+    branding: <BrandingTab config={localConfig} update={update} />,
+    services: <ServicesTab config={localConfig} update={update} />,
     embed: <EmbedTab {...tabProps} />,
     leads: <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab {...tabProps} />,

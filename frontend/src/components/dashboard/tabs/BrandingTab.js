@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
 
-const BrandingTab = forwardRef(function BrandingTab({ config }, ref) {
+export default function BrandingTab({ config, update }) {
   const [form, setForm] = useState({
     companyName: '', logo: '', primaryColor: '#2563eb', accentColor: '#16a34a',
     ctaHeadline: '', ctaSubtext: '', ctaButtonText: '', ctaPhone: '', ctaButtonUrl: '',
@@ -29,24 +29,27 @@ const BrandingTab = forwardRef(function BrandingTab({ config }, ref) {
     }
   }, [config]);
 
-  useImperativeHandle(ref, () => ({
-    getData: () => ({
-      companyName: form.companyName,
-      logo: form.logo,
-      primaryColor: form.primaryColor,
-      accentColor: form.accentColor,
-      ctaHeadline: form.ctaHeadline,
-      ctaSubtext: form.ctaSubtext,
-      ctaButtonText: form.ctaButtonText,
-      ctaPhone: form.ctaPhone,
-      ctaButtonUrl: form.ctaButtonUrl,
-      fontFamily: form.fontFamily,
-      frameHeight: parseInt(form.frameHeight) || 700,
-      borderRadius: parseInt(form.borderRadius) || 12,
-    }),
-  }), [form]);
-
-  const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
+  const set = (key, val) => {
+    setForm(f => {
+      const next = { ...f, [key]: val };
+      // Keep localConfig in sync so Save Changes always has the latest branding
+      if (update) update({
+        companyName: next.companyName,
+        logo: next.logo,
+        primaryColor: next.primaryColor,
+        accentColor: next.accentColor,
+        ctaHeadline: next.ctaHeadline,
+        ctaSubtext: next.ctaSubtext,
+        ctaButtonText: next.ctaButtonText,
+        ctaPhone: next.ctaPhone,
+        ctaButtonUrl: next.ctaButtonUrl,
+        fontFamily: next.fontFamily,
+        frameHeight: parseInt(next.frameHeight) || 700,
+        borderRadius: parseInt(next.borderRadius) || 12,
+      });
+      return next;
+    });
+  };
 
   const previewConfig = {
     companyName: form.companyName,
@@ -138,9 +141,7 @@ const BrandingTab = forwardRef(function BrandingTab({ config }, ref) {
       </div>
     </div>
   );
-});
-
-export default BrandingTab;
+}
 
 function Card({ title, children }) {
   return (
