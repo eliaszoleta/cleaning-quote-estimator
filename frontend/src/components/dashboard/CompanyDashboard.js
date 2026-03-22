@@ -106,7 +106,7 @@ export default function CompanyDashboard({ user, onLogout }) {
   const TABS = {
     overview: <OverviewTab {...tabProps} />,
     branding: <BrandingTab config={localConfig} update={update} />,
-    services: <ServicesTab config={localConfig} update={update} />,
+    services: <ServicesTab config={localConfig} companyId={user.id} update={update} />,
     embed: <EmbedTab {...tabProps} />,
     leads: <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab {...tabProps} />,

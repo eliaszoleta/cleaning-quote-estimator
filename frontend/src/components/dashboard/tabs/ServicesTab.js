@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from '../../../lib/supabase';
+import { patchCompanyServices } from '../../../utils/api';
 
 const SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning', icon: '🏠' },
@@ -14,11 +16,14 @@ const SERVICES = [
 
 const DEFAULT_SERVICE = { enabled: true, markup: 1.0, minimumCharge: null };
 
-export default function ServicesTab({ config, update }) {
+export default function ServicesTab({ config, companyId, update }) {
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
   const [customQuestions, setCustomQuestions] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [savedMsg, setSavedMsg] = useState('');
   const initialized = useRef(false);
+  const markupTimers = useRef({});
 
   useEffect(() => {
     if (config && !initialized.current) {
@@ -31,13 +36,45 @@ export default function ServicesTab({ config, update }) {
 
   const getSvc = (id) => ({ ...DEFAULT_SERVICE, ...(services[id] || {}) });
 
-  const setSvc = (id, key, val) => {
-    setServices(prev => {
-      const next = { ...prev, [id]: { ...getSvc(id), [key]: val } };
-      // Update localConfig immediately — services are always current on Save
-      if (update) update({ services: next });
-      return next;
-    });
+  // Auto-save services to dedicated backend endpoint — no global save needed
+  const saveServices = async (nextServices) => {
+    try {
+      setSaving(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) return;
+      await patchCompanyServices(token, companyId, nextServices);
+      setSavedMsg('Saved');
+      setTimeout(() => setSavedMsg(''), 2000);
+      if (update) update({ services: nextServices });
+    } catch (err) {
+      console.error('Failed to save services:', err.message);
+      setSavedMsg('Error saving');
+      setTimeout(() => setSavedMsg(''), 3000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleService = (id, enabled) => {
+    const next = { ...services, [id]: { ...getSvc(id), enabled } };
+    setServices(next);
+    saveServices(next);
+  };
+
+  const setMarkup = (id, markup) => {
+    const next = { ...services, [id]: { ...getSvc(id), markup } };
+    setServices(next);
+    // Debounce markup saves to avoid hammering the API on every keystroke
+    clearTimeout(markupTimers.current[id]);
+    markupTimers.current[id] = setTimeout(() => saveServices(next), 800);
+  };
+
+  const setMinCharge = (id, minimumCharge) => {
+    const next = { ...services, [id]: { ...getSvc(id), minimumCharge } };
+    setServices(next);
+    clearTimeout(markupTimers.current[`min_${id}`]);
+    markupTimers.current[`min_${id}`] = setTimeout(() => saveServices(next), 800);
   };
 
   const setLeadCapture = (val) => {
@@ -75,9 +112,16 @@ export default function ServicesTab({ config, update }) {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Services & Pricing</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Enable the services you offer and optionally adjust pricing markup.</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+        <div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Services & Pricing</h2>
+          <p style={{ color: '#64748b', fontSize: 14 }}>Changes save automatically when you toggle a service.</p>
+        </div>
+        {(saving || savedMsg) && (
+          <div style={{ fontSize: 13, fontWeight: 600, color: saving ? '#64748b' : savedMsg === 'Saved' ? '#16a34a' : '#dc2626', padding: '8px 16px', background: saving ? '#f1f5f9' : savedMsg === 'Saved' ? '#f0fdf4' : '#fef2f2', borderRadius: 8 }}>
+            {saving ? 'Saving…' : savedMsg}
+          </div>
+        )}
       </div>
 
       {/* Services */}
@@ -99,7 +143,7 @@ export default function ServicesTab({ config, update }) {
                     <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Markup:</label>
                     <input
                       type="number" step={0.05} min={0.5} max={3.0} value={s.markup}
-                      onChange={e => setSvc(svc.id, 'markup', parseFloat(e.target.value) || 1.0)}
+                      onChange={e => setMarkup(svc.id, parseFloat(e.target.value) || 1.0)}
                       style={{ ...input, width: 70 }}
                     />
                     <span style={{ fontSize: 12, color: '#94a3b8' }}>×</span>
@@ -111,7 +155,7 @@ export default function ServicesTab({ config, update }) {
                     <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Min $:</label>
                     <input
                       type="number" min={0} value={s.minimumCharge || ''}
-                      onChange={e => setSvc(svc.id, 'minimumCharge', e.target.value ? parseInt(e.target.value) : null)}
+                      onChange={e => setMinCharge(svc.id, e.target.value ? parseInt(e.target.value) : null)}
                       placeholder="Default"
                       style={{ ...input, width: 80 }}
                     />
@@ -119,7 +163,12 @@ export default function ServicesTab({ config, update }) {
                 )}
 
                 <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-                  <input type="checkbox" checked={s.enabled} onChange={e => setSvc(svc.id, 'enabled', e.target.checked)} style={{ width: 18, height: 18, cursor: 'pointer' }} />
+                  <input
+                    type="checkbox"
+                    checked={s.enabled}
+                    onChange={e => toggleService(svc.id, e.target.checked)}
+                    style={{ width: 18, height: 18, cursor: 'pointer' }}
+                  />
                   <span style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>{s.enabled ? 'On' : 'Off'}</span>
                 </label>
               </div>

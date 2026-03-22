@@ -29,6 +29,12 @@ export async function putCompanyConfig(token, companyId, config) {
   });
 }
 
+export async function patchCompanyServices(token, companyId, services) {
+  return apiFetch(`/api/company/${companyId}/services`, {
+    method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ services }),
+  });
+}
+
 export async function getSubscriptionStatus(token) {
   return apiFetch('/api/subscription/status', { headers: { Authorization: `Bearer ${token}` } });
 }

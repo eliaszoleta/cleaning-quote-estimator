@@ -69,6 +69,32 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// PATCH /api/company/:id/services — save ONLY services (deep merge, dedicated endpoint)
+router.patch('/:id/services', async (req, res) => {
+  const { id } = req.params;
+  if (req.user.id !== id) return res.status(403).json({ success: false, error: 'Forbidden' });
+
+  const { services } = req.body;
+  if (!services || typeof services !== 'object') {
+    return res.status(400).json({ success: false, error: 'Invalid services object' });
+  }
+
+  try {
+    const existing = (await getCompanyConfig(id)) || { ...DEFAULT_COMPANY_CONFIG };
+    // Deep merge: existing services + incoming changes (preserves unmentioned services)
+    const mergedServices = { ...(existing.services || {}), ...services };
+    const updated = { ...existing, services: mergedServices };
+    updated.subscription = existing.subscription || DEFAULT_COMPANY_CONFIG.subscription;
+    const svcLog = Object.entries(mergedServices).map(([k,v]) => `${k}=${v?.enabled}`).join(' ');
+    console.log(`[PATCH services] user=${id} | ${svcLog}`);
+    await saveCompanyConfig(id, updated);
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    console.error('PATCH services error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to save services' });
+  }
+});
+
 // GET /api/company/:id/public — branding only, no auth (for widget)
 router.get('/:id/public', async (req, res) => {
   try {
