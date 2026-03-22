@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
 
-export default function BrandingTab({ config, saveConfig, saving, saved }) {
+export default function BrandingTab({ config, onStateChange }) {
   const [form, setForm] = useState({
     companyName: '', logo: '', primaryColor: '#2563eb', accentColor: '#16a34a',
     ctaHeadline: '', ctaSubtext: '', ctaButtonText: '', ctaPhone: '', ctaButtonUrl: '',
@@ -29,10 +29,9 @@ export default function BrandingTab({ config, saveConfig, saving, saved }) {
     }
   }, [config]);
 
-  const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
-
-  const handleSave = () => {
-    saveConfig({
+  useEffect(() => {
+    if (!initialized.current) return;
+    if (onStateChange) onStateChange({
       companyName: form.companyName,
       logo: form.logo,
       primaryColor: form.primaryColor,
@@ -46,7 +45,10 @@ export default function BrandingTab({ config, saveConfig, saving, saved }) {
       frameHeight: parseInt(form.frameHeight) || 700,
       borderRadius: parseInt(form.borderRadius) || 12,
     });
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
+  const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
   const previewConfig = {
     companyName: form.companyName,
@@ -66,14 +68,9 @@ export default function BrandingTab({ config, saveConfig, saving, saved }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
-        <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Widget Branding</h2>
-          <p style={{ color: '#64748b', fontSize: 14 }}>Customize how your calculator looks on your website.</p>
-        </div>
-        <button onClick={handleSave} disabled={saving} style={{ padding: '10px 24px', background: saving ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 14 }}>
-          {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save Changes'}
-        </button>
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Widget Branding</h2>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Customize how your calculator looks on your website.</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'start' }}>

@@ -14,7 +14,7 @@ const SERVICES = [
 
 const DEFAULT_SERVICE = { enabled: true, markup: 1.0, minimumCharge: null };
 
-export default function ServicesTab({ config, saveConfig, saving, saved }) {
+export default function ServicesTab({ config, onStateChange }) {
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
   const [customQuestions, setCustomQuestions] = useState([]);
@@ -29,6 +29,12 @@ export default function ServicesTab({ config, saveConfig, saving, saved }) {
     }
   }, [config]);
 
+  useEffect(() => {
+    if (!initialized.current) return;
+    if (onStateChange) onStateChange({ services, enableLeadCapture, customLeadQuestions: customQuestions });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [services, enableLeadCapture, customQuestions]);
+
   const getSvc = (id) => ({ ...DEFAULT_SERVICE, ...(services[id] || {}) });
   const setSvc = (id, key, val) => setServices(prev => ({ ...prev, [id]: { ...getSvc(id), [key]: val } }));
 
@@ -36,24 +42,15 @@ export default function ServicesTab({ config, saveConfig, saving, saved }) {
   const removeQuestion = (idx) => setCustomQuestions(prev => prev.filter((_, i) => i !== idx));
   const updateQuestion = (idx, key, val) => setCustomQuestions(prev => prev.map((q, i) => i === idx ? { ...q, [key]: val } : q));
 
-  const handleSave = () => {
-    saveConfig({ services, enableLeadCapture, customLeadQuestions: customQuestions });
-  };
-
   const input = {
     padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: 13, color: '#0f172a', outline: 'none',
   };
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
-        <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Services & Pricing</h2>
-          <p style={{ color: '#64748b', fontSize: 14 }}>Enable the services you offer and optionally adjust pricing markup.</p>
-        </div>
-        <button onClick={handleSave} disabled={saving} style={{ padding: '10px 24px', background: saving ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 14 }}>
-          {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save Changes'}
-        </button>
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Services & Pricing</h2>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Enable the services you offer and optionally adjust pricing markup.</p>
       </div>
 
       {/* Services */}

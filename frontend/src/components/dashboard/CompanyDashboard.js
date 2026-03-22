@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
 import { supabase } from '../../lib/supabase';
@@ -23,7 +23,19 @@ const NAV = [
 export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [subStatus, setSubStatus] = useState(null);
+  const [hasUnsaved, setHasUnsaved] = useState(false);
+  const pendingChanges = useRef({});
   const { config, loading, saving, saved, error, saveConfig } = useCompanyConfig(user.id);
+
+  const handleTabStateChange = (partial) => {
+    pendingChanges.current = { ...pendingChanges.current, ...partial };
+    setHasUnsaved(true);
+  };
+
+  const handleGlobalSave = () => {
+    saveConfig(pendingChanges.current);
+    setHasUnsaved(false);
+  };
 
   // Parse tab from URL
   useEffect(() => {
@@ -86,8 +98,8 @@ export default function CompanyDashboard({ user, onLogout }) {
 
   const TABS = {
     overview: <OverviewTab {...tabProps} />,
-    branding: <BrandingTab {...tabProps} />,
-    services: <ServicesTab {...tabProps} />,
+    branding: <BrandingTab config={config} onStateChange={handleTabStateChange} />,
+    services: <ServicesTab config={config} onStateChange={handleTabStateChange} />,
     embed: <EmbedTab {...tabProps} />,
     leads: <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab {...tabProps} />,
@@ -117,7 +129,12 @@ export default function CompanyDashboard({ user, onLogout }) {
                subStatus.status === 'past_due' ? '⚠ Past Due' : 'Expired'}
             </div>
           )}
-          {saved && <span style={{ color: '#4ade80', fontSize: 13, fontWeight: 600 }}>✓ Saved</span>}
+          {hasUnsaved && (
+            <button onClick={handleGlobalSave} disabled={saving} style={{ padding: '8px 18px', background: saving ? '#475569' : '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 13 }}>
+              {saving ? 'Saving…' : 'Save Changes'}
+            </button>
+          )}
+          {saved && !hasUnsaved && <span style={{ color: '#4ade80', fontSize: 13, fontWeight: 600 }}>✓ Saved</span>}
           <span style={{ color: '#64748b', fontSize: 13 }}>{user.email}</span>
           <button onClick={onLogout} style={{ background: '#1e293b', color: '#94a3b8', border: 'none', padding: '8px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             Sign Out
