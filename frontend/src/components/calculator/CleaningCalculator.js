@@ -44,6 +44,7 @@ const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Your Info', 'Results
 
 export default function CleaningCalculator({ companyConfig = null, embedded = false }) {
   const cardRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
   const [serviceType, setServiceType] = useState(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [location, setLocation] = useState({ zip: '', state: '' });
@@ -55,6 +56,12 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   const steps = serviceType ? SERVICE_STEPS[serviceType] : ['service'];
   const currentStep = steps[stepIndex];
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 640);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   // Pre-select service from URL param
   useEffect(() => {
@@ -237,7 +244,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           )}
 
           {/* Steps */}
-          <div style={{ padding: embedded ? '20px 16px' : '32px 40px' }}>
+          <div style={{ padding: embedded ? '20px 16px' : isMobile ? '20px 16px' : '32px 40px' }}>
             {currentStep === 'service' && (
               <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} />
             )}

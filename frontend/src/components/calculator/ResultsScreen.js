@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, AlertTriangle, Zap, Phone, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
 
 export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset }) {
   const [shared, setShared] = useState(false);
+
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, []);
 
   if (!result) return null;
 

@@ -44,7 +44,7 @@ export default function ApartmentStep({ value, onBack, onNext, primaryColor }) {
   return (
     <StepWrapper title="Apartment details" subtitle="Get an accurate quote for your unit" onBack={onBack} onNext={() => onNext({ size, bathrooms, cleaningType, frequency, furnished, extras })} primaryColor={primaryColor}>
       <Section label="Apartment size">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
           {SIZES.map(o => (
             <Opt key={o.id} selected={size === o.id} onClick={() => setSize(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>{o.label}</div>

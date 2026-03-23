@@ -76,7 +76,7 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor }) 
       </Section>
 
       <Section label="Service level">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
           {SERVICE_LEVELS.map(l => (
             <button key={l.id} onClick={() => setServiceLevel(l.id)} style={{ padding: '12px 10px', textAlign: 'left', borderRadius: 10, border: `2px solid ${serviceLevel === l.id ? primaryColor : '#e2e8f0'}`, background: serviceLevel === l.id ? `${primaryColor}10` : 'white', cursor: 'pointer', width: '100%' }}>
               <div style={{ fontWeight: 700, fontSize: 14, color: serviceLevel === l.id ? primaryColor : '#0f172a' }}>{l.label}</div>
@@ -87,12 +87,12 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor }) 
       </Section>
 
       <Section label="Options">
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
           {[
             { key: 'dayPorter', val: dayPorter, set: setDayPorter, label: 'Day Porter Service', hint: 'On-site porter during business hours' },
             { key: 'afterHours', val: afterHours, set: setAfterHours, label: 'After-Hours Cleaning', hint: '+15% for after-hours access' },
           ].map(({ key, val, set, label, hint }) => (
-            <button key={key} onClick={() => set(!val)} style={{ padding: '12px 16px', borderRadius: 10, border: `2px solid ${val ? primaryColor : '#e2e8f0'}`, background: val ? `${primaryColor}10` : 'white', cursor: 'pointer', textAlign: 'left', minWidth: 200 }}>
+            <button key={key} onClick={() => set(!val)} style={{ padding: '12px 16px', borderRadius: 10, border: `2px solid ${val ? primaryColor : '#e2e8f0'}`, background: val ? `${primaryColor}10` : 'white', cursor: 'pointer', textAlign: 'left', width: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14, color: val ? primaryColor : '#374151' }}>
                 <span style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${val ? primaryColor : '#94a3b8'}`, background: val ? primaryColor : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{val ? <Check size={11} color="white" strokeWidth={3} /> : null}</span>
                 {label}
