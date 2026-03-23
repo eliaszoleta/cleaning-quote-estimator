@@ -155,7 +155,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
           <meta property="og:type" content="website" />
           <meta property="og:url" content="https://www.cleanestimator.com/" />
+          <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
+          <meta property="og:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:site" content="@CleanEstimator" />
           <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+          <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
+          <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         </Helmet>
       )}
 
@@ -175,7 +181,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
               <span style={{ color: primaryColor }}>In Your Area?</span>
             </h1>
             <p style={{ fontSize: 18, color: '#64748b', maxWidth: 560, margin: '0 auto' }}>
-              Get an accurate, ZIP-code specific estimate for any cleaning service in seconds.
+              Clean Estimator gives you accurate, ZIP-code specific estimates for any cleaning service in seconds.
             </p>
           </div>
         )}

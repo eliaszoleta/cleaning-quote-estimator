@@ -90,6 +90,12 @@ export default function SEOContent() {
       '@type': 'Organization',
       name: 'Clean Estimator',
       url: 'https://www.cleanestimator.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.cleanestimator.com/og-image.png',
+        width: 1200,
+        height: 630,
+      },
     },
   };
 
@@ -105,9 +111,16 @@ export default function SEOContent() {
         <meta property="og:description" content="Instant ZIP-code specific cleaning cost estimates. House cleaning, carpet, air duct, mold remediation and more. Free, no signup." />
         <meta property="og:url" content="https://www.cleanestimator.com/" />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
+        <meta property="og:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@CleanEstimator" />
         <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
         <meta name="twitter:description" content="Free cleaning cost calculator — instant ZIP-code specific estimates for any cleaning service. No signup required." />
+        <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
+        <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(webAppSchema)}</script>
       </Helmet>

@@ -6,6 +6,12 @@
     <meta name="theme-color" content="#2563eb" />
     <meta name="robots" content="index, follow" />
 
+    <!-- ═══ Favicons ═══ -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" sizes="any" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
     <!-- ═══ Primary SEO ═══ -->
     <title>Free Cleaning Cost Estimator 2026 | Clean Estimator</title>
     <meta name="description" content="Free cleaning cost calculator for 2026. Instant ZIP-code specific estimates for house cleaning ($120–$250), carpet cleaning ($100–$300), air duct ($300–$700), commercial, mold remediation & more. No signup needed." />
@@ -21,6 +27,8 @@
     <meta property="og:url" content="https://www.cleanestimator.com/" />
     <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
     <meta property="og:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <!-- ═══ Twitter Card ═══ -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -28,6 +36,7 @@
     <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
     <meta name="twitter:description" content="Instant, ZIP-code specific cleaning cost estimates for any service. Free, no signup required." />
     <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
+    <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
 
     <!-- ═══ Canonical ═══ -->
     <link rel="canonical" href="https://www.cleanestimator.com/" />
@@ -38,16 +47,25 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Clean Estimator",
-      "alternateName": ["CleanEstimator"],
       "url": "https://www.cleanestimator.com",
       "description": "Free cleaning cost estimator for US homeowners and businesses. Instant, ZIP-code specific estimates for house cleaning, carpet, air duct, mold remediation, and more.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.cleanestimator.com/?service={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      },
       "publisher": {
         "@type": "Organization",
         "name": "Clean Estimator",
         "url": "https://www.cleanestimator.com",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://www.cleanestimator.com/og-image.png"
+          "url": "https://www.cleanestimator.com/og-image.png",
+          "width": 1200,
+          "height": 630
         },
         "contactPoint": {
           "@type": "ContactPoint",
@@ -56,6 +74,31 @@
           "url": "https://www.cleanestimator.com/contact"
         }
       }
+    }
+    </script>
+
+    <!-- ═══ Schema.org — Organization ═══ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Clean Estimator",
+      "url": "https://www.cleanestimator.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.cleanestimator.com/og-image.png",
+        "width": 1200,
+        "height": 630
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "hello@cleanestimator.com",
+        "url": "https://www.cleanestimator.com/contact"
+      },
+      "sameAs": [
+        "https://twitter.com/CleanEstimator"
+      ]
     }
     </script>
 

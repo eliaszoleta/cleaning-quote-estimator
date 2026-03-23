@@ -75,8 +75,19 @@ export default function BlogPost({ slug }) {
     headline: post.title,
     description: post.excerpt,
     datePublished: post.dateISO || post.date,
-    author: { '@type': 'Organization', name: 'Clean Estimator' },
-    publisher: { '@type': 'Organization', name: 'Clean Estimator', url: 'https://www.cleanestimator.com' },
+    image: 'https://www.cleanestimator.com/og-image.png',
+    author: { '@type': 'Organization', name: 'Clean Estimator', url: 'https://www.cleanestimator.com' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Clean Estimator',
+      url: 'https://www.cleanestimator.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.cleanestimator.com/og-image.png',
+        width: 1200,
+        height: 630,
+      },
+    },
   };
 
   return (
@@ -90,8 +101,13 @@ export default function BlogPost({ slug }) {
         <meta property="og:description" content={post.excerpt} />
         <meta property="og:url" content={`https://www.cleanestimator.com/blog/${slug}`} />
         <meta property="og:type" content="article" />
+        <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
+        <meta property="og:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@CleanEstimator" />
         <meta name="twitter:title" content={`${post.title} | Clean Estimator`} />
+        <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
+        <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         <script type="application/ld+json">{JSON.stringify(schema)}</script>
       </Helmet>
 

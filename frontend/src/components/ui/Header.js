@@ -73,8 +73,8 @@ export default function Header() {
   return (
     <header style={styles.header}>
       <div style={styles.inner}>
-        <a href="/" style={styles.logo}>
-          <span style={styles.logoIcon}>✦</span>
+        <a href="/" style={styles.logo} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
+          <span style={styles.logoIcon} aria-hidden="true">✦</span>
           Clean Estimator
         </a>
 
