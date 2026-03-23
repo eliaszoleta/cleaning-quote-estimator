@@ -256,13 +256,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         {!embedded && currentStep === 'service' && (
           <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', gap: 28, flexWrap: 'wrap' }}>
             {[
-              { Icon: MapPin,    label: 'All 50 states' },
-              { Icon: BarChart3, label: '9 service types' },
-              { Icon: ShieldOff, label: 'No email required' },
-              { Icon: Zap,       label: 'Instant results' },
-            ].map(({ Icon, label }) => (
+              { Icon: MapPin,    label: 'All 50 states',     color: '#059669' },
+              { Icon: BarChart3, label: '9 service types',   color: '#2563eb' },
+              { Icon: ShieldOff, label: 'No email required', color: '#7c3aed' },
+              { Icon: Zap,       label: 'Instant results',   color: '#ea580c' },
+            ].map(({ Icon, label, color }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#64748b', fontWeight: 500 }}>
-                <Icon size={14} color="#94a3b8" /> {label}
+                <Icon size={14} color={color} /> {label}
               </div>
             ))}
           </div>

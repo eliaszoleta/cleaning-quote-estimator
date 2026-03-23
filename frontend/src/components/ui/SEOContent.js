@@ -24,15 +24,15 @@ const STATES_DATA = [
 ];
 
 const SERVICES = [
-  { Icon: Home,          title: 'House Cleaning',           range: '$120 – $250', detail: 'per visit, standard clean', href: '/?service=home_residential', facts: ['Prices based on sq footage & bedrooms', 'Deep clean costs 1.5–2× more', 'Recurring discounts up to 15%'] },
-  { Icon: Building2,     title: 'Apartment Cleaning',       range: '$85 – $200',  detail: 'per visit',                href: '/?service=apartment',         facts: ['Studio to 4+ bedroom', 'Move-in/out cleans cost more', 'Vacant units 10–15% cheaper'] },
-  { Icon: Building,      title: 'Commercial Cleaning',      range: '$200 – $2,000+', detail: 'per month',            href: '/?service=commercial',        facts: ['Priced per sq ft per visit', 'Frequency heavily affects cost', 'Medical/restaurant rates higher'] },
-  { Icon: Layers,        title: 'Carpet Cleaning',          range: '$100 – $300', detail: 'whole home',              href: '/?service=carpet',            facts: ['$25–$75 per room', 'Steam cleaning most effective', 'Pet odor treatment extra'] },
-  { Icon: Wind,          title: 'Air Duct Cleaning',        range: '$300 – $700', detail: 'per system',              href: '/?service=air_duct',          facts: ['Recommended every 3–5 years', 'More vents = higher cost', 'Mold treatment costs more'] },
-  { Icon: Flame,         title: 'Dryer Vent Cleaning',      range: '$100 – $200', detail: 'per dryer',               href: '/?service=dryer_vent',        facts: ['Prevents fire hazard', 'Annual cleaning recommended', 'Clogs cost $50–$100 extra'] },
-  { Icon: Grid3x3,       title: 'Tile & Grout Cleaning',   range: '$175 – $450', detail: 'per project',              href: '/?service=tile_grout',        facts: ['Natural stone costs more', 'Sealing adds $1–$2/sq ft', 'Recoloring transforms appearance'] },
-  { Icon: AlertTriangle, title: 'Mold Remediation',         range: '$500 – $6,000+', detail: 'requires inspection', href: '/?service=mold_remediation',  facts: ['In-person inspection required', 'Fix moisture source first', 'Air testing adds $200–$500'] },
-  { Icon: Droplets,      title: 'Water Damage Restoration', range: '$1,500 – $8,000+', detail: 'emergency service', href: '/?service=water_damage',      facts: ['Act within 24–48 hours', 'Category 3 (sewage) costs most', "Homeowner's insurance may cover"] },
+  { Icon: Home,          color: '#2563eb', bg: '#eff6ff', title: 'House Cleaning',           range: '$120 – $250',    detail: 'per visit, standard clean', href: '/?service=home_residential', facts: ['Prices based on sq footage & bedrooms', 'Deep clean costs 1.5–2× more', 'Recurring discounts up to 15%'] },
+  { Icon: Building2,     color: '#4f46e5', bg: '#eef2ff', title: 'Apartment Cleaning',       range: '$85 – $200',     detail: 'per visit',                href: '/?service=apartment',         facts: ['Studio to 4+ bedroom', 'Move-in/out cleans cost more', 'Vacant units 10–15% cheaper'] },
+  { Icon: Building,      color: '#7c3aed', bg: '#f5f3ff', title: 'Commercial Cleaning',      range: '$200 – $2,000+', detail: 'per month',                href: '/?service=commercial',        facts: ['Priced per sq ft per visit', 'Frequency heavily affects cost', 'Medical/restaurant rates higher'] },
+  { Icon: Layers,        color: '#059669', bg: '#ecfdf5', title: 'Carpet Cleaning',          range: '$100 – $300',    detail: 'whole home',               href: '/?service=carpet',            facts: ['$25–$75 per room', 'Steam cleaning most effective', 'Pet odor treatment extra'] },
+  { Icon: Wind,          color: '#0891b2', bg: '#ecfeff', title: 'Air Duct Cleaning',        range: '$300 – $700',    detail: 'per system',               href: '/?service=air_duct',          facts: ['Recommended every 3–5 years', 'More vents = higher cost', 'Mold treatment costs more'] },
+  { Icon: Flame,         color: '#ea580c', bg: '#fff7ed', title: 'Dryer Vent Cleaning',      range: '$100 – $200',    detail: 'per dryer',                href: '/?service=dryer_vent',        facts: ['Prevents fire hazard', 'Annual cleaning recommended', 'Clogs cost $50–$100 extra'] },
+  { Icon: Grid3x3,       color: '#0d9488', bg: '#f0fdfa', title: 'Tile & Grout Cleaning',   range: '$175 – $450',    detail: 'per project',              href: '/?service=tile_grout',        facts: ['Natural stone costs more', 'Sealing adds $1–$2/sq ft', 'Recoloring transforms appearance'] },
+  { Icon: AlertTriangle, color: '#d97706', bg: '#fffbeb', title: 'Mold Remediation',         range: '$500 – $6,000+', detail: 'requires inspection',      href: '/?service=mold_remediation',  facts: ['In-person inspection required', 'Fix moisture source first', 'Air testing adds $200–$500'] },
+  { Icon: Droplets,      color: '#0284c7', bg: '#f0f9ff', title: 'Water Damage Restoration', range: '$1,500 – $8,000+', detail: 'emergency service',      href: '/?service=water_damage',      facts: ['Act within 24–48 hours', 'Category 3 (sewage) costs most', "Homeowner's insurance may cover"] },
 ];
 
 export default function SEOContent() {
@@ -70,16 +70,16 @@ export default function SEOContent() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16, marginBottom: 80 }}>
-            {SERVICES.map(({ Icon, title, range, detail, href, facts }) => (
+            {SERVICES.map(({ Icon, color, bg, title, range, detail, href, facts }) => (
               <a
                 key={title} href={href}
                 style={{ display: 'block', background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, padding: '22px 20px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 28px rgba(37,99,235,0.11)'; e.currentTarget.style.borderColor = '#2563eb'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.querySelector('.svc-icon').style.background = '#2563eb'; e.currentTarget.querySelector('.svc-icon').style.color = 'white'; }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'none'; e.currentTarget.querySelector('.svc-icon').style.background = '#f1f5f9'; e.currentTarget.querySelector('.svc-icon').style.color = '#475569'; }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 8px 28px ${color}22`; e.currentTarget.style.borderColor = color; e.currentTarget.style.transform = 'translateY(-2px)'; const tile = e.currentTarget.querySelector('.svc-icon'); tile.style.background = color; tile.style.color = 'white'; }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'none'; const tile = e.currentTarget.querySelector('.svc-icon'); tile.style.background = bg; tile.style.color = color; }}
               >
                 <div
                   className="svc-icon"
-                  style={{ width: 40, height: 40, borderRadius: 10, background: '#f1f5f9', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, transition: 'all 0.2s' }}
+                  style={{ width: 40, height: 40, borderRadius: 10, background: bg, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, transition: 'all 0.2s' }}
                 >
                   <Icon size={19} strokeWidth={1.8} />
                 </div>

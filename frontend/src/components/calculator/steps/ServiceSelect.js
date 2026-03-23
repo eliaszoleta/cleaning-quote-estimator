@@ -2,15 +2,15 @@ import React from 'react';
 import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets } from 'lucide-react';
 
 const SERVICES = [
-  { id: 'home_residential', Icon: Home,          label: 'House Cleaning',           desc: 'Standard, deep clean, move-in/out' },
-  { id: 'apartment',        Icon: Building2,      label: 'Apartment Cleaning',       desc: 'Studio to 4+ bedrooms' },
-  { id: 'commercial',       Icon: Building,       label: 'Commercial Cleaning',      desc: 'Offices, retail, warehouses' },
-  { id: 'carpet',           Icon: Layers,         label: 'Carpet Cleaning',          desc: 'Steam, dry-clean, stain removal' },
-  { id: 'air_duct',         Icon: Wind,           label: 'Air Duct Cleaning',        desc: 'HVAC duct cleaning & sanitizing' },
-  { id: 'dryer_vent',       Icon: Flame,          label: 'Dryer Vent Cleaning',      desc: 'Fire prevention, efficiency' },
-  { id: 'tile_grout',       Icon: Grid3x3,        label: 'Tile & Grout Cleaning',    desc: 'Deep clean, sealing, recoloring' },
-  { id: 'mold_remediation', Icon: AlertTriangle,  label: 'Mold Remediation',         desc: 'Assessment, removal, prevention' },
-  { id: 'water_damage',     Icon: Droplets,       label: 'Water Damage Restoration', desc: 'Emergency extraction & drying' },
+  { id: 'home_residential', Icon: Home,          label: 'House Cleaning',           desc: 'Standard, deep clean, move-in/out', color: '#2563eb', bg: '#eff6ff' },
+  { id: 'apartment',        Icon: Building2,      label: 'Apartment Cleaning',       desc: 'Studio to 4+ bedrooms',             color: '#4f46e5', bg: '#eef2ff' },
+  { id: 'commercial',       Icon: Building,       label: 'Commercial Cleaning',      desc: 'Offices, retail, warehouses',        color: '#7c3aed', bg: '#f5f3ff' },
+  { id: 'carpet',           Icon: Layers,         label: 'Carpet Cleaning',          desc: 'Steam, dry-clean, stain removal',    color: '#059669', bg: '#ecfdf5' },
+  { id: 'air_duct',         Icon: Wind,           label: 'Air Duct Cleaning',        desc: 'HVAC duct cleaning & sanitizing',    color: '#0891b2', bg: '#ecfeff' },
+  { id: 'dryer_vent',       Icon: Flame,          label: 'Dryer Vent Cleaning',      desc: 'Fire prevention, efficiency',        color: '#ea580c', bg: '#fff7ed' },
+  { id: 'tile_grout',       Icon: Grid3x3,        label: 'Tile & Grout Cleaning',    desc: 'Deep clean, sealing, recoloring',    color: '#0d9488', bg: '#f0fdfa' },
+  { id: 'mold_remediation', Icon: AlertTriangle,  label: 'Mold Remediation',         desc: 'Assessment, removal, prevention',    color: '#d97706', bg: '#fffbeb' },
+  { id: 'water_damage',     Icon: Droplets,       label: 'Water Damage Restoration', desc: 'Emergency extraction & drying',      color: '#0284c7', bg: '#f0f9ff' },
 ];
 
 export default function ServiceSelect({ onSelect, primaryColor, companyName }) {
@@ -24,7 +24,7 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName }) {
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(195px, 1fr))', gap: 10 }}>
-        {SERVICES.map(({ id, Icon, label, desc }) => (
+        {SERVICES.map(({ id, Icon, label, desc, color, bg }) => (
           <button
             key={id}
             onClick={() => onSelect(id)}
@@ -39,25 +39,27 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName }) {
               display: 'block',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = primaryColor;
-              e.currentTarget.style.boxShadow = `0 4px 20px rgba(37,99,235,0.10)`;
+              e.currentTarget.style.borderColor = color;
+              e.currentTarget.style.boxShadow = `0 4px 20px ${color}22`;
               e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.querySelector('.svc-icon-wrap').style.background = primaryColor;
-              e.currentTarget.querySelector('.svc-icon-wrap').style.color = 'white';
+              const tile = e.currentTarget.querySelector('.svc-tile');
+              tile.style.background = color;
+              tile.style.color = 'white';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor = '#e2e8f0';
               e.currentTarget.style.boxShadow = 'none';
               e.currentTarget.style.transform = 'none';
-              e.currentTarget.querySelector('.svc-icon-wrap').style.background = '#f1f5f9';
-              e.currentTarget.querySelector('.svc-icon-wrap').style.color = '#475569';
+              const tile = e.currentTarget.querySelector('.svc-tile');
+              tile.style.background = bg;
+              tile.style.color = color;
             }}
           >
             <div
-              className="svc-icon-wrap"
+              className="svc-tile"
               style={{
                 width: 38, height: 38, borderRadius: 9,
-                background: '#f1f5f9', color: '#475569',
+                background: bg, color: color,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 marginBottom: 10, transition: 'all 0.15s',
               }}

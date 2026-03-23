@@ -5,12 +5,12 @@ import Header from '../ui/Header';
 import Footer from '../ui/Footer';
 
 const FEATURES = [
-  { Icon: Palette,       title: 'White-label branding',       desc: 'Your logo, colors, and call-to-action text. Visitors never see the CleanCalc name.' },
-  { Icon: ClipboardList, title: 'Lead capture built-in',       desc: 'Collect name, email, phone, and timeline from every visitor before they see the estimate.' },
-  { Icon: MapPin,        title: 'ZIP-code accurate pricing',   desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
-  { Icon: Settings,      title: 'Per-service markup control',  desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
-  { Icon: Code2,         title: 'Easy one-line embed',         desc: 'Paste one line of HTML to add the calculator to any website, Wix, Squarespace, or WordPress.' },
-  { Icon: Key,           title: 'API for CRM sync',            desc: 'Pull leads via REST API into HubSpot, Salesforce, or any CRM using Zapier or Make.' },
+  { Icon: Palette,       color: '#7c3aed', bg: '#f5f3ff', title: 'White-label branding',       desc: 'Your logo, colors, and call-to-action text. Visitors never see the CleanCalc name.' },
+  { Icon: ClipboardList, color: '#2563eb', bg: '#eff6ff', title: 'Lead capture built-in',       desc: 'Collect name, email, phone, and timeline from every visitor before they see the estimate.' },
+  { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',   desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
+  { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',  desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
+  { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Easy one-line embed',         desc: 'Paste one line of HTML to add the calculator to any website, Wix, Squarespace, or WordPress.' },
+  { Icon: Key,           color: '#d97706', bg: '#fffbeb', title: 'API for CRM sync',            desc: 'Pull leads via REST API into HubSpot, Salesforce, or any CRM using Zapier or Make.' },
 ];
 
 const STEPS = [
@@ -73,10 +73,10 @@ export default function CompanyLanding() {
             <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Everything you need</h2>
             <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 52 }}>No technical skills required. Set up in under 30 minutes.</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
-              {FEATURES.map(({ Icon, title, desc }) => (
-                <div key={title} style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 14, padding: '26px 22px' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 11, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                    <Icon size={20} color="#2563eb" strokeWidth={1.8} />
+              {FEATURES.map(({ Icon, color, bg, title, desc }) => (
+                <div key={title} style={{ background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, padding: '26px 22px' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 11, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                    <Icon size={20} color={color} strokeWidth={1.8} />
                   </div>
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>{title}</h3>
                   <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: 0 }}>{desc}</p>
