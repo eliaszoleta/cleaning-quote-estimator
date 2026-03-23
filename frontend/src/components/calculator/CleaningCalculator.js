@@ -149,13 +149,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     <>
       {!embedded && (
         <Helmet>
-          <title>Cleaning Cost Calculator & Estimator 2026 — Free, Instant | Clean Estimator</title>
+          <title>Free Cleaning Cost Estimator 2026 | Clean Estimator</title>
           <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $120–$250, carpet $100–$300, air duct $300–$700, commercial, mold remediation & more. No signup needed." />
           <meta property="og:site_name" content="Clean Estimator" />
-          <meta property="og:title" content="Cleaning Cost Calculator & Estimator 2026 | Clean Estimator" />
+          <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
           <meta property="og:type" content="website" />
           <meta property="og:url" content="https://www.cleanestimator.com/" />
-          <meta name="twitter:title" content="Cleaning Cost Calculator & Estimator 2026 | Clean Estimator" />
+          <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
         </Helmet>
       )}
 

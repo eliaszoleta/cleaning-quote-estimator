@@ -96,17 +96,17 @@ export default function SEOContent() {
   return (
     <>
       <Helmet>
-        <title>Cleaning Cost Calculator & Estimator 2026 — Free, Instant | Clean Estimator</title>
+        <title>Free Cleaning Cost Estimator 2026 — House, Carpet, Commercial | Clean Estimator</title>
         <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $120–$250, carpet cleaning $100–$300, air duct $300–$700, commercial, mold remediation & more. No signup needed." />
         <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, house cleaning cost calculator, how much does cleaning cost, cleaning estimate, carpet cleaning cost, air duct cleaning cost, commercial cleaning rates, mold remediation cost, cleaning price calculator, free cleaning estimate" />
         <link rel="canonical" href="https://www.cleanestimator.com/" />
         <meta property="og:site_name" content="Clean Estimator" />
-        <meta property="og:title" content="Cleaning Cost Calculator & Estimator 2026 | Clean Estimator" />
-        <meta property="og:description" content="Free cleaning cost calculator — instant ZIP-code specific estimates for house cleaning, carpet, air duct, mold remediation & more. No signup required." />
+        <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+        <meta property="og:description" content="Instant ZIP-code specific cleaning cost estimates. House cleaning, carpet, air duct, mold remediation and more. Free, no signup." />
         <meta property="og:url" content="https://www.cleanestimator.com/" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Cleaning Cost Calculator & Estimator 2026 | Clean Estimator" />
+        <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
         <meta name="twitter:description" content="Free cleaning cost calculator — instant ZIP-code specific estimates for any cleaning service. No signup required." />
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
         <script type="application/ld+json">{JSON.stringify(webAppSchema)}</script>
