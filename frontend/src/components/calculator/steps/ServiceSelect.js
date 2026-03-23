@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets } from 'lucide-react';
 
 const SERVICES = [
@@ -14,16 +14,41 @@ const SERVICES = [
 ];
 
 export default function ServiceSelect({ onSelect, primaryColor, companyName }) {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 640);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   return (
     <div>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', marginBottom: 6, letterSpacing: '-0.3px' }}>
+      {/* Step indicator */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 24, height: 24, borderRadius: '50%',
+          background: primaryColor || '#2563eb', color: 'white',
+          fontSize: 12, fontWeight: 700, flexShrink: 0,
+        }}>1</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+          Step 1 of 4 — Pick a service
+        </span>
+      </div>
+
+      <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: '#0f172a', marginBottom: 4, letterSpacing: '-0.3px' }}>
         {companyName ? `${companyName} — Get Your Quote` : 'What service do you need?'}
       </h2>
-      <p style={{ color: '#64748b', fontSize: 14, marginBottom: 24 }}>
-        Select a service to get an accurate local estimate.
+      <p style={{ color: '#64748b', fontSize: 13, marginBottom: 18 }}>
+        Tap a service to get your free, instant estimate.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(195px, 1fr))', gap: 10 }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(195px, 1fr))',
+        gap: isMobile ? 8 : 10,
+      }}>
         {SERVICES.map(({ id, Icon, label, desc, color, bg }) => (
           <button
             key={id}
@@ -32,11 +57,12 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName }) {
               background: 'white',
               border: '1.5px solid #e2e8f0',
               borderRadius: 12,
-              padding: '16px 14px',
+              padding: isMobile ? '12px 10px' : '16px 14px',
               cursor: 'pointer',
               textAlign: 'left',
               transition: 'all 0.15s',
               display: 'block',
+              width: '100%',
             }}
             onMouseEnter={e => {
               e.currentTarget.style.borderColor = color;
@@ -58,16 +84,16 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName }) {
             <div
               className="svc-tile"
               style={{
-                width: 38, height: 38, borderRadius: 9,
+                width: 34, height: 34, borderRadius: 8,
                 background: bg, color: color,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                marginBottom: 10, transition: 'all 0.15s',
+                marginBottom: 8, transition: 'all 0.15s', flexShrink: 0,
               }}
             >
-              <Icon size={18} strokeWidth={1.8} />
+              <Icon size={16} strokeWidth={1.8} />
             </div>
-            <div style={{ fontWeight: 600, fontSize: 14, color: '#0f172a', marginBottom: 3, lineHeight: 1.3 }}>{label}</div>
-            <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.4 }}>{desc}</div>
+            <div style={{ fontWeight: 600, fontSize: isMobile ? 13 : 14, color: '#0f172a', marginBottom: 2, lineHeight: 1.3 }}>{label}</div>
+            <div style={{ fontSize: 11, color: '#94a3b8', lineHeight: 1.4 }}>{desc}</div>
           </button>
         ))}
       </div>

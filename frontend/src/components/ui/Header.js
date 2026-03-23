@@ -95,7 +95,7 @@ export default function Header() {
     <header style={styles.header}>
       <div style={styles.inner}>
         {/* Logo */}
-        <a href="/" style={styles.logo} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
+        <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
           <span style={styles.logoIcon} aria-hidden="true">✦</span>
           Clean Estimator
         </a>
