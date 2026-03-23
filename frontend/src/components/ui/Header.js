@@ -97,7 +97,7 @@ export default function Header() {
             onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f8fafc'; }}
             onMouseLeave={e => { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; }}
           >
-            For Companies
+            Get Estimator
           </a>
           <a
             href="/company"
@@ -127,7 +127,7 @@ export default function Header() {
               {n.label}
             </a>
           ))}
-          <a href="/for-companies" style={{ ...styles.navLink, display: 'block', padding: '10px 12px' }}>For Companies</a>
+          <a href="/for-companies" style={{ ...styles.navLink, display: 'block', padding: '10px 12px' }}>Get Estimator</a>
           <a href="/company" style={{ ...styles.cta, display: 'block', textAlign: 'center', marginLeft: 0, marginTop: 8 }}>Company Login →</a>
         </div>
       )}
