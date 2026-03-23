@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { AlertCircle, MapPin, BarChart3, ShieldOff, Zap } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
@@ -43,6 +43,7 @@ const DETAIL_STEP_COMPONENT = {
 const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Your Info', 'Results'];
 
 export default function CleaningCalculator({ companyConfig = null, embedded = false }) {
+  const cardRef = useRef(null);
   const [serviceType, setServiceType] = useState(null);
   const [stepIndex, setStepIndex] = useState(0);
   const [location, setLocation] = useState({ zip: '', state: '' });
@@ -63,6 +64,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
       setStepIndex(1);
     }
   }, []);
+
+  // Scroll to top of card on every step change
+  useEffect(() => {
+    if (cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [stepIndex]);
 
   const goNext = () => setStepIndex(i => Math.min(i + 1, steps.length - 1));
   const goBack = () => setStepIndex(i => Math.max(i - 1, 0));
@@ -187,7 +195,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         )}
 
         {/* Calculator card */}
-        <div style={{
+        <div ref={cardRef} style={{
           maxWidth: 720,
           margin: '0 auto',
           background: 'white',
