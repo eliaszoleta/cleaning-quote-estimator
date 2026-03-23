@@ -112,7 +112,7 @@ export default function CompanyLanding() {
                       <Star key={i} size={15} color="#f59e0b" fill="#f59e0b" />
                     ))}
                   </div>
-                  <p style={{ fontSize: 14.5, color: '#374151', lineHeight: 1.7, marginBottom: 18, fontStyle: 'italic' }}>"{t.text}"</p>
+                  <p style={{ fontSize: 14.5, color: '#374151', lineHeight: 1.7, marginBottom: 18 }}>"{t.text}"</p>
                   <div style={{ fontWeight: 700, fontSize: 13.5, color: '#0f172a' }}>{t.name}</div>
                   <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 2 }}>{t.company}</div>
                 </div>

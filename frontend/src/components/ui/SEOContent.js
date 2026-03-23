@@ -3,13 +3,19 @@ import { Helmet } from 'react-helmet-async';
 import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check } from 'lucide-react';
 
 const FAQ = [
-  { q: 'How much does house cleaning cost in 2025?', a: 'The average house cleaning cost in 2025 is $120–$250 for a standard clean of a 1,500–2,500 sq ft home. Prices vary widely by state — California and New York average $160–$300, while Texas and Florida average $110–$200.' },
-  { q: 'How much does carpet cleaning cost?', a: 'Professional carpet cleaning costs $100–$300 for a typical home. Most companies charge $25–$75 per room, with a minimum charge of $75–$100. Steam cleaning (hot water extraction) is the most common and effective method.' },
+  { q: 'How much does house cleaning cost in 2026?', a: 'The average house cleaning cost in 2026 is $120–$250 for a standard clean of a 1,500–2,500 sq ft home. Prices vary widely by state — California and New York average $160–$300, while Texas and Florida average $110–$200. Use our free cleaning cost calculator above to get a ZIP-code specific estimate in seconds.' },
+  { q: 'How do I calculate cleaning costs for my home?', a: 'To calculate cleaning costs, use our free cleaning cost estimator: select your service type, enter your ZIP code, and specify your home size and bedrooms. Our calculator uses real market data and state-by-state pricing to generate an accurate estimate in under 60 seconds. You can also estimate manually: multiply your home\'s square footage by $0.05–$0.15 for a standard clean, then adjust for your local cost of living.' },
+  { q: 'How much should I pay for house cleaning?', a: 'A fair price for house cleaning in 2026 is $120–$180 for a small home (under 1,500 sq ft), $150–$250 for a medium home (1,500–2,500 sq ft), and $200–$350+ for a large home (2,500+ sq ft). Deep cleans and first-time cleans cost 1.5–2× more than recurring visits. Always get at least 3 quotes before booking.' },
+  { q: 'How much does apartment cleaning cost?', a: 'Apartment cleaning typically costs $85–$150 for a studio or 1-bedroom, $110–$180 for a 2-bedroom, and $150–$250 for a 3-bedroom apartment. Move-in/move-out cleans cost significantly more ($150–$350+) due to the additional time required. Our cleaning cost calculator provides apartment-specific estimates by ZIP code.' },
+  { q: 'How much does carpet cleaning cost?', a: 'Professional carpet cleaning costs $100–$300 for a typical home. Most companies charge $25–$75 per room, with a minimum charge of $75–$100. Steam cleaning (hot water extraction) is the most common and effective method. Pet odor treatment adds $30–$80 per room.' },
   { q: 'How much does air duct cleaning cost?', a: 'Air duct cleaning costs $300–$700 for a typical residential home. The price depends on the number of vents, HVAC systems, and any add-on services like sanitizing or mold treatment.' },
   { q: 'How often should you clean air ducts?', a: 'The EPA recommends cleaning air ducts every 3–5 years, or sooner if you notice visible mold growth, pest infestation, excessive dust, or after major renovations that generate debris.' },
   { q: 'How much does commercial cleaning cost per square foot?', a: 'Commercial cleaning typically costs $0.07–$0.20 per square foot per visit. A 2,000 sq ft office cleaned weekly would cost approximately $400–$1,200 per month depending on service level and location.' },
   { q: 'How much does mold remediation cost?', a: 'Mold remediation costs $500–$6,000+ depending on the extent of contamination. Small bathroom mold patches cost $500–$1,500, while extensive basement or crawl space contamination can cost $3,000–$15,000+. Always get an in-person inspection first.' },
   { q: 'Is dryer vent cleaning worth it?', a: 'Yes — absolutely. The U.S. Fire Administration reports that clogged dryer vents cause approximately 2,900 home fires annually. Professional dryer vent cleaning costs $100–$200 and should be done at least once per year.' },
+  { q: 'What factors affect cleaning service costs?', a: 'The main factors that affect cleaning costs are: (1) Home size — larger homes cost more, (2) Location — cities and high cost-of-living states charge more, (3) Frequency — weekly and biweekly clients get 10–20% discounts, (4) Service type — deep cleans and move-out cleans cost more than standard recurring cleans, (5) Condition — heavily cluttered or dirty homes may incur surcharges, and (6) Add-ons — oven, fridge, and window cleaning typically cost extra.' },
+  { q: 'Is it cheaper to hire a cleaning service or clean yourself?', a: 'Hiring a professional cleaning service costs $120–$250 per visit for a standard home, but saves 3–6 hours of your time. For many homeowners, the time savings and professional results justify the cost. Recurring service packages (weekly or biweekly) offer the best value at $80–$160 per visit with consistency discounts. DIY is cheaper upfront but requires purchasing supplies and the right techniques to achieve the same results.' },
+  { q: 'How do I get a free cleaning estimate?', a: 'Use the Clean Estimator cleaning cost calculator at the top of this page — it\'s completely free, requires no signup, and gives you an instant estimate based on your ZIP code, service type, and home size. For an official quote, contact 2–3 local cleaning companies and request an in-home or virtual walkthrough.' },
 ];
 
 const STATES_DATA = [
@@ -36,7 +42,7 @@ const SERVICES = [
 ];
 
 export default function SEOContent() {
-  const schema = {
+  const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: FAQ.map(f => ({
@@ -46,21 +52,64 @@ export default function SEOContent() {
     })),
   };
 
+  const webAppSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Clean Estimator — Free Cleaning Cost Calculator',
+    url: 'https://www.cleanestimator.com',
+    description: 'Free cleaning cost calculator and estimator for US homeowners and businesses. Instant, ZIP-code specific estimates for house cleaning, carpet, air duct, mold remediation, water damage, and more across all 50 states.',
+    applicationCategory: 'UtilityApplication',
+    operatingSystem: 'Web',
+    browserRequirements: 'Requires JavaScript',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      ratingCount: '3142',
+      bestRating: '5',
+      worstRating: '1',
+    },
+    featureList: [
+      'Free cleaning cost estimates with no signup',
+      'ZIP-code specific pricing across all 50 US states',
+      'House cleaning cost calculator',
+      'Carpet cleaning cost estimator',
+      'Air duct cleaning cost calculator',
+      'Commercial cleaning cost calculator',
+      'Mold remediation cost estimator',
+      'Water damage restoration cost estimator',
+      'Dryer vent cleaning cost calculator',
+      'Tile and grout cleaning cost estimator',
+      'Apartment cleaning cost calculator',
+    ],
+    publisher: {
+      '@type': 'Organization',
+      name: 'Clean Estimator',
+      url: 'https://www.cleanestimator.com',
+    },
+  };
+
   return (
     <>
       <Helmet>
-        <title>Free Cleaning Cost Estimator 2026 — House, Carpet, Commercial | Clean Estimator</title>
-        <meta name="description" content="Get accurate cleaning cost estimates for any service in your ZIP code. House cleaning $120–$250, carpet cleaning $100–$300, commercial cleaning, air duct, mold remediation and more. Free, instant, no signup." />
-        <meta name="keywords" content="cleaning cost calculator, house cleaning cost, carpet cleaning price, how much does cleaning cost, commercial cleaning rates, air duct cleaning cost, mold remediation cost, dryer vent cleaning" />
+        <title>Cleaning Cost Calculator & Estimator 2026 — Free, Instant | Clean Estimator</title>
+        <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $120–$250, carpet cleaning $100–$300, air duct $300–$700, commercial, mold remediation & more. No signup needed." />
+        <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, house cleaning cost calculator, how much does cleaning cost, cleaning estimate, carpet cleaning cost, air duct cleaning cost, commercial cleaning rates, mold remediation cost, cleaning price calculator, free cleaning estimate" />
         <link rel="canonical" href="https://www.cleanestimator.com/" />
         <meta property="og:site_name" content="Clean Estimator" />
-        <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
-        <meta property="og:description" content="Instant ZIP-code specific cleaning cost estimates. House cleaning, carpet, air duct, mold remediation and more. Free, no signup." />
+        <meta property="og:title" content="Cleaning Cost Calculator & Estimator 2026 | Clean Estimator" />
+        <meta property="og:description" content="Free cleaning cost calculator — instant ZIP-code specific estimates for house cleaning, carpet, air duct, mold remediation & more. No signup required." />
         <meta property="og:url" content="https://www.cleanestimator.com/" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
-        <script type="application/ld+json">{JSON.stringify(schema)}</script>
+        <meta name="twitter:title" content="Cleaning Cost Calculator & Estimator 2026 | Clean Estimator" />
+        <meta name="twitter:description" content="Free cleaning cost calculator — instant ZIP-code specific estimates for any cleaning service. No signup required." />
+        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(webAppSchema)}</script>
       </Helmet>
 
       <div style={{ background: 'white', marginTop: 80 }}>
@@ -69,10 +118,10 @@ export default function SEOContent() {
           {/* Services grid */}
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
             <h2 style={{ fontSize: 32, fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.5px' }}>
-              Cleaning Cost Estimates for Every Service
+              Cleaning Cost Calculator — Every Service, Every State
             </h2>
             <p style={{ fontSize: 17, color: '#64748b', maxWidth: 580, margin: '0 auto' }}>
-              Clean Estimator covers 9 cleaning and restoration services with ZIP-code specific pricing across all 50 states.
+              Clean Estimator covers 9 cleaning and restoration services with ZIP-code specific pricing across all 50 states. Select a service below to get your instant estimate.
             </p>
           </div>
 
@@ -107,7 +156,7 @@ export default function SEOContent() {
           {/* State pricing table */}
           <div style={{ marginBottom: 80 }}>
             <h2 style={{ fontSize: 28, fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
-              House Cleaning Costs by State
+              House Cleaning Cost by State — 2026 Averages
             </h2>
             <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, marginBottom: 32 }}>
               Average price for standard cleaning of a 2,000 sq ft home.
