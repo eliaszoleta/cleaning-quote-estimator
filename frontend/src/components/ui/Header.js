@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const styles = {
   header: {
@@ -26,6 +26,7 @@ const styles = {
     fontWeight: 800,
     fontSize: 20,
     color: '#0f172a',
+    flexShrink: 0,
   },
   logoIcon: {
     width: 34,
@@ -37,6 +38,7 @@ const styles = {
     justifyContent: 'center',
     color: 'white',
     fontSize: 18,
+    flexShrink: 0,
   },
   nav: { display: 'flex', alignItems: 'center', gap: 4 },
   navLink: {
@@ -58,6 +60,18 @@ const styles = {
     fontWeight: 600,
     marginLeft: 8,
     transition: 'all 0.15s',
+    whiteSpace: 'nowrap',
+  },
+  ctaMobile: {
+    background: '#2563eb',
+    color: 'white',
+    padding: '8px 14px',
+    borderRadius: 8,
+    textDecoration: 'none',
+    fontSize: 13,
+    fontWeight: 600,
+    whiteSpace: 'nowrap',
+    transition: 'all 0.15s',
   },
 };
 
@@ -69,66 +83,87 @@ const navItems = [
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   return (
     <header style={styles.header}>
       <div style={styles.inner}>
+        {/* Logo */}
         <a href="/" style={styles.logo} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
           <span style={styles.logoIcon} aria-hidden="true">✦</span>
           Clean Estimator
         </a>
 
-        {/* Desktop nav */}
-        <nav style={{ ...styles.nav, '@media(max-width:640px)': { display: 'none' } }}>
-          {navItems.map(n => (
+        {isMobile ? (
+          /* ── Mobile: Get Estimator CTA + hamburger ── */
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <a
-              key={n.href}
-              href={n.href}
+              href="/for-companies"
+              style={styles.ctaMobile}
+              onMouseEnter={e => { e.currentTarget.style.background = '#1d4ed8'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#2563eb'; }}
+            >
+              Get Estimator
+            </a>
+            <button
+              onClick={() => setMenuOpen(m => !m)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 4px', fontSize: 22, color: '#0f172a', lineHeight: 1 }}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            >
+              {menuOpen ? '✕' : '☰'}
+            </button>
+          </div>
+        ) : (
+          /* ── Desktop nav ── */
+          <nav style={styles.nav}>
+            {navItems.map(n => (
+              <a
+                key={n.href}
+                href={n.href}
+                style={styles.navLink}
+                onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f8fafc'; }}
+                onMouseLeave={e => { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; }}
+              >
+                {n.label}
+              </a>
+            ))}
+            <a
+              href="/for-companies"
               style={styles.navLink}
               onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f8fafc'; }}
               onMouseLeave={e => { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; }}
             >
-              {n.label}
+              Get Estimator
             </a>
-          ))}
-          <a
-            href="/for-companies"
-            style={styles.navLink}
-            onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f8fafc'; }}
-            onMouseLeave={e => { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; }}
-          >
-            Get Estimator
-          </a>
-          <a
-            href="/company"
-            style={styles.cta}
-            onMouseEnter={e => { e.target.style.background = '#1d4ed8'; }}
-            onMouseLeave={e => { e.target.style.background = '#2563eb'; }}
-          >
-            Company Login →
-          </a>
-        </nav>
-
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => setMenuOpen(m => !m)}
-          style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 8, fontSize: 22 }}
-          aria-label="Menu"
-        >
-          {menuOpen ? '✕' : '☰'}
-        </button>
+            <a
+              href="/company"
+              style={styles.cta}
+              onMouseEnter={e => { e.currentTarget.style.background = '#1d4ed8'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#2563eb'; }}
+            >
+              Company Login →
+            </a>
+          </nav>
+        )}
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div style={{ padding: '12px 24px 20px', borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {/* Mobile dropdown */}
+      {isMobile && menuOpen && (
+        <div style={{ padding: '12px 24px 20px', borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: 4, background: 'white' }}>
           {navItems.map(n => (
             <a key={n.href} href={n.href} style={{ ...styles.navLink, display: 'block', padding: '10px 12px' }}>
               {n.label}
             </a>
           ))}
-          <a href="/for-companies" style={{ ...styles.navLink, display: 'block', padding: '10px 12px' }}>Get Estimator</a>
-          <a href="/company" style={{ ...styles.cta, display: 'block', textAlign: 'center', marginLeft: 0, marginTop: 8 }}>Company Login →</a>
+          <a href="/company" style={{ ...styles.cta, display: 'block', textAlign: 'center', marginLeft: 0, marginTop: 8 }}>
+            Company Login →
+          </a>
         </div>
       )}
     </header>
