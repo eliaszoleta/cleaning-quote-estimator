@@ -75,7 +75,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
     <div style={{ maxWidth: 600 }}>
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Subscription</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Manage your CleanCalc plan and billing.</p>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Manage your Clean Estimator plan and billing.</p>
       </div>
 
       {error && (

@@ -23,7 +23,7 @@ const cols = [
       { label: 'Commercial Cleaning Guide', href: '/blog/category/commercial' },
       { label: 'Mold & Water Damage', href: '/blog/category/restoration' },
       { label: 'Carpet Care', href: '/blog/category/carpet' },
-      { label: 'About CleanCalc', href: '/about' },
+      { label: 'About Clean Estimator', href: '/about' },
       { label: 'Contact', href: '/contact' },
     ],
   },
@@ -84,16 +84,16 @@ export default function Footer() {
         <div style={s.bottom}>
           <div style={s.brand}>
             <span style={s.logoIcon}>✦</span>
-            <span style={{ color: 'white', fontWeight: 700 }}>CleanCalc</span>
+            <span style={{ color: 'white', fontWeight: 700 }}>Clean Estimator</span>
           </div>
-          <div style={s.copy}>© {new Date().getFullYear()} CleanCalc. All rights reserved.</div>
+          <div style={s.copy}>© {new Date().getFullYear()} Clean Estimator. All rights reserved.</div>
         </div>
       </div>
       <div style={s.disclaimer}>
-        <strong style={{ color: '#64748b' }}>Disclaimer:</strong> All price estimates provided by CleanCalc are for informational purposes only.
+        <strong style={{ color: '#64748b' }}>Disclaimer:</strong> All price estimates provided by Clean Estimator are for informational purposes only.
         Actual cleaning service costs vary based on local market conditions, specific service requirements, company pricing policies,
         and other factors. Always get multiple quotes from licensed, insured cleaning professionals in your area.
-        CleanCalc is not responsible for any decisions made based on these estimates.
+        Clean Estimator is not responsible for any decisions made based on these estimates.
       </div>
     </footer>
   );

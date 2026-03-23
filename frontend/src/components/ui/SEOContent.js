@@ -49,10 +49,17 @@ export default function SEOContent() {
   return (
     <>
       <Helmet>
-        <title>Free Cleaning Cost Estimator 2025 — House, Carpet, Commercial | CleanCalc</title>
+        <title>Free Cleaning Cost Estimator 2026 — House, Carpet, Commercial | Clean Estimator</title>
         <meta name="description" content="Get accurate cleaning cost estimates for any service in your ZIP code. House cleaning $120–$250, carpet cleaning $100–$300, commercial cleaning, air duct, mold remediation and more. Free, instant, no signup." />
         <meta name="keywords" content="cleaning cost calculator, house cleaning cost, carpet cleaning price, how much does cleaning cost, commercial cleaning rates, air duct cleaning cost, mold remediation cost, dryer vent cleaning" />
-        <link rel="canonical" href="https://cleaningcalculator.app/" />
+        <link rel="canonical" href="https://www.cleanestimator.com/" />
+        <meta property="og:site_name" content="Clean Estimator" />
+        <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+        <meta property="og:description" content="Instant ZIP-code specific cleaning cost estimates. House cleaning, carpet, air duct, mold remediation and more. Free, no signup." />
+        <meta property="og:url" content="https://www.cleanestimator.com/" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
         <script type="application/ld+json">{JSON.stringify(schema)}</script>
       </Helmet>
 
@@ -65,7 +72,7 @@ export default function SEOContent() {
               Cleaning Cost Estimates for Every Service
             </h2>
             <p style={{ fontSize: 17, color: '#64748b', maxWidth: 580, margin: '0 auto' }}>
-              CleanCalc covers 9 cleaning and restoration services with ZIP-code specific pricing across all 50 states.
+              Clean Estimator covers 9 cleaning and restoration services with ZIP-code specific pricing across all 50 states.
             </p>
           </div>
 

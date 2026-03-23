@@ -101,7 +101,7 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
         {[
           { label: 'List Leads', color: '#7dd3fc', code: `GET /api/leads\nX-API-Key: your_api_key\n\n# Optional query params:\n?limit=100          # Max 1,000\n?since=2025-01-01   # ISO date filter` },
           { label: 'Response Format', color: '#86efac', code: `{\n  "success": true,\n  "count": 42,\n  "data": [\n    {\n      "id": "uuid",\n      "name": "Jane Smith",\n      "email": "jane@example.com",\n      "phone": "(555) 000-0000",\n      "service_type": "home_residential",\n      "estimated_price_low": 150,\n      "estimated_price_high": 220,\n      "created_at": "2025-01-15T14:30:00Z"\n    }\n  ]\n}` },
-          { label: 'cURL Example', color: '#fde68a', code: `curl https://api.cleaningcalculator.app/api/leads \\\n  -H "X-API-Key: ${apiKey || 'your_api_key_here'}"` },
+          { label: 'cURL Example', color: '#fde68a', code: `curl https://api.cleanestimator.com/api/leads \\\n  -H "X-API-Key: ${apiKey || 'your_api_key_here'}"` },
         ].map(({ label, color, code }) => (
           <div key={label} style={{ marginBottom: 18 }}>
             <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 7, color: '#374151' }}>{label}</div>

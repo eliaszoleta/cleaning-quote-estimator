@@ -5,7 +5,7 @@ import Header from '../ui/Header';
 import Footer from '../ui/Footer';
 
 const FEATURES = [
-  { Icon: Palette,       color: '#7c3aed', bg: '#f5f3ff', title: 'White-label branding',       desc: 'Your logo, colors, and call-to-action text. Visitors never see the CleanCalc name.' },
+  { Icon: Palette,       color: '#7c3aed', bg: '#f5f3ff', title: 'White-label branding',       desc: 'Your logo, colors, and call-to-action text. Visitors never see the Clean Estimator name.' },
   { Icon: ClipboardList, color: '#2563eb', bg: '#eff6ff', title: 'Lead capture built-in',       desc: 'Collect name, email, phone, and timeline from every visitor before they see the estimate.' },
   { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',   desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
   { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',  desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
@@ -21,7 +21,7 @@ const STEPS = [
 ];
 
 const TESTIMONIALS = [
-  { name: 'Sarah M.',  company: 'Sparkle Cleaning Services — Austin, TX', text: "We've been using CleanCalc for 4 months and it's generated 47 qualified leads. Conversion rate is way higher than our contact form because visitors are pre-qualified." },
+  { name: 'Sarah M.',  company: 'Sparkle Cleaning Services — Austin, TX', text: "We've been using Clean Estimator for 4 months and it's generated 47 qualified leads. Conversion rate is way higher than our contact form because visitors are pre-qualified." },
   { name: 'James R.',  company: 'Pro Restoration Group — Denver, CO',      text: 'The water damage and mold calculators are exactly what we needed. Customers come in already understanding the price range, so there\'s less sticker shock on-site.' },
   { name: 'Maria L.',  company: 'Crystal Clean Commercial — Miami, FL',    text: "Setup took about 20 minutes. The embed is seamless — my website visitors don't even realize it's a third-party tool." },
 ];
@@ -40,7 +40,7 @@ export default function CompanyLanding() {
   return (
     <>
       <Helmet>
-        <title>Embed a Cleaning Cost Calculator on Your Website | CleanCalc for Companies</title>
+        <title>Embed a Cleaning Cost Calculator on Your Website | Clean Estimator for Companies</title>
         <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. Free 30-day trial. $49/month." />
       </Helmet>
       <div className="app">
@@ -152,7 +152,7 @@ export default function CompanyLanding() {
           {/* CTA */}
           <div style={{ background: '#0f172a', color: 'white', padding: '80px 24px', textAlign: 'center' }}>
             <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 14, letterSpacing: '-0.4px' }}>Ready to capture more leads?</h2>
-            <p style={{ fontSize: 16, color: '#94a3b8', marginBottom: 30, maxWidth: 460, margin: '0 auto 30px' }}>Join cleaning companies already using CleanCalc to turn website visitors into booked jobs.</p>
+            <p style={{ fontSize: 16, color: '#94a3b8', marginBottom: 30, maxWidth: 460, margin: '0 auto 30px' }}>Join cleaning companies already using Clean Estimator to turn website visitors into booked jobs.</p>
             <a href="/company" style={{ background: '#2563eb', color: 'white', padding: '15px 38px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 17 }}>Get Started Free →</a>
           </div>
 

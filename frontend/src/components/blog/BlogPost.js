@@ -75,16 +75,23 @@ export default function BlogPost({ slug }) {
     headline: post.title,
     description: post.excerpt,
     datePublished: post.dateISO || post.date,
-    author: { '@type': 'Organization', name: 'CleanCalc' },
-    publisher: { '@type': 'Organization', name: 'CleanCalc', url: 'https://cleaningcalculator.app' },
+    author: { '@type': 'Organization', name: 'Clean Estimator' },
+    publisher: { '@type': 'Organization', name: 'Clean Estimator', url: 'https://www.cleanestimator.com' },
   };
 
   return (
     <>
       <Helmet>
-        <title>{post.title} | CleanCalc</title>
+        <title>{post.title} | Clean Estimator</title>
         <meta name="description" content={post.excerpt} />
-        <link rel="canonical" href={`https://cleaningcalculator.app/blog/${slug}`} />
+        <link rel="canonical" href={`https://www.cleanestimator.com/blog/${slug}`} />
+        <meta property="og:site_name" content="Clean Estimator" />
+        <meta property="og:title" content={`${post.title} | Clean Estimator`} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:url" content={`https://www.cleanestimator.com/blog/${slug}`} />
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${post.title} | Clean Estimator`} />
         <script type="application/ld+json">{JSON.stringify(schema)}</script>
       </Helmet>
 

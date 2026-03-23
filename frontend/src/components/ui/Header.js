@@ -75,7 +75,7 @@ export default function Header() {
       <div style={styles.inner}>
         <a href="/" style={styles.logo}>
           <span style={styles.logoIcon}>✦</span>
-          CleanCalc
+          Clean Estimator
         </a>
 
         {/* Desktop nav */}

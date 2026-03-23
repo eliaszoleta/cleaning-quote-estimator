@@ -142,7 +142,7 @@ export default function CompanyDashboard({ user, onLogout }) {
             }}>
               <span style={{ color: 'white', fontSize: 13, fontWeight: 900 }}>✦</span>
             </div>
-            <span style={{ color: 'white', fontWeight: 700, fontSize: 15, letterSpacing: '-0.2px' }}>CleanCalc</span>
+            <span style={{ color: 'white', fontWeight: 700, fontSize: 15, letterSpacing: '-0.2px' }}>Clean Estimator</span>
           </a>
           <span style={{ color: '#334155', fontSize: 13 }}>/</span>
           <span style={{ color: '#94a3b8', fontSize: 13 }}>Dashboard</span>

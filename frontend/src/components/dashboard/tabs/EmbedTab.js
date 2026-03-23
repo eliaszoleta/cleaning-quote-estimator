@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Copy, Check, ExternalLink } from 'lucide-react';
 
-const SITE_URL = process.env.REACT_APP_SITE_URL || 'https://cleaningcalculator.app';
+const SITE_URL = process.env.REACT_APP_SITE_URL || 'https://www.cleanestimator.com';
 
 export default function EmbedTab({ config, user }) {
   const [copied, setCopied] = useState(null);
@@ -53,7 +53,7 @@ export default function EmbedTab({ config, user }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <EmbedCard title="Standard iFrame" badge="Recommended" desc="Works on any website. Paste inside your page's HTML." code={iframeCode} onCopy={() => copy(iframeCode, 'iframe')} copied={copied === 'iframe'} />
         <EmbedCard title="JavaScript Snippet" desc="Dynamically injects the widget. Good for CMS platforms." code={scriptCode} onCopy={() => copy(scriptCode, 'script')} copied={copied === 'script'} />
-        <EmbedCard title="WordPress Shortcode" desc="Install the CleanCalc WordPress plugin, then paste this shortcode." code={wordpressCode} onCopy={() => copy(wordpressCode, 'wp')} copied={copied === 'wp'} />
+        <EmbedCard title="WordPress Shortcode" desc="Install the Clean Estimator WordPress plugin, then paste this shortcode." code={wordpressCode} onCopy={() => copy(wordpressCode, 'wp')} copied={copied === 'wp'} />
 
         {/* Installation Guide */}
         <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>

@@ -149,8 +149,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     <>
       {!embedded && (
         <Helmet>
-          <title>Free Cleaning Cost Estimator — CleanCalc</title>
+          <title>Free Cleaning Cost Estimator 2026 | Clean Estimator</title>
           <meta name="description" content="Get instant, accurate cleaning cost estimates for your home, apartment, or business. Compare prices by ZIP code across all 50 states." />
+          <meta property="og:site_name" content="Clean Estimator" />
+          <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://www.cleanestimator.com/" />
+          <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
         </Helmet>
       )}
 

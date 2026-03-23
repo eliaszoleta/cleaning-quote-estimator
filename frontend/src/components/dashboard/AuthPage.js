@@ -55,7 +55,7 @@ export default function AuthPage({ onAuth }) {
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
           <div style={{ width: 38, height: 38, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 20, fontWeight: 700 }}>✦</div>
-          <span style={{ fontWeight: 800, fontSize: 20, color: '#0f172a' }}>CleanCalc</span>
+          <span style={{ fontWeight: 800, fontSize: 20, color: '#0f172a' }}>Clean Estimator</span>
           <span style={{ fontSize: 12, background: '#f1f5f9', color: '#64748b', padding: '2px 8px', borderRadius: 20, fontWeight: 600, marginLeft: 4 }}>Company Portal</span>
         </div>
 

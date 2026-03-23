@@ -10,7 +10,7 @@ export default function BlogCategory({ category }) {
   return (
     <>
       <Helmet>
-        <title>{title} Guides | CleanCalc Blog</title>
+        <title>{title} Guides | Clean Estimator Blog</title>
         <meta name="description" content={`Expert guides on ${title.toLowerCase()} costs, tips, and best practices.`} />
       </Helmet>
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 24px' }}>

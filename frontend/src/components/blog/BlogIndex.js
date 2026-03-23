@@ -9,7 +9,7 @@ export default function BlogIndex() {
   return (
     <>
       <Helmet>
-        <title>Cleaning Cost Guides & Tips | CleanCalc Blog</title>
+        <title>Cleaning Cost Guides & Tips | Clean Estimator Blog</title>
         <meta name="description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses." />
       </Helmet>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '60px 24px' }}>
