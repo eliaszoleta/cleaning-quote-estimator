@@ -14,11 +14,6 @@ const cols = [
   {
     title: 'Resources',
     links: [
-      { label: 'Blog', href: '/blog' },
-      { label: 'House Cleaning Tips', href: '/blog/category/house-cleaning' },
-      { label: 'Commercial Cleaning Guide', href: '/blog/category/commercial' },
-      { label: 'Mold & Water Damage', href: '/blog/category/restoration' },
-      { label: 'Carpet Care', href: '/blog/category/carpet' },
       { label: 'About Clean Estimator', href: '/about' },
       { label: 'Contact', href: '/contact' },
     ],
