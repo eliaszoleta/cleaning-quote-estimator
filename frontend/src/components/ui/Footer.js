@@ -2,17 +2,13 @@ import React from 'react';
 
 const cols = [
   {
-    title: 'Calculators',
+    title: 'Blog Categories',
     links: [
-      { label: 'House Cleaning Cost', href: '/?service=home_residential' },
-      { label: 'Apartment Cleaning Cost', href: '/?service=apartment' },
-      { label: 'Commercial Cleaning Cost', href: '/?service=commercial' },
-      { label: 'Carpet Cleaning Cost', href: '/?service=carpet' },
-      { label: 'Air Duct Cleaning Cost', href: '/?service=air_duct' },
-      { label: 'Dryer Vent Cleaning Cost', href: '/?service=dryer_vent' },
-      { label: 'Tile & Grout Cleaning Cost', href: '/?service=tile_grout' },
-      { label: 'Mold Remediation Cost', href: '/?service=mold_remediation' },
-      { label: 'Water Damage Restoration Cost', href: '/?service=water_damage' },
+      { label: 'House Cleaning Tips', href: '/blog/category/house-cleaning' },
+      { label: 'Carpet Cleaning', href: '/blog/category/carpet' },
+      { label: 'Commercial Cleaning', href: '/blog/category/commercial' },
+      { label: 'Mold & Water Damage', href: '/blog/category/restoration' },
+      { label: 'All Blog Posts', href: '/blog' },
     ],
   },
   {
