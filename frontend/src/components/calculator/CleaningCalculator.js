@@ -72,11 +72,12 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     }
   }, []);
 
-  // Scroll to top of card on every step change
+  // Scroll to card on step change, accounting for sticky navbar height
   useEffect(() => {
-    if (cardRef.current) {
-      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (stepIndex === 0 || !cardRef.current) return;
+    const navbarHeight = 70;
+    const top = cardRef.current.getBoundingClientRect().top + window.scrollY - navbarHeight;
+    window.scrollTo({ top, behavior: 'smooth' });
   }, [stepIndex]);
 
   const goNext = () => setStepIndex(i => Math.min(i + 1, steps.length - 1));
