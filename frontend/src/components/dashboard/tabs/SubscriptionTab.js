@@ -112,7 +112,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
 
             {/* Price */}
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 8 }}>
-              <span style={{ fontSize: 44, fontWeight: 900, color: '#0f172a', lineHeight: 1, letterSpacing: '-2px' }}>$49</span>
+              <span style={{ fontSize: 44, fontWeight: 900, color: '#0f172a', lineHeight: 1, letterSpacing: '-2px' }}>$149</span>
               <span style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>/mo</span>
             </div>
 
