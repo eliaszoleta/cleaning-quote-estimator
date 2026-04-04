@@ -99,7 +99,7 @@ export default function App() {
   const handleLogout = async () => {
     if (supabase) await supabase.auth.signOut();
     setUser(null);
-    window.location.href = '/';
+    window.location.href = '/company';
   };
 
   // Embed mode — no chrome
