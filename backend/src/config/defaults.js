@@ -138,12 +138,12 @@ const DEFAULT_COMPANY_CONFIG = {
 // Home / Residential Cleaning base prices by sq footage tier
 // Source: HomeAdvisor 2024, Angi 2024
 const HOME_SQFT_BASE_PRICES = {
-  'under_1000': { low: 80, high: 130 },
-  '1000_1500':  { low: 110, high: 170 },
-  '1500_2000':  { low: 140, high: 210 },
-  '2000_2500':  { low: 170, high: 255 },
-  '2500_3000':  { low: 200, high: 300 },
-  'over_3000':  { low: 240, high: 360 },
+  'under_1000': { low: 90,  high: 115 },
+  '1000_1500':  { low: 122, high: 152 },
+  '1500_2000':  { low: 158, high: 198 },
+  '2000_2500':  { low: 195, high: 245 },
+  '2500_3000':  { low: 228, high: 282 },
+  'over_3000':  { low: 272, high: 338 },
 };
 
 // Bedroom/bathroom modifier (additional cost per room beyond base)
@@ -153,9 +153,9 @@ const BATHROOM_ADDON = { 1: 0, '1.5': 20, 2: 35, '2.5': 50, 3: 65, '3+': 90 };
 // Cleaning type multipliers
 const CLEANING_TYPE_MULTIPLIERS = {
   standard:         { low: 1.0,  high: 1.0  },
-  deep:             { low: 1.5,  high: 2.0  },
-  move_in_out:      { low: 1.7,  high: 2.2  },
-  post_construction:{ low: 2.0,  high: 2.5  },
+  deep:             { low: 1.6,  high: 1.9  },
+  move_in_out:      { low: 1.8,  high: 2.1  },
+  post_construction:{ low: 2.1,  high: 2.4  },
 };
 
 // Frequency discounts
@@ -168,14 +168,14 @@ const FREQUENCY_DISCOUNTS = {
 
 // Extra add-on costs (residential/apartment)
 const HOME_EXTRAS = {
-  inside_oven:      { low: 30, high: 60 },
-  inside_fridge:    { low: 25, high: 50 },
-  interior_windows: { low: 40, high: 80 },
-  laundry:          { low: 30, high: 50 },
-  dishes:           { low: 20, high: 40 },
-  garage:           { low: 50, high: 100 },
-  basement:         { low: 60, high: 120 },
-  balcony_patio:    { low: 35, high: 70 },
+  inside_oven:      { low: 35, high: 50 },
+  inside_fridge:    { low: 28, high: 42 },
+  interior_windows: { low: 48, high: 68 },
+  laundry:          { low: 32, high: 45 },
+  dishes:           { low: 22, high: 33 },
+  garage:           { low: 58, high: 82 },
+  basement:         { low: 70, high: 100 },
+  balcony_patio:    { low: 40, high: 58 },
 };
 
 // Home condition multipliers
@@ -187,23 +187,23 @@ const CONDITION_MULTIPLIERS = {
 
 // Apartment size base prices (slightly lower than residential)
 const APARTMENT_SIZE_PRICES = {
-  studio:  { low: 75,  high: 120 },
-  '1br':   { low: 95,  high: 145 },
-  '2br':   { low: 125, high: 190 },
-  '3br':   { low: 155, high: 235 },
-  '4br_plus': { low: 185, high: 280 },
+  studio:     { low: 85,  high: 108 },
+  '1br':      { low: 107, high: 133 },
+  '2br':      { low: 140, high: 175 },
+  '3br':      { low: 175, high: 215 },
+  '4br_plus': { low: 210, high: 258 },
 };
 
 // Commercial cleaning prices per sq ft per visit
 // Source: ISSA (International Sanitary Supply Association), BuildingOperationsManagement
 const COMMERCIAL_SQFT_RATES = {
-  office:    { low: 0.06, high: 0.12 },
-  retail:    { low: 0.07, high: 0.13 },
-  medical:   { low: 0.12, high: 0.20 },
-  restaurant:{ low: 0.10, high: 0.18 },
-  warehouse: { low: 0.04, high: 0.08 },
-  school:    { low: 0.08, high: 0.14 },
-  gym:       { low: 0.09, high: 0.15 },
+  office:    { low: 0.07, high: 0.10 },
+  retail:    { low: 0.08, high: 0.11 },
+  medical:   { low: 0.14, high: 0.18 },
+  restaurant:{ low: 0.11, high: 0.16 },
+  warehouse: { low: 0.05, high: 0.07 },
+  school:    { low: 0.09, high: 0.13 },
+  gym:       { low: 0.10, high: 0.14 },
 };
 
 // Service level multipliers for commercial
@@ -226,15 +226,15 @@ const COMMERCIAL_VISITS_PER_MONTH = {
 const DAY_PORTER_DAILY_RATE = { low: 180, high: 280 };
 
 // Carpet cleaning prices
-const CARPET_PRICE_PER_ROOM = { low: 25, high: 75 };
-const CARPET_PRICE_PER_SQFT = { low: 0.20, high: 0.40 };
-const CARPET_MINIMUM = { low: 75, high: 100 };
+const CARPET_PRICE_PER_ROOM = { low: 38, high: 55 };
+const CARPET_PRICE_PER_SQFT = { low: 0.25, high: 0.35 };
+const CARPET_MINIMUM = { low: 90, high: 110 };
 
 const CARPET_CONDITION_MULTIPLIERS = {
-  light:   { low: 1.0, high: 1.0 },
-  moderate:{ low: 1.1, high: 1.2 },
-  heavy:   { low: 1.3, high: 1.5 },
-  pet:     { low: 1.5, high: 2.0 },
+  light:   { low: 1.0,  high: 1.0  },
+  moderate:{ low: 1.1,  high: 1.2  },
+  heavy:   { low: 1.35, high: 1.45 },
+  pet:     { low: 1.6,  high: 1.85 },
 };
 
 const CARPET_METHOD_MULTIPLIERS = {
