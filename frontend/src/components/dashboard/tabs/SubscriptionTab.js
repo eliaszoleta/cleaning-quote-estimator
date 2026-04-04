@@ -124,7 +124,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
           <div style={{ alignSelf: 'center' }}>
             {(!isActive || status === 'trialing') && (
               <button onClick={handleCheckout} disabled={loading === 'checkout'}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 22px', background: loading === 'checkout' ? '#94a3b8' : '#ea580c', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}>
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 22px', background: loading === 'checkout' ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}>
                 {loading === 'checkout'
                   ? <><Loader2 size={14} /> Redirecting…</>
                   : <><CreditCard size={15} /> {status === 'trialing' ? 'Add Payment Method' : 'Reactivate →'}</>}
