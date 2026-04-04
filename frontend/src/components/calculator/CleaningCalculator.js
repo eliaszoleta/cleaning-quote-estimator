@@ -184,20 +184,20 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
       <div style={{
         background: embedded ? 'white' : 'linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%)',
         minHeight: embedded ? 'auto' : '100vh',
-        padding: embedded ? '0' : '40px 16px',
+        padding: embedded ? '0' : '28px 16px',
       }}>
         {/* Hero (non-embedded only) */}
         {!embedded && currentStep === 'service' && (
-          <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <div style={{ display: 'inline-block', background: '#dbeafe', color: '#1e40af', padding: '6px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 16 }}>
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <div style={{ display: 'inline-block', background: '#dbeafe', color: '#1e40af', padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, marginBottom: 12 }}>
               Free • Instant • No signup required
             </div>
-            <h1 style={{ fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 800, color: '#0f172a', lineHeight: 1.15, marginBottom: 16 }}>
-              How Much Does Cleaning Cost<br />
+            <h1 style={{ fontSize: 'clamp(22px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, marginBottom: 8 }}>
+              How Much Does Cleaning Cost{' '}
               <span style={{ color: primaryColor }}>In Your Area?</span>
             </h1>
-            <p style={{ fontSize: 18, color: '#64748b', maxWidth: 560, margin: '0 auto' }}>
-              Clean Estimator gives you accurate, ZIP-code specific estimates for any cleaning service in seconds.
+            <p style={{ fontSize: 15, color: '#64748b', maxWidth: 480, margin: '0 auto' }}>
+              ZIP-code accurate estimates for any cleaning service — in seconds.
             </p>
           </div>
         )}
