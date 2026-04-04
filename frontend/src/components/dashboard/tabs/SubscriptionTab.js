@@ -134,10 +134,10 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
           <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1px' }}>$149</span>
           <span style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>/month</span>
         </div>
-        <div style={{ fontSize: 13, color: '#64748b', marginBottom: 16 }}>Includes a 30-day free trial. Cancel anytime. &nbsp;·&nbsp; 🔒 Secure billing via Stripe</div>
-        {(!isActive || status === 'trialing') && (
+        <div style={{ fontSize: 13, color: '#64748b', marginBottom: !isActive && status !== 'trialing' ? 16 : 0 }}>Includes a 30-day free trial. Cancel anytime. &nbsp;·&nbsp; 🔒 Secure billing via Stripe</div>
+        {(!isActive && status !== 'trialing') && (
           <button onClick={handleCheckout} disabled={loading === 'checkout'}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer' }}>
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '11px 22px', marginTop: 16, background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer' }}>
             {loading === 'checkout' ? <><Loader2 size={14} className="spin" /> Redirecting…</> : 'Start Free Trial →'}
           </button>
         )}
