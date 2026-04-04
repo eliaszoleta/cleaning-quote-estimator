@@ -260,7 +260,7 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
   const perVisitHigh = Math.round(sqft * sqftRate.high * levelMult.high * afterHoursMult * stateMultiplier * markup);
 
   const monthlyLow = Math.max(perVisitLow * visitsPerMonth, minCharge);
-  const monthlyHigh = Math.max(perVisitHigh * visitsPerMonth, minCharge + 100);
+  const monthlyHigh = Math.max(perVisitHigh * visitsPerMonth, minCharge);
 
   const adjustments = [
     { label: `${buildingType} @ ${sqft.toLocaleString()} sq ft`, low: perVisitLow, high: perVisitHigh },
@@ -278,12 +278,12 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
   }
 
   const restroomSurcharge = restrooms > 2 ? (restrooms - 2) * 30 : 0;
-  if (restroomSurcharge > 0) adjustments.push({ label: `${restrooms} restrooms surcharge`, low: restroomSurcharge, high: restroomSurcharge + 20 });
+  if (restroomSurcharge > 0) adjustments.push({ label: `${restrooms} restrooms surcharge`, low: restroomSurcharge, high: restroomSurcharge });
 
   return {
     serviceType: 'commercial',
     totalLow: monthlyLow + porterMonthlyLow + restroomSurcharge,
-    totalHigh: monthlyHigh + porterMonthlyHigh + restroomSurcharge + 20,
+    totalHigh: monthlyHigh + porterMonthlyHigh + restroomSurcharge,
     basePrice: (perVisitLow + perVisitHigh) / 2,
     adjustments,
     unit: 'per_month',

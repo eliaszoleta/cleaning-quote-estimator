@@ -197,20 +197,20 @@ const APARTMENT_SIZE_PRICES = {
 // Commercial cleaning prices per sq ft per visit
 // Source: ISSA (International Sanitary Supply Association), BuildingOperationsManagement
 const COMMERCIAL_SQFT_RATES = {
-  office:    { low: 0.07, high: 0.10 },
-  retail:    { low: 0.08, high: 0.11 },
-  medical:   { low: 0.14, high: 0.18 },
-  restaurant:{ low: 0.11, high: 0.16 },
-  warehouse: { low: 0.05, high: 0.07 },
-  school:    { low: 0.09, high: 0.13 },
-  gym:       { low: 0.10, high: 0.14 },
+  office:    { low: 0.088, high: 0.107 },
+  retail:    { low: 0.09,  high: 0.11  },
+  medical:   { low: 0.15,  high: 0.185 },
+  restaurant:{ low: 0.12,  high: 0.148 },
+  warehouse: { low: 0.052, high: 0.065 },
+  school:    { low: 0.095, high: 0.118 },
+  gym:       { low: 0.104, high: 0.128 },
 };
 
 // Service level multipliers for commercial
 const COMMERCIAL_SERVICE_LEVELS = {
-  basic:    { low: 1.0, high: 1.0 },
-  standard: { low: 1.2, high: 1.3 },
-  premium:  { low: 1.5, high: 1.7 },
+  basic:    { low: 1.0,  high: 1.0  },
+  standard: { low: 1.2,  high: 1.25 },
+  premium:  { low: 1.55, high: 1.68 },
 };
 
 // Commercial frequency (visits per month)
@@ -223,7 +223,7 @@ const COMMERCIAL_VISITS_PER_MONTH = {
 };
 
 // Day porter monthly rate (loaded labor including benefits/overhead)
-const DAY_PORTER_DAILY_RATE = { low: 180, high: 280 };
+const DAY_PORTER_DAILY_RATE = { low: 218, high: 265 };
 
 // Carpet cleaning prices
 const CARPET_PRICE_PER_ROOM = { low: 38, high: 55 };
