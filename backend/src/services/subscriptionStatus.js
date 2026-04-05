@@ -1,10 +1,24 @@
-const TRIAL_DAYS = 30;
+const TRIAL_DAYS = 30; // Legacy: for existing accounts that started a free trial without CC
 
 function computeSubscriptionStatus(config) {
   const sub = config.subscription || {};
   const trialStart = sub.trialStartedAt ? new Date(sub.trialStartedAt) : null;
 
   if (sub.stripeSubscriptionId) {
+    if (sub.status === 'trialing') {
+      const daysLeft = sub.currentPeriodEnd
+        ? Math.max(0, Math.ceil((new Date(sub.currentPeriodEnd) - Date.now()) / (1000 * 60 * 60 * 24)))
+        : null;
+      return {
+        active: true,
+        status: 'trialing',
+        cancelAtPeriodEnd: sub.cancelAtPeriodEnd || false,
+        daysLeft,
+        currentPeriodEnd: sub.currentPeriodEnd || null,
+        stripeCustomerId: sub.stripeCustomerId || null,
+        stripeSubscriptionId: sub.stripeSubscriptionId,
+      };
+    }
     if (sub.status === 'active') {
       return {
         active: true,
@@ -25,6 +39,7 @@ function computeSubscriptionStatus(config) {
     return { active: false, status: sub.status || 'inactive', daysLeft: null, currentPeriodEnd: sub.currentPeriodEnd || null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: sub.stripeSubscriptionId };
   }
 
+  // Legacy: free trial started without CC (existing accounts — keep 30-day window)
   if (trialStart) {
     const daysElapsed = (Date.now() - trialStart.getTime()) / (1000 * 60 * 60 * 24);
     if (daysElapsed < TRIAL_DAYS) {
@@ -33,7 +48,8 @@ function computeSubscriptionStatus(config) {
     return { active: false, status: 'expired', daysLeft: 0, currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
   }
 
-  return { active: true, status: 'trialing', daysLeft: TRIAL_DAYS, currentPeriodEnd: null, stripeCustomerId: null, stripeSubscriptionId: null };
+  // New account: must start Stripe trial with CC (7 days)
+  return { active: false, status: 'requires_trial_setup', daysLeft: 7, currentPeriodEnd: null, stripeCustomerId: null, stripeSubscriptionId: null };
 }
 
 module.exports = { computeSubscriptionStatus };

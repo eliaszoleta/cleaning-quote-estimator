@@ -16,16 +16,17 @@ router.get('/:id', async (req, res) => {
     const svcStates = config ? Object.entries(config.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') : 'none';
     console.log(`[GET config] user=${id} found=${!!config} | ${svcStates}`);
     if (!config) {
-      // First login — create default config with trial start
+      // First login — new account requires Stripe checkout to start 7-day trial (CC required)
       config = {
         ...DEFAULT_COMPANY_CONFIG,
         subscription: {
           ...DEFAULT_COMPANY_CONFIG.subscription,
-          trialStartedAt: new Date().toISOString(),
+          trialType: 'stripe',
         },
       };
       await saveCompanyConfig(id, config);
-    } else if (!config.subscription?.trialStartedAt) {
+    } else if (!config.subscription?.trialStartedAt && config.subscription?.trialType !== 'stripe') {
+      // Legacy backfill: existing accounts missing trialStartedAt (keep 30-day free trial)
       config.subscription = {
         ...DEFAULT_COMPANY_CONFIG.subscription,
         ...(config.subscription || {}),

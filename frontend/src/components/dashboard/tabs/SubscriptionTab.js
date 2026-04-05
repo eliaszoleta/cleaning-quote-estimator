@@ -52,16 +52,18 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
 
   // Status display config
   const statusConfig = {
-    trialing:          { Icon: Zap,           iconColor: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', title: 'Free Trial' },
-    active:            { Icon: CheckCircle2,   iconColor: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0', title: 'Active Subscription' },
-    active_canceling:  { Icon: AlertTriangle,  iconColor: '#d97706', bg: '#fffbeb', border: '#fde68a', title: 'Active (Canceling)' },
-    past_due:          { Icon: AlertTriangle,  iconColor: '#dc2626', bg: '#fff1f2', border: '#fecdd3', title: 'Payment Past Due' },
-    expired:           { Icon: AlertTriangle,  iconColor: '#dc2626', bg: '#fef2f2', border: '#fecaca', title: 'Trial Expired' },
-    canceled:          { Icon: AlertTriangle,  iconColor: '#dc2626', bg: '#fef2f2', border: '#fecaca', title: 'Subscription Canceled' },
+    requires_trial_setup: { Icon: Zap,           iconColor: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', title: 'Start Your Free Trial' },
+    trialing:             { Icon: Zap,           iconColor: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', title: 'Free Trial' },
+    active:               { Icon: CheckCircle2,  iconColor: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0', title: 'Active Subscription' },
+    active_canceling:     { Icon: AlertTriangle, iconColor: '#d97706', bg: '#fffbeb', border: '#fde68a', title: 'Active (Canceling)' },
+    past_due:             { Icon: AlertTriangle, iconColor: '#dc2626', bg: '#fff1f2', border: '#fecdd3', title: 'Payment Past Due' },
+    expired:              { Icon: AlertTriangle, iconColor: '#dc2626', bg: '#fef2f2', border: '#fecaca', title: 'Trial Expired' },
+    canceled:             { Icon: AlertTriangle, iconColor: '#dc2626', bg: '#fef2f2', border: '#fecaca', title: 'Subscription Canceled' },
   };
   const sc = statusConfig[status] || { Icon: AlertTriangle, iconColor: '#94a3b8', bg: '#f8fafc', border: '#e2e8f0', title: 'No Active Plan' };
 
   const statusDetail = (() => {
+    if (status === 'requires_trial_setup') return 'Get 7 days free — credit card required, cancel anytime before your trial ends.';
     if (status === 'trialing' && subStatus?.daysLeft > 0) return `${subStatus.daysLeft} days remaining in your trial.`;
     if (status === 'trialing') return 'Your trial ends today.';
     if (status === 'active' && subStatus?.currentPeriodEnd) return `Renews on ${new Date(subStatus.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`;
@@ -100,7 +102,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
             {(!isActive || status === 'trialing') && (
               <button onClick={handleCheckout} disabled={loading === 'checkout'}
                 style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'checkout' ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer' }}>
-                {loading === 'checkout' ? <><Loader2 size={14} className="spin" /> Redirecting…</> : status === 'trialing' ? 'Subscribe Now →' : 'Reactivate →'}
+                {loading === 'checkout' ? <><Loader2 size={14} className="spin" /> Redirecting…</> : status === 'requires_trial_setup' ? 'Start 7-Day Trial →' : status === 'trialing' ? 'Subscribe Now →' : 'Reactivate →'}
               </button>
             )}
             {(status === 'active' || status === 'active_canceling' || status === 'past_due') && (

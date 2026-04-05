@@ -63,7 +63,7 @@ export default function AuthPage({ onAuth }) {
           {mode === 'login' ? 'Sign in to your dashboard' : 'Create your account'}
         </h1>
         <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28 }}>
-          {mode === 'login' ? 'Manage your widget, leads, and subscription.' : 'Start your free 30-day trial — no credit card required.'}
+          {mode === 'login' ? 'Manage your widget, leads, and subscription.' : 'Start your 7-day free trial — credit card required after signup.'}
         </p>
 
         {/* Toggle */}
