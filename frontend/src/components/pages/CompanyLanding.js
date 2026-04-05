@@ -41,7 +41,7 @@ export default function CompanyLanding() {
     <>
       <Helmet>
         <title>Embed a Cleaning Cost Calculator on Your Website | Clean Estimator for Companies</title>
-        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. Free 30-day trial. $49/month." />
+        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. Free 30-day trial. $149/month." />
       </Helmet>
       <div className="app">
         <Header />
@@ -64,7 +64,7 @@ export default function CompanyLanding() {
                 <a href="/company" style={{ background: '#2563eb', color: 'white', padding: '15px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 16 }}>Start Free Trial →</a>
                 <a href="/?service=home_residential" style={{ background: 'rgba(255,255,255,0.08)', color: 'white', padding: '15px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 16, border: '1px solid rgba(255,255,255,0.15)' }}>See Demo</a>
               </div>
-              <p style={{ color: '#475569', fontSize: 13.5, marginTop: 14 }}>30-day free trial · No credit card required · $49/month after</p>
+              <p style={{ color: '#475569', fontSize: 13.5, marginTop: 14 }}>30-day free trial · No credit card required · $149/month after</p>
             </div>
           </div>
 
@@ -127,7 +127,7 @@ export default function CompanyLanding() {
               <p style={{ color: '#64748b', fontSize: 15, marginBottom: 36 }}>One plan. Everything included. No surprises.</p>
               <div style={{ background: 'white', border: '2px solid #2563eb', borderRadius: 20, padding: '38px 34px', boxShadow: '0 8px 40px rgba(37,99,235,0.12)' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 4, marginBottom: 4 }}>
-                  <span style={{ fontSize: 54, fontWeight: 900, color: '#0f172a', letterSpacing: '-2px' }}>$49</span>
+                  <span style={{ fontSize: 54, fontWeight: 900, color: '#0f172a', letterSpacing: '-2px' }}>$149</span>
                   <span style={{ fontSize: 17, color: '#64748b' }}>/month</span>
                 </div>
                 <div style={{ color: '#16a34a', fontWeight: 600, fontSize: 14, marginBottom: 26 }}>30-day free trial · Cancel anytime</div>
