@@ -11,6 +11,7 @@ export default function SettingsTab({ user, onLogout }) {
   const [pwMsg, setPwMsg] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -46,7 +47,7 @@ export default function SettingsTab({ user, onLogout }) {
       await supabase.auth.signOut();
       if (onLogout) onLogout();
     } catch (err) {
-      alert(err.message || 'Failed to delete account. Please try again.');
+      setDeleteError(err.message || 'Failed to delete account. Please try again.');
       setDeleteLoading(false);
     }
   };
@@ -131,6 +132,11 @@ export default function SettingsTab({ user, onLogout }) {
             style={{ width: '100%', padding: '8px 12px', border: '1px solid #fecaca', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
           />
         </div>
+        {deleteError && (
+          <div style={{ marginBottom: 12, fontSize: 13, padding: '8px 12px', borderRadius: 7, color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca' }}>
+            {deleteError}
+          </div>
+        )}
         <button
           onClick={handleDeleteAccount}
           disabled={deleteConfirm !== 'DELETE' || deleteLoading}
