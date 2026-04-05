@@ -39,6 +39,12 @@ function computeSubscriptionStatus(config) {
     return { active: false, status: sub.status || 'inactive', daysLeft: null, currentPeriodEnd: sub.currentPeriodEnd || null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: sub.stripeSubscriptionId };
   }
 
+  // New CC-required trial — trialType:'stripe' means the account was created after the
+  // CC-required trial was introduced. Must complete Stripe checkout first.
+  if (sub.trialType === 'stripe') {
+    return { active: false, status: 'requires_trial_setup', daysLeft: 7, currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
+  }
+
   // Legacy: free trial started without CC (existing accounts — keep 30-day window)
   if (trialStart) {
     const daysElapsed = (Date.now() - trialStart.getTime()) / (1000 * 60 * 60 * 24);
@@ -48,7 +54,7 @@ function computeSubscriptionStatus(config) {
     return { active: false, status: 'expired', daysLeft: 0, currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
   }
 
-  // New account: must start Stripe trial with CC (7 days)
+  // New account: no Stripe subscription and no trial started yet
   return { active: false, status: 'requires_trial_setup', daysLeft: 7, currentPeriodEnd: null, stripeCustomerId: null, stripeSubscriptionId: null };
 }
 
