@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Zap, AlertTriangle, Globe, Paintbrush, Users, SlidersHorizontal, KeyRound, BarChart3, Phone, Infinity, Check, Loader2 } from 'lucide-react';
+import { CheckCircle2, Zap, AlertTriangle, Globe, Paintbrush, Users, SlidersHorizontal, KeyRound, BarChart3, Phone, Infinity, Check, Loader2, Lock } from 'lucide-react';
 import { postCheckout, postPortal } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 
@@ -132,11 +132,11 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
 
       {/* Pricing */}
       <div style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)', border: '1px solid #bfdbfe', borderRadius: 12, padding: '20px 22px' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
-          <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1px' }}>$159</span>
-          <span style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>/month</span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginBottom: 4 }}>
+          <span style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>$159</span>
+          <span style={{ fontSize: 14, color: '#64748b', fontWeight: 500 }}>/month</span>
         </div>
-        <div style={{ fontSize: 13, color: '#64748b' }}>Cancel anytime. &nbsp;·&nbsp; 🔒 Secure billing via Stripe</div>
+        <div style={{ fontSize: 13, color: '#64748b', display: 'flex', alignItems: 'center', gap: 5 }}>Cancel anytime. &nbsp;·&nbsp; <Lock size={12} color="#64748b" /> Secure billing via Stripe</div>
       </div>
     </div>
   );
