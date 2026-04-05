@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
-  Users, CreditCard, KeyRound, Loader2, Check, LogOut, AlertCircle, Save,
+  Users, CreditCard, KeyRound, Settings, Loader2, Check, LogOut, AlertCircle, Save,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
@@ -13,6 +13,7 @@ import EmbedTab from './tabs/EmbedTab';
 import LeadsTab from './tabs/LeadsTab';
 import SubscriptionTab from './tabs/SubscriptionTab';
 import APIKeysTab from './tabs/APIKeysTab';
+import SettingsTab from './tabs/SettingsTab';
 
 const NAV = [
   { id: 'overview',      Icon: LayoutDashboard,   label: 'Overview' },
@@ -22,6 +23,7 @@ const NAV = [
   { id: 'leads',         Icon: Users,              label: 'Leads' },
   { id: 'subscription',  Icon: CreditCard,         label: 'Subscription' },
   { id: 'api',           Icon: KeyRound,           label: 'API Keys' },
+  { id: 'settings',      Icon: Settings,           label: 'Settings' },
 ];
 
 export default function CompanyDashboard({ user, onLogout }) {
@@ -111,6 +113,7 @@ export default function CompanyDashboard({ user, onLogout }) {
     leads:        <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab {...tabProps} />,
     api:          <APIKeysTab {...tabProps} />,
+    settings:     <SettingsTab user={user} onLogout={onLogout} />,
   };
 
   const subBadge = subStatus ? (() => {

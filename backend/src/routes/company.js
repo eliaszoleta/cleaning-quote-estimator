@@ -1,8 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { getCompanyConfig, saveCompanyConfig } = require('../services/companyConfig');
+
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SERVICE_KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
+function dbHeaders() {
+  const key = SERVICE_KEY();
+  return { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
+}
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
@@ -120,6 +128,36 @@ router.get('/:id/public', async (req, res) => {
     });
   } catch (err) {
     res.json({ success: true, data: DEFAULT_COMPANY_CONFIG });
+  }
+});
+
+// DELETE /api/company/account — permanently delete account and all associated data
+router.delete('/account', async (req, res) => {
+  const companyId = req.user.id;
+  try {
+    if (SERVICE_KEY()) {
+      // Delete leads (non-fatal)
+      await axios.delete(
+        `${SUPABASE_URL}/rest/v1/leads?company_id=eq.${encodeURIComponent(companyId)}`,
+        { headers: dbHeaders() }
+      ).catch(e => console.warn('Delete leads warning:', e.message));
+
+      // Delete company config
+      await axios.delete(
+        `${SUPABASE_URL}/rest/v1/cleaning_company_configs?company_id=eq.${encodeURIComponent(companyId)}`,
+        { headers: dbHeaders() }
+      ).catch(e => console.warn('Delete config warning:', e.message));
+
+      // Delete Supabase auth user (must come last)
+      await axios.delete(
+        `${SUPABASE_URL}/auth/v1/admin/users/${companyId}`,
+        { headers: { apikey: SERVICE_KEY(), Authorization: `Bearer ${SERVICE_KEY()}` } }
+      );
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete account error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to delete account. Please try again.' });
   }
 });
 
