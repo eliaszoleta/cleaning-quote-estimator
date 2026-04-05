@@ -133,7 +133,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
       {/* Pricing */}
       <div style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)', border: '1px solid #bfdbfe', borderRadius: 12, padding: '20px 22px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
-          <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1px' }}>$149</span>
+          <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1px' }}>$159</span>
           <span style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>/month</span>
         </div>
         <div style={{ fontSize: 13, color: '#64748b' }}>Cancel anytime. &nbsp;·&nbsp; 🔒 Secure billing via Stripe</div>
