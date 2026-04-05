@@ -40,7 +40,7 @@ const DETAIL_STEP_COMPONENT = {
   water_damage: WaterDamageStep,
 };
 
-const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Your Info', 'Results'];
+const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Send', 'Results'];
 
 export default function CleaningCalculator({ companyConfig = null, embedded = false }) {
   const cardRef = useRef(null);
