@@ -26,7 +26,7 @@ html { font-size: 16px; }
 input, select, textarea, button { font-family: inherit; }
 
 body {
-  font-family: customFont, "customFont Fallback", Circular, custom-font, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: 1.6;
