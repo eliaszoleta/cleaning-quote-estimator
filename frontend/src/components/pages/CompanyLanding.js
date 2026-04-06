@@ -121,7 +121,7 @@ export default function CompanyLanding() {
           </div>
 
           {/* Pricing */}
-          <div id="pricing" style={{ background: 'linear-gradient(135deg, #f0f7ff, #f8fafc)', padding: '80px 24px', borderTop: '1px solid #e2e8f0' }}>
+          <div id="pricing" style={{ background: 'linear-gradient(135deg, #f0f7ff, #f8fafc)', padding: '80px 24px 60px', borderTop: '1px solid #e2e8f0' }}>
             <div style={{ maxWidth: 500, margin: '0 auto', textAlign: 'center' }}>
               <h2 style={{ fontSize: 32, fontWeight: 700, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
               <p style={{ color: '#64748b', fontSize: 15, marginBottom: 36 }}>One plan. Everything included. No surprises.</p>
@@ -144,7 +144,7 @@ export default function CompanyLanding() {
                 <a href="/company" style={{ display: 'block', background: '#2563eb', color: 'white', padding: '15px 0', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 16, textAlign: 'center' }}>
                   Start Free Trial →
                 </a>
-                <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 11 }}>Credit card required. Cancel before 7 days and you won't be charged.</p>
+                <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 11, textAlign: 'center' }}>$159/mo after 7 days · Cancel anytime</p>
               </div>
             </div>
           </div>
