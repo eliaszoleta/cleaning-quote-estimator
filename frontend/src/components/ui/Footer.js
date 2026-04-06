@@ -38,7 +38,7 @@ const cols = [
 ];
 
 const s = {
-  footer: { background: '#0f172a', color: '#94a3b8', marginTop: 80 },
+  footer: { background: '#0f172a', color: '#94a3b8' },
   inner: { maxWidth: 1200, margin: '0 auto', padding: '64px 24px 40px' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 40, marginBottom: 48 },
   colTitle: { color: 'white', fontWeight: 700, fontSize: 14, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em' },
