@@ -64,7 +64,7 @@ export default function CompanyLanding() {
                 <a href="/company" style={{ background: '#2563eb', color: 'white', padding: '15px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 16 }}>Start Free Trial →</a>
                 <a href="/?service=home_residential" style={{ background: 'rgba(255,255,255,0.08)', color: 'white', padding: '15px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 16, border: '1px solid rgba(255,255,255,0.15)' }}>See Demo</a>
               </div>
-              <p style={{ color: '#475569', fontSize: 13.5, marginTop: 14 }}>7-day free trial · Credit card required · $159/month after</p>
+              <p style={{ color: '#475569', fontSize: 13.5, marginTop: 14 }}>$159/mo after 7 days · Cancel anytime</p>
             </div>
           </div>
 
