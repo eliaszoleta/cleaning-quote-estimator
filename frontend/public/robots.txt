@@ -5,4 +5,4 @@ Disallow: /embed
 Disallow: /results
 Disallow: /company
 
-Sitemap: https://cleanestimator.com/sitemap.xml
+Sitemap: https://www.cleanestimator.com/sitemap.xml

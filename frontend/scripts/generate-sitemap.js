@@ -7,7 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SITE_URL = 'https://cleanestimator.com';
+const SITE_URL = 'https://www.cleanestimator.com';
 const TODAY = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
 // ── Parse blogPosts.js as text ─────────────────────────────────────────────
