@@ -150,9 +150,9 @@ export default function CompanyLanding() {
           </div>
 
           {/* CTA */}
-          <div style={{ background: '#0f172a', color: 'white', padding: '80px 24px', textAlign: 'center' }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 14, letterSpacing: '-0.4px' }}>Ready to capture more leads?</h2>
-            <p style={{ fontSize: 16, color: '#94a3b8', marginBottom: 30, maxWidth: 460, margin: '0 auto 30px' }}>Join cleaning companies already using Clean Estimator to turn website visitors into booked jobs.</p>
+          <div style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', padding: '80px 24px', textAlign: 'center' }}>
+            <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 14, letterSpacing: '-0.4px', color: '#0f172a' }}>Ready to capture more leads?</h2>
+            <p style={{ fontSize: 16, color: '#64748b', marginBottom: 30, maxWidth: 460, margin: '0 auto 30px' }}>Join cleaning companies already using Clean Estimator to turn website visitors into booked jobs.</p>
             <a href="/company" style={{ background: '#2563eb', color: 'white', padding: '15px 38px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 17 }}>Get Started Free →</a>
           </div>
 
