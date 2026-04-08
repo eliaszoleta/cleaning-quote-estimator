@@ -145,6 +145,24 @@ export default function App() {
       <div className="app">
         <Header />
         <main>
+          {/* H1 intro — critical for SEO; establishes primary keyword signal for Google */}
+          <section style={{ background: 'white', padding: '36px 24px 0', textAlign: 'center' }}>
+            <div style={{ maxWidth: 640, margin: '0 auto' }}>
+              <h1 style={{ fontSize: 'clamp(22px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', lineHeight: 1.15, marginBottom: 10, letterSpacing: '-0.025em' }}>
+                Free Cleaning Cost Estimator &amp; Calculator
+              </h1>
+              <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.65, maxWidth: 520, margin: '0 auto 14px' }}>
+                Instant, ZIP-code accurate cleaning cost estimates for house cleaning, deep cleaning, move-out, carpet, air duct, mold remediation &amp; more. No signup required.
+              </p>
+              <div style={{ display: 'flex', gap: 18, justifyContent: 'center', flexWrap: 'wrap', fontSize: 12.5, color: '#64748b', paddingBottom: 4 }}>
+                {['100% free', 'No signup required', '9 cleaning services', 'All 50 states'].map(t => (
+                  <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ color: '#16a34a', fontWeight: 700 }}>✓</span> {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </section>
           <CleaningCalculator />
           <SEOContent />
         </main>
