@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
+import './CleaningCalculator.css';
 import { AlertCircle, MapPin, BarChart3, ShieldOff, Zap } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
 import ServiceSelect from './steps/ServiceSelect';
@@ -188,17 +189,10 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
       }}>
         {/* Hero (non-embedded only) */}
         {!embedded && currentStep === 'service' && (
-          <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ display: 'inline-block', background: '#dbeafe', color: '#1e40af', padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, marginBottom: 12 }}>
-              Free • Instant • No signup required
-            </div>
-            <h1 style={{ fontSize: 'clamp(22px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', lineHeight: 1.2, marginBottom: 8 }}>
-              How Much Does Cleaning Cost{' '}
-              <span style={{ color: primaryColor }}>In Your Area?</span>
-            </h1>
-            <p style={{ fontSize: 15, color: '#64748b', maxWidth: 480, margin: '0 auto' }}>
-              ZIP-code accurate estimates for any cleaning service — in seconds.
-            </p>
+          <div className="calc-hero">
+            <div className="calc-hero__badge">Free • Instant • No signup required</div>
+            <h1 className="calc-hero__title">Free Cleaning Cost Estimator &amp; Calculator</h1>
+            <p className="calc-hero__subtitle">Instant, ZIP-code accurate cleaning cost estimates for house cleaning, deep cleaning, move-out, carpet, air duct, mold remediation &amp; more.</p>
           </div>
         )}
 
