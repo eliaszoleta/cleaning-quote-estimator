@@ -16,10 +16,6 @@ const FAQ = [
   { q: 'What factors affect cleaning service costs?', a: 'The main factors that affect cleaning costs are: (1) Home size — larger homes cost more, (2) Location — cities and high cost-of-living states charge more, (3) Frequency — weekly and biweekly clients get 10–20% discounts, (4) Service type — deep cleans and move-out cleans cost more than standard recurring cleans, (5) Condition — heavily cluttered or dirty homes may incur surcharges, and (6) Add-ons — oven, fridge, and window cleaning typically cost extra.' },
   { q: 'Is it cheaper to hire a cleaning service or clean yourself?', a: 'Hiring a professional cleaning service costs $120–$250 per visit for a standard home, but saves 3–6 hours of your time. For many homeowners, the time savings and professional results justify the cost. Recurring service packages (weekly or biweekly) offer the best value at $80–$160 per visit with consistency discounts. DIY is cheaper upfront but requires purchasing supplies and the right techniques to achieve the same results.' },
   { q: 'How do I get a free cleaning estimate?', a: 'Use the Clean Estimator cleaning cost calculator at the top of this page — it\'s completely free, requires no signup, and gives you an instant estimate based on your ZIP code, service type, and home size. For an official quote, contact 2–3 local cleaning companies and request an in-home or virtual walkthrough.' },
-  { q: 'How much does deep cleaning cost?', a: 'A deep cleaning costs $200–$400 for a standard 2,000 sq ft home — roughly 1.5–2× the price of a regular clean. Deep cleans involve cleaning inside appliances, baseboards, blinds, grout lines, and areas typically skipped in a maintenance clean. Most cleaning companies recommend a deep clean as a first-time service before starting recurring visits.' },
-  { q: 'How much does move-out cleaning cost?', a: 'Move-out (end-of-tenancy) cleaning costs $150–$450 for an apartment and $250–$600+ for a house, depending on size and condition. Move-out cleans are more thorough than standard cleans — cleaners scrub appliances inside and out, clean inside cabinets, and leave the home in condition for new tenants. Many landlords require professional cleaning before returning a security deposit.' },
-  { q: 'Do cleaning services charge per hour or a flat rate?', a: 'It depends on the company. Hourly rates typically run $25–$60 per cleaner per hour, meaning a team of two cleaning for 2 hours costs $100–$240. Flat-rate pricing is more common and predictable — you pay a set price per visit based on home size and service type, regardless of how long it takes. Flat-rate pricing is generally better for the customer since cleaners are incentivized to work efficiently.' },
-  { q: 'How do I find a reliable cleaning service near me?', a: 'To find a reputable local cleaning service: (1) Use our calculator to understand fair pricing in your area. (2) Ask neighbors or friends for referrals — word of mouth is the most reliable source. (3) Check Google reviews and look for companies with 50+ reviews and a 4.5+ rating. (4) Verify the company is bonded and insured. (5) Get quotes from 2–3 companies and compare — a quote significantly below market often means cut corners or hidden fees.' },
 ];
 
 const STATES_DATA = [
@@ -107,8 +103,8 @@ export default function SEOContent() {
     <>
       <Helmet>
         <title>Free Cleaning Cost Estimator 2026 — House, Carpet, Commercial | Clean Estimator</title>
-        <meta name="description" content="Get instant cleaning cost estimates for any service — house cleaning, deep cleaning, move-out, carpet, air duct, mold remediation & more. ZIP-code accurate. No signup." />
-        <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, free cleaning estimate, house cleaning cost, deep cleaning cost, move out cleaning cost, carpet cleaning cost, air duct cleaning cost, mold remediation cost, commercial cleaning rates, cleaning service per hour, cleaning rates per hour, how much does cleaning cost, cleaning price calculator, cleaning service near me, house cleaning prices, how much does a cleaner cost, cleaning cost by zip code" />
+        <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $120–$250, carpet cleaning $100–$300, air duct $300–$700, commercial, mold remediation & more. No signup needed." />
+        <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, house cleaning cost calculator, how much does cleaning cost, cleaning estimate, carpet cleaning cost, air duct cleaning cost, commercial cleaning rates, mold remediation cost, cleaning price calculator, free cleaning estimate" />
         <link rel="canonical" href="https://www.cleanestimator.com/" />
         <meta property="og:site_name" content="Clean Estimator" />
         <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
@@ -192,56 +188,6 @@ export default function SEOContent() {
             <p style={{ textAlign: 'center', fontSize: 12.5, color: '#94a3b8', marginTop: 14 }}>
               Prices vary. <a href="/" style={{ color: '#2563eb' }}>Use the calculator above</a> for a ZIP-code specific estimate.
             </p>
-          </div>
-
-          {/* Cleaning Pricing Guide */}
-          <div style={{ marginBottom: 80 }}>
-            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
-              Cleaning Service Pricing Guide: What Affects Your Cost
-            </h2>
-            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, marginBottom: 36, maxWidth: 600, margin: '0 auto 36px' }}>
-              Understanding how cleaning companies set their prices helps you compare quotes and spot a fair deal.
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
-              {[
-                {
-                  title: 'Standard Cleaning',
-                  price: '$120 – $250',
-                  color: '#2563eb', bg: '#eff6ff',
-                  points: ['Recurring visits (weekly/biweekly)', 'Dusting, vacuuming, mopping, bathrooms', 'Kitchens wiped down (not inside appliances)', 'Discounts of 10–20% for regular clients'],
-                },
-                {
-                  title: 'Deep Cleaning',
-                  price: '$200 – $400',
-                  color: '#7c3aed', bg: '#f5f3ff',
-                  points: ['First-time clean or after long gaps', 'Inside oven, fridge, cabinets', 'Baseboards, blinds, window sills', '1.5–2× the cost of a standard clean'],
-                },
-                {
-                  title: 'Move-Out Cleaning',
-                  price: '$150 – $600',
-                  color: '#059669', bg: '#ecfdf5',
-                  points: ['Required by most landlords', 'Everything in deep clean, plus interior windows', 'Empty-home rate vs. furnished rate', 'Often required to recover security deposit'],
-                },
-                {
-                  title: 'Flat Rate vs. Hourly',
-                  price: '$25 – $60/hr',
-                  color: '#ea580c', bg: '#fff7ed',
-                  points: ['Hourly: $25–$60 per cleaner per hour', 'Flat rate: fixed price per visit', 'Flat rate more predictable for budgeting', 'Most companies use flat-rate pricing'],
-                },
-              ].map(item => (
-                <div key={item.title} style={{ background: item.bg, borderRadius: 14, padding: '20px 18px', border: `1px solid ${item.color}22` }}>
-                  <div style={{ fontWeight: 800, fontSize: 15, color: item.color, marginBottom: 4 }}>{item.title}</div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>{item.price}</div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {item.points.map(p => (
-                      <li key={p} style={{ fontSize: 13, color: '#374151', marginBottom: 6, display: 'flex', alignItems: 'flex-start', gap: 7 }}>
-                        <Check size={12} color="#16a34a" style={{ flexShrink: 0, marginTop: 2 }} />{p}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* FAQ */}
