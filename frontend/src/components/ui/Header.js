@@ -97,7 +97,7 @@ export default function Header() {
         {/* Logo */}
         <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
           <span style={styles.logoIcon} aria-hidden="true">✦</span>
-          Clean Estimator
+          {!isMobile && 'Clean Estimator'}
         </a>
 
         {isMobile ? (
