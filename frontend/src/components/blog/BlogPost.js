@@ -119,9 +119,11 @@ export default function BlogPost({ slug }) {
 
         {/* Header */}
         <div style={{ marginBottom: 40 }}>
-          <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-            <a href={`/blog/category/${post.category}`} style={{ background: '#eff6ff', color: '#2563eb', padding: '4px 12px', borderRadius: 20, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>{post.categoryLabel}</a>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+            <a href={`/blog/category/${post.category}`} style={{ color: '#2563eb', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>{post.categoryLabel}</a>
+            <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
             <span style={{ color: '#94a3b8', fontSize: 13 }}>{post.readTime} read</span>
+            <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
             <span style={{ color: '#94a3b8', fontSize: 13 }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
           </div>
           <h1 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.2, marginBottom: 16 }}>{post.title}</h1>
