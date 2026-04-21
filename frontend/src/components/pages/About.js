@@ -7,6 +7,7 @@ export default function About() {
       <Helmet>
         <title>About Clean Estimator | Free Cleaning Cost Estimator</title>
         <meta name="description" content="Clean Estimator provides free, accurate cleaning cost estimates for homeowners and businesses across all 50 U.S. states." />
+        <link rel="canonical" href="https://www.cleanestimator.com/about" />
       </Helmet>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '60px 24px' }}>
         <h1 style={{ fontSize: 40, fontWeight: 900, color: '#0f172a', marginBottom: 12 }}>About Clean Estimator</h1>

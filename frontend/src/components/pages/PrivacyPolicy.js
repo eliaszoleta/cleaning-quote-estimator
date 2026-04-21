@@ -4,7 +4,10 @@ import { Helmet } from 'react-helmet-async';
 export default function PrivacyPolicy() {
   return (
     <>
-      <Helmet><title>Privacy Policy | Clean Estimator</title></Helmet>
+      <Helmet>
+        <title>Privacy Policy | Clean Estimator</title>
+        <link rel="canonical" href="https://www.cleanestimator.com/privacy-policy" />
+      </Helmet>
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '60px 24px', lineHeight: 1.8 }}>
         <h1 style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>Privacy Policy</h1>
         <p style={{ color: '#64748b', marginBottom: 40 }}>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>

@@ -12,6 +12,7 @@ export default function BlogCategory({ category }) {
       <Helmet>
         <title>{title} Guides | Clean Estimator Blog</title>
         <meta name="description" content={`Expert guides on ${title.toLowerCase()} costs, tips, and best practices.`} />
+        <link rel="canonical" href={`https://www.cleanestimator.com/blog/category/${category}`} />
       </Helmet>
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 24px' }}>
         <div style={{ marginBottom: 8 }}>

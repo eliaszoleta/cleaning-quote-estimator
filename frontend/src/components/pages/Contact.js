@@ -18,6 +18,7 @@ export default function Contact() {
       <Helmet>
         <title>Contact Us | Clean Estimator</title>
         <meta name="description" content="Get in touch with the Clean Estimator team for support, partnerships, or general questions." />
+        <link rel="canonical" href="https://www.cleanestimator.com/contact" />
       </Helmet>
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '60px 24px' }}>
         <h1 style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>Contact Us</h1>

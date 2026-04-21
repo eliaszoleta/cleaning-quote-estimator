@@ -11,6 +11,7 @@ export default function BlogIndex() {
       <Helmet>
         <title>Cleaning Cost Guides & Tips | Clean Estimator Blog</title>
         <meta name="description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses." />
+        <link rel="canonical" href="https://www.cleanestimator.com/blog" />
       </Helmet>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '60px 24px' }}>
         <h1 style={{ fontSize: 40, fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>Cleaning Cost Guides</h1>
