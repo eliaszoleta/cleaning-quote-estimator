@@ -9,9 +9,35 @@ export default function BlogIndex() {
   return (
     <>
       <Helmet>
-        <title>Cleaning Cost Guides & Tips | Clean Estimator Blog</title>
+        <title>Cleaning Cost Guides &amp; Tips | Clean Estimator Blog</title>
         <meta name="description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses." />
         <link rel="canonical" href="https://www.cleanestimator.com/blog" />
+        <meta property="og:title" content="Cleaning Cost Guides & Tips | Clean Estimator Blog" />
+        <meta property="og:description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.cleanestimator.com/blog" />
+        <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
+        <meta property="og:site_name" content="Clean Estimator" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Cleaning Cost Guides & Tips | Clean Estimator Blog" />
+        <meta name="twitter:description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses." />
+        <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          "name": "Clean Estimator Cleaning Cost Blog",
+          "description": "Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses.",
+          "url": "https://www.cleanestimator.com/blog",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Clean Estimator",
+            "url": "https://www.cleanestimator.com",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.cleanestimator.com/og-image.png"
+            }
+          }
+        })}</script>
       </Helmet>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '60px 24px' }}>
         <h1 style={{ fontSize: 40, fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>Cleaning Cost Guides</h1>

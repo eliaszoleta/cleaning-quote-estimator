@@ -11,8 +11,34 @@ export default function BlogCategory({ category }) {
     <>
       <Helmet>
         <title>{title} Guides | Clean Estimator Blog</title>
-        <meta name="description" content={`Expert guides on ${title.toLowerCase()} costs, tips, and best practices.`} />
+        <meta name="description" content={`Expert guides on ${title.toLowerCase()} costs, tips, and best practices. Browse ${posts.length} articles.`} />
         <link rel="canonical" href={`https://www.cleanestimator.com/blog/category/${category}`} />
+        <meta property="og:title" content={`${title} Guides | Clean Estimator Blog`} />
+        <meta property="og:description" content={`Expert guides on ${title.toLowerCase()} costs, tips, and best practices.`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://www.cleanestimator.com/blog/category/${category}`} />
+        <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
+        <meta property="og:site_name" content="Clean Estimator" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={`${title} Guides | Clean Estimator Blog`} />
+        <meta name="twitter:description" content={`Expert guides on ${title.toLowerCase()} costs, tips, and best practices.`} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.cleanestimator.com" },
+            { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.cleanestimator.com/blog" },
+            { "@type": "ListItem", "position": 3, "name": title, "item": `https://www.cleanestimator.com/blog/category/${category}` }
+          ]
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": `${title} — Clean Estimator Blog`,
+          "description": `Expert guides on ${title.toLowerCase()} costs, tips, and best practices.`,
+          "url": `https://www.cleanestimator.com/blog/category/${category}`,
+          "publisher": { "@type": "Organization", "name": "Clean Estimator", "url": "https://www.cleanestimator.com" }
+        })}</script>
       </Helmet>
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 24px' }}>
         <div style={{ marginBottom: 8 }}>

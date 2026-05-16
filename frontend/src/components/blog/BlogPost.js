@@ -69,13 +69,20 @@ export default function BlogPost({ slug }) {
   const others = BLOG_POSTS.filter(p => p.slug !== slug && p.category !== post.category).slice(0, 2);
   const suggestions = [...related, ...others].slice(0, 3);
 
+  const canonicalUrl = `https://www.cleanestimator.com/blog/${slug}`;
+  const seoTitle = `${post.title} | Clean Estimator`;
+  const dateISO = post.dateISO || (post.date ? new Date(post.date).toISOString() : new Date().toISOString());
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt,
-    datePublished: post.dateISO || post.date,
+    datePublished: dateISO,
+    dateModified: dateISO,
     image: 'https://www.cleanestimator.com/og-image.png',
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+    url: canonicalUrl,
     author: { '@type': 'Organization', name: 'Clean Estimator', url: 'https://www.cleanestimator.com' },
     publisher: {
       '@type': 'Organization',
@@ -90,25 +97,41 @@ export default function BlogPost({ slug }) {
     },
   };
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.cleanestimator.com' },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://www.cleanestimator.com/blog' },
+      { '@type': 'ListItem', position: 3, name: post.categoryLabel || post.category, item: `https://www.cleanestimator.com/blog/category/${post.category}` },
+      { '@type': 'ListItem', position: 4, name: post.title, item: canonicalUrl },
+    ],
+  };
+
   return (
     <>
       <Helmet>
-        <title>{post.title} | Clean Estimator</title>
+        <title>{seoTitle}</title>
         <meta name="description" content={post.excerpt} />
-        <link rel="canonical" href={`https://www.cleanestimator.com/blog/${slug}`} />
+        <link rel="canonical" href={canonicalUrl} />
         <meta property="og:site_name" content="Clean Estimator" />
-        <meta property="og:title" content={`${post.title} | Clean Estimator`} />
+        <meta property="og:title" content={seoTitle} />
         <meta property="og:description" content={post.excerpt} />
-        <meta property="og:url" content={`https://www.cleanestimator.com/blog/${slug}`} />
+        <meta property="og:url" content={canonicalUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
         <meta property="og:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
+        <meta property="article:published_time" content={dateISO} />
+        <meta property="article:modified_time" content={dateISO} />
+        <meta property="article:section" content={post.categoryLabel || post.category} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@CleanEstimator" />
-        <meta name="twitter:title" content={`${post.title} | Clean Estimator`} />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={post.excerpt} />
         <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
         <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         <script type="application/ld+json">{JSON.stringify(schema)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
       </Helmet>
 
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '60px 24px' }}>
