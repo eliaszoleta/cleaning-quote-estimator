@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HelmetProvider } from 'react-helmet-async';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
 import CleaningCalculator from './components/calculator/CleaningCalculator';
 import ResultsScreen from './components/calculator/ResultsScreen';
@@ -92,6 +92,7 @@ export default function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      setAuthLoading(false);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -99,7 +100,7 @@ export default function App() {
   const handleLogout = async () => {
     if (supabase) await supabase.auth.signOut();
     setUser(null);
-    window.location.href = '/';
+    window.location.href = '/company';
   };
 
   // Embed mode — no chrome
@@ -141,6 +142,20 @@ export default function App() {
   // Home — public calculator
   return (
     <HelmetProvider>
+      <Helmet>
+        <link rel="canonical" href="https://www.cleanestimator.com/" />
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "Clean Estimator — Free Cleaning Cost Estimator",
+          "url": "https://www.cleanestimator.com/",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "Any",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "description": "Free cleaning cost estimator for US homeowners and businesses. Instant ZIP-code specific estimates for house cleaning, carpet cleaning, air duct cleaning, mold remediation, and more."
+        })}</script>
+      </Helmet>
       <div className="app">
         <Header />
         <main>

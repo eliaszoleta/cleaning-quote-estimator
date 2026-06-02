@@ -37,9 +37,11 @@ router.post('/checkout', async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
+      payment_method_collection: 'always',
       line_items: [{ price: priceId, quantity: 1 }],
       customer: existingCustomerId || undefined,
       customer_email: existingCustomerId ? undefined : req.user.email,
+      subscription_data: { trial_period_days: 7 },
       metadata: { companyId },
       success_url: `${FRONTEND_URL}/company?subscribed=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/company?tab=subscription`,
@@ -93,14 +95,15 @@ router.post('/verify-checkout', async (req, res) => {
     }
 
     const sub = session.subscription;
+    const subObj = sub && typeof sub !== 'string' ? sub : null;
     config.subscription = {
       ...(config.subscription || {}),
       stripeCustomerId: session.customer,
       stripeSubscriptionId: typeof sub === 'string' ? sub : sub?.id,
-      status: 'active',
-      cancelAtPeriodEnd: false,
-      currentPeriodEnd: sub && typeof sub !== 'string' && sub.current_period_end
-        ? new Date(sub.current_period_end * 1000).toISOString()
+      status: subObj?.status || 'active',
+      cancelAtPeriodEnd: subObj?.cancel_at_period_end || false,
+      currentPeriodEnd: subObj?.current_period_end
+        ? new Date(subObj.current_period_end * 1000).toISOString()
         : null,
     };
     await saveCompanyConfig(companyId, config);
@@ -144,14 +147,15 @@ async function handleStripeEvent(event) {
         const fullSession = await stripe.checkout.sessions.retrieve(session.id, { expand: ['subscription'] });
         const config = (await getCompanyConfig(companyId)) || {};
         const sub = fullSession.subscription;
+        const subObj = sub && typeof sub !== 'string' ? sub : null;
         config.subscription = {
           ...(config.subscription || {}),
           stripeCustomerId: fullSession.customer,
           stripeSubscriptionId: typeof sub === 'string' ? sub : sub?.id,
-          status: 'active',
-          cancelAtPeriodEnd: false,
-          currentPeriodEnd: sub && typeof sub !== 'string' && sub.current_period_end
-            ? new Date(sub.current_period_end * 1000).toISOString()
+          status: subObj?.status || 'active',
+          cancelAtPeriodEnd: subObj?.cancel_at_period_end || false,
+          currentPeriodEnd: subObj?.current_period_end
+            ? new Date(subObj.current_period_end * 1000).toISOString()
             : (config.subscription?.currentPeriodEnd || null),
         };
         await saveCompanyConfig(companyId, config);

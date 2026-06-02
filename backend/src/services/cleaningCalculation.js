@@ -131,7 +131,7 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
 
   // Minimum
   range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge + 30);
+  range.high = Math.max(range.high, minCharge);
 
   // Frequency discount
   const discount = FREQUENCY_DISCOUNTS[frequency] || 0;
@@ -204,7 +204,7 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
   }
 
   range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge + 25);
+  range.high = Math.max(range.high, minCharge);
 
   const discount = FREQUENCY_DISCOUNTS[frequency] || 0;
   let recurringLow = null, recurringHigh = null, annualSavings = null;
@@ -260,7 +260,7 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
   const perVisitHigh = Math.round(sqft * sqftRate.high * levelMult.high * afterHoursMult * stateMultiplier * markup);
 
   const monthlyLow = Math.max(perVisitLow * visitsPerMonth, minCharge);
-  const monthlyHigh = Math.max(perVisitHigh * visitsPerMonth, minCharge + 100);
+  const monthlyHigh = Math.max(perVisitHigh * visitsPerMonth, minCharge);
 
   const adjustments = [
     { label: `${buildingType} @ ${sqft.toLocaleString()} sq ft`, low: perVisitLow, high: perVisitHigh },
@@ -278,12 +278,12 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
   }
 
   const restroomSurcharge = restrooms > 2 ? (restrooms - 2) * 30 : 0;
-  if (restroomSurcharge > 0) adjustments.push({ label: `${restrooms} restrooms surcharge`, low: restroomSurcharge, high: restroomSurcharge + 20 });
+  if (restroomSurcharge > 0) adjustments.push({ label: `${restrooms} restrooms surcharge`, low: restroomSurcharge, high: restroomSurcharge });
 
   return {
     serviceType: 'commercial',
     totalLow: monthlyLow + porterMonthlyLow + restroomSurcharge,
-    totalHigh: monthlyHigh + porterMonthlyHigh + restroomSurcharge + 20,
+    totalHigh: monthlyHigh + porterMonthlyHigh + restroomSurcharge,
     basePrice: (perVisitLow + perVisitHigh) / 2,
     adjustments,
     unit: 'per_month',
@@ -355,7 +355,7 @@ function calculateCarpet(details, stateMultiplier, companyConfig) {
   }
 
   range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge + 25);
+  range.high = Math.max(range.high, minCharge);
 
   return {
     serviceType: 'carpet',
@@ -421,13 +421,13 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
   }
 
   if (moldSuspected) {
-    const moldSurcharge = { low: Math.round(range.low * 0.40), high: Math.round(range.high * 0.50) };
+    const moldSurcharge = { low: Math.round(range.low * 0.43), high: Math.round(range.high * 0.47) };
     range = addRange(range, moldSurcharge);
-    adjustments.push({ label: 'Mold suspected surcharge (+40–50%)', low: moldSurcharge.low, high: moldSurcharge.high });
+    adjustments.push({ label: 'Mold suspected surcharge (+43–47%)', low: moldSurcharge.low, high: moldSurcharge.high });
   }
 
   range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge + 100);
+  range.high = Math.max(range.high, minCharge);
 
   return {
     serviceType: 'air_duct',
@@ -480,7 +480,7 @@ function calculateDryerVent(details, stateMultiplier, companyConfig) {
   }
 
   range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge + 40);
+  range.high = Math.max(range.high, minCharge);
 
   return {
     serviceType: 'dryer_vent',
@@ -531,7 +531,7 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
   const adjustments = [{ label: `${sqft} sq ft ${tileType} tile cleaning`, low: range.low, high: range.high }];
 
   if (soapScum || hardWater) {
-    const surcharge = { low: Math.round(range.low * 0.10), high: Math.round(range.high * 0.15) };
+    const surcharge = { low: Math.round(range.low * 0.11), high: Math.round(range.high * 0.13) };
     range = addRange(range, surcharge);
     adjustments.push({ label: 'Soap scum / hard water deposits', low: surcharge.low, high: surcharge.high });
   }
@@ -553,7 +553,7 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
   }
 
   range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge + 50);
+  range.high = Math.max(range.high, minCharge);
 
   return {
     serviceType: 'tile_grout',

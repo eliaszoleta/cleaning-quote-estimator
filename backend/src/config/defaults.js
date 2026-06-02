@@ -138,12 +138,12 @@ const DEFAULT_COMPANY_CONFIG = {
 // Home / Residential Cleaning base prices by sq footage tier
 // Source: HomeAdvisor 2024, Angi 2024
 const HOME_SQFT_BASE_PRICES = {
-  'under_1000': { low: 80, high: 130 },
-  '1000_1500':  { low: 110, high: 170 },
-  '1500_2000':  { low: 140, high: 210 },
-  '2000_2500':  { low: 170, high: 255 },
-  '2500_3000':  { low: 200, high: 300 },
-  'over_3000':  { low: 240, high: 360 },
+  'under_1000': { low: 90,  high: 115 },
+  '1000_1500':  { low: 122, high: 152 },
+  '1500_2000':  { low: 158, high: 198 },
+  '2000_2500':  { low: 195, high: 245 },
+  '2500_3000':  { low: 228, high: 282 },
+  'over_3000':  { low: 272, high: 338 },
 };
 
 // Bedroom/bathroom modifier (additional cost per room beyond base)
@@ -153,9 +153,9 @@ const BATHROOM_ADDON = { 1: 0, '1.5': 20, 2: 35, '2.5': 50, 3: 65, '3+': 90 };
 // Cleaning type multipliers
 const CLEANING_TYPE_MULTIPLIERS = {
   standard:         { low: 1.0,  high: 1.0  },
-  deep:             { low: 1.5,  high: 2.0  },
-  move_in_out:      { low: 1.7,  high: 2.2  },
-  post_construction:{ low: 2.0,  high: 2.5  },
+  deep:             { low: 1.68, high: 1.85 },
+  move_in_out:      { low: 1.88, high: 2.05 },
+  post_construction:{ low: 2.18, high: 2.35 },
 };
 
 // Frequency discounts
@@ -168,49 +168,49 @@ const FREQUENCY_DISCOUNTS = {
 
 // Extra add-on costs (residential/apartment)
 const HOME_EXTRAS = {
-  inside_oven:      { low: 30, high: 60 },
-  inside_fridge:    { low: 25, high: 50 },
-  interior_windows: { low: 40, high: 80 },
-  laundry:          { low: 30, high: 50 },
-  dishes:           { low: 20, high: 40 },
-  garage:           { low: 50, high: 100 },
-  basement:         { low: 60, high: 120 },
-  balcony_patio:    { low: 35, high: 70 },
+  inside_oven:      { low: 38, high: 50 },
+  inside_fridge:    { low: 30, high: 42 },
+  interior_windows: { low: 52, high: 65 },
+  laundry:          { low: 34, high: 44 },
+  dishes:           { low: 24, high: 32 },
+  garage:           { low: 63, high: 80 },
+  basement:         { low: 76, high: 96 },
+  balcony_patio:    { low: 43, high: 56 },
 };
 
 // Home condition multipliers
 const CONDITION_MULTIPLIERS = {
   good:  { low: 1.0,  high: 1.0  },
-  fair:  { low: 1.10, high: 1.15 },
-  needs_attention: { low: 1.20, high: 1.30 },
+  fair:  { low: 1.10, high: 1.14 },
+  needs_attention: { low: 1.22, high: 1.28 },
 };
 
 // Apartment size base prices (slightly lower than residential)
 const APARTMENT_SIZE_PRICES = {
-  studio:  { low: 75,  high: 120 },
-  '1br':   { low: 95,  high: 145 },
-  '2br':   { low: 125, high: 190 },
-  '3br':   { low: 155, high: 235 },
-  '4br_plus': { low: 185, high: 280 },
+  studio:     { low: 85,  high: 108 },
+  '1br':      { low: 107, high: 133 },
+  '2br':      { low: 140, high: 175 },
+  '3br':      { low: 175, high: 215 },
+  '4br_plus': { low: 210, high: 258 },
 };
 
 // Commercial cleaning prices per sq ft per visit
 // Source: ISSA (International Sanitary Supply Association), BuildingOperationsManagement
 const COMMERCIAL_SQFT_RATES = {
-  office:    { low: 0.06, high: 0.12 },
-  retail:    { low: 0.07, high: 0.13 },
-  medical:   { low: 0.12, high: 0.20 },
-  restaurant:{ low: 0.10, high: 0.18 },
-  warehouse: { low: 0.04, high: 0.08 },
-  school:    { low: 0.08, high: 0.14 },
-  gym:       { low: 0.09, high: 0.15 },
+  office:    { low: 0.088, high: 0.107 },
+  retail:    { low: 0.09,  high: 0.11  },
+  medical:   { low: 0.15,  high: 0.185 },
+  restaurant:{ low: 0.12,  high: 0.148 },
+  warehouse: { low: 0.052, high: 0.065 },
+  school:    { low: 0.095, high: 0.118 },
+  gym:       { low: 0.104, high: 0.128 },
 };
 
 // Service level multipliers for commercial
 const COMMERCIAL_SERVICE_LEVELS = {
-  basic:    { low: 1.0, high: 1.0 },
-  standard: { low: 1.2, high: 1.3 },
-  premium:  { low: 1.5, high: 1.7 },
+  basic:    { low: 1.0,  high: 1.0  },
+  standard: { low: 1.2,  high: 1.25 },
+  premium:  { low: 1.55, high: 1.68 },
 };
 
 // Commercial frequency (visits per month)
@@ -223,89 +223,89 @@ const COMMERCIAL_VISITS_PER_MONTH = {
 };
 
 // Day porter monthly rate (loaded labor including benefits/overhead)
-const DAY_PORTER_DAILY_RATE = { low: 180, high: 280 };
+const DAY_PORTER_DAILY_RATE = { low: 218, high: 265 };
 
 // Carpet cleaning prices
-const CARPET_PRICE_PER_ROOM = { low: 25, high: 75 };
-const CARPET_PRICE_PER_SQFT = { low: 0.20, high: 0.40 };
-const CARPET_MINIMUM = { low: 75, high: 100 };
+const CARPET_PRICE_PER_ROOM = { low: 44, high: 55 };
+const CARPET_PRICE_PER_SQFT = { low: 0.28, high: 0.35 };
+const CARPET_MINIMUM = { low: 90, high: 110 };
 
 const CARPET_CONDITION_MULTIPLIERS = {
-  light:   { low: 1.0, high: 1.0 },
-  moderate:{ low: 1.1, high: 1.2 },
-  heavy:   { low: 1.3, high: 1.5 },
-  pet:     { low: 1.5, high: 2.0 },
+  light:   { low: 1.0,  high: 1.0  },
+  moderate:{ low: 1.12, high: 1.18 },
+  heavy:   { low: 1.37, high: 1.45 },
+  pet:     { low: 1.65, high: 1.82 },
 };
 
 const CARPET_METHOD_MULTIPLIERS = {
-  steam:          { low: 1.0, high: 1.0 },
-  dry:            { low: 1.1, high: 1.15 },
-  encapsulation:  { low: 1.0, high: 1.1 },
+  steam:          { low: 1.0,  high: 1.0  },
+  dry:            { low: 1.10, high: 1.13 },
+  encapsulation:  { low: 1.02, high: 1.08 },
 };
 
 const CARPET_ADDONS = {
-  pet_odor:         { low: 40, high: 80 },
-  stain_protector:  { low: 30, high: 60 },
-  deodorizer:       { low: 20, high: 40 },
-  area_rug:         { low: 50, high: 150 }, // per rug
+  pet_odor:         { low: 48, high: 75 },
+  stain_protector:  { low: 35, high: 55 },
+  deodorizer:       { low: 22, high: 35 },
+  area_rug:         { low: 58, high: 120 }, // per rug
 };
 
-const CARPET_STAIRS_PER_FLIGHT = { low: 45, high: 75 }; // 13-15 steps × $3-$5/step
+const CARPET_STAIRS_PER_FLIGHT = { low: 52, high: 68 }; // 13-15 steps × $3.50-$4.50/step
 
 // Air duct cleaning
-const AIR_DUCT_BASE = { low: 300, high: 500 }; // up to ~12 vents residential
-const AIR_DUCT_PER_VENT = { low: 15, high: 25 };
-const AIR_DUCT_PER_SYSTEM = { low: 50, high: 100 };
-const AIR_DUCT_COMMERCIAL_PER_SQFT = { low: 0.15, high: 0.35 };
+const AIR_DUCT_BASE = { low: 330, high: 420 }; // up to ~12 vents residential
+const AIR_DUCT_PER_VENT = { low: 18, high: 23 };
+const AIR_DUCT_PER_SYSTEM = { low: 65, high: 85 };
+const AIR_DUCT_COMMERCIAL_PER_SQFT = { low: 0.20, high: 0.27 };
 
 const AIR_DUCT_ADDONS = {
-  dryer_vent_combo: { low: 60, high: 100 },
-  sanitization:     { low: 100, high: 200 },
-  hepa_filtration:  { low: 75, high: 150 },
-  uv_light:         { low: 200, high: 400 },
-  coil_cleaning:    { low: 80, high: 160 },
+  dryer_vent_combo: { low: 65, high: 90 },
+  sanitization:     { low: 118, high: 168 },
+  hepa_filtration:  { low: 88, high: 130 },
+  uv_light:         { low: 245, high: 335 },
+  coil_cleaning:    { low: 92, high: 130 },
 };
 
 // Dryer vent cleaning
-const DRYER_VENT_BASE = { low: 80, high: 170 };
+const DRYER_VENT_BASE = { low: 105, high: 138 };
 
 const DRYER_VENT_LENGTH_ADDON = {
-  short:      { low: 0, high: 0 },
-  medium:     { low: 20, high: 40 },
-  long:       { low: 40, high: 80 },
-  very_long:  { low: 75, high: 130 },
+  short:      { low: 0,  high: 0   },
+  medium:     { low: 22, high: 38  },
+  long:       { low: 48, high: 70  },
+  very_long:  { low: 85, high: 115 },
 };
 
 const DRYER_VENT_TYPE_ADDON = {
-  standard:   { low: 0, high: 0 },
-  roof:       { low: 25, high: 50 },
-  side_wall:  { low: 10, high: 25 },
-  floor:      { low: 15, high: 30 },
+  standard:   { low: 0,  high: 0  },
+  roof:       { low: 30, high: 48 },
+  side_wall:  { low: 12, high: 22 },
+  floor:      { low: 17, high: 28 },
 };
 
-const DRYER_VENT_CLOG_ADDON = { low: 30, high: 60 };
-const DRYER_VENT_COMMERCIAL_RATE = { low: 60, high: 120 }; // per machine
+const DRYER_VENT_CLOG_ADDON = { low: 35, high: 55 };
+const DRYER_VENT_COMMERCIAL_RATE = { low: 72, high: 100 }; // per machine
 
 // Tile & Grout cleaning
 const TILE_PRICE_PER_SQFT = {
-  ceramic:    { low: 0.75, high: 1.50 },
-  porcelain:  { low: 0.85, high: 1.65 },
-  natural_stone: { low: 1.25, high: 2.50 },
-  saltillo:   { low: 1.00, high: 2.00 },
+  ceramic:    { low: 0.92, high: 1.22 },
+  porcelain:  { low: 1.05, high: 1.40 },
+  natural_stone: { low: 1.55, high: 2.05 },
+  saltillo:   { low: 1.25, high: 1.65 },
 };
 
 const TILE_CONDITION_MULTIPLIERS = {
-  light:   { low: 1.0, high: 1.0 },
-  moderate:{ low: 1.1, high: 1.2 },
-  heavy:   { low: 1.3, high: 1.5 },
-  damaged: { low: 1.4, high: 1.6 },
+  light:   { low: 1.0,  high: 1.0  },
+  moderate:{ low: 1.12, high: 1.18 },
+  heavy:   { low: 1.32, high: 1.42 },
+  damaged: { low: 1.42, high: 1.55 },
 };
 
 const TILE_SERVICE_ADDONS = {
-  grout_sealing:     { perSqft: { low: 0.50, high: 1.00 } },
-  grout_recoloring:  { perSqft: { low: 1.50, high: 3.00 } },
-  caulk_replacement: { perLinFt: { low: 3, high: 8 } },
-  tile_repair:       { perSqft: { low: 5, high: 15 } },
+  grout_sealing:     { perSqft: { low: 0.55, high: 0.88 } },
+  grout_recoloring:  { perSqft: { low: 1.65, high: 2.55 } },
+  caulk_replacement: { perLinFt: { low: 3.5, high: 7 } },
+  tile_repair:       { perSqft: { low: 6, high: 13 } },
 };
 
 const TILE_MINIMUM = { low: 150, high: 200 };

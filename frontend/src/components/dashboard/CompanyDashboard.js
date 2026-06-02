@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
-  Users, CreditCard, KeyRound, Loader2, Check, LogOut, AlertCircle, Save,
+  Users, CreditCard, KeyRound, Settings, Loader2, Check, LogOut, AlertCircle, Save,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
@@ -13,6 +13,7 @@ import EmbedTab from './tabs/EmbedTab';
 import LeadsTab from './tabs/LeadsTab';
 import SubscriptionTab from './tabs/SubscriptionTab';
 import APIKeysTab from './tabs/APIKeysTab';
+import SettingsTab from './tabs/SettingsTab';
 
 const NAV = [
   { id: 'overview',      Icon: LayoutDashboard,   label: 'Overview' },
@@ -22,6 +23,7 @@ const NAV = [
   { id: 'leads',         Icon: Users,              label: 'Leads' },
   { id: 'subscription',  Icon: CreditCard,         label: 'Subscription' },
   { id: 'api',           Icon: KeyRound,           label: 'API Keys' },
+  { id: 'settings',      Icon: Settings,           label: 'Settings' },
 ];
 
 export default function CompanyDashboard({ user, onLogout }) {
@@ -111,9 +113,11 @@ export default function CompanyDashboard({ user, onLogout }) {
     leads:        <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab {...tabProps} />,
     api:          <APIKeysTab {...tabProps} />,
+    settings:     <SettingsTab user={user} onLogout={onLogout} />,
   };
 
   const subBadge = subStatus ? (() => {
+    if (subStatus.status === 'requires_trial_setup') return { label: 'Start Trial', bg: '#1e3a8a', color: '#bfdbfe' };
     if (subStatus.status === 'trialing') return { label: `Trial · ${subStatus.daysLeft}d`, bg: '#1e3a8a', color: '#bfdbfe' };
     if (subStatus.status === 'active') return { label: 'Active', bg: '#14532d', color: '#bbf7d0' };
     if (subStatus.status === 'active_canceling') return { label: 'Canceling', bg: '#78350f', color: '#fde68a' };
@@ -209,10 +213,10 @@ export default function CompanyDashboard({ user, onLogout }) {
         <div style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#dc2626', fontWeight: 600, fontSize: 13 }}>
             <AlertCircle size={15} />
-            Your widget is currently paused — {subStatus.status === 'expired' ? 'your trial has expired' : 'subscription issue'}.
+            Your widget is currently paused — {subStatus.status === 'requires_trial_setup' ? 'start your 7-day free trial to activate' : subStatus.status === 'expired' ? 'your trial has expired' : 'subscription issue'}.
           </div>
           <button onClick={() => setActiveTab('subscription')} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
-            Reactivate →
+            {subStatus.status === 'requires_trial_setup' ? 'Start Trial →' : 'Reactivate →'}
           </button>
         </div>
       )}
