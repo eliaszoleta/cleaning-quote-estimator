@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-Disallow: /embed
-Disallow: /company
+Disallow: /embed/
+Disallow: /company/
 
 Sitemap: https://www.cleanestimator.com/sitemap.xml
