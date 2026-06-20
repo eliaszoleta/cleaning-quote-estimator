@@ -27,7 +27,7 @@ function renderMarkdown(md) {
   // Bold
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
-  // Emoji with text: ✅ text / ⚠️ text / 🚩 text
+  // Emoji with text
   html = html.replace(/^([✅⚠️🚩❌✓])\s+(.+)$/gm, '<div style="display:flex;gap:8px;margin-bottom:8px"><span>$1</span><span>$2</span></div>');
 
   // Links
@@ -80,7 +80,7 @@ export default function BlogPost({ slug }) {
     description: post.excerpt,
     datePublished: dateISO,
     dateModified: dateISO,
-    image: 'https://www.cleanestimator.com/og-image.png',
+    image: 'https://www.cleanestimator.com/og-image.svg',
     mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
     url: canonicalUrl,
     author: { '@type': 'Organization', name: 'Clean Estimator', url: 'https://www.cleanestimator.com' },
@@ -90,7 +90,7 @@ export default function BlogPost({ slug }) {
       url: 'https://www.cleanestimator.com',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://www.cleanestimator.com/og-image.png',
+        url: 'https://www.cleanestimator.com/og-image.svg',
         width: 1200,
         height: 630,
       },
@@ -119,7 +119,7 @@ export default function BlogPost({ slug }) {
         <meta property="og:description" content={post.excerpt} />
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:type" content="article" />
-        <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
+        <meta property="og:image" content="https://www.cleanestimator.com/og-image.svg" />
         <meta property="og:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         <meta property="article:published_time" content={dateISO} />
         <meta property="article:modified_time" content={dateISO} />
@@ -128,7 +128,7 @@ export default function BlogPost({ slug }) {
         <meta name="twitter:site" content="@CleanEstimator" />
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={post.excerpt} />
-        <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
+        <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.svg" />
         <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         <script type="application/ld+json">{JSON.stringify(schema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
