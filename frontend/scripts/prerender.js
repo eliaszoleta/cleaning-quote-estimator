@@ -41,7 +41,24 @@ function esc(str) {
     .replace(/>/g, '&gt;');
 }
 
-// ─── 4. Markdown renderer (mirrors BlogPost.js renderMarkdown) ───────────────
+// ─── 4. Static nav header (visible to Googlebot without JS) ─────────────────
+
+function staticHeader() {
+  return `<header style="background:white;border-bottom:1px solid #e2e8f0;padding:0 24px">
+  <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px">
+    <a href="/" style="font-size:18px;font-weight:800;color:#0f172a;text-decoration:none">Clean Estimator</a>
+    <nav style="display:flex;gap:24px;align-items:center">
+      <a href="/#how-it-works" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">How It Works</a>
+      <a href="/blog" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">Blog</a>
+      <a href="/#faq" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">FAQ</a>
+      <a href="/for-companies" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">For Companies</a>
+      <a href="/" style="background:${PRIMARY};color:white;padding:8px 18px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700">Get Estimate</a>
+    </nav>
+  </div>
+</header>`;
+}
+
+// ─── 5. Markdown renderer (mirrors BlogPost.js renderMarkdown) ───────────────
 
 function renderMarkdown(md) {
   if (!md) return '';
@@ -99,7 +116,7 @@ function renderMarkdown(md) {
   return html;
 }
 
-// ─── 5. Blog post renderer ───────────────────────────────────────────────────
+// ─── 6. Blog post renderer ───────────────────────────────────────────────────
 
 function renderBlogPost(post, cat, assets) {
   const dateISO  = post.dateISO || (post.date ? new Date(post.date).toISOString() : new Date().toISOString());
@@ -146,6 +163,7 @@ function renderBlogPost(post, cat, assets) {
   <meta name="description" content="${esc(post.excerpt)}">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}/blog/${post.slug}">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta property="og:site_name" content="Clean Estimator">
   <meta property="og:title" content="${esc(seoTitle)}">
@@ -166,7 +184,7 @@ function renderBlogPost(post, cat, assets) {
   ${assets.cssLinks}
 </head>
 <body>
-<div id="root"><div style="max-width:760px;margin:0 auto;padding:60px 24px;font-family:system-ui,-apple-system,sans-serif">
+<div id="root">${staticHeader()}<div style="max-width:760px;margin:0 auto;padding:60px 24px;font-family:system-ui,-apple-system,sans-serif">
   <div style="font-size:13px;color:#94a3b8;margin-bottom:24px">
     <a href="/" style="color:#94a3b8">Home</a> ›
     <a href="/blog" style="color:#94a3b8">Blog</a> ›
@@ -197,7 +215,7 @@ function renderBlogPost(post, cat, assets) {
 </html>`;
 }
 
-// ─── 6. Blog index renderer ──────────────────────────────────────────────────
+// ─── 7. Blog index renderer ──────────────────────────────────────────────────
 
 function renderBlogIndex(posts, categories, assets) {
   const featured = posts[0];
@@ -244,6 +262,7 @@ function renderBlogIndex(posts, categories, assets) {
   <meta name="description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses.">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}/blog">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta property="og:title" content="Cleaning Cost Guides &amp; Tips | Clean Estimator Blog">
   <meta property="og:description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses.">
@@ -260,6 +279,7 @@ function renderBlogIndex(posts, categories, assets) {
 </head>
 <body>
 <div id="root">
+${staticHeader()}
 <div style="max-width:1100px;margin:0 auto;padding:60px 24px;font-family:system-ui,-apple-system,sans-serif">
   <h1 style="font-size:40px;font-weight:900;color:#0f172a;margin-bottom:8px">Cleaning Cost Guides</h1>
   <p style="font-size:18px;color:#64748b;margin-bottom:40px">Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
@@ -285,7 +305,7 @@ function renderBlogIndex(posts, categories, assets) {
 </html>`;
 }
 
-// ─── 7. Category page renderer ───────────────────────────────────────────────
+// ─── 8. Category page renderer ───────────────────────────────────────────────
 
 function renderCategoryPage(cat, posts, assets) {
   const catPosts = posts.filter(p => p.category === cat.id);
@@ -320,6 +340,7 @@ function renderCategoryPage(cat, posts, assets) {
   <meta name="description" content="${esc(seoDesc)}">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}/blog/category/${cat.id}">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta property="og:title" content="${esc(seoTitle)}">
   <meta property="og:description" content="${esc(seoDesc)}">
@@ -336,6 +357,7 @@ function renderCategoryPage(cat, posts, assets) {
 </head>
 <body>
 <div id="root">
+${staticHeader()}
 <div style="background:#f8fafc;min-height:100vh;padding:48px 24px 64px;font-family:system-ui,-apple-system,sans-serif">
   <div style="max-width:900px;margin:0 auto">
     <a href="/blog" style="font-size:13px;color:#64748b;text-decoration:none;display:inline-block;margin-bottom:28px">&#8592; All Guides</a>
@@ -355,7 +377,87 @@ function renderCategoryPage(cat, posts, assets) {
 </html>`;
 }
 
-// ─── 8. Write helper ─────────────────────────────────────────────────────────
+// ─── 9. Homepage injection ────────────────────────────────────────────────────
+
+function injectHomepage(posts, categories) {
+  const indexPath = path.join(BUILD, 'index.html');
+  if (!fs.existsSync(indexPath)) return;
+
+  let html = fs.readFileSync(indexPath, 'utf8');
+  if (!html.includes('<div id="root"></div>')) return;
+
+  const topPosts = posts.slice(0, 6);
+  const postLinks = topPosts.map(p =>
+    `<li style="margin-bottom:10px"><a href="/blog/${p.slug}" style="color:${PRIMARY};text-decoration:none;font-size:14px;font-weight:500;line-height:1.5">${esc(p.title)}</a></li>`
+  ).join('\n      ');
+
+  const staticContent = `${staticHeader()}
+<div style="font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;min-height:80vh">
+  <div style="max-width:1100px;margin:0 auto;padding:40px 24px 64px">
+    <div style="text-align:center;padding:48px 24px 40px">
+      <h1 style="font-size:clamp(28px,5vw,52px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:16px">Free Cleaning Cost Estimator 2026</h1>
+      <p style="font-size:18px;color:#475569;max-width:560px;margin:0 auto 32px;line-height:1.6">Get instant, ZIP-code specific cleaning service prices for house cleaning, carpet cleaning, air duct cleaning, and more — 100% free.</p>
+      <a href="/" style="background:${PRIMARY};color:white;padding:16px 36px;border-radius:10px;text-decoration:none;font-weight:700;font-size:17px;display:inline-block">Get My Free Estimate &#8594;</a>
+    </div>
+    <div id="how-it-works" style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
+      <h2 style="font-size:24px;font-weight:800;color:#0f172a;margin-bottom:28px;text-align:center">How It Works</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px">
+        <div style="text-align:center">
+          <div style="width:48px;height:48px;background:#eff6ff;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px">📍</div>
+          <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:8px">1. Enter Your ZIP Code</h3>
+          <p style="font-size:14px;color:#64748b;line-height:1.6">Local labor rates and cost-of-living factors are applied automatically.</p>
+        </div>
+        <div style="text-align:center">
+          <div style="width:48px;height:48px;background:#eff6ff;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px">🏠</div>
+          <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:8px">2. Describe Your Home</h3>
+          <p style="font-size:14px;color:#64748b;line-height:1.6">Select service type, home size, and any add-ons for an accurate quote.</p>
+        </div>
+        <div style="text-align:center">
+          <div style="width:48px;height:48px;background:#eff6ff;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px">💰</div>
+          <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:8px">3. Get Your Estimate</h3>
+          <p style="font-size:14px;color:#64748b;line-height:1.6">Instant price range with low, average, and high estimates for your area.</p>
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:40px">
+      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:20px">Cleaning Cost Guides</h2>
+      <ul style="list-style:none;padding:0;margin:0;background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px">
+        ${postLinks}
+      </ul>
+      <a href="/blog" style="display:inline-block;margin-top:14px;color:${PRIMARY};font-weight:700;font-size:14px;text-decoration:none">View all guides &#8594;</a>
+    </div>
+    <div id="faq" style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px">
+      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:24px">Frequently Asked Questions</h2>
+      <div style="margin-bottom:20px">
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How much does house cleaning cost?</h3>
+        <p style="font-size:14px;color:#475569;line-height:1.6">House cleaning typically costs $100–$250 for a standard home, depending on size, location, and frequency. Our calculator gives you a precise estimate based on your ZIP code.</p>
+      </div>
+      <div style="margin-bottom:20px">
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">What affects carpet cleaning prices?</h3>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Carpet cleaning costs $25–$75 per room on average. Factors include room size, carpet condition, stain treatment, and method (steam vs. dry cleaning).</p>
+      </div>
+      <div style="margin-bottom:20px">
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How often should I have my air ducts cleaned?</h3>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Most experts recommend air duct cleaning every 3–5 years. Costs range from $300–$500 for a typical home. More frequent cleaning may be needed with pets or allergies.</p>
+      </div>
+      <div style="margin-bottom:20px">
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How much does mold remediation cost?</h3>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Mold remediation averages $500–$6,000 depending on the extent and location. Small areas under 10 sq ft may cost as little as $50–$200 with DIY treatment.</p>
+      </div>
+      <div>
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Is this calculator really free?</h3>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Yes, 100% free. No sign-up, no email required. We provide estimates based on real local market data so you can negotiate confidently with cleaning companies.</p>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+  html = html.replace('<div id="root"></div>', `<div id="root">${staticContent}</div>`);
+  fs.writeFileSync(indexPath, html, 'utf8');
+  console.log('✓ homepage — static content injected into build/index.html');
+}
+
+// ─── 10. Write helper ─────────────────────────────────────────────────────────
 
 function writeFile(relPath, html) {
   const full = path.join(BUILD, relPath, 'index.html');
@@ -363,7 +465,7 @@ function writeFile(relPath, html) {
   fs.writeFileSync(full, html, 'utf8');
 }
 
-// ─── 9. Main ─────────────────────────────────────────────────────────────────
+// ─── 11. Main ─────────────────────────────────────────────────────────────────
 
 function main() {
   if (!fs.existsSync(BUILD)) {
@@ -374,6 +476,8 @@ function main() {
   const { BLOG_POSTS, CATEGORIES } = loadBlogData();
   const assets = getAssetTags();
   let count = 0;
+
+  injectHomepage(BLOG_POSTS, CATEGORIES);
 
   writeFile('blog', renderBlogIndex(BLOG_POSTS, CATEGORIES, assets));
   count++;
