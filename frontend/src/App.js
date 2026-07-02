@@ -5,6 +5,7 @@ import CleaningCalculator from './components/calculator/CleaningCalculator';
 import ResultsScreen from './components/calculator/ResultsScreen';
 import CompanyDashboard from './components/dashboard/CompanyDashboard';
 import AuthPage from './components/dashboard/AuthPage';
+import AdminPartners from './components/admin/AdminPartners';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import SEOContent from './components/ui/SEOContent';
@@ -31,6 +32,7 @@ const isAbout = pathname === '/about';
 const isContact = pathname === '/contact';
 const isPrivacy = pathname === '/privacy-policy';
 const isTerms = pathname === '/terms-of-service';
+const isAdminPartners = pathname === '/admin/partners';
 
 const embedCompanyId = isEmbed ? searchParams.get('company') : null;
 
@@ -103,7 +105,6 @@ export default function App() {
     window.location.href = '/company';
   };
 
-  // Embed mode — no chrome
   if (isEmbed) return (
     <HelmetProvider>
       <EmbedWrapper companyId={embedCompanyId} />
@@ -111,6 +112,8 @@ export default function App() {
   );
 
   if (isResults) return <HelmetProvider><ResultsPage /></HelmetProvider>;
+
+  if (isAdminPartners) return <HelmetProvider><AdminPartners /></HelmetProvider>;
 
   if (isForCompanies) return <HelmetProvider><CompanyLanding /></HelmetProvider>;
 
@@ -139,7 +142,6 @@ export default function App() {
     return <HelmetProvider><CompanyDashboard user={user} onLogout={handleLogout} /></HelmetProvider>;
   }
 
-  // Home — public calculator
   return (
     <HelmetProvider>
       <Helmet>

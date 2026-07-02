@@ -2,11 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, AlertTriangle, Zap, Phone, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
+import { supabase } from '../../lib/supabase';
+import PartnerCard from '../partners/PartnerCard';
+
+async function getUserLocation() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    return { city: data.city, state: data.region };
+  } catch {
+    return null;
+  }
+}
+
+async function findPartner(city, state) {
+  if (!supabase || !city || !state) return null;
+  const { data } = await supabase
+    .from('partners')
+    .select('*')
+    .eq('active', true)
+    .ilike('city', city)
+    .ilike('state', state)
+    .limit(1);
+  return data?.[0] || null;
+}
 
 export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset }) {
   const [shared, setShared] = useState(false);
+  const [partner, setPartner] = useState(null);
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, []);
+
+  useEffect(() => {
+    if (embedded) return;
+    getUserLocation().then(loc => {
+      if (loc) findPartner(loc.city, loc.state).then(setPartner);
+    });
+  }, [embedded]);
 
   if (!result) return null;
 
@@ -150,6 +182,9 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                   {stateMultiplier >= 0.95 && stateMultiplier <= 1.05 && `${stateName} is close to the national average for cleaning service costs.`}
                 </span>
               </div>
+
+              {/* Partner recommendation */}
+              {partner && !embedded && <PartnerCard partner={partner} />}
 
               {/* CTA */}
               <div style={{ background: embedded && companyName ? `${primaryColor}08` : '#f8fafc', border: `1px solid ${embedded && companyName ? primaryColor + '28' : '#e2e8f0'}`, borderRadius: 12, padding: '18px 20px' }}>
