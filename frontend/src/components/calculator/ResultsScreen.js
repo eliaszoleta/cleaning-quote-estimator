@@ -2,11 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, AlertTriangle, Zap, Phone, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
+import { supabase } from '../../lib/supabase';
+import PartnerCard from '../partners/PartnerCard';
+
+async function getUserLocation() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    return { city: data.city, state: data.region };
+  } catch {
+    return null;
+  }
+}
+
+async function findPartner(city, state) {
+  if (!supabase || !city || !state) return null;
+  const { data } = await supabase
+    .from('partners')
+    .select('*')
+    .eq('active', true)
+    .ilike('city', city)
+    .ilike('state', state)
+    .limit(1);
+  return data?.[0] || null;
+}
 
 export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset }) {
   const [shared, setShared] = useState(false);
+  const [partner, setPartner] = useState(null);
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, []);
+
+  useEffect(() => {
+    if (embedded) return;
+    getUserLocation().then(loc => {
+      if (loc) findPartner(loc.city, loc.state).then(setPartner);
+    });
+  }, [embedded]);
 
   if (!result) return null;
 
@@ -58,10 +90,8 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
       <div style={{ padding: embedded ? '0' : '40px 16px', background: embedded ? 'white' : '#f8fafc', minHeight: embedded ? 'auto' : '100vh' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
-          {/* Result card */}
           <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: embedded ? 'none' : '0 8px 40px rgba(0,0,0,0.10)', border: embedded ? 'none' : '1px solid #e2e8f0', marginBottom: 20 }}>
 
-            {/* Header */}
             <div style={{ background: headerBg, padding: '28px 32px', color: 'white' }}>
               <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.8, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 {serviceTypeLabel(serviceType)} Estimate · {stateName}
@@ -74,7 +104,6 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 {isHighState && ` · ${stateName} is a higher-cost market`}
                 {isLowState && ` · ${stateName} is a lower-cost market`}
               </div>
-
               {recurringMonthlyLow && unit !== 'per_month' && (
                 <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '10px 14px', display: 'inline-block' }}>
                   <span style={{ fontWeight: 700, fontSize: 13.5 }}>Recurring: {formatPrice(recurringMonthlyLow)} – {formatPrice(recurringMonthlyHigh)}/visit</span>
@@ -83,17 +112,11 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
               )}
             </div>
 
-            {/* Body */}
             <div style={{ padding: '24px 28px' }}>
-
-              {/* Disclaimer */}
               {disclaimer && (
                 <div style={{ background: urgencyLevel === 'critical' ? '#fef2f2' : '#fffbeb', border: `1px solid ${urgencyLevel === 'critical' ? '#fecaca' : '#fde68a'}`, borderRadius: 10, padding: '13px 16px', marginBottom: 20, display: 'flex', gap: 10 }}>
                   <div style={{ flexShrink: 0, marginTop: 1 }}>
-                    {urgencyLevel === 'critical'
-                      ? <AlertTriangle size={16} color="#dc2626" />
-                      : <Zap size={16} color="#d97706" />
-                    }
+                    {urgencyLevel === 'critical' ? <AlertTriangle size={16} color="#dc2626" /> : <Zap size={16} color="#d97706" />}
                   </div>
                   <div>
                     <div style={{ fontWeight: 700, color: urgColor, marginBottom: 3, fontSize: 13 }}>
@@ -104,7 +127,6 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 </div>
               )}
 
-              {/* Price breakdown */}
               <div style={{ marginBottom: 20 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Price breakdown</div>
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
@@ -125,7 +147,6 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 </div>
               </div>
 
-              {/* Key factors */}
               {keyFactors.length > 0 && (
                 <div style={{ marginBottom: 20 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Key factors in your estimate</div>
@@ -140,7 +161,6 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 </div>
               )}
 
-              {/* State cost context */}
               <div style={{ background: '#f0f7ff', borderRadius: 10, padding: '13px 16px', marginBottom: 20, fontSize: 13, color: '#1e40af', display: 'flex', gap: 9, alignItems: 'flex-start' }}>
                 <MapPin size={14} style={{ marginTop: 2, flexShrink: 0 }} />
                 <span>
@@ -151,7 +171,8 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 </span>
               </div>
 
-              {/* CTA */}
+              {partner && !embedded && <PartnerCard partner={partner} />}
+
               <div style={{ background: embedded && companyName ? `${primaryColor}08` : '#f8fafc', border: `1px solid ${embedded && companyName ? primaryColor + '28' : '#e2e8f0'}`, borderRadius: 12, padding: '18px 20px' }}>
                 <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>
                   {companyName ? `Ready to book with ${companyName}?` : 'Ready to get real quotes?'}
@@ -182,7 +203,6 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
             </div>
           </div>
 
-          {/* Action buttons */}
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={onReset} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, color: '#374151' }}>
               <ArrowLeft size={14} /> New Estimate
