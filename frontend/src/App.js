@@ -13,6 +13,7 @@ import BlogIndex from './components/blog/BlogIndex';
 import BlogPost from './components/blog/BlogPost';
 import BlogCategory from './components/blog/BlogCategory';
 import CompanyLanding from './components/pages/CompanyLanding';
+import PartnerWithUs from './components/pages/PartnerWithUs';
 import About from './components/pages/About';
 import Contact from './components/pages/Contact';
 import PrivacyPolicy from './components/pages/PrivacyPolicy';
@@ -33,6 +34,7 @@ const isContact = pathname === '/contact';
 const isPrivacy = pathname === '/privacy-policy';
 const isTerms = pathname === '/terms-of-service';
 const isAdminPartners = pathname === '/admin/partners';
+const isPartnerWithUs = pathname === '/partner-with-us';
 
 const embedCompanyId = isEmbed ? searchParams.get('company') : null;
 
@@ -114,6 +116,16 @@ export default function App() {
   if (isResults) return <HelmetProvider><ResultsPage /></HelmetProvider>;
 
   if (isAdminPartners) return <HelmetProvider><AdminPartners /></HelmetProvider>;
+
+  if (isPartnerWithUs) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><PartnerWithUs /></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
 
   if (isForCompanies) return <HelmetProvider><CompanyLanding /></HelmetProvider>;
 

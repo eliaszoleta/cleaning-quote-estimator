@@ -50,6 +50,15 @@ const styles = {
     color: '#475569',
     transition: 'all 0.15s',
   },
+  partnerLink: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    textDecoration: 'none',
+    fontSize: 14,
+    fontWeight: 700,
+    color: '#2563eb',
+    transition: 'all 0.15s',
+  },
   cta: {
     background: '#2563eb',
     color: 'white',
@@ -96,12 +105,12 @@ export default function Header() {
       <div style={styles.inner}>
         {/* Logo */}
         <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
-          <span style={styles.logoIcon} aria-hidden="true">✦</span>
+          <span style={styles.logoIcon} aria-hidden="true">✶</span>
           {!isMobile && 'Clean Estimator'}
         </a>
 
         {isMobile ? (
-          /* ── Mobile: Get Estimator CTA + hamburger ── */
+          /* Mobile: CTA + hamburger */
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <a
               href="/for-companies"
@@ -120,7 +129,7 @@ export default function Header() {
             </button>
           </div>
         ) : (
-          /* ── Desktop nav ── */
+          /* Desktop nav */
           <nav style={styles.nav}>
             {navItems.map(n => (
               <a
@@ -133,6 +142,14 @@ export default function Header() {
                 {n.label}
               </a>
             ))}
+            <a
+              href="/partner-with-us"
+              style={styles.partnerLink}
+              onMouseEnter={e => { e.target.style.background = '#eff6ff'; }}
+              onMouseLeave={e => { e.target.style.background = 'transparent'; }}
+            >
+              Partner With Us
+            </a>
             <a
               href="/for-companies"
               style={styles.navLink}
@@ -161,6 +178,9 @@ export default function Header() {
               {n.label}
             </a>
           ))}
+          <a href="/partner-with-us" style={{ ...styles.navLink, display: 'block', padding: '10px 12px', color: '#2563eb', fontWeight: 700 }}>
+            Partner With Us
+          </a>
           <a href="/company" style={{ ...styles.cta, display: 'block', textAlign: 'center', marginLeft: 0, marginTop: 8 }}>
             Company Login →
           </a>
