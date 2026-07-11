@@ -1,11 +1,45 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Home, SprayCan, Building2, ShieldAlert, ArrowRight, ArrowLeft } from 'lucide-react';
 import { getPostsByCategory, CATEGORIES, BLOG_POSTS } from '../../data/blogPosts';
+
+const CATEGORY_ICONS = {
+  'house-cleaning': { Icon: Home, color: '#1e40af', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)' },
+  carpet: { Icon: SprayCan, color: '#7c3aed', bg: 'linear-gradient(135deg,#f5f3ff,#ede9fe)' },
+  commercial: { Icon: Building2, color: '#0891b2', bg: 'linear-gradient(135deg,#ecfeff,#cffafe)' },
+  restoration: { Icon: ShieldAlert, color: '#dc2626', bg: 'linear-gradient(135deg,#fef2f2,#fee2e2)' },
+};
+
+function CategoryPill({ id, label, href }) {
+  const meta = CATEGORY_ICONS[id];
+  const Icon = meta?.Icon;
+  return (
+    <a
+      href={href}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 7,
+        padding: '7px 16px 7px 12px', borderRadius: 20,
+        background: 'white', border: '1px solid #e2e8f0', color: '#374151',
+        textDecoration: 'none', fontSize: 14, fontWeight: 600,
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04)', transition: 'all 0.15s',
+      }}
+    >
+      {Icon && (
+        <span style={{ width: 20, height: 20, borderRadius: '50%', background: meta.bg, color: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Icon size={12} strokeWidth={2.5} />
+        </span>
+      )}
+      {label}
+    </a>
+  );
+}
 
 export default function BlogCategory({ category }) {
   const cat = CATEGORIES.find(c => c.id === category);
   const posts = cat ? getPostsByCategory(category) : BLOG_POSTS;
   const title = cat ? cat.label : 'All Posts';
+  const meta = CATEGORY_ICONS[category];
+  const HeaderIcon = meta?.Icon;
 
   return (
     <>
@@ -41,18 +75,23 @@ export default function BlogCategory({ category }) {
         })}</script>
       </Helmet>
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 24px' }}>
-        <div style={{ marginBottom: 8 }}>
-          <a href="/blog" style={{ color: '#2563eb', fontWeight: 600, fontSize: 14 }}>← All posts</a>
+        <div style={{ marginBottom: 16 }}>
+          <a href="/blog" style={{ color: '#1e40af', fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}><ArrowLeft size={14} strokeWidth={2.5} /> All posts</a>
         </div>
-        <h1 style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>{cat?.icon} {title}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
+          {HeaderIcon && (
+            <span style={{ width: 48, height: 48, borderRadius: 14, background: meta.bg, color: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 8px rgba(15,23,42,0.06)' }}>
+              <HeaderIcon size={24} strokeWidth={2} />
+            </span>
+          )}
+          <h1 style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.01em' }}>{title}</h1>
+        </div>
         <p style={{ color: '#64748b', fontSize: 16, marginBottom: 36 }}>{posts.length} guide{posts.length !== 1 ? 's' : ''}</p>
 
         {/* Other categories */}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 36 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 36 }}>
           {CATEGORIES.filter(c => c.id !== category).map(c => (
-            <a key={c.id} href={`/blog/category/${c.id}`} style={{ padding: '8px 16px', borderRadius: 20, background: '#f1f5f9', color: '#374151', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>
-              {c.icon} {c.label}
-            </a>
+            <CategoryPill key={c.id} id={c.id} label={c.label} href={`/blog/category/${c.id}`} />
           ))}
         </div>
 
@@ -61,9 +100,9 @@ export default function BlogCategory({ category }) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {posts.map(post => (
-              <a key={post.slug} href={`/blog/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 28px', textDecoration: 'none', transition: 'all 0.15s', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#2563eb'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(37,99,235,0.10)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)'; }}
+              <a key={post.slug} href={`/blog/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: '24px 28px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#bfdbfe'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(15,23,42,0.04), 0 10px 26px rgba(30,64,175,0.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)'; e.currentTarget.style.transform = 'none'; }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1 }}>
@@ -73,7 +112,7 @@ export default function BlogCategory({ category }) {
                     <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8, lineHeight: 1.35 }}>{post.title}</h2>
                     <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.6 }}>{post.excerpt}</p>
                   </div>
-                  <span style={{ color: '#2563eb', fontWeight: 700, fontSize: 15, flexShrink: 0, marginTop: 4 }}>Read →</span>
+                  <span style={{ color: '#1e40af', fontWeight: 700, fontSize: 15, flexShrink: 0, marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 5 }}>Read <ArrowRight size={15} strokeWidth={2.5} /></span>
                 </div>
               </a>
             ))}
