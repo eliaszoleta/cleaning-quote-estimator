@@ -1,4 +1,5 @@
 import React from 'react';
+import { Sparkles } from 'lucide-react';
 
 const cols = [
   {
@@ -38,14 +39,19 @@ const cols = [
 ];
 
 const s = {
-  footer: { background: '#0f172a', color: '#94a3b8' },
+  footer: { background: '#0b1220', color: '#94a3b8' },
   inner: { maxWidth: 1200, margin: '0 auto', padding: '64px 24px 40px' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 40, marginBottom: 48 },
   colTitle: { color: 'white', fontWeight: 700, fontSize: 14, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em' },
-  link: { display: 'block', color: '#94a3b8', textDecoration: 'none', fontSize: 14, marginBottom: 10, transition: 'color 0.15s' },
+  link: { display: 'block', color: '#94a3b8', textDecoration: 'none', fontSize: 14, marginBottom: 10, transition: 'color 0.15s, transform 0.15s' },
   bottom: { borderTop: '1px solid #1e293b', paddingTop: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 },
   brand: { display: 'flex', alignItems: 'center', gap: 10 },
-  logoIcon: { width: 30, height: 30, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 15 },
+  logoIcon: {
+    width: 30, height: 30,
+    background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)',
+    borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white',
+    boxShadow: '0 2px 8px rgba(30,64,175,0.4), inset 0 1px 0 rgba(255,255,255,0.18)',
+  },
   copy: { fontSize: 13, color: '#64748b' },
   disclaimer: { maxWidth: 1200, margin: '0 auto', padding: '0 24px 40px', fontSize: 12, color: '#475569', lineHeight: 1.7 },
 };
@@ -63,8 +69,8 @@ export default function Footer() {
                   key={l.href}
                   href={l.href}
                   style={s.link}
-                  onMouseEnter={e => { e.target.style.color = 'white'; }}
-                  onMouseLeave={e => { e.target.style.color = '#94a3b8'; }}
+                  onMouseEnter={e => { e.target.style.color = 'white'; e.target.style.transform = 'translateX(2px)'; }}
+                  onMouseLeave={e => { e.target.style.color = '#94a3b8'; e.target.style.transform = 'none'; }}
                 >
                   {l.label}
                 </a>
@@ -74,7 +80,7 @@ export default function Footer() {
         </div>
         <div style={s.bottom}>
           <div style={s.brand}>
-            <span style={s.logoIcon}>✦</span>
+            <span style={s.logoIcon}><Sparkles size={15} strokeWidth={2.25} /></span>
             <span style={{ color: 'white', fontWeight: 700 }}>Clean Estimator</span>
           </div>
           <div style={s.copy}>© {new Date().getFullYear()} Clean Estimator. All rights reserved.</div>
