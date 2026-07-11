@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const PRIMARY = '#2563eb';
+const PRIMARY_GRADIENT = 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)';
 const WEB3FORMS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
 
 const IconHome = () => (
@@ -60,7 +61,7 @@ function StatBadge({ number, label }) {
 function StepCard({ number, title, desc }) {
   return (
     <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
-      <div style={{ width: 40, height: 40, borderRadius: '50%', background: PRIMARY, color: 'white', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{number}</div>
+      <div style={{ width: 40, height: 40, borderRadius: '50%', background: PRIMARY_GRADIENT, color: 'white', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 6px 16px rgba(29,78,216,0.3)' }}>{number}</div>
       <div>
         <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 4 }}>{title}</div>
         <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{desc}</div>
@@ -136,7 +137,7 @@ export default function PartnerWithUs() {
           <p style={{ fontSize: 'clamp(15px, 2.5vw, 18px)', color: '#cbd5e1', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 36px' }}>
             Clean Estimator gets <strong style={{ color: 'white' }}>20,000&ndash;30,000 organic visits per month</strong> from people actively using our cost calculator &mdash; not casual browsers, but homeowners and renters with a real cleaning job in mind and a budget in hand.
           </p>
-          <a href="#apply" style={{ display: 'inline-flex', alignItems: 'center', background: PRIMARY, color: 'white', padding: '15px 36px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 17, letterSpacing: '-0.2px', gap: 4 }}>
+          <a href="#apply" style={{ display: 'inline-flex', alignItems: 'center', background: PRIMARY_GRADIENT, color: 'white', padding: '15px 36px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 17, letterSpacing: '-0.2px', gap: 4, boxShadow: '0 8px 24px rgba(29,78,216,0.4)' }}>
             Get My City <IconArrow size={18} color="white" />
           </a>
         </div>
@@ -165,7 +166,7 @@ export default function PartnerWithUs() {
               { icon: <IconPin />, title: 'They give us their location', body: 'Users enter their ZIP code or city to get an accurate local estimate. We know exactly where they are and match them to you.' },
               { icon: <IconWallet />, title: 'They have a budget', body: "Our estimator gives them a price range. By the time they see your recommendation, they already know what to expect to pay and they're ready to book." },
             ].map((card, i) => (
-              <div key={i} style={{ background: '#f8fafc', borderRadius: 14, padding: '28px 24px', border: '1px solid #e2e8f0' }}>
+              <div key={i} style={{ background: '#f8fafc', borderRadius: 14, padding: '28px 24px', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(15,23,42,0.05)' }}>
                 <div style={{ width: 52, height: 52, background: '#eff6ff', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>{card.icon}</div>
                 <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 8 }}>{card.title}</div>
                 <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: card.body }} />
@@ -197,7 +198,7 @@ export default function PartnerWithUs() {
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>Simple, Transparent Pricing</h2>
             <p style={{ fontSize: 15, color: '#64748b' }}>One flat rate. No setup fees. No commissions. Cancel anytime.</p>
           </div>
-          <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: '2px solid #2563eb', borderRadius: 20, padding: 'clamp(28px, 5vw, 48px)', maxWidth: 540, margin: '0 auto' }}>
+          <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: '2px solid #1d4ed8', borderRadius: 20, padding: 'clamp(28px, 5vw, 48px)', maxWidth: 540, margin: '0 auto', boxShadow: '0 12px 36px rgba(29,78,216,0.16)' }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: PRIMARY, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Per City Plan</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
               <span style={{ fontSize: 56, fontWeight: 900, color: '#0f172a', letterSpacing: '-2px', lineHeight: 1 }}>$350</span>
@@ -247,7 +248,7 @@ export default function PartnerWithUs() {
               { q: 'What if traffic in my city is low?', a: "We can share an estimate of current monthly sessions for your city before you commit. You're still getting targeted, high-intent visitors for less than the cost of one Google Ads day." },
               { q: 'Can I cancel?', a: "Yes. Give us 30 days notice and we'll remove your listing at the end of the billing cycle. No long-term contracts." },
             ].map((item, i) => (
-              <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2 }}>
+              <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)' }}>
                 <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 8 }}>{item.q}</div>
                 <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{item.a}</div>
               </div>
@@ -300,7 +301,7 @@ export default function PartnerWithUs() {
               {error && (
                 <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, padding: '10px 14px', fontSize: 13.5, color: '#dc2626', marginBottom: 14 }}>{error}</div>
               )}
-              <button type="submit" disabled={sending} style={{ width: '100%', background: sending ? '#93c5fd' : PRIMARY, color: 'white', border: 'none', borderRadius: 10, padding: '14px 0', fontWeight: 800, fontSize: 16, cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'background 0.2s' }}>
+              <button type="submit" disabled={sending} style={{ width: '100%', background: sending ? '#93c5fd' : PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 10, padding: '14px 0', fontWeight: 800, fontSize: 16, cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'opacity 0.2s', boxShadow: sending ? 'none' : '0 8px 22px rgba(29,78,216,0.35)' }}>
                 {sending ? 'Sending...' : <> Send My Application <IconArrow size={18} color="white" /> </>}
               </button>
               <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 14, marginBottom: 0 }}>We'll confirm city availability and pricing within 48 hours. No payment required to apply.</p>
