@@ -184,7 +184,7 @@ function renderBlogPost(post, cat, assets) {
   ${assets.cssLinks}
 </head>
 <body>
-<div id="root">${staticHeader()}<div style="max-width:760px;margin:0 auto;padding:60px 24px;font-family:system-ui,-apple-system,sans-serif">
+<div id="root">${staticHeader()}<div style="max-width:760px;margin:0 auto;padding:60px 24px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
   <div style="font-size:13px;color:#94a3b8;margin-bottom:24px">
     <a href="/" style="color:#94a3b8">Home</a> ›
     <a href="/blog" style="color:#94a3b8">Blog</a> ›
@@ -280,7 +280,7 @@ function renderBlogIndex(posts, categories, assets) {
 <body>
 <div id="root">
 ${staticHeader()}
-<div style="max-width:1100px;margin:0 auto;padding:60px 24px;font-family:system-ui,-apple-system,sans-serif">
+<div style="max-width:1100px;margin:0 auto;padding:60px 24px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
   <h1 style="font-size:40px;font-weight:900;color:#0f172a;margin-bottom:8px">Cleaning Cost Guides</h1>
   <p style="font-size:18px;color:#64748b;margin-bottom:40px">Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px">
@@ -359,7 +359,7 @@ function renderCategoryPage(cat, posts, assets) {
 <body>
 <div id="root">
 ${staticHeader()}
-<div style="background:#f8fafc;min-height:100vh;padding:48px 24px 64px;font-family:system-ui,-apple-system,sans-serif">
+<div style="background:#f8fafc;min-height:100vh;padding:48px 24px 64px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
   <div style="max-width:900px;margin:0 auto">
     <a href="/blog" style="font-size:13px;color:#64748b;text-decoration:none;display:inline-block;margin-bottom:28px">&#8592; All Guides</a>
     <h1 style="font-size:clamp(24px,4vw,34px);font-weight:800;color:#0f172a;margin-bottom:8px">${esc(cat.label)}</h1>
@@ -383,7 +383,7 @@ ${staticFooter()}
 
 function staticFooter() {
   return `<footer style="background:#0f172a;color:#94a3b8">
-  <div style="max-width:1200px;margin:0 auto;padding:64px 24px 40px;font-family:system-ui,-apple-system,sans-serif">
+  <div style="max-width:1200px;margin:0 auto;padding:64px 24px 40px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:40px;margin-bottom:48px">
       <div>
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Blog Categories</div>
@@ -417,7 +417,7 @@ function staticFooter() {
       <div style="font-size:13px;color:#64748b">&copy; ${new Date().getFullYear()} Clean Estimator. All rights reserved.</div>
     </div>
   </div>
-  <div style="max-width:1200px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:#475569;line-height:1.7;font-family:system-ui,-apple-system,sans-serif">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:#475569;line-height:1.7;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
     <strong style="color:#64748b">Disclaimer:</strong> All price estimates provided by Clean Estimator are for informational purposes only.
     Actual cleaning service costs vary based on local market conditions, specific service requirements, company pricing policies,
     and other factors. Always get multiple quotes from licensed, insured cleaning professionals in your area.
@@ -453,7 +453,7 @@ function renderStaticPage({ path: urlPath, seoTitle, seoDesc, bodyHtml, maxWidth
   ${assets.cssLinks}
 </head>
 <body>
-<div id="root">${staticHeader()}<div style="max-width:${maxWidth}px;margin:0 auto;padding:60px 24px;font-family:system-ui,-apple-system,sans-serif">
+<div id="root">${staticHeader()}<div style="max-width:${maxWidth}px;margin:0 auto;padding:60px 24px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
 ${bodyHtml}
 </div>${staticFooter()}</div>
   ${assets.jsScripts}
@@ -625,7 +625,7 @@ function injectHomepage(posts, categories) {
   ).join('\n      ');
 
   const staticContent = `${staticHeader()}
-<div style="font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;min-height:80vh">
+<div style="font-family:'Poppins','Poppins Fallback',Arial,sans-serif;background:#f8fafc;min-height:80vh">
   <div style="max-width:1100px;margin:0 auto;padding:40px 24px 64px">
     <div style="text-align:center;padding:48px 24px 40px">
       <h1 style="font-size:clamp(28px,5vw,52px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:16px">Free Cleaning Cost Estimator 2026</h1>
