@@ -67,7 +67,7 @@ export default function Contact() {
   };
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
+    <div style={{ background: '#f8fafc', minHeight: '100vh', fontFamily: "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
       <Helmet>
         <title>Contact Us | Clean Estimator</title>
         <meta name="description" content="Get in touch with the Clean Estimator team for support, partnerships, or general questions." />
