@@ -26,9 +26,10 @@ function loadBlogData() {
 
 function getAssetTags() {
   const indexHtml = fs.readFileSync(path.join(BUILD, 'index.html'), 'utf8');
-  const cssLinks  = (indexHtml.match(/<link[^>]+\.css[^>]*>/g)  || []).join('\n  ');
-  const jsScripts = (indexHtml.match(/<script\b[^>]*\ssrc="[^"]*\.js[^"]*"[^>]*>\s*<\/script>/g) || []).join('\n  ');
-  return { cssLinks, jsScripts };
+  const cssLinks   = (indexHtml.match(/<link[^>]+\.css[^>]*>/g) || []).join('\n  ');
+  const fontLinks  = (indexHtml.match(/<link[^>]+fonts\.g(?:oogleapis|static)\.com[^>]*>/g) || []).join('\n  ');
+  const jsScripts  = (indexHtml.match(/<script\b[^>]*\ssrc="[^"]*\.js[^"]*"[^>]*>\s*<\/script>/g) || []).join('\n  ');
+  return { cssLinks: [fontLinks, cssLinks].filter(Boolean).join('\n  '), jsScripts };
 }
 
 // ─── 3. Helpers ──────────────────────────────────────────────────────────────
