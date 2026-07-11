@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const WEB3FORMS_ACCESS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
+const PRIMARY_GRADIENT = 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)';
 
 function Icon({ children, size = 20 }) {
   return (
@@ -136,7 +137,7 @@ export default function Contact() {
                   <div style={{ marginBottom: 14, color: '#16a34a', display: 'flex', justifyContent: 'center' }}><CheckCircleIcon size={44} /></div>
                   <p style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Message sent!</p>
                   <p style={{ fontSize: 14, color: '#64748b', marginBottom: 22 }}>Thanks for reaching out — we typically respond within 1 business day.</p>
-                  <button onClick={() => setStatus('idle')} style={{ padding: '10px 22px', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14, fontFamily: 'inherit' }}>
+                  <button onClick={() => setStatus('idle')} style={{ padding: '10px 22px', background: PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14, fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(29,78,216,0.3)' }}>
                     Send Another Message
                   </button>
                 </div>
@@ -183,7 +184,7 @@ export default function Contact() {
                     disabled={status === 'sending'}
                     style={{
                       padding: '13px 28px',
-                      background: '#2563eb',
+                      background: PRIMARY_GRADIENT,
                       color: 'white',
                       border: 'none',
                       borderRadius: 10,
@@ -192,12 +193,12 @@ export default function Contact() {
                       cursor: status === 'sending' ? 'not-allowed' : 'pointer',
                       opacity: status === 'sending' ? 0.7 : 1,
                       alignSelf: 'flex-start',
-                      transition: 'background 0.15s',
+                      transition: 'opacity 0.15s',
                       fontFamily: 'inherit',
-                      boxShadow: '0 4px 14px rgba(37,99,235,0.28)',
+                      boxShadow: '0 8px 22px rgba(29,78,216,0.35)',
                     }}
-                    onMouseEnter={e => { if (status !== 'sending') e.currentTarget.style.background = '#1d4ed8'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '#2563eb'; }}
+                    onMouseEnter={e => { if (status !== 'sending') e.currentTarget.style.opacity = '0.9'; }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = status === 'sending' ? '0.7' : '1'; }}
                   >
                     {status === 'sending' ? 'Sending…' : 'Send Message →'}
                   </button>
