@@ -130,8 +130,8 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
               <div style={{ marginBottom: 20 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Price breakdown</div>
                 <div style={{ border: '1px solid #f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
-                  {adjustments.map((adj, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', borderBottom: i < adjustments.length - 1 ? '1px solid #f8fafc' : 'none', fontSize: 13.5, background: i % 2 === 0 ? 'white' : '#fafafa' }}>
+                  {adjustments.filter(adj => !adj.separate).map((adj, i, arr) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', borderBottom: i < arr.length - 1 ? '1px solid #f8fafc' : 'none', fontSize: 13.5, background: i % 2 === 0 ? 'white' : '#fafafa' }}>
                       <span style={{ color: '#374151', textTransform: 'capitalize' }}>{adj.label}</span>
                       <span style={{ fontWeight: 600, color: (adj.low < 0 || adj.high < 0) ? '#16a34a' : '#0f172a' }}>
                         {adj.low < 0
@@ -145,6 +145,12 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                     <span style={{ color: primaryColor }}>{formatPriceRange(totalLow, totalHigh)}</span>
                   </div>
                 </div>
+                {adjustments.filter(adj => adj.separate).map((adj, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', marginTop: 10, background: '#fffbeb', border: '1px dashed #fde68a', borderRadius: 10, fontSize: 13 }}>
+                    <span style={{ color: '#78350f' }}>{adj.label}</span>
+                    <span style={{ fontWeight: 600, color: '#78350f', whiteSpace: 'nowrap', marginLeft: 12 }}>{formatPriceRange(adj.low, adj.high)}</span>
+                  </div>
+                ))}
               </div>
 
               {keyFactors.length > 0 && (

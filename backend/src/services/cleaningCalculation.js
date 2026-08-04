@@ -35,9 +35,17 @@ const {
   TILE_SERVICE_ADDONS,
   TILE_MINIMUM,
   MOLD_PRICE_RANGES,
+  MOLD_TYPE_MULTIPLIERS,
+  MOLD_SOURCE_FIXED_MULTIPLIERS,
   MOLD_ADDONS,
   MOLD_COMMERCIAL_MULTIPLIER,
-  WATER_DAMAGE_RANGES,
+  WATER_EXTRACTION_DRYING_PER_SQFT,
+  WATER_EXTRACTION_DRYING_MINIMUM,
+  WATER_STRUCTURAL_DRYING_ADDON,
+  WATER_MOLD_PREVENTION_ADDON,
+  WATER_CONTENTS_PACKOUT_ADDON,
+  WATER_FULL_RESTORATION_PER_SQFT,
+  WATER_FULL_RESTORATION_MINIMUM,
   WATER_CATEGORY_MULTIPLIERS,
   STATE_NAMES,
 } = require('../config/defaults');
@@ -589,8 +597,18 @@ function calculateMold(details, stateMultiplier, companyConfig) {
   const cfg = companyConfig?.services?.moldRemediation || {};
   const markup = cfg.markup || 1.0;
 
-  let range = { ...(MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium) };
-  range = applyMultiplier(range, stateMultiplier * markup);
+  const baseTier = MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium;
+  const typeMult = MOLD_TYPE_MULTIPLIERS[moldType] || MOLD_TYPE_MULTIPLIERS.not_sure;
+  const sourceMult = MOLD_SOURCE_FIXED_MULTIPLIERS[sourceFixed] || MOLD_SOURCE_FIXED_MULTIPLIERS.not_sure;
+
+  // Known mold type and moisture-source status refine (narrow) the tier's base range
+  // instead of leaving every job at the full tier width.
+  const refinedBase = {
+    low: baseTier.low * typeMult.low * sourceMult.low,
+    high: baseTier.high * typeMult.high * sourceMult.high,
+  };
+
+  let range = applyMultiplier(refinedBase, stateMultiplier * markup);
 
   if (propertyType === 'commercial') {
     range = { low: Math.round(range.low * MOLD_COMMERCIAL_MULTIPLIER.low), high: Math.round(range.high * MOLD_COMMERCIAL_MULTIPLIER.high) };
@@ -620,7 +638,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     serviceType: 'mold_remediation',
     totalLow: range.low,
     totalHigh: range.high,
-    basePrice: ((MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium).low + (MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium).high) / 2,
+    basePrice: (baseTier.low + baseTier.high) / 2,
     adjustments,
     unit: 'flat',
     recurringMonthlyLow: null,
@@ -629,6 +647,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     keyFactors: [
       { label: 'Affected area', impact: affectedSize },
       { label: 'Mold type', impact: moldType },
+      { label: 'Moisture source', impact: sourceFixed === 'yes' ? 'Fixed' : sourceFixed === 'not_fixed' ? 'Still leaking' : 'Unknown' },
       { label: 'Locations', impact: locations.join(', ') },
     ],
     disclaimer: `IMPORTANT: These are preliminary estimates only. Mold remediation pricing requires an in-person inspection by a licensed remediation contractor. Final costs depend on the extent of contamination, building materials, and local regulations.${sourceWarning ? ' The moisture source must be identified and fixed BEFORE remediation, or mold will return.' : ''}`,
@@ -653,43 +672,61 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
 
   const catMult = WATER_CATEGORY_MULTIPLIERS[waterCategory] || WATER_CATEGORY_MULTIPLIERS.clean;
 
-  // Base: extraction + drying — apply category multiplier asymmetrically (low/high)
+  // Extraction + drying scales with the actual affected sq ft (from the calculator's area
+  // slider) instead of quoting every job the same flat range, floored at a small-loss minimum.
+  const rawExtraction = {
+    low: Math.max(sqft * WATER_EXTRACTION_DRYING_PER_SQFT.low, WATER_EXTRACTION_DRYING_MINIMUM.low),
+    high: Math.max(sqft * WATER_EXTRACTION_DRYING_PER_SQFT.high, WATER_EXTRACTION_DRYING_MINIMUM.high),
+  };
+
   let range = {
-    low: Math.round(WATER_DAMAGE_RANGES.extraction_drying.low * catMult.low),
-    high: Math.round(WATER_DAMAGE_RANGES.extraction_drying.high * catMult.high),
+    low: Math.round(rawExtraction.low * catMult.low),
+    high: Math.round(rawExtraction.high * catMult.high),
   };
   range = applyMultiplier(range, stateMultiplier * markup);
 
-  const adjustments = [{ label: 'Water extraction + drying (3–5 days)', low: WATER_DAMAGE_RANGES.extraction_drying.low, high: WATER_DAMAGE_RANGES.extraction_drying.high }];
+  const adjustments = [{ label: 'Water extraction + drying (3–5 days)', low: range.low, high: range.high }];
 
   if (damageClass === 'wet_walls' || damageClass === 'structural') {
-    const adj = applyMultiplier({ ...WATER_DAMAGE_RANGES.structural_drying }, stateMultiplier * markup);
+    const adj = applyMultiplier({ ...WATER_STRUCTURAL_DRYING_ADDON }, stateMultiplier * markup);
     range = addRange(range, adj);
     adjustments.push({ label: 'Structural drying (walls opened)', low: adj.low, high: adj.high });
   }
 
-  // Mold prevention if >24h
+  // Mold prevention if >72h
   const moldRisk = ['days_3_7', 'week_plus'].includes(whenHappened);
   if (moldRisk) {
-    const adj = applyMultiplier({ ...WATER_DAMAGE_RANGES.mold_prevention }, stateMultiplier * markup);
+    const adj = applyMultiplier({ ...WATER_MOLD_PREVENTION_ADDON }, stateMultiplier * markup);
     range = addRange(range, adj);
     adjustments.push({ label: 'Mold prevention treatment (required)', low: adj.low, high: adj.high });
+  }
+
+  if (contentsDamaged) {
+    const adj = applyMultiplier({ ...WATER_CONTENTS_PACKOUT_ADDON }, stateMultiplier * markup);
+    range = addRange(range, adj);
+    adjustments.push({ label: 'Furniture / contents pack-out & cleaning', low: adj.low, high: adj.high });
   }
 
   const urgencyMsg = whenHappened === 'today' || whenHappened === '24_48h'
     ? 'Act now — mold can begin growing within 24–48 hours of water damage.'
     : 'Mold growth is likely after this time period. Remediation may be required in addition to restoration.';
 
-  // For large areas, add full restoration estimate
+  // For large or multi-area losses, show a separate (not summed into the total above)
+  // full-restoration ballpark, scaled per sq ft rather than one flat $2k–$25k range.
   if (sqft > 1000 || areas.length > 1) {
-    adjustments.push({ label: 'Full restoration (drywall, flooring) — separate estimate', low: WATER_DAMAGE_RANGES.full_restoration.low, high: WATER_DAMAGE_RANGES.full_restoration.high });
+    const fullRestoration = {
+      low: Math.max(sqft * WATER_FULL_RESTORATION_PER_SQFT.low, WATER_FULL_RESTORATION_MINIMUM.low),
+      high: Math.max(sqft * WATER_FULL_RESTORATION_PER_SQFT.high, WATER_FULL_RESTORATION_MINIMUM.high),
+    };
+    const adj = applyMultiplier(fullRestoration, stateMultiplier);
+    adjustments.push({ label: 'Full restoration (drywall, flooring) — separate estimate, not included above', low: adj.low, high: adj.high, separate: true });
   }
 
   return {
     serviceType: 'water_damage',
     totalLow: range.low,
     totalHigh: range.high,
-    basePrice: (WATER_DAMAGE_RANGES.extraction_drying.low + WATER_DAMAGE_RANGES.extraction_drying.high) / 2,
+    basePrice: Math.round((rawExtraction.low + rawExtraction.high) / 2),
     adjustments,
     unit: 'flat',
     recurringMonthlyLow: null,
@@ -697,6 +734,8 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
     recurringAnnualSavings: null,
     keyFactors: [
       { label: 'Water category', impact: waterCategory + ' water' },
+      { label: 'Cause', impact: cause.replace(/_/g, ' ') },
+      { label: 'Affected area', impact: `${sqft.toLocaleString()} sq ft` },
       { label: 'Time elapsed', impact: whenHappened },
       { label: 'Insurance', impact: hasInsurance ? 'May be covered' : 'Out of pocket' },
     ],

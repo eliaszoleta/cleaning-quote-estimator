@@ -312,36 +312,64 @@ const TILE_MINIMUM = { low: 150, high: 200 };
 
 // Mold remediation price ranges by affected area
 // Source: EPA mold remediation guidelines, NORMI certified remediators
+// Ranges are tightened around each tier's typical job cost (~1.5-1.9x spread, in line
+// with the other services below) — remaining uncertainty is resolved by the mold-type
+// and moisture-source multipliers instead of being baked into one wide tier range.
 const MOLD_PRICE_RANGES = {
-  small:     { low: 500,  high: 1500  },  // <10 sq ft
-  medium:    { low: 1500, high: 3500  },  // 10–100 sq ft
-  large:     { low: 3500, high: 7000  },  // 100–300 sq ft
-  extensive: { low: 7000, high: 25000 },  // 300+ sq ft
+  small:     { low: 700,  high: 1150  },  // <10 sq ft
+  medium:    { low: 1800, high: 2900  },  // 10–100 sq ft
+  large:     { low: 4000, high: 6200  },  // 100–300 sq ft
+  extensive: { low: 8000, high: 15000 },  // 300+ sq ft
+};
+
+// Known mold type narrows (and shifts) the estimate instead of leaving the full tier
+// width — "not sure" keeps the tier's full uncertainty since containment/PPE needs are
+// unknown until inspection.
+const MOLD_TYPE_MULTIPLIERS = {
+  not_sure:   { low: 1.0,  high: 1.0  },
+  green_mold: { low: 0.85, high: 0.92 },  // common surface mold, cheapest to treat
+  white_mold: { low: 0.90, high: 0.97 },
+  black_mold: { low: 1.05, high: 1.18 },  // Stachybotrys — more containment/PPE/disposal
+};
+
+// Whether the moisture source is fixed affects re-treatment risk, not the base job size.
+const MOLD_SOURCE_FIXED_MULTIPLIERS = {
+  yes:        { low: 1.0, high: 1.0  },
+  not_fixed:  { low: 1.0, high: 1.15 },
+  not_sure:   { low: 1.0, high: 1.08 },
 };
 
 const MOLD_ADDONS = {
-  air_testing:         { low: 150, high: 350 },
-  clearance_test:      { low: 200, high: 400 },
-  hvac_cleaning:       { low: 300, high: 600 },
+  air_testing:         { low: 200, high: 320 },
+  clearance_test:      { low: 180, high: 280 },
+  hvac_cleaning:       { low: 320, high: 480 },
   drywall_replacement: { low: 3, high: 8 }, // per sq ft
 };
 
-const MOLD_COMMERCIAL_MULTIPLIER = { low: 2.0, high: 3.0 };
+// Matches the "+30–50%" shown in the calculator UI for commercial properties.
+const MOLD_COMMERCIAL_MULTIPLIER = { low: 1.3, high: 1.5 };
 
-// Water damage restoration price ranges
+// Water damage restoration pricing
 // Source: IICRC S500 standards, restoration industry data
-const WATER_DAMAGE_RANGES = {
-  extraction_only:     { low: 300,  high: 2500  },
-  extraction_drying:   { low: 1200, high: 4000  },
-  structural_drying:   { low: 500,  high: 2000  }, // additional
-  mold_prevention:     { low: 300,  high: 800   },
-  full_restoration:    { low: 2000, high: 25000 },
-};
+// Extraction + drying scales per affected sq ft (collected from the calculator's area
+// slider) instead of a single flat range, so the estimate reflects the actual job size.
+const WATER_EXTRACTION_DRYING_PER_SQFT = { low: 2.60, high: 4.20 }; // 3–5 day extraction + drying
+const WATER_EXTRACTION_DRYING_MINIMUM = { low: 500, high: 850 };   // small-loss minimum charge
 
+const WATER_STRUCTURAL_DRYING_ADDON = { low: 600, high: 1100 };  // walls opened for drying — additional
+const WATER_MOLD_PREVENTION_ADDON = { low: 320, high: 520 };     // required once 72h+ has passed
+const WATER_CONTENTS_PACKOUT_ADDON = { low: 250, high: 450 };    // furniture/contents pack-out & cleaning
+
+// Full drywall/flooring restoration is its own, separately-quoted project — priced per sq ft
+// so it scales with the job instead of quoting every large loss the same $2k–$25k range.
+const WATER_FULL_RESTORATION_PER_SQFT = { low: 8, high: 18 };
+const WATER_FULL_RESTORATION_MINIMUM = { low: 2000, high: 3600 };
+
+// Matches the "+30%" (gray) / "+60–100%" (black) shown in the calculator UI.
 const WATER_CATEGORY_MULTIPLIERS = {
-  clean:  { low: 1.0, high: 1.0 },
-  gray:   { low: 1.3, high: 1.5 },
-  black:  { low: 2.0, high: 3.0 },
+  clean:  { low: 1.0,  high: 1.0  },
+  gray:   { low: 1.25, high: 1.35 },
+  black:  { low: 1.6,  high: 2.0  },
 };
 
 // State name lookup
@@ -412,8 +440,16 @@ module.exports = {
   TILE_SERVICE_ADDONS,
   TILE_MINIMUM,
   MOLD_PRICE_RANGES,
+  MOLD_TYPE_MULTIPLIERS,
+  MOLD_SOURCE_FIXED_MULTIPLIERS,
   MOLD_ADDONS,
   MOLD_COMMERCIAL_MULTIPLIER,
-  WATER_DAMAGE_RANGES,
+  WATER_EXTRACTION_DRYING_PER_SQFT,
+  WATER_EXTRACTION_DRYING_MINIMUM,
+  WATER_STRUCTURAL_DRYING_ADDON,
+  WATER_MOLD_PREVENTION_ADDON,
+  WATER_CONTENTS_PACKOUT_ADDON,
+  WATER_FULL_RESTORATION_PER_SQFT,
+  WATER_FULL_RESTORATION_MINIMUM,
   WATER_CATEGORY_MULTIPLIERS,
 };
