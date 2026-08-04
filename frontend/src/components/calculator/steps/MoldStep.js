@@ -86,7 +86,7 @@ export default function MoldStep({ value, onBack, onNext, primaryColor }) {
 
       <Section label="Additional services">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[['air_testing','Air Quality Testing (+$200–$320)'],['clearance_test','Post-Remediation Clearance Test (+$180–$280)']].map(([id,label]) => (
+          {[['air_testing','Air Quality Testing (+$220–$290)'],['clearance_test','Post-Remediation Clearance Test (+$190–$250)']].map(([id,label]) => (
             <button key={id} onClick={() => toggleExtra(id)} style={{ padding: '9px 16px', borderRadius: 20, border: `2px solid ${extras.includes(id) ? primaryColor : '#e2e8f0'}`, background: extras.includes(id) ? `${primaryColor}15` : 'white', color: extras.includes(id) ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
               {label}
             </button>

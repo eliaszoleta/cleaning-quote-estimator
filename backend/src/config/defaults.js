@@ -312,14 +312,14 @@ const TILE_MINIMUM = { low: 150, high: 200 };
 
 // Mold remediation price ranges by affected area
 // Source: EPA mold remediation guidelines, NORMI certified remediators
-// Ranges are tightened around each tier's typical job cost (~1.5-1.9x spread, in line
-// with the other services below) — remaining uncertainty is resolved by the mold-type
+// Ranges are tightened around each tier's typical job cost (~1.3-1.5x spread, matching
+// the other services below) — remaining uncertainty is resolved by the mold-type
 // and moisture-source multipliers instead of being baked into one wide tier range.
 const MOLD_PRICE_RANGES = {
-  small:     { low: 700,  high: 1150  },  // <10 sq ft
-  medium:    { low: 1800, high: 2900  },  // 10–100 sq ft
-  large:     { low: 4000, high: 6200  },  // 100–300 sq ft
-  extensive: { low: 8000, high: 15000 },  // 300+ sq ft
+  small:     { low: 750,  high: 1050  },  // <10 sq ft
+  medium:    { low: 1950, high: 2700  },  // 10–100 sq ft
+  large:     { low: 4300, high: 5800  },  // 100–300 sq ft
+  extensive: { low: 8500, high: 13000 },  // 300+ sq ft — widest tier since "300+" is open-ended
 };
 
 // Known mold type narrows (and shifts) the estimate instead of leaving the full tier
@@ -340,9 +340,9 @@ const MOLD_SOURCE_FIXED_MULTIPLIERS = {
 };
 
 const MOLD_ADDONS = {
-  air_testing:         { low: 200, high: 320 },
-  clearance_test:      { low: 180, high: 280 },
-  hvac_cleaning:       { low: 320, high: 480 },
+  air_testing:         { low: 220, high: 290 },
+  clearance_test:      { low: 190, high: 250 },
+  hvac_cleaning:       { low: 340, high: 440 },
   drywall_replacement: { low: 3, high: 8 }, // per sq ft
 };
 
@@ -353,23 +353,26 @@ const MOLD_COMMERCIAL_MULTIPLIER = { low: 1.3, high: 1.5 };
 // Source: IICRC S500 standards, restoration industry data
 // Extraction + drying scales per affected sq ft (collected from the calculator's area
 // slider) instead of a single flat range, so the estimate reflects the actual job size.
-const WATER_EXTRACTION_DRYING_PER_SQFT = { low: 2.60, high: 4.20 }; // 3–5 day extraction + drying
-const WATER_EXTRACTION_DRYING_MINIMUM = { low: 500, high: 850 };   // small-loss minimum charge
+// Tightened to a ~1.3x per-sqft spread — matching the other services — since sq ft and
+// category already do the job of separating cheap jobs from expensive ones.
+const WATER_EXTRACTION_DRYING_PER_SQFT = { low: 2.90, high: 3.90 }; // 3–5 day extraction + drying
+const WATER_EXTRACTION_DRYING_MINIMUM = { low: 550, high: 750 };   // small-loss minimum charge
 
-const WATER_STRUCTURAL_DRYING_ADDON = { low: 600, high: 1100 };  // walls opened for drying — additional
-const WATER_MOLD_PREVENTION_ADDON = { low: 320, high: 520 };     // required once 72h+ has passed
-const WATER_CONTENTS_PACKOUT_ADDON = { low: 250, high: 450 };    // furniture/contents pack-out & cleaning
+const WATER_STRUCTURAL_DRYING_ADDON = { low: 700, high: 950 };   // walls opened for drying — additional
+const WATER_MOLD_PREVENTION_ADDON = { low: 350, high: 460 };     // required once 72h+ has passed
+const WATER_CONTENTS_PACKOUT_ADDON = { low: 280, high: 380 };    // furniture/contents pack-out & cleaning
 
 // Full drywall/flooring restoration is its own, separately-quoted project — priced per sq ft
-// so it scales with the job instead of quoting every large loss the same $2k–$25k range.
-const WATER_FULL_RESTORATION_PER_SQFT = { low: 8, high: 18 };
-const WATER_FULL_RESTORATION_MINIMUM = { low: 2000, high: 3600 };
+// so it scales with the job instead of quoting every large loss the same flat range.
+const WATER_FULL_RESTORATION_PER_SQFT = { low: 9, high: 15 };
+const WATER_FULL_RESTORATION_MINIMUM = { low: 2200, high: 3300 };
 
-// Matches the "+30%" (gray) / "+60–100%" (black) shown in the calculator UI.
+// Matches the "+30%" (gray) / "+60–100%" (black) shown in the calculator UI, narrowed to
+// a tight band around each since category is already a strong, known signal.
 const WATER_CATEGORY_MULTIPLIERS = {
   clean:  { low: 1.0,  high: 1.0  },
-  gray:   { low: 1.25, high: 1.35 },
-  black:  { low: 1.6,  high: 2.0  },
+  gray:   { low: 1.27, high: 1.33 },
+  black:  { low: 1.7,  high: 1.9  },
 };
 
 // State name lookup
