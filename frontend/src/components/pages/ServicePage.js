@@ -20,6 +20,12 @@ function formatPrice(n) {
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }
 
+// Per-sq-ft tier rates are often well under $1 (e.g. commercial: $0.052–$0.185/sq ft) —
+// rounding those to whole dollars collapses them all to "$0". Show cents for rates.
+function formatTierPrice(n, service) {
+  return service.unitType === 'per_sqft' ? `$${n.toFixed(2)}` : formatPrice(n);
+}
+
 function unitSuffix(service) {
   if (service.unitType === 'per_sqft') return '/sq ft';
   if (service.unitType === 'per_room') return '/room';
@@ -42,7 +48,7 @@ function TiersTable({ service }) {
             <tr key={i} style={{ background: i % 2 === 0 ? 'white' : '#fafafa' }}>
               <td style={{ padding: '10px 14px', color: '#0f172a', fontWeight: 600, borderBottom: '1px solid #f1f5f9' }}>{tier.label}</td>
               <td style={{ padding: '10px 14px', color: '#2563eb', fontWeight: 700, borderBottom: '1px solid #f1f5f9', whiteSpace: 'nowrap' }}>
-                {formatPrice(tier.low)}–{formatPrice(tier.high)}<span style={{ color: '#94a3b8', fontWeight: 500, fontSize: 12 }}>{unitSuffix(service)}</span>
+                {formatTierPrice(tier.low, service)}–{formatTierPrice(tier.high, service)}<span style={{ color: '#94a3b8', fontWeight: 500, fontSize: 12 }}>{unitSuffix(service)}</span>
               </td>
               <td style={{ padding: '10px 14px', color: '#475569', borderBottom: '1px solid #f1f5f9' }}>{tier.note}</td>
             </tr>

@@ -612,6 +612,12 @@ function unitSuffix(service) {
   return '';
 }
 
+// Per-sq-ft tier rates are often well under $1 (e.g. commercial: $0.052–$0.185/sq ft) —
+// rounding those to whole dollars collapses them all to "$0". Show cents for rates.
+function fmtTier(n, service) {
+  return service.unitType === 'per_sqft' ? `$${n.toFixed(2)}` : fmt(n);
+}
+
 function renderServicePage(service, statesMod, assets) {
   const ICON_EMOJI = { home_residential: '🏠', apartment: '🏢', commercial: '🏬', carpet: '🧶', air_duct: '💨', dryer_vent: '🔥', tile_grout: '▦', mold_remediation: '⚠️', water_damage: '💧' };
 
@@ -623,7 +629,7 @@ function renderServicePage(service, statesMod, assets) {
   const tierRows = service.tiers.map((tier, i) => `
     <tr style="background:${i % 2 === 0 ? 'white' : '#fafafa'}">
       <td style="padding:10px 14px;color:#0f172a;font-weight:600;border-bottom:1px solid #f1f5f9">${esc(tier.label)}</td>
-      <td style="padding:10px 14px;color:${PRIMARY};font-weight:700;border-bottom:1px solid #f1f5f9;white-space:nowrap">${fmt(tier.low)}&ndash;${fmt(tier.high)}<span style="color:#94a3b8;font-weight:500;font-size:12px">${unitSuffix(service)}</span></td>
+      <td style="padding:10px 14px;color:${PRIMARY};font-weight:700;border-bottom:1px solid #f1f5f9;white-space:nowrap">${fmtTier(tier.low, service)}&ndash;${fmtTier(tier.high, service)}<span style="color:#94a3b8;font-weight:500;font-size:12px">${unitSuffix(service)}</span></td>
       <td style="padding:10px 14px;color:#475569;border-bottom:1px solid #f1f5f9">${esc(tier.note)}</td>
     </tr>`).join('');
 
