@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Clock, ShieldOff, Zap } from 'lucide-react';
+import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets } from 'lucide-react';
 
 // "Most Requested" mirrors the verified tagline already shipped for this service in
 // data/services.js ("...the most requested service on Clean Estimator") — not a new claim.
@@ -13,12 +13,6 @@ const SERVICES = [
   { id: 'tile_grout',       Icon: Grid3x3,        label: 'Tile & Grout Cleaning',    desc: 'Deep clean, sealing, recoloring',    color: '#0d9488', bg: '#f0fdfa' },
   { id: 'mold_remediation', Icon: AlertTriangle,  label: 'Mold Remediation',         desc: 'Assessment, removal, prevention',    color: '#d97706', bg: '#fffbeb' },
   { id: 'water_damage',     Icon: Droplets,       label: 'Water Damage Restoration', desc: 'Emergency extraction & drying',      color: '#0284c7', bg: '#f0f9ff' },
-];
-
-const TRUST_ITEMS = [
-  { Icon: Clock,     label: '60-second estimate' },
-  { Icon: ShieldOff, label: 'No email required' },
-  { Icon: Zap,       label: 'Instant results' },
 ];
 
 export default function ServiceSelect({ onSelect, primaryColor, companyName }) {
@@ -48,17 +42,9 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName }) {
       <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: '#0f172a', marginBottom: 4, letterSpacing: '-0.3px' }}>
         {companyName ? `${companyName} — Get Your Quote` : 'What service do you need?'}
       </h2>
-      <p style={{ color: '#64748b', fontSize: 13, marginBottom: 12 }}>
+      <p style={{ color: '#64748b', fontSize: 13, marginBottom: 18 }}>
         Tap a service to get your free, instant estimate.
       </p>
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginBottom: 18 }}>
-        {TRUST_ITEMS.map(({ Icon, label }) => (
-          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#64748b', fontWeight: 500 }}>
-            <Icon size={13} color={primaryColor || '#2563eb'} strokeWidth={2} /> {label}
-          </div>
-        ))}
-      </div>
 
       <div className="cc-svc-grid" style={{
         display: 'grid',
