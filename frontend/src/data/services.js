@@ -244,6 +244,7 @@ const SERVICES = [
     unitType: 'flat',
     unit: 'total remediation cost',
     typicalTierIndex: 1,
+    disclaimer: 'These are preliminary estimates only. Mold remediation always requires an in-person inspection by a licensed remediation contractor — final cost depends on the extent of contamination, building materials, local regulations, and whether the moisture source has been fixed. If it hasn\'t, mold will return regardless of how thorough the cleanup is.',
     tiers: [
       { label: 'Small (<10 sq ft)', low: 750, high: 1050, note: 'Corner of shower or small spot treatment' },
       { label: 'Medium (10–100 sq ft, Most Common)', low: 1950, high: 2700, note: 'Bathroom wall or similar single-area job' },
@@ -276,6 +277,7 @@ const SERVICES = [
     unit: 'per sq ft, extraction + drying',
     typicalQuantity: 500,
     typicalTierIndex: 0,
+    disclaimer: 'Act now — mold can begin growing within 24–48 hours of water damage. These are preliminary estimates only; final pricing requires an in-person assessment from a licensed restoration company. If you have homeowner\'s insurance, contact your insurer immediately and document all damage with photos before cleanup begins.',
     tiers: [
       { label: 'Clean Water (Category 1)', low: 2.90, high: 3.90, note: 'Supply line or appliance leak — no contamination' },
       { label: 'Gray Water (Category 2)', low: 3.68, high: 5.19, note: 'Washing machine or dishwasher overflow' },

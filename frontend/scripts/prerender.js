@@ -660,6 +660,10 @@ function renderServicePage(service, statesMod, assets) {
       <span style="font-size:13px;color:#94a3b8">${esc(unitNote)}</span>
     </div>
   </div>
+  ${service.disclaimer ? `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:13px 16px;margin-bottom:24px;display:flex;gap:10px">
+    <span style="flex-shrink:0;margin-top:1px">&#9888;&#65039;</span>
+    <div><div style="font-weight:700;color:#991b1b;margin-bottom:3px;font-size:13px">Important</div><p style="font-size:13px;color:#7f1d1d;line-height:1.6;margin:0">${esc(service.disclaimer)}</p></div>
+  </div>` : ''}
   <div style="background:linear-gradient(135deg,${PRIMARY},#1d4ed8);border-radius:12px;padding:18px 24px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
     <div style="color:white"><div style="font-weight:700;font-size:15px">Get a ZIP-code accurate ${esc(service.name.toLowerCase())} estimate</div><div style="font-size:13px;opacity:0.9">Free &middot; No signup &middot; 60 seconds</div></div>
     <a href="/?service=${service.id}" style="background:white;color:${PRIMARY};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap">Calculate Now &rarr;</a>
@@ -910,19 +914,19 @@ function injectHomepage(posts, categories) {
       <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:24px">Frequently Asked Questions</h2>
       <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How much does house cleaning cost?</h3>
-        <p style="font-size:14px;color:#475569;line-height:1.6">House cleaning typically costs $100–$250 for a standard home, depending on size, location, and frequency. Our calculator gives you a precise estimate based on your ZIP code.</p>
+        <p style="font-size:14px;color:#475569;line-height:1.6">House cleaning runs $90–$338 per visit depending on home size — $158–$198 is typical for a 1,500–2,000 sq ft home. Our calculator gives you a precise estimate based on your ZIP code.</p>
       </div>
       <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">What affects carpet cleaning prices?</h3>
-        <p style="font-size:14px;color:#475569;line-height:1.6">Carpet cleaning costs $25–$75 per room on average. Factors include room size, carpet condition, stain treatment, and method (steam vs. dry cleaning).</p>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Carpet cleaning costs $44–$100 per room depending on condition, with a $90–$110 whole-home minimum. Factors include room count, soil level (light to pet stains), and method (steam vs. dry cleaning).</p>
       </div>
       <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How often should I have my air ducts cleaned?</h3>
-        <p style="font-size:14px;color:#475569;line-height:1.6">Most experts recommend air duct cleaning every 3–5 years. Costs range from $300–$500 for a typical home. More frequent cleaning may be needed with pets or allergies.</p>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Most experts recommend air duct cleaning every 3–5 years. A standard residential system costs $330–$420, plus $65–$85 per additional HVAC system. More frequent cleaning may be needed with pets or allergies.</p>
       </div>
       <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How much does mold remediation cost?</h3>
-        <p style="font-size:14px;color:#475569;line-height:1.6">Mold remediation averages $500–$6,000 depending on the extent and location. Small areas under 10 sq ft may cost as little as $50–$200 with DIY treatment.</p>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Mold remediation costs $750–$1,050 for a small spot (under 10 sq ft) up to $8,500–$13,000+ for extensive contamination (300+ sq ft). It always requires an in-person inspection — final pricing depends on the extent of contamination and whether the moisture source has been fixed.</p>
       </div>
       <div>
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Is this calculator really free?</h3>

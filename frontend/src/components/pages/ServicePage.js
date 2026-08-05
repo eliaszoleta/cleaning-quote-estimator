@@ -185,6 +185,16 @@ export default function ServicePage({ slug }) {
             </div>
           </div>
 
+          {service.disclaimer && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '13px 16px', marginBottom: 24, display: 'flex', gap: 10 }}>
+              <span style={{ flexShrink: 0, marginTop: 1 }}>⚠️</span>
+              <div>
+                <div style={{ fontWeight: 700, color: '#991b1b', marginBottom: 3, fontSize: 13 }}>Important</div>
+                <p style={{ fontSize: 13, color: '#7f1d1d', lineHeight: 1.6, margin: 0 }}>{service.disclaimer}</p>
+              </div>
+            </div>
+          )}
+
           <div style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', borderRadius: 12, padding: '18px 24px', marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <div style={{ color: 'white' }}>
               <div style={{ fontWeight: 700, fontSize: 15 }}>Get a ZIP-code accurate {service.name.toLowerCase()} estimate</div>
