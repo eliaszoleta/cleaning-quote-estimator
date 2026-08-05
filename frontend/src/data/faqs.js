@@ -1,0 +1,25 @@
+// ─── Homepage FAQ content ───────────────────────────────────────────────────
+// General cleaning-cost questions shown on the homepage FAQ section (content
+// unchanged from the previous inline array in SEOContent.js — just moved here
+// so it can also be reused on the new state cost pages). Service-specific
+// FAQs live alongside each service in services.js.
+
+const FAQS = [
+  { q: 'How much does house cleaning cost in 2026?', a: 'The average house cleaning cost in 2026 is $120–$250 for a standard clean of a 1,500–2,500 sq ft home. Prices vary widely by state — California and New York average $160–$300, while Texas and Florida average $110–$200. Use our free cleaning cost calculator above to get a ZIP-code specific estimate in seconds.' },
+  { q: 'How do I calculate cleaning costs for my home?', a: 'To calculate cleaning costs, use our free cleaning cost estimator: select your service type, enter your ZIP code, and specify your home size and bedrooms. Our calculator uses real market data and state-by-state pricing to generate an accurate estimate in under 60 seconds. You can also estimate manually: multiply your home\'s square footage by $0.05–$0.15 for a standard clean, then adjust for your local cost of living.' },
+  { q: 'How much should I pay for house cleaning?', a: 'A fair price for house cleaning in 2026 is $120–$180 for a small home (under 1,500 sq ft), $150–$250 for a medium home (1,500–2,500 sq ft), and $200–$350+ for a large home (2,500+ sq ft). Deep cleans and first-time cleans cost 1.5–2× more than recurring visits. Always get at least 3 quotes before booking.' },
+  { q: 'How much does apartment cleaning cost?', a: 'Apartment cleaning typically costs $85–$150 for a studio or 1-bedroom, $110–$180 for a 2-bedroom, and $150–$250 for a 3-bedroom apartment. Move-in/move-out cleans cost significantly more ($150–$350+) due to the additional time required. Our cleaning cost calculator provides apartment-specific estimates by ZIP code.' },
+  { q: 'How much does carpet cleaning cost?', a: 'Professional carpet cleaning costs $100–$300 for a typical home. Most companies charge $25–$75 per room, with a minimum charge of $75–$100. Steam cleaning (hot water extraction) is the most common and effective method. Pet odor treatment adds $30–$80 per room.' },
+  { q: 'How much does air duct cleaning cost?', a: 'Air duct cleaning costs $300–$700 for a typical residential home. The price depends on the number of vents, HVAC systems, and any add-on services like sanitizing or mold treatment.' },
+  { q: 'How often should you clean air ducts?', a: 'The EPA recommends cleaning air ducts every 3–5 years, or sooner if you notice visible mold growth, pest infestation, excessive dust, or after major renovations that generate debris.' },
+  { q: 'How much does commercial cleaning cost per square foot?', a: 'Commercial cleaning typically costs $0.07–$0.20 per square foot per visit. A 2,000 sq ft office cleaned weekly would cost approximately $400–$1,200 per month depending on service level and location.' },
+  { q: 'How much does mold remediation cost?', a: 'Mold remediation costs $500–$6,000+ depending on the extent of contamination. Small bathroom mold patches cost $500–$1,500, while extensive basement or crawl space contamination can cost $3,000–$15,000+. Always get an in-person inspection first.' },
+  { q: 'Is dryer vent cleaning worth it?', a: 'Yes — absolutely. The U.S. Fire Administration reports that clogged dryer vents cause approximately 2,900 home fires annually. Professional dryer vent cleaning costs $100–$200 and should be done at least once per year.' },
+  { q: 'What factors affect cleaning service costs?', a: 'The main factors that affect cleaning costs are: (1) Home size — larger homes cost more, (2) Location — cities and high cost-of-living states charge more, (3) Frequency — weekly and biweekly clients get 10–20% discounts, (4) Service type — deep cleans and move-out cleans cost more than standard recurring cleans, (5) Condition — heavily cluttered or dirty homes may incur surcharges, and (6) Add-ons — oven, fridge, and window cleaning typically cost extra.' },
+  { q: 'Is it cheaper to hire a cleaning service or clean yourself?', a: 'Hiring a professional cleaning service costs $120–$250 per visit for a standard home, but saves 3–6 hours of your time. For many homeowners, the time savings and professional results justify the cost. Recurring service packages (weekly or biweekly) offer the best value at $80–$160 per visit with consistency discounts. DIY is cheaper upfront but requires purchasing supplies and the right techniques to achieve the same results.' },
+  { q: 'How do I get a free cleaning estimate?', a: 'Use the Clean Estimator cleaning cost calculator at the top of this page — it\'s completely free, requires no signup, and gives you an instant estimate based on your ZIP code, service type, and home size. For an official quote, contact 2–3 local cleaning companies and request an in-home or virtual walkthrough.' },
+];
+
+export function getAllFaqs() {
+  return FAQS;
+}

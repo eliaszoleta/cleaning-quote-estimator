@@ -22,6 +22,36 @@ function loadBlogData() {
   return fn();
 }
 
+function loadServicesData() {
+  const raw = fs.readFileSync(path.join(SRC, 'data/services.js'), 'utf8');
+  const src = raw
+    .replace(/^export const /gm, 'const ')
+    .replace(/^export function /gm, 'function ')
+    .replace(/^export default /gm, 'const _default = ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(src + '\nreturn { getAllServices, getServiceBySlug, getRelatedServices, typicalCost };');
+  return fn();
+}
+
+function loadStatesData() {
+  const raw = fs.readFileSync(path.join(SRC, 'data/statePricing.js'), 'utf8');
+  const src = raw
+    .replace(/^export const /gm, 'const ')
+    .replace(/^export function /gm, 'function ')
+    .replace(/^export default /gm, 'const _default = ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(src + '\nreturn { getAllStates, getStateBySlug, getFeaturedStates, adjustForState };');
+  return fn();
+}
+
+function loadFaqsData() {
+  const raw = fs.readFileSync(path.join(SRC, 'data/faqs.js'), 'utf8');
+  const src = raw.replace(/^export function /gm, 'function ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(src + '\nreturn { getAllFaqs };');
+  return fn();
+}
+
 // ─── 2. Extract CSS/JS asset tags from the built index.html ─────────────────
 
 function getAssetTags() {
@@ -429,7 +459,7 @@ function staticFooter() {
 
 // ─── 8c. Standalone static page renderers (About / Contact / Legal / For-Companies) ─
 
-function renderStaticPage({ path: urlPath, seoTitle, seoDesc, bodyHtml, maxWidth = 760, assets }) {
+function renderStaticPage({ path: urlPath, seoTitle, seoDesc, bodyHtml, maxWidth = 760, assets, extraHead = '' }) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -451,6 +481,7 @@ function renderStaticPage({ path: urlPath, seoTitle, seoDesc, bodyHtml, maxWidth
   <meta name="twitter:title" content="${esc(seoTitle)}">
   <meta name="twitter:description" content="${esc(seoDesc)}">
   <meta name="twitter:image" content="${DOMAIN}/og-image.svg">
+  ${extraHead}
   ${assets.cssLinks}
 </head>
 <body>
@@ -531,6 +562,215 @@ function renderLegalPage(kind, assets) {
     <p style="color:#374151;font-size:15px;line-height:1.8">${esc(txt)}</p>
   </div>`).join('\n  ')}`;
   return renderStaticPage({ path: isPrivacy ? '/privacy-policy' : '/terms-of-service', seoTitle, seoDesc, bodyHtml: body, assets });
+}
+
+// ─── 8d. Service & state cost page renderers ─────────────────────────────────
+
+function fmt(n) {
+  return `$${Math.round(n).toLocaleString('en-US')}`;
+}
+
+function faqAccordionHtml(faqs) {
+  return faqs.map(f => `
+    <div style="background:#fafafa;border:1px solid #f1f5f9;border-radius:10px;overflow:hidden;margin-bottom:10px">
+      <div style="padding:14px 18px;font-weight:700;font-size:14.5px;color:#0f172a">${esc(f.q)}</div>
+      <div style="padding:0 18px 16px"><p style="font-size:13.5px;color:#475569;line-height:1.7;margin:0">${esc(f.a)}</p></div>
+    </div>`).join('');
+}
+
+function serviceSchema(service, cost) {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.name,
+    description: service.metaDescription,
+    provider: { '@type': 'Organization', name: 'Clean Estimator', url: DOMAIN },
+    areaServed: 'United States',
+    offers: { '@type': 'AggregateOffer', priceCurrency: 'USD', lowPrice: String(cost.low), highPrice: String(cost.high) },
+  });
+}
+
+function faqSchema(faqs) {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  });
+}
+
+function breadcrumbSchema(items) {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, item: it.item })),
+  });
+}
+
+function unitSuffix(service) {
+  if (service.unitType === 'per_sqft') return '/sq ft';
+  if (service.unitType === 'per_room') return '/room';
+  return '';
+}
+
+function renderServicePage(service, statesMod, assets) {
+  const ICON_EMOJI = { home_residential: '🏠', apartment: '🏢', commercial: '🏬', carpet: '🧶', air_duct: '💨', dryer_vent: '🔥', tile_grout: '▦', mold_remediation: '⚠️', water_damage: '💧' };
+
+  const headlineTier = service.tiers[service.typicalTierIndex] || service.tiers[0];
+  const cost = service.unitType === 'flat'
+    ? { low: headlineTier.low, high: headlineTier.high }
+    : { low: Math.round(headlineTier.low * (service.typicalQuantity || 1) * (service.typicalVisitsPerMonth || 1)), high: Math.round(headlineTier.high * (service.typicalQuantity || 1) * (service.typicalVisitsPerMonth || 1)) };
+
+  const tierRows = service.tiers.map((tier, i) => `
+    <tr style="background:${i % 2 === 0 ? 'white' : '#fafafa'}">
+      <td style="padding:10px 14px;color:#0f172a;font-weight:600;border-bottom:1px solid #f1f5f9">${esc(tier.label)}</td>
+      <td style="padding:10px 14px;color:${PRIMARY};font-weight:700;border-bottom:1px solid #f1f5f9;white-space:nowrap">${fmt(tier.low)}&ndash;${fmt(tier.high)}<span style="color:#94a3b8;font-weight:500;font-size:12px">${unitSuffix(service)}</span></td>
+      <td style="padding:10px 14px;color:#475569;border-bottom:1px solid #f1f5f9">${esc(tier.note)}</td>
+    </tr>`).join('');
+
+  const bulletsHtml = service.bullets.map(b => `<li style="display:flex;gap:8px;font-size:14.5px;color:#374151;line-height:1.7;margin-bottom:10px"><span style="color:#16a34a;flex-shrink:0">&check;</span>${esc(b)}</li>`).join('');
+
+  const qty = service.unitType === 'flat' ? 1 : (service.typicalQuantity || 1) * (service.typicalVisitsPerMonth || 1);
+  const featured = statesMod.getFeaturedStates();
+  const stateRows = featured.map(state => {
+    const range = statesMod.adjustForState(headlineTier.low * qty, headlineTier.high * qty, state);
+    return `<a href="/cleaning-cost/${state.slug}" style="text-decoration:none"><div style="border:1px solid #f1f5f9;background:#fafafa;border-radius:8px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:13px;font-weight:600;color:#0f172a">${esc(state.name)}</span><span style="font-size:12.5px;font-weight:700;color:${PRIMARY};white-space:nowrap">${fmt(range.low)}&ndash;${fmt(range.high)}</span></div></a>`;
+  }).join('');
+
+  const related = (service.relatedSlugs || []).slice(0, 3);
+  const relatedHtml = related.map(slug => `<a href="/cleaning-services/${slug}" style="text-decoration:none"><div style="background:white;border-radius:10px;border:1px solid #e2e8f0;padding:16px 18px"><div style="font-size:14px;font-weight:700;color:#0f172a;margin-bottom:6px">${esc(slug)}</div><span style="font-size:12.5px;color:${PRIMARY};font-weight:600">See pricing &rarr;</span></div></a>`).join('');
+
+  const unitNote = service.unitType === 'flat' ? 'typical job cost' : service.unitType === 'per_room' ? `for a ${service.typicalQuantity}-room home` : service.id === 'commercial' ? `for a ${service.typicalQuantity.toLocaleString()} sq ft office, weekly` : `for ${service.typicalQuantity.toLocaleString()} sq ft`;
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:24px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">${esc(service.name)}</span>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <div style="width:44px;height:44px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:20px">${ICON_EMOJI[service.id] || '🏠'}</div>
+    <h1 style="font-size:clamp(24px,4vw,32px);font-weight:800;color:#0f172a;line-height:1.25;margin-bottom:10px">${esc(service.name)} Cost 2026</h1>
+    <p style="font-size:15.5px;color:#64748b;line-height:1.7;margin-bottom:20px">${esc(service.tagline)}</p>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <span style="font-size:30px;font-weight:800;color:${PRIMARY}">${fmt(cost.low)} &ndash; ${fmt(cost.high)}</span>
+      <span style="font-size:13px;color:#94a3b8">${esc(unitNote)}</span>
+    </div>
+  </div>
+  <div style="background:linear-gradient(135deg,${PRIMARY},#1d4ed8);border-radius:12px;padding:18px 24px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="color:white"><div style="font-weight:700;font-size:15px">Get a ZIP-code accurate ${esc(service.name.toLowerCase())} estimate</div><div style="font-size:13px;opacity:0.9">Free &middot; No signup &middot; 60 seconds</div></div>
+    <a href="/?service=${service.id}" style="background:white;color:${PRIMARY};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap">Calculate Now &rarr;</a>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:6px">Pricing by Tier</h2>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">National average pricing &mdash; ${esc(service.unit)}.</p>
+    <div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Tier</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Price</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Notes</th></tr></thead>
+      <tbody>${tierRows}</tbody>
+    </table></div>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">What to Know</h2>
+    <ul style="list-style:none;padding:0;margin:0">${bulletsHtml}</ul>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">${esc(service.name)} Cost by State</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${stateRows}</div>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">FAQs</h2>
+    ${faqAccordionHtml(service.faqs)}
+  </div>
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:24px 28px;margin-bottom:32px;text-align:center">
+    <div style="font-weight:800;font-size:18px;color:#0f172a;margin-bottom:6px">Ready to get an accurate estimate?</div>
+    <p style="font-size:14px;color:#64748b;margin-bottom:16px">Use our free calculator for a ZIP-code accurate ${esc(service.name.toLowerCase())} estimate in under 60 seconds.</p>
+    <a href="/?service=${service.id}" style="background:${PRIMARY};color:white;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Get My Free Estimate &rarr;</a>
+  </div>
+  ${related.length ? `<div><div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Related Services</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">${relatedHtml}</div></div>` : ''}`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'Cleaning Services', item: `${DOMAIN}/#services` },
+    { name: service.name, item: `${DOMAIN}/cleaning-services/${service.slug}` },
+  ]);
+
+  return renderStaticPage({
+    path: `/cleaning-services/${service.slug}`,
+    seoTitle: service.seoTitle,
+    seoDesc: service.metaDescription,
+    bodyHtml: body,
+    maxWidth: 780,
+    assets,
+    extraHead: `<script type="application/ld+json">${serviceSchema(service, cost)}</script><script type="application/ld+json">${faqSchema(service.faqs)}</script><script type="application/ld+json">${breadcrumb}</script>`,
+  });
+}
+
+function renderStatePage(state, servicesMod, statesMod, faqsMod, assets) {
+  const otherStates = statesMod.getAllStates().filter(s => s.slug !== state.slug);
+  const faqs = faqsMod.getAllFaqs().slice(0, 5);
+  const pctVsNational = Math.round((state.multiplier - 1) * 100);
+  const TIER_COPY = {
+    high: `Cleaning service costs in ${state.name} run above the national average, driven by higher labor rates and cost of living.`,
+    low: `Cleaning service costs in ${state.name} run below the national average, making it a comparatively affordable market for cleaning services.`,
+    average: `Cleaning service costs in ${state.name} are close to the national average.`,
+  };
+
+  const serviceRows = servicesMod.getAllServices().map((service, i) => {
+    const national = servicesMod.typicalCost(service);
+    const adjusted = statesMod.adjustForState(national.low, national.high, state);
+    return `<tr style="background:${i % 2 === 0 ? 'white' : '#fafafa'}">
+      <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9"><a href="/cleaning-services/${service.slug}" style="color:#0f172a;font-weight:600;text-decoration:none">${esc(service.name)}</a></td>
+      <td style="padding:10px 14px;color:${PRIMARY};font-weight:700;border-bottom:1px solid #f1f5f9;white-space:nowrap">${fmt(adjusted.low)}&ndash;${fmt(adjusted.high)}</td>
+    </tr>`;
+  }).join('');
+
+  const otherStatesHtml = otherStates.map(s => `<a href="/cleaning-cost/${s.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(s.name)}</a>`).join(' ');
+
+  const seoTitle = `Cleaning Service Cost in ${state.name} (2026) | Average Prices & Estimates | Clean Estimator`;
+  const seoDesc = `See average cleaning service costs in ${state.name} for 2026: house cleaning, carpet, mold remediation, water damage, and more, adjusted for local labor rates. Get a free instant estimate.`;
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:24px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">Cleaning Cost in ${esc(state.name)}</span>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <div style="font-size:12px;font-weight:700;color:${PRIMARY};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">${esc(state.name)}</div>
+    <h1 style="font-size:clamp(24px,4vw,32px);font-weight:800;color:#0f172a;line-height:1.25;margin-bottom:10px">Cleaning Service Cost in ${esc(state.name)} (2026)</h1>
+    <p style="font-size:15.5px;color:#64748b;line-height:1.7;margin-bottom:20px">${esc(TIER_COPY[state.tier])}${pctVsNational !== 0 ? ` That's about ${Math.abs(pctVsNational)}% ${pctVsNational > 0 ? 'above' : 'below'} the national average.` : ''}</p>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <span style="font-size:30px;font-weight:800;color:${PRIMARY}">${fmt(state.low)} &ndash; ${fmt(state.high)}</span>
+      <span style="font-size:13px;color:#94a3b8">standard house cleaning, 2,000 sq ft home</span>
+    </div>
+  </div>
+  <div style="background:linear-gradient(135deg,${PRIMARY},#1d4ed8);border-radius:12px;padding:18px 24px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="color:white"><div style="font-weight:700;font-size:15px">Get a ZIP-code accurate estimate in ${esc(state.name)}</div><div style="font-size:13px;opacity:0.9">Free &middot; No signup &middot; 60 seconds</div></div>
+    <a href="/" style="background:white;color:${PRIMARY};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap">Calculate Now &rarr;</a>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:6px">Cost by Service in ${esc(state.name)}</h2>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">Estimated typical job cost, adjusted for ${esc(state.name)}'s labor rates.</p>
+    <div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Service</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">${esc(state.name)} Estimate</th></tr></thead>
+      <tbody>${serviceRows}</tbody>
+    </table></div>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">FAQs</h2>
+    ${faqAccordionHtml(faqs)}
+  </div>
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:24px 28px;margin-bottom:32px;text-align:center">
+    <div style="font-weight:800;font-size:18px;color:#0f172a;margin-bottom:6px">Ready to get an accurate estimate?</div>
+    <p style="font-size:14px;color:#64748b;margin-bottom:16px">Use our free calculator for a ZIP-code accurate cleaning estimate in ${esc(state.name)} in under 60 seconds.</p>
+    <a href="/" style="background:${PRIMARY};color:white;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Get My Free Estimate &rarr;</a>
+  </div>
+  <div>
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Cleaning Costs in Other States</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${otherStatesHtml}</div>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: `Cleaning Cost in ${state.name}`, item: `${DOMAIN}/cleaning-cost/${state.slug}` },
+  ]);
+
+  return renderStaticPage({
+    path: `/cleaning-cost/${state.slug}`,
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 780,
+    assets,
+    extraHead: `<script type="application/ld+json">${faqSchema(faqs)}</script><script type="application/ld+json">${breadcrumb}</script>`,
+  });
 }
 
 function renderForCompanies(assets) {
@@ -708,6 +948,9 @@ function main() {
   }
 
   const { BLOG_POSTS, CATEGORIES } = loadBlogData();
+  const servicesMod = loadServicesData();
+  const statesMod = loadStatesData();
+  const faqsMod = loadFaqsData();
   const assets = getAssetTags();
   let count = 0;
 
@@ -738,7 +981,19 @@ function main() {
   writeFile('for-companies', renderForCompanies(assets));
   count++;
 
-  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 5 static pages)');
+  const services = servicesMod.getAllServices();
+  for (const service of services) {
+    writeFile('cleaning-services/' + service.slug, renderServicePage(service, statesMod, assets));
+    count++;
+  }
+
+  const states = statesMod.getAllStates();
+  for (const state of states) {
+    writeFile('cleaning-cost/' + state.slug, renderStatePage(state, servicesMod, statesMod, faqsMod, assets));
+    count++;
+  }
+
+  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 5 static pages, ' + services.length + ' services, ' + states.length + ' states)');
 }
 
 main();

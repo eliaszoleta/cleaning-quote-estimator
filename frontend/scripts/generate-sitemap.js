@@ -30,6 +30,20 @@ const posts = slugMatches.map((m, i) => ({
 const categoryMatches = [...postsFile.matchAll(/(?<!\w)category:\s*['"]([^'"]+)['"]/g)];
 const categorySlugs = [...new Set(categoryMatches.map(m => m[1]))];
 
+// ── Parse services.js and statePricing.js as text ──────────────────────────
+
+const servicesFile = fs.readFileSync(
+  path.join(__dirname, '../src/data/services.js'),
+  'utf8'
+);
+const serviceSlugs = [...servicesFile.matchAll(/(?<!\w)slug:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+
+const statesFile = fs.readFileSync(
+  path.join(__dirname, '../src/data/statePricing.js'),
+  'utf8'
+);
+const stateSlugs = [...statesFile.matchAll(/(?<!\w)slug:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+
 // ── Static pages ───────────────────────────────────────────────────────────
 const staticPages = [
   { path: '/',                 priority: '1.0', changefreq: 'weekly',  lastmod: TODAY },
@@ -65,6 +79,16 @@ const xml = [
     urlEntry({ loc: `${SITE_URL}/blog/${p.slug}`, lastmod: p.date, changefreq: 'monthly', priority: '0.8' })
   ),
   '',
+  '  <!-- Cleaning services (auto-generated from services.js) -->',
+  ...serviceSlugs.map(slug =>
+    urlEntry({ loc: `${SITE_URL}/cleaning-services/${slug}`, lastmod: TODAY, changefreq: 'monthly', priority: '0.9' })
+  ),
+  '',
+  '  <!-- Cleaning cost by state (auto-generated from statePricing.js) -->',
+  ...stateSlugs.map(slug =>
+    urlEntry({ loc: `${SITE_URL}/cleaning-cost/${slug}`, lastmod: TODAY, changefreq: 'monthly', priority: '0.8' })
+  ),
+  '',
   '</urlset>',
 ].join('\n') + '\n';
 
@@ -72,4 +96,4 @@ const xml = [
 const outPath = path.join(__dirname, '../public/sitemap.xml');
 fs.writeFileSync(outPath, xml, 'utf8');
 
-console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories`);
+console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories, ${serviceSlugs.length} services, ${stateSlugs.length} states`);

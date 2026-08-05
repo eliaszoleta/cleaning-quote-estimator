@@ -18,6 +18,8 @@ import About from './components/pages/About';
 import Contact from './components/pages/Contact';
 import PrivacyPolicy from './components/pages/PrivacyPolicy';
 import TermsOfService from './components/pages/TermsOfService';
+import ServicePage from './components/pages/ServicePage';
+import StatePage from './components/pages/StatePage';
 import EmbedWrapper from './components/EmbedWrapper';
 import './App.css';
 
@@ -35,6 +37,8 @@ const isPrivacy = pathname === '/privacy-policy';
 const isTerms = pathname === '/terms-of-service';
 const isAdminPartners = pathname === '/admin/partners';
 const isPartnerWithUs = pathname === '/partner-with-us';
+const isServicePage = pathname.startsWith('/cleaning-services/');
+const isStatePage = pathname.startsWith('/cleaning-cost/');
 
 const embedCompanyId = isEmbed ? searchParams.get('company') : null;
 
@@ -135,6 +139,8 @@ export default function App() {
   if (isContact) return <HelmetProvider><div className="app"><Header /><main><Contact /></main><Footer /></div></HelmetProvider>;
   if (isPrivacy) return <HelmetProvider><div className="app"><Header /><main><PrivacyPolicy /></main><Footer /></div></HelmetProvider>;
   if (isTerms) return <HelmetProvider><div className="app"><Header /><main><TermsOfService /></main><Footer /></div></HelmetProvider>;
+  if (isServicePage) return <HelmetProvider><div className="app"><Header /><main><ServicePage slug={pathname.replace('/cleaning-services/', '')} /></main><Footer /></div></HelmetProvider>;
+  if (isStatePage) return <HelmetProvider><div className="app"><Header /><main><StatePage slug={pathname.replace('/cleaning-cost/', '')} /></main><Footer /></div></HelmetProvider>;
 
   if (isCompany) {
     if (authLoading) return (

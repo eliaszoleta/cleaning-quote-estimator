@@ -3,6 +3,28 @@ import { Sparkles } from 'lucide-react';
 
 const cols = [
   {
+    title: 'Cleaning Services',
+    links: [
+      { label: 'House Cleaning', href: '/cleaning-services/house-cleaning-cost' },
+      { label: 'Apartment Cleaning', href: '/cleaning-services/apartment-cleaning-cost' },
+      { label: 'Commercial Cleaning', href: '/cleaning-services/commercial-cleaning-cost' },
+      { label: 'Carpet Cleaning', href: '/cleaning-services/carpet-cleaning-cost' },
+      { label: 'Mold Remediation', href: '/cleaning-services/mold-remediation-cost' },
+      { label: 'Water Damage Restoration', href: '/cleaning-services/water-damage-restoration-cost' },
+    ],
+  },
+  {
+    title: 'Cleaning Cost by State',
+    links: [
+      { label: 'California', href: '/cleaning-cost/california' },
+      { label: 'Texas', href: '/cleaning-cost/texas' },
+      { label: 'Florida', href: '/cleaning-cost/florida' },
+      { label: 'New York', href: '/cleaning-cost/new-york' },
+      { label: 'Illinois', href: '/cleaning-cost/illinois' },
+      { label: 'Washington', href: '/cleaning-cost/washington' },
+    ],
+  },
+  {
     title: 'Blog Categories',
     links: [
       { label: 'House Cleaning Tips', href: '/blog/category/house-cleaning' },

@@ -1,45 +1,78 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check } from 'lucide-react';
+import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin } from 'lucide-react';
+import { getAllFaqs } from '../../data/faqs';
+import { getAllServices, typicalCost } from '../../data/services';
+import { getFeaturedStates } from '../../data/statePricing';
 
-const FAQ = [
-  { q: 'How much does house cleaning cost in 2026?', a: 'The average house cleaning cost in 2026 is $120–$250 for a standard clean of a 1,500–2,500 sq ft home. Prices vary widely by state — California and New York average $160–$300, while Texas and Florida average $110–$200. Use our free cleaning cost calculator above to get a ZIP-code specific estimate in seconds.' },
-  { q: 'How do I calculate cleaning costs for my home?', a: 'To calculate cleaning costs, use our free cleaning cost estimator: select your service type, enter your ZIP code, and specify your home size and bedrooms. Our calculator uses real market data and state-by-state pricing to generate an accurate estimate in under 60 seconds. You can also estimate manually: multiply your home\'s square footage by $0.05–$0.15 for a standard clean, then adjust for your local cost of living.' },
-  { q: 'How much should I pay for house cleaning?', a: 'A fair price for house cleaning in 2026 is $120–$180 for a small home (under 1,500 sq ft), $150–$250 for a medium home (1,500–2,500 sq ft), and $200–$350+ for a large home (2,500+ sq ft). Deep cleans and first-time cleans cost 1.5–2× more than recurring visits. Always get at least 3 quotes before booking.' },
-  { q: 'How much does apartment cleaning cost?', a: 'Apartment cleaning typically costs $85–$150 for a studio or 1-bedroom, $110–$180 for a 2-bedroom, and $150–$250 for a 3-bedroom apartment. Move-in/move-out cleans cost significantly more ($150–$350+) due to the additional time required. Our cleaning cost calculator provides apartment-specific estimates by ZIP code.' },
-  { q: 'How much does carpet cleaning cost?', a: 'Professional carpet cleaning costs $100–$300 for a typical home. Most companies charge $25–$75 per room, with a minimum charge of $75–$100. Steam cleaning (hot water extraction) is the most common and effective method. Pet odor treatment adds $30–$80 per room.' },
-  { q: 'How much does air duct cleaning cost?', a: 'Air duct cleaning costs $300–$700 for a typical residential home. The price depends on the number of vents, HVAC systems, and any add-on services like sanitizing or mold treatment.' },
-  { q: 'How often should you clean air ducts?', a: 'The EPA recommends cleaning air ducts every 3–5 years, or sooner if you notice visible mold growth, pest infestation, excessive dust, or after major renovations that generate debris.' },
-  { q: 'How much does commercial cleaning cost per square foot?', a: 'Commercial cleaning typically costs $0.07–$0.20 per square foot per visit. A 2,000 sq ft office cleaned weekly would cost approximately $400–$1,200 per month depending on service level and location.' },
-  { q: 'How much does mold remediation cost?', a: 'Mold remediation costs $500–$6,000+ depending on the extent of contamination. Small bathroom mold patches cost $500–$1,500, while extensive basement or crawl space contamination can cost $3,000–$15,000+. Always get an in-person inspection first.' },
-  { q: 'Is dryer vent cleaning worth it?', a: 'Yes — absolutely. The U.S. Fire Administration reports that clogged dryer vents cause approximately 2,900 home fires annually. Professional dryer vent cleaning costs $100–$200 and should be done at least once per year.' },
-  { q: 'What factors affect cleaning service costs?', a: 'The main factors that affect cleaning costs are: (1) Home size — larger homes cost more, (2) Location — cities and high cost-of-living states charge more, (3) Frequency — weekly and biweekly clients get 10–20% discounts, (4) Service type — deep cleans and move-out cleans cost more than standard recurring cleans, (5) Condition — heavily cluttered or dirty homes may incur surcharges, and (6) Add-ons — oven, fridge, and window cleaning typically cost extra.' },
-  { q: 'Is it cheaper to hire a cleaning service or clean yourself?', a: 'Hiring a professional cleaning service costs $120–$250 per visit for a standard home, but saves 3–6 hours of your time. For many homeowners, the time savings and professional results justify the cost. Recurring service packages (weekly or biweekly) offer the best value at $80–$160 per visit with consistency discounts. DIY is cheaper upfront but requires purchasing supplies and the right techniques to achieve the same results.' },
-  { q: 'How do I get a free cleaning estimate?', a: 'Use the Clean Estimator cleaning cost calculator at the top of this page — it\'s completely free, requires no signup, and gives you an instant estimate based on your ZIP code, service type, and home size. For an official quote, contact 2–3 local cleaning companies and request an in-home or virtual walkthrough.' },
-];
+const FAQ = getAllFaqs();
 
-const STATES_DATA = [
-  { state: 'California', avg: '$165–$290', note: 'High cost of living drives premium pricing' },
-  { state: 'New York', avg: '$155–$280', note: 'NYC metro significantly higher than upstate' },
-  { state: 'Texas', avg: '$110–$195', note: 'Competitive market with many providers' },
-  { state: 'Florida', avg: '$115–$200', note: 'High demand due to tourism/vacation rentals' },
-  { state: 'Illinois', avg: '$120–$215', note: 'Chicago metro commands higher rates' },
-  { state: 'Washington', avg: '$140–$250', note: 'Seattle/Bellevue among highest in nation' },
-  { state: 'Colorado', avg: '$130–$230', note: 'Growing market, rates rising rapidly' },
-  { state: 'Arizona', avg: '$105–$185', note: 'Lower cost market, growing population' },
-];
+const ICONS = {
+  home_residential: Home,
+  apartment: Building2,
+  commercial: Building,
+  carpet: Layers,
+  air_duct: Wind,
+  dryer_vent: Flame,
+  tile_grout: Grid3x3,
+  mold_remediation: AlertTriangle,
+  water_damage: Droplets,
+};
+const COLORS = {
+  home_residential: { color: '#2563eb', bg: '#eff6ff' },
+  apartment: { color: '#4f46e5', bg: '#eef2ff' },
+  commercial: { color: '#7c3aed', bg: '#f5f3ff' },
+  carpet: { color: '#059669', bg: '#ecfdf5' },
+  air_duct: { color: '#0891b2', bg: '#ecfeff' },
+  dryer_vent: { color: '#ea580c', bg: '#fff7ed' },
+  tile_grout: { color: '#0d9488', bg: '#f0fdfa' },
+  mold_remediation: { color: '#d97706', bg: '#fffbeb' },
+  water_damage: { color: '#0284c7', bg: '#f0f9ff' },
+};
+const TIER_NOTE = {
+  high: 'Higher cost of living drives premium pricing',
+  low: 'Lower cost market, competitive pricing',
+  average: 'Close to the national average for cleaning service costs',
+};
 
-const SERVICES = [
-  { Icon: Home,          color: '#2563eb', bg: '#eff6ff', title: 'House Cleaning',           range: '$120 – $250',    detail: 'per visit, standard clean', href: '/?service=home_residential', facts: ['Prices based on sq footage & bedrooms', 'Deep clean costs 1.5–2× more', 'Recurring discounts up to 15%'] },
-  { Icon: Building2,     color: '#4f46e5', bg: '#eef2ff', title: 'Apartment Cleaning',       range: '$85 – $200',     detail: 'per visit',                href: '/?service=apartment',         facts: ['Studio to 4+ bedroom', 'Move-in/out cleans cost more', 'Vacant units 10–15% cheaper'] },
-  { Icon: Building,      color: '#7c3aed', bg: '#f5f3ff', title: 'Commercial Cleaning',      range: '$200 – $2,000+', detail: 'per month',                href: '/?service=commercial',        facts: ['Priced per sq ft per visit', 'Frequency heavily affects cost', 'Medical/restaurant rates higher'] },
-  { Icon: Layers,        color: '#059669', bg: '#ecfdf5', title: 'Carpet Cleaning',          range: '$100 – $300',    detail: 'whole home',               href: '/?service=carpet',            facts: ['$25–$75 per room', 'Steam cleaning most effective', 'Pet odor treatment extra'] },
-  { Icon: Wind,          color: '#0891b2', bg: '#ecfeff', title: 'Air Duct Cleaning',        range: '$300 – $700',    detail: 'per system',               href: '/?service=air_duct',          facts: ['Recommended every 3–5 years', 'More vents = higher cost', 'Mold treatment costs more'] },
-  { Icon: Flame,         color: '#ea580c', bg: '#fff7ed', title: 'Dryer Vent Cleaning',      range: '$100 – $200',    detail: 'per dryer',                href: '/?service=dryer_vent',        facts: ['Prevents fire hazard', 'Annual cleaning recommended', 'Clogs cost $50–$100 extra'] },
-  { Icon: Grid3x3,       color: '#0d9488', bg: '#f0fdfa', title: 'Tile & Grout Cleaning',   range: '$175 – $450',    detail: 'per project',              href: '/?service=tile_grout',        facts: ['Natural stone costs more', 'Sealing adds $1–$2/sq ft', 'Recoloring transforms appearance'] },
-  { Icon: AlertTriangle, color: '#d97706', bg: '#fffbeb', title: 'Mold Remediation',         range: '$500 – $6,000+', detail: 'requires inspection',      href: '/?service=mold_remediation',  facts: ['In-person inspection required', 'Fix moisture source first', 'Air testing adds $200–$500'] },
-  { Icon: Droplets,      color: '#0284c7', bg: '#f0f9ff', title: 'Water Damage Restoration', range: '$1,500 – $8,000+', detail: 'emergency service',      href: '/?service=water_damage',      facts: ['Act within 24–48 hours', 'Category 3 (sewage) costs most', "Homeowner's insurance may cover"] },
-];
+// Short, human labels for the price shown on each service card — kept
+// separate from the raw unit type so the wording matches how homeowners
+// actually think about each service (e.g. "requires inspection" for mold).
+const DETAIL_OVERRIDES = {
+  home_residential: 'per visit, standard clean',
+  apartment: 'per visit',
+  commercial: 'per month, 2,000 sq ft office (weekly)',
+  carpet: 'for a 5-room home',
+  air_duct: 'per system',
+  dryer_vent: 'per dryer',
+  tile_grout: 'for 300 sq ft',
+  mold_remediation: 'requires inspection',
+  water_damage: 'emergency service',
+};
+
+function formatPrice(n) {
+  return `$${Math.round(n).toLocaleString('en-US')}`;
+}
+
+const SERVICES = getAllServices().map(service => {
+  const cost = typicalCost(service);
+  return {
+    Icon: ICONS[service.id] || Home,
+    ...COLORS[service.id],
+    title: service.name,
+    range: `${formatPrice(cost.low)} – ${formatPrice(cost.high)}`,
+    detail: DETAIL_OVERRIDES[service.id] || service.unit,
+    href: `/cleaning-services/${service.slug}`,
+    facts: service.bullets.slice(0, 3),
+  };
+});
+
+const STATES_DATA = getFeaturedStates().map(s => ({
+  state: s.name,
+  avg: `${formatPrice(s.low)}–${formatPrice(s.high)}`,
+  note: TIER_NOTE[s.tier],
+  href: `/cleaning-cost/${s.slug}`,
+}));
 
 export default function SEOContent() {
   const faqSchema = {
@@ -125,7 +158,7 @@ export default function SEOContent() {
         <script type="application/ld+json">{JSON.stringify(webAppSchema)}</script>
       </Helmet>
 
-      <div style={{ background: 'white', marginTop: 80 }}>
+      <div id="services" style={{ background: 'white', marginTop: 80 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 24px' }}>
 
           {/* Services grid */}
@@ -176,13 +209,19 @@ export default function SEOContent() {
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
               {STATES_DATA.map(s => (
-                <div key={s.state} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f8fafc', borderRadius: 10, padding: '13px 16px', border: '1px solid #f1f5f9' }}>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{s.state}</div>
-                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{s.note}</div>
+                <a key={s.state} href={s.href} style={{ textDecoration: 'none' }}>
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f8fafc', borderRadius: 10, padding: '13px 16px', border: '1px solid #f1f5f9', transition: 'border-color 0.15s, background 0.15s' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#bfdbfe'; e.currentTarget.style.background = '#eff6ff'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#f1f5f9'; e.currentTarget.style.background = '#f8fafc'; }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontWeight: 700, fontSize: 14, color: '#0f172a' }}><MapPin size={12} color="#2563eb" />{s.state}</div>
+                      <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{s.note}</div>
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: '#2563eb', whiteSpace: 'nowrap', marginLeft: 12 }}>{s.avg}</div>
                   </div>
-                  <div style={{ fontWeight: 800, fontSize: 15, color: '#2563eb', whiteSpace: 'nowrap', marginLeft: 12 }}>{s.avg}</div>
-                </div>
+                </a>
               ))}
             </div>
             <p style={{ textAlign: 'center', fontSize: 12.5, color: '#94a3b8', marginTop: 14 }}>
