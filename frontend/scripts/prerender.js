@@ -195,7 +195,11 @@ function renderBlogPost(post, cat, assets) {
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}/blog/${post.slug}">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:site_name" content="Clean Estimator">
   <meta property="og:title" content="${esc(seoTitle)}">
   <meta property="og:description" content="${esc(post.excerpt)}">
@@ -294,7 +298,11 @@ function renderBlogIndex(posts, categories, assets) {
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}/blog">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:title" content="Cleaning Cost Guides &amp; Tips | Clean Estimator Blog">
   <meta property="og:description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses.">
   <meta property="og:type" content="website">
@@ -373,7 +381,11 @@ function renderCategoryPage(cat, posts, assets) {
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}/blog/category/${cat.id}">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:title" content="${esc(seoTitle)}">
   <meta property="og:description" content="${esc(seoDesc)}">
   <meta property="og:url" content="${DOMAIN}/blog/category/${cat.id}">
@@ -470,7 +482,11 @@ function renderStaticPage({ path: urlPath, seoTitle, seoDesc, bodyHtml, maxWidth
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}${urlPath}">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:site_name" content="Clean Estimator">
   <meta property="og:title" content="${esc(seoTitle)}">
   <meta property="og:description" content="${esc(seoDesc)}">
