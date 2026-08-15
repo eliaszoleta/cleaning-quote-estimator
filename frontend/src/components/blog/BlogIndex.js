@@ -70,11 +70,13 @@ export default function BlogIndex() {
 
   const searchResults = useMemo(() => {
     if (!isSearching) return [];
-    const term = query.trim().toLowerCase();
+    const normalize = s => s.toLowerCase().replace(/[-_]/g, ' ');
+    const term = normalize(query.trim());
     return BLOG_POSTS.filter(p =>
-      p.title.toLowerCase().includes(term) ||
-      p.excerpt.toLowerCase().includes(term) ||
-      (p.categoryLabel || '').toLowerCase().includes(term)
+      normalize(p.title).includes(term) ||
+      normalize(p.excerpt).includes(term) ||
+      normalize(p.categoryLabel || '').includes(term) ||
+      normalize(p.slug || '').includes(term)
     );
   }, [query, isSearching]);
 
