@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, SprayCan, Building2, ShieldAlert, ArrowRight } from 'lucide-react';
+import { Home, SprayCan, Building2, ShieldAlert, ArrowRight, Search, X } from 'lucide-react';
 import { BLOG_POSTS, CATEGORIES } from '../../data/blogPosts';
 
 const CATEGORY_ICONS = {
@@ -37,9 +37,46 @@ function CategoryPill({ id, label, href, active }) {
   );
 }
 
+function PostCard({ post }) {
+  const meta = CATEGORY_ICONS[post.category];
+  const Icon = meta?.Icon;
+  return (
+    <a href={`/blog/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: '24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)' }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 8px rgba(15,23,42,0.04), 0 12px 28px rgba(30,64,175,0.12)'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = '#bfdbfe'; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        {Icon && (
+          <span style={{ width: 28, height: 28, borderRadius: 9, background: meta.bg, color: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Icon size={15} strokeWidth={2.25} />
+          </span>
+        )}
+        <div style={{ fontSize: 12, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          {post.categoryLabel} · {post.readTime}
+        </div>
+      </div>
+      <h3 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 10, lineHeight: 1.4 }}>{post.title}</h3>
+      <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.6, marginBottom: 16 }}>{post.excerpt}</p>
+      <span style={{ color: '#1e40af', fontWeight: 700, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}>Read more <ArrowRight size={14} strokeWidth={2.5} /></span>
+    </a>
+  );
+}
+
 export default function BlogIndex() {
   const featured = BLOG_POSTS[0];
   const rest = BLOG_POSTS.slice(1);
+  const [query, setQuery] = useState('');
+  const isSearching = query.trim().length > 0;
+
+  const searchResults = useMemo(() => {
+    if (!isSearching) return [];
+    const term = query.trim().toLowerCase();
+    return BLOG_POSTS.filter(p =>
+      p.title.toLowerCase().includes(term) ||
+      p.excerpt.toLowerCase().includes(term) ||
+      (p.categoryLabel || '').toLowerCase().includes(term)
+    );
+  }, [query, isSearching]);
 
   return (
     <>
@@ -76,7 +113,51 @@ export default function BlogIndex() {
       </Helmet>
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '60px 24px' }}>
         <h1 style={{ fontSize: 40, fontWeight: 900, color: '#0f172a', marginBottom: 8, letterSpacing: '-0.01em' }}>Cleaning Cost Guides</h1>
-        <p style={{ fontSize: 18, color: '#64748b', marginBottom: 40 }}>Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
+        <p style={{ fontSize: 18, color: '#64748b', marginBottom: 28 }}>Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
+
+        {/* Search */}
+        <div style={{ position: 'relative', maxWidth: 480, marginBottom: 32 }}>
+          <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search cleaning topics — e.g. tipping, Airbnb, mold…"
+            aria-label="Search blog posts"
+            style={{
+              width: '100%', padding: '13px 40px', borderRadius: 12, border: '1.5px solid #e2e8f0',
+              fontSize: 15, color: '#0f172a', background: 'white', boxSizing: 'border-box',
+              outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s',
+            }}
+            onFocus={e => { e.target.style.borderColor = '#93c5fd'; e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.12)'; }}
+            onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; }}
+          />
+          {isSearching && (
+            <button
+              onClick={() => setQuery('')}
+              aria-label="Clear search"
+              style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', color: '#94a3b8' }}
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+
+        {isSearching ? (
+          <>
+            <p style={{ fontSize: 14, color: '#64748b', marginBottom: 20 }}>
+              {searchResults.length === 0
+                ? `No posts found for "${query.trim()}"`
+                : `${searchResults.length} result${searchResults.length === 1 ? '' : 's'} for "${query.trim()}"`}
+            </p>
+            {searchResults.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20, marginBottom: 40 }}>
+                {searchResults.map(post => <PostCard key={post.slug} post={post} />)}
+              </div>
+            )}
+          </>
+        ) : (
+        <>
 
         {/* Categories */}
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 40 }}>
@@ -104,31 +185,10 @@ export default function BlogIndex() {
 
         {/* Post grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
-          {rest.map(post => {
-            const meta = CATEGORY_ICONS[post.category];
-            const Icon = meta?.Icon;
-            return (
-              <a key={post.slug} href={`/blog/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: '24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)' }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 8px rgba(15,23,42,0.04), 0 12px 28px rgba(30,64,175,0.12)'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = '#bfdbfe'; }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  {Icon && (
-                    <span style={{ width: 28, height: 28, borderRadius: 9, background: meta.bg, color: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Icon size={15} strokeWidth={2.25} />
-                    </span>
-                  )}
-                  <div style={{ fontSize: 12, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    {post.categoryLabel} · {post.readTime}
-                  </div>
-                </div>
-                <h3 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 10, lineHeight: 1.4 }}>{post.title}</h3>
-                <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.6, marginBottom: 16 }}>{post.excerpt}</p>
-                <span style={{ color: '#1e40af', fontWeight: 700, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}>Read more <ArrowRight size={14} strokeWidth={2.5} /></span>
-              </a>
-            );
-          })}
+          {rest.map(post => <PostCard key={post.slug} post={post} />)}
         </div>
+        </>
+        )}
 
         {/* CTA */}
         <div style={{ marginTop: 60, background: 'linear-gradient(135deg,#0f172a,#1e293b)', borderRadius: 18, padding: '36px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, boxShadow: '0 12px 32px rgba(15,23,42,0.24)' }}>

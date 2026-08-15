@@ -54,6 +54,16 @@ const styles = {
     color: '#475569',
     transition: 'all 0.15s',
   },
+  navLinkActive: {
+    padding: '8px 14px',
+    borderRadius: 8,
+    textDecoration: 'none',
+    fontSize: 14,
+    fontWeight: 700,
+    color: '#1d4ed8',
+    background: '#eff6ff',
+    transition: 'all 0.15s',
+  },
   partnerLink: {
     padding: '8px 14px',
     borderRadius: 8,
@@ -97,14 +107,36 @@ const navItems = [
   { label: 'About', href: '/about' },
 ];
 
+function isNavItemActive(href, pathname, hash) {
+  const path = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
+  if (href === '/') return path === '/' && hash !== '#services';
+  if (href === '/#services') return path === '/' && hash === '#services';
+  if (href === '/blog') return path === '/blog' || path.startsWith('/blog/');
+  return path === href;
+}
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  const [location, setLocation] = useState(() => ({
+    pathname: window.location.pathname,
+    hash: window.location.hash,
+  }));
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
+    const onLocationChange = () => setLocation({ pathname: window.location.pathname, hash: window.location.hash });
+    window.addEventListener('hashchange', onLocationChange);
+    window.addEventListener('popstate', onLocationChange);
+    return () => {
+      window.removeEventListener('hashchange', onLocationChange);
+      window.removeEventListener('popstate', onLocationChange);
+    };
   }, []);
 
   return (
@@ -135,17 +167,21 @@ export default function Header() {
           </div>
         ) : (
           <nav style={styles.nav}>
-            {navItems.map(n => (
-              <a
-                key={n.href}
-                href={n.href}
-                style={styles.navLink}
-                onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f1f5f9'; }}
-                onMouseLeave={e => { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; }}
-              >
-                {n.label}
-              </a>
-            ))}
+            {navItems.map(n => {
+              const active = isNavItemActive(n.href, location.pathname, location.hash);
+              return (
+                <a
+                  key={n.href}
+                  href={n.href}
+                  aria-current={active ? 'page' : undefined}
+                  style={active ? styles.navLinkActive : styles.navLink}
+                  onMouseEnter={e => { if (!active) { e.target.style.color = '#0f172a'; e.target.style.background = '#f1f5f9'; } }}
+                  onMouseLeave={e => { if (!active) { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; } }}
+                >
+                  {n.label}
+                </a>
+              );
+            })}
             <a
               href="/partner-with-us"
               style={styles.partnerLink}
@@ -176,11 +212,19 @@ export default function Header() {
 
       {isMobile && menuOpen && (
         <div style={{ padding: '12px 24px 20px', borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: 4, background: 'white' }}>
-          {navItems.map(n => (
-            <a key={n.href} href={n.href} style={{ ...styles.navLink, display: 'block', padding: '10px 12px' }}>
-              {n.label}
-            </a>
-          ))}
+          {navItems.map(n => {
+            const active = isNavItemActive(n.href, location.pathname, location.hash);
+            return (
+              <a
+                key={n.href}
+                href={n.href}
+                aria-current={active ? 'page' : undefined}
+                style={{ ...(active ? styles.navLinkActive : styles.navLink), display: 'block', padding: '10px 12px' }}
+              >
+                {n.label}
+              </a>
+            );
+          })}
           <a href="/partner-with-us" style={{ ...styles.navLink, display: 'block', padding: '10px 12px', color: '#1e40af', fontWeight: 700 }}>
             Partner With Us
           </a>
