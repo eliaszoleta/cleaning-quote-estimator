@@ -927,6 +927,18 @@ function injectHomepage(posts, categories) {
         </div>
       </div>
     </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
+      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">How Our Cleaning Estimator Calculates Your Price</h2>
+      <p style="font-size:14px;color:#64748b;text-align:center;max-width:560px;margin:0 auto 24px;line-height:1.6">Clean Estimator is a free cleaning cost estimator that builds every quote from six real variables — not a flat national guess.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Home Size (Square Footage)</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Your base price scales with square footage — $90–$115 under 1,000 sq ft, up to $272–$338 over 3,000 sq ft.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Service Type</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Standard cleaning is the baseline. Deep cleaning costs 68–85% more, move-in/move-out costs 88–105% more.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Location (ZIP Code)</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">State and city cost-of-living adjust your price — CA and NY run 30–60% above the national average.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Cleaning Frequency</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Weekly service gets a 20% discount, biweekly 15%, and monthly 10% off the one-time rate.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Add-Ons</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Inside oven, inside fridge, interior windows, and laundry are priced separately on top of the base clean.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Home Condition</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">A home not professionally cleaned in months typically costs 22–28% more for the first visit.</p></div>
+      </div>
+    </div>
     <div style="margin-bottom:40px">
       <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:20px">Cleaning Cost Guides</h2>
       <ul style="list-style:none;padding:0;margin:0;background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px">

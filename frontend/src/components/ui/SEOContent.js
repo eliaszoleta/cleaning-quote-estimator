@@ -1,11 +1,20 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin } from 'lucide-react';
+import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles } from 'lucide-react';
 import { getAllFaqs } from '../../data/faqs';
 import { getAllServices, typicalCost } from '../../data/services';
 import { getFeaturedStates } from '../../data/statePricing';
 
 const FAQ = getAllFaqs();
+
+const PRICE_FACTORS = [
+  { Icon: Ruler, term: 'Home Size (Square Footage)', detail: 'Your base price scales with square footage — $90–$115 for a home under 1,000 sq ft, up to $272–$338 for a home over 3,000 sq ft.' },
+  { Icon: ListChecks, term: 'Service Type', detail: 'Standard cleaning is the baseline. Deep cleaning costs 68–85% more, and move-in/move-out cleaning costs 88–105% more than a standard visit.' },
+  { Icon: MapPin, term: 'Location (ZIP Code)', detail: 'State and city cost-of-living adjust your price — California and New York run 30–60% above the national average; many Southern and Midwest states run below it.' },
+  { Icon: RefreshCw, term: 'Cleaning Frequency', detail: 'Recurring service is cheaper per visit: weekly gets a 20% discount, biweekly 15%, and monthly 10% off the one-time rate.' },
+  { Icon: PlusCircle, term: 'Add-Ons', detail: 'Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and laundry are priced separately on top of the base clean.' },
+  { Icon: Sparkles, term: 'Home Condition', detail: 'A home that hasn\'t been professionally cleaned in months typically costs 22–28% more for the first visit than one already in good condition.' },
+];
 
 const ICONS = {
   home_residential: Home,
@@ -227,6 +236,29 @@ export default function SEOContent() {
             <p style={{ textAlign: 'center', fontSize: 12.5, color: '#94a3b8', marginTop: 14 }}>
               Prices vary. <a href="/" style={{ color: '#2563eb' }}>Use the calculator above</a> for a ZIP-code specific estimate.
             </p>
+          </div>
+
+          {/* How the cleaning estimator calculates price */}
+          <div style={{ marginBottom: 80 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
+              How Our Cleaning Estimator Calculates Your Price
+            </h2>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, maxWidth: 640, margin: '0 auto 36px' }}>
+              Clean Estimator is a free cleaning cost estimator that builds every quote from six real variables — not a flat national guess. Here's exactly what goes into your number.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, maxWidth: 980, margin: '0 auto' }}>
+              {PRICE_FACTORS.map(({ Icon, term, detail }) => (
+                <div key={term} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '20px 22px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                    <span style={{ width: 30, height: 30, borderRadius: 9, background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={15} strokeWidth={2.25} />
+                    </span>
+                    <strong style={{ fontSize: 15, color: '#0f172a' }}>{term}</strong>
+                  </div>
+                  <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: 0 }}>{detail}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* FAQ */}
