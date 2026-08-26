@@ -20,6 +20,7 @@ import PrivacyPolicy from './components/pages/PrivacyPolicy';
 import TermsOfService from './components/pages/TermsOfService';
 import ServicePage from './components/pages/ServicePage';
 import StatePage from './components/pages/StatePage';
+import CityPage from './components/pages/CityPage';
 import EmbedWrapper from './components/EmbedWrapper';
 import './App.css';
 
@@ -38,7 +39,8 @@ const isTerms = pathname === '/terms-of-service';
 const isAdminPartners = pathname === '/admin/partners';
 const isPartnerWithUs = pathname === '/partner-with-us';
 const isServicePage = pathname.startsWith('/cleaning-services/');
-const isStatePage = pathname.startsWith('/cleaning-cost/');
+const isCityPage = pathname.startsWith('/cleaning-cost/city/');
+const isStatePage = pathname.startsWith('/cleaning-cost/') && !isCityPage;
 
 const embedCompanyId = isEmbed ? searchParams.get('company') : null;
 
@@ -140,6 +142,7 @@ export default function App() {
   if (isPrivacy) return <HelmetProvider><div className="app"><Header /><main><PrivacyPolicy /></main><Footer /></div></HelmetProvider>;
   if (isTerms) return <HelmetProvider><div className="app"><Header /><main><TermsOfService /></main><Footer /></div></HelmetProvider>;
   if (isServicePage) return <HelmetProvider><div className="app"><Header /><main><ServicePage slug={pathname.replace('/cleaning-services/', '')} /></main><Footer /></div></HelmetProvider>;
+  if (isCityPage) return <HelmetProvider><div className="app"><Header /><main><CityPage slug={pathname.replace('/cleaning-cost/city/', '')} /></main><Footer /></div></HelmetProvider>;
   if (isStatePage) return <HelmetProvider><div className="app"><Header /><main><StatePage slug={pathname.replace('/cleaning-cost/', '')} /></main><Footer /></div></HelmetProvider>;
 
   if (isCompany) {

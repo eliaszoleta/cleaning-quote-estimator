@@ -44,6 +44,36 @@ const statesFile = fs.readFileSync(
 );
 const stateSlugs = [...statesFile.matchAll(/(?<!\w)slug:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
 
+// City slugs are computed at runtime (`${slugify(name)}-${stateCode}`), not a
+// literal string in the source, so the regex scan above can't find them --
+// actually evaluate cityPricing.js (with its statePricing.js import stripped
+// and the needed function injected, same trick prerender.js uses) to get the
+// real computed slugs.
+const statesModForCities = (() => {
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(
+    statesFile
+      .replace(/^export const /gm, 'const ')
+      .replace(/^export function /gm, 'function ')
+      + '\nreturn { getStateBySlug, adjustForState };'
+  );
+  return fn();
+})();
+const cityFile = fs.readFileSync(
+  path.join(__dirname, '../src/data/cityPricing.js'),
+  'utf8'
+);
+const citySlugs = (() => {
+  const src = cityFile
+    .replace(/^import[^\n]*\n/gm, '')
+    .replace(/^export const /gm, 'const ')
+    .replace(/^export function /gm, 'function ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function('getStateBySlug', 'adjustForState', 'getAllServices', 'typicalCost', src + '\nreturn { getAllCities };');
+  return fn(statesModForCities.getStateBySlug, statesModForCities.adjustForState, () => [], () => ({ low: 0, high: 0 }))
+    .getAllCities().map(c => c.slug);
+})();
+
 // ── Static pages ───────────────────────────────────────────────────────────
 const staticPages = [
   { path: '/',                 priority: '1.0', changefreq: 'weekly',  lastmod: TODAY },
@@ -89,6 +119,11 @@ const xml = [
     urlEntry({ loc: `${SITE_URL}/cleaning-cost/${slug}`, lastmod: TODAY, changefreq: 'monthly', priority: '0.8' })
   ),
   '',
+  '  <!-- Cleaning cost by city (auto-generated from cityPricing.js) -->',
+  ...citySlugs.map(slug =>
+    urlEntry({ loc: `${SITE_URL}/cleaning-cost/city/${slug}`, lastmod: TODAY, changefreq: 'monthly', priority: '0.7' })
+  ),
+  '',
   '</urlset>',
 ].join('\n') + '\n';
 
@@ -96,4 +131,4 @@ const xml = [
 const outPath = path.join(__dirname, '../public/sitemap.xml');
 fs.writeFileSync(outPath, xml, 'utf8');
 
-console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories, ${serviceSlugs.length} services, ${stateSlugs.length} states`);
+console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories, ${serviceSlugs.length} services, ${stateSlugs.length} states, ${citySlugs.length} cities`);

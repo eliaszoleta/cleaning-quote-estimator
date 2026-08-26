@@ -44,6 +44,29 @@ function loadStatesData() {
   return fn();
 }
 
+// cityPricing.js imports getStateBySlug/adjustForState from statePricing.js and
+// getAllServices/typicalCost from services.js (real ES imports the webpack/React
+// build resolves natively) instead of duplicating that pricing data -- a second
+// copy of the same multiplier table is exactly the kind of two-sources-of-truth
+// mistake that already caused blog copy to contradict the calculator once on
+// this site. The raw-text eval trick every other loader here uses can't execute
+// import statements, so strip them and inject the already-loaded functions as
+// parameters instead of re-parsing them from source.
+function loadCityData(statesMod, servicesMod) {
+  const raw = fs.readFileSync(path.join(SRC, 'data/cityPricing.js'), 'utf8');
+  const src = raw
+    .replace(/^import[^\n]*\n/gm, '')
+    .replace(/^export const /gm, 'const ')
+    .replace(/^export function /gm, 'function ')
+    .replace(/^export default /gm, 'const _default = ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(
+    'getStateBySlug', 'adjustForState', 'getAllServices', 'typicalCost',
+    src + '\nreturn { getAllCities, getCityBySlug, getCitiesByState, getFeaturedCities, cityServicePrices };'
+  );
+  return fn(statesMod.getStateBySlug, statesMod.adjustForState, servicesMod.getAllServices, servicesMod.typicalCost);
+}
+
 function loadFaqsData() {
   const raw = fs.readFileSync(path.join(SRC, 'data/faqs.js'), 'utf8');
   const src = raw.replace(/^export function /gm, 'function ');
@@ -730,8 +753,9 @@ function renderServicePage(service, statesMod, assets) {
   });
 }
 
-function renderStatePage(state, servicesMod, statesMod, faqsMod, assets) {
+function renderStatePage(state, servicesMod, statesMod, faqsMod, assets, citiesMod) {
   const otherStates = statesMod.getAllStates().filter(s => s.slug !== state.slug);
+  const cities = citiesMod.getCitiesByState(state.slug);
   const faqs = faqsMod.getAllFaqs().slice(0, 5);
   const pctVsNational = Math.round((state.multiplier - 1) * 100);
   const TIER_COPY = {
@@ -750,6 +774,7 @@ function renderStatePage(state, servicesMod, statesMod, faqsMod, assets) {
   }).join('');
 
   const otherStatesHtml = otherStates.map(s => `<a href="/cleaning-cost/${s.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(s.name)}</a>`).join(' ');
+  const citiesInStateHtml = cities.map(c => `<a href="/cleaning-cost/city/${c.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(c.name)}</a>`).join(' ');
 
   const seoTitle = `Cleaning Service Cost in ${state.name} (2026) | Average Prices & Estimates | Clean Estimator`;
   const seoDesc = `See average cleaning service costs in ${state.name} for 2026: house cleaning, carpet, mold remediation, water damage, and more, adjusted for local labor rates. Get a free instant estimate.`;
@@ -786,6 +811,10 @@ function renderStatePage(state, servicesMod, statesMod, faqsMod, assets) {
     <p style="font-size:14px;color:#64748b;margin-bottom:16px">Use our free calculator for a ZIP-code accurate cleaning estimate in ${esc(state.name)} in under 60 seconds.</p>
     <a href="/" style="background:${PRIMARY};color:white;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Get My Free Estimate &rarr;</a>
   </div>
+  ${cities.length > 0 ? `<div style="margin-bottom:32px">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Cleaning Costs by City in ${esc(state.name)}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${citiesInStateHtml}</div>
+  </div>` : ''}
   <div>
     <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Cleaning Costs in Other States</div>
     <div style="display:flex;flex-wrap:wrap;gap:8px">${otherStatesHtml}</div>
@@ -798,6 +827,88 @@ function renderStatePage(state, servicesMod, statesMod, faqsMod, assets) {
 
   return renderStaticPage({
     path: `/cleaning-cost/${state.slug}`,
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 780,
+    assets,
+    extraHead: `<script type="application/ld+json">${faqSchema(faqs)}</script><script type="application/ld+json">${breadcrumb}</script>`,
+  });
+}
+
+function renderCityPage(city, servicesMod, citiesMod, faqsMod, assets) {
+  const otherCitiesInState = citiesMod.getCitiesByState(city.stateSlugRef).filter(c => c.slug !== city.slug);
+  const featuredCities = citiesMod.getFeaturedCities().filter(c => c.slug !== city.slug).slice(0, 8);
+  const faqs = faqsMod.getAllFaqs().slice(0, 5);
+  const pctVsNational = Math.round((city.multiplier - 1) * 100);
+  const TIER_COPY = {
+    high: `Cleaning service costs in ${city.name} run above the national average, in line with ${city.name}'s overall cost of living.`,
+    low: `Cleaning service costs in ${city.name} run below the national average, making it a comparatively affordable market for cleaning services.`,
+    average: `Cleaning service costs in ${city.name} are close to the national average.`,
+  };
+
+  const serviceRows = citiesMod.cityServicePrices(city).map(({ service, low, high }, i) => `<tr style="background:${i % 2 === 0 ? 'white' : '#fafafa'}">
+      <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9"><a href="/cleaning-services/${service.slug}" style="color:#0f172a;font-weight:600;text-decoration:none">${esc(service.name)}</a></td>
+      <td style="padding:10px 14px;color:${PRIMARY};font-weight:700;border-bottom:1px solid #f1f5f9;white-space:nowrap">${fmt(low)}&ndash;${fmt(high)}</td>
+    </tr>`).join('');
+
+  const otherCitiesHtml = otherCitiesInState.map(c => `<a href="/cleaning-cost/city/${c.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(c.name)}</a>`).join(' ')
+    + ` <a href="/cleaning-cost/${city.stateSlugRef}" style="font-size:12.5px;color:${PRIMARY};font-weight:700;text-decoration:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:6px 12px">All of ${esc(city.stateName)} &rarr;</a>`;
+  const featuredCitiesHtml = featuredCities.map(c => `<a href="/cleaning-cost/city/${c.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(c.name)}, ${c.stateCode}</a>`).join(' ');
+
+  const seoTitle = `Cleaning Service Cost in ${city.name}, ${city.stateCode} (2026) | Clean Estimator`;
+  const seoDesc = `See average cleaning service costs in ${city.name}, ${city.stateName} for 2026: house cleaning, carpet, mold remediation, water damage, and more. Get a free instant estimate.`;
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:24px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <a href="/cleaning-cost/${city.stateSlugRef}" style="color:#64748b;text-decoration:none">${esc(city.stateName)}</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">${esc(city.name)}</span>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <div style="font-size:12px;font-weight:700;color:${PRIMARY};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">${esc(city.name)}, ${city.stateCode}</div>
+    <h1 style="font-size:clamp(24px,4vw,32px);font-weight:800;color:#0f172a;line-height:1.25;margin-bottom:10px">Cleaning Service Cost in ${esc(city.name)}, ${city.stateCode} (2026)</h1>
+    <p style="font-size:15.5px;color:#64748b;line-height:1.7;margin-bottom:20px">${esc(TIER_COPY[city.tier])}${pctVsNational !== 0 ? ` That's about ${Math.abs(pctVsNational)}% ${pctVsNational > 0 ? 'above' : 'below'} the national average, matching the broader ${esc(city.stateName)} market.` : ''}</p>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <span style="font-size:30px;font-weight:800;color:${PRIMARY}">${fmt(city.low)} &ndash; ${fmt(city.high)}</span>
+      <span style="font-size:13px;color:#94a3b8">standard house cleaning, 2,000 sq ft home</span>
+    </div>
+  </div>
+  <div style="background:linear-gradient(135deg,${PRIMARY},#1d4ed8);border-radius:12px;padding:18px 24px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="color:white"><div style="font-weight:700;font-size:15px">Get a ZIP-code accurate estimate in ${esc(city.name)}</div><div style="font-size:13px;opacity:0.9">Free &middot; No signup &middot; 60 seconds</div></div>
+    <a href="/" style="background:white;color:${PRIMARY};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap">Calculate Now &rarr;</a>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:6px">Cost by Service in ${esc(city.name)}</h2>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">Estimated typical job cost, adjusted for the ${esc(city.stateName)} market.</p>
+    <div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Service</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">${esc(city.name)} Estimate</th></tr></thead>
+      <tbody>${serviceRows}</tbody>
+    </table></div>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">FAQs</h2>
+    ${faqAccordionHtml(faqs)}
+  </div>
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:24px 28px;margin-bottom:32px;text-align:center">
+    <div style="font-weight:800;font-size:18px;color:#0f172a;margin-bottom:6px">Ready to get an accurate estimate?</div>
+    <p style="font-size:14px;color:#64748b;margin-bottom:16px">Use our free calculator for a ZIP-code accurate cleaning estimate in ${esc(city.name)} in under 60 seconds.</p>
+    <a href="/" style="background:${PRIMARY};color:white;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Get My Free Estimate &rarr;</a>
+  </div>
+  ${otherCitiesInState.length ? `<div style="margin-bottom:32px">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">More Cities in ${esc(city.stateName)}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${otherCitiesHtml}</div>
+  </div>` : ''}
+  <div>
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Popular Cities</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${featuredCitiesHtml}</div>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: `Cleaning Cost in ${city.stateName}`, item: `${DOMAIN}/cleaning-cost/${city.stateSlugRef}` },
+    { name: `Cleaning Cost in ${city.name}`, item: `${DOMAIN}/cleaning-cost/city/${city.slug}` },
+  ]);
+
+  return renderStaticPage({
+    path: `/cleaning-cost/city/${city.slug}`,
     seoTitle,
     seoDesc,
     bodyHtml: body,
@@ -1033,13 +1144,21 @@ function main() {
     count++;
   }
 
+  const citiesMod = loadCityData(statesMod, servicesMod);
+
   const states = statesMod.getAllStates();
   for (const state of states) {
-    writeFile('cleaning-cost/' + state.slug, renderStatePage(state, servicesMod, statesMod, faqsMod, assets));
+    writeFile('cleaning-cost/' + state.slug, renderStatePage(state, servicesMod, statesMod, faqsMod, assets, citiesMod));
     count++;
   }
 
-  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 5 static pages, ' + services.length + ' services, ' + states.length + ' states)');
+  const cities = citiesMod.getAllCities();
+  for (const city of cities) {
+    writeFile('cleaning-cost/city/' + city.slug, renderCityPage(city, servicesMod, citiesMod, faqsMod, assets));
+    count++;
+  }
+
+  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 5 static pages, ' + services.length + ' services, ' + states.length + ' states, ' + cities.length + ' cities)');
 }
 
 main();

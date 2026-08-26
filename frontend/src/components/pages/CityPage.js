@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ChevronDown, Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin } from 'lucide-react';
-import { getStateBySlug, getAllStates, adjustForState } from '../../data/statePricing';
-import { getAllServices, typicalCost } from '../../data/services';
+import { getCityBySlug, getCitiesByState, getFeaturedCities, cityServicePrices } from '../../data/cityPricing';
 import { getAllFaqs } from '../../data/faqs';
-import { getCitiesByState } from '../../data/cityPricing';
 
 const ICONS = {
   home_residential: Home,
@@ -19,7 +17,7 @@ const ICONS = {
 };
 
 const TIER_COPY = {
-  high: (name) => `Cleaning service costs in ${name} run above the national average, driven by higher labor rates and cost of living.`,
+  high: (name) => `Cleaning service costs in ${name} run above the national average, in line with ${name}'s overall cost of living.`,
   low: (name) => `Cleaning service costs in ${name} run below the national average, making it a comparatively affordable market for cleaning services.`,
   average: (name) => `Cleaning service costs in ${name} are close to the national average.`,
 };
@@ -28,21 +26,19 @@ function formatPrice(n) {
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }
 
-function ServiceStateTable({ state }) {
-  const services = getAllServices();
+function CityServiceTable({ city }) {
+  const rows = cityServicePrices(city);
   return (
     <div style={{ overflowX: 'auto', margin: '20px 0' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
         <thead>
           <tr style={{ background: '#f8fafc' }}>
             <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#374151', borderBottom: '2px solid #e2e8f0' }}>Service</th>
-            <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#374151', borderBottom: '2px solid #e2e8f0', whiteSpace: 'nowrap' }}>{state.name} Estimate</th>
+            <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#374151', borderBottom: '2px solid #e2e8f0', whiteSpace: 'nowrap' }}>{city.name} Estimate</th>
           </tr>
         </thead>
         <tbody>
-          {services.map((service, i) => {
-            const national = typicalCost(service);
-            const adjusted = adjustForState(national.low, national.high, state);
+          {rows.map(({ service, low, high }, i) => {
             const Icon = ICONS[service.id] || Home;
             return (
               <tr key={service.id} style={{ background: i % 2 === 0 ? 'white' : '#fafafa' }}>
@@ -52,7 +48,7 @@ function ServiceStateTable({ state }) {
                   </a>
                 </td>
                 <td style={{ padding: '10px 14px', color: '#2563eb', fontWeight: 700, borderBottom: '1px solid #f1f5f9', whiteSpace: 'nowrap' }}>
-                  {formatPrice(adjusted.low)}–{formatPrice(adjusted.high)}
+                  {formatPrice(low)}–{formatPrice(high)}
                 </td>
               </tr>
             );
@@ -91,30 +87,31 @@ function FaqAccordion({ faqs }) {
   );
 }
 
-export default function StatePage({ slug }) {
-  const state = getStateBySlug(slug);
+export default function CityPage({ slug }) {
+  const city = getCityBySlug(slug);
 
-  if (!state) return (
+  if (!city) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
-      <h2 style={{ color: '#0f172a' }}>State not found</h2>
+      <h2 style={{ color: '#0f172a' }}>City not found</h2>
       <a href="/" style={{ color: '#2563eb', fontWeight: 600 }}>← Back to home</a>
     </div>
   );
 
-  const otherStates = getAllStates().filter(s => s.slug !== state.slug);
-  const cities = getCitiesByState(state.slug);
+  const otherCitiesInState = getCitiesByState(city.stateSlugRef).filter(c => c.slug !== city.slug);
+  const featuredCities = getFeaturedCities().filter(c => c.slug !== city.slug).slice(0, 8);
   const faqs = getAllFaqs().slice(0, 5);
-  const pctVsNational = Math.round((state.multiplier - 1) * 100);
+  const pctVsNational = Math.round((city.multiplier - 1) * 100);
 
-  const title = `Cleaning Service Cost in ${state.name} (2026) | Average Prices & Estimates | Clean Estimator`;
-  const description = `See average cleaning service costs in ${state.name} for 2026: house cleaning, carpet, mold remediation, water damage, and more, adjusted for local labor rates. Get a free instant estimate.`;
+  const title = `Cleaning Service Cost in ${city.name}, ${city.stateCode} (2026) | Clean Estimator`;
+  const description = `See average cleaning service costs in ${city.name}, ${city.stateName} for 2026: house cleaning, carpet, mold remediation, water damage, and more. Get a free instant estimate.`;
 
   const breadcrumb = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.cleanestimator.com' },
-      { '@type': 'ListItem', position: 2, name: `Cleaning Cost in ${state.name}`, item: `https://www.cleanestimator.com/cleaning-cost/${state.slug}` },
+      { '@type': 'ListItem', position: 2, name: `Cleaning Cost in ${city.stateName}`, item: `https://www.cleanestimator.com/cleaning-cost/${city.stateSlugRef}` },
+      { '@type': 'ListItem', position: 3, name: `Cleaning Cost in ${city.name}`, item: `https://www.cleanestimator.com/cleaning-cost/city/${city.slug}` },
     ],
   };
   const faqSchema = {
@@ -128,7 +125,7 @@ export default function StatePage({ slug }) {
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />
-        <link rel="canonical" href={`https://www.cleanestimator.com/cleaning-cost/${state.slug}`} />
+        <link rel="canonical" href={`https://www.cleanestimator.com/cleaning-cost/city/${city.slug}`} />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
@@ -144,27 +141,29 @@ export default function StatePage({ slug }) {
           <div style={{ display: 'flex', gap: 6, fontSize: 13, color: '#94a3b8', marginBottom: 24, flexWrap: 'wrap' }}>
             <a href="/" style={{ color: '#64748b', textDecoration: 'none' }}>Home</a>
             <span>›</span>
-            <span style={{ color: '#0f172a' }}>Cleaning Cost in {state.name}</span>
+            <a href={`/cleaning-cost/${city.stateSlugRef}`} style={{ color: '#64748b', textDecoration: 'none' }}>{city.stateName}</a>
+            <span>›</span>
+            <span style={{ color: '#0f172a' }}>{city.name}</span>
           </div>
 
           <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '32px 36px', marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <MapPin size={18} color="#2563eb" />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{state.name}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{city.name}, {city.stateCode}</span>
             </div>
-            <h1 style={{ fontSize: 'clamp(24px,4vw,32px)', fontWeight: 800, color: '#0f172a', lineHeight: 1.25, marginBottom: 10 }}>Cleaning Service Cost in {state.name} (2026)</h1>
+            <h1 style={{ fontSize: 'clamp(24px,4vw,32px)', fontWeight: 800, color: '#0f172a', lineHeight: 1.25, marginBottom: 10 }}>Cleaning Service Cost in {city.name}, {city.stateCode} (2026)</h1>
             <p style={{ fontSize: 15.5, color: '#64748b', lineHeight: 1.7, marginBottom: 20 }}>
-              {TIER_COPY[state.tier](state.name)} {pctVsNational !== 0 && `That's about ${Math.abs(pctVsNational)}% ${pctVsNational > 0 ? 'above' : 'below'} the national average.`}
+              {TIER_COPY[city.tier](city.name)} {pctVsNational !== 0 && `That's about ${Math.abs(pctVsNational)}% ${pctVsNational > 0 ? 'above' : 'below'} the national average, matching the broader ${city.stateName} market.`}
             </p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 30, fontWeight: 800, color: '#2563eb' }}>{formatPrice(state.low)} – {formatPrice(state.high)}</span>
+              <span style={{ fontSize: 30, fontWeight: 800, color: '#2563eb' }}>{formatPrice(city.low)} – {formatPrice(city.high)}</span>
               <span style={{ fontSize: 13, color: '#94a3b8' }}>standard house cleaning, 2,000 sq ft home</span>
             </div>
           </div>
 
           <div style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', borderRadius: 12, padding: '18px 24px', marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <div style={{ color: 'white' }}>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>Get a ZIP-code accurate estimate in {state.name}</div>
+              <div style={{ fontWeight: 700, fontSize: 15 }}>Get a ZIP-code accurate estimate in {city.name}</div>
               <div style={{ fontSize: 13, opacity: 0.9 }}>Free · No signup · 60 seconds</div>
             </div>
             <a href="/" style={{ background: 'white', color: '#2563eb', padding: '10px 20px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14, whiteSpace: 'nowrap' }}>
@@ -173,9 +172,9 @@ export default function StatePage({ slug }) {
           </div>
 
           <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '32px 36px', marginBottom: 24 }}>
-            <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Cost by Service in {state.name}</h2>
-            <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 4 }}>Estimated typical job cost, adjusted for {state.name}'s labor rates.</p>
-            <ServiceStateTable state={state} />
+            <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Cost by Service in {city.name}</h2>
+            <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 4 }}>Estimated typical job cost, adjusted for the {city.stateName} market.</p>
+            <CityServiceTable city={city} />
 
             <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginTop: 32, marginBottom: 14 }}>FAQs</h2>
             <FaqAccordion faqs={faqs} />
@@ -183,31 +182,34 @@ export default function StatePage({ slug }) {
 
           <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '24px 28px', marginBottom: 32, textAlign: 'center' }}>
             <div style={{ fontWeight: 800, fontSize: 18, color: '#0f172a', marginBottom: 6 }}>Ready to get an accurate estimate?</div>
-            <p style={{ fontSize: 14, color: '#64748b', marginBottom: 16 }}>Use our free calculator for a ZIP-code accurate cleaning estimate in {state.name} in under 60 seconds.</p>
+            <p style={{ fontSize: 14, color: '#64748b', marginBottom: 16 }}>Use our free calculator for a ZIP-code accurate cleaning estimate in {city.name} in under 60 seconds.</p>
             <a href="/" style={{ background: '#2563eb', color: 'white', padding: '12px 28px', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
               Get My Free Estimate →
             </a>
           </div>
 
-          {cities.length > 0 && (
+          {otherCitiesInState.length > 0 && (
             <div style={{ marginBottom: 32 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Cleaning Costs by City in {state.name}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>More Cities in {city.stateName}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {cities.map(c => (
+                {otherCitiesInState.map(c => (
                   <a key={c.slug} href={`/cleaning-cost/city/${c.slug}`} style={{ fontSize: 12.5, color: '#64748b', textDecoration: 'none', background: 'white', border: '1px solid #e2e8f0', borderRadius: 20, padding: '6px 12px' }}>
                     {c.name}
                   </a>
                 ))}
+                <a href={`/cleaning-cost/${city.stateSlugRef}`} style={{ fontSize: 12.5, color: '#2563eb', fontWeight: 700, textDecoration: 'none', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 20, padding: '6px 12px' }}>
+                  All of {city.stateName} →
+                </a>
               </div>
             </div>
           )}
 
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Cleaning Costs in Other States</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Popular Cities</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {otherStates.map(s => (
-                <a key={s.code} href={`/cleaning-cost/${s.slug}`} style={{ fontSize: 12.5, color: '#64748b', textDecoration: 'none', background: 'white', border: '1px solid #e2e8f0', borderRadius: 20, padding: '6px 12px' }}>
-                  {s.name}
+              {featuredCities.map(c => (
+                <a key={c.slug} href={`/cleaning-cost/city/${c.slug}`} style={{ fontSize: 12.5, color: '#64748b', textDecoration: 'none', background: 'white', border: '1px solid #e2e8f0', borderRadius: 20, padding: '6px 12px' }}>
+                  {c.name}, {c.stateCode}
                 </a>
               ))}
             </div>
