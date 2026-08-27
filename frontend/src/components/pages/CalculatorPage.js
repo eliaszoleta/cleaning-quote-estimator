@@ -99,7 +99,9 @@ export default function CalculatorPage() {
           </p>
         </div>
 
-        <CleaningCalculator />
+        <div style={{ maxWidth: 720, margin: '0 auto', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <CleaningCalculator embedded />
+        </div>
 
         <div style={{ marginTop: 48 }}>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 20, textAlign: 'center' }}>Why Use This Cleaning Cost Calculator</h2>
