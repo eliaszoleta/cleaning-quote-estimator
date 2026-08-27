@@ -1106,8 +1106,8 @@ function injectHomepage(posts, categories) {
       </div>
     </div>
     <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
-      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">How Our Cleaning Estimator Calculates Your Price</h2>
-      <p style="font-size:14px;color:#64748b;text-align:center;max-width:560px;margin:0 auto 24px;line-height:1.6">Clean Estimator is a free cleaning cost estimator that builds every quote from six real variables — not a flat national guess.</p>
+      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">How Our Cleaning Calculator Estimate Your Price</h2>
+      <p style="font-size:14px;color:#64748b;text-align:center;max-width:560px;margin:0 auto 24px;line-height:1.6">Clean Estimator is a free cleaning cost calculator that builds every quote from six real variables — not a flat national guess. Here's exactly what goes into your number.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
         <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Home Size (Square Footage)</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Your base price scales with square footage — $90–$115 under 1,000 sq ft, up to $272–$338 over 3,000 sq ft.</p></div>
         <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Service Type</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Standard cleaning is the baseline. Deep cleaning costs 68–85% more, move-in/move-out costs 88–105% more.</p></div>

@@ -241,10 +241,10 @@ export default function SEOContent() {
           {/* How the cleaning estimator calculates price */}
           <div style={{ marginBottom: 80 }}>
             <h2 style={{ fontSize: 28, fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
-              How Our Cleaning Estimator Calculates Your Price
+              How Our Cleaning Calculator Estimate Your Price
             </h2>
             <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, maxWidth: 640, margin: '0 auto 36px' }}>
-              Clean Estimator is a free cleaning cost estimator that builds every quote from six real variables — not a flat national guess. Here's exactly what goes into your number.
+              Clean Estimator is a free cleaning cost calculator that builds every quote from six real variables — not a flat national guess. Here's exactly what goes into your number.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, maxWidth: 980, margin: '0 auto' }}>
               {PRICE_FACTORS.map(({ Icon, term, detail }) => (
