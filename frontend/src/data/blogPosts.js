@@ -100,70 +100,80 @@ Use [our free calculator](/?service=home_residential) to get a ZIP-code specific
   },
   {
     slug: 'carpet-cleaning-cost-guide',
-    title: 'How Much Does Carpet Cleaning Cost in 2026?',
+    title: 'Carpet Cleaning Cost Estimate: Real Prices by Room and Condition in 2026',
     category: 'carpet',
     categoryLabel: 'Carpet Cleaning',
-    date: '2026-01-15',
-    readTime: '6 min',
-    excerpt: 'Professional carpet cleaning costs $100–$300 for a typical home. Learn what affects pricing, which method is best, and how to find a good deal.',
+    date: '2026-08-27',
+    readTime: '7 min',
+    excerpt: 'Carpet cleaning costs $44–$100 per room depending on how soiled it is, with a $90–$110 whole-home minimum. A typical 5-room home runs $220–$275 for routine cleaning. Here\'s a real cost breakdown by condition, plus what pet stains, rugs, and stairs add.',
     content: `
-## Carpet Cleaning Cost Overview
+## How Much Does Carpet Cleaning Cost?
 
-Professional carpet cleaning costs **$100–$300** for a typical 3-bedroom home. Companies generally charge either by the room or by square footage.
+Carpet cleaning is almost always priced per room rather than by square footage — room shape, furniture, and edge work affect labor time more than raw square footage does, so per-room pricing is actually the more honest way to quote it. The rate depends on how soiled the carpet is:
 
-**Per-room pricing**: $25–$75 per room (most common)
-**Per square foot**: $0.20–$0.60 per sq ft
-**Minimum charge**: $75–$125
-
-## Cost by Carpet Cleaning Method
-
-| Method | Cost Range | Best For |
+| Condition | Cost Per Room | What It Looks Like |
 |---|---|---|
-| Steam (hot water extraction) | $0.25–$0.50/sq ft | Deep cleaning, pet stains |
-| Dry cleaning | $0.30–$0.60/sq ft | Quick-dry situations |
-| Encapsulation | $0.15–$0.40/sq ft | Commercial/light soil |
-| Bonnet cleaning | $0.15–$0.35/sq ft | Maintenance cleaning |
+| Light (routine maintenance) | $44–$55 | Regular upkeep, no visible staining |
+| Moderate soiling | $49–$65 | High-traffic areas, some visible dirt |
+| Heavy soiling | $60–$80 | Significant buildup, overdue cleaning |
+| Pet stains / odor | $73–$100 | Needs enzyme treatment and extra extraction passes |
+
+Every job also carries a **$90–$110 whole-home minimum**, so if you're only getting one small room done, expect to pay the minimum rather than the per-room rate.
+
+## What a Real Carpet Cleaning Estimate Looks Like
+
+For a typical 5-room home getting a routine, light-soiling clean, you're looking at **$220–$275** — that's the per-room rate times five rooms, no surprises. If two of those rooms have pet stains instead of light soiling, swap those two rooms to the $73–$100 range and the total climbs closer to $320–$375.
+
+If you're converting to a per-square-foot number for comparison shopping: a typical bedroom or living room runs roughly 150–200 sq ft, which puts light-soiling carpet cleaning at roughly **$0.25–$0.35 per square foot** once you back into it. Most professional cleaners, including ours, don't quote per square foot for this reason — it hides how much labor actually goes into edges, furniture, and corners.
 
 ## Steam Cleaning vs. Dry Cleaning
 
-**Steam cleaning (hot water extraction)** is the most common and recommended method. It injects hot water and detergent deep into the carpet fibers, then extracts it along with dirt and debris. Carpets take 6–12 hours to fully dry.
+**Steam cleaning (hot water extraction)** is the industry-standard method and what most companies quote by default. Hot water and detergent get injected deep into the fibers, then extracted along with the dirt. It's the most effective method for deep soil and pet stains, but carpets take 6–12 hours to fully dry.
 
-**Dry cleaning** uses low-moisture chemical compounds that encapsulate dirt. Carpets are dry within 1–2 hours. Less effective for deeply embedded dirt or pet stains, but great when you need fast results.
+**Dry cleaning** costs **10–13% more** than steam, using low-moisture compounds that dry within 1–2 hours instead. It's less effective on deeply embedded dirt, but worth the premium if you can't have a room out of use for half a day — a home office or a commercial space that needs to reopen the same day, for example.
 
-## Add-On Services and Costs
+## Add-Ons That Change Your Estimate
 
-- **Pet odor/stain treatment**: $25–$75 per room
-- **Scotchgard protection**: $0.15–$0.25 per sq ft
-- **Deodorizer treatment**: $20–$50 per room
-- **Area rug cleaning**: $50–$200 per rug (depending on size)
-- **Stair cleaning**: $3–$5 per step, or $50–$80 per flight
-- **Furniture moving**: $20–$50 if you can't move it yourself
+- **Area rugs**: $58–$120 per rug, priced separately from wall-to-wall carpet since they're often cleaned off-site
+- **Stairs**: $52–$68 per flight (roughly 13–15 steps), also separate from room pricing
+- **Stain protector**: $35–$55 per treated area, applied after cleaning to slow how fast new stains set in
+- **Furniture moving**: usually $20–$50 if you'd rather not clear the room yourself first
 
-## How Carpet Condition Affects Price
+## How Carpet Condition Actually Changes the Price
 
-Heavily soiled carpets with years of buildup, pet stains, or deeply embedded dirt require more time and chemicals:
+The jump from light to pet-stain pricing isn't arbitrary — pet urine and heavy odor require an enzyme treatment that breaks down the odor-causing compounds at a molecular level, plus multiple extraction passes to fully pull the treated water back out. Skipping that step just masks the smell temporarily instead of removing it, which is why companies charge more for doing it properly.
 
-- **Lightly soiled**: Standard rate
-- **Moderately soiled**: +20–30%
-- **Heavily soiled / pet stains**: +40–80%
-- **Extremely neglected**: Some companies will decline or charge 2× the standard rate
-
-## How Often Should You Clean Your Carpets?
+## How Often You Actually Need Carpet Cleaning
 
 The IICRC (Institute of Inspection, Cleaning and Restoration Certification) recommends:
-- **Households without pets or children**: Every 12–18 months
-- **Households with pets or children**: Every 6–12 months
-- **High-traffic commercial areas**: Every 3–6 months
+- Every 12–18 months for households without pets or kids
+- Every 6–12 months for households with pets or kids
+- Every 3–6 months for high-traffic commercial spaces
 
-## How to Save on Carpet Cleaning
+Waiting past that window doesn't just make carpets look worse — soil that's ground in over years is genuinely harder to remove and more likely to push you into the "heavy soiling" price tier.
 
-1. **Clean multiple rooms at once** — per-room rates drop with volume (often 10–20% off for 4+ rooms)
-2. **Vacuum thoroughly first** — removes surface dirt so technicians can focus on deep cleaning
-3. **Move small furniture yourself** — save the moving charge
-4. **Book during off-peak times** — weekday rates can be 10–15% lower
-5. **Bundle with other services** — many companies offer discounts when bundling carpet + upholstery or carpet + tile cleaning
+## How to Keep Your Estimate Down
 
-[Use our carpet cleaning cost calculator](/?service=carpet) to get a local estimate.
+Vacuum thoroughly before your appointment — it clears surface debris so the technician's time goes toward the deep-clean work you're actually paying for, not the stuff a vacuum could've handled. Get every room you're considering done in the same visit; most companies apply a modest volume discount at four or more rooms rather than charging full minimums per area. And if you can move small furniture yourself, do it — that's usually a flat charge you can just skip.
+
+## FAQ
+
+**How much does carpet cleaning cost?**
+Carpet cleaning costs $44–$55 per room for routine, lightly soiled carpet, with a $90–$110 whole-home minimum. A typical 5-room home runs about $220–$275 for a light cleaning.
+
+**What's a fair carpet cleaning cost estimate for pet stains?**
+Pet-stained or heavily odorous carpet runs $73–$100 per room — about 65–82% more than routine cleaning — because it requires enzyme treatment and extra extraction passes the odor won't come out with a standard clean.
+
+**Is carpet cleaning priced per room or per square foot?**
+Most companies, including ours, price per room rather than per square foot, since labor time depends more on furniture and edge work than raw floor area. If you need a rough per-square-foot comparison, light cleaning works out to roughly $0.25–$0.35/sq ft for an average-sized room.
+
+**How much more does dry carpet cleaning cost than steam cleaning?**
+Dry cleaning costs about 10–13% more than steam cleaning, but dries in 1–2 hours instead of 6–12 — worth it if you need the room usable the same day.
+
+**Are stairs included in a whole-home carpet cleaning quote?**
+No — carpeted stairs are priced separately, typically $52–$68 per flight of 13–15 steps.
+
+[Use our carpet cleaning cost calculator](/?service=carpet) to get a ZIP-code accurate estimate for your home.
     `,
   },
   {
@@ -246,68 +256,85 @@ For anything with pet stains, silk or velvet fabric, or valuable antique furnitu
   },
   {
     slug: 'tile-grout-cleaning-cost-guide',
-    title: 'Tile and Grout Cleaning Cost: What Professionals Charge in 2026',
+    title: 'Tile and Grout Cleaning Cost Per Square Foot: 2026 Pricing by Material',
     category: 'carpet',
     categoryLabel: 'Carpet Cleaning',
-    date: '2026-02-18',
-    readTime: '5 min',
-    excerpt: 'Professional tile and grout cleaning costs $0.50–$3.00 per square foot, or $200–$900 for a typical bathroom and kitchen. Here\'s everything that affects the price.',
+    date: '2026-08-27',
+    readTime: '6 min',
+    excerpt: 'Tile and grout cleaning costs $0.92–$2.05 per square foot depending on material — $276–$366 for a typical 300 sq ft ceramic floor, up to $465–$615 for natural stone. Here\'s what drives the price, plus sealing and recoloring costs.',
     content: `
-## Tile and Grout Cleaning Cost: Quick Numbers
+## How Much Does Tile and Grout Cleaning Cost?
 
-Professional tile and grout cleaning costs **$0.50–$3.00 per square foot**, with most homeowners paying **$200–$600** for a standard-size bathroom and kitchen combined.
+Tile and grout cleaning is priced per square foot, and the material matters more than most people expect — the difference between ceramic and natural stone can add over 60% to your bill, because natural stone needs gentler, pH-neutral products that take more time to work properly.
 
-| Area | Average Cost |
-|---|---|
-| Small bathroom (40–60 sq ft) | $100–$200 |
-| Master bathroom (80–120 sq ft) | $175–$350 |
-| Kitchen floor (150–200 sq ft) | $200–$400 |
-| Full home tile (400–600 sq ft) | $500–$900 |
-| Shower tile (walls + floor) | $150–$350 |
+| Material | Cost Per Sq Ft | Why |
+|---|---|---|
+| Ceramic (most common) | $0.92–$1.22 | Standard residential tile, holds up to stronger cleaners |
+| Porcelain | $1.05–$1.40 | Denser material, slightly more effort to lift soil |
+| Saltillo | $1.25–$1.65 | Porous terracotta, needs gentler products |
+| Natural stone | $1.55–$2.05 | Marble, travertine, slate — requires pH-neutral products only |
 
-## Why Tile Gets Dirty Even with Regular Mopping
+There's also a **$150–$200 whole-project minimum** — small jobs like a single bathroom don't get charged the raw per-square-foot rate if it comes out below that minimum.
 
-Regular mopping moves dirty water around, but it can't scrub grout lines clean. Grout is porous and traps:
-- Soap scum and body oils (in showers)
-- Cooking grease splatter (in kitchens)
-- Foot traffic grime (on floors)
-- Mold and mildew (anywhere moisture accumulates)
+## Real Cost Examples by Room
 
-After a few years, grout that was originally white or light gray darkens noticeably.
+Here's what that actually works out to for ceramic tile, the most common material:
 
-## What Professional Cleaning Includes
+| Area | Size | Cost |
+|---|---|---|
+| Small bathroom | ~50 sq ft | $150–$200 (minimum applies) |
+| Master bathroom | ~100 sq ft | $150–$200 (minimum applies) |
+| Kitchen floor | ~180 sq ft | $166–$220 |
+| Whole-home tile | ~400 sq ft | $368–$488 |
 
-The professional process is more thorough than anything you can replicate with store-bought cleaners:
+Notice the small and master bathroom rows land at the same price — both fall under the whole-project minimum, so the raw per-square-foot math ($46–$61 and $92–$122 respectively) doesn't actually apply until the area gets large enough to exceed it. For natural stone, the same 400 sq ft whole-home job runs $620–$820 instead.
 
-1. **Pre-treatment spray** — alkaline or acidic cleaner applied to break down soils
-2. **High-pressure steam or spinner tool** — rotary machine with jets that hit grout lines directly at 200+ PSI
-3. **Extraction** — dirty water is vacuumed out simultaneously
-4. **Detail brush work** — corners, edges, and stubborn spots cleaned by hand
-5. **Optional sealing** — grout sealer applied after cleaning to prevent future staining
+## Why Tile Gets Dirty Even With Regular Mopping
 
-## Add-On: Grout Sealing
+Mopping just moves dirty water across the surface — it can't scrub grout lines, which are porous and trap soap scum and body oils in showers, cooking grease in kitchens, foot-traffic grime on floors, and mold or mildew anywhere moisture sits. That's why grout that started out white or light gray gradually darkens no matter how often you mop.
 
-After cleaning, sealing grout is highly recommended. Sealed grout repels water and stains for **2–5 years**. Cost:
-- **$1.00–$2.00 per sq ft** for sealing alone
-- Most companies bundle cleaning + sealing for a 20–30% discount
+## What Professional Cleaning Actually Involves
 
-If you skip sealing, grout will re-darken faster, and you'll be paying for cleaning more frequently.
+1. **Pre-treatment** — an alkaline or acidic cleaner applied first to break down embedded soil
+2. **High-pressure steam or a spinner tool** — a rotary machine hitting grout lines directly at 200+ PSI, which is well beyond what a mop or handheld brush can generate
+3. **Extraction** — dirty water pulled back out immediately, rather than left to re-settle into the grout
+4. **Detail work by hand** — corners, edges, and stubborn spots that the machine can't fully reach
+5. **Optional sealing** — applied after cleaning to slow how fast grout re-stains
 
-## Grout Recoloring and Restoration
+## Grout Sealing: Worth the Extra Cost?
 
-If cleaning doesn't fully restore your grout's appearance, recoloring is an option. A colorant is applied that penetrates the porous grout, covering deep stains and providing uniform color.
+Sealing runs **$0.55–$0.88 per square foot** on top of cleaning, and most companies discount it 20–30% when bundled with a cleaning visit rather than booked separately. Sealed grout repels water and stains for 2–5 years — skip it, and grout will re-darken noticeably faster, which usually means paying for a full cleaning again sooner than you'd like.
 
-- **Grout recoloring cost**: $2–$4 per sq ft
-- Effective for severely stained grout that cleaning can't fix
-- Results last 5–10 years with proper maintenance
+## Grout Recoloring vs. Cleaning
 
-## Can You DIY Tile and Grout Cleaning?
+If cleaning alone doesn't fully restore badly stained grout, recoloring is the next option: a colorant penetrates the porous grout and covers deep, set-in staining with a uniform color, rather than trying to lift it out. It costs **$1.65–$2.55 per square foot** and results typically hold up 5–10 years with normal maintenance. It's worth it for grout that's discolored beyond what cleaning can fix, rather than paying to replace the grout entirely.
 
-Yes — for light-to-moderate soiling, a combination of baking soda paste and a stiff brush can significantly improve grout. More powerful DIY options include oxygen bleach-based cleaners ($15–$30 per bottle) and grout brushes with drill attachments ($10–$20).
+## How Soiling and Damage Affect Your Price
 
-Where professional cleaning truly beats DIY: the pressure and heat of commercial equipment loosens embedded grime that hand scrubbing simply can't reach.
+Heavily soiled or damaged tile and grout costs **32–55% more** than lightly soiled tile — the extra time goes into more aggressive pre-treatment and, in the case of damage, prep work around cracked or chipped grout lines before cleaning can even begin.
 
-[Get a tile and grout cleaning estimate](/?service=carpet) →
+## Can You DIY It?
+
+For light-to-moderate soiling, a baking soda paste and a stiff brush genuinely helps. Oxygen bleach-based cleaners ($15–$30 a bottle) and a grout brush drill attachment ($10–$20) go further. Where professional equipment wins is pressure and heat — 200+ PSI steam loosens embedded grime that hand scrubbing physically can't move, which is the whole reason grout darkens permanently over time if it's never professionally cleaned.
+
+## FAQ
+
+**How much does tile and grout cleaning cost?**
+For a typical 300 sq ft area, ceramic tile cleaning costs $276–$366. Natural stone costs more, at $465–$615, due to the specialized products required.
+
+**How much does it cost to clean tile and grout in a bathroom?**
+A small bathroom (around 50 sq ft) usually falls under the $150–$200 whole-project minimum rather than the raw per-square-foot rate, since most bathrooms are too small to exceed it.
+
+**How much does grout cleaning cost by itself?**
+Grout cleaning isn't typically sold separately from tile cleaning — the same pass that cleans the tile surface cleans the grout lines, priced together at $0.92–$2.05/sq ft depending on material.
+
+**Is grout sealing worth it?**
+Yes — sealing ($0.55–$0.88/sq ft) protects grout from future staining and meaningfully extends the time between deep cleanings, which usually makes it cheaper over a few years than skipping it.
+
+**Can discolored grout be restored without replacing it?**
+Yes — grout recoloring ($1.65–$2.55/sq ft) applies a durable colorant that restores a uniform, like-new appearance without tearing out the existing grout.
+
+[Get a tile and grout cleaning estimate](/?service=tile_grout) →
     `,
   },
   {
@@ -438,87 +465,97 @@ Safe DIY routine:
   },
   {
     slug: 'commercial-cleaning-cost-guide',
-    title: 'Commercial Cleaning Costs: What to Expect in 2026',
+    title: 'Commercial Cleaning Cost Per Square Foot: 2026 Pricing Guide by Building Type',
     category: 'commercial',
     categoryLabel: 'Commercial Cleaning',
-    date: '2026-01-20',
-    readTime: '7 min',
-    excerpt: 'Commercial cleaning costs $200–$2,000+ per month for most offices. Learn how to price your facility correctly and what\'s included in different service levels.',
+    date: '2026-08-27',
+    readTime: '8 min',
+    excerpt: 'Commercial cleaning costs $0.052–$0.185 per square foot per visit depending on building type — a standard office runs $0.088–$0.107, medical facilities run $0.15–$0.185. Here\'s what a 2,000 sq ft space actually costs per month at every service frequency.',
     content: `
-## Commercial Cleaning Cost Overview
+## How Much Does Commercial Cleaning Cost?
 
-Commercial cleaning is priced per square foot per visit, with the monthly total depending on how often you schedule service.
+Commercial cleaning is priced per square foot, per visit — then multiplied by how often you actually need someone in the building. That second part is where most people get their budget wrong: two buildings of the exact same size and type can have monthly bills that differ by 5x purely because one gets cleaned nightly and the other gets cleaned once a week.
 
-**Typical ranges by frequency:**
-- Daily cleaning: $0.07–$0.15/sq ft/visit
-- Weekly cleaning: $0.10–$0.20/sq ft/visit
-- Bi-weekly/monthly: $0.15–$0.30/sq ft/visit
+Here's what the per-visit rate looks like across building types, based on current market pricing:
 
-For a **2,000 sq ft office cleaned weekly**, expect to pay **$400–$900/month**.
-
-## Commercial Cleaning Costs by Building Type
-
-Different building types have different requirements and pricing:
-
-| Building Type | Rate Multiplier | Notes |
+| Building Type | Rate Per Sq Ft, Per Visit | Why |
 |---|---|---|
-| Office / Professional | 1.0× (baseline) | Standard surfaces, restrooms |
-| Retail / Showroom | 1.1–1.2× | High foot traffic |
-| Medical / Dental | 1.5–2.0× | Biohazard protocols, OSHA compliance |
-| Restaurant | 1.4–1.8× | Grease, kitchen equipment |
-| Warehouse / Industrial | 0.7–1.0× | Simpler surfaces, large area discounts |
-| School / Daycare | 1.2–1.5× | Sanitization requirements |
-| Gym / Fitness | 1.3–1.6× | Equipment cleaning, locker rooms |
+| Warehouse | $0.052–$0.065 | Large open floor plans, minimal detail work |
+| Office (most common) | $0.088–$0.107 | Trash, dusting, floor care, restrooms |
+| Retail | $0.090–$0.110 | Sales floor upkeep, fitting rooms, entryways |
+| School | $0.095–$0.118 | Classrooms, cafeterias, gym floors |
+| Gym / Fitness | $0.104–$0.128 | Equipment sanitizing, locker rooms |
+| Restaurant | $0.120–$0.148 | Kitchen sanitation, grease management |
+| Medical | $0.150–$0.185 | Strict disinfection and compliance requirements |
+
+Notice how tight that range actually is on a per-square-foot basis — the real swing in your total bill comes almost entirely from square footage and frequency, not the type of building.
+
+## Office Cleaning Cost: A Closer Look
+
+Since office space is what most people searching for commercial cleaning are actually pricing out, it's worth breaking out on its own. A standard office — desks, a break room, a couple of restrooms, some conference rooms — runs **$0.088–$0.107 per square foot per visit**. That covers trash, vacuuming and mopping, restroom sanitizing, and wiping down common surfaces. It does not cover deep carpet extraction, interior window washing, or anything you'd only need a few times a year — those get quoted separately.
+
+## What a 2,000 Sq Ft Office Actually Costs Per Month
+
+This is the number people actually want, and it depends entirely on frequency:
+
+| Frequency | Visits/Month | Monthly Cost (Office Rate) |
+|---|---|---|
+| Daily (5x/week) | ~21.7 | $3,820–$4,640 |
+| Weekly | 4 | $704–$856 |
+| Biweekly | 2 | $352–$428 |
+| Monthly | 1 | $176–$214 |
+
+Weekly service is the most common choice for small offices under a dozen employees. Daily service is standard for anything with real foot traffic — client-facing lobbies, medical suites, restaurants — where trash and restrooms can't wait a week.
+
+For comparison, the same 2,000 sq ft space cleaned weekly runs **$416–$520/month** at warehouse rates or **$1,200–$1,480/month** at medical rates — the building type matters, but frequency moves the number a lot more.
 
 ## What's Included at Each Service Level
 
-### Basic (janitorial)
-- Empty trash cans
-- Vacuum carpeted areas
-- Sweep and mop hard floors
-- Clean and sanitize restrooms
-- Restock paper products
+**Basic (janitorial)**
+Trash removal, vacuuming carpeted areas, sweeping and mopping hard floors, restroom cleaning and sanitizing, restocking paper products. This is what most weekly office contracts actually cover.
 
-### Standard (most common)
-Everything in basic, plus:
-- Wipe down work surfaces, desks, and countertops
-- Clean breakroom/kitchen (microwave, counter, sink)
-- Dust horizontal surfaces
-- Clean glass doors and partitions
+**Standard** — roughly 20–25% more than basic
+Everything in basic, plus wiping down desks and work surfaces, cleaning the break room (microwave, counters, sink), dusting horizontal surfaces, and cleaning glass doors and partitions.
 
-### Premium
-Everything in standard, plus:
-- Detailed dusting (blinds, ceiling vents, baseboards)
-- Interior window cleaning
-- Floor waxing/burnishing or carpet extracting
-- Deep restroom scrubbing
+**Premium** — roughly 55–68% more than basic
+Everything in standard, plus detailed dusting (blinds, ceiling vents, baseboards), interior window cleaning, floor waxing or carpet extraction, and a deeper restroom scrub. Most companies budget for premium service quarterly even if they're on a basic or standard weekly plan.
 
 ## Day Porter Services
 
-A day porter is an on-site cleaner who works during business hours, typically handling:
-- Restroom checks and restocking every 1–2 hours
-- Lobby maintenance and trash collection
-- Spill response
-- Conference room turnaround between meetings
+A day porter is different from a nightly cleaning crew — it's a person on-site during business hours handling restroom checks every 1–2 hours, lobby upkeep, spill response, and conference room turnover between meetings. This is common in high-traffic office buildings, retail, and medical facilities. Expect to pay **$218–$265 per day**, which comes out to roughly $4,800–$5,830/month for a standard 22-workday month.
 
-**Day porter cost**: $120–$250/day (22 working days/month = $2,600–$5,500/month)
+## Questions to Ask Before Signing a Contract
 
-## Key Questions to Ask Commercial Cleaning Companies
+Getting three quotes at wildly different prices is normal in this industry, and it usually means the companies aren't quoting the same scope of work. Before comparing numbers, ask each one:
 
-1. Are your employees W-2 employees or 1099 contractors? (Employees = more accountability)
-2. Are you bonded and insured? (Critical — this protects you from theft and damage claims)
-3. Who will be cleaning my building? Will it change weekly?
-4. What cleaning products do you use? (Important for medical, food service, or allergy-sensitive environments)
-5. What's your response time for complaints or re-cleans?
+1. Are the people cleaning my building W-2 employees or subcontractors? Direct employees are generally easier to hold accountable.
+2. Are you bonded and insured, and can you provide proof? This matters if something goes missing or gets damaged.
+3. Will the same crew clean my building every visit, or does it rotate?
+4. What products do you use — is that going to be a problem for anyone with allergies or chemical sensitivity in the building?
+5. What happens if I'm not happy with a visit? Is there a re-clean guarantee, or do I have to wait until the next scheduled cleaning?
 
-## How to Get the Best Commercial Cleaning Contract
+## Getting the Best Contract
 
-- **Get 3–5 quotes** — commercial pricing varies enormously between companies
-- **Specify exactly what you want** — write a detailed scope of work before requesting quotes so all bids are comparable
-- **Negotiate a trial period** — ask for a 30-day trial before signing a long-term contract
-- **Add a performance clause** — include the right to terminate without penalty if quality standards aren't met
+Write down exactly what you want cleaned and how often *before* you request quotes — a one-page scope of work makes every bid comparable, instead of getting three numbers for three different levels of service. Ask for a 30-day trial period before committing to anything longer than a few months, and get a clause in writing that lets you walk away without penalty if the quality doesn't hold up.
 
-[Use our commercial cleaning calculator](/?service=commercial) to get a monthly cost estimate for your facility.
+## FAQ
+
+**How much does commercial cleaning cost per square foot?**
+Commercial cleaning runs $0.052–$0.185 per square foot per visit depending on building type. A standard office is $0.088–$0.107/sq ft, while medical facilities run $0.15–$0.185/sq ft because of stricter sanitation requirements.
+
+**How much does office cleaning cost per month?**
+For a 2,000 sq ft office at the standard office rate, weekly cleaning runs $704–$856/month, daily cleaning runs $3,820–$4,640/month, and monthly cleaning runs $176–$214.
+
+**Why is medical office cleaning so much more expensive?**
+Medical spaces run $0.15–$0.185/sq ft/visit — roughly 50–70% more than a standard office — because of stricter disinfection protocols, documentation requirements, and the extra time needed for terminal cleaning between exam rooms.
+
+**What's the difference between basic, standard, and premium commercial cleaning?**
+Basic covers trash, floors, and restrooms. Standard adds desk and surface wiping plus break room cleaning, for about 20–25% more than basic. Premium adds detailed dusting, interior windows, and deep floor care, for about 55–68% more than basic.
+
+**How much does a day porter cost?**
+A day porter runs $218–$265 per day, or roughly $4,800–$5,830 per month for a standard 22-workday schedule.
+
+[Use our commercial cleaning cost calculator](/?service=commercial) to get a real, ZIP-code adjusted monthly estimate for your building.
     `,
   },
   {
@@ -619,61 +656,94 @@ Once you have your scope, send it to **3–5 cleaning companies** and ask them t
   },
   {
     slug: 'medical-office-cleaning-cost-guide',
-    title: 'Medical Office Cleaning Costs and Requirements in 2026',
+    title: 'Medical Office Cleaning Cost: Price Per Square Foot and Compliance Requirements in 2026',
     category: 'commercial',
     categoryLabel: 'Commercial Cleaning',
-    date: '2026-02-17',
-    readTime: '7 min',
-    excerpt: 'Medical office cleaning costs $0.15–$0.40 per sq ft per visit — 50–100% more than standard offices. Learn what the regulatory requirements are and how to find compliant vendors.',
+    date: '2026-08-27',
+    readTime: '8 min',
+    excerpt: 'Medical office cleaning costs $0.15–$0.185 per sq ft per visit for a general practice — 50–70% more than a standard office — because of OSHA and disinfection requirements. Here\'s real pricing by facility type, plus what a compliant vendor actually needs to provide.',
     content: `
+## How Much Does Medical Office Cleaning Cost?
+
+A general medical or dental office runs **$0.15–$0.185 per square foot, per visit** — noticeably more than a standard office's $0.088–$0.107, and for a specific reason: medical spaces can't be cleaned like an ordinary office. Every exam room needs full disinfection between patients, staff need documented training, and the products used have to meet a higher regulatory bar than general-purpose cleaners.
+
+More specialized facilities run higher still, since they carry protocols beyond what a general practice needs:
+
+| Facility Type | Typical Rate Per Sq Ft/Visit | Why |
+|---|---|---|
+| General medical/GP office | $0.15–$0.185 | Standard patient rooms, waiting areas |
+| Dental office | $0.20–$0.35 | Operatory breakdown protocol required between patients |
+| Urgent care / walk-in clinic | $0.25–$0.40 | Higher patient volume, biohazard handling |
+| Outpatient surgery center | $0.35–$0.60 | Full terminal cleaning required |
+| Lab / diagnostic facility | $0.30–$0.50 | Specialized handling protocols |
+
+The general medical/GP row is what our calculator prices directly. The more specialized categories below it are general industry ranges — they carry protocols specific enough that they're usually quoted individually by a vendor who's walked the space first.
+
+## What a 2,000 Sq Ft Medical Office Actually Costs Per Month
+
+This depends heavily on how often the space gets cleaned, and general practices vary more here than standard offices do:
+
+| Frequency | Visits/Month | Monthly Cost |
+|---|---|---|
+| Weekly | 4 | $1,200–$1,480 |
+| Daily (5x/week) | ~21.7 | $6,510–$8,030 |
+
+A once-a-week clean is realistic for a small practice with light patient volume and in-house staff handling day-to-day disinfection between visits. Most general practices with real daily traffic end up somewhere between those two numbers, with daily service being standard for anything seeing patients five days a week.
+
 ## Why Medical Cleaning Costs More
 
-Medical and dental offices can't use the same cleaning protocols as standard commercial spaces. The differences:
+- **OSHA's Bloodborne Pathogen Standard** (29 CFR 1910.1030) applies to any surface that could contact blood or other potentially infectious material — that's most of an exam room
+- **EPA-registered disinfectants** are required, not general-purpose cleaning products
+- **Staff need documented training** on the practice's exposure control plan before they can clean the space
+- **Cleaning logs are often required** for compliance audits, which adds administrative time on top of the physical cleaning
 
-- **OSHA Bloodborne Pathogen Standard** (29 CFR 1910.1030) applies to any surface that may contact blood or other potentially infectious materials
-- **EPA-registered disinfectants** are required — not just general-purpose cleaners
-- **Cleaning staff must be trained** on exposure control plans
-- **Documentation and logs** of cleaning procedures are often required for compliance
+All of that is labor, training, and materials cost that a standard office simply doesn't carry — which is the entire reason the per-square-foot rate runs 50–70% higher.
 
-These requirements add labor time, training cost, and materials cost — all of which show up in the price.
+## What Medical Office Cleaning Actually Has to Include
 
-## Medical Cleaning Cost Ranges
+**Daily**
+- Terminal cleaning of exam rooms after each patient — exam table, chair, counters, light handles, and door handles fully disinfected, not just wiped
+- High-touch surfaces in the waiting room disinfected multiple times a day
+- Restrooms disinfected, not just cleaned, at least twice daily
+- Regulated medical waste and sharps handled separately — most general cleaning companies won't touch this, it requires a licensed medical waste vendor
 
-| Facility Type | Rate Per Sq Ft | Notes |
-|---|---|---|
-| General medical/GP office | $0.15–$0.30/sq ft/visit | Standard patient rooms, waiting areas |
-| Dental office | $0.20–$0.35/sq ft/visit | Operatory breakdown protocol required |
-| Urgent care / walk-in clinic | $0.25–$0.40/sq ft/visit | Higher patient volume, biohazard handling |
-| Outpatient surgery center | $0.35–$0.60/sq ft/visit | Terminal cleaning required |
-| Lab / diagnostic facility | $0.30–$0.50/sq ft/visit | Specialized protocols |
-
-For a 2,000 sq ft medical office cleaned 5 days/week:
-- **Monthly cost**: $1,200–$2,500+
-
-## What Medical Office Cleaning Must Include
-
-### Daily Protocol
-- **Examination room terminal cleaning**: Full disinfection of all surfaces after each patient (exam table, chair, counters, light handles, door handles)
-- **Waiting room**: High-touch surfaces disinfected multiple times daily
-- **Restrooms**: Disinfected (not just cleaned) at minimum twice daily
-- **Waste**: Regulated medical waste and sharps containers must be handled separately under OSHA standards — most cleaning companies will NOT handle this; it requires a licensed medical waste vendor
-
-### Weekly Protocol
+**Weekly**
 - Detailed cleaning of exam room fixtures, cabinets, and equipment surfaces
-- Floor scrubbing (not just mopping)
-- Disinfection of all chair arms and waiting room furniture
+- Floor scrubbing rather than mopping alone
+- Disinfection of chair arms and waiting room furniture
 
-## What to Require From Vendors
+## What to Require From a Vendor
 
-1. **Proof of OSHA Bloodborne Pathogen training** for all staff who will clean your facility
-2. **Product list for disinfectants** — must be EPA-registered for healthcare settings (look for EPA List N for SARS-CoV-2 or List K for norovirus)
-3. **Certificate of insurance** with minimum $1M per occurrence / $2M aggregate
-4. **HIPAA awareness training** — cleaning staff working in areas with patient records must understand PHI
-5. **Background checks** on all cleaning personnel
+1. Proof of OSHA Bloodborne Pathogen training for every staff member who'll be in your facility
+2. A product list — disinfectants need to be EPA-registered for healthcare use (look for EPA List N for SARS-CoV-2, or List K for norovirus)
+3. Certificate of insurance, minimum $1M per occurrence / $2M aggregate
+4. HIPAA awareness training for staff working anywhere near patient records
+5. Background checks completed on all cleaning personnel, not just the crew lead
 
-## Green and Sustainable Cleaning for Healthcare
+## If You're Bidding a Medical Office Cleaning Job
 
-Many medical facilities are moving toward Green Seal-certified or UL ECOLOGO-certified cleaning products. These reduce chemical exposure to patients and staff. Note: always verify that eco-friendly products still meet EPA disinfectant requirements — some "green" products are not effective disinfectants.
+If you're on the other side of this — a cleaning company pricing a bid rather than a practice looking to hire one — build your number from the same $0.15–$0.185/sq ft baseline for a general practice, then add for anything beyond standard scope: OSHA training time you're covering for staff, EPA-registered product costs (which run higher than standard janitorial supplies), and any documentation or logging the practice is requiring. Underbidding a medical account by pricing it like a standard office is the fastest way to lose money on labor once the real compliance workload shows up.
+
+## Green Cleaning for Healthcare Settings
+
+Many practices are moving toward Green Seal or UL ECOLOGO-certified products to cut chemical exposure for patients and staff. One caveat worth knowing before you switch: verify any "green" product is still on an EPA-approved disinfectant list. A product can be genuinely eco-friendly and simply not registered as an effective disinfectant — those are two different certifications, and a compliant vendor needs to satisfy both.
+
+## FAQ
+
+**How much does medical office cleaning cost?**
+A general medical or dental office costs $0.15–$0.185 per square foot per visit — roughly 50–70% more than a standard office — due to disinfection and compliance requirements.
+
+**How much should I charge to clean a medical office?**
+Price from the same $0.15–$0.185/sq ft baseline as a general practice, then add for OSHA training time, EPA-registered product costs, and any compliance documentation the practice requires. Specialized facilities like surgery centers or labs justify higher rates, up to $0.35–$0.60/sq ft, because of their added protocols.
+
+**What's the average cost of medical office cleaning per month?**
+For a 2,000 sq ft general practice, weekly cleaning runs $1,200–$1,480/month, and daily (5x/week) cleaning runs $6,510–$8,030/month.
+
+**Why is medical office cleaning more expensive than regular office cleaning?**
+OSHA's Bloodborne Pathogen Standard, required EPA-registered disinfectants, mandatory staff training, and compliance documentation all add cost that a standard office doesn't carry.
+
+**Do cleaning companies handle medical waste and sharps disposal?**
+No — most general cleaning companies won't handle regulated medical waste or sharps containers. That requires a separately licensed medical waste vendor under OSHA standards.
 
 [Get medical office cleaning estimates](/?service=commercial) →
     `,
