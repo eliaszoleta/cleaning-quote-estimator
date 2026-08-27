@@ -144,12 +144,12 @@ export default function SEOContent() {
   return (
     <>
       <Helmet>
-        <title>Free Cleaning Cost Estimator 2026 | Clean Estimator</title>
+        <title>Free Cleaning Cost Calculator 2026 | Clean Estimator</title>
         <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $90–$338, carpet cleaning $44–$100/room, air duct from $330, commercial, mold remediation & more. No signup needed." />
         <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, house cleaning cost calculator, how much does cleaning cost, cleaning estimate, carpet cleaning cost, air duct cleaning cost, commercial cleaning rates, mold remediation cost, cleaning price calculator, free cleaning estimate" />
         <link rel="canonical" href="https://www.cleanestimator.com/" />
         <meta property="og:site_name" content="Clean Estimator" />
-        <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+        <meta property="og:title" content="Free Cleaning Cost Calculator 2026 | Clean Estimator" />
         <meta property="og:description" content="Instant ZIP-code specific cleaning cost estimates. House cleaning, carpet, air duct, mold remediation and more. Free, no signup." />
         <meta property="og:url" content="https://www.cleanestimator.com/" />
         <meta property="og:type" content="website" />
@@ -159,7 +159,7 @@ export default function SEOContent() {
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@CleanEstimator" />
-        <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+        <meta name="twitter:title" content="Free Cleaning Cost Calculator 2026 | Clean Estimator" />
         <meta name="twitter:description" content="Free cleaning cost calculator — instant ZIP-code specific estimates for any cleaning service. No signup required." />
         <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
         <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />

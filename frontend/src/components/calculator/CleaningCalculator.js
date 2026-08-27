@@ -166,18 +166,18 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     <>
       {!embedded && (
         <Helmet>
-          <title>Free Cleaning Cost Estimator 2026 | Clean Estimator</title>
+          <title>Free Cleaning Cost Calculator 2026 | Clean Estimator</title>
           <meta name="description" content="Free cleaning cost calculator for 2026. Instant ZIP-code specific estimates for house cleaning, carpet, air duct, mold remediation & more. No signup needed." />
           <link rel="canonical" href="https://www.cleanestimator.com/" />
           <meta property="og:site_name" content="Clean Estimator" />
-          <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+          <meta property="og:title" content="Free Cleaning Cost Calculator 2026 | Clean Estimator" />
           <meta property="og:type" content="website" />
           <meta property="og:url" content="https://www.cleanestimator.com/" />
           <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
           <meta property="og:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:site" content="@CleanEstimator" />
-          <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+          <meta name="twitter:title" content="Free Cleaning Cost Calculator 2026 | Clean Estimator" />
           <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
           <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         </Helmet>
