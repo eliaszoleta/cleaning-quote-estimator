@@ -469,6 +469,7 @@ function staticFooter() {
       <div>
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Resources</div>
         <a href="/cleaning-cost-calculator" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Cleaning Cost Calculator</a>
+        <a href="/cleaning-cost-estimator" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Cleaning Cost Estimator</a>
         <a href="/about" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">About Clean Estimator</a>
         <a href="/contact" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Contact</a>
       </div>
@@ -627,6 +628,71 @@ function renderCalculatorPage(assets) {
     maxWidth: 900,
     assets,
     extraHead: `<script type="application/ld+json">${webAppSchema}</script><script type="application/ld+json">${breadcrumb}</script><script type="application/ld+json">${faqSchema(calcFaqs)}</script>`,
+  });
+}
+
+function renderEstimatorPage(assets) {
+  const seoTitle = 'Cleaning Cost Estimator - Free Instant Estimate (2026)';
+  const seoDesc = 'Free cleaning cost estimator with ZIP-code accurate pricing. Instantly estimate house cleaning, carpet cleaning, commercial cleaning, mold remediation, and more. No signup required.';
+
+  const whyPoints = [
+    ['Real Market Pricing', 'This cleaning cost estimator pulls from actual state-by-state pricing data, not a generic industry average.'],
+    ['Covers Every Room & Service', 'Estimate house cleaning, apartment cleaning, commercial spaces, carpets, air ducts, dryer vents, tile & grout, mold remediation, and water damage restoration.'],
+    ['No Waiting on Quotes', 'Skip the back-and-forth with cleaning companies — get your price estimate the moment you finish answering a few questions.'],
+    ['Always Free', "There's no cost to use this estimator, no account required, and no limit on how many times you can run it."],
+  ];
+
+  const estimatorFaqs = [
+    { q: 'What is a cleaning cost estimator?', a: 'A cleaning cost estimator is a tool that calculates an expected price range for a cleaning service based on inputs like your location, home size, and service type — instead of requiring an in-person quote.' },
+    { q: 'How is a cleaning cost estimator different from a fixed price?', a: 'An estimator gives you a realistic price range based on typical market rates in your area. The exact price a cleaning company charges can vary slightly based on the specific condition of your space and their own pricing policies.' },
+    { q: 'Can I use this cleaning cost estimator for commercial properties?', a: 'Yes — select Commercial Cleaning as your service type and enter your square footage to get an estimate for offices, retail spaces, or warehouses.' },
+    { q: 'Is my information saved when I use the estimator?', a: "No. Your estimate is calculated instantly and isn't stored unless you choose to submit your contact information at the end." },
+    { q: 'How often should I re-check my cleaning cost estimate?', a: "Cleaning prices can shift with inflation and local labor rates, so it's worth re-running your estimate once or twice a year, especially before renewing a recurring cleaning contract." },
+  ];
+
+  const body = `  <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:14px;text-align:center">Cleaning Cost Estimator</h1>
+  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and 6 other services &mdash; enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation.</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:32px;margin-bottom:40px;text-align:center">
+    <p style="font-size:14px;color:#94a3b8;margin:0">Loading your free cleaning cost estimator&hellip; please enable JavaScript to use the interactive calculator.</p>
+  </div>
+  <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:20px;text-align:center">Why Use This Cleaning Cost Estimator</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:40px">
+    ${whyPoints.map(([t, txt]) => `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:22px 24px">
+      <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px">${esc(t)}</h3>
+      <p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">${esc(txt)}</p>
+    </div>`).join('\n    ')}
+  </div>
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:32px 36px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:16px">Cleaning Cost Estimator FAQs</h2>
+    ${faqAccordionHtml(estimatorFaqs)}
+  </div>
+  <div style="margin-top:40px;text-align:center">
+    <p style="font-size:14px;color:#64748b">Want cost breakdowns by state or service instead? Browse our <a href="/blog" style="color:${PRIMARY};font-weight:600">cleaning cost guides</a>.</p>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'Cleaning Cost Estimator', item: `${DOMAIN}/cleaning-cost-estimator` },
+  ]);
+  const webAppSchema = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Cleaning Cost Estimator',
+    url: `${DOMAIN}/cleaning-cost-estimator`,
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    description: seoDesc,
+  });
+
+  return renderStaticPage({
+    path: '/cleaning-cost-estimator',
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 900,
+    assets,
+    extraHead: `<script type="application/ld+json">${webAppSchema}</script><script type="application/ld+json">${breadcrumb}</script><script type="application/ld+json">${faqSchema(estimatorFaqs)}</script>`,
   });
 }
 
@@ -1206,6 +1272,8 @@ function main() {
   count++;
   writeFile('cleaning-cost-calculator', renderCalculatorPage(assets));
   count++;
+  writeFile('cleaning-cost-estimator', renderEstimatorPage(assets));
+  count++;
 
   const services = servicesMod.getAllServices();
   for (const service of services) {
@@ -1227,7 +1295,7 @@ function main() {
     count++;
   }
 
-  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 6 static pages, ' + services.length + ' services, ' + states.length + ' states, ' + cities.length + ' cities)');
+  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 7 static pages, ' + services.length + ' services, ' + states.length + ' states, ' + cities.length + ' cities)');
 }
 
 main();
