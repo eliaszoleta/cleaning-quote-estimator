@@ -47,7 +47,7 @@ function FaqAccordion({ faqs }) {
 }
 
 export default function CalculatorPage() {
-  const title = 'Cleaning Cost Calculator - Free Instant Estimate (2026) | Clean Estimator';
+  const title = 'Cleaning Cost Calculator - Free Instant Estimate (2026)';
   const description = 'Free cleaning cost calculator with ZIP-code accurate pricing. Instantly estimate house cleaning, carpet cleaning, commercial cleaning, mold remediation, and more. No signup required.';
 
   const breadcrumb = {
