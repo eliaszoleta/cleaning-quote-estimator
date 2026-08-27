@@ -2253,6 +2253,505 @@ Restaurant and food-service cleaning runs $0.132–$0.163 per square foot per vi
 [Get a real commercial cleaning estimate for your Las Vegas facility](/?service=commercial), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
     `,
   },
+  {
+    slug: 'water-damage-restoration-cost-las-vegas',
+    title: 'Water Damage Restoration Cost in Las Vegas, NV (2026)',
+    category: 'restoration',
+    categoryLabel: 'Restoration',
+    date: '2026-08-27',
+    readTime: '6 min',
+    excerpt: 'Water damage restoration in Las Vegas costs $3.19–$8.15 per sq ft depending on contamination category — for a 500 sq ft area, that\'s $1,595–$4,076. Here\'s Las Vegas Valley pricing by water type, and why acting fast matters most in a desert climate.',
+    content: `
+## How Much Does Water Damage Restoration Cost in Las Vegas?
+
+Nevada runs about 10% above the national average for water damage restoration, priced per square foot based on how contaminated the water is:
+
+| Water Category | Cost Per Sq Ft | Source |
+|---|---|---|
+| Clean Water (Category 1) | $3.19–$4.29 | Supply line or appliance leak — no contamination |
+| Gray Water (Category 2) | $4.05–$5.71 | Washing machine or dishwasher overflow |
+| Black Water (Category 3) | $5.42–$8.15 | Sewage or flooding — highest contamination risk |
+
+For a 500 sq ft affected area — a common size for a burst pipe or appliance failure — that works out to **$1,595–$2,145** for clean water, **$2,024–$2,855** for gray water, and **$2,712–$4,076** for black water, which requires the extra containment and disinfection protocols contaminated water demands.
+
+## Why Las Vegas Homes Aren't as Safe from Water Damage as You'd Think
+
+It's easy to assume a desert city doesn't need to worry much about water damage, but that's backwards for two reasons. First, Las Vegas Valley homes see intense monsoon activity from July through September — sudden, heavy downpours that overwhelm roofs, windows, and grading never designed for real rainfall, since most of the year the climate is bone dry. Second, indoor water damage here is almost entirely about failed plumbing and appliances rather than weather — leaking supply lines, water heater failures, and washing machine hose ruptures are the most common calls, and they happen year-round regardless of the desert climate outside.
+
+## Act Fast — Especially Here
+
+Mold risk starts within 24-48 hours of any water event, and that window doesn't get any longer just because the air outside is dry. In fact, homes here run air conditioning constantly, and a compromised AC system combined with standing water creates the same mold-friendly conditions you'd get anywhere else. Structural drying, if walls need to be opened, adds $700–$950. If mold prevention treatment becomes necessary after that 72-hour window, add $350–$460.
+
+## Insurance in Las Vegas
+
+Sudden water damage from a burst pipe or failed appliance is typically covered by standard homeowner's insurance. Gradual leaks and flood damage from monsoon flooding generally are not — flood damage specifically requires separate flood insurance, which is worth strongly considering here given the summer monsoon risk. Document everything with photos before cleanup begins, and contact your insurer immediately.
+
+## FAQ
+
+**How much does water damage restoration cost in Las Vegas?**
+For a 500 sq ft area, clean water extraction and drying costs $1,595–$2,145. Gray water costs $2,024–$2,855, and black water (sewage or flooding) costs $2,712–$4,076.
+
+**Does Las Vegas really get enough water damage to worry about?**
+Yes — monsoon season (July-September) brings sudden, heavy rain that overwhelms roofs and drainage, and indoor plumbing failures happen year-round regardless of the dry climate outside.
+
+**How fast do I need to act on water damage in Las Vegas?**
+Within 24-48 hours, same as anywhere — constant air conditioning use doesn't prevent mold growth once water has gotten into walls, flooring, or insulation.
+
+[Get a ZIP-code accurate water damage estimate](/?service=water_damage), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'mold-remediation-cost-las-vegas',
+    title: 'Mold Remediation Cost in Las Vegas, NV (2026)',
+    category: 'restoration',
+    categoryLabel: 'Restoration',
+    date: '2026-08-27',
+    readTime: '6 min',
+    excerpt: 'Mold remediation in Las Vegas costs $825–$14,300+ depending on the affected area — a medium job (10–100 sq ft, like a bathroom wall) runs $2,145–$2,970. Here\'s real Las Vegas Valley pricing, and why mold here almost always traces back to a specific leak.',
+    content: `
+## How Much Does Mold Remediation Cost in Las Vegas?
+
+Nevada runs about 10% above the national average for mold remediation:
+
+| Affected Area | Cost in Las Vegas |
+|---|---|
+| Small (under 10 sq ft) | $825–$1,155 |
+| Medium (10–100 sq ft, most common) | $2,145–$2,970 |
+| Large (100–300 sq ft) | $4,730–$6,380 |
+| Extensive (300+ sq ft) | $9,350–$14,300 |
+
+Air quality testing runs $220–$290, and post-remediation clearance testing runs $190–$250. Black mold (Stachybotrys) typically adds 5–18% to the cost due to stricter containment requirements, and commercial properties run 30–50% more than residential due to scale and compliance needs.
+
+## Mold in a Desert City? Yes — But It's Almost Always Traceable to One Thing
+
+Las Vegas' dry climate means mold doesn't grow from ambient humidity the way it does in the Southeast or Pacific Northwest — there's no year-round moisture in the air feeding it. That's actually useful information: when mold does show up in a Las Vegas home, it's almost always tied to a specific, identifiable water event — a slow plumbing leak, AC condensation pooling somewhere it shouldn't, a roof leak from monsoon rain, or water damage that wasn't fully dried out. That makes diagnosis more straightforward here than in humid climates, but it also means the moisture source absolutely has to be found and fixed, or the mold returns within weeks no matter how thorough the cleanup was.
+
+## Where It Shows Up Most
+
+The most common spots we hear about across the Valley — Summerlin, Henderson, Green Valley, North Las Vegas, and the older neighborhoods closer to downtown — are bathrooms with poor ventilation, around water heaters, under kitchen sinks, and near AC air handlers where condensation lines can clog and back up. Older homes near central Las Vegas with original plumbing are somewhat more prone to the slow leaks that go unnoticed long enough to cause a real mold problem.
+
+## Always Requires an Inspection First
+
+An in-person inspection is non-negotiable — pricing depends entirely on the extent of contamination and whether the moisture source has already been fixed. If it hasn't, remediation is just a temporary fix.
+
+## FAQ
+
+**How much does mold remediation cost in Las Vegas?**
+A medium-sized area (10–100 sq ft, like a bathroom wall) costs $2,145–$2,970. Small spot treatments run $825–$1,155, and extensive contamination (300+ sq ft) can run $9,350–$14,300.
+
+**Why would a house in the desert have a mold problem?**
+Because Las Vegas' dry air means mold here is almost never from ambient humidity — it's tied to a specific leak, condensation issue, or water event. Find and fix that source, or remediation won't hold.
+
+**Does commercial mold remediation cost more in Las Vegas?**
+Yes — commercial properties run 30–50% more than residential due to larger scale and stricter compliance requirements.
+
+[Get a mold remediation estimate for your Las Vegas property](/?service=mold_remediation), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'flood-damage-cleanup-cost-las-vegas',
+    title: 'Flood Damage Cleanup Cost in Las Vegas, NV (2026)',
+    category: 'restoration',
+    categoryLabel: 'Restoration',
+    date: '2026-08-27',
+    readTime: '6 min',
+    excerpt: 'Flood damage cleanup in Las Vegas is typically priced as Category 3 (black water) restoration — $5.42–$8.15 per sq ft, or $2,712–$4,076 for a 500 sq ft area. Here\'s what monsoon flash flooding actually costs to clean up, and how insurance handles it.',
+    content: `
+## Flooding Is a Real Las Vegas Valley Risk
+
+It surprises people, but the Las Vegas Valley has a dedicated Regional Flood Control District for exactly this reason — the desert doesn't absorb sudden, heavy rain the way soil in wetter climates does, and monsoon season (July through September) brings intense downpours that can turn dry washes into fast-moving water within minutes. Homes near washes, low-lying areas, and older neighborhoods with aging drainage infrastructure carry real flood risk despite the desert setting.
+
+## What Flood Damage Cleanup Costs
+
+Floodwater is classified as Category 3 (black water) contamination, since it typically picks up soil, chemicals, and bacteria on its way into a home — the same category as sewage backup:
+
+| Scope | Cost Per Sq Ft |
+|---|---|
+| Black water extraction and drying (flooding) | $5.42–$8.15 |
+
+For a 500 sq ft affected area, that's **$2,712–$4,076** for extraction and drying alone — not including any structural repairs, drywall replacement, or flooring that floodwater contamination requires removing rather than just drying.
+
+## Why Flood Cleanup Costs More Than a Clean Water Leak
+
+A supply-line leak (Clean Water, Category 1) runs $3.19–$4.29/sq ft here — roughly half the cost of flood damage. The difference is contamination: floodwater carries soil, debris, and often bacteria, which means porous materials that absorbed it — carpet, drywall, insulation — usually have to be removed and replaced rather than dried and saved, and every surface needs disinfection on top of the drying process.
+
+## Insurance and Flood Damage
+
+This is the part that catches people off guard: standard homeowner's insurance does **not** cover flood damage — it requires a separate flood insurance policy, typically through the National Flood Insurance Program. If you're in a wash-adjacent area of the Valley, it's worth checking your flood zone designation and getting a policy before monsoon season, not after a flood.
+
+## FAQ
+
+**How much does flood damage cleanup cost in Las Vegas?**
+For a 500 sq ft affected area, flood damage cleanup (Category 3 black water) costs $2,712–$4,076 for extraction and drying, before any structural repairs.
+
+**Does Las Vegas actually flood?**
+Yes — the desert terrain doesn't absorb heavy monsoon rain well, and the Las Vegas Valley has flash flooding significant enough to have its own dedicated flood control district.
+
+**Is flood damage covered by regular homeowner's insurance?**
+No — flood damage requires a separate flood insurance policy. Standard homeowner's policies only cover sudden damage from things like burst pipes, not flooding.
+
+[Get a water damage estimate for your Las Vegas property](/?service=water_damage), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'sewage-cleanup-cost-las-vegas',
+    title: 'Sewage Cleanup Cost in Las Vegas, NV (2026)',
+    category: 'restoration',
+    categoryLabel: 'Restoration',
+    date: '2026-08-27',
+    readTime: '6 min',
+    excerpt: 'Sewage backup cleanup in Las Vegas ranges from $1,500 for a small, contained overflow up to $25,000+ for a main line failure affecting the whole home. Here\'s what drives the cost, and why older Las Vegas neighborhoods see this more often.',
+    content: `
+## Sewage Cleanup Cost in Las Vegas
+
+Sewage backup is priced by scope, not square footage, since the health-hazard protocols involved (Category 3 biohazard cleanup) apply regardless of area:
+
+| Scope | Typical Cost |
+|---|---|
+| Small backup (toilet overflow, contained) | $1,500–$3,500 |
+| Moderate backup (floor drain, basement equivalent) | $3,000–$7,000 |
+| Extensive flooding (crawlspace or ground-level rooms) | $6,000–$15,000+ |
+| Main line failure, whole-home impact | $10,000–$25,000+ |
+
+These figures cover cleanup only, not the plumbing repair needed to fix whatever caused the backup in the first place.
+
+## Why This Comes Up More in Older Las Vegas Neighborhoods
+
+Newer master-planned communities — Summerlin, parts of Henderson, Green Valley — generally have modern plumbing with lower backup risk. Older neighborhoods closer to central and downtown Las Vegas, built decades earlier, are more likely to have aging sewer laterals and clay or cast-iron pipe that's prone to root intrusion and collapse over time. If you own an older Las Vegas home and haven't had your sewer line scoped recently, it's worth doing before a backup forces the issue.
+
+## Why Sewage Requires Specialized Cleanup
+
+Sewage carries E. coli, hepatitis A, norovirus, and other pathogens — even brief contact is a genuine health risk. This isn't a job for a standard cleaning company; it requires licensed biohazard remediation with full PPE, removal of any porous material the sewage touched (drywall, insulation, flooring, carpet), EPA-registered disinfection, and industrial drying with air quality verification before the space is cleared safe.
+
+## Insurance
+
+Standard homeowner's policies typically do NOT cover sewage backup unless you've added a sewer backup rider — usually $50–$250/year for $5,000–$25,000 in coverage. Given the age of plumbing in parts of the Las Vegas Valley, this is a genuinely useful add-on to check for before you need it.
+
+## FAQ
+
+**How much does sewage cleanup cost in Las Vegas?**
+A small, contained overflow runs $1,500–$3,500. A main line failure affecting the whole home can run $10,000–$25,000+, not including plumbing repair.
+
+**Why do older Las Vegas homes see more sewage backups?**
+Aging sewer laterals — clay or cast-iron pipe common in older construction — are more prone to root intrusion and collapse than the modern plumbing in newer master-planned communities.
+
+**Does insurance cover sewage backup in Las Vegas?**
+Only if you've added a sewer backup rider to your policy. Standard homeowner's insurance typically excludes it.
+
+[Get a related mold or water damage estimate](/?service=mold_remediation), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'fire-smoke-damage-restoration-cost-las-vegas',
+    title: 'Fire and Smoke Damage Restoration Cost in Las Vegas, NV (2026)',
+    category: 'restoration',
+    categoryLabel: 'Restoration',
+    date: '2026-08-27',
+    readTime: '6 min',
+    excerpt: 'Fire and smoke damage restoration in Las Vegas ranges from $200–$800 for minor smoke odor removal up to $25,000–$75,000+ for major structural fire damage. Here\'s what drives the cost, and why desert heat and HVAC use make smoke spread faster.',
+    content: `
+## Fire and Smoke Damage Cost in Las Vegas
+
+| Damage Type | Typical Cost |
+|---|---|
+| Smoke odor removal only (minor fire) | $200–$800 |
+| Soot cleaning throughout home | $2,000–$6,000 |
+| Small fire (one room) | $3,000–$10,000 |
+| Moderate fire (part of home) | $10,000–$30,000 |
+| Major fire (significant structural damage) | $25,000–$75,000+ |
+
+A small kitchen fire can cause a couple thousand dollars of direct structural damage and several times that in smoke damage spread throughout the rest of the home — the fire itself is often the smaller cost.
+
+## Why Smoke Spreads Fast in a Las Vegas Home
+
+Central air conditioning runs almost year-round here, and that constant airflow is exactly what pulls smoke and soot particles into every room, into the ductwork, and into furniture and soft goods far from where the fire actually was. If a fire happens while the AC system is running, expect smoke damage to reach further into the home than it would in a house with less HVAC circulation. Duct cleaning is frequently a necessary part of full smoke restoration here for that reason — see our [Las Vegas air duct cleaning cost guide](/blog/air-duct-cleaning-cost-las-vegas) for what that adds separately.
+
+## Time Matters
+
+Within about 72 hours, soot and smoke begin permanently etching porous surfaces. Dry cleaning methods (chemical sponges, HEPA vacuums) come first, since wet cleaning pushes soot deeper before it's been lifted out. The faster restoration starts, the more of the home can actually be saved rather than replaced.
+
+## Insurance
+
+Virtually all homeowner's policies cover fire damage from accidental fires. Document everything with photos and video before cleanup, keep every receipt for emergency expenses, and for larger claims, a public adjuster (5–15% of the settlement) often recovers meaningfully more than what an insurer offers upfront.
+
+## FAQ
+
+**How much does fire damage restoration cost in Las Vegas?**
+A small, single-room fire runs $3,000–$10,000. Major structural fire damage runs $25,000–$75,000 or more depending on scope.
+
+**Why does smoke damage spread so far from the actual fire?**
+Central air conditioning, which runs nearly constantly here, circulates smoke and soot particles throughout the ductwork and into rooms far from where the fire occurred.
+
+**Does homeowner's insurance cover fire damage in Las Vegas?**
+Yes, virtually all standard policies cover accidental fire damage — document everything with photos before cleanup begins.
+
+[Get a related mold or water damage estimate](/?service=mold_remediation), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'storm-damage-cleanup-cost-las-vegas',
+    title: 'Storm Damage Cleanup Cost in Las Vegas, NV (2026)',
+    category: 'restoration',
+    categoryLabel: 'Restoration',
+    date: '2026-08-27',
+    readTime: '5 min',
+    excerpt: 'Storm damage cleanup in Las Vegas — mostly monsoon-driven roof leaks, water intrusion, and wind damage — typically runs $500–$5,000 for minor cleanup and debris removal, up to $10,000+ when water has gotten into the structure. Here\'s what to expect.',
+    content: `
+## Storm Damage in the Las Vegas Valley
+
+Storm damage here looks different than in hurricane or tornado zones — it's almost entirely tied to monsoon season, roughly July through September, when sudden, intense rain and wind arrive with little warning after months of dry weather. Common damage includes roof leaks from rain the roofing wasn't stressed by all year, water intrusion around windows and doors, damaged patio covers and fencing from wind gusts, and debris from dust storms that frequently precede monsoon storms.
+
+## What Storm Damage Cleanup Typically Costs
+
+| Scope | Typical Cost |
+|---|---|
+| Debris removal and minor exterior cleanup | $500–$1,500 |
+| Roof leak with interior water intrusion (contained) | $1,500–$5,000 |
+| Significant water intrusion requiring structural drying | $5,000–$10,000+ |
+
+If storm water has gotten inside the home, the actual cleanup follows standard water damage protocols — see our [water damage restoration cost guide](/blog/water-damage-restoration-cost-las-vegas) for category-specific pricing once water is inside rather than just around the exterior.
+
+## Why This Catches People Off Guard
+
+A house that's been fine for years of dry weather can suddenly have a real leak the first time a genuine monsoon storm hits it directly, simply because roofing and sealing in a desert climate isn't tested by rain nearly as often as it would be elsewhere. It's worth having a roof and exterior seal inspection before monsoon season rather than after the first storm finds the weak point for you.
+
+## Insurance
+
+Wind and rain damage from a storm is typically covered by standard homeowner's insurance, separate from flood insurance (which only covers rising floodwater specifically). Document damage immediately and get a tarp or temporary repair in place to prevent it from getting worse before a full assessment.
+
+## FAQ
+
+**How much does storm damage cleanup cost in Las Vegas?**
+Minor debris removal and exterior cleanup runs $500–$1,500. If water got into the structure, expect $1,500–$10,000+ depending on how much drying and repair is needed.
+
+**What kind of storm damage is common in Las Vegas?**
+Monsoon-season roof leaks, water intrusion around windows and doors, and wind damage to patio covers and fencing — mostly July through September.
+
+**Is storm damage covered by homeowner's insurance?**
+Wind and rain damage typically is, separately from flood insurance, which only applies to rising floodwater specifically.
+
+[Get a related water damage estimate](/?service=water_damage), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'biohazard-cleanup-cost-las-vegas',
+    title: 'Biohazard Cleanup Cost in Las Vegas, NV (2026)',
+    category: 'restoration',
+    categoryLabel: 'Restoration',
+    date: '2026-08-27',
+    readTime: '5 min',
+    excerpt: 'Biohazard cleanup in Las Vegas ranges from $1,000 for a contained hoarding situation up to $50,000+ for the most severe contamination scenarios. Here\'s real pricing by situation and what licensed remediation actually involves.',
+    content: `
+## Biohazard Cleanup Cost in Las Vegas
+
+| Situation | Typical Cost Range |
+|---|---|
+| Unattended death / decomposition | $3,000–$15,000+ |
+| Trauma scene (blood/bodily fluids) | $2,000–$8,000 |
+| Hoarding cleanup | $1,000–$25,000+ depending on severity |
+| Sewage contamination | $2,000–$10,000 |
+| Drug lab (meth) decontamination | $5,000–$20,000+ |
+
+Costs vary this widely because the scope is always different — volume of contamination, how much material has to be removed, and the structural impact all move the final price significantly.
+
+## Why This Requires Licensed Professionals
+
+Biohazard cleanup isn't a service a standard cleaning company can provide. Technicians wear full-body suits, respirators, and multiple layers of gloves. Any porous material — drywall, subflooring, carpet, insulation — that absorbed biological contamination must be removed and disposed of as regulated biohazardous waste, not regular trash. Surfaces are disinfected with EPA-registered hospital-grade products, and odor elimination (hydroxyl generators, ozone treatment, or thermal fogging) follows depending on severity.
+
+## Finding a Licensed Provider in the Las Vegas Area
+
+Look for OSHA Bloodborne Pathogen Standard compliance, Nevada state licensing for biohazardous waste transport, and 24/7 emergency response — these situations rarely wait for business hours. Given Las Vegas' large hospitality and resort industry, there's a reasonably deep bench of remediation companies with genuine commercial and multi-unit residential experience here, not just single-family home work.
+
+## Insurance
+
+Some homeowner's policies cover biohazard cleanup, particularly for unattended death situations, but coverage varies significantly. Call your insurer before authorizing work — many biohazard companies have direct experience navigating insurance claims and can help.
+
+## FAQ
+
+**How much does biohazard cleanup cost in Las Vegas?**
+It depends heavily on the situation — trauma scenes run $2,000–$8,000, while unattended death or severe hoarding situations can run $15,000–$25,000 or more.
+
+**Do I need a licensed company for biohazard cleanup?**
+Yes — this involves regulated waste disposal and health risks that require OSHA-compliant, state-licensed remediation, not a standard cleaning service.
+
+**Does insurance cover biohazard cleanup in Las Vegas?**
+Sometimes, particularly for unattended death situations, but coverage varies. Confirm with your insurer before authorizing work.
+
+[Get a related mold remediation estimate](/?service=mold_remediation), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'air-duct-cleaning-cost-las-vegas',
+    title: 'Air Duct Cleaning Cost in Las Vegas, NV (2026)',
+    category: 'restoration',
+    categoryLabel: 'Restoration',
+    date: '2026-08-27',
+    readTime: '5 min',
+    excerpt: 'Air duct cleaning in Las Vegas costs $363–$462 for a standard residential system, plus $72–$94 per additional HVAC system. Here\'s real Las Vegas pricing, and why desert dust makes duct cleaning matter more here than in most climates.',
+    content: `
+## How Much Does Air Duct Cleaning Cost in Las Vegas?
+
+Nevada runs about 10% above the national average:
+
+| System | Cost in Las Vegas |
+|---|---|
+| Base system (up to ~12 vents) | $363–$462 |
+| Additional HVAC system | $72–$94 |
+
+Sanitization treatment adds $118–$168, HEPA filtration adds $88–$130, and UV light installation ($245–$335) helps prevent future mold and bacteria growth in the system.
+
+## Why Duct Cleaning Matters More in a Desert Climate
+
+Two things make air ducts dirtier faster here than in a lot of the country. First, air conditioning runs nearly year-round given the heat, which means far more air cycling through the duct system than in a milder climate — more cycles means more dust accumulation over the same period of time. Second, the Las Vegas Valley genuinely does get periodic windstorms and dust events that push fine desert dust into homes even through small gaps, and a lot of that ends up pulled into the HVAC system rather than staying on visible surfaces where you'd notice and clean it.
+
+## How Often You Actually Need It Here
+
+The EPA's general recommendation is every 3–5 years. Given how much more duct cycling happens in a desert climate with near-constant AC use, homes here — especially ones with pets, allergy suffers, or a home that hasn't been done in a while — often benefit from being on the shorter end of that window rather than the longer one.
+
+## FAQ
+
+**How much does air duct cleaning cost in Las Vegas?**
+A standard residential system (up to ~12 vents) costs $363–$462. Homes with multiple HVAC systems pay an additional $72–$94 per extra system.
+
+**Does the Las Vegas climate really make ducts dirtier faster?**
+Yes — near-constant air conditioning use means more air cycling through the system, and periodic desert windstorms push extra dust into homes that ends up pulled into the ductwork.
+
+**How often should air ducts be cleaned in Las Vegas?**
+The EPA recommends every 3–5 years generally; given the heavier AC use here, leaning toward the shorter end of that range is reasonable for most homes.
+
+[Get a ZIP-code accurate air duct cleaning estimate](/?service=air_duct), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'dryer-vent-cleaning-cost-las-vegas',
+    title: 'Dryer Vent Cleaning Cost in Las Vegas, NV (2026)',
+    category: 'house-cleaning',
+    categoryLabel: 'House Cleaning',
+    date: '2026-08-27',
+    readTime: '5 min',
+    excerpt: 'Dryer vent cleaning in Las Vegas costs $116–$278 depending on vent length and complexity. Here\'s real Las Vegas pricing, and why lint buildup is a genuine fire risk worth taking seriously every year.',
+    content: `
+## How Much Does Dryer Vent Cleaning Cost in Las Vegas?
+
+Nevada runs about 10% above the national average:
+
+| Vent Length/Complexity | Cost in Las Vegas |
+|---|---|
+| Standard / short run | $116–$152 |
+| Medium-length run | $140–$194 |
+| Long run (multi-story or multiple bends) | $168–$229 |
+| Very long / complex (roof-terminated) | $209–$278 |
+
+Roof-terminated vents — common on the single-story homes throughout much of the Valley where the dryer vents straight up rather than out a side wall — tend to fall into the longer, more complex pricing tiers.
+
+## Why This Isn't Optional
+
+The U.S. Fire Administration links clogged dryer vents to roughly 2,900 home fires a year nationally. Annual cleaning is the standard recommendation, and it matters just as much in a desert climate as anywhere else — lint buildup is a mechanical fire risk regardless of outside humidity. Longer or more complex vent runs should be checked more often, since lint has more distance and bends to accumulate in before it clears the house.
+
+## FAQ
+
+**How much does dryer vent cleaning cost in Las Vegas?**
+A standard, short vent run costs $116–$152. Longer or more complex runs, including roof-terminated vents, cost $168–$278.
+
+**Is dryer vent cleaning really necessary in a dry climate?**
+Yes — lint buildup is a mechanical fire risk that has nothing to do with outside humidity. The U.S. Fire Administration links clogged vents to roughly 2,900 home fires annually nationwide.
+
+**How often should dryer vents be cleaned?**
+At least once a year, more often for heavy dryer use or longer, more complex vent runs.
+
+[Get a dryer vent cleaning estimate for your Las Vegas home](/?service=dryer_vent), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'rebuild-reconstruction-cost-las-vegas',
+    title: 'Rebuild and Reconstruction Cost After Damage in Las Vegas, NV (2026)',
+    category: 'restoration',
+    categoryLabel: 'Restoration',
+    date: '2026-08-27',
+    readTime: '5 min',
+    excerpt: 'Rebuild and reconstruction after water, fire, or storm damage in Las Vegas typically runs $10–$60+ per square foot depending on the scope, from drywall patching to full room rebuilds. Here\'s what determines the cost and how it connects to your restoration timeline.',
+    content: `
+## Reconstruction Comes After Remediation, Not Instead Of It
+
+Rebuild and reconstruction is the phase that follows water extraction, mold remediation, or fire cleanup — once the source of damage is fixed and the space is dry and clean, reconstruction restores the drywall, flooring, cabinetry, or structural elements that had to be removed. It's a separate service from restoration cleanup, and it's typically quoted separately once the remediation company has assessed exactly what needs to be rebuilt.
+
+## What Reconstruction Typically Costs
+
+| Scope | Typical Cost |
+|---|---|
+| Drywall patching and paint (single room) | $1,000–$4,000 |
+| Flooring replacement (per room) | $3–$12 per sq ft |
+| Full room rebuild (drywall, flooring, trim, paint) | $10,000–$30,000 |
+| Structural repair (framing, load-bearing elements) | $20,000–$60,000+ |
+
+These are general industry ranges — actual reconstruction pricing depends heavily on the materials being matched, whether custom cabinetry or flooring needs to be sourced, and local contractor availability at the time.
+
+## Why It's Worth Coordinating With One Company When Possible
+
+Reconstruction after a water, fire, or mold event goes faster and has fewer disputes over scope when the same company (or a closely coordinated pair) handles both remediation and rebuild — there's no gap where one company's "done" doesn't match what the next company needs to start. In a fast-growing market like the Las Vegas Valley, licensed contractors capable of both phases can book out during peak seasons (particularly after a heavy monsoon), so it's worth getting reconstruction scheduling confirmed early rather than waiting until remediation wraps up.
+
+## Insurance
+
+If reconstruction follows an insured event (fire, sudden water damage), your insurer typically covers rebuilding to the home's prior condition — not upgrades beyond that. Get the reconstruction scope approved by your adjuster before work begins to avoid disputes over what's covered.
+
+## FAQ
+
+**How much does reconstruction cost after water or fire damage in Las Vegas?**
+A single room rebuild (drywall, flooring, trim, paint) typically runs $10,000–$30,000. Simple drywall patching after a contained issue can run as low as $1,000–$4,000.
+
+**Is reconstruction included in restoration or mold remediation pricing?**
+No — reconstruction is quoted separately once remediation is complete and the space is confirmed dry and clean.
+
+**Does insurance cover reconstruction?**
+If it follows a covered event like fire or sudden water damage, typically yes, up to restoring the home's prior condition. Get the scope approved by your adjuster first.
+
+[Contact us](/contact) to discuss your Las Vegas restoration project, or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) for cleanup services.
+    `,
+  },
+  {
+    slug: 'commercial-restoration-cost-las-vegas',
+    title: 'Commercial Restoration Cost in Las Vegas, NV (2026)',
+    category: 'commercial',
+    categoryLabel: 'Commercial Cleaning',
+    date: '2026-08-27',
+    readTime: '6 min',
+    excerpt: 'Commercial restoration in Las Vegas — water, fire, or mold recovery for offices, retail, and hospitality space — typically costs 30–50% more than residential restoration due to scale and compliance requirements. Here\'s what that means in real numbers.',
+    content: `
+## Commercial Restoration Costs More Than Residential — Here's the Real Multiplier
+
+Across water damage, mold, and fire restoration, commercial properties consistently run **30–50% more** than an equivalent residential job. That's not an arbitrary premium — commercial buildings involve larger scale, stricter compliance and documentation requirements, and often need to happen around business operations rather than an empty house.
+
+Using mold remediation as a concrete example: a medium-sized residential job (10–100 sq ft) in Las Vegas runs $2,145–$2,970. Apply the same 30–50% commercial premium, and a comparable commercial job runs roughly **$2,790–$4,455**.
+
+## Why Las Vegas Commercial Restoration Has Its Own Considerations
+
+Las Vegas' economy is unusually concentrated in hospitality, retail, and resort properties — buildings that can't simply close for a week during restoration the way an office might tolerate. A hotel with a burst pipe on one floor needs restoration that works around occupied rooms and continuing operations, which adds coordination cost beyond the physical cleanup itself. Restaurants and food-service space carry the added requirement of health-code compliance before reopening, on top of standard restoration protocols.
+
+## What Drives Commercial Restoration Pricing
+
+- **Scale** — commercial spaces are typically larger, and per-square-foot restoration costs add up faster
+- **Compliance** — documentation, especially for medical, food service, or regulated industries, adds administrative time
+- **Operational continuity** — working around a business that needs to stay open, or reopen quickly, often requires off-hours work at a premium
+- **Specialized equipment** — larger commercial HVAC and duct systems, industrial flooring, and larger-scale drying equipment cost more to deploy than residential-scale gear
+
+## Getting a Commercial Restoration Estimate
+
+Because commercial restoration scope varies so much by building type and the extent of damage, an accurate number requires an in-person assessment. Start with our [commercial cleaning cost guide](/blog/commercial-cleaning-cost-las-vegas) for baseline janitorial and per-square-foot rates in Las Vegas, and request a direct restoration quote once you know the extent of water, fire, or mold damage involved.
+
+## FAQ
+
+**How much more does commercial restoration cost than residential in Las Vegas?**
+Roughly 30–50% more for the same type and scope of damage, due to scale and compliance requirements.
+
+**Does a hotel or restaurant need special restoration protocols in Las Vegas?**
+Yes — hospitality properties often need restoration coordinated around continued operations, and restaurants need health-code compliance verified before reopening, on top of standard restoration work.
+
+**What commercial properties need restoration services most in Las Vegas?**
+Given the concentration of hotels, resorts, and restaurants in the Las Vegas economy, hospitality and food-service properties are among the most common commercial restoration clients here.
+
+[Get a commercial cleaning estimate](/?service=commercial) as a starting baseline, or [contact us](/contact) to discuss a specific restoration project.
+    `,
+  },
 ];
 
 export const CATEGORIES = [
