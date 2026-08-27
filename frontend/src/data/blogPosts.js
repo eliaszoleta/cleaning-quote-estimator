@@ -2094,6 +2094,165 @@ If your home is already maintained and you're booking recurring service, standar
 [Get a free estimate](/?service=home_residential) for a standard clean sized to your home, and use the checklist above to confirm exactly what you're paying for before your cleaner arrives.
     `,
   },
+  {
+    slug: 'house-cleaning-cost-las-vegas',
+    title: 'House Cleaning Cost in Las Vegas, NV: 2026 Price Guide',
+    category: 'house-cleaning',
+    categoryLabel: 'House Cleaning',
+    date: '2026-08-27',
+    readTime: '6 min',
+    excerpt: 'House cleaning in Las Vegas costs $174–$218 for a standard 1,500–2,000 sq ft home — about 10% above the national average. Here\'s real Las Vegas pricing by home size, plus what deep cleans, move-out cleans, and recurring service cost.',
+    content: `
+## How Much Does House Cleaning Cost in Las Vegas?
+
+Nevada runs about **10% above the national average** for house cleaning, and Las Vegas — as the state's largest and most competitive market — sets the pace. For a standard clean, here's what that works out to by home size:
+
+| Home Size | Cost in Las Vegas |
+|---|---|
+| Under 1,000 sq ft | $99–$127 |
+| 1,000–1,500 sq ft | $134–$167 |
+| 1,500–2,000 sq ft (most common) | $174–$218 |
+| 2,000–2,500 sq ft | $215–$270 |
+| 2,500–3,000 sq ft | $251–$310 |
+| Over 3,000 sq ft | $299–$372 |
+
+If you're renting rather than owning — and a huge share of the Las Vegas Valley does — a 2-bedroom apartment runs **$154–$193** per visit, in line with the size and turnover common in the Strip-adjacent and Henderson apartment corridors.
+
+## Why Las Vegas Runs Above the National Average
+
+It comes down to labor cost and market demand more than anything exotic. Las Vegas' service-and-hospitality-driven economy keeps wages competitive across cleaning, housekeeping, and hospitality work, and that gets reflected in what independent house cleaners and cleaning companies charge. It's a mid-tier market — noticeably cheaper than California or the Northeast, but above states like Arizona or Texas.
+
+## The Desert Actually Changes How Often You Need Cleaning
+
+This part is genuinely local and not just marketing: Las Vegas summers regularly hit 105–115°F, which means air conditioning runs nearly nonstop from May through September. That constant airflow pulls dust through the whole house and settles it on every horizontal surface faster than in milder climates. The Vegas Valley also sits in a desert basin that gets occasional windstorms, especially in spring, that push fine dust into homes even with windows shut. Homeowners who clean on a "normal" every-3-4-weeks schedule elsewhere in the country often find every 2-3 weeks holds up better here.
+
+## Deep Cleaning and Move-Out Cleaning in Las Vegas
+
+For the most common home size (1,500–2,000 sq ft):
+- **Deep cleaning** (68–85% more than standard): **$292–$403**
+- **Move-in/move-out cleaning** (88–105% more than standard): **$327–$447**
+
+Move-out cleaning is worth calling out specifically for Las Vegas — with one of the country's highest renter turnover rates in large apartment complexes and master-planned communities, it's one of the most commonly booked services here, not just an occasional job.
+
+## Recurring Cleaning Discounts
+
+Booking on a schedule brings the per-visit price down from the standard $174–$218 baseline:
+- **Weekly**: $139–$174 (20% off)
+- **Biweekly**: $148–$185 (15% off)
+- **Monthly**: $157–$196 (10% off)
+
+## Neighborhoods We Get Asked About Most
+
+Pricing doesn't change block by block, but home size and layout does — and that's really what drives your number. Summerlin and Henderson tend to skew toward larger single-family homes (often landing in the 2,000–3,000+ sq ft range), while Spring Valley, Enterprise, and the areas closer to the Strip have a heavier mix of condos and apartments in the 1,000–1,500 sq ft range. North Las Vegas covers both ends. Whatever your address, the home-size table above is the more accurate way to estimate than the neighborhood name.
+
+## Add-Ons
+
+- Inside oven: $38–$50
+- Inside fridge: $30–$42
+- Interior windows: $52–$65
+- Laundry: $34–$44
+
+A home that hasn't had a professional clean in several months typically runs 22–28% more for the first visit, after which recurring pricing applies.
+
+## Running an Airbnb or Vacation Rental in Vegas?
+
+With tourism and conventions driving one of the largest short-term rental markets in the country, a lot of Las Vegas "house cleaning" searches are actually turnover cleaning between guests. That's priced differently than a standard residential clean — see our [Airbnb cleaning cost guide](/blog/airbnb-cleaning-cost) for turnover-specific pricing.
+
+## FAQ
+
+**How much does house cleaning cost in Las Vegas?**
+A standard clean for the most common home size (1,500–2,000 sq ft) costs $174–$218. Smaller homes under 1,000 sq ft run $99–$127, and homes over 3,000 sq ft run $299–$372.
+
+**Is house cleaning more expensive in Las Vegas than the national average?**
+Yes, by about 10% — Nevada's cost-of-living and labor market push prices a bit above the national baseline, though still well below states like California or New York.
+
+**How often should I get my house cleaned in Las Vegas?**
+More often than you might in a milder climate. The heat means air conditioning runs constantly and pulls dust through the house, so every 2-3 weeks tends to hold up better than the standard every-4-weeks schedule.
+
+**How much does move-out cleaning cost in Las Vegas?**
+For a 1,500–2,000 sq ft home, move-out cleaning runs $327–$447 — 88–105% more than a standard clean, since every surface, cabinet, and appliance needs a full walkthrough-ready clean.
+
+[Get a ZIP-code accurate estimate for your Las Vegas home](/?service=home_residential), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
+  {
+    slug: 'commercial-cleaning-cost-las-vegas',
+    title: 'Commercial Cleaning Cost in Las Vegas, NV: 2026 Price Guide',
+    category: 'commercial',
+    categoryLabel: 'Commercial Cleaning',
+    date: '2026-08-27',
+    readTime: '7 min',
+    excerpt: 'Commercial cleaning in Las Vegas runs $0.057–$0.204 per square foot per visit depending on building type — about 10% above the national average. Here\'s real Las Vegas pricing for offices, retail, restaurants, and medical space, by frequency.',
+    content: `
+## How Much Does Commercial Cleaning Cost in Las Vegas?
+
+Nevada's commercial cleaning market runs about **10% above the national average**, driven by a competitive, hospitality-heavy labor market where cleaning and janitorial staff compete for wages against the Strip's massive resort and casino employers. Here's what that looks like per square foot, per visit, by building type:
+
+| Building Type | Rate Per Sq Ft, Per Visit |
+|---|---|
+| Warehouse | $0.057–$0.072 |
+| Office (most common) | $0.097–$0.118 |
+| Retail | $0.099–$0.121 |
+| School | $0.105–$0.130 |
+| Gym / Fitness | $0.114–$0.141 |
+| Restaurant | $0.132–$0.163 |
+| Medical | $0.165–$0.204 |
+
+## Office Cleaning Cost in Las Vegas
+
+A standard Las Vegas office — desks, break room, restrooms, a conference room or two — runs **$0.097–$0.118 per square foot per visit**. That's trash, floors, restroom sanitizing, and common-area surface cleaning. Anything beyond that (carpet extraction, interior windows, floor waxing) gets quoted as a separate premium service.
+
+## What a 2,000 Sq Ft Las Vegas Office Costs Per Month
+
+| Frequency | Visits/Month | Monthly Cost |
+|---|---|---|
+| Daily (5x/week) | ~21.7 | $4,201–$5,108 |
+| Weekly | 4 | $774–$942 |
+| Biweekly | 2 | $387–$471 |
+| Monthly | 1 | $194–$235 |
+
+Daily service is standard for anything with real walk-in traffic — medical suites, retail on or near the Strip, and restaurants. Weekly is the norm for standard back-office space without much foot traffic.
+
+## Restaurants and Hospitality-Adjacent Space
+
+Las Vegas has one of the largest concentrations of restaurants and hospitality venues in the country, and that segment runs $0.132–$0.163/sq ft/visit here — noticeably above office rates because of kitchen sanitation and grease management requirements. If you're operating anything food-service adjacent, expect daily or near-daily cleaning to be the norm rather than the exception, both for health-code compliance and because a restaurant simply can't run on a weekly janitorial schedule.
+
+## Day Porter Services in Las Vegas
+
+For buildings that need someone on-site during business hours — restroom checks, lobby upkeep, spill response — a day porter in Las Vegas runs **$240–$292 per day**, or roughly **$5,280–$6,424/month** on a standard 22-workday schedule. This is common in retail centers, medical buildings, and any lobby-facing office space near high foot traffic.
+
+## What's Included at Each Service Level
+
+**Basic**: trash removal, vacuuming, sweeping and mopping, restroom cleaning, restocking paper products.
+
+**Standard** (roughly 20–25% more than basic): everything in basic, plus wiping desks and surfaces, cleaning the break room, dusting, and glass door cleaning.
+
+**Premium** (roughly 55–68% more than basic): everything in standard, plus detailed dusting, interior windows, and deep floor care.
+
+## Getting Quotes in a Competitive Market
+
+Las Vegas has no shortage of commercial cleaning companies competing for contracts, which is good for pricing but makes apples-to-apples comparison harder — get at least three quotes against the exact same written scope of work, not just "clean my office weekly." Ask specifically whether the crew is direct employees or subcontracted, since accountability and consistency tend to be better with the former, especially for buildings that need the same trusted crew back every visit.
+
+## FAQ
+
+**How much does commercial cleaning cost in Las Vegas?**
+Commercial cleaning in Las Vegas runs $0.057–$0.204 per square foot per visit depending on building type. A standard office is $0.097–$0.118/sq ft, and medical facilities run $0.165–$0.204/sq ft.
+
+**What are typical commercial cleaning rates in Las Vegas per month?**
+For a 2,000 sq ft office cleaned weekly, expect $774–$942/month. Daily service for the same space runs $4,201–$5,108/month.
+
+**How much does office cleaning cost in Las Vegas per square foot?**
+$0.097–$0.118 per square foot per visit for standard office cleaning — trash, floors, restrooms, and common-area surfaces.
+
+**Why is commercial cleaning more expensive in Las Vegas than the national average?**
+Nevada runs about 10% above the national average, largely due to a competitive labor market where cleaning staff wages compete against the Strip's resort and hospitality employers.
+
+**How much does restaurant cleaning cost in Las Vegas?**
+Restaurant and food-service cleaning runs $0.132–$0.163 per square foot per visit, higher than standard office rates due to kitchen sanitation and grease management needs.
+
+[Get a real commercial cleaning estimate for your Las Vegas facility](/?service=commercial), or see the [full Las Vegas cost breakdown](/cleaning-cost/city/las-vegas-nv) across all our services.
+    `,
+  },
 ];
 
 export const CATEGORIES = [
