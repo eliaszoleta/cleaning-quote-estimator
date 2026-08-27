@@ -102,6 +102,7 @@ function staticHeader() {
   <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px">
     <a href="/" style="font-size:18px;font-weight:800;color:#0f172a;text-decoration:none">Clean Estimator</a>
     <nav style="display:flex;gap:24px;align-items:center">
+      <a href="/cleaning-cost-calculator" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">Cost Calculator</a>
       <a href="/#how-it-works" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">How It Works</a>
       <a href="/blog" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">Blog</a>
       <a href="/#faq" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">FAQ</a>
@@ -467,6 +468,7 @@ function staticFooter() {
       </div>
       <div>
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Resources</div>
+        <a href="/cleaning-cost-calculator" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Cleaning Cost Calculator</a>
         <a href="/about" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">About Clean Estimator</a>
         <a href="/contact" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Contact</a>
       </div>
@@ -561,6 +563,71 @@ function renderAbout(assets) {
     <a href="/contact" style="background:${PRIMARY};color:white;padding:13px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px">Contact Us</a>
   </div>`;
   return renderStaticPage({ path: '/about', seoTitle, seoDesc, bodyHtml: body, assets });
+}
+
+function renderCalculatorPage(assets) {
+  const seoTitle = 'Cleaning Cost Calculator - Free Instant Estimate (2026) | Clean Estimator';
+  const seoDesc = 'Free cleaning cost calculator with ZIP-code accurate pricing. Instantly estimate house cleaning, carpet cleaning, commercial cleaning, mold remediation, and more. No signup required.';
+
+  const whyPoints = [
+    ['ZIP-Code Accurate', 'Every price this cleaning cost calculator returns is adjusted for your local labor rates and cost of living, not a flat national guess.'],
+    ['Instant Results', "Answer a few quick questions and get your estimate in under 60 seconds — no waiting for a callback from a cleaning company."],
+    ['9 Service Types Covered', 'From standard house cleaning to mold remediation and water damage restoration, this calculator covers the full range of cleaning and restoration services.'],
+    ['100% Free, No Signup', 'Use the cleaning cost calculator as many times as you want. No account, no credit card, and no obligation to book.'],
+  ];
+
+  const calcFaqs = [
+    { q: 'Is this cleaning cost calculator really free?', a: 'Yes. Our cleaning cost calculator is completely free to use, with no signup, no account, and no hidden fees. You can run as many estimates as you need.' },
+    { q: 'How accurate is the cleaning cost calculator?', a: 'The calculator uses real market pricing data with state-by-state cost-of-living adjustments, so your estimate reflects typical local pricing. Final prices from an actual cleaning company can vary based on the specific condition of your home and other in-person factors, so treat the result as a reliable starting range rather than a binding quote.' },
+    { q: 'What information do I need to use the cleaning cost calculator?', a: 'Just your ZIP code, the type of cleaning service you need, and a few basic details about your space (like square footage or number of rooms). No email or phone number is required to see your price range.' },
+    { q: 'Does the cleaning cost calculator work for businesses too?', a: 'Yes. In addition to house and apartment cleaning, the calculator includes commercial cleaning, carpet cleaning, air duct cleaning, dryer vent cleaning, tile & grout cleaning, mold remediation, and water damage restoration — for both residential and commercial properties.' },
+    { q: 'Can I embed this cleaning cost calculator on my own website?', a: 'Yes — cleaning companies can embed a white-labeled version of this calculator on their own site to capture leads with accurate, localized estimates. Visit our for-companies page for details.' },
+  ];
+
+  const body = `  <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:14px;text-align:center">Cleaning Cost Calculator</h1>
+  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">This free cleaning cost calculator gives you an instant, ZIP-code specific price for house cleaning, carpet cleaning, commercial cleaning, and 6 other services. Built as a standalone cleaning calculator you can bookmark and reuse — no signup, no phone calls, just enter your details and get a real cleaning estimator price range in under 60 seconds.</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:32px;margin-bottom:40px;text-align:center">
+    <p style="font-size:14px;color:#94a3b8;margin:0">Loading your free cleaning cost calculator&hellip; please enable JavaScript to use the interactive calculator.</p>
+  </div>
+  <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:20px;text-align:center">Why Use This Cleaning Cost Calculator</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:40px">
+    ${whyPoints.map(([t, txt]) => `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:22px 24px">
+      <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px">${esc(t)}</h3>
+      <p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">${esc(txt)}</p>
+    </div>`).join('\n    ')}
+  </div>
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:32px 36px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:16px">Cleaning Cost Calculator FAQs</h2>
+    ${faqAccordionHtml(calcFaqs)}
+  </div>
+  <div style="margin-top:40px;text-align:center">
+    <p style="font-size:14px;color:#64748b">Want cost breakdowns by state or service instead? Browse our <a href="/blog" style="color:${PRIMARY};font-weight:600">cleaning cost guides</a>.</p>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'Cleaning Cost Calculator', item: `${DOMAIN}/cleaning-cost-calculator` },
+  ]);
+  const webAppSchema = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Cleaning Cost Calculator',
+    url: `${DOMAIN}/cleaning-cost-calculator`,
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    description: seoDesc,
+  });
+
+  return renderStaticPage({
+    path: '/cleaning-cost-calculator',
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 900,
+    assets,
+    extraHead: `<script type="application/ld+json">${webAppSchema}</script><script type="application/ld+json">${breadcrumb}</script><script type="application/ld+json">${faqSchema(calcFaqs)}</script>`,
+  });
 }
 
 function renderContact(assets) {
@@ -1137,6 +1204,8 @@ function main() {
   count++;
   writeFile('for-companies', renderForCompanies(assets));
   count++;
+  writeFile('cleaning-cost-calculator', renderCalculatorPage(assets));
+  count++;
 
   const services = servicesMod.getAllServices();
   for (const service of services) {
@@ -1158,7 +1227,7 @@ function main() {
     count++;
   }
 
-  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 5 static pages, ' + services.length + ' services, ' + states.length + ' states, ' + cities.length + ' cities)');
+  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 6 static pages, ' + services.length + ' services, ' + states.length + ' states, ' + cities.length + ' cities)');
 }
 
 main();

@@ -37,6 +37,7 @@ const cols = [
   {
     title: 'Resources',
     links: [
+      { label: 'Cleaning Cost Calculator', href: '/cleaning-cost-calculator' },
       { label: 'About Clean Estimator', href: '/about' },
       { label: 'Contact', href: '/contact' },
     ],
