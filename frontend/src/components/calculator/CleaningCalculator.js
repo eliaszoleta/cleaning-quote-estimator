@@ -43,7 +43,7 @@ const DETAIL_STEP_COMPONENT = {
 
 const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Send', 'Results'];
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false }) {
   const cardRef = useRef(null);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
   const [serviceType, setServiceType] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? initialService : null);
@@ -148,7 +148,11 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   const progressStep = Math.min(stepIndex, 4);
 
-  // Results page
+  // Results page. embedded keeps its visual meaning (flush into the page's
+  // own card, no duplicate shadow/border) for both siteLanding pages and a
+  // real third-party embed (EmbedWrapper); siteLanding separately tells
+  // ResultsScreen to keep the promo features (Share, Print, disclaimer,
+  // nearby partner) that a real third-party embed deliberately hides.
   if (currentStep === 'results' && result) {
     return (
       <ResultsScreen
@@ -156,6 +160,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         serviceDetails={serviceDetails}
         companyConfig={companyConfig}
         embedded={embedded}
+        siteLanding={siteLanding}
         onReset={handleReset}
       />
     );

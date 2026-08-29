@@ -100,7 +100,7 @@ export default function EstimatorPage() {
         </div>
 
         <div style={{ maxWidth: 720, margin: '0 auto', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <CleaningCalculator embedded />
+          <CleaningCalculator embedded siteLanding />
         </div>
 
         <div style={{ marginTop: 48 }}>
