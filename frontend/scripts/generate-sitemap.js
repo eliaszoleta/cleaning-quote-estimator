@@ -117,6 +117,11 @@ const xml = [
     urlEntry({ loc: `${SITE_URL}/cleaning-services/${slug}`, lastmod: TODAY, changefreq: 'monthly', priority: '0.9' })
   ),
   '',
+  '  <!-- Dedicated per-service calculator pages (auto-generated from services.js) -->',
+  ...serviceSlugs.map(slug =>
+    urlEntry({ loc: `${SITE_URL}/${slug}-calculator`, lastmod: TODAY, changefreq: 'weekly', priority: '0.85' })
+  ),
+  '',
   '  <!-- Cleaning cost by state (auto-generated from statePricing.js) -->',
   ...stateSlugs.map(slug =>
     urlEntry({ loc: `${SITE_URL}/cleaning-cost/${slug}`, lastmod: TODAY, changefreq: 'monthly', priority: '0.8' })
@@ -134,4 +139,4 @@ const xml = [
 const outPath = path.join(__dirname, '../public/sitemap.xml');
 fs.writeFileSync(outPath, xml, 'utf8');
 
-console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories, ${serviceSlugs.length} services, ${stateSlugs.length} states, ${citySlugs.length} cities`);
+console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories, ${serviceSlugs.length} services, ${serviceSlugs.length} service calculators, ${stateSlugs.length} states, ${citySlugs.length} cities`);

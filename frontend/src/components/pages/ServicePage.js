@@ -176,7 +176,7 @@ export default function ServicePage({ slug }) {
               <Icon size={22} color="#2563eb" strokeWidth={1.75} />
             </div>
             <h1 style={{ fontSize: 'clamp(24px,4vw,32px)', fontWeight: 800, color: '#0f172a', lineHeight: 1.25, marginBottom: 10 }}>{service.name} Cost 2026</h1>
-            <p style={{ fontSize: 15.5, color: '#64748b', lineHeight: 1.7, marginBottom: 20 }}>{service.tagline}</p>
+            <p style={{ fontSize: 15.5, color: '#64748b', lineHeight: 1.7, marginBottom: 20 }}>{service.tagline} <a href={`/${service.slug}-calculator`} style={{ color: '#2563eb', fontWeight: 600 }}>Try our dedicated {service.name} Calculator &rarr;</a></p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 30, fontWeight: 800, color: '#2563eb' }}>{formatPrice(cost.low)} – {formatPrice(cost.high)}</span>
               <span style={{ fontSize: 13, color: '#94a3b8' }}>

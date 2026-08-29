@@ -921,7 +921,7 @@ function renderServicePage(service, statesMod, assets) {
   <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
     <div style="width:44px;height:44px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:20px">${ICON_EMOJI[service.id] || '🏠'}</div>
     <h1 style="font-size:clamp(24px,4vw,32px);font-weight:800;color:#0f172a;line-height:1.25;margin-bottom:10px">${esc(service.name)} Cost 2026</h1>
-    <p style="font-size:15.5px;color:#64748b;line-height:1.7;margin-bottom:20px">${esc(service.tagline)}</p>
+    <p style="font-size:15.5px;color:#64748b;line-height:1.7;margin-bottom:20px">${esc(service.tagline)} <a href="/${service.slug}-calculator" style="color:${PRIMARY};font-weight:600">Try our dedicated ${esc(service.name)} Calculator &rarr;</a></p>
     <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
       <span style="font-size:30px;font-weight:800;color:${PRIMARY}">${fmt(cost.low)} &ndash; ${fmt(cost.high)}</span>
       <span style="font-size:13px;color:#94a3b8">${esc(unitNote)}</span>
@@ -970,6 +970,70 @@ function renderServicePage(service, statesMod, assets) {
     maxWidth: 780,
     assets,
     extraHead: `<script type="application/ld+json">${serviceSchema(service, cost)}</script><script type="application/ld+json">${faqSchema(service.faqs)}</script><script type="application/ld+json">${breadcrumb}</script>`,
+  });
+}
+
+// Derives /{service.slug}-calculator (all service slugs already end in
+// "-cost", so this reads naturally as "[service] cost calculator") --
+// must match calculatorSlugFor() in ServiceCalculatorPage.js exactly, since
+// this is the static-HTML mirror of that React page.
+function calculatorSlugFor(service) {
+  return `${service.slug}-calculator`;
+}
+
+function renderServiceCalculatorPage(service, servicesMod, assets) {
+  const pageSlug = calculatorSlugFor(service);
+  const title = `${service.name} Cost Calculator - Free Instant Estimate (2026)`;
+  const description = `Free ${service.name.toLowerCase()} cost calculator with ZIP-code accurate pricing. ${service.tagline}`;
+  const related = servicesMod.getRelatedServices(service);
+
+  const bulletsHtml = service.bullets.map(b => `<div style="display:flex;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:10px">${checkIconSvg()}<span style="font-size:13.5px;color:#374151;line-height:1.6">${esc(b)}</span></div>`).join('');
+
+  const relatedHtml = related.length ? `<p style="font-size:13.5px;color:#94a3b8;margin-top:14px">Other calculators: ${related.map(r => `<a href="/${calculatorSlugFor(r)}" style="color:${PRIMARY};font-weight:600">${esc(r.name)}</a>`).join(' &middot; ')}</p>` : '';
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:20px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">${esc(service.name)} Cost Calculator</span>
+  </div>
+  <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:14px;text-align:center">${esc(service.name)} Cost Calculator</h1>
+  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">Get an instant, ZIP-code accurate ${esc(service.name.toLowerCase())} estimate &mdash; enter a few details and see a real price range in under 60 seconds. ${esc(service.tagline)}</p>
+  <div style="max-width:720px;margin:0 auto 40px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:32px;text-align:center">
+    <p style="font-size:14px;color:#94a3b8;margin:0">Loading your free ${esc(service.name.toLowerCase())} cost calculator&hellip; please enable JavaScript to use the interactive calculator.</p>
+  </div>
+  <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:20px;text-align:center">What Affects Your ${esc(service.name)} Price</h2>
+  <div style="max-width:720px;margin:0 auto 40px">${bulletsHtml}</div>
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:32px 36px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:16px">${esc(service.name)} Cost Calculator FAQs</h2>
+    ${faqAccordionHtml(service.faqs)}
+  </div>
+  <div style="margin-top:40px;text-align:center">
+    <p style="font-size:14px;color:#64748b;margin-bottom:14px">Want the full price breakdown by tier? See our <a href="/cleaning-services/${service.slug}" style="color:${PRIMARY};font-weight:600">complete ${esc(service.name.toLowerCase())} cost guide</a>.</p>
+    ${relatedHtml}
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: `${service.name} Cost Calculator`, item: `${DOMAIN}/${pageSlug}` },
+  ]);
+  const webAppSchema = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: `${service.name} Cost Calculator`,
+    url: `${DOMAIN}/${pageSlug}`,
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    description,
+  });
+
+  return renderStaticPage({
+    path: `/${pageSlug}`,
+    seoTitle: title,
+    seoDesc: description,
+    bodyHtml: body,
+    maxWidth: 900,
+    assets,
+    extraHead: `<script type="application/ld+json">${webAppSchema}</script><script type="application/ld+json">${breadcrumb}</script><script type="application/ld+json">${faqSchema(service.faqs)}</script>`,
   });
 }
 
@@ -1368,6 +1432,8 @@ function main() {
   const services = servicesMod.getAllServices();
   for (const service of services) {
     writeFile('cleaning-services/' + service.slug, renderServicePage(service, statesMod, assets));
+    count++;
+    writeFile(calculatorSlugFor(service), renderServiceCalculatorPage(service, servicesMod, assets));
     count++;
   }
 

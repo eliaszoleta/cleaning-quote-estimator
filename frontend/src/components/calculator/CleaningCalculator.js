@@ -43,11 +43,11 @@ const DETAIL_STEP_COMPONENT = {
 
 const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Send', 'Results'];
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null }) {
   const cardRef = useRef(null);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
-  const [serviceType, setServiceType] = useState(null);
-  const [stepIndex, setStepIndex] = useState(0);
+  const [serviceType, setServiceType] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? initialService : null);
+  const [stepIndex, setStepIndex] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? 1 : 0);
   const [location, setLocation] = useState({ zip: '', state: '' });
   const [serviceDetails, setServiceDetails] = useState({});
   const [leadInfo, setLeadInfo] = useState(null);
@@ -64,14 +64,15 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Pre-select service from URL param
+  // Pre-select service from URL param (skipped if initialService already set it)
   useEffect(() => {
+    if (initialService) return;
     const param = new URLSearchParams(window.location.search).get('service');
     if (param && SERVICE_STEPS[param]) {
       setServiceType(param);
       setStepIndex(1);
     }
-  }, []);
+  }, [initialService]);
 
   // Scroll to card on step change, accounting for sticky navbar height
   useEffect(() => {
