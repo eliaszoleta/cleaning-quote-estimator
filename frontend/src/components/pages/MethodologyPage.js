@@ -1,12 +1,26 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Database, MapPin, SlidersHorizontal, BookOpen, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Database, MapPin, SlidersHorizontal, BookOpen, ShieldCheck, RefreshCw, Scale } from 'lucide-react';
+
+const CROSS_CHECKS = [
+  { service: 'House Cleaning (1,500–2,000 sq ft)', ours: '$158–$198', published: '$118–$238, avg ~$176', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-it-cost-hire-house-cleaner.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/hire-a-maid-service']] },
+  { service: 'Carpet Cleaning (per room)', ours: '$44–$100', published: '$25–$125 per room', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-carpet-cleaning-cost.htm'], ['HomeGuide', 'https://homeguide.com/costs/carpet-cleaning-prices']] },
+  { service: 'Office Cleaning (per sq ft, per visit)', ours: '$0.088–$0.107', published: '$0.07–$0.20', sources: [['Housecall Pro', 'https://www.housecallpro.com/resources/how-to-price-commercial-cleaning-jobs/']] },
+  { service: 'Air Duct Cleaning (base system)', ours: '$330–$420', published: '$268–$509, avg ~$379–$389', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-air-duct-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-ducts-and-vents']] },
+  { service: 'Mold Remediation (10–100 sq ft)', ours: '$1,950–$2,700', published: '~$1,000–$2,500 for 100 sq ft, avg $2,368', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-mold-remediation-service-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/environmental-safety/remove-mold-and-toxic-materials/']] },
+  { service: 'Dryer Vent Cleaning', ours: '$105–$253', published: '$104–$250+ depending on vent length', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-dryer-vent-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-dryer-vents/']] },
+];
 
 const SECTIONS = [
   {
     Icon: Database,
     title: 'Our Base Pricing',
-    body: "Every price tier in our calculator — for house cleaning, carpet cleaning, commercial cleaning, and every other service — starts from aggregated market research across residential and commercial cleaning providers nationwide: published rate surveys, provider pricing pages, and industry cost data. We don't invent a number and work backward; we build each tier from what providers are actually charging, then keep it current as the market shifts.",
+    body: "Every price tier in our calculator — for house cleaning, carpet cleaning, commercial cleaning, and every other service — starts from aggregated market research across residential and commercial cleaning providers nationwide: published rate surveys, provider pricing pages, and industry cost data. We don't invent a number and work backward; we build each tier from what providers are actually charging, then keep it current as the market shifts. Below, we show exactly how our numbers stack up against published guides from Angi, HomeAdvisor, and other industry sources.",
+  },
+  {
+    Icon: Scale,
+    title: 'How Our Numbers Compare to Published Industry Guides',
+    body: null, // rendered specially below
   },
   {
     Icon: MapPin,
@@ -90,6 +104,42 @@ export default function MethodologyPage() {
               <div style={{ flex: 1 }}>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>{t}</h2>
                 {body && <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7, margin: 0 }}>{body}</p>}
+                {t === 'How Our Numbers Compare to Published Industry Guides' && (
+                  <>
+                    <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7, margin: '0 0 14px' }}>
+                      We don't just claim our numbers are researched — here's where they land next to current, publicly published cost guides from Angi, HomeAdvisor, HomeGuide, and Housecall Pro (checked August 2026). We're not claiming these sites as our original data source; this is an independent cross-check showing our ranges are in the same ballpark as what's publicly reported elsewhere.
+                    </p>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
+                        <thead>
+                          <tr style={{ background: '#f8fafc' }}>
+                            <th style={{ textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #e2e8f0', fontWeight: 700, color: '#374151' }}>Service</th>
+                            <th style={{ textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #e2e8f0', fontWeight: 700, color: '#374151' }}>Our Estimate</th>
+                            <th style={{ textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #e2e8f0', fontWeight: 700, color: '#374151' }}>Published Range</th>
+                            <th style={{ textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #e2e8f0', fontWeight: 700, color: '#374151' }}>Source</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {CROSS_CHECKS.map(row => (
+                            <tr key={row.service} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                              <td style={{ padding: '8px 10px', color: '#0f172a' }}>{row.service}</td>
+                              <td style={{ padding: '8px 10px', color: '#1d4ed8', fontWeight: 700, whiteSpace: 'nowrap' }}>{row.ours}</td>
+                              <td style={{ padding: '8px 10px', color: '#475569', whiteSpace: 'nowrap' }}>{row.published}</td>
+                              <td style={{ padding: '8px 10px', color: '#475569' }}>
+                                {row.sources.map(([name, href], i) => (
+                                  <React.Fragment key={name}>
+                                    {i > 0 && ', '}
+                                    <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>{name}</a>
+                                  </React.Fragment>
+                                ))}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
                 {t === 'External Sources We Reference' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
                     <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7, margin: '0 0 4px' }}>

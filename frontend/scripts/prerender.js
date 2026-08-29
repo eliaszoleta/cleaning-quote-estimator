@@ -702,11 +702,38 @@ function renderMethodologyPage(assets) {
   const seoDesc = "See exactly how Clean Estimator builds its pricing: base rate research, state cost-of-living adjustments, city pricing methodology, and the external sources we cite. Full transparency on where our numbers come from.";
 
   const sections = [
-    ['Our Base Pricing', "Every price tier in our calculator — for house cleaning, carpet cleaning, commercial cleaning, and every other service — starts from aggregated market research across residential and commercial cleaning providers nationwide: published rate surveys, provider pricing pages, and industry cost data. We don't invent a number and work backward; we build each tier from what providers are actually charging, then keep it current as the market shifts."],
+    ['Our Base Pricing', "Every price tier in our calculator — for house cleaning, carpet cleaning, commercial cleaning, and every other service — starts from aggregated market research across residential and commercial cleaning providers nationwide: published rate surveys, provider pricing pages, and industry cost data. We don't invent a number and work backward; we build each tier from what providers are actually charging, then keep it current as the market shifts. Below, we show exactly how our numbers stack up against published guides from Angi, HomeAdvisor, and other industry sources."],
     ['State Cost-of-Living Adjustments', "The same house cleaning job costs more in California than in Arkansas, and our numbers reflect that. Each state carries a multiplier — California sits around 1.40&times; the national baseline, Arkansas around 0.80&times; — built from regional labor cost and cost-of-living differences. That multiplier is applied directly to the national base price for whichever service you're pricing, not estimated separately per state."],
     ['City and ZIP Code Pricing', "For city-level pages, we intentionally reuse the parent state's pricing data rather than inventing separate city-specific numbers. Reliable, verifiable cost data doesn't exist at neighborhood granularity for most markets — and we'd rather show you a number we can stand behind than a more precise-looking one we made up. If that changes for a given metro area, we'll update it."],
     ['How Service Type Changes Your Price', "Deep cleans, move-in/move-out cleans, recurring-service discounts, and add-ons (inside oven, interior windows, and similar) are all priced as a percentage adjustment off the base tier, derived from how cleaning companies actually structure their own rate cards — for example, deep cleaning consistently runs 68-85% above a standard clean across the providers we've reviewed, so that's the range we show."],
   ];
+
+  const crossChecks = [
+    ['House Cleaning (1,500–2,000 sq ft)', '$158–$198', '$118–$238, avg ~$176', [['Angi', 'https://www.angi.com/articles/how-much-does-it-cost-hire-house-cleaner.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/hire-a-maid-service']]],
+    ['Carpet Cleaning (per room)', '$44–$100', '$25–$125 per room', [['Angi', 'https://www.angi.com/articles/how-much-does-carpet-cleaning-cost.htm'], ['HomeGuide', 'https://homeguide.com/costs/carpet-cleaning-prices']]],
+    ['Office Cleaning (per sq ft, per visit)', '$0.088–$0.107', '$0.07–$0.20', [['Housecall Pro', 'https://www.housecallpro.com/resources/how-to-price-commercial-cleaning-jobs/']]],
+    ['Air Duct Cleaning (base system)', '$330–$420', '$268–$509, avg ~$379–$389', [['Angi', 'https://www.angi.com/articles/how-much-does-air-duct-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-ducts-and-vents']]],
+    ['Mold Remediation (10–100 sq ft)', '$1,950–$2,700', '~$1,000–$2,500 for 100 sq ft, avg $2,368', [['Angi', 'https://www.angi.com/articles/how-much-does-mold-remediation-service-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/environmental-safety/remove-mold-and-toxic-materials/']]],
+    ['Dryer Vent Cleaning', '$105–$253', '$104–$250+ depending on vent length', [['Angi', 'https://www.angi.com/articles/how-much-does-dryer-vent-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-dryer-vents/']]],
+  ];
+
+  const crossCheckTable = `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 14px">We don't just claim our numbers are researched — here's where they land next to current, publicly published cost guides from Angi, HomeAdvisor, HomeGuide, and Housecall Pro (checked August 2026). We're not claiming these sites as our original data source; this is an independent cross-check showing our ranges are in the same ballpark as what's publicly reported elsewhere.</p>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13.5px">
+      <thead><tr style="background:#f8fafc">
+        <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e2e8f0;font-weight:700;color:#374151">Service</th>
+        <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e2e8f0;font-weight:700;color:#374151">Our Estimate</th>
+        <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e2e8f0;font-weight:700;color:#374151">Published Range</th>
+        <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e2e8f0;font-weight:700;color:#374151">Source</th>
+      </tr></thead>
+      <tbody>
+        ${crossChecks.map(([service, ours, published, sources]) => `<tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:8px 10px;color:#0f172a">${esc(service)}</td>
+          <td style="padding:8px 10px;color:${PRIMARY};font-weight:700;white-space:nowrap">${ours}</td>
+          <td style="padding:8px 10px;color:#475569;white-space:nowrap">${esc(published)}</td>
+          <td style="padding:8px 10px;color:#475569">${sources.map(([name, href]) => `<a href="${href}" target="_blank" rel="noopener noreferrer" style="color:${PRIMARY};text-decoration:none;font-weight:600">${esc(name)}</a>`).join(', ')}</td>
+        </tr>`).join('\n        ')}
+      </tbody>
+    </table></div>`;
 
   const citations = [
     ['https://www.epa.gov', 'U.S. Environmental Protection Agency (EPA)', 'Air duct cleaning frequency guidance, and EPA-registered disinfectant lists (List N, List K) referenced in our medical and healthcare cleaning content.'],
@@ -722,7 +749,9 @@ function renderMethodologyPage(assets) {
 
   const body = `  <h1 style="font-size:40px;font-weight:900;color:#0f172a;margin-bottom:12px">How We Calculate Cleaning Prices</h1>
   <p style="font-size:18px;color:#64748b;margin-bottom:40px;line-height:1.7">Every estimate on Clean Estimator comes from a real methodology, not a guess. Here's exactly how the numbers behind the calculator — and every cost guide on this site — actually get built.</p>
-  ${sections.map(([t, txt]) => sectionCard(t, `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">${txt}</p>`)).join('\n  ')}
+  ${sectionCard(sections[0][0], `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">${sections[0][1]}</p>`)}
+  ${sectionCard('How Our Numbers Compare to Published Industry Guides', crossCheckTable)}
+  ${sections.slice(1).map(([t, txt]) => sectionCard(t, `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">${txt}</p>`)).join('\n  ')}
   ${sectionCard('External Sources We Reference', `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 10px">Where our content relies on safety guidance, industry standards, or regulatory requirements rather than our own pricing data, we cite the source directly:</p>
     ${citations.map(([href, name, use]) => `<div style="font-size:14px;color:#475569;line-height:1.6;padding-left:14px;border-left:2px solid #e2e8f0;margin-bottom:10px"><a href="${href}" target="_blank" rel="noopener noreferrer" style="color:${PRIMARY};font-weight:700;text-decoration:none">${esc(name)}</a> &mdash; ${esc(use)}</div>`).join('\n    ')}`)}
   ${sectionCard("What Our Estimates Are — and Aren't", `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">Every number on Clean Estimator is a starting point, not a quote. Actual pricing depends on the specific condition of a property, local competition, and each company's own pricing — factors that are only ever fully visible in person. Use our numbers to negotiate confidently and spot outliers, then always get multiple quotes from licensed, insured professionals before booking.</p>`)}
