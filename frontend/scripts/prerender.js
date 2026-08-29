@@ -931,7 +931,7 @@ function renderServicePage(service, statesMod, assets) {
   </div>
   <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
     <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:6px">Pricing by Tier</h2>
-    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">National average pricing &mdash; ${esc(service.unit)}.</p>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">National average pricing &mdash; ${esc(service.unit)}. <a href="/how-we-calculate-prices" style="color:${PRIMARY};font-weight:600">See how we calculate these prices &rarr;</a></p>
     <div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">
       <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Tier</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Price</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Notes</th></tr></thead>
       <tbody>${tierRows}</tbody>

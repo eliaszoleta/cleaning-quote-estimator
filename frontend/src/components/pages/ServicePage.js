@@ -207,7 +207,7 @@ export default function ServicePage({ slug }) {
 
           <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '32px 36px', marginBottom: 24 }}>
             <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Pricing by Tier</h2>
-            <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 4 }}>National average pricing — {service.unit}.</p>
+            <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 4 }}>National average pricing — {service.unit}. <a href="/how-we-calculate-prices" style={{ color: '#2563eb', fontWeight: 600 }}>See how we calculate these prices →</a></p>
             <TiersTable service={service} />
 
             <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginTop: 32, marginBottom: 14 }}>What to Know</h2>
