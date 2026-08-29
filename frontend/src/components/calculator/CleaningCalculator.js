@@ -43,7 +43,7 @@ const DETAIL_STEP_COMPONENT = {
 
 const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Send', 'Results'];
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null }) {
   const cardRef = useRef(null);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
   const [serviceType, setServiceType] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? initialService : null);
@@ -81,6 +81,14 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     const top = cardRef.current.getBoundingClientRect().top + window.scrollY - navbarHeight;
     window.scrollTo({ top, behavior: 'smooth' });
   }, [stepIndex]);
+
+  // Let a siteLanding page's own wrapper drop its fixed white/shadow card
+  // once results are showing, since ResultsScreen renders its own full page
+  // chrome (grey background, its own card, buttons outside it) that would
+  // otherwise get boxed in a second time by that wrapper.
+  useEffect(() => {
+    onShowResults?.(currentStep === 'results' && !!result);
+  }, [currentStep, result, onShowResults]);
 
   const goNext = () => setStepIndex(i => Math.min(i + 1, steps.length - 1));
   const goBack = () => setStepIndex(i => Math.max(i - 1, 0));
@@ -148,19 +156,18 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   const progressStep = Math.min(stepIndex, 4);
 
-  // Results page. embedded keeps its visual meaning (flush into the page's
-  // own card, no duplicate shadow/border) for both siteLanding pages and a
-  // real third-party embed (EmbedWrapper); siteLanding separately tells
-  // ResultsScreen to keep the promo features (Share, Print, disclaimer,
-  // nearby partner) that a real third-party embed deliberately hides.
+  // Results page. On a siteLanding page (our own standalone calculator
+  // pages) the wizard steps stay flush/embedded inside the page's own card,
+  // but results should look exactly like the homepage's full results screen
+  // (its own grey background, its own card, Share/Print/disclaimer outside
+  // it) -- only a real third-party embed (EmbedWrapper) needs it flush too.
   if (currentStep === 'results' && result) {
     return (
       <ResultsScreen
         result={result}
         serviceDetails={serviceDetails}
         companyConfig={companyConfig}
-        embedded={embedded}
-        siteLanding={siteLanding}
+        embedded={embedded && !siteLanding}
         onReset={handleReset}
       />
     );

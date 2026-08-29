@@ -27,25 +27,18 @@ async function findPartner(city, state) {
   return data?.[0] || null;
 }
 
-export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, siteLanding, onReset }) {
+export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset }) {
   const [shared, setShared] = useState(false);
   const [partner, setPartner] = useState(null);
-
-  // embedded controls visual chrome only (no duplicate shadow/border/Helmet
-  // when nested in a page that already provides its own card). Promo
-  // features (Share, Print, disclaimer, nearby partner) are hidden for a
-  // real third-party embed (EmbedWrapper) but kept for our own siteLanding
-  // pages, which just need the flush embedded visual treatment.
-  const showFullFeatures = !embedded || siteLanding;
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, []);
 
   useEffect(() => {
-    if (!showFullFeatures) return;
+    if (embedded) return;
     getUserLocation().then(loc => {
       if (loc) findPartner(loc.city, loc.state).then(setPartner);
     });
-  }, [showFullFeatures]);
+  }, [embedded]);
 
   if (!result) return null;
 
@@ -87,7 +80,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
   return (
     <>
-      {showFullFeatures && (
+      {!embedded && (
         <Helmet>
           <title>{serviceTypeLabel(serviceType)} Cost Estimate — {stateName} | Clean Estimator</title>
           <meta name="description" content={`Your estimated cost for ${serviceTypeLabel(serviceType).toLowerCase()} in ${stateName}: ${formatPriceRange(totalLow, totalHigh)}.`} />
@@ -184,7 +177,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 </span>
               </div>
 
-              {partner && showFullFeatures && <PartnerCard partner={partner} />}
+              {partner && !embedded && <PartnerCard partner={partner} />}
 
               <div style={{ background: embedded && companyName ? `${primaryColor}08` : '#f8fafc', border: `1px solid ${embedded && companyName ? primaryColor + '28' : '#e2e8f0'}`, borderRadius: 12, padding: '18px 20px' }}>
                 <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>
@@ -220,19 +213,19 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
             <button onClick={onReset} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, color: '#374151' }}>
               <ArrowLeft size={14} /> New Estimate
             </button>
-            {showFullFeatures && (
+            {!embedded && (
               <button onClick={handleShare} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, color: '#374151' }}>
                 {shared ? <><Check size={14} strokeLinecap="square" strokeLinejoin="miter" /> Copied!</> : <><Share2 size={14} /> Share Results</>}
               </button>
             )}
-            {showFullFeatures && (
+            {!embedded && (
               <button onClick={() => window.print()} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, color: '#374151' }}>
                 <Printer size={14} /> Print
               </button>
             )}
           </div>
 
-          {showFullFeatures && (
+          {!embedded && (
             <p style={{ textAlign: 'center', fontSize: 11.5, color: '#94a3b8', marginTop: 16, maxWidth: 520, margin: '16px auto 0' }}>
               These estimates are for informational purposes only. Actual prices vary. Always get multiple quotes from licensed, insured professionals.
             </p>

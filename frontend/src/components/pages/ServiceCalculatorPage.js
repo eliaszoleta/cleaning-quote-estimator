@@ -40,6 +40,11 @@ export function calculatorSlugFor(service) {
 }
 
 export default function ServiceCalculatorPage({ slug }) {
+  // Once results are showing, ResultsScreen renders its own full page chrome
+  // (grey background, its own card, Share/Print/disclaimer outside it) --
+  // drop this wrapper's fixed white card so it isn't boxed in a second time.
+  const [showingResults, setShowingResults] = useState(false);
+
   // slug here is the full calculator-page slug (e.g. "carpet-cleaning-cost-calculator");
   // strip the trailing "-calculator" to look up the underlying service.
   const service = getServiceBySlug(slug.replace(/-calculator$/, ''));
@@ -105,8 +110,8 @@ export default function ServiceCalculatorPage({ slug }) {
           </p>
         </div>
 
-        <div style={{ maxWidth: 720, margin: '0 auto', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <CleaningCalculator embedded siteLanding initialService={service.id} />
+        <div style={showingResults ? undefined : { maxWidth: 720, margin: '0 auto', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <CleaningCalculator embedded siteLanding initialService={service.id} onShowResults={setShowingResults} />
         </div>
 
         <div style={{ marginTop: 48 }}>
