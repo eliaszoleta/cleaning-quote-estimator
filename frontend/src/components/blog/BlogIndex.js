@@ -118,7 +118,7 @@ export default function BlogIndex() {
         <p style={{ fontSize: 18, color: '#64748b', marginBottom: 28 }}>Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
 
         {/* Search */}
-        <div style={{ position: 'relative', maxWidth: 480, marginBottom: 32 }}>
+        <div style={{ position: 'relative', marginBottom: 32 }}>
           <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
           <input
             type="text"
