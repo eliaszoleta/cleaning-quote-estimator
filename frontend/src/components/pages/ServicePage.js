@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ChevronDown, Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin } from 'lucide-react';
+import { ChevronDown, Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, Check } from 'lucide-react';
 import { getServiceBySlug, getRelatedServices, typicalCost } from '../../data/services';
 import { getFeaturedStates, adjustForState } from '../../data/statePricing';
 
@@ -214,7 +214,7 @@ export default function ServicePage({ slug }) {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {service.bullets.map((b, i) => (
                 <li key={i} style={{ display: 'flex', gap: 8, fontSize: 14.5, color: '#374151', lineHeight: 1.7, marginBottom: 10 }}>
-                  <span style={{ color: '#16a34a', flexShrink: 0 }}>✓</span>{b}
+                  <Check size={16} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" style={{ flexShrink: 0, marginTop: 2 }} />{b}
                 </li>
               ))}
             </ul>

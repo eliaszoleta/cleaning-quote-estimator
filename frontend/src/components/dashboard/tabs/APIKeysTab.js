@@ -63,7 +63,7 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
                   onClick={copyKey}
                   style={{ display: 'flex', alignItems: 'center', gap: 5, background: copied ? '#16a34a' : '#2563eb', color: 'white', border: 'none', padding: '6px 11px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'background 0.15s' }}
                 >
-                  {copied ? <><Check size={13} /> Copied</> : <><Copy size={13} /> Copy</>}
+                  {copied ? <><Check size={13} strokeLinecap="square" strokeLinejoin="miter" /> Copied</> : <><Copy size={13} /> Copy</>}
                 </button>
               </div>
             </div>

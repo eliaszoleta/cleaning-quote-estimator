@@ -200,7 +200,7 @@ export default function SEOContent() {
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {facts.map(f => (
                     <li key={f} style={{ fontSize: 13, color: '#475569', marginBottom: 5, display: 'flex', alignItems: 'flex-start', gap: 7 }}>
-                      <Check size={13} color="#16a34a" style={{ flexShrink: 0, marginTop: 1 }} />{f}
+                      <Check size={13} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" style={{ flexShrink: 0, marginTop: 1 }} />{f}
                     </li>
                   ))}
                 </ul>

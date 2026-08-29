@@ -29,7 +29,7 @@ const IconWallet = () => (
 
 const IconCheck = ({ size = 18, color = '#16a34a', bg = '#dcfce7' }) => (
   <div style={{ width: size + 4, height: size + 4, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-    <svg width={size - 4} height={size - 4} viewBox="0 0 12 12" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size - 4} height={size - 4} viewBox="0 0 12 12" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="square" strokeLinejoin="miter">
       <polyline points="1.5,6 4.5,9 10.5,3" />
     </svg>
   </div>
@@ -43,7 +43,7 @@ const IconArrow = ({ size = 16, color = 'currentColor' }) => (
 );
 
 const IconSuccess = () => (
-  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
     <circle cx="12" cy="12" r="10" />
     <polyline points="7,12 10,15 17,9" />
   </svg>

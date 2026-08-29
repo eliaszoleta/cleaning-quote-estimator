@@ -4,9 +4,9 @@ import { Helmet } from 'react-helmet-async';
 const WEB3FORMS_ACCESS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
 const PRIMARY_GRADIENT = 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)';
 
-function Icon({ children, size = 20 }) {
+function Icon({ children, size = 20, linecap = 'round', linejoin = 'round' }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap={linecap} strokeLinejoin={linejoin} aria-hidden="true">
       {children}
     </svg>
   );
@@ -134,7 +134,7 @@ export default function Contact() {
             <div style={{ padding: '26px 30px 30px' }}>
               {status === 'success' ? (
                 <div style={{ textAlign: 'center', padding: '36px 0' }}>
-                  <div style={{ marginBottom: 14, color: '#16a34a', display: 'flex', justifyContent: 'center' }}><CheckCircleIcon size={44} /></div>
+                  <div style={{ marginBottom: 14, color: '#16a34a', display: 'flex', justifyContent: 'center' }}><CheckCircleIcon size={44} linecap="square" linejoin="miter" /></div>
                   <p style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Message sent!</p>
                   <p style={{ fontSize: 14, color: '#64748b', marginBottom: 22 }}>Thanks for reaching out — we typically respond within 1 business day.</p>
                   <button onClick={() => setStatus('idle')} style={{ padding: '10px 22px', background: PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14, fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(29,78,216,0.3)' }}>

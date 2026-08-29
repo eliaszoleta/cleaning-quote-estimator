@@ -183,7 +183,7 @@ export default function CompanyDashboard({ user, onLogout }) {
 
           {saved && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#4ade80', fontSize: 13, fontWeight: 600 }}>
-              <Check size={14} /> Saved
+              <Check size={14} strokeLinecap="square" strokeLinejoin="miter" /> Saved
             </div>
           )}
 

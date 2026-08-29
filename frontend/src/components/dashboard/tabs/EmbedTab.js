@@ -117,7 +117,7 @@ function EmbedCard({ title, badge, desc, code, onCopy, copied }) {
             flexShrink: 0, marginLeft: 14, transition: 'background 0.15s',
           }}
         >
-          {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy Code</>}
+          {copied ? <><Check size={13} strokeLinecap="square" strokeLinejoin="miter" /> Copied!</> : <><Copy size={13} /> Copy Code</>}
         </button>
       </div>
       <div style={{ background: '#0f172a', padding: '14px 18px', overflowX: 'auto' }}>

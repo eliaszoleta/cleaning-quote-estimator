@@ -215,7 +215,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
             </button>
             {!embedded && (
               <button onClick={handleShare} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', border: '1.5px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13.5, color: '#374151' }}>
-                {shared ? <><Check size={14} /> Copied!</> : <><Share2 size={14} /> Share Results</>}
+                {shared ? <><Check size={14} strokeLinecap="square" strokeLinejoin="miter" /> Copied!</> : <><Share2 size={14} /> Share Results</>}
               </button>
             )}
             {!embedded && (

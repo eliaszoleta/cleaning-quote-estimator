@@ -95,6 +95,12 @@ function esc(str) {
     .replace(/>/g, '&gt;');
 }
 
+// Crisp checkmark bullet icon (square caps/miter joins, not lucide's rounded
+// default) matching the React Check icon usage in ServicePage.js etc.
+function checkIconSvg() {
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+}
+
 // ─── 4. Static nav header (visible to Googlebot without JS) ─────────────────
 
 function staticHeader() {
@@ -894,7 +900,7 @@ function renderServicePage(service, statesMod, assets) {
       <td style="padding:10px 14px;color:#475569;border-bottom:1px solid #f1f5f9">${esc(tier.note)}</td>
     </tr>`).join('');
 
-  const bulletsHtml = service.bullets.map(b => `<li style="display:flex;gap:8px;font-size:14.5px;color:#374151;line-height:1.7;margin-bottom:10px"><span style="color:#16a34a;flex-shrink:0">&check;</span>${esc(b)}</li>`).join('');
+  const bulletsHtml = service.bullets.map(b => `<li style="display:flex;gap:8px;font-size:14.5px;color:#374151;line-height:1.7;margin-bottom:10px">${checkIconSvg()}${esc(b)}</li>`).join('');
 
   const qty = service.unitType === 'flat' ? 1 : (service.typicalQuantity || 1) * (service.typicalVisitsPerMonth || 1);
   const featured = statesMod.getFeaturedStates();

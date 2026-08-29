@@ -94,7 +94,7 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor }) 
           ].map(({ key, val, set, label, hint }) => (
             <button key={key} onClick={() => set(!val)} style={{ padding: '12px 16px', borderRadius: 10, border: `2px solid ${val ? primaryColor : '#e2e8f0'}`, background: val ? `${primaryColor}10` : 'white', cursor: 'pointer', textAlign: 'left', width: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14, color: val ? primaryColor : '#374151' }}>
-                <span style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${val ? primaryColor : '#94a3b8'}`, background: val ? primaryColor : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{val ? <Check size={11} color="white" strokeWidth={3} /> : null}</span>
+                <span style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${val ? primaryColor : '#94a3b8'}`, background: val ? primaryColor : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{val ? <Check size={11} color="white" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" /> : null}</span>
                 {label}
               </div>
               <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, paddingLeft: 26 }}>{hint}</div>

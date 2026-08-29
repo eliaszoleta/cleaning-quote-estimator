@@ -138,7 +138,7 @@ export default function CompanyLanding() {
                   {PLAN_FEATURES.map(item => (
                     <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#374151' }}>
                       <span style={{ width: 16, height: 16, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Check size={9} color="#16a34a" strokeWidth={3} />
+                        <Check size={9} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" />
                       </span>
                       {item}
                     </li>
