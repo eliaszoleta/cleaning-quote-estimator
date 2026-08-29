@@ -23,6 +23,7 @@ import StatePage from './components/pages/StatePage';
 import CityPage from './components/pages/CityPage';
 import CalculatorPage from './components/pages/CalculatorPage';
 import EstimatorPage from './components/pages/EstimatorPage';
+import MethodologyPage from './components/pages/MethodologyPage';
 import EmbedWrapper from './components/EmbedWrapper';
 import './App.css';
 
@@ -45,6 +46,7 @@ const isCityPage = pathname.startsWith('/cleaning-cost/city/');
 const isStatePage = pathname.startsWith('/cleaning-cost/') && !isCityPage;
 const isCalculatorPage = pathname === '/cleaning-cost-calculator';
 const isEstimatorPage = pathname === '/cleaning-cost-estimator';
+const isMethodologyPage = pathname === '/how-we-calculate-prices';
 
 const embedCompanyId = isEmbed ? searchParams.get('company') : null;
 
@@ -150,6 +152,7 @@ export default function App() {
   if (isStatePage) return <HelmetProvider><div className="app"><Header /><main><StatePage slug={pathname.replace('/cleaning-cost/', '')} /></main><Footer /></div></HelmetProvider>;
   if (isCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><CalculatorPage /></main><Footer /></div></HelmetProvider>;
   if (isEstimatorPage) return <HelmetProvider><div className="app"><Header /><main><EstimatorPage /></main><Footer /></div></HelmetProvider>;
+  if (isMethodologyPage) return <HelmetProvider><div className="app"><Header /><main><MethodologyPage /></main><Footer /></div></HelmetProvider>;
 
   if (isCompany) {
     if (authLoading) return (

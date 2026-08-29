@@ -470,6 +470,7 @@ function staticFooter() {
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Resources</div>
         <a href="/cleaning-cost-calculator" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Cleaning Cost Calculator</a>
         <a href="/cleaning-cost-estimator" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Cleaning Cost Estimator</a>
+        <a href="/how-we-calculate-prices" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">How We Calculate Prices</a>
         <a href="/about" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">About Clean Estimator</a>
         <a href="/contact" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Contact</a>
       </div>
@@ -693,6 +694,57 @@ function renderEstimatorPage(assets) {
     maxWidth: 900,
     assets,
     extraHead: `<script type="application/ld+json">${webAppSchema}</script><script type="application/ld+json">${breadcrumb}</script><script type="application/ld+json">${faqSchema(estimatorFaqs)}</script>`,
+  });
+}
+
+function renderMethodologyPage(assets) {
+  const seoTitle = 'How We Calculate Cleaning Prices | Clean Estimator';
+  const seoDesc = "See exactly how Clean Estimator builds its pricing: base rate research, state cost-of-living adjustments, city pricing methodology, and the external sources we cite. Full transparency on where our numbers come from.";
+
+  const sections = [
+    ['Our Base Pricing', "Every price tier in our calculator — for house cleaning, carpet cleaning, commercial cleaning, and every other service — starts from aggregated market research across residential and commercial cleaning providers nationwide: published rate surveys, provider pricing pages, and industry cost data. We don't invent a number and work backward; we build each tier from what providers are actually charging, then keep it current as the market shifts."],
+    ['State Cost-of-Living Adjustments', "The same house cleaning job costs more in California than in Arkansas, and our numbers reflect that. Each state carries a multiplier — California sits around 1.40&times; the national baseline, Arkansas around 0.80&times; — built from regional labor cost and cost-of-living differences. That multiplier is applied directly to the national base price for whichever service you're pricing, not estimated separately per state."],
+    ['City and ZIP Code Pricing', "For city-level pages, we intentionally reuse the parent state's pricing data rather than inventing separate city-specific numbers. Reliable, verifiable cost data doesn't exist at neighborhood granularity for most markets — and we'd rather show you a number we can stand behind than a more precise-looking one we made up. If that changes for a given metro area, we'll update it."],
+    ['How Service Type Changes Your Price', "Deep cleans, move-in/move-out cleans, recurring-service discounts, and add-ons (inside oven, interior windows, and similar) are all priced as a percentage adjustment off the base tier, derived from how cleaning companies actually structure their own rate cards — for example, deep cleaning consistently runs 68-85% above a standard clean across the providers we've reviewed, so that's the range we show."],
+  ];
+
+  const citations = [
+    ['https://www.epa.gov', 'U.S. Environmental Protection Agency (EPA)', 'Air duct cleaning frequency guidance, and EPA-registered disinfectant lists (List N, List K) referenced in our medical and healthcare cleaning content.'],
+    ['https://www.usfa.fema.gov', 'U.S. Fire Administration', 'Dryer vent fire statistics cited in our dryer vent cleaning guides.'],
+    ['https://www.iicrc.org', 'IICRC (Institute of Inspection, Cleaning and Restoration Certification)', 'Recommended carpet cleaning frequency and industry certification standards referenced across our carpet and restoration content.'],
+    ['https://www.osha.gov', 'OSHA (Occupational Safety and Health Administration)', 'Bloodborne Pathogen Standard and workplace safety requirements referenced in our medical and healthcare facility cleaning content.'],
+  ];
+
+  const sectionCard = (title, inner) => `<div style="background:white;border-radius:16px;padding:26px 28px;border:1px solid #e2e8f0;margin-bottom:20px">
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:8px">${esc(title)}</h2>
+      ${inner}
+    </div>`;
+
+  const body = `  <h1 style="font-size:40px;font-weight:900;color:#0f172a;margin-bottom:12px">How We Calculate Cleaning Prices</h1>
+  <p style="font-size:18px;color:#64748b;margin-bottom:40px;line-height:1.7">Every estimate on Clean Estimator comes from a real methodology, not a guess. Here's exactly how the numbers behind the calculator — and every cost guide on this site — actually get built.</p>
+  ${sections.map(([t, txt]) => sectionCard(t, `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">${txt}</p>`)).join('\n  ')}
+  ${sectionCard('External Sources We Reference', `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 10px">Where our content relies on safety guidance, industry standards, or regulatory requirements rather than our own pricing data, we cite the source directly:</p>
+    ${citations.map(([href, name, use]) => `<div style="font-size:14px;color:#475569;line-height:1.6;padding-left:14px;border-left:2px solid #e2e8f0;margin-bottom:10px"><a href="${href}" target="_blank" rel="noopener noreferrer" style="color:${PRIMARY};font-weight:700;text-decoration:none">${esc(name)}</a> &mdash; ${esc(use)}</div>`).join('\n    ')}`)}
+  ${sectionCard("What Our Estimates Are — and Aren't", `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">Every number on Clean Estimator is a starting point, not a quote. Actual pricing depends on the specific condition of a property, local competition, and each company's own pricing — factors that are only ever fully visible in person. Use our numbers to negotiate confidently and spot outliers, then always get multiple quotes from licensed, insured professionals before booking.</p>`)}
+  ${sectionCard('How Often We Update Pricing', `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">We review and adjust our pricing models as national and regional market conditions change, rather than on a fixed calendar schedule. If you ever see a number that looks out of step with what you're being quoted locally, we want to know — <a href="/contact" style="color:${PRIMARY};font-weight:600">contact us</a> and we'll take a look.</p>`)}
+  <div style="margin-top:24px;background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:32px 36px;text-align:center">
+    <h2 style="font-size:22px;font-weight:800;color:white;margin-bottom:10px">See the Methodology in Action</h2>
+    <p style="color:#94a3b8;margin-bottom:20px;font-size:15px">Run a real, ZIP-code accurate estimate using the pricing engine described above.</p>
+    <a href="/cleaning-cost-calculator" style="background:${PRIMARY};color:white;padding:13px 30px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block">Try the Calculator &rarr;</a>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'How We Calculate Prices', item: `${DOMAIN}/how-we-calculate-prices` },
+  ]);
+
+  return renderStaticPage({
+    path: '/how-we-calculate-prices',
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    assets,
+    extraHead: `<script type="application/ld+json">${breadcrumb}</script>`,
   });
 }
 
@@ -931,7 +983,7 @@ function renderStatePage(state, servicesMod, statesMod, faqsMod, assets, citiesM
   </div>
   <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
     <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:6px">Cost by Service in ${esc(state.name)}</h2>
-    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">Estimated typical job cost, adjusted for ${esc(state.name)}'s labor rates.</p>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">Estimated typical job cost, adjusted for ${esc(state.name)}'s labor rates. <a href="/how-we-calculate-prices" style="color:${PRIMARY};font-weight:600">See how we calculate these prices &rarr;</a></p>
     <div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">
       <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Service</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">${esc(state.name)} Estimate</th></tr></thead>
       <tbody>${serviceRows}</tbody>
@@ -1012,7 +1064,7 @@ function renderCityPage(city, servicesMod, citiesMod, faqsMod, assets) {
   </div>
   <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
     <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:6px">Cost by Service in ${esc(city.name)}</h2>
-    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">Estimated typical job cost, adjusted for the ${esc(city.stateName)} market.</p>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">Estimated typical job cost, adjusted for the ${esc(city.stateName)} market. <a href="/how-we-calculate-prices" style="color:${PRIMARY};font-weight:600">See how we calculate these prices &rarr;</a></p>
     <div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">
       <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Service</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">${esc(city.name)} Estimate</th></tr></thead>
       <tbody>${serviceRows}</tbody>
@@ -1173,7 +1225,8 @@ function injectHomepage(posts, categories) {
     </div>
     <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
       <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">How Our Cleaning Cost Calculator Estimates Your Price</h2>
-      <p style="font-size:14px;color:#64748b;text-align:center;max-width:560px;margin:0 auto 24px;line-height:1.6">Clean Estimator is a free cleaning cost calculator that builds every quote from six real variables — not a flat national guess. Here's exactly what goes into your number.</p>
+      <p style="font-size:14px;color:#64748b;text-align:center;max-width:560px;margin:0 auto 10px;line-height:1.6">Clean Estimator is a free cleaning cost calculator that builds every quote from six real variables — not a flat national guess. Here's exactly what goes into your number.</p>
+      <p style="text-align:center;font-size:13px;margin:0 auto 24px"><a href="/how-we-calculate-prices" style="color:${PRIMARY};font-weight:700;text-decoration:none">See our full pricing methodology and sources &rarr;</a></p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
         <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Home Size (Square Footage)</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Your base price scales with square footage — $90–$115 under 1,000 sq ft, up to $272–$338 over 3,000 sq ft.</p></div>
         <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Service Type</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Standard cleaning is the baseline. Deep cleaning costs 68–85% more, move-in/move-out costs 88–105% more.</p></div>
@@ -1274,6 +1327,8 @@ function main() {
   count++;
   writeFile('cleaning-cost-estimator', renderEstimatorPage(assets));
   count++;
+  writeFile('how-we-calculate-prices', renderMethodologyPage(assets));
+  count++;
 
   const services = servicesMod.getAllServices();
   for (const service of services) {
@@ -1295,7 +1350,7 @@ function main() {
     count++;
   }
 
-  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 7 static pages, ' + services.length + ' services, ' + states.length + ' states, ' + cities.length + ' cities)');
+  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 8 static pages, ' + services.length + ' services, ' + states.length + ' states, ' + cities.length + ' cities)');
 }
 
 main();

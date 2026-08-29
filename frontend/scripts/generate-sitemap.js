@@ -79,6 +79,7 @@ const staticPages = [
   { path: '/',                       priority: '1.0', changefreq: 'weekly',  lastmod: TODAY },
   { path: '/cleaning-cost-calculator', priority: '0.9', changefreq: 'weekly', lastmod: TODAY },
   { path: '/cleaning-cost-estimator',  priority: '0.9', changefreq: 'weekly', lastmod: TODAY },
+  { path: '/how-we-calculate-prices',  priority: '0.7', changefreq: 'monthly', lastmod: TODAY },
   { path: '/blog',                   priority: '0.9', changefreq: 'weekly',  lastmod: TODAY },
   { path: '/for-companies',    priority: '0.8', changefreq: 'monthly', lastmod: TODAY },
   { path: '/about',            priority: '0.6', changefreq: 'monthly', lastmod: '2026-01-01' },
