@@ -146,7 +146,7 @@ export default function SEOContent() {
       <Helmet>
         <title>Free Cleaning Cost Calculator 2026 | Clean Estimator</title>
         <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $90–$338, carpet cleaning $44–$100/room, air duct from $330, commercial, mold remediation & more. No signup needed." />
-        <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, house cleaning cost calculator, how much does cleaning cost, cleaning estimate, carpet cleaning cost, air duct cleaning cost, commercial cleaning rates, mold remediation cost, cleaning price calculator, free cleaning estimate" />
+        <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, house cleaning cost calculator, how much does cleaning cost, cleaning estimate, cleaning cost estimate online, carpet cleaning cost, air duct cleaning cost, commercial cleaning rates, mold remediation cost, cleaning price calculator, free cleaning estimate" />
         <link rel="canonical" href="https://www.cleanestimator.com/" />
         <meta property="og:site_name" content="Clean Estimator" />
         <meta property="og:title" content="Free Cleaning Cost Calculator 2026 | Clean Estimator" />
@@ -167,7 +167,21 @@ export default function SEOContent() {
         <script type="application/ld+json">{JSON.stringify(webAppSchema)}</script>
       </Helmet>
 
-      <div id="services" style={{ background: 'white', marginTop: 80 }}>
+      <div style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginTop: 80 }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', padding: '48px 24px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px' }}>
+            Get a Cleaning Cost Estimate Online in Under 60 Seconds
+          </h2>
+          <p style={{ fontSize: 15.5, color: '#475569', lineHeight: 1.75, margin: '0 auto 14px' }}>
+            No phone calls, no waiting on a callback — just a real cleaning cost estimate online, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the job above, and Clean Estimator returns a live price range for house cleaning, carpet cleaning, commercial cleaning, and 6 other services in under a minute.
+          </p>
+          <p style={{ fontSize: 15.5, color: '#475569', lineHeight: 1.75, margin: '0 auto' }}>
+            It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.
+          </p>
+        </div>
+      </div>
+
+      <div id="services" style={{ background: 'white' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 24px' }}>
 
           {/* Services grid */}

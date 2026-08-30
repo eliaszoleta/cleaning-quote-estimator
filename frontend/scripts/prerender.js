@@ -1302,6 +1302,11 @@ function injectHomepage(posts, categories) {
       <p style="font-size:18px;color:#475569;max-width:560px;margin:0 auto 32px;line-height:1.6">Get instant, ZIP-code specific cleaning service prices for house cleaning, carpet cleaning, air duct cleaning, and more — 100% free.</p>
       <a href="/" style="background:${PRIMARY};color:white;padding:16px 36px;border-radius:10px;text-decoration:none;font-weight:700;font-size:17px;display:inline-block">Get My Free Estimate &#8594;</a>
     </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px;text-align:center">
+      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:12px">Get a Cleaning Cost Estimate Online in Under 60 Seconds</h2>
+      <p style="font-size:14.5px;color:#475569;line-height:1.7;max-width:640px;margin:0 auto 12px">No phone calls, no waiting on a callback — just a real cleaning cost estimate online, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the job above, and Clean Estimator returns a live price range for house cleaning, carpet cleaning, commercial cleaning, and 6 other services in under a minute.</p>
+      <p style="font-size:14.5px;color:#475569;line-height:1.7;max-width:640px;margin:0 auto">It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.</p>
+    </div>
     <div id="how-it-works" style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
       <h2 style="font-size:24px;font-weight:800;color:#0f172a;margin-bottom:28px;text-align:center">How It Works</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px">
@@ -1360,9 +1365,13 @@ function injectHomepage(posts, categories) {
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How much does mold remediation cost?</h3>
         <p style="font-size:14px;color:#475569;line-height:1.6">Mold remediation costs $750–$1,050 for a small spot (under 10 sq ft) up to $8,500–$13,000+ for extensive contamination (300+ sq ft). It always requires an in-person inspection — final pricing depends on the extent of contamination and whether the moisture source has been fixed.</p>
       </div>
-      <div>
+      <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Is this calculator really free?</h3>
         <p style="font-size:14px;color:#475569;line-height:1.6">Yes, 100% free. No sign-up, no email required. We provide estimates based on real local market data so you can negotiate confidently with cleaning companies.</p>
+      </div>
+      <div>
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Can I get a cleaning cost estimate online instead of scheduling an in-home visit?</h3>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Yes — that's exactly what Clean Estimator is built for. You get a full cleaning cost estimate online in under 60 seconds, based on real state-by-state pricing data, without a salesperson visiting your home or a phone call.</p>
       </div>
     </div>
   </div>
