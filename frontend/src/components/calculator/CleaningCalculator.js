@@ -198,7 +198,6 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
       <div style={{
         background: embedded ? 'white' : 'linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%)',
-        minHeight: embedded ? 'auto' : '100vh',
         padding: embedded ? '0' : '28px 16px',
       }}>
         {/* Hero (non-embedded only) */}

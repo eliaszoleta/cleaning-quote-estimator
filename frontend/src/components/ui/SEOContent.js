@@ -167,8 +167,8 @@ export default function SEOContent() {
         <script type="application/ld+json">{JSON.stringify(webAppSchema)}</script>
       </Helmet>
 
-      <div style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', marginTop: 80 }}>
-        <div style={{ maxWidth: 760, margin: '0 auto', padding: '48px 24px', textAlign: 'center' }}>
+      <div style={{ background: 'white' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', padding: '56px 24px 0', textAlign: 'center' }}>
           <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px' }}>
             Get a Cleaning Cost Estimate Online in Under 60 Seconds
           </h2>
