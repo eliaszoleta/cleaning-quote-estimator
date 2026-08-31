@@ -238,10 +238,13 @@ export default function SEOContent() {
       <div style={{ background: 'white' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', padding: '56px 24px 0', textAlign: 'center' }}>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px' }}>
-            Get a Cleaning Cost Estimate Online in Under 60 Seconds
+            Get a FREE Cleaning Cost Estimate Online
           </h2>
           <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
-            No phone calls, no waiting on a callback — just a real cleaning cost estimate online, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the job above, and Clean Estimator returns a live price range for house cleaning, carpet cleaning, commercial cleaning, and 6 other services in under a minute.
+            No phone calls, no waiting on a callback — just a real cleaning cost estimate online, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.
+          </p>
+          <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
+            It works the same way across all 9 services — house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, air duct cleaning, dryer vent cleaning, tile &amp; grout cleaning, mold remediation, and water damage restoration — each with its own scope questions, not a one-size-fits-all form.
           </p>
           <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto' }}>
             It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.
