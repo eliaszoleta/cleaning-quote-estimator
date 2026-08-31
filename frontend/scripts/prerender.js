@@ -486,6 +486,11 @@ function staticFooter() {
         <a href="/company" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Company Login</a>
       </div>
       <div>
+        <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Local Partner Program</div>
+        <a href="/partner-with-us" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Become a Partner</a>
+        <a href="/client" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Partner Login</a>
+      </div>
+      <div>
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Legal</div>
         <a href="/privacy-policy" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Privacy Policy</a>
         <a href="/terms-of-service" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Terms of Service</a>
@@ -1394,6 +1399,26 @@ function injectHomepage(posts, categories) {
         ${postLinks}
       </ul>
       <a href="/blog" style="display:inline-block;margin-top:14px;color:${PRIMARY};font-weight:700;font-size:14px;text-decoration:none">View all guides &#8594;</a>
+    </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
+      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">Key Features for Businesses</h2>
+      <p style="text-align:center;color:#64748b;font-size:14px;max-width:600px;margin:0 auto 24px">Clean Estimator isn't just a consumer tool — cleaning companies work with us two ways.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px">
+          <h3 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px">Local Partner Program</h3>
+          <p style="font-size:13px;color:#475569;line-height:1.65;margin:0 0 12px">Exclusive, one-partner-per-city placement — your business is recommended directly to homeowners in your city actively searching for cleaning services. $350/month per city, only one partner per city.</p>
+          <a href="/partner-with-us" style="font-size:13px;color:${PRIMARY};font-weight:700;text-decoration:none">See partner program details &rarr;</a>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px">
+          <h3 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px">Website Integration</h3>
+          <p style="font-size:13px;color:#475569;line-height:1.65;margin:0 0 12px">Embed a branded, white-labeled cleaning cost calculator directly on your own website to capture leads. $159/month after a 7-day free trial.</p>
+          <a href="/for-companies" style="font-size:13px;color:${PRIMARY};font-weight:700;text-decoration:none">See embeddable calculator details &rarr;</a>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px">
+          <h3 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px">No Signup Needed for Consumers</h3>
+          <p style="font-size:13px;color:#475569;line-height:1.65;margin:0">Homeowners get instant, free estimates without creating an account — so every lead reaching a partner or embedded calculator is already warm.</p>
+        </div>
+      </div>
     </div>
     <div id="faq" style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px">
       <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:24px">Frequently Asked Questions</h2>
