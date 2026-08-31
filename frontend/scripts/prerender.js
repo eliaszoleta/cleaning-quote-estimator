@@ -1294,6 +1294,27 @@ function injectHomepage(posts, categories) {
     `<li style="margin-bottom:10px"><a href="/blog/${p.slug}" style="color:${PRIMARY};text-decoration:none;font-size:14px;font-weight:500;line-height:1.5">${esc(p.title)}</a></li>`
   ).join('\n      ');
 
+  // What the calculator actually asks for each service -- pulled directly
+  // from each step component's real form fields, mirroring the same data
+  // used in SEOContent.js's React "What Affects Your Price, by Service" grid.
+  const SERVICE_PRICE_FACTORS = [
+    ['House Cleaning', ['Home size — 7 tiers from under 1,000 sq ft to 4,000+ sq ft', 'Number of bedrooms and bathrooms', 'Cleaning type: standard, deep, move-in/move-out, or post-construction', 'Frequency: one-time, weekly, biweekly, or monthly', 'Home condition: good, fair, or neglected', 'Add-ons: inside oven/fridge/cabinets, laundry, interior windows, garage, patio, pet hair, finished basement']],
+    ['Apartment Cleaning', ['Unit size: studio up to 4+ bedrooms', 'Number of bathrooms', 'Cleaning type: standard, deep, or move-in/move-out', 'Frequency, and whether the unit is furnished or vacant (vacant runs 10–15% less)', 'Add-ons: inside oven/fridge/cabinets, laundry, interior windows, balcony/patio']],
+    ['Commercial Cleaning', ['Building type: office, retail, medical/dental, restaurant, warehouse, school, gym, or church', 'Square footage and number of restrooms', 'Cleaning frequency: daily, weekly, biweekly, or monthly', 'Service level: basic, standard, or premium', 'Optional day porter or after-hours service (+15%)']],
+    ['Carpet Cleaning', ['Room count or total square footage', 'Soil level: light, moderate, heavy, or pet stains/odors', 'Cleaning method: steam, dry cleaning, or encapsulation', 'Number of stairs', 'Add-ons: area rugs, Scotchgard protection, deodorizer, pet odor treatment']],
+    ['Air Duct Cleaning', ['Residential (vent count and HVAC system count) or commercial (square footage)', 'Add-ons: UV sanitizing, dryer vent bundle, coil cleaning, filter replacement', 'Suspected mold in the ductwork (+40–50%, requires inspection)']],
+    ['Dryer Vent Cleaning', ['Residential (vent length and routing) or commercial (number of dryers)', 'Vent length: short, medium, long, or very long', 'Routing: through wall, through roof, underground, or periscope/tight space', 'Suspected clog (+$50–$100), and bulk discounts for 10+ dryers']],
+    ['Tile & Grout Cleaning', ['Area size in square feet', 'Tile material: ceramic, porcelain, natural stone, travertine, or slate (natural stone costs 30–40% more)', 'Current condition, plus soap scum or hard water buildup', 'Services needed: deep clean, grout sealing, grout recoloring, caulk replacement']],
+    ['Mold Remediation', ['Affected area: under 10 sq ft up to 300+ sq ft', 'Locations affected: bathroom, basement, attic, crawl space, HVAC/ductwork, walls, kitchen, garage', 'Whether the moisture source has already been fixed', 'Residential or commercial property (+30–50%)', 'Optional air quality testing and post-remediation clearance testing']],
+    ['Water Damage Restoration', ['How long ago the damage occurred — urgency affects response', 'Cause: burst pipe, appliance leak, toilet overflow, roof leak, flooding, or sewage backup', 'Water category: clean, gray (+30%), or black water (+60–100%)', 'Affected square footage and which floors/areas are affected', 'Damage severity: wet carpets, soaked walls, or structural damage']],
+  ];
+  const serviceFactorCards = SERVICE_PRICE_FACTORS.map(([name, factors]) => `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px 20px">
+          <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">${esc(name)}</h3>
+          <ul style="margin:0;padding-left:18px;color:#475569;font-size:12.5px;line-height:1.7">
+            ${factors.map(f => `<li>${esc(f)}</li>`).join('\n            ')}
+          </ul>
+        </div>`).join('\n        ');
+
   const staticContent = `${staticHeader()}
 <div style="font-family:'Poppins','Poppins Fallback',Arial,sans-serif;background:#f8fafc;min-height:80vh">
   <div style="max-width:1100px;margin:0 auto;padding:40px 24px 64px">
@@ -1321,10 +1342,17 @@ function injectHomepage(posts, categories) {
       <ul style="margin:0;padding-left:20px;color:#374151;font-size:14.5px;line-height:1.9">
         <li><strong>Square Footage:</strong> Base price scales with home or space size — larger square footage means a higher price.</li>
         <li><strong>Room Count:</strong> Extra bedrooms and bathrooms add roughly $15–$25 each on top of the base price.</li>
-        <li><strong>Service Scope:</strong> Not just for house cleaning — carpet cleaning is scoped by room count, soil level, and cleaning method; commercial cleaning by square footage and visit frequency; mold remediation and water damage by affected square footage; air duct cleaning by HVAC system count.</li>
+        <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our 9 services asks its own scope questions. See the full breakdown by service below.</li>
         <li><strong>Cleaning Frequency:</strong> Weekly service saves 20%, biweekly 15%, and monthly 10% off the one-time rate.</li>
         <li><strong>Add-Ons:</strong> Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and similar extras are priced separately.</li>
       </ul>
+    </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">What Affects Your Price, by Service</h2>
+      <p style="text-align:center;color:#64748b;font-size:13.5px;max-width:640px;margin:0 auto 20px;line-height:1.7">Every service on this cleaning cost estimator asks its own scope questions — not just square footage and ZIP code. Here's exactly what factors into each one.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+        ${serviceFactorCards}
+      </div>
     </div>
     <div id="how-it-works" style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
       <h2 style="font-size:24px;font-weight:800;color:#0f172a;margin-bottom:28px;text-align:center">How It Works</h2>

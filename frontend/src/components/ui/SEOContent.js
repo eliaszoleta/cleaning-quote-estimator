@@ -66,6 +66,7 @@ function formatPrice(n) {
 const SERVICES = getAllServices().map(service => {
   const cost = typicalCost(service);
   return {
+    id: service.id,
     Icon: ICONS[service.id] || Home,
     ...COLORS[service.id],
     title: service.name,
@@ -75,6 +76,72 @@ const SERVICES = getAllServices().map(service => {
     facts: service.bullets.slice(0, 3),
   };
 });
+
+// What the calculator actually asks for each service — pulled directly from
+// each step component's real form fields (HomeStep.js, CarpetStep.js, etc.),
+// not a generic restatement, so this matches the live calculator exactly.
+const SERVICE_PRICE_FACTORS = {
+  home_residential: [
+    'Home size — 7 tiers from under 1,000 sq ft to 4,000+ sq ft',
+    'Number of bedrooms and bathrooms',
+    'Cleaning type: standard, deep, move-in/move-out, or post-construction',
+    'Frequency: one-time, weekly, biweekly, or monthly',
+    'Home condition: good, fair, or neglected',
+    'Add-ons: inside oven/fridge/cabinets, laundry, interior windows, garage, patio, pet hair, finished basement',
+  ],
+  apartment: [
+    'Unit size: studio up to 4+ bedrooms',
+    'Number of bathrooms',
+    'Cleaning type: standard, deep, or move-in/move-out',
+    'Frequency, and whether the unit is furnished or vacant (vacant runs 10–15% less)',
+    'Add-ons: inside oven/fridge/cabinets, laundry, interior windows, balcony/patio',
+  ],
+  commercial: [
+    'Building type: office, retail, medical/dental, restaurant, warehouse, school, gym, or church',
+    'Square footage and number of restrooms',
+    'Cleaning frequency: daily, weekly, biweekly, or monthly',
+    'Service level: basic, standard, or premium',
+    'Optional day porter or after-hours service (+15%)',
+  ],
+  carpet: [
+    'Room count or total square footage',
+    'Soil level: light, moderate, heavy, or pet stains/odors',
+    'Cleaning method: steam, dry cleaning, or encapsulation',
+    'Number of stairs',
+    'Add-ons: area rugs, Scotchgard protection, deodorizer, pet odor treatment',
+  ],
+  air_duct: [
+    'Residential (vent count and HVAC system count) or commercial (square footage)',
+    'Add-ons: UV sanitizing, dryer vent bundle, coil cleaning, filter replacement',
+    'Suspected mold in the ductwork (+40–50%, requires inspection)',
+  ],
+  dryer_vent: [
+    'Residential (vent length and routing) or commercial (number of dryers)',
+    'Vent length: short, medium, long, or very long',
+    'Routing: through wall, through roof, underground, or periscope/tight space',
+    'Suspected clog (+$50–$100), and bulk discounts for 10+ dryers',
+  ],
+  tile_grout: [
+    'Area size in square feet',
+    'Tile material: ceramic, porcelain, natural stone, travertine, or slate (natural stone costs 30–40% more)',
+    'Current condition, plus soap scum or hard water buildup',
+    'Services needed: deep clean, grout sealing, grout recoloring, caulk replacement',
+  ],
+  mold_remediation: [
+    'Affected area: under 10 sq ft up to 300+ sq ft',
+    'Locations affected: bathroom, basement, attic, crawl space, HVAC/ductwork, walls, kitchen, garage',
+    'Whether the moisture source has already been fixed',
+    'Residential or commercial property (+30–50%)',
+    'Optional air quality testing and post-remediation clearance testing',
+  ],
+  water_damage: [
+    'How long ago the damage occurred — urgency affects response',
+    'Cause: burst pipe, appliance leak, toilet overflow, roof leak, flooding, or sewage backup',
+    'Water category: clean, gray (+30%), or black water (+60–100%)',
+    'Affected square footage and which floors/areas are affected',
+    'Damage severity: wet carpets, soaked walls, or structural damage',
+  ],
+};
 
 const STATES_DATA = getFeaturedStates().map(s => ({
   state: s.name,
@@ -198,13 +265,33 @@ export default function SEOContent() {
           <ul style={{ margin: '0 0 24px', paddingLeft: 20, color: '#374151', fontSize: 15, lineHeight: 1.9 }}>
             <li><strong>Square Footage:</strong> Base price scales with home or space size — larger square footage means a higher price.</li>
             <li><strong>Room Count:</strong> Extra bedrooms and bathrooms add roughly $15–$25 each on top of the base price.</li>
-            <li><strong>Service Scope:</strong> Not just for house cleaning — carpet cleaning is scoped by room count, soil level, and cleaning method; commercial cleaning by square footage and visit frequency; mold remediation and water damage by affected square footage; air duct cleaning by HVAC system count.</li>
+            <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our 9 services asks its own scope questions. See the full breakdown by service below.</li>
             <li><strong>Cleaning Frequency:</strong> Weekly service saves 20%, biweekly 15%, and monthly 10% off the one-time rate.</li>
             <li><strong>Add-Ons:</strong> Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and similar extras are priced separately.</li>
           </ul>
-          <p style={{ textAlign: 'center', fontSize: 13.5, color: '#94a3b8' }}>
+          <p style={{ textAlign: 'center', fontSize: 13.5, color: '#94a3b8', marginBottom: 48 }}>
             See the full breakdown on our <a href="/how-we-calculate-prices" style={{ color: '#2563eb', fontWeight: 600 }}>pricing methodology page</a>.
           </p>
+
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>What Affects Your Price, by Service</h2>
+          <p style={{ textAlign: 'center', color: '#64748b', fontSize: 14.5, maxWidth: 640, margin: '0 auto 24px', lineHeight: 1.7 }}>
+            Every service on this cleaning cost estimator asks its own scope questions — not just square footage and ZIP code. Here's exactly what factors into each one.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
+            {SERVICES.map(({ id, Icon, color, bg, title, href }) => (
+              <div key={id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '20px 22px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                  <span style={{ width: 30, height: 30, borderRadius: 9, background: bg, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Icon size={15} strokeWidth={2.1} />
+                  </span>
+                  <a href={href} style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', textDecoration: 'none' }}>{title}</a>
+                </div>
+                <ul style={{ margin: 0, paddingLeft: 18, color: '#475569', fontSize: 13, lineHeight: 1.7 }}>
+                  {(SERVICE_PRICE_FACTORS[id] || []).map((factor, i) => <li key={i}>{factor}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
