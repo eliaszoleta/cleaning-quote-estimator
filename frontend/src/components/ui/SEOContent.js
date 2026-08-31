@@ -99,7 +99,7 @@ export default function SEOContent() {
     '@type': 'WebApplication',
     name: 'Clean Estimator — Free Cleaning Cost Calculator',
     url: 'https://www.cleanestimator.com',
-    description: 'Free cleaning cost calculator and estimator for US homeowners and businesses. Instant, ZIP-code specific estimates for house cleaning, carpet, air duct, mold remediation, water damage, and more across all 50 states.',
+    description: 'Free cleaning cost calculator and estimator for US homeowners and businesses. Every price factors in home size, room count, service scope, and cleaning frequency, then adjusts for ZIP-code specific cost of living, for house cleaning, carpet, air duct, mold remediation, water damage, and more across all 50 states.',
     applicationCategory: 'UtilityApplication',
     operatingSystem: 'Web',
     browserRequirements: 'Requires JavaScript',
@@ -117,6 +117,7 @@ export default function SEOContent() {
     },
     featureList: [
       'Free cleaning cost estimates with no signup',
+      'Every service asks about size, scope, and frequency — not just ZIP code',
       'ZIP-code specific pricing across all 50 US states',
       'House cleaning cost calculator',
       'Carpet cleaning cost estimator',
@@ -177,6 +178,32 @@ export default function SEOContent() {
           </p>
           <p style={{ fontSize: 15.5, color: '#475569', lineHeight: 1.75, margin: '0 auto' }}>
             It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.
+          </p>
+        </div>
+
+        <div style={{ maxWidth: 860, margin: '48px auto 0', padding: '0 24px 56px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', marginBottom: 16, textAlign: 'center' }}>Average Cleaning Costs (2026)</h2>
+          <ul style={{ margin: '0 0 40px', paddingLeft: 20, color: '#374151', fontSize: 15, lineHeight: 1.9 }}>
+            <li><strong>Standard House Cleaning:</strong> $90–$338 per visit depending on home size — $158–$198 is typical for the most common 1,500–2,000 sq ft home.</li>
+            <li><strong>Deep Cleaning:</strong> 68–85% more than a standard clean; move-in/move-out cleans run 88–105% more.</li>
+            <li><strong>Commercial Cleaning:</strong> $0.052–$0.185 per square foot per visit, depending on building type.</li>
+            <li><strong>Carpet Cleaning:</strong> $44–$100 per room, with a $90–$110 whole-home minimum.</li>
+            <li><strong>Mold Remediation:</strong> $750–$1,050 for a small spot under 10 sq ft, up to $8,500–$13,000+ for 300+ sq ft.</li>
+          </ul>
+
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>Key Pricing Factors</h2>
+          <p style={{ textAlign: 'center', color: '#64748b', fontSize: 14.5, maxWidth: 620, margin: '0 auto 18px', lineHeight: 1.7 }}>
+            Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 9 services, not just house cleaning.
+          </p>
+          <ul style={{ margin: '0 0 24px', paddingLeft: 20, color: '#374151', fontSize: 15, lineHeight: 1.9 }}>
+            <li><strong>Square Footage:</strong> Base price scales with home or space size — larger square footage means a higher price.</li>
+            <li><strong>Room Count:</strong> Extra bedrooms and bathrooms add roughly $15–$25 each on top of the base price.</li>
+            <li><strong>Service Scope:</strong> Not just for house cleaning — carpet cleaning is scoped by room count, soil level, and cleaning method; commercial cleaning by square footage and visit frequency; mold remediation and water damage by affected square footage; air duct cleaning by HVAC system count.</li>
+            <li><strong>Cleaning Frequency:</strong> Weekly service saves 20%, biweekly 15%, and monthly 10% off the one-time rate.</li>
+            <li><strong>Add-Ons:</strong> Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and similar extras are priced separately.</li>
+          </ul>
+          <p style={{ textAlign: 'center', fontSize: 13.5, color: '#94a3b8' }}>
+            See the full breakdown on our <a href="/how-we-calculate-prices" style={{ color: '#2563eb', fontWeight: 600 }}>pricing methodology page</a>.
           </p>
         </div>
       </div>

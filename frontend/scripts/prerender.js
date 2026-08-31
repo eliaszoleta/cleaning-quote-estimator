@@ -1307,6 +1307,25 @@ function injectHomepage(posts, categories) {
       <p style="font-size:14.5px;color:#475569;line-height:1.7;max-width:640px;margin:0 auto 12px">No phone calls, no waiting on a callback — just a real cleaning cost estimate online, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the job above, and Clean Estimator returns a live price range for house cleaning, carpet cleaning, commercial cleaning, and 6 other services in under a minute.</p>
       <p style="font-size:14.5px;color:#475569;line-height:1.7;max-width:640px;margin:0 auto">It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.</p>
     </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:14px;text-align:center">Average Cleaning Costs (2026)</h2>
+      <ul style="margin:0 0 32px;padding-left:20px;color:#374151;font-size:14.5px;line-height:1.9">
+        <li><strong>Standard House Cleaning:</strong> $90–$338 per visit depending on home size — $158–$198 is typical for the most common 1,500–2,000 sq ft home.</li>
+        <li><strong>Deep Cleaning:</strong> 68–85% more than a standard clean; move-in/move-out cleans run 88–105% more.</li>
+        <li><strong>Commercial Cleaning:</strong> $0.052–$0.185 per square foot per visit, depending on building type.</li>
+        <li><strong>Carpet Cleaning:</strong> $44–$100 per room, with a $90–$110 whole-home minimum.</li>
+        <li><strong>Mold Remediation:</strong> $750–$1,050 for a small spot under 10 sq ft, up to $8,500–$13,000+ for 300+ sq ft.</li>
+      </ul>
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">Key Pricing Factors</h2>
+      <p style="text-align:center;color:#64748b;font-size:13.5px;max-width:600px;margin:0 auto 14px;line-height:1.7">Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 9 services, not just house cleaning.</p>
+      <ul style="margin:0;padding-left:20px;color:#374151;font-size:14.5px;line-height:1.9">
+        <li><strong>Square Footage:</strong> Base price scales with home or space size — larger square footage means a higher price.</li>
+        <li><strong>Room Count:</strong> Extra bedrooms and bathrooms add roughly $15–$25 each on top of the base price.</li>
+        <li><strong>Service Scope:</strong> Not just for house cleaning — carpet cleaning is scoped by room count, soil level, and cleaning method; commercial cleaning by square footage and visit frequency; mold remediation and water damage by affected square footage; air duct cleaning by HVAC system count.</li>
+        <li><strong>Cleaning Frequency:</strong> Weekly service saves 20%, biweekly 15%, and monthly 10% off the one-time rate.</li>
+        <li><strong>Add-Ons:</strong> Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and similar extras are priced separately.</li>
+      </ul>
+    </div>
     <div id="how-it-works" style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
       <h2 style="font-size:24px;font-weight:800;color:#0f172a;margin-bottom:28px;text-align:center">How It Works</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px">
