@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
+import FloatingPartnerBanner from '../partners/FloatingPartnerBanner';
 
 const styles = {
   header: {
@@ -141,6 +142,7 @@ export default function Header() {
 
   return (
     <header style={styles.header}>
+      <FloatingPartnerBanner />
       <div style={styles.inner}>
         <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
           <span style={styles.logoIcon} aria-hidden="true"><Sparkles size={17} strokeWidth={2.25} /></span>

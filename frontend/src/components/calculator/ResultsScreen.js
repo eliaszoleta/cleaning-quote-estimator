@@ -2,30 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, AlertTriangle, Zap, Phone, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
-import { supabase } from '../../lib/supabase';
+import { getUserLocation, findPartner } from '../../utils/partnerLookup';
 import PartnerCard from '../partners/PartnerCard';
-
-async function getUserLocation() {
-  try {
-    const res = await fetch('https://ipapi.co/json/');
-    const data = await res.json();
-    return { city: data.city, state: data.region };
-  } catch {
-    return null;
-  }
-}
-
-async function findPartner(city, state) {
-  if (!supabase || !city || !state) return null;
-  const { data } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('active', true)
-    .ilike('city', city)
-    .ilike('state', state)
-    .limit(1);
-  return data?.[0] || null;
-}
 
 export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset }) {
   const [shared, setShared] = useState(false);
