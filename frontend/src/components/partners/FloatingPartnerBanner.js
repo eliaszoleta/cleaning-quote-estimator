@@ -61,7 +61,7 @@ export default function FloatingPartnerBanner() {
         bottom: isMobile ? 12 : 'auto',
         right: isMobile ? 10 : 16,
         zIndex: 90,
-        width: isMobile ? 190 : 268,
+        width: isMobile ? 218 : 268,
         maxWidth: 'calc(100vw - 20px)',
         background: 'white',
         border: `1.5px solid #2563eb`,
@@ -81,7 +81,7 @@ export default function FloatingPartnerBanner() {
         <X size={isMobile ? 12 : 14} />
       </button>
 
-      <div style={{ fontSize: isMobile ? 8.5 : 10.5, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: isMobile ? 5 : 8, paddingRight: 16 }}>
+      <div style={{ fontSize: isMobile ? 8.5 : 10.5, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: isMobile ? 5 : 8, textAlign: 'center' }}>
         Local Cleaner Near You
       </div>
 
@@ -97,19 +97,17 @@ export default function FloatingPartnerBanner() {
         <div style={{ fontWeight: 800, fontSize: isMobile ? 11.5 : 14.5, color: '#0f172a', lineHeight: 1.25 }}>
           {partner.business_name}
         </div>
-        {!isMobile && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: partner.logo_url ? 'center' : 'flex-start', gap: 4, fontSize: 12, color: '#64748b', marginTop: 2 }}>
-            <MapPin size={11} color="#94a3b8" /> {partner.city}, {partner.state}
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: partner.logo_url ? 'center' : 'flex-start', gap: 4, fontSize: isMobile ? 10.5 : 12, color: '#64748b', marginTop: 2 }}>
+          <MapPin size={isMobile ? 10 : 11} color="#94a3b8" /> {partner.city}, {partner.state}
+        </div>
       </div>
 
       {partner.phone && (
         <a
           href={`tel:${partner.phone}`}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#16a34a', color: 'white', padding: isMobile ? '7px 10px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11 : 13 }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#16a34a', color: 'white', padding: isMobile ? '7px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap' }}
         >
-          <Phone size={isMobile ? 11 : 13} /> {isMobile ? 'Call Now' : `Call ${partner.phone}`}
+          <Phone size={isMobile ? 11 : 13} /> Call {partner.phone}
         </a>
       )}
     </div>,
