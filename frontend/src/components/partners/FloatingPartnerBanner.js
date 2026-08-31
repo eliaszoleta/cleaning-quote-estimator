@@ -21,7 +21,10 @@ export default function FloatingPartnerBanner() {
       if (sessionStorage.getItem(DISMISS_KEY)) return;
     } catch { /* ignore */ }
 
-    getCachedPartnerMatch().then(match => {
+    // TEMP-PREVIEW-ONLY -- forced fake data (555 = reserved fictional phone
+    // prefix, no real number) so the banner is visible on the live deploy
+    // for review. Revert to getCachedPartnerMatch() before this ships.
+    Promise.resolve({ business_name: 'Sparkle & Shine Cleaning Co.', city: 'Las Vegas', state: 'NV', phone: '(702) 555-0148' }).then(match => {
       if (cancelled || !match) return;
       setPartner(match);
       setTimeout(() => { if (!cancelled) setVisible(true); }, 1500);
