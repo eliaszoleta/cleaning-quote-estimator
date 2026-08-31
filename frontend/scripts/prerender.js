@@ -1304,8 +1304,8 @@ function injectHomepage(posts, categories) {
     </div>
     <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px;text-align:center">
       <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:12px">Get a Cleaning Cost Estimate Online in Under 60 Seconds</h2>
-      <p style="font-size:14.5px;color:#475569;line-height:1.7;max-width:640px;margin:0 auto 12px">No phone calls, no waiting on a callback — just a real cleaning cost estimate online, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the job above, and Clean Estimator returns a live price range for house cleaning, carpet cleaning, commercial cleaning, and 6 other services in under a minute.</p>
-      <p style="font-size:14.5px;color:#475569;line-height:1.7;max-width:640px;margin:0 auto">It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.</p>
+      <p style="font-size:14.5px;color:#64748b;line-height:1.7;max-width:640px;margin:0 auto 12px">No phone calls, no waiting on a callback — just a real cleaning cost estimate online, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the job above, and Clean Estimator returns a live price range for house cleaning, carpet cleaning, commercial cleaning, and 6 other services in under a minute.</p>
+      <p style="font-size:14.5px;color:#64748b;line-height:1.7;max-width:640px;margin:0 auto">It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.</p>
     </div>
     <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
       <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:14px;text-align:center">Average Cleaning Costs (2026)</h2>
