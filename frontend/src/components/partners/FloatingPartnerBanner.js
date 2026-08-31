@@ -29,10 +29,7 @@ export default function FloatingPartnerBanner() {
       if (sessionStorage.getItem(DISMISS_KEY)) return;
     } catch { /* ignore */ }
 
-    // TEMP-PREVIEW-ONLY -- forced fake data (555 = reserved fictional phone
-    // prefix, no real number) so the banner is visible on the live deploy
-    // for review. Revert to getCachedPartnerMatch() before this ships.
-    Promise.resolve({ business_name: 'Immaculate Restoration', address: 'Las Vegas, NV', phone: '(702) 555-0148', logo_url: 'https://immaculaterestoration.com/wp-content/uploads/immaculate-restoration-logo.webp' }).then(match => {
+    getCachedPartnerMatch().then(match => {
       if (cancelled || !match) return;
       setPartner(match);
       setTimeout(() => {
