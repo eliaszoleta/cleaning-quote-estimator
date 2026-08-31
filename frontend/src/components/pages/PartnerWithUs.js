@@ -124,7 +124,7 @@ export default function PartnerWithUs() {
     <>
       <Helmet>
         <title>Partner With Us | Clean Estimator</title>
-        <meta name="description" content="Get your cleaning business recommended to thousands of homeowners actively searching for cleaning services in your city. Join Clean Estimator's partner network for $350/month per city." />
+        <meta name="description" content="Get your cleaning business recommended to thousands of homeowners actively searching for cleaning services in your city. Join Clean Estimator's partner network for $350/month per city — sitewide placement, multi-city support, and a free performance dashboard included." />
       </Helmet>
 
       {/* Hero */}
@@ -183,10 +183,11 @@ export default function PartnerWithUs() {
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>How the Partnership Works</h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            <StepCard number="1" title="You choose your city (or cities)" desc="Tell us which cities or metro areas you serve. Each city is $350/month and gives you exclusive placement there — only one partner per city." />
-            <StepCard number="2" title="We add your business to our platform" desc="We set up your profile with your business name, phone number, website, and logo. No tech work needed on your end." />
-            <StepCard number="3" title="Your business appears on estimate results" desc="When someone in your city finishes using our estimator, your contact card shows up on their results page as a recommended local cleaner — right when they're ready to book." />
+            <StepCard number="1" title="You choose your city (or cities)" desc="Tell us which cities or metro areas you serve — one city or several. Each city is $350/month and gives you exclusive placement there — only one partner per city." />
+            <StepCard number="2" title="We add your business to our platform" desc="We set up your profile with your business name, address, phone number, website, and logo. No tech work needed on your end." />
+            <StepCard number="3" title="You show up wherever your customers are — not just one page" desc="Your listing appears as a recommended local cleaner on the estimate results page, and as a floating banner on every page someone in your city visits — the home page, blog posts, cost guides, all of it." />
             <StepCard number="4" title="They call or visit your website directly" desc="There's no middleman and no lead fee. The customer contacts you directly. Every lead is yours, no commission, no strings." />
+            <StepCard number="5" title="You track exactly what it's earning you" desc="Log into your free partner dashboard anytime to see how many times your listing was shown and how many calls it generated — real numbers, not guesswork." />
           </div>
         </div>
       </div>
@@ -207,11 +208,12 @@ export default function PartnerWithUs() {
             <div style={{ fontSize: 13.5, color: '#64748b', marginBottom: 28 }}>per city you want coverage in</div>
             <div style={{ marginBottom: 28 }}>
               <Check>Exclusive placement &mdash; only 1 partner per city</Check>
-              <Check>Your name, phone, website &amp; logo on every results page in your city</Check>
+              <Check>Your name, address, phone, website &amp; logo on every results page in your city, plus a floating recommendation banner sitewide</Check>
               <Check>Direct contact &mdash; customers call or click you straight away</Check>
               <Check>No lead fees, no commissions, no hidden costs</Check>
+              <Check>Free performance dashboard &mdash; see your views, calls, and click-through rate anytime</Check>
               <Check>Cancel anytime with 30 days notice</Check>
-              <Check>Add more cities at the same rate as you grow</Check>
+              <Check>Serve multiple cities under one account &mdash; add more at the same per-city rate as you grow</Check>
             </div>
             <div style={{ background: 'white', borderRadius: 10, padding: '14px 18px', border: '1px solid #bfdbfe', fontSize: 13.5, color: '#1e40af', lineHeight: 1.6 }}>
               <strong>Example:</strong> A business serving Dallas and Houston pays $700/month and appears on every estimate result from both cities.
@@ -243,7 +245,9 @@ export default function PartnerWithUs() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {[
               { q: 'Is there really only one partner per city?', a: 'Yes. We give one cleaning business exclusive placement per city. Once a city is taken, we waitlist new applicants. Apply early to lock in your market.' },
-              { q: 'How exactly does my business appear?', a: 'After a user completes an estimate, a branded card with your business name, logo, phone number, and website link appears on their results page under "Recommended Cleaner Near You." It looks like a trusted recommendation, not a banner ad.' },
+              { q: 'How exactly does my business appear?', a: 'Two ways. After a user completes an estimate, a branded card with your business name, address, logo, phone number, and website link appears on their results page as a recommended local cleaner. On top of that, a small floating banner with the same info follows visitors in your city across the whole site — home page, blog posts, cost guides — not just the results page. Both look like trusted recommendations, not banner ads.' },
+              { q: 'Can I cover more than one city?', a: "Yes. There's no limit — add as many cities as you want to serve, each at the same $350/month rate, all under one account and one dashboard." },
+              { q: 'Can I see how it\'s performing?', a: "Yes. Every partner gets free access to a performance dashboard at cleanestimator.com/client. Sign up with the email your listing is set up with to see exactly how many times your listing was shown and how many calls it generated." },
               { q: 'What counts as a city?', a: "We go by city name as detected from the user's IP address. Major metros count as one city each. If you serve a wide metro area, let us know and we'll figure out the best coverage for you." },
               { q: 'What if traffic in my city is low?', a: "We can share an estimate of current monthly sessions for your city before you commit. You're still getting targeted, high-intent visitors for less than the cost of one Google Ads day." },
               { q: 'Can I cancel?', a: "Yes. Give us 30 days notice and we'll remove your listing at the end of the billing cycle. No long-term contracts." },
