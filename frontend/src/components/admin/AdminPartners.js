@@ -20,6 +20,7 @@ export default function AdminPartners() {
   const [pwInput, setPwInput] = useState('');
   const [pwError, setPwError] = useState(false);
   const [partners, setPartners] = useState([]);
+  const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -34,6 +35,15 @@ export default function AdminPartners() {
     setLoading(false);
     if (!error) setPartners(data || []);
     else setError(error.message);
+
+    // Banner impressions/calls per partner, for reporting back to each
+    // paying partner what they're getting for the placement. Reads from the
+    // partner_banner_stats view (see the setup SQL) -- silently skipped if
+    // that view doesn't exist yet so it never breaks the main partner list.
+    const { data: statsData } = await supabase.from('partner_banner_stats').select('*');
+    if (statsData) {
+      setStats(Object.fromEntries(statsData.map(s => [s.partner_id, s])));
+    }
   }, []);
 
   useEffect(() => { if (authed) load(); }, [authed, load]);
@@ -178,6 +188,7 @@ export default function AdminPartners() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{p.business_name}</div>
                   <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 2 }}>{p.city}, {p.state}{p.phone && ` · ${p.phone}`}</div>
+                  <PartnerBannerStats stats={stats[p.id]} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                   <span style={{ fontSize: 11, fontWeight: 600, color: p.active ? '#16a34a' : '#94a3b8', background: p.active ? '#f0fdf4' : '#f8fafc', border: `1px solid ${p.active ? '#bbf7d0' : '#e2e8f0'}`, borderRadius: 6, padding: '3px 9px' }}>{p.active ? 'Active' : 'Inactive'}</span>
@@ -192,6 +203,22 @@ export default function AdminPartners() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// Impressions/calls for the floating banner (see partner_banner_stats view
+// in the setup SQL) -- the KPI numbers reported back to each paying partner.
+function PartnerBannerStats({ stats }) {
+  const impressions = stats?.impressions || 0;
+  const calls = stats?.calls || 0;
+  if (!impressions && !calls) return null;
+  const ctr = impressions > 0 ? ((calls / impressions) * 100).toFixed(1) : '0.0';
+  return (
+    <div style={{ display: 'flex', gap: 12, marginTop: 6, fontSize: 12, color: '#374151' }}>
+      <span><strong>{impressions.toLocaleString()}</strong> banner views</span>
+      <span><strong>{calls.toLocaleString()}</strong> calls</span>
+      <span style={{ color: '#94a3b8' }}>{ctr}% CTR</span>
     </div>
   );
 }

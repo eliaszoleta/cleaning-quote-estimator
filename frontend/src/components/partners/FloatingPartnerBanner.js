@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Phone, X, MapPin } from 'lucide-react';
-import { getCachedPartnerMatch } from '../../utils/partnerLookup';
+import { getCachedPartnerMatch, logBannerEvent } from '../../utils/partnerLookup';
 
 const DISMISS_KEY = 'cleanestimator_partner_banner_dismissed';
 
@@ -35,7 +35,11 @@ export default function FloatingPartnerBanner() {
     Promise.resolve({ business_name: 'Immaculate Restoration', city: 'Las Vegas', state: 'NV', phone: '(702) 555-0148', logo_url: 'https://immaculaterestoration.com/wp-content/uploads/immaculate-restoration-logo.webp' }).then(match => {
       if (cancelled || !match) return;
       setPartner(match);
-      setTimeout(() => { if (!cancelled) setVisible(true); }, 1500);
+      setTimeout(() => {
+        if (cancelled) return;
+        setVisible(true);
+        logBannerEvent(match.id, 'impression');
+      }, 1500);
     });
 
     return () => { cancelled = true; };
@@ -105,6 +109,7 @@ export default function FloatingPartnerBanner() {
       {partner.phone && (
         <a
           href={`tel:${partner.phone}`}
+          onClick={() => logBannerEvent(partner.id, 'call_click')}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#16a34a', color: 'white', padding: isMobile ? '7px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap' }}
         >
           <Phone size={isMobile ? 11 : 13} /> Call {partner.phone}
