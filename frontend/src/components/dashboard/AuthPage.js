@@ -47,7 +47,7 @@ export default function AuthPage({ onAuth }) {
   };
 
   const inputStyle = {
-    width: '100%', padding: '13px 16px', border: '1.5px solid #e2e8f0', borderRadius: 10,
+    width: '100%', padding: '13px 16px', border: '1.5px solid #e2e8f0', borderRadius: 5,
     fontSize: 15, outline: 'none', color: '#0f172a', background: '#fafafa',
     transition: 'border-color 0.15s, box-shadow 0.15s', boxSizing: 'border-box',
   };
@@ -56,7 +56,7 @@ export default function AuthPage({ onAuth }) {
   if (emailSent) {
     return (
       <div style={{ minHeight: '100vh', background: 'linear-gradient(145deg, #0f172a 0%, #1e293b 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <div style={{ background: 'white', borderRadius: 22, padding: '52px 44px', maxWidth: 420, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)', textAlign: 'center' }}>
+        <div style={{ background: 'white', borderRadius: 11, padding: '52px 44px', maxWidth: 420, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)', textAlign: 'center' }}>
           <div style={{ position: 'relative', width: 76, height: 76, margin: '0 auto 28px' }}>
             <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Mail size={32} color="#2563eb" strokeWidth={1.5} />
@@ -67,12 +67,12 @@ export default function AuthPage({ onAuth }) {
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.3px' }}>Check your inbox</h2>
           <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7, marginBottom: 10 }}>We sent a confirmation link to</p>
-          <div style={{ display: 'inline-block', background: '#f1f5f9', borderRadius: 8, padding: '6px 16px', fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 24 }}>{email}</div>
+          <div style={{ display: 'inline-block', background: '#f1f5f9', borderRadius: 4, padding: '6px 16px', fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 24 }}>{email}</div>
           <p style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7, marginBottom: 32 }}>
             Click the link in the email to confirm your account.<br />You'll land directly in your dashboard.
           </p>
           <button onClick={() => { setEmailSent(false); setMode('login'); }}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 11, border: 'none', background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}>
+            style={{ width: '100%', padding: '13px 0', borderRadius: 5.5, border: 'none', background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}>
             Go to Sign In
           </button>
           <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 16 }}>
@@ -87,13 +87,13 @@ export default function AuthPage({ onAuth }) {
   // ── Main auth card ─────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(145deg, #0f172a 0%, #1e293b 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ background: 'white', borderRadius: 22, padding: '48px 44px', maxWidth: 440, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}>
+      <div style={{ background: 'white', borderRadius: 11, padding: '48px 44px', maxWidth: 440, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}>
 
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 36 }}>
-          <div style={{ width: 38, height: 38, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 20, fontWeight: 700, boxShadow: '0 4px 12px rgba(37,99,235,0.35)', flexShrink: 0 }}>✦</div>
+          <div style={{ width: 38, height: 38, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 20, fontWeight: 700, boxShadow: '0 4px 12px rgba(37,99,235,0.35)', flexShrink: 0 }}>✦</div>
           <span style={{ fontWeight: 800, fontSize: 19, color: '#0f172a', letterSpacing: '-0.2px' }}>Clean Estimator</span>
-          <span style={{ fontSize: 11, background: '#eff6ff', color: '#2563eb', padding: '3px 9px', borderRadius: 20, fontWeight: 700, marginLeft: 2, letterSpacing: '0.02em' }}>Company Portal</span>
+          <span style={{ fontSize: 11, background: '#eff6ff', color: '#2563eb', padding: '3px 9px', borderRadius: 10, fontWeight: 700, marginLeft: 2, letterSpacing: '0.02em' }}>Company Portal</span>
         </div>
 
         <h1 style={{ fontSize: 23, fontWeight: 800, color: '#0f172a', marginBottom: 5, letterSpacing: '-0.3px' }}>
@@ -104,17 +104,17 @@ export default function AuthPage({ onAuth }) {
         </p>
 
         {/* Toggle */}
-        <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 11, padding: 4, marginBottom: 26 }}>
+        <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 5.5, padding: 4, marginBottom: 26 }}>
           {[['login', 'Sign In'], ['signup', 'Create Account']].map(([m, l]) => (
             <button key={m} onClick={() => { setMode(m); setError(''); }}
-              style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, background: mode === m ? 'white' : 'transparent', color: mode === m ? '#0f172a' : '#64748b', boxShadow: mode === m ? '0 1px 6px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.15s' }}>
+              style={{ flex: 1, padding: '10px 0', borderRadius: 4, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, background: mode === m ? 'white' : 'transparent', color: mode === m ? '#0f172a' : '#64748b', boxShadow: mode === m ? '0 1px 6px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.15s' }}>
               {l}
             </button>
           ))}
         </div>
 
         {error && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 20, color: '#dc2626', fontSize: 13.5, fontWeight: 500 }}>
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 5, padding: '12px 16px', marginBottom: 20, color: '#dc2626', fontSize: 13.5, fontWeight: 500 }}>
             ⚠ {error}
           </div>
         )}
@@ -150,7 +150,7 @@ export default function AuthPage({ onAuth }) {
           </div>
 
           <button type="submit" disabled={loading}
-            style={{ marginTop: 4, padding: '14px 0', borderRadius: 11, border: 'none', background: loading ? '#94a3b8' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: 'white', fontWeight: 700, fontSize: 16, cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 16px rgba(37,99,235,0.3)', transition: 'all 0.15s', letterSpacing: '0.01em' }}>
+            style={{ marginTop: 4, padding: '14px 0', borderRadius: 5.5, border: 'none', background: loading ? '#94a3b8' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: 'white', fontWeight: 700, fontSize: 16, cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 16px rgba(37,99,235,0.3)', transition: 'all 0.15s', letterSpacing: '0.01em' }}>
             {loading ? 'Please wait…' : mode === 'login' ? 'Sign In →' : 'Start Free Trial →'}
           </button>
         </form>
