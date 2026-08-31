@@ -73,11 +73,26 @@ export default function FloatingPartnerBanner() {
         Local Cleaner Near You
       </div>
 
-      <div style={{ fontWeight: 800, fontSize: 14.5, color: '#0f172a', lineHeight: 1.25, marginBottom: 2 }}>
-        {partner.business_name}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#64748b', marginBottom: 12 }}>
-        <MapPin size={11} color="#94a3b8" /> {partner.city}, {partner.state}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+        {partner.logo_url ? (
+          <img
+            src={partner.logo_url}
+            alt={partner.business_name}
+            style={{ width: 38, height: 38, objectFit: 'contain', borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', padding: 3, flexShrink: 0 }}
+          />
+        ) : (
+          <div style={{ width: 38, height: 38, borderRadius: 8, background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
+            {partner.business_name?.trim()?.[0]?.toUpperCase() || '?'}
+          </div>
+        )}
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontWeight: 800, fontSize: 14.5, color: '#0f172a', lineHeight: 1.25 }}>
+            {partner.business_name}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#64748b', marginTop: 2 }}>
+            <MapPin size={11} color="#94a3b8" /> {partner.city}, {partner.state}
+          </div>
+        </div>
       </div>
 
       {partner.phone && (
