@@ -6,6 +6,7 @@ import ResultsScreen from './components/calculator/ResultsScreen';
 import CompanyDashboard from './components/dashboard/CompanyDashboard';
 import AuthPage from './components/dashboard/AuthPage';
 import AdminPartners from './components/admin/AdminPartners';
+import ClientPortal from './components/client/ClientPortal';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import SEOContent from './components/ui/SEOContent';
@@ -42,6 +43,7 @@ const isContact = pathname === '/contact';
 const isPrivacy = pathname === '/privacy-policy';
 const isTerms = pathname === '/terms-of-service';
 const isAdminPartners = pathname === '/admin/partners';
+const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
 const isServicePage = pathname.startsWith('/cleaning-services/');
 const isCityPage = pathname.startsWith('/cleaning-cost/city/');
@@ -131,6 +133,8 @@ export default function App() {
   if (isResults) return <HelmetProvider><ResultsPage /></HelmetProvider>;
 
   if (isAdminPartners) return <HelmetProvider><AdminPartners /></HelmetProvider>;
+
+  if (isClientPortal) return <HelmetProvider><ClientPortal /></HelmetProvider>;
 
   if (isPartnerWithUs) return (
     <HelmetProvider>
