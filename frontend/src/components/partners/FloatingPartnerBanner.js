@@ -22,9 +22,13 @@ export default function FloatingPartnerBanner() {
     } catch { /* ignore */ }
 
     // TEMP-PREVIEW-ONLY -- forced fake data (555 = reserved fictional phone
-    // prefix, no real number) so the banner is visible on the live deploy
-    // for review. Revert to getCachedPartnerMatch() before this ships.
-    Promise.resolve({ business_name: 'Sparkle & Shine Cleaning Co.', city: 'Las Vegas', state: 'NV', phone: '(702) 555-0148' }).then(match => {
+    // prefix, no real number; logo is a placeholder text banner, not the
+    // real client logo) so the banner is visible on the live deploy for
+    // review. Revert to getCachedPartnerMatch() before this ships.
+    const placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="70"><rect width="400" height="70" fill="none"/><text x="200" y="40" font-family="Arial, sans-serif" font-weight="800" font-size="30" fill="#2563eb" text-anchor="middle">IMMACULATE</text><text x="200" y="60" font-family="Arial, sans-serif" font-weight="500" font-size="13" letter-spacing="4" fill="#94a3b8" text-anchor="middle">RESTORATION</text></svg>'
+    );
+    Promise.resolve({ business_name: 'Immaculate Restoration', city: 'Las Vegas', state: 'NV', phone: '(702) 555-0148', logo_url: placeholderLogo }).then(match => {
       if (cancelled || !match) return;
       setPartner(match);
       setTimeout(() => { if (!cancelled) setVisible(true); }, 1500);
@@ -73,25 +77,20 @@ export default function FloatingPartnerBanner() {
         Local Cleaner Near You
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        {partner.logo_url ? (
-          <img
-            src={partner.logo_url}
-            alt={partner.business_name}
-            style={{ width: 38, height: 38, objectFit: 'contain', borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', padding: 3, flexShrink: 0 }}
-          />
-        ) : (
-          <div style={{ width: 38, height: 38, borderRadius: 8, background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
-            {partner.business_name?.trim()?.[0]?.toUpperCase() || '?'}
-          </div>
-        )}
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontWeight: 800, fontSize: 14.5, color: '#0f172a', lineHeight: 1.25 }}>
-            {partner.business_name}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#64748b', marginTop: 2 }}>
-            <MapPin size={11} color="#94a3b8" /> {partner.city}, {partner.state}
-          </div>
+      {partner.logo_url && (
+        <img
+          src={partner.logo_url}
+          alt={partner.business_name}
+          style={{ maxWidth: '100%', maxHeight: 44, objectFit: 'contain', display: 'block', margin: '0 auto 10px' }}
+        />
+      )}
+
+      <div style={{ marginBottom: 12, textAlign: partner.logo_url ? 'center' : 'left' }}>
+        <div style={{ fontWeight: 800, fontSize: 14.5, color: '#0f172a', lineHeight: 1.25 }}>
+          {partner.business_name}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: partner.logo_url ? 'center' : 'flex-start', gap: 4, fontSize: 12, color: '#64748b', marginTop: 2 }}>
+          <MapPin size={11} color="#94a3b8" /> {partner.city}, {partner.state}
         </div>
       </div>
 
