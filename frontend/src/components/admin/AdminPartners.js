@@ -4,15 +4,17 @@ import { Plus, Trash2, ToggleLeft, ToggleRight, X } from 'lucide-react';
 
 const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || 'admin123';
 
+const EMPTY_LOCATION = { city: '', state: '' };
+
 const EMPTY_FORM = {
   business_name: '',
-  city: '',
-  state: '',
+  address: '',
   phone: '',
   email: '',
   website: '',
   logo_url: '',
   active: true,
+  locations: [EMPTY_LOCATION],
 };
 
 export default function AdminPartners() {
@@ -20,6 +22,7 @@ export default function AdminPartners() {
   const [pwInput, setPwInput] = useState('');
   const [pwError, setPwError] = useState(false);
   const [partners, setPartners] = useState([]);
+  const [locationsByPartner, setLocationsByPartner] = useState({});
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -35,6 +38,19 @@ export default function AdminPartners() {
     setLoading(false);
     if (!error) setPartners(data || []);
     else setError(error.message);
+
+    // Every city/state a partner serves (one row per city -- see the setup
+    // SQL). Grouped by partner_id so the list and edit form can show all of
+    // a client's cities, not just one.
+    const { data: locData } = await supabase.from('partner_locations').select('*').order('city');
+    if (locData) {
+      const grouped = {};
+      for (const loc of locData) {
+        if (!grouped[loc.partner_id]) grouped[loc.partner_id] = [];
+        grouped[loc.partner_id].push(loc);
+      }
+      setLocationsByPartner(grouped);
+    }
 
     // Banner impressions/calls per partner, for reporting back to each
     // paying partner what they're getting for the placement. Reads from the
@@ -63,15 +79,40 @@ export default function AdminPartners() {
     if (!supabase) return;
     setSaving(true);
     setError(null);
-    const payload = { ...form };
+
+    const { locations, ...partnerFields } = form;
+    const validLocations = locations
+      .map(l => ({ city: l.city.trim(), state: l.state.trim() }))
+      .filter(l => l.city && l.state);
+
+    if (validLocations.length === 0) {
+      setSaving(false);
+      setError('Add at least one city/state this partner serves.');
+      return;
+    }
+
+    let partnerId = editId;
     let err;
     if (editId) {
-      ({ error: err } = await supabase.from('partners').update(payload).eq('id', editId));
+      ({ error: err } = await supabase.from('partners').update(partnerFields).eq('id', editId));
     } else {
-      ({ error: err } = await supabase.from('partners').insert(payload));
+      const { data, error: insertErr } = await supabase.from('partners').insert(partnerFields).select().single();
+      err = insertErr;
+      partnerId = data?.id;
     }
+    if (err) { setSaving(false); setError(err.message); return; }
+
+    // Full-replace the partner's service areas: simplest way to keep them
+    // in sync with whatever the form currently has, added/removed/edited.
+    const { error: delErr } = await supabase.from('partner_locations').delete().eq('partner_id', partnerId);
+    if (!delErr) {
+      const { error: locErr } = await supabase.from('partner_locations').insert(
+        validLocations.map(l => ({ partner_id: partnerId, city: l.city, state: l.state }))
+      );
+      if (locErr) { setSaving(false); setError(locErr.message); return; }
+    }
+
     setSaving(false);
-    if (err) { setError(err.message); return; }
     setShowForm(false);
     setEditId(null);
     setForm(EMPTY_FORM);
@@ -79,7 +120,17 @@ export default function AdminPartners() {
   };
 
   const handleEdit = (p) => {
-    setForm({ business_name: p.business_name, city: p.city, state: p.state, phone: p.phone || '', email: p.email || '', website: p.website || '', logo_url: p.logo_url || '', active: p.active });
+    const existingLocations = (locationsByPartner[p.id] || []).map(l => ({ city: l.city, state: l.state }));
+    setForm({
+      business_name: p.business_name,
+      address: p.address || '',
+      phone: p.phone || '',
+      email: p.email || '',
+      website: p.website || '',
+      logo_url: p.logo_url || '',
+      active: p.active,
+      locations: existingLocations.length > 0 ? existingLocations : [EMPTY_LOCATION],
+    });
     setEditId(p.id);
     setShowForm(true);
   };
@@ -94,6 +145,12 @@ export default function AdminPartners() {
     await supabase.from('partners').delete().eq('id', id);
     load();
   };
+
+  const updateLocation = (index, field, value) => {
+    setForm(f => ({ ...f, locations: f.locations.map((l, i) => i === index ? { ...l, [field]: value } : l) }));
+  };
+  const addLocation = () => setForm(f => ({ ...f, locations: [...f.locations, { ...EMPTY_LOCATION }] }));
+  const removeLocation = (index) => setForm(f => ({ ...f, locations: f.locations.filter((_, i) => i !== index) }));
 
   const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' };
 
@@ -135,13 +192,26 @@ export default function AdminPartners() {
                   <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Business Name *</label>
                   <input required style={inputStyle} value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} />
                 </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>City *</label>
-                  <input required style={inputStyle} placeholder="e.g. Austin" value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Address</label>
+                  <input style={inputStyle} placeholder="e.g. 123 Main St, Las Vegas, NV 89101" value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>Shown in the estimate results card and the floating banner, above the phone number.</div>
                 </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>State * (full name)</label>
-                  <input required style={inputStyle} placeholder="e.g. Texas" value={form.state} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} />
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Service Areas *</label>
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 8 }}>Every city/state this partner serves — the banner shows for visitors matched to any of these.</div>
+                  {form.locations.map((loc, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+                      <input required style={inputStyle} placeholder="City (e.g. Las Vegas)" value={loc.city} onChange={e => updateLocation(i, 'city', e.target.value)} />
+                      <input required style={inputStyle} placeholder="State — full name (e.g. Nevada)" value={loc.state} onChange={e => updateLocation(i, 'state', e.target.value)} />
+                      <button type="button" onClick={() => removeLocation(i)} disabled={form.locations.length === 1} style={{ background: 'none', border: 'none', cursor: form.locations.length === 1 ? 'not-allowed' : 'pointer', color: form.locations.length === 1 ? '#cbd5e1' : '#ef4444', padding: 4, flexShrink: 0 }}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={addLocation} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'none', border: '1.5px dashed #cbd5e1', borderRadius: 8, padding: '7px 14px', cursor: 'pointer', fontWeight: 600, fontSize: 12.5, color: '#2563eb' }}>
+                    <Plus size={13} /> Add another city
+                  </button>
                 </div>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Phone</label>
@@ -187,7 +257,14 @@ export default function AdminPartners() {
                 {p.logo_url && <img src={p.logo_url} alt={p.business_name} style={{ height: 44, width: 44, objectFit: 'contain', borderRadius: 6, border: '1px solid #e2e8f0', flexShrink: 0 }} />}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{p.business_name}</div>
-                  <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 2 }}>{p.city}, {p.state}{p.phone && ` · ${p.phone}`}</div>
+                  {(p.address || p.phone) && (
+                    <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 2 }}>{p.address}{p.address && p.phone && ' · '}{p.phone}</div>
+                  )}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 6 }}>
+                    {(locationsByPartner[p.id] || []).map((loc, i) => (
+                      <span key={i} style={{ fontSize: 11, color: '#475569', background: '#f1f5f9', borderRadius: 5, padding: '2px 8px' }}>{loc.city}, {loc.state}</span>
+                    ))}
+                  </div>
                   <PartnerBannerStats stats={stats[p.id]} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>

@@ -32,7 +32,7 @@ export default function FloatingPartnerBanner() {
     // TEMP-PREVIEW-ONLY -- forced fake data (555 = reserved fictional phone
     // prefix, no real number) so the banner is visible on the live deploy
     // for review. Revert to getCachedPartnerMatch() before this ships.
-    Promise.resolve({ business_name: 'Immaculate Restoration', city: 'Las Vegas', state: 'NV', phone: '(702) 555-0148', logo_url: 'https://immaculaterestoration.com/wp-content/uploads/immaculate-restoration-logo.webp' }).then(match => {
+    Promise.resolve({ business_name: 'Immaculate Restoration', address: 'Las Vegas, NV', phone: '(702) 555-0148', logo_url: 'https://immaculaterestoration.com/wp-content/uploads/immaculate-restoration-logo.webp' }).then(match => {
       if (cancelled || !match) return;
       setPartner(match);
       setTimeout(() => {
@@ -101,9 +101,11 @@ export default function FloatingPartnerBanner() {
         <div style={{ fontWeight: 800, fontSize: isMobile ? 11.5 : 14.5, color: '#0f172a', lineHeight: 1.25 }}>
           {partner.business_name}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: partner.logo_url ? 'center' : 'flex-start', gap: 4, fontSize: isMobile ? 10.5 : 12, color: '#64748b', marginTop: 2 }}>
-          <MapPin size={isMobile ? 10 : 11} color="#94a3b8" /> {partner.city}, {partner.state}
-        </div>
+        {partner.address && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: partner.logo_url ? 'center' : 'flex-start', gap: 4, fontSize: isMobile ? 10.5 : 12, color: '#64748b', marginTop: 2 }}>
+            <MapPin size={isMobile ? 10 : 11} color="#94a3b8" /> {partner.address}
+          </div>
+        )}
       </div>
 
       {partner.phone && (

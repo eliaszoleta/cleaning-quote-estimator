@@ -16,16 +16,20 @@ export async function getUserLocation() {
   }
 }
 
+// A partner can serve multiple cities (one partner_locations row per city),
+// so the match is: any active partner with a service-area row matching the
+// visitor's city/state. partners!inner lets the .eq('partners.active', ...)
+// filter apply to the joined table (a plain left join would ignore it).
 export async function findPartner(city, state) {
   if (!supabase || !city || !state) return null;
   const { data } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('active', true)
+    .from('partner_locations')
+    .select('*, partners!inner(*)')
+    .eq('partners.active', true)
     .ilike('city', city)
     .ilike('state', state)
     .limit(1);
-  return data?.[0] || null;
+  return data?.[0]?.partners || null;
 }
 
 // Resolves the visitor's matched partner (or null), reusing a sessionStorage

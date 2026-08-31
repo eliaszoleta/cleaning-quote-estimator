@@ -23,7 +23,7 @@ export default function PartnerCard({ partner }) {
         )}
         <div>
           <div style={{ fontWeight: 800, fontSize: 17, color: '#0f172a', lineHeight: 1.2 }}>{partner.business_name}</div>
-          <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>{partner.city}, {partner.state}</div>
+          {partner.address && <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>{partner.address}</div>}
         </div>
       </div>
       <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap' }}>
