@@ -2753,74 +2753,6 @@ Given the concentration of hotels, resorts, and restaurants in the Las Vegas eco
     `,
   },
   {
-    slug: 'cleaning-cost-calculator-for-your-website',
-    title: 'The Best Cleaning Cost Calculator to Add to Your Website in 2026',
-    category: 'grow-your-business',
-    categoryLabel: 'Grow Your Business',
-    date: '2026-08-28',
-    readTime: '7 min',
-    excerpt: 'An instant quote calculator converts better than a "contact us" form because it removes the biggest source of friction in booking a cleaning service: not knowing the price. Here\'s what to look for, and how to add one to your site without building it yourself.',
-    content: `
-## Why "Contact Us for a Quote" Is Costing You Leads
-
-Think about the last time you searched for a service online and landed on a page that just said "contact us for pricing." Did you fill out the form immediately, or did you leave and check three more sites first, looking for someone willing to just tell you the number?
-
-Most people do the second thing. Price is the first filter a potential customer applies, and a company that hides it — even for good reasons like "every job is different" — is asking someone to hand over their contact information before they know if your service is even in their budget. That's a lot to ask from someone who's still comparing options.
-
-An instant quote calculator removes that friction. The visitor enters a few details, sees a real price range immediately, and only then decides whether to submit their contact info. By the time a lead reaches you, they already know roughly what they'll pay and chose to move forward anyway — which is a fundamentally warmer lead than someone who filled out a blind contact form.
-
-## What to Look For in a Cleaning Cost Calculator
-
-If you're evaluating tools to add to your site, a few things separate a calculator that actually generates leads from one that just sits there:
-
-**ZIP-code or location-based pricing.** A single flat "$150 for a standard clean" number doesn't hold up once someone sees a different number from a competitor down the street. Pricing that adjusts for local cost of living looks — and is — more credible.
-
-**Your own branding, not the vendor's.** A calculator that visibly belongs to a third-party tool undercuts the trust you're trying to build. Look for white-label options that use your logo and colors.
-
-**Lead capture built in, not bolted on.** The calculator should collect contact information as a natural next step after showing a price, not as a separate form the visitor has to seek out.
-
-**No-code embedding.** You shouldn't need a developer on staff to add a line of HTML to your site. If a tool requires custom integration work, factor that cost and delay into your decision.
-
-**Coverage for every service you offer.** A calculator that only handles standard house cleaning is a dead end the moment someone wants a quote for carpet cleaning, move-out cleaning, or commercial space — you want one tool that covers your full service list.
-
-## Building One Yourself vs. Using an Existing Tool
-
-It's technically possible to build your own calculator — a simple version isn't a huge engineering lift. But a *good* one needs accurate, defensible pricing data across every service and location you operate in, a lead-capture flow that doesn't feel bolted on, and ongoing maintenance as your pricing changes. For most cleaning businesses, the time and cost of building and maintaining that in-house outweighs paying for a tool that already does it well.
-
-## What Clean Estimator's Embeddable Calculator Includes
-
-We built the same ZIP-code accurate, multi-service calculator that powers this site into a white-label version you can embed on your own website:
-
-- Branded with your logo and colors, not ours
-- Covers all 9 service types — house cleaning, apartment cleaning, commercial, carpet, air duct, dryer vent, tile & grout, mold remediation, and water damage
-- Built-in lead capture, delivered to your own dashboard
-- A single line of HTML to embed — no developer required
-- API access if you do want deeper custom integration
-
-It's a **7-day free trial**, then **$159/month**, cancel anytime. No long-term contract.
-
-## Is This Worth It for a Small Cleaning Business?
-
-If you're currently relying on a static "request a quote" form, this is genuinely one of the higher-leverage changes you can make to your website — it directly addresses the biggest reason a visitor leaves without contacting you. Even converting a handful of extra leads a month into booked jobs typically covers the monthly cost many times over.
-
-## FAQ
-
-**What's the best cleaning cost calculator to embed on a website?**
-Look for one with location-based pricing, your own branding, built-in lead capture, and no-code embedding. Clean Estimator's embeddable calculator covers all of these and supports every major cleaning service type.
-
-**How much does it cost to add a cleaning quote calculator to my website?**
-Clean Estimator's embeddable calculator is $159/month after a 7-day free trial, with no long-term contract required.
-
-**Will an instant quote calculator actually generate more leads than a contact form?**
-Generally yes — showing a price range upfront removes the biggest reason a visitor leaves without submitting their information, and it pre-qualifies leads who already know roughly what they'll pay.
-
-**Do I need a developer to add this to my site?**
-No — Clean Estimator's calculator embeds with a single line of HTML, and API access is available if you want a deeper custom integration.
-
-[See pricing and start your free trial](/for-companies) →
-    `,
-  },
-  {
     slug: 'how-to-get-more-cleaning-clients',
     title: 'How to Get More Cleaning Clients in 2026: 10 Proven Strategies',
     category: 'grow-your-business',
@@ -3293,6 +3225,136 @@ Clean Estimator's Local Partner Program is a flat $350/month per city, with only
 Yes — most growing cleaning businesses run a mix, commonly one shared pay-per-lead platform for volume alongside one exclusive channel for predictable, non-competitive placement.
 
 [Check if your city is available for exclusive placement](/partner-with-us) →
+    `,
+  },
+  {
+    slug: 'how-to-increase-cleaning-business-sales',
+    title: 'How to Increase Cleaning Business Sales: 9 Strategies That Actually Work',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-09-02',
+    readTime: '8 min',
+    excerpt: 'More clients isn\'t the only way to grow revenue. Here are 9 real ways to increase sales from the clients you already have, plus how to price and position your business so growth doesn\'t just mean working more hours.',
+    content: `
+## Revenue Growth Isn't Just About Getting More Clients
+
+Most advice about growing a cleaning business focuses entirely on lead generation — more clients, more jobs, more marketing spend. But increasing sales and increasing client count aren't the same goal, and the fastest, cheapest revenue gains often come from the clients you already have, not from finding new ones.
+
+## 1. Convert One-Time Cleans Into Recurring Service
+
+A one-time client is a single transaction. A recurring client (weekly, biweekly, or monthly) is predictable revenue you don't have to re-sell every time. Offer a modest discount (10–20%) for committing to a recurring schedule — the lifetime value of a recurring client is almost always higher than the discount costs you.
+
+## 2. Upsell Add-On Services
+
+Inside-fridge cleaning, inside-oven cleaning, interior windows, and laundry are all common add-ons most clients will say yes to if you simply offer them at booking, rather than waiting to be asked. These are typically high-margin since they add relatively little time to a job already in progress.
+
+## 3. Raise Prices Strategically, Not Apologetically
+
+Many cleaning business owners underprice out of fear of losing clients, then stay underpriced for years. A modest, well-communicated annual price adjustment (tied to rising supply and labor costs) is standard practice and rarely causes the mass cancellations owners fear — clients who value reliable, quality service tend to stay.
+
+## 4. Reduce Cancellations and No-Shows
+
+A cancelled job is lost revenue you already blocked time for. A clear cancellation policy (e.g., a fee for cancellations inside 24 hours) protects your schedule, and automated appointment reminders by text noticeably cut down on forgotten bookings.
+
+## 5. Bundle Services for Higher-Value Jobs
+
+Instead of quoting a standard clean alone, offer a bundled package — standard clean plus a seasonal deep clean twice a year, for example. Bundled packages increase the average value per client relationship and make your pricing feel like a plan rather than a series of one-off asks.
+
+## 6. Focus on Retention, Not Just Acquisition
+
+It's consistently cheaper to keep an existing client than to acquire a new one. A quick check-in after the first few cleans, consistent quality, and simple things like showing up on time go further toward retention than most owners give credit for — and a retained client is pure margin compared to the cost of replacing them.
+
+## 7. Target Higher-Value Service Types
+
+Move-in/move-out cleans, post-construction cleaning, and commercial contracts typically pay more per job than standard recurring residential cleaning. If you're capable of taking these on, actively marketing toward them (rather than waiting for them to come to you) can lift your average job value significantly.
+
+## 8. Get Reviews That Specifically Mention Value, Not Just Price
+
+A review that says "affordable" attracts price-sensitive clients who'll leave for a cheaper competitor. A review that mentions reliability, thoroughness, or trustworthiness attracts clients willing to pay for quality — when you ask for reviews, a light prompt toward what made the service worth it (not just "leave us a review") shapes the kind of client that finds you next.
+
+## 9. Get Exclusive Local Leads Instead of Competing on Price
+
+Shared-lead platforms put you in a bidding war against other cleaners quoting the same job, which pushes prices down. [Clean Estimator's Local Partner Program](/partner-with-us) gives one cleaning business exclusive placement per city — no competing quotes shown, which means you're not forced to win jobs purely by being the cheapest option.
+
+## FAQ
+
+**What's the fastest way to increase cleaning business revenue without more clients?**
+Upselling add-on services and converting one-time clients to recurring service are usually the fastest, since both increase revenue from people who already trust and use your business.
+
+**Is it safe to raise prices on existing cleaning clients?**
+Generally yes, if communicated clearly and tied to a reasonable cause (rising costs, added value). Most owners overestimate how many clients will actually leave over a modest, well-explained increase.
+
+**How do I get higher-value cleaning jobs?**
+Actively market toward higher-paying service types like move-in/move-out cleaning, post-construction cleaning, and commercial contracts, rather than waiting for them to come in through general residential inquiries.
+
+**Does exclusive lead placement help with pricing power?**
+Yes — when you're not competing with other cleaners bidding on the same shared lead, you're not pressured to win jobs purely on being the cheapest quote.
+
+[Get exclusive placement in your city](/partner-with-us) →
+    `,
+  },
+  {
+    slug: 'cleaning-business-marketing-guide',
+    title: 'Cleaning Business Marketing Guide: How to Grow Your Client Base in 2026',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-09-02',
+    readTime: '10 min',
+    excerpt: 'A complete overview of how to market a cleaning business in 2026 — free channels, paid channels, reviews, budgeting, and how to put it all together into one plan.',
+    content: `
+## The Complete Picture
+
+Growing a cleaning business's client base isn't about picking one tactic — it's about running a handful of channels together, consistently, over time. This guide ties together the full picture; each section links to a deeper, dedicated guide if you want to go further on any one piece.
+
+## 1. Start With What's Free
+
+Before spending anything on marketing, get the free foundation in place:
+
+- **Google Business Profile** — the single highest-leverage thing a local cleaning business can do, and it costs nothing. [See the full step-by-step setup guide](/blog/google-business-profile-cleaning-company).
+- **Reviews** — review count and rating directly affect your local search ranking, not just trust. [See how to get more 5-star reviews](/blog/how-to-get-5-star-reviews-cleaning-business).
+- **Referrals** — a modest credit for referring a new client turns your existing customers into a lead source at almost no cost.
+
+## 2. Layer In Lead Platforms
+
+Once your free foundation is in place, lead platforms fill in volume. These range from shared, pay-per-lead platforms (Thumbtack, Angi, Google Local Services Ads) to exclusive local placement where only one business per city is shown. [See a full comparison of lead platforms](/blog/best-lead-generation-platforms-cleaning-companies) and [where cleaning leads actually come from](/blog/where-to-find-cleaning-business-leads).
+
+## 3. Budget Based on Your Stage
+
+A new business should think in fixed monthly dollars ($100–$500 to start); an established business growing market share typically budgets 7–12% of gross revenue toward marketing. [See a full breakdown of how to budget by stage and channel](/blog/cleaning-business-marketing-budget).
+
+## 4. Grow Revenue From Clients You Already Have
+
+New client acquisition gets most of the attention, but increasing revenue from existing clients — recurring service conversion, upsells, and strategic pricing — is often the highest-return, lowest-cost lever available. [See 9 ways to increase sales without needing more clients](/blog/how-to-increase-cleaning-business-sales).
+
+## 5. Put It All Together
+
+A realistic marketing plan for a growing cleaning business combines:
+
+| Layer | Examples | Cost |
+|---|---|---|
+| Free foundation | Google Business Profile, reviews, referrals | $0 |
+| Lead platforms | Thumbtack, Angi, Google Local Services Ads | Pay-per-lead |
+| Exclusive placement | Local Partner Program | Flat monthly |
+| Paid ads | Local Facebook/Instagram ads | Variable |
+| Revenue optimization | Upsells, recurring conversion, pricing | $0 (internal) |
+
+Most successful cleaning businesses run 3–4 of these layers simultaneously rather than relying on just one — free channels build the trust foundation, paid channels fill in volume, and revenue optimization makes every client relationship worth more.
+
+## FAQ
+
+**What's the single most important marketing channel for a cleaning business?**
+Google Business Profile — it's free, it's where most local searches convert, and every other channel (reviews, ads, referrals) reinforces it rather than replaces it.
+
+**How many marketing channels should a cleaning business run at once?**
+Most growing cleaning businesses run 3–4 layers at once: a free foundation, one or two lead sources, and active revenue optimization from existing clients — relying on a single channel makes growth fragile.
+
+**Where should a new cleaning business start with marketing?**
+Start with the free foundation — Google Business Profile, actively requesting reviews, and a simple referral incentive — before spending on paid lead platforms.
+
+**How is exclusive local placement different from other lead platforms?**
+Most lead platforms show your quote alongside competitors bidding on the same job. Exclusive placement, like the Local Partner Program, shows only one cleaning business per city, with no competing quotes.
+
+[Apply for exclusive placement in your city](/partner-with-us) →
     `,
   },
 ];
