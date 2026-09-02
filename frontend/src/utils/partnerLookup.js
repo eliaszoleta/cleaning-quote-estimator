@@ -37,8 +37,11 @@ export async function getUserLocation() {
 // visitor's city/state. partners!inner lets the .eq('partners.active', ...)
 // filter apply to the joined table (a plain left join would ignore it).
 export async function findPartner(city, state) {
-  // TEMPORARY TEST OVERRIDE — see comment above. Remove this line once done.
-  if (city && city.trim().toLowerCase() === 'minneapolis') return TEST_MOCK_PARTNER;
+  // TEMPORARY TEST OVERRIDE — showing to EVERY visitor right now so it can
+  // be checked without a VPN. Narrow back to Minneapolis-only (or remove
+  // entirely) once confirmed — see comment above. Real lookup logic is
+  // preserved below, just skipped for now.
+  if (true) return TEST_MOCK_PARTNER; // eslint-disable-line no-constant-condition
 
   if (!supabase || !city || !state) return null;
   const { data } = await supabase
