@@ -161,7 +161,7 @@ export default function BlogPost({ slug }) {
           <span style={{ fontSize: 14, color: '#1e40af', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
             <Lightbulb size={17} strokeWidth={2} /> Get a free local estimate for your project
           </span>
-          <a href="/" style={{ background: 'linear-gradient(135deg,#1e3a8a,#1d4ed8)', color: 'white', padding: '9px 20px', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: '0 2px 8px rgba(30,64,175,0.25)' }}>Use Free Calculator →</a>
+          <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '9px 20px', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: '0 2px 8px rgba(30,64,175,0.25)' }}>Use Free Calculator →</a>
         </div>
 
         {/* Content */}
@@ -171,7 +171,7 @@ export default function BlogPost({ slug }) {
         <div style={{ background: 'linear-gradient(135deg, #0b1220, #1e293b)', borderRadius: 18, padding: '36px 40px', marginTop: 48, color: 'white', textAlign: 'center', boxShadow: '0 12px 32px rgba(15,23,42,0.24)' }}>
           <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Get a Free Local Estimate</h3>
           <p style={{ color: '#94a3b8', marginBottom: 20, fontSize: 15 }}>Our calculator gives ZIP-code specific prices across all 50 states. Free and instant.</p>
-          <a href="/" style={{ background: 'linear-gradient(135deg,#1e3a8a,#1d4ed8,#2563eb)', color: 'white', padding: '14px 32px', borderRadius: 11, textDecoration: 'none', fontWeight: 700, fontSize: 16, boxShadow: '0 4px 16px rgba(37,99,235,0.3)' }}>Calculate My Cost →</a>
+          <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '14px 32px', borderRadius: 11, textDecoration: 'none', fontWeight: 700, fontSize: 16, boxShadow: '0 4px 16px rgba(37,99,235,0.3)' }}>Calculate My Cost →</a>
         </div>
 
         {/* Related posts */}

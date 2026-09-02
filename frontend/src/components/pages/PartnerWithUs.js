@@ -4,7 +4,7 @@ import { getAllStates, getStateByCode } from '../../data/statePricing';
 import { getCityTier, getAllCityTierEntries, POPULATION_THRESHOLD, MAJOR_CITY_PRICE, MINOR_CITY_PRICE } from '../../data/partnerCityTiers';
 
 const PRIMARY = '#2563eb';
-const PRIMARY_GRADIENT = 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)';
+const PRIMARY_GRADIENT = '#1d4ed8';
 const WEB3FORMS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
 
 const IconHome = () => (

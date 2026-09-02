@@ -75,7 +75,7 @@ const styles = {
     transition: 'all 0.15s',
   },
   cta: {
-    background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)',
+    background: '#1d4ed8',
     color: 'white',
     padding: '9px 18px',
     borderRadius: 9,
@@ -88,7 +88,7 @@ const styles = {
     boxShadow: '0 2px 10px rgba(30,64,175,0.24)',
   },
   ctaMobile: {
-    background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)',
+    background: '#1d4ed8',
     color: 'white',
     padding: '8px 14px',
     borderRadius: 8,

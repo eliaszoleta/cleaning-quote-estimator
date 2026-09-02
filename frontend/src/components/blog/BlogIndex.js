@@ -19,7 +19,7 @@ function CategoryPill({ id, label, href, active }) {
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 7,
         padding: '7px 16px 7px 12px', borderRadius: 20,
-        background: active ? 'linear-gradient(135deg,#1e3a8a,#1d4ed8)' : 'white',
+        background: active ? '#1d4ed8' : 'white',
         border: active ? 'none' : '1px solid #e2e8f0',
         color: active ? 'white' : '#374151',
         textDecoration: 'none', fontSize: 14, fontWeight: 600,
@@ -198,7 +198,7 @@ export default function BlogIndex() {
             <div style={{ fontWeight: 800, fontSize: 20, color: 'white', marginBottom: 6 }}>Ready to get an estimate?</div>
             <p style={{ color: '#94a3b8', fontSize: 15 }}>Use our free calculator to get a ZIP-code specific price for any cleaning service.</p>
           </div>
-          <a href="/" style={{ background: 'linear-gradient(135deg,#1e3a8a,#1d4ed8,#2563eb)', color: 'white', padding: '14px 28px', borderRadius: 11, textDecoration: 'none', fontWeight: 700, fontSize: 16, flexShrink: 0, boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}>Free Calculator →</a>
+          <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '14px 28px', borderRadius: 11, textDecoration: 'none', fontWeight: 700, fontSize: 16, flexShrink: 0, boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}>Free Calculator →</a>
         </div>
       </div>
     </>

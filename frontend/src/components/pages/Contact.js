@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const WEB3FORMS_ACCESS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
-const PRIMARY_GRADIENT = 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)';
+const PRIMARY_GRADIENT = '#1d4ed8';
 
 function Icon({ children, size = 20, linecap = 'round', linejoin = 'round' }) {
   return (

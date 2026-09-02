@@ -72,7 +72,7 @@ export default function AuthPage({ onAuth }) {
             Click the link in the email to confirm your account.<br />You'll land directly in your dashboard.
           </p>
           <button onClick={() => { setEmailSent(false); setMode('login'); }}
-            style={{ width: '100%', padding: '13px 0', borderRadius: 5.5, border: 'none', background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}>
+            style={{ width: '100%', padding: '13px 0', borderRadius: 5.5, border: 'none', background: '#1d4ed8', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}>
             Go to Sign In
           </button>
           <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 16 }}>
@@ -150,7 +150,7 @@ export default function AuthPage({ onAuth }) {
           </div>
 
           <button type="submit" disabled={loading}
-            style={{ marginTop: 4, padding: '14px 0', borderRadius: 5.5, border: 'none', background: loading ? '#94a3b8' : 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: 'white', fontWeight: 700, fontSize: 16, cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 16px rgba(37,99,235,0.3)', transition: 'all 0.15s', letterSpacing: '0.01em' }}>
+            style={{ marginTop: 4, padding: '14px 0', borderRadius: 5.5, border: 'none', background: loading ? '#94a3b8' : '#1d4ed8', color: 'white', fontWeight: 700, fontSize: 16, cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 16px rgba(37,99,235,0.3)', transition: 'all 0.15s', letterSpacing: '0.01em' }}>
             {loading ? 'Please wait…' : mode === 'login' ? 'Sign In →' : 'Start Free Trial →'}
           </button>
         </form>

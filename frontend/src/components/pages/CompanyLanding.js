@@ -4,7 +4,7 @@ import { Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star } fro
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
 
-const PRIMARY_GRADIENT = 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)';
+const PRIMARY_GRADIENT = '#1d4ed8';
 
 const FEATURES = [
   { Icon: Palette,       color: '#7c3aed', bg: '#f5f3ff', title: 'White-label branding',       desc: 'Your logo, colors, and call-to-action text. Visitors never see the Clean Estimator name.' },
