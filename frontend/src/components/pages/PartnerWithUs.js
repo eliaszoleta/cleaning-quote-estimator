@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { getAllStates, getStateByCode } from '../../data/statePricing';
+import { getCityTier, POPULATION_THRESHOLD, MAJOR_CITY_PRICE, MINOR_CITY_PRICE } from '../../data/partnerCityTiers';
 
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)';
@@ -79,17 +81,43 @@ function Check({ children }) {
   );
 }
 
+const ALL_STATES = getAllStates();
+
 export default function PartnerWithUs() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', cities: '', message: '' });
+  const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', message: '' });
+  const [cityList, setCityList] = useState([]);
+  const [cityInput, setCityInput] = useState('');
+  const [stateInput, setStateInput] = useState('');
+
+  const addCity = () => {
+    const city = cityInput.trim();
+    if (!city || !stateInput) return;
+    const tierInfo = getCityTier(city, stateInput);
+    const stateObj = getStateByCode(stateInput);
+    setCityList(list => [...list, { city, stateCode: stateInput, stateName: stateObj ? stateObj.name : stateInput, tierInfo }]);
+    setCityInput('');
+  };
+
+  const removeCity = (idx) => setCityList(list => list.filter((_, i) => i !== idx));
+
+  const monthlyTotal = cityList.reduce((sum, c) => sum + (c.tierInfo ? c.tierInfo.price : 0), 0);
+  const unmatchedCities = cityList.filter(c => !c.tierInfo);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (cityList.length === 0) {
+      setError('Add at least one city before submitting.');
+      return;
+    }
     setSending(true);
     setError('');
     try {
+      const citiesSummary = cityList
+        .map(c => `${c.city}, ${c.stateCode}${c.tierInfo ? ` (${c.tierInfo.tier === 'major' ? 'Major' : 'Minor'} — $${c.tierInfo.price}/mo)` : ' (tier to confirm)'}`)
+        .join('; ');
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -101,7 +129,8 @@ export default function PartnerWithUs() {
           business: form.business,
           email: form.email,
           phone: form.phone || 'Not provided',
-          cities: form.cities,
+          cities: citiesSummary,
+          estimated_monthly_total: unmatchedCities.length ? `$${monthlyTotal}+/mo (some cities need manual tier confirmation)` : `$${monthlyTotal}/mo`,
           message: form.message || 'No additional message',
         }),
       });
@@ -124,7 +153,7 @@ export default function PartnerWithUs() {
     <>
       <Helmet>
         <title>Partner With Us | Clean Estimator</title>
-        <meta name="description" content="Get your cleaning business recommended to thousands of homeowners actively searching for cleaning services in your city. Join Clean Estimator's partner network for $350/month per city — sitewide placement, multi-city support, and a free performance dashboard included." />
+        <meta name="description" content="Get your cleaning business recommended to thousands of homeowners actively searching for cleaning services in your city. Join Clean Estimator's partner network from $175/month per city (major metros are $350/month) — sitewide placement, multi-city support, and a free performance dashboard included." />
       </Helmet>
 
       {/* Hero */}
@@ -149,7 +178,7 @@ export default function PartnerWithUs() {
           <StatBadge number="20K+" label="Monthly visitors" />
           <StatBadge number="100%" label="Organic, targeted traffic" />
           <StatBadge number="1" label="Partner per city" />
-          <StatBadge number="$350" label="Per city / month" />
+          <StatBadge number="$175-$350" label="Per city / month" />
         </div>
       </div>
 
@@ -183,7 +212,7 @@ export default function PartnerWithUs() {
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>How the Partnership Works</h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            <StepCard number="1" title="You choose your city (or cities)" desc="Tell us which cities or metro areas you serve — one city or several. Each city is $350/month and gives you exclusive placement there — only one partner per city." />
+            <StepCard number="1" title="You choose your city (or cities)" desc={`Tell us which cities or metro areas you serve — one city or several. Major metro areas (roughly ${POPULATION_THRESHOLD.toLocaleString()}+ residents) are $${MAJOR_CITY_PRICE}/month; smaller cities are $${MINOR_CITY_PRICE}/month — half price. Either way you get exclusive placement, only one partner per city.`} />
             <StepCard number="2" title="We add your business to our platform" desc="We set up your profile with your business name, address, phone number, website, and logo. No tech work needed on your end." />
             <StepCard number="3" title="You show up wherever your customers are — not just one page" desc="Your listing appears as a recommended local cleaner on the estimate results page, and as a floating banner on every page someone in your city visits — the home page, blog posts, cost guides, all of it." />
             <StepCard number="4" title="They call or visit your website directly" desc="There's no middleman and no lead fee. The customer contacts you directly. Every lead is yours, no commission, no strings." />
@@ -196,27 +225,39 @@ export default function PartnerWithUs() {
       <div style={{ padding: 'clamp(48px, 8vw, 80px) 24px', background: 'white' }}>
         <div style={{ maxWidth: 780, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 44 }}>
-            <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>Simple, Transparent Pricing</h2>
-            <p style={{ fontSize: 15, color: '#64748b' }}>One flat rate. No setup fees. No commissions. Cancel anytime.</p>
+            <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>Simple, Size-Based Pricing</h2>
+            <p style={{ fontSize: 15, color: '#64748b' }}>Priced by city size, not a one-size-fits-all rate. No setup fees. No commissions. Cancel anytime.</p>
           </div>
-          <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: '1px solid #bfdbfe', borderRadius: 20, padding: 'clamp(28px, 5vw, 48px)', maxWidth: 540, margin: '0 auto', boxShadow: '0 12px 36px rgba(29,78,216,0.16)' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: PRIMARY, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Per City Plan</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
-              <span style={{ fontSize: 56, fontWeight: 900, color: '#0f172a', letterSpacing: '-2px', lineHeight: 1 }}>$350</span>
-              <span style={{ fontSize: 16, color: '#64748b', fontWeight: 500 }}>/month</span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, maxWidth: 700, margin: '0 auto 20px' }}>
+            <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: '1px solid #bfdbfe', borderRadius: 18, padding: 'clamp(24px, 4vw, 32px)' }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: PRIMARY, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Major City</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
+                <span style={{ fontSize: 44, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px', lineHeight: 1 }}>${MAJOR_CITY_PRICE}</span>
+                <span style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>/month</span>
+              </div>
+              <div style={{ fontSize: 13, color: '#64748b' }}>About {POPULATION_THRESHOLD.toLocaleString()}+ residents &mdash; e.g. Dallas, Seattle, Atlanta</div>
             </div>
-            <div style={{ fontSize: 13.5, color: '#64748b', marginBottom: 28 }}>per city you want coverage in</div>
-            <div style={{ marginBottom: 28 }}>
+            <div style={{ background: 'linear-gradient(135deg, #fdf4ff, #fef9ff)', border: '1px solid #e9d5ff', borderRadius: 18, padding: 'clamp(24px, 4vw, 32px)' }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#9333ea', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Smaller City</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
+                <span style={{ fontSize: 44, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px', lineHeight: 1 }}>${MINOR_CITY_PRICE}</span>
+                <span style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>/month</span>
+              </div>
+              <div style={{ fontSize: 13, color: '#64748b' }}>Under {POPULATION_THRESHOLD.toLocaleString()} residents &mdash; half the major-city rate</div>
+            </div>
+          </div>
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(24px, 4vw, 36px)', maxWidth: 700, margin: '0 auto' }}>
+            <div style={{ marginBottom: 24 }}>
               <Check>Exclusive placement &mdash; only 1 partner per city</Check>
               <Check>Your name, address, phone, website &amp; logo on every results page in your city, plus a floating recommendation banner sitewide</Check>
               <Check>Direct contact &mdash; customers call or click you straight away</Check>
               <Check>No lead fees, no commissions, no hidden costs</Check>
               <Check>Free performance dashboard &mdash; see your views, calls, and click-through rate anytime</Check>
               <Check>Cancel anytime with 30 days notice</Check>
-              <Check>Serve multiple cities under one account &mdash; add more at the same per-city rate as you grow</Check>
+              <Check>Serve multiple cities under one account &mdash; each priced by that city's own tier</Check>
             </div>
-            <div style={{ background: 'white', borderRadius: 10, padding: '14px 18px', border: '1px solid #bfdbfe', fontSize: 13.5, color: '#1e40af', lineHeight: 1.6 }}>
-              <strong>Example:</strong> A business serving Dallas and Houston pays $700/month and appears on every estimate result from both cities.
+            <div style={{ background: 'white', borderRadius: 10, padding: '14px 18px', border: '1px solid #e2e8f0', fontSize: 13.5, color: '#1e40af', lineHeight: 1.6 }}>
+              <strong>Example:</strong> A business covering a major metro like Dallas (${MAJOR_CITY_PRICE}/mo) plus a smaller city like Waco (${MINOR_CITY_PRICE}/mo) pays ${MAJOR_CITY_PRICE + MINOR_CITY_PRICE}/month total. Type your cities into the form below and we'll show you the exact tier and price for each.
             </div>
           </div>
         </div>
@@ -246,9 +287,9 @@ export default function PartnerWithUs() {
             {[
               { q: 'Is there really only one partner per city?', a: 'Yes. We give one cleaning business exclusive placement per city. Once a city is taken, we waitlist new applicants. Apply early to lock in your market.' },
               { q: 'How exactly does my business appear?', a: 'Two ways. After a user completes an estimate, a branded card with your business name, address, logo, phone number, and website link appears on their results page as a recommended local cleaner. On top of that, a small floating banner with the same info follows visitors in your city across the whole site — home page, blog posts, cost guides — not just the results page. Both look like trusted recommendations, not banner ads.' },
-              { q: 'Can I cover more than one city?', a: "Yes. There's no limit — add as many cities as you want to serve, each at the same $350/month rate, all under one account and one dashboard." },
+              { q: 'Can I cover more than one city?', a: `Yes. There's no limit — add as many cities as you want to serve, each priced by that city's own tier ($${MAJOR_CITY_PRICE}/month for major metros, $${MINOR_CITY_PRICE}/month for smaller cities), all under one account and one dashboard.` },
               { q: 'Can I see how it\'s performing?', a: "Yes. Every partner gets free access to a performance dashboard at cleanestimator.com/client. Sign up with the email your listing is set up with to see exactly how many times your listing was shown and how many calls it generated." },
-              { q: 'What counts as a city?', a: "We go by city name as detected from the user's IP address. Major metros count as one city each. If you serve a wide metro area, let us know and we'll figure out the best coverage for you." },
+              { q: 'What counts as a city, and how is pricing decided?', a: `We go by city name as detected from the user's IP address. Pricing is size-based: cities with roughly ${POPULATION_THRESHOLD.toLocaleString()}+ residents are "major" and billed at $${MAJOR_CITY_PRICE}/month; smaller cities are "minor" and billed at $${MINOR_CITY_PRICE}/month, half price. Add your cities in the form below and we'll show you exactly which tier each one falls into before you commit.` },
               { q: 'What if traffic in my city is low?', a: "We can share an estimate of current monthly sessions for your city before you commit. You're still getting targeted, high-intent visitors for less than the cost of one Google Ads day." },
               { q: 'Can I cancel?', a: "Yes. Give us 30 days notice and we'll remove your listing at the end of the billing cycle. No long-term contracts." },
             ].map((item, i) => (
@@ -295,7 +336,55 @@ export default function PartnerWithUs() {
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cities You Want to Cover *</label>
-                  <input required style={inputStyle} value={form.cities} onChange={e => setForm(f => ({ ...f, cities: e.target.value }))} placeholder="e.g. Austin TX, Dallas TX" />
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      style={{ ...inputStyle, flex: 2 }}
+                      value={cityInput}
+                      onChange={e => setCityInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCity(); } }}
+                      placeholder="City, e.g. Austin"
+                    />
+                    <select
+                      style={{ ...inputStyle, flex: 1 }}
+                      value={stateInput}
+                      onChange={e => setStateInput(e.target.value)}
+                    >
+                      <option value="">State</option>
+                      {ALL_STATES.map(s => <option key={s.code} value={s.code}>{s.code}</option>)}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={addCity}
+                      disabled={!cityInput.trim() || !stateInput}
+                      style={{ padding: '11px 18px', border: 'none', borderRadius: 9, background: (!cityInput.trim() || !stateInput) ? '#cbd5e1' : PRIMARY, color: 'white', fontWeight: 700, fontSize: 13.5, cursor: (!cityInput.trim() || !stateInput) ? 'not-allowed' : 'pointer', flexShrink: 0 }}
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {cityList.length > 0 && (
+                    <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {cityList.map((c, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'white', border: '1px solid #e2e8f0', borderRadius: 9, padding: '9px 12px' }}>
+                          <div style={{ fontSize: 13.5, color: '#0f172a' }}>
+                            <strong>{c.city}, {c.stateCode}</strong>
+                            {c.tierInfo ? (
+                              <span style={{ marginLeft: 8, color: c.tierInfo.tier === 'major' ? PRIMARY : '#9333ea', fontWeight: 700 }}>
+                                {c.tierInfo.tier === 'major' ? 'Major' : 'Minor'} &mdash; ${c.tierInfo.price}/mo
+                              </span>
+                            ) : (
+                              <span style={{ marginLeft: 8, color: '#94a3b8', fontStyle: 'italic' }}>we'll confirm this city's tier</span>
+                            )}
+                          </div>
+                          <button type="button" onClick={() => removeCity(i)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 4 }} aria-label="Remove city">&times;</button>
+                        </div>
+                      ))}
+                      {monthlyTotal > 0 && (
+                        <div style={{ fontSize: 13.5, color: '#0f172a', fontWeight: 700, textAlign: 'right', paddingTop: 2 }}>
+                          Estimated total: ${monthlyTotal}/month{unmatchedCities.length ? '+' : ''}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Anything else?</label>
