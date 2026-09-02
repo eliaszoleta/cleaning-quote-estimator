@@ -2861,9 +2861,9 @@ Move-in/move-out cleaning is a recurring, predictable need for agents and proper
 
 Facebook and Instagram ads targeted to a 5–10 mile radius around your service area can work well for cleaning businesses, especially paired with a strong before/after photo or a limited-time first-clean discount. Keep the geographic radius tight — a cleaning ad shown 30 miles outside your service area is wasted spend.
 
-## 8. Put an Instant Quote Calculator on Your Website
+## 8. Make Your Pricing and Service Area Easy to Find
 
-A "contact us for a quote" form is friction — most visitors leave without knowing whether your price is even in their budget. [An embeddable cost calculator](/for-companies) shows a real price range instantly, which converts noticeably better than a static form and captures the lead's info automatically.
+A "contact us for a quote" form with no pricing information anywhere on the site is friction — most visitors leave without knowing whether you're even in their budget or service area. Put a clear starting price range, your service area, and what's included right on your homepage so a visitor doesn't have to ask just to find out the basics.
 
 ## 9. Follow Up Fast
 
@@ -3062,7 +3062,7 @@ Respond to every review, positive and negative (see our [full guide to getting m
 
 ## Step 8: Set Up Messaging and a Booking Link
 
-Enable direct messaging so customers can reach you straight from search results, and add a booking or quote-request link — ideally one that gives an [instant price estimate](/for-companies) rather than a plain contact form, since that converts noticeably better.
+Enable direct messaging so customers can reach you straight from search results, and add a booking or quote-request link rather than making them dig for your phone number — every extra step between finding you and contacting you loses potential leads.
 
 ## Step 9: Monitor Your Insights
 
@@ -3082,7 +3082,7 @@ A newly verified profile can appear in search within days, but building strong r
 **Does a service-area business need a physical address on Google?**
 No — service-area businesses can hide their address and instead list the cities or zip codes they serve, which is the correct setup for most cleaning companies that work in customers' homes.
 
-[See how an instant quote calculator can turn Google traffic into booked jobs](/for-companies) →
+[Turn your Google traffic into exclusive local leads](/partner-with-us) →
     `,
   },
   {
@@ -3121,7 +3121,7 @@ Registering as an LLC (rather than operating as a sole proprietor) is worth stro
 
 ## Pricing Your First Jobs
 
-Underpricing is the most common mistake new cleaning businesses make — competing purely on being the cheapest option attracts price-sensitive clients who churn the moment a cheaper competitor shows up, and it makes it hard to raise prices later without losing them. [Use a real cost calculator](/) to see what accurate, competitive pricing looks like in your area based on real cost-of-living data, rather than guessing or just undercutting whatever a competitor charges.
+Underpricing is the most common mistake new cleaning businesses make — competing purely on being the cheapest option attracts price-sensitive clients who churn the moment a cheaper competitor shows up, and it makes it hard to raise prices later without losing them. Research what comparable cleaners in your specific city actually charge rather than guessing or just undercutting whatever a competitor charges — local cost of living affects fair pricing more than most new owners expect.
 
 ## Getting Your First Clients
 
@@ -3151,7 +3151,7 @@ Start with your personal network for your first few jobs, then set up a Google B
 **Should I start as an LLC or sole proprietor?**
 An LLC is worth the modest extra cost and paperwork for most cleaning businesses since it separates personal assets from business liability — important in a hands-on service where accidents can happen.
 
-[Get a real, location-based price estimate to guide your pricing](/) →
+[See if exclusive local placement is available in your city](/partner-with-us) →
     `,
   },
   {
