@@ -57,8 +57,8 @@ export default function CompanyLanding() {
                 For cleaning companies
               </div>
               <h1 style={{ fontSize: 'clamp(30px,5vw,52px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 18, letterSpacing: '-1px' }}>
-                Add a Branded Cleaning<br />
-                <span style={{ color: '#60a5fa' }}>Cost Calculator to Your Cleaning Website</span>
+                Give every homeowner<br />
+                <span style={{ color: '#60a5fa' }}>an instant cleaning estimate<br />on your website</span>
               </h1>
               <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 540, margin: '0 auto 32px', lineHeight: 1.6 }}>
                 Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7.
