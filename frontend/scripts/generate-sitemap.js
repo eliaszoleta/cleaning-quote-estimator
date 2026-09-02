@@ -82,6 +82,8 @@ const staticPages = [
   { path: '/how-we-calculate-prices',  priority: '0.7', changefreq: 'monthly', lastmod: TODAY },
   { path: '/blog',                   priority: '0.9', changefreq: 'weekly',  lastmod: TODAY },
   { path: '/for-companies',    priority: '0.8', changefreq: 'monthly', lastmod: TODAY },
+  { path: '/partner-with-us',        priority: '0.7', changefreq: 'monthly', lastmod: TODAY },
+  { path: '/partner-city-pricing',   priority: '0.5', changefreq: 'monthly', lastmod: TODAY },
   { path: '/about',            priority: '0.6', changefreq: 'monthly', lastmod: '2026-01-01' },
   { path: '/contact',          priority: '0.5', changefreq: 'monthly', lastmod: '2026-01-01' },
   { path: '/privacy-policy',   priority: '0.3', changefreq: 'yearly',  lastmod: '2026-01-01' },

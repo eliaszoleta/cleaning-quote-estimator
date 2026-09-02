@@ -59,7 +59,7 @@ const cols = [
     links: [
       { label: 'Become a Partner', href: '/partner-with-us' },
       { label: 'Exclusive City Placement', href: '/partner-with-us' },
-      { label: 'Partner Pricing', href: '/partner-with-us' },
+      { label: 'Partner Pricing', href: '/partner-city-pricing' },
       { label: 'Apply Now', href: '/partner-with-us#apply' },
       { label: 'Partner Login', href: '/client' },
     ],
