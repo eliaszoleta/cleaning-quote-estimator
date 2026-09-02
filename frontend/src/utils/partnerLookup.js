@@ -1,5 +1,21 @@
 import { supabase } from '../lib/supabase';
 
+// ── TEMPORARY TEST OVERRIDE ──────────────────────────────────────────────
+// Mocks a Minneapolis partner match so NorthStone can check how the banner
+// and results-page card look before real data exists in Supabase. Remove
+// this block (and the check for it in findPartner below) once they've
+// confirmed and/or once the real partner row is added via the admin panel.
+const TEST_MOCK_PARTNER = {
+  id: 'test-northstone-mn',
+  business_name: 'NorthStone',
+  phone: '(612) 314-9044',
+  email: 'info@northstonemn.com',
+  address: 'Minneapolis & St. Paul, MN',
+  website: 'https://northstonemn.com/',
+  logo_url: 'https://northstonemn.com/logo.png',
+  active: true,
+};
+
 // Shared by ResultsScreen (inline partner card) and FloatingPartnerBanner
 // (sitewide corner banner) so both use the same match logic and, for the
 // banner, the same cached result -- avoids hitting ipapi.co and Supabase
@@ -21,6 +37,9 @@ export async function getUserLocation() {
 // visitor's city/state. partners!inner lets the .eq('partners.active', ...)
 // filter apply to the joined table (a plain left join would ignore it).
 export async function findPartner(city, state) {
+  // TEMPORARY TEST OVERRIDE — see comment above. Remove this line once done.
+  if (city && city.trim().toLowerCase() === 'minneapolis') return TEST_MOCK_PARTNER;
+
   if (!supabase || !city || !state) return null;
   const { data } = await supabase
     .from('partner_locations')
