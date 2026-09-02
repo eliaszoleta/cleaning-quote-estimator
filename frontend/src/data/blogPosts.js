@@ -257,8 +257,8 @@ For anything with pet stains, silk or velvet fabric, or valuable antique furnitu
   {
     slug: 'tile-grout-cleaning-cost-guide',
     title: 'Tile and Grout Cleaning Cost Per Square Foot: 2026 Pricing by Material',
-    category: 'carpet',
-    categoryLabel: 'Carpet Cleaning',
+    category: 'tile-grout',
+    categoryLabel: 'Tile & Grout',
     date: '2026-08-27',
     readTime: '6 min',
     excerpt: 'Tile and grout cleaning costs $0.92–$2.05 per square foot depending on material — $276–$366 for a typical 300 sq ft ceramic floor, up to $465–$615 for natural stone. Here\'s what drives the price, plus sealing and recoloring costs.',
@@ -899,8 +899,8 @@ When hiring a single company for both janitorial and commercial cleaning:
   {
     slug: 'air-duct-cleaning-cost-guide',
     title: 'Air Duct Cleaning Cost: Is It Worth It? (2026 Guide)',
-    category: 'restoration',
-    categoryLabel: 'Restoration',
+    category: 'air-duct',
+    categoryLabel: 'Air Duct Cleaning',
     date: '2026-01-25',
     readTime: '7 min',
     excerpt: 'Air duct cleaning costs $300–$700 for a typical home. Learn when it\'s worth it, what to watch out for, and how to find a legitimate contractor.',
@@ -1369,8 +1369,8 @@ Do not attempt to clean biological contamination yourself. Beyond the health ris
   {
     slug: 'dryer-vent-cleaning-guide',
     title: 'Dryer Vent Cleaning: Costs, Safety, and When to Do It',
-    category: 'house-cleaning',
-    categoryLabel: 'House Cleaning',
+    category: 'dryer-vent',
+    categoryLabel: 'Dryer Vent Cleaning',
     date: '2026-02-05',
     readTime: '5 min',
     excerpt: 'Dryer vent cleaning costs $100–$200 and should be done annually. Clogged vents cause 2,900+ house fires per year. Here\'s everything you need to know.',
@@ -2583,8 +2583,8 @@ Sometimes, particularly for unattended death situations, but coverage varies. Co
   {
     slug: 'air-duct-cleaning-cost-las-vegas',
     title: 'Air Duct Cleaning Cost in Las Vegas, NV (2026)',
-    category: 'restoration',
-    categoryLabel: 'Restoration',
+    category: 'air-duct',
+    categoryLabel: 'Air Duct Cleaning',
     date: '2026-08-27',
     readTime: '5 min',
     excerpt: 'Air duct cleaning in Las Vegas costs $363–$462 for a standard residential system, plus $72–$94 per additional HVAC system. Here\'s real Las Vegas pricing, and why desert dust makes duct cleaning matter more here than in most climates.',
@@ -2625,8 +2625,8 @@ The EPA recommends every 3–5 years generally; given the heavier AC use here, l
   {
     slug: 'dryer-vent-cleaning-cost-las-vegas',
     title: 'Dryer Vent Cleaning Cost in Las Vegas, NV (2026)',
-    category: 'house-cleaning',
-    categoryLabel: 'House Cleaning',
+    category: 'dryer-vent',
+    categoryLabel: 'Dryer Vent Cleaning',
     date: '2026-08-27',
     readTime: '5 min',
     excerpt: 'Dryer vent cleaning in Las Vegas costs $116–$278 depending on vent length and complexity. Here\'s real Las Vegas pricing, and why lint buildup is a genuine fire risk worth taking seriously every year.',
@@ -3562,12 +3562,190 @@ Yes — a business with strong retention needs fewer new clients each month just
 [Pair strong retention with a steady lead source](/partner-with-us) →
     `,
   },
+  {
+    slug: 'apartment-cleaning-cost-guide',
+    title: 'Apartment Cleaning Cost in 2026: Prices by Unit Size',
+    category: 'apartment',
+    categoryLabel: 'Apartment Cleaning',
+    date: '2026-09-04',
+    readTime: '6 min',
+    excerpt: 'Apartment cleaning costs $85–$258 per visit depending on unit size, from studios to 4+ bedrooms. Here\'s real 2026 pricing by unit size, plus what changes the cost.',
+    content: `
+## Apartment Cleaning Cost by Unit Size
+
+Apartment cleaning is typically priced by unit size rather than square footage, since bedroom and bathroom count drive labor time more directly than raw floor area in a compact layout.
+
+| Unit Size | Cost Per Visit |
+|---|---|
+| Studio | $85–$108 |
+| 1 Bedroom | $107–$133 |
+| 2 Bedroom (Most Common) | $140–$175 |
+| 3 Bedroom | $175–$215 |
+| 4+ Bedroom | $210–$258 |
+
+A 2-bedroom apartment — the most common size nationally — runs **$140–$175** for a standard clean.
+
+## What Changes the Price
+
+- **Vacant vs. occupied**: Vacant, unfurnished units typically cost **10–15% less** since there's no furniture to work around and cleaners can move faster.
+- **Move-in/move-out**: A full turnover clean costs significantly more than routine service — see our [dedicated move-out cleaning cost guide](/blog/move-out-apartment-cleaning-checklist) for exact numbers.
+- **Frequency**: The same recurring discounts apply as house cleaning — roughly 20% off for weekly, 15% for biweekly, and 10% for monthly service.
+- **Add-ons**: Inside-fridge, inside-oven, and interior window cleaning are priced the same as standard house cleaning add-ons.
+
+## Apartments vs. Houses: Why Pricing Differs Slightly
+
+Apartment cleaning tends to run a bit cheaper per square foot than a comparable single-family home, mainly because apartments are more compact and cleaners spend less time moving between rooms and floors. Multi-story homes also add stairs and more total surface area for the same "bedroom count," which apartment pricing doesn't factor in.
+
+## FAQ
+
+**How much does it cost to clean a 2-bedroom apartment?**
+$140–$175 per visit for a standard clean — the most common apartment size and price point.
+
+**Is it cheaper to clean a vacant apartment?**
+Yes, vacant and unfurnished units typically cost 10–15% less since there's no furniture to clean around.
+
+**Do property managers get a discount on multi-unit cleaning?**
+Often, yes — many cleaning companies offer volume pricing for property managers booking recurring turnover cleaning across multiple units.
+
+**Does apartment cleaning cost less than house cleaning?**
+Generally yes, per comparable size — apartments are more compact, so cleaners spend less time moving between spaces than in a multi-story home.
+
+[Get a ZIP-code accurate apartment cleaning estimate](/?service=apartment) →
+    `,
+  },
+  {
+    slug: 'move-out-apartment-cleaning-checklist',
+    title: 'Move-Out Apartment Cleaning Checklist & Cost for 2026',
+    category: 'apartment',
+    categoryLabel: 'Apartment Cleaning',
+    date: '2026-09-04',
+    readTime: '7 min',
+    excerpt: 'Move-out cleaning costs 88–105% more than a standard clean since every surface, cabinet, and appliance needs full attention. Here\'s a complete checklist and what it actually costs, so you get your deposit back.',
+    content: `
+## Why Move-Out Cleaning Costs More
+
+A standard clean maintains a space you already live in. A move-out clean has to bring every surface back to a "move-in ready" standard for the next tenant — inside every cabinet, appliance, closet, and fixture — which is why it typically costs **88–105% more** than routine service. For a 2-bedroom apartment (normally $140–$175), expect **$260–$360** for a full move-out clean.
+
+## The Complete Move-Out Cleaning Checklist
+
+### Kitchen
+- Inside and outside of all cabinets and drawers
+- Inside refrigerator (including behind/under if it moves)
+- Inside oven and stovetop, including burner drip pans
+- Inside microwave
+- Countertops, backsplash, and sink, including faucet fixtures
+- Floor, including behind appliances that can be pulled out
+
+### Bathrooms
+- Inside medicine cabinets and vanity drawers
+- Tub, shower, and tile — including grout, if soap scum has built up
+- Toilet, inside and out, including the base
+- Mirrors and fixtures
+- Floor and baseboards
+
+### Bedrooms and Living Areas
+- Inside all closets, including shelving
+- Baseboards and window sills
+- Light switch plates and outlet covers (landlords check these more than people expect)
+- Floors — vacuumed and mopped, or professionally cleaned if carpeted
+
+### Whole Unit
+- All interior windows and window tracks
+- Ceiling fans and light fixtures
+- Walls spot-cleaned for scuffs (not full repainting, but visible marks)
+- Trash removed entirely, including any left in outdoor areas
+
+## Why This Matters for Your Security Deposit
+
+Most lease agreements require the unit returned in the condition it was received, minus normal wear and tear — and "normal wear and tear" is a much narrower standard than most tenants assume. A landlord doing a move-out inspection is specifically checking the items on this list, and a professional move-out clean covers all of them systematically, rather than relying on memory during an already stressful move.
+
+## DIY vs. Professional Move-Out Cleaning
+
+Doing it yourself saves the cost of the clean itself but takes real time — realistically 4–8 hours for a 2-bedroom unit done thoroughly, on top of the rest of moving. A professional move-out clean means one less thing to coordinate during a move, and it provides a level of documented thoroughness that can matter if a deposit dispute comes up.
+
+## FAQ
+
+**How much does move-out apartment cleaning cost?**
+88–105% more than a standard clean. A 2-bedroom apartment runs roughly $260–$360 for a full move-out clean, compared to $140–$175 for routine service.
+
+**What's included in a move-out cleaning that isn't in a regular clean?**
+Inside cabinets, inside appliances (fridge, oven, microwave), closets, window tracks, and light fixtures — areas a routine clean typically skips since they don't need attention every visit.
+
+**Will move-out cleaning guarantee I get my full deposit back?**
+Not automatically — deposit return depends on your specific lease and any damage beyond normal wear and tear, but a thorough move-out clean addresses the cleanliness portion landlords most commonly deduct for.
+
+**Should I clean before or after I move my furniture out?**
+After — a vacant unit cleans faster and more thoroughly since there's no furniture to work around, and it's the standard approach for move-out cleaning specifically.
+
+[Get a move-out cleaning estimate for your apartment](/?service=apartment) →
+    `,
+  },
+  {
+    slug: 'grout-sealing-vs-recoloring',
+    title: 'Grout Sealing vs. Grout Recoloring: Which Does Your Bathroom Actually Need?',
+    category: 'tile-grout',
+    categoryLabel: 'Tile & Grout',
+    date: '2026-09-04',
+    readTime: '6 min',
+    excerpt: 'Discolored grout doesn\'t always mean it needs replacing. Here\'s how to tell whether sealing or recoloring is the right (and cheaper) fix, with real 2026 pricing for both.',
+    content: `
+## Two Different Problems, Two Different Fixes
+
+Discolored or stained grout gets people searching for "grout replacement" when what they actually need is far cheaper and less disruptive. Sealing and recoloring solve two different problems — knowing which one you have saves both money and a lot of unnecessary demolition.
+
+## Grout Sealing: Prevention, Not a Fix
+
+**Cost**: $0.55–$0.88 per sq ft
+**What it does**: Applies a protective coating to clean grout that resists future staining and moisture penetration.
+**When to use it**: Right after a deep clean, on grout that's already close to its original color — sealing doesn't fix existing discoloration, it protects grout that's already in good shape from getting stained again.
+
+Unsealed grout is porous and absorbs spills, soap scum, and moisture, which is why bathroom and kitchen grout discolors faster than grout in low-moisture areas. Sealing every 1–2 years significantly extends the time between deep cleanings.
+
+## Grout Recoloring: Fixing Grout That's Already Discolored
+
+**Cost**: $1.65–$2.55 per sq ft
+**What it does**: Applies a durable, pigmented colorant directly to the grout lines, restoring a uniform, like-new appearance without removing or replacing the existing grout.
+**When to use it**: When grout is already stained, uneven in color, or was never sealed and has absorbed years of discoloration that cleaning alone won't fully lift.
+
+Recoloring is a genuine alternative to regrouting for grout that's structurally fine (not crumbling or cracked) but cosmetically far gone. It's a fraction of the cost and disruption of a full regrout.
+
+## How to Tell Which One You Need
+
+- **Grout looks clean, just unprotected** → Sealing
+- **Grout is visibly stained or discolored even after cleaning** → Recoloring
+- **Grout is crumbling, cracked, or missing in sections** → Neither — this needs actual regrouting, which is a different (and more expensive) job entirely
+
+## Can You Do Both?
+
+Yes, and it's the standard approach for a full refresh — recolor first to restore uniform color, then seal over the fresh color to protect it going forward. Doing both together costs **$2.20–$3.43 per sq ft** combined, still well below the cost of replacing tile or grout entirely.
+
+## FAQ
+
+**Is grout sealing the same as grout recoloring?**
+No — sealing protects grout that already looks good from future staining, while recoloring fixes grout that's already discolored. They solve different problems and are sometimes done together.
+
+**How often does grout need to be resealed?**
+Every 1–2 years for high-moisture areas like showers, longer for lower-moisture areas like kitchen floors.
+
+**Is grout recoloring permanent?**
+It's durable, typically lasting several years with normal cleaning, though it's not literally permanent — it can be reapplied if it eventually wears.
+
+**Is recoloring cheaper than replacing grout entirely?**
+Yes, significantly — recoloring costs $1.65–$2.55/sq ft versus the labor-intensive process of fully removing and replacing grout, which costs considerably more.
+
+[Get a tile and grout cleaning estimate](/?service=tile_grout) →
+    `,
+  },
 ];
 
 export const CATEGORIES = [
   { id: 'house-cleaning', label: 'House Cleaning', icon: '🏠' },
+  { id: 'apartment', label: 'Apartment Cleaning', icon: '🏢' },
   { id: 'carpet', label: 'Carpet Cleaning', icon: '🪣' },
   { id: 'commercial', label: 'Commercial', icon: '🏬' },
+  { id: 'air-duct', label: 'Air Duct Cleaning', icon: '💨' },
+  { id: 'dryer-vent', label: 'Dryer Vent Cleaning', icon: '🔥' },
+  { id: 'tile-grout', label: 'Tile & Grout', icon: '🧽' },
   { id: 'restoration', label: 'Mold & Water Damage', icon: '⚠️' },
   { id: 'grow-your-business', label: 'Grow Your Business', icon: '📈' },
 ];

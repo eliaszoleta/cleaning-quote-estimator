@@ -77,7 +77,19 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.cleanestimator.com/blog/category/tile-grout</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.cleanestimator.com/blog/category/commercial</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/category/air-duct</loc>
     <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -89,7 +101,19 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://www.cleanestimator.com/blog/category/dryer-vent</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.cleanestimator.com/blog/category/grow-your-business</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/category/apartment</loc>
     <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -417,6 +441,24 @@
   <url>
     <loc>https://www.cleanestimator.com/blog/cleaning-business-customer-retention-guide</loc>
     <lastmod>2026-09-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/apartment-cleaning-cost-guide</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/move-out-apartment-cleaning-checklist</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/grout-sealing-vs-recoloring</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
