@@ -35,3 +35,12 @@ export function getCityTier(cityName, stateCode) {
   const tier = population >= POPULATION_THRESHOLD ? 'major' : 'minor';
   return { tier, population, price: tier === 'major' ? MAJOR_CITY_PRICE : MINOR_CITY_PRICE };
 }
+
+// Every city in the dataset with its tier/price pre-computed, for a
+// browsable "look up your city" list on the partner page.
+export function getAllCityTierEntries() {
+  return CITY_POPULATIONS.map(([stateCode, city, population]) => {
+    const tier = population >= POPULATION_THRESHOLD ? 'major' : 'minor';
+    return { stateCode, city, population, tier, price: tier === 'major' ? MAJOR_CITY_PRICE : MINOR_CITY_PRICE };
+  });
+}
