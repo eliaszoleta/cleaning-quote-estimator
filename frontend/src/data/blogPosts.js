@@ -2755,8 +2755,8 @@ Given the concentration of hotels, resorts, and restaurants in the Las Vegas eco
   {
     slug: 'cleaning-cost-calculator-for-your-website',
     title: 'The Best Cleaning Cost Calculator to Add to Your Website in 2026',
-    category: 'commercial',
-    categoryLabel: 'Commercial Cleaning',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
     date: '2026-08-28',
     readTime: '7 min',
     excerpt: 'An instant quote calculator converts better than a "contact us" form because it removes the biggest source of friction in booking a cleaning service: not knowing the price. Here\'s what to look for, and how to add one to your site without building it yourself.',
@@ -2820,6 +2820,481 @@ No — Clean Estimator's calculator embeds with a single line of HTML, and API a
 [See pricing and start your free trial](/for-companies) →
     `,
   },
+  {
+    slug: 'how-to-get-more-cleaning-clients',
+    title: 'How to Get More Cleaning Clients in 2026: 10 Proven Strategies',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-08-30',
+    readTime: '9 min',
+    excerpt: 'Getting new clients consistently is the single biggest challenge cleaning business owners face. Here are 10 real, proven ways to bring in more leads — from free tactics you can start today to paid channels worth the money.',
+    content: `
+## Why Client Acquisition Is the Hardest Part of Running a Cleaning Business
+
+Most cleaning companies don't fail because the owner can't clean — they stall because the pipeline of new clients dries up. Word of mouth only gets you so far, and relying on it alone means growth is unpredictable. The good news: getting more cleaning clients is a solvable, repeatable problem once you're running the right mix of tactics.
+
+## 1. Claim and Fully Optimize Your Google Business Profile
+
+This is free, and it's the single highest-leverage thing you can do. When someone searches "cleaning service near me," Google's local results (the "map pack") are what shows up first — above the regular search results. A complete, active profile with your correct service area, categories, photos, and hours puts you in that pack.
+
+## 2. Ask Every Happy Customer for a Review
+
+Reviews are a direct ranking factor for local search, not just a trust signal. The best time to ask is right after a job the customer was visibly happy with — send a text with a direct link to your Google review page so there's zero friction.
+
+## 3. List Your Business on Cleaning-Specific Lead Platforms
+
+Platforms like Thumbtack, Angi, and Nextdoor put your business in front of people actively looking to hire. Most work on a shared-lead, pay-per-lead model — you're competing with other cleaners for the same request, and costs add up fast if your close rate isn't strong.
+
+## 4. Get Exclusive Local Leads Through a Partner Program
+
+The alternative to shared-lead platforms is exclusive placement — where only one cleaning business per city gets shown to visitors. [Clean Estimator's Local Partner Program](/partner-with-us) works this way: your business appears on every cleaning cost estimate result for homeowners in your city, with no other cleaning company competing for that same placement. Because it's a flat monthly rate instead of pay-per-lead, your cost doesn't climb as you close more jobs.
+
+## 5. Offer a Referral Incentive to Existing Customers
+
+A $20–$50 credit (for either party, or both) toward a future cleaning is usually enough to get satisfied customers actively recommending you. Referred customers also tend to have a higher close rate than cold leads, since there's already built-in trust.
+
+## 6. Build Relationships With Real Estate Agents and Property Managers
+
+Move-in/move-out cleaning is a recurring, predictable need for agents and property managers — and once you're their go-to, that relationship can produce steady work without any additional marketing spend. Reach out directly to a handful of local agents and offer a straightforward referral fee or discounted first job.
+
+## 7. Run Targeted Local Ads
+
+Facebook and Instagram ads targeted to a 5–10 mile radius around your service area can work well for cleaning businesses, especially paired with a strong before/after photo or a limited-time first-clean discount. Keep the geographic radius tight — a cleaning ad shown 30 miles outside your service area is wasted spend.
+
+## 8. Put an Instant Quote Calculator on Your Website
+
+A "contact us for a quote" form is friction — most visitors leave without knowing whether your price is even in their budget. [An embeddable cost calculator](/for-companies) shows a real price range instantly, which converts noticeably better than a static form and captures the lead's info automatically.
+
+## 9. Follow Up Fast
+
+Response speed is one of the most overlooked factors in closing a new lead. A homeowner requesting a cleaning quote is usually requesting from 2–3 companies at once — whoever responds first with a clear price and a way to book often wins the job, regardless of who's actually the better cleaner.
+
+## 10. Convert One-Time Clients Into Recurring Revenue
+
+The cheapest new client to get is one you already have. Offer a modest discount (10–20%) for weekly, biweekly, or monthly recurring service compared to one-time cleanings — recurring clients are more predictable revenue and require zero additional marketing spend to keep.
+
+## FAQ
+
+**How do I get more cleaning clients fast?**
+The fastest results usually come from a combination of a complete Google Business Profile, actively asking recent customers for reviews, and listing on a lead platform (shared or exclusive) — these can start producing leads within days to a couple of weeks, versus months for purely organic growth.
+
+**How much does it cost to get new cleaning clients?**
+It varies widely by channel. Google Business Profile and review requests are free. Shared-lead platforms like Thumbtack typically run $15–$50+ per lead depending on your market and service type. Exclusive local partner programs are usually a flat monthly rate regardless of lead volume.
+
+**What's the best way to get cleaning clients without paying for ads?**
+A strong Google Business Profile, consistent review generation, and a referral program are the three highest-impact free channels — all three compound over time as your review count and referral network grow.
+
+**How long does it take to grow a cleaning business through marketing?**
+Expect meaningful, compounding results in 3–6 months of consistent effort across multiple channels. Paid lead sources can produce faster short-term results, but organic channels (reviews, Google Business Profile, referrals) build a foundation that keeps producing leads without ongoing spend.
+
+[Apply for exclusive placement in your city](/partner-with-us) →
+    `,
+  },
+  {
+    slug: 'where-to-find-cleaning-business-leads',
+    title: 'Where to Find Cleaning Business Leads Online: 8 Free and Paid Sources',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-08-30',
+    readTime: '8 min',
+    excerpt: 'From free listings to pay-per-lead platforms to exclusive local placement, here\'s a real breakdown of where cleaning business leads actually come from — and what each one costs.',
+    content: `
+## Where Cleaning Leads Actually Come From
+
+Every cleaning business needs a mix of lead sources — relying on just one is risky if that channel changes its algorithm, raises prices, or simply dries up. Here's a real breakdown of the 8 most common sources, free and paid, and what to expect from each.
+
+## Free Sources
+
+### 1. Google Business Profile
+Free to claim and maintain. This is where most "cleaning service near me" searches actually convert — a complete, active profile with reviews and photos shows up in Google's local map pack above organic search results.
+
+### 2. Nextdoor
+Nextdoor's neighborhood-based structure means recommendations carry real weight — a neighbor vouching for your business is a strong trust signal. Claim your business page and respond to any local "recommend a cleaner" posts you see.
+
+### 3. Facebook Local Groups
+Most cities and neighborhoods have active "buy nothing," "local recommendations," or neighborhood Facebook groups. Genuine participation (not just posting ads) tends to work better than cold promotion.
+
+### 4. Referral Program
+Not a platform, but effectively free — a $20–$50 credit for referring a new client typically pays for itself many times over given how much cheaper a referred lead is to acquire than a cold one.
+
+## Paid Sources
+
+### 5. Thumbtack
+Pay-per-lead model where you bid to respond to a homeowner's request. Leads are shared with other cleaners responding to the same request, so your close rate depends heavily on speed and how competitive your quote is.
+
+### 6. Angi (formerly Angie's List / HomeAdvisor)
+Combines a membership fee with pay-per-lead pricing in most markets. Leads are shared, similar to Thumbtack, though Angi's brand recognition can bring in homeowners who specifically searched there.
+
+### 7. Google Local Services Ads
+Pay-per-lead, but with the added "Google Guaranteed" badge (after a background check) that builds trust. Requires a separate application process from a standard Google Business Profile.
+
+### 8. Exclusive Local Partner Programs
+Instead of paying per lead or sharing leads with competitors, an exclusive partner program gives one cleaning business per city guaranteed placement — no other cleaner competing for that spot. [Clean Estimator's Local Partner Program](/partner-with-us) works this way for $350/month per city, with your business shown on every cleaning estimate result for homeowners in your area.
+
+## Comparison at a Glance
+
+| Source | Cost Model | Exclusive? | Best For |
+|---|---|---|---|
+| Google Business Profile | Free | N/A | Every business, no exceptions |
+| Nextdoor | Free (paid ads optional) | No | Neighborhood trust and word-of-mouth |
+| Facebook Local Groups | Free | No | Hyperlocal, community-driven leads |
+| Referral Program | Low cost (credits) | N/A | Converting happy customers into a lead source |
+| Thumbtack | Pay-per-lead | No, shared | High lead volume, fast growth phase |
+| Angi | Membership + pay-per-lead | No, shared | Brand recognition, established markets |
+| Google Local Services Ads | Pay-per-lead | No, shared | Trust-building via Google Guaranteed badge |
+| Local Partner Program | Flat monthly fee | Yes, one per city | Predictable cost, no competing quotes |
+
+## How to Choose
+
+Most growing cleaning businesses run 2–3 of these at once rather than relying on a single source. A common approach: free channels (Google Business Profile, reviews, referrals) as the foundation, plus one paid channel to fill in volume. If cost predictability matters more than raw lead volume, exclusive placement tends to work out cheaper per booked job than shared pay-per-lead platforms, since you're not paying for leads that go to a competitor instead.
+
+## FAQ
+
+**What's the cheapest way to get cleaning business leads?**
+Google Business Profile and a referral program are effectively free and, for most cleaning businesses, produce the highest-quality leads since they come with built-in trust.
+
+**Are shared leads from Thumbtack or Angi worth it?**
+They can be, especially for newer businesses building volume — but your close rate has to be strong enough to justify the per-lead cost, since you're competing directly with other cleaners quoting the same job.
+
+**What does exclusive lead placement cost for a cleaning business?**
+Clean Estimator's Local Partner Program is $350/month per city, with no per-lead charges and no competing cleaning businesses shown for that city.
+
+[See if your city is available](/partner-with-us) →
+    `,
+  },
+  {
+    slug: 'how-to-get-5-star-reviews-cleaning-business',
+    title: 'How to Get 5-Star Reviews for Your Cleaning Business (and Why They Matter)',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-08-31',
+    readTime: '7 min',
+    excerpt: 'Reviews aren\'t just social proof — they\'re a direct factor in whether your cleaning business shows up when someone searches nearby. Here\'s how to get more of them, and how to handle the occasional bad one.',
+    content: `
+## Why Reviews Matter More Than Most Cleaning Business Owners Realize
+
+Google's local search ranking is built on three factors: relevance, distance, and prominence. Prominence includes your review count and average rating — meaning a business with 80 reviews at 4.8 stars will generally outrank a business with 5 reviews at 5.0 stars for the same search, even if both do equally good work. Reviews aren't just something customers read before hiring you; they directly affect whether you show up at all.
+
+## When to Ask for a Review
+
+Timing matters more than the wording. Ask right after a job the customer was visibly happy with — while the experience is fresh, not days later. If you can see them in person at the end of the job, ask verbally and follow up immediately with a text containing the direct review link. Waiting for a follow-up email days later dramatically lowers response rates.
+
+## How to Ask Without It Feeling Awkward
+
+Keep it short and specific: "Thanks for choosing us today! If you have 30 seconds, a Google review really helps a small business like ours — here's the direct link: [link]." Avoid generic mass emails; a personal text from the technician or owner converts far better than an automated system that feels impersonal.
+
+## Make It as Easy as Possible
+
+Every extra step between "wants to leave a review" and "actually leaves one" loses people. Use your Google Business Profile's short review link (found in your profile dashboard) rather than sending someone to search for your business themselves.
+
+## Where to Prioritize
+
+- **Google** first — it's what most homeowners check and what directly affects your local search ranking
+- **Yelp** second, especially in markets where Yelp still has meaningful local search traffic
+- **Facebook** third, useful for social proof if you're running local Facebook ads
+- Platform-specific reviews (Angi, Thumbtack) matter mainly if you're actively using those platforms for leads
+
+## How to Handle a Negative Review
+
+Respond publicly, promptly, and professionally — never defensively. Acknowledge the issue, briefly explain what you'll do about it, and offer to make it right offline (a phone number or email, not a public back-and-forth). A thoughtful response to a bad review often builds more trust with future customers than having no negative reviews at all, since it shows how you handle problems.
+
+## Never Buy or Fake Reviews
+
+Purchased or incentivized reviews (offering a discount specifically in exchange for a positive review) violate Google's policies and risk your entire profile being suspended — which would remove ALL your reviews, not just the fake ones. It's not worth the risk for a shortcut that a determined competitor could report anyway.
+
+## FAQ
+
+**How many reviews does a cleaning business need to rank well locally?**
+There's no fixed number, but businesses with 50+ reviews at a strong average rating tend to consistently outrank newer competitors with only a handful of reviews, all else being equal.
+
+**What's the best way to ask for a review after a cleaning job?**
+Ask in person or by text immediately after the job while the experience is fresh, with a direct link that takes just one tap to open — don't rely solely on a delayed automated email.
+
+**Should I respond to negative reviews?**
+Yes, always — respond professionally and promptly, and move the specifics of the complaint to a private conversation rather than arguing publicly.
+
+**Can I offer a discount in exchange for a review?**
+No — incentivizing or offering anything specifically in exchange for a review violates most platforms' policies and risks having your profile suspended.
+
+[Learn more about growing your cleaning business](/blog/category/grow-your-business) →
+    `,
+  },
+  {
+    slug: 'google-business-profile-cleaning-company',
+    title: 'Google Business Profile Optimization for Cleaning Companies: A Step-by-Step Guide',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-08-31',
+    readTime: '8 min',
+    excerpt: 'Your Google Business Profile is free, and it\'s the single biggest driver of new cleaning clients for most local businesses. Here\'s exactly how to set it up and optimize it, step by step.',
+    content: `
+## Why This Matters More Than Almost Anything Else
+
+When someone searches "house cleaning near me" or "cleaning service in [city]," Google shows a local map pack above regular search results — pulled directly from Google Business Profiles. A well-optimized, active profile is often the single biggest lever a local cleaning business has for getting found, and it's completely free.
+
+## Step 1: Claim and Verify Your Listing
+
+If you haven't already, claim your business at business.google.com. Google will verify your business, typically by mail (postcard with a code), phone, or email depending on your business type. Skip this step and none of the rest matters — an unverified profile won't show up reliably in search.
+
+## Step 2: Choose the Right Categories
+
+Your **primary category** should be the closest match to your main service — usually "House Cleaning Service" or "Commercial Cleaning Service." Add secondary categories for every other service you actually offer (carpet cleaning, move-out cleaning, etc.) since each category can help you surface for related searches.
+
+## Step 3: Set Up Your Service Area Correctly
+
+If you clean in customers' homes rather than operating from a storefront, set your profile as a **service-area business** and list every city or zip code you actually serve. Don't list areas you don't serve just to appear bigger — Google can penalize profiles that misrepresent their service area, and it wastes clicks from people you can't actually help.
+
+## Step 4: Fill Out Every Field Completely
+
+Business hours, phone number, website, a full business description, and services list. Incomplete profiles rank worse than complete ones, all else equal — Google's algorithm favors listings with more verified, complete information.
+
+## Step 5: Add Real Photos
+
+Before/after cleaning photos perform especially well for this industry — they're concrete proof of quality in a way text reviews aren't. Add photos of your team, your vehicle if branded, and the spaces you clean. Aim to add new photos regularly rather than uploading everything once and never returning.
+
+## Step 6: Use Google Posts
+
+The "Posts" feature lets you share updates, offers, and photos directly to your profile — they show up right in your listing. A post about a seasonal discount or a recent five-star review keeps your profile active, which Google's algorithm favors over dormant listings.
+
+## Step 7: Actively Manage Reviews
+
+Respond to every review, positive and negative (see our [full guide to getting more reviews](/blog/how-to-get-5-star-reviews-cleaning-business)). Review count and rating are direct ranking factors, and responding shows both Google and prospective customers that you're actively engaged.
+
+## Step 8: Set Up Messaging and a Booking Link
+
+Enable direct messaging so customers can reach you straight from search results, and add a booking or quote-request link — ideally one that gives an [instant price estimate](/for-companies) rather than a plain contact form, since that converts noticeably better.
+
+## Step 9: Monitor Your Insights
+
+Google Business Profile shows you how customers found you (direct search vs. discovery), what they searched to find you, and how many calls, messages, and direction requests you got. Check this monthly to see what's actually working.
+
+## FAQ
+
+**Is Google Business Profile free?**
+Yes, completely free to claim, verify, and maintain — there's no paid tier required to appear in local search results.
+
+**How long does it take for a Google Business Profile to start ranking?**
+A newly verified profile can appear in search within days, but building strong rankings against established competitors typically takes a few months of consistent reviews, posts, and complete information.
+
+**What category should a cleaning business use on Google Business Profile?**
+"House Cleaning Service" is the standard primary category for residential cleaners; commercial-focused businesses should use "Commercial Cleaning Service." Add every relevant secondary category you actually offer.
+
+**Does a service-area business need a physical address on Google?**
+No — service-area businesses can hide their address and instead list the cities or zip codes they serve, which is the correct setup for most cleaning companies that work in customers' homes.
+
+[See how an instant quote calculator can turn Google traffic into booked jobs](/for-companies) →
+    `,
+  },
+  {
+    slug: 'how-to-start-a-cleaning-business',
+    title: 'How to Start a Cleaning Business in 2026: Costs, Licensing & Getting Your First Clients',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-09-01',
+    readTime: '9 min',
+    excerpt: 'What it actually costs to start a cleaning business, what licensing and insurance you need, how to price your first jobs, and where your first clients realistically come from.',
+    content: `
+## What It Actually Costs to Start
+
+Cleaning is one of the lower-cost service businesses to start, which is part of why it's a popular choice — but "low cost" doesn't mean zero cost. Here's a realistic breakdown for a solo or small-crew residential cleaning startup:
+
+| Item | Typical Cost |
+|---|---|
+| Cleaning supplies and equipment | $200–$800 |
+| Business registration (LLC or sole proprietorship) | $50–$500 (varies by state) |
+| General liability insurance | $30–$70/month |
+| Bonding | $10–$40/month |
+| Website and basic branding | $0–$300 (DIY vs. hiring out) |
+| Marketing (first-month budget) | $100–$500 |
+
+Total realistic startup cost for a solo operation: roughly **$500–$2,000**, well below what most service businesses require.
+
+## Licensing and Insurance: What You Actually Need
+
+Requirements vary by state and city, but there are three things almost every legitimate cleaning business needs regardless of location:
+
+- **General liability insurance** — covers damage to a client's property or injury that happens on the job. Most clients, especially commercial ones, will ask for proof before hiring you.
+- **Bonding** — protects clients against theft by an employee. It's relatively inexpensive and significantly increases trust, especially for clients who'll be giving you a house key or access code.
+- **A business license** — requirements vary widely by city and county; check your local government's website rather than assuming, since some jurisdictions require nothing beyond basic business registration and others require a specific home-service license.
+
+Registering as an LLC (rather than operating as a sole proprietor) is worth strongly considering even at a small scale — it separates your personal assets from business liability, which matters in a hands-on service business where accidents can happen.
+
+## Pricing Your First Jobs
+
+Underpricing is the most common mistake new cleaning businesses make — competing purely on being the cheapest option attracts price-sensitive clients who churn the moment a cheaper competitor shows up, and it makes it hard to raise prices later without losing them. [Use a real cost calculator](/) to see what accurate, competitive pricing looks like in your area based on real cost-of-living data, rather than guessing or just undercutting whatever a competitor charges.
+
+## Getting Your First Clients
+
+Your very first clients almost always come from your existing personal network — friends, family, neighbors, and anyone who already trusts you. Don't skip this step even if it feels small; those first few jobs become your first reviews, which everything else builds on.
+
+From there:
+1. **Set up your Google Business Profile immediately** — see our [step-by-step guide](/blog/google-business-profile-cleaning-company)
+2. **Ask every one of those first clients for a review** the moment the job is done
+3. **List on a lead platform** (Thumbtack, Angi, or Nextdoor) to supplement personal-network jobs while your organic presence builds
+4. **Consider exclusive local placement once you're ready to handle steady volume** — [Clean Estimator's Local Partner Program](/partner-with-us) gives one business per city guaranteed visibility, which works especially well once you have the reviews and capacity to convert that traffic reliably
+
+## How Long Until It's a Full-Time Income?
+
+This varies enormously by market and effort, but most solo cleaning businesses that treat marketing as a real, ongoing part of the job (not an afterthought) reach a steady client base within 6–12 months. The businesses that struggle to get past a few clients are almost always the ones relying purely on word of mouth with no active lead-generation effort.
+
+## FAQ
+
+**How much does it cost to start a cleaning business?**
+A solo residential cleaning startup typically costs $500–$2,000 to get properly licensed, insured, and equipped — significantly less than most service businesses.
+
+**Do I need insurance to start a cleaning business?**
+Yes, in practice — general liability insurance and bonding are expected by most clients and protect you from real financial risk if something goes wrong on a job.
+
+**How do I get my first cleaning clients?**
+Start with your personal network for your first few jobs, then set up a Google Business Profile, request reviews immediately, and list on a lead platform to build volume beyond word of mouth.
+
+**Should I start as an LLC or sole proprietor?**
+An LLC is worth the modest extra cost and paperwork for most cleaning businesses since it separates personal assets from business liability — important in a hands-on service where accidents can happen.
+
+[Get a real, location-based price estimate to guide your pricing](/) →
+    `,
+  },
+  {
+    slug: 'cleaning-business-marketing-budget',
+    title: 'How Much Should a Cleaning Business Spend on Marketing?',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-09-01',
+    readTime: '7 min',
+    excerpt: 'A common small-business rule of thumb is 7–8% of gross revenue on marketing — here\'s how to think about that for a cleaning business specifically, and how to split your budget across channels.',
+    content: `
+## The General Rule of Thumb
+
+A commonly cited small-business guideline (used broadly across the SBA and industry marketing advisors) is to budget roughly **7–8% of gross revenue** on marketing for an established business, and up to **10–12%** for a business actively trying to grow market share. For a cleaning business doing $10,000/month in revenue, that's roughly $700–$1,200/month during a growth phase.
+
+That said, the right number depends heavily on your stage — a brand-new business with $0 in revenue obviously can't spend a percentage of nothing, and needs a small fixed starting budget instead (see below).
+
+## For a Brand-New Cleaning Business
+
+If you're just starting out, think in fixed dollars rather than a percentage: a realistic first-month marketing budget is **$100–$500**, covering:
+- $0 — Google Business Profile setup (free)
+- $0 — asking your first clients for reviews (free)
+- $50–$300 — a lead platform like Thumbtack to supplement personal-network jobs while reviews build
+- $50–$200 — basic local Facebook/Instagram ads, if budget allows
+
+## For a Growing Cleaning Business (1–3 Years In)
+
+Once you have steady revenue and want to accelerate growth, the 7–12% guideline becomes more useful. A rough split that works for most cleaning businesses:
+
+| Channel | % of Marketing Budget | Notes |
+|---|---|---|
+| Paid lead platforms (Thumbtack, Angi, etc.) | 30–40% | Variable cost, scales with volume |
+| Local/exclusive placement | 20–30% | Flat monthly cost, predictable |
+| Paid social ads | 15–20% | Best for brand awareness and repeat targeting |
+| Review/referral incentives | 5–10% | Low cost, high trust return |
+| Website and tools (calculator, booking) | 10–15% | One-time or low monthly cost, improves conversion on all other traffic |
+
+## Measure Cost Per Booked Job, Not Just Cost Per Lead
+
+This is the most important shift in thinking for a growing cleaning business: a cheap lead that never converts is more expensive than an expensive lead that closes. Track how many leads from each channel actually turn into booked, paid jobs — not just raw lead count — and reallocate budget toward whichever channel has the best cost per booked job, even if its cost per lead looks higher on paper.
+
+## Why Flat-Rate Channels Change the Math
+
+Pay-per-lead platforms scale their cost with your success — the more jobs you close, the more you're paying for the leads that produced them. A flat monthly cost channel, like [an exclusive local partner program](/partner-with-us), behaves the opposite way: your cost stays fixed regardless of how many jobs you close from it, which means your effective cost per booked job actually goes down the better you get at closing.
+
+## FAQ
+
+**What percentage of revenue should a small cleaning business spend on marketing?**
+A common guideline is 7–8% of gross revenue for an established business, rising to 10–12% during an active growth phase — though brand-new businesses should think in fixed monthly dollars instead until there's real revenue to base a percentage on.
+
+**Is Thumbtack or Angi worth the cost for a cleaning business?**
+It depends on your close rate — if you convert a solid percentage of the leads you respond to, the pay-per-lead cost is usually worthwhile, especially early on while you're building reviews and volume.
+
+**What's the cheapest effective marketing channel for a cleaning business?**
+Google Business Profile and customer reviews are both free and consistently rank among the highest-converting sources for local service businesses.
+
+**How do I know if my marketing spend is working?**
+Track cost per booked job (not just cost per lead) by channel — the channel with the lowest cost per closed job, not the lowest cost per lead, is where more budget should go.
+
+[Compare a flat-rate alternative to pay-per-lead platforms](/partner-with-us) →
+    `,
+  },
+  {
+    slug: 'best-lead-generation-platforms-cleaning-companies',
+    title: 'Best Lead Generation Platforms for Cleaning Companies in 2026',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-09-02',
+    readTime: '8 min',
+    excerpt: 'Thumbtack, Angi, Google Local Services Ads, Nextdoor, and exclusive local partner programs all generate leads differently — here\'s a real comparison of how each works, what it costs, and which fits which stage of business.',
+    content: `
+## Not All Lead Platforms Work the Same Way
+
+The biggest difference between cleaning lead platforms isn't the price — it's whether your leads are **shared** (multiple cleaners quoting the same job) or **exclusive** (only your business shown). That distinction matters more than almost anything else when deciding where to put your budget.
+
+## Thumbtack
+
+**Model**: Pay-per-lead, shared. You bid to respond to a homeowner's request, and typically 3–5 other cleaners are responding to the same request.
+**Cost**: Varies by market and service type, generally $15–$50+ per lead.
+**Best for**: Businesses that can respond fast and close well on price — speed and a strong quote win the job here, not just being listed.
+
+## Angi (formerly Angie's List / HomeAdvisor)
+
+**Model**: Membership fee plus pay-per-lead in most markets, also shared leads.
+**Cost**: Membership plus per-lead costs, generally comparable to or slightly higher than Thumbtack depending on market.
+**Best for**: Businesses in markets where Angi has strong brand recognition and search traffic — homeowner trust in the platform itself can boost close rates.
+
+## Google Local Services Ads
+
+**Model**: Pay-per-lead, shown at the very top of Google search results with a "Google Guaranteed" badge after a background check.
+**Cost**: Pay-per-lead, varies by market competitiveness.
+**Best for**: Businesses that want the trust boost of Google's guarantee badge and top placement, separate from a standard Google Business Profile listing.
+
+## Nextdoor
+
+**Model**: Mostly organic (free business page, community recommendations) with optional paid local ads.
+**Cost**: Free for a business page; paid ads are additional.
+**Best for**: Hyperlocal trust — a neighbor's recommendation on Nextdoor carries real weight, and it's a channel most competitors underuse.
+
+## Yelp
+
+**Model**: Free organic listing with optional paid ads to boost visibility.
+**Cost**: Paid ads vary by market; the organic listing itself is free.
+**Best for**: Markets where Yelp still gets meaningful local search traffic — varies significantly by region and demographic.
+
+## Exclusive Local Partner Programs
+
+**Model**: Flat monthly fee for guaranteed, exclusive placement — one cleaning business per city, no competing quotes shown.
+**Cost**: [Clean Estimator's Local Partner Program](/partner-with-us) is $350/month per city, flat regardless of how many jobs you close.
+**Best for**: Businesses that want predictable costs and don't want to compete head-to-head on every single lead — your cost per booked job goes down as your close rate improves, unlike pay-per-lead models.
+
+## Side-by-Side Comparison
+
+| Platform | Cost Model | Shared or Exclusive | Typical Best Fit |
+|---|---|---|---|
+| Thumbtack | Pay-per-lead | Shared | Fast-responding businesses building volume |
+| Angi | Membership + pay-per-lead | Shared | Established markets with strong Angi presence |
+| Google Local Services Ads | Pay-per-lead | Shared | Businesses wanting the Google Guaranteed badge |
+| Nextdoor | Free + optional ads | Neither (organic recs) | Hyperlocal trust-building |
+| Yelp | Free + optional ads | Neither (organic listing) | Yelp-heavy local markets |
+| Local Partner Program | Flat monthly | Exclusive | Predictable cost, no competing quotes |
+
+## How to Decide
+
+Most cleaning businesses don't need to pick just one — a common, effective mix is one shared pay-per-lead platform for volume plus one exclusive channel for predictable, non-competitive placement. If you're newer and still building reviews and capacity, shared platforms let you dip in and out flexibly. Once you have the reviews and crew capacity to reliably convert steady traffic, exclusive placement tends to produce a better cost per booked job over time, since you're never competing with another cleaner for the same lead.
+
+## FAQ
+
+**What's the difference between shared and exclusive cleaning leads?**
+Shared leads are sent to multiple cleaning businesses at once, who all compete to respond first and win the job. Exclusive leads are shown only to one business, with no competing quotes.
+
+**Is Thumbtack or an exclusive local partner program better for a cleaning business?**
+It depends on your stage — Thumbtack's shared, pay-per-lead model is flexible for businesses still building volume, while exclusive placement tends to produce a lower cost per booked job once you have the reviews and capacity to reliably close a steady stream of traffic.
+
+**How much does exclusive local lead placement cost for cleaning companies?**
+Clean Estimator's Local Partner Program is a flat $350/month per city, with only one cleaning business shown per city and no per-lead charges.
+
+**Can I use multiple lead platforms at once?**
+Yes — most growing cleaning businesses run a mix, commonly one shared pay-per-lead platform for volume alongside one exclusive channel for predictable, non-competitive placement.
+
+[Check if your city is available for exclusive placement](/partner-with-us) →
+    `,
+  },
 ];
 
 export const CATEGORIES = [
@@ -2827,6 +3302,7 @@ export const CATEGORIES = [
   { id: 'carpet', label: 'Carpet Cleaning', icon: '🪣' },
   { id: 'commercial', label: 'Commercial', icon: '🏬' },
   { id: 'restoration', label: 'Mold & Water Damage', icon: '⚠️' },
+  { id: 'grow-your-business', label: 'Grow Your Business', icon: '📈' },
 ];
 
 export function getPostBySlug(slug) {
