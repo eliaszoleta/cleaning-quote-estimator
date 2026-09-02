@@ -199,7 +199,7 @@ export default function PartnerWithUs() {
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>Simple, Transparent Pricing</h2>
             <p style={{ fontSize: 15, color: '#64748b' }}>One flat rate. No setup fees. No commissions. Cancel anytime.</p>
           </div>
-          <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: '2px solid #1d4ed8', borderRadius: 20, padding: 'clamp(28px, 5vw, 48px)', maxWidth: 540, margin: '0 auto', boxShadow: '0 12px 36px rgba(29,78,216,0.16)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: '1px solid #bfdbfe', borderRadius: 20, padding: 'clamp(28px, 5vw, 48px)', maxWidth: 540, margin: '0 auto', boxShadow: '0 12px 36px rgba(29,78,216,0.16)' }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: PRIMARY, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Per City Plan</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
               <span style={{ fontSize: 56, fontWeight: 900, color: '#0f172a', letterSpacing: '-2px', lineHeight: 1 }}>$350</span>
