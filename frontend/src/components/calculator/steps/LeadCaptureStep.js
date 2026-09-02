@@ -10,16 +10,15 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
   const [customAnswers, setCustomAnswers] = useState({});
 
   const ctaHeadline = companyConfig?.ctaHeadline || 'Get Your Instant Estimate';
-  const ctaSubtext = companyConfig?.ctaSubtext || "We'll email your results and connect you with local cleaning professionals.";
+  const ctaSubtext = companyConfig?.ctaSubtext || "Optional — we'll email your results and connect you with local cleaning professionals.";
   const ctaButtonText = companyConfig?.ctaButtonText || 'See My Estimate';
 
   const emailValid = !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const nameValid = name.trim().length > 0;
-  const canSubmit = !loading && emailValid && nameValid;
+  const canSubmit = !loading && emailValid;
 
   const handleSubmit = (e) => {
     e?.preventDefault();
-    onNext({ name: name.trim(), email: email.trim() || null, phone: phone.trim() || null, timeline, preferredContact, customAnswers });
+    onNext({ name: name.trim() || null, email: email.trim() || null, phone: phone.trim() || null, timeline, preferredContact, customAnswers });
   };
 
   const inputStyle = {
@@ -38,9 +37,9 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
             <label style={labelStyle}>
-              Name <span style={{ color: '#dc2626', fontWeight: 400 }}>*</span>
+              Name <span style={{ color: '#94a3b8', fontWeight: 400 }}>(optional)</span>
             </label>
-            <input type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith"
+            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith"
               style={inputStyle}
               onFocus={e => { e.target.style.borderColor = primaryColor; }}
               onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
@@ -117,6 +116,13 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
             style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '13px 20px', borderRadius: 10, border: 'none', cursor: canSubmit ? 'pointer' : 'not-allowed', fontSize: 14, fontWeight: 700, color: 'white', background: canSubmit ? primaryColor : '#cbd5e1', transition: 'all 0.15s' }}
           >
             {loading ? <><Loader2 size={15} className="spin" /> Calculating…</> : `${ctaButtonText} →`}
+          </button>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 10 }}>
+          <button type="button" onClick={() => onNext({})} disabled={loading}
+            style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: 12.5, cursor: 'pointer', textDecoration: 'underline' }}>
+            Skip and see estimate anyway
           </button>
         </div>
 
