@@ -64,7 +64,11 @@ export async function getCachedPartnerMatch() {
   } catch { /* sessionStorage unavailable — fall through and fetch live */ }
 
   const loc = await getUserLocation();
-  const partner = loc ? await findPartner(loc.city, loc.state) : null;
+  // TEMPORARY TEST OVERRIDE — call findPartner unconditionally (not just
+  // when loc resolves) so the mock still shows even if the geolocation
+  // fetch itself fails (ad blocker, rate limit, etc). Revert alongside the
+  // rest of the override in findPartner above.
+  const partner = await findPartner(loc?.city, loc?.state);
 
   try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(partner)); } catch { /* ignore quota/private-mode errors */ }
 
