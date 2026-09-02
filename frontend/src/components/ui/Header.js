@@ -34,10 +34,10 @@ const styles = {
     letterSpacing: '-0.01em',
   },
   logoIcon: {
-    width: 34,
-    height: 34,
+    width: 44,
+    height: 44,
     background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)',
-    borderRadius: 9,
+    borderRadius: 12,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -145,7 +145,7 @@ export default function Header() {
       <FloatingPartnerBanner />
       <div style={styles.inner}>
         <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
-          <span style={styles.logoIcon} aria-hidden="true"><Sparkles size={17} strokeWidth={2.25} /></span>
+          <span style={styles.logoIcon} aria-hidden="true"><Sparkles size={22} strokeWidth={2.25} /></span>
           {!isMobile && 'Clean Estimator'}
         </a>
 
