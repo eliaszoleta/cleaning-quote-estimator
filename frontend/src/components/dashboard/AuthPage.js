@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Mail, CheckCircle2 } from 'lucide-react';
+import { Mail, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export default function AuthPage({ onAuth }) {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [company, setCompany] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -14,6 +17,12 @@ export default function AuthPage({ onAuth }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (mode === 'signup' && password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -50,6 +59,12 @@ export default function AuthPage({ onAuth }) {
     width: '100%', padding: '13px 16px', border: '1.5px solid #e2e8f0', borderRadius: 5,
     fontSize: 15, outline: 'none', color: '#0f172a', background: '#fafafa',
     transition: 'border-color 0.15s, box-shadow 0.15s', boxSizing: 'border-box',
+  };
+  const passwordInputStyle = { ...inputStyle, paddingRight: 44 };
+  const eyeButtonStyle = {
+    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+    background: 'none', border: 'none', padding: 4, cursor: 'pointer', color: '#94a3b8',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
   };
 
   // ── Email confirmation screen ───────────────────────────────────────────────
@@ -143,11 +158,34 @@ export default function AuthPage({ onAuth }) {
               <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Password</label>
               {mode === 'login' && <span style={{ fontSize: 12, color: '#2563eb', fontWeight: 500, cursor: 'pointer' }}>Forgot password?</span>}
             </div>
-            <input type="password" required minLength={8} value={password} onChange={e => setPassword(e.target.value)}
-              placeholder={mode === 'signup' ? 'At least 8 characters' : '••••••••'} style={inputStyle}
-              onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
-              onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
+            <div style={{ position: 'relative' }}>
+              <input type={showPassword ? 'text' : 'password'} required minLength={8} value={password} onChange={e => setPassword(e.target.value)}
+                placeholder={mode === 'signup' ? 'At least 8 characters' : '••••••••'} style={passwordInputStyle}
+                onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
+                onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
+              <button type="button" onClick={() => setShowPassword(s => !s)} style={eyeButtonStyle} aria-label={showPassword ? 'Hide password' : 'Show password'} tabIndex={-1}>
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
           </div>
+
+          {mode === 'signup' && (
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Confirm password</label>
+              <div style={{ position: 'relative' }}>
+                <input type={showConfirmPassword ? 'text' : 'password'} required minLength={8} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter your password" style={{ ...passwordInputStyle, borderColor: confirmPassword && confirmPassword !== password ? '#dc2626' : '#e2e8f0' }}
+                  onFocus={e => { e.target.style.borderColor = confirmPassword && confirmPassword !== password ? '#dc2626' : '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
+                  onBlur={e => { e.target.style.borderColor = confirmPassword && confirmPassword !== password ? '#dc2626' : '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
+                <button type="button" onClick={() => setShowConfirmPassword(s => !s)} style={eyeButtonStyle} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'} tabIndex={-1}>
+                  {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
+              </div>
+              {confirmPassword && confirmPassword !== password && (
+                <p style={{ fontSize: 12, color: '#dc2626', marginTop: 6 }}>Passwords do not match.</p>
+              )}
+            </div>
+          )}
 
           <button type="submit" disabled={loading}
             style={{ marginTop: 4, padding: '14px 0', borderRadius: 5.5, border: 'none', background: loading ? '#94a3b8' : '#1d4ed8', color: 'white', fontWeight: 700, fontSize: 16, cursor: loading ? 'not-allowed' : 'pointer', boxShadow: loading ? 'none' : '0 4px 16px rgba(37,99,235,0.3)', transition: 'all 0.15s', letterSpacing: '0.01em' }}>
