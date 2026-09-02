@@ -34,10 +34,10 @@ const styles = {
     letterSpacing: '-0.01em',
   },
   logoIcon: {
-    width: 44,
-    height: 44,
+    width: 34,
+    height: 34,
     background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)',
-    borderRadius: 12,
+    borderRadius: 9,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -119,13 +119,17 @@ function isNavItemActive(href, pathname, hash) {
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  const [narrowMobile, setNarrowMobile] = useState(() => window.innerWidth <= 360);
   const [location, setLocation] = useState(() => ({
     pathname: window.location.pathname,
     hash: window.location.hash,
   }));
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    const onResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      setNarrowMobile(window.innerWidth <= 360);
+    };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -145,8 +149,8 @@ export default function Header() {
       <FloatingPartnerBanner />
       <div style={styles.inner}>
         <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
-          <span style={styles.logoIcon} aria-hidden="true"><Sparkles size={22} strokeWidth={2.25} /></span>
-          {!isMobile && 'Clean Estimator'}
+          <span style={styles.logoIcon} aria-hidden="true"><Sparkles size={17} strokeWidth={2.25} /></span>
+          {!(isMobile && narrowMobile) && 'Clean Estimator'}
         </a>
 
         {isMobile ? (
