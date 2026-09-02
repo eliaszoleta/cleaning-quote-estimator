@@ -152,12 +152,12 @@ export default function Header() {
         {isMobile ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <a
-              href="/for-companies"
+              href="/partner-with-us"
               style={styles.ctaMobile}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 14px rgba(30,64,175,0.32)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(30,64,175,0.22)'; }}
             >
-              Get Estimator
+              Partner With Us
             </a>
             <button
               onClick={() => setMenuOpen(m => !m)}
