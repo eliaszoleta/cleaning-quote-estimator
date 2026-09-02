@@ -161,33 +161,35 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
               {partner && !embedded && <PartnerCard partner={partner} />}
 
-              <div style={{ background: embedded && companyName ? `${primaryColor}08` : '#f8fafc', border: `1px solid ${embedded && companyName ? primaryColor + '28' : '#e2e8f0'}`, borderRadius: 12, padding: '18px 20px' }}>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>
-                  {companyName ? `Ready to book with ${companyName}?` : 'Ready to get real quotes?'}
+              {!(partner && !embedded) && (
+                <div style={{ background: embedded && companyName ? `${primaryColor}08` : '#f8fafc', border: `1px solid ${embedded && companyName ? primaryColor + '28' : '#e2e8f0'}`, borderRadius: 12, padding: '18px 20px' }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>
+                    {companyName ? `Ready to book with ${companyName}?` : 'Ready to get real quotes?'}
+                  </div>
+                  <p style={{ fontSize: 13, color: '#64748b', marginBottom: 14, margin: '4px 0 14px' }}>
+                    {companyName ? 'Contact us for a free, no-obligation on-site quote.' : 'Compare quotes from vetted local cleaning professionals.'}
+                  </p>
+                  <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap' }}>
+                    {ctaButtonUrl && (
+                      <a href={ctaButtonUrl} target="_blank" rel="noopener noreferrer"
+                        style={{ background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
+                        {ctaButtonText}
+                      </a>
+                    )}
+                    {ctaPhone && (
+                      <a href={`tel:${ctaPhone}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#16a34a', color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
+                        <Phone size={14} /> Call {ctaPhone}
+                      </a>
+                    )}
+                    {!ctaButtonUrl && !ctaPhone && (
+                      <a href="/" style={{ background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
+                        {ctaButtonText}
+                      </a>
+                    )}
+                  </div>
                 </div>
-                <p style={{ fontSize: 13, color: '#64748b', marginBottom: 14, margin: '4px 0 14px' }}>
-                  {companyName ? 'Contact us for a free, no-obligation on-site quote.' : 'Compare quotes from vetted local cleaning professionals.'}
-                </p>
-                <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap' }}>
-                  {ctaButtonUrl && (
-                    <a href={ctaButtonUrl} target="_blank" rel="noopener noreferrer"
-                      style={{ background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
-                      {ctaButtonText}
-                    </a>
-                  )}
-                  {ctaPhone && (
-                    <a href={`tel:${ctaPhone}`}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#16a34a', color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
-                      <Phone size={14} /> Call {ctaPhone}
-                    </a>
-                  )}
-                  {!ctaButtonUrl && !ctaPhone && (
-                    <a href="/" style={{ background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
-                      {ctaButtonText}
-                    </a>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
