@@ -51,14 +51,14 @@ export default function CompanyLanding() {
         <main>
 
           {/* Hero */}
-          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: 'white', padding: '100px 24px 120px', textAlign: 'center' }}>
+          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: '100px 24px 120px', textAlign: 'center' }}>
             <div style={{ maxWidth: 760, margin: '0 auto' }}>
               <div style={{ display: 'inline-block', background: 'rgba(37,99,235,0.25)', color: '#93c5fd', padding: '5px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 22, border: '1px solid rgba(37,99,235,0.35)', letterSpacing: '0.02em' }}>
                 For cleaning companies
               </div>
               <h1 style={{ fontSize: 'clamp(30px,5vw,52px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 18, letterSpacing: '-1px' }}>
                 Add a Branded Cleaning<br />
-                <span style={{ color: '#60a5fa' }}>Cost Calculator to Your Website</span>
+                <span style={{ color: '#60a5fa' }}>Cost Calculator to Your Cleaning Website</span>
               </h1>
               <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 540, margin: '0 auto 32px', lineHeight: 1.6 }}>
                 Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7.
