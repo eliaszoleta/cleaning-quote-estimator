@@ -37,11 +37,8 @@ export async function getUserLocation() {
 // visitor's city/state. partners!inner lets the .eq('partners.active', ...)
 // filter apply to the joined table (a plain left join would ignore it).
 export async function findPartner(city, state) {
-  // TEMPORARY TEST OVERRIDE — showing to EVERY visitor right now so it can
-  // be checked without a VPN. Narrow back to Minneapolis-only (or remove
-  // entirely) once confirmed — see comment above. Real lookup logic is
-  // preserved below, just skipped for now.
-  if (true) return TEST_MOCK_PARTNER; // eslint-disable-line no-constant-condition
+  // TEMPORARY TEST OVERRIDE — see comment above. Remove this line once done.
+  if (city && city.trim().toLowerCase() === 'minneapolis') return TEST_MOCK_PARTNER;
 
   if (!supabase || !city || !state) return null;
   const { data } = await supabase
@@ -64,11 +61,7 @@ export async function getCachedPartnerMatch() {
   } catch { /* sessionStorage unavailable — fall through and fetch live */ }
 
   const loc = await getUserLocation();
-  // TEMPORARY TEST OVERRIDE — call findPartner unconditionally (not just
-  // when loc resolves) so the mock still shows even if the geolocation
-  // fetch itself fails (ad blocker, rate limit, etc). Revert alongside the
-  // rest of the override in findPartner above.
-  const partner = await findPartner(loc?.city, loc?.state);
+  const partner = loc ? await findPartner(loc.city, loc.state) : null;
 
   try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(partner)); } catch { /* ignore quota/private-mode errors */ }
 
