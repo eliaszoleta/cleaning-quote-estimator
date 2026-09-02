@@ -170,16 +170,34 @@ export default function PartnerWithUs() {
   const [error, setError] = useState('');
   const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', message: '' });
   const [cityList, setCityList] = useState([]);
-  const [cityInput, setCityInput] = useState('');
   const [stateInput, setStateInput] = useState('');
+  const [citySelectValue, setCitySelectValue] = useState('');
+  const [customCityText, setCustomCityText] = useState('');
 
-  const addCity = () => {
-    const city = cityInput.trim();
+  const citiesForState = stateInput ? (STATES_WITH_CITIES.find(s => s.code === stateInput)?.cities || []) : [];
+
+  const addCity = (city) => {
     if (!city || !stateInput) return;
     const tierInfo = getCityTier(city, stateInput);
     const stateObj = getStateByCode(stateInput);
     setCityList(list => [...list, { city, stateCode: stateInput, stateName: stateObj ? stateObj.name : stateInput, tierInfo }]);
-    setCityInput('');
+  };
+
+  const handleCitySelect = (e) => {
+    const val = e.target.value;
+    setCitySelectValue(val);
+    if (val && val !== '__other__') {
+      addCity(val);
+      setCitySelectValue('');
+    }
+  };
+
+  const addCustomCity = () => {
+    const city = customCityText.trim();
+    if (!city) return;
+    addCity(city);
+    setCustomCityText('');
+    setCitySelectValue('');
   };
 
   const removeCity = (idx) => setCityList(list => list.filter((_, i) => i !== idx));
@@ -419,30 +437,47 @@ export default function PartnerWithUs() {
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cities You Want to Cover *</label>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <input
-                      style={{ ...inputStyle, flex: 2 }}
-                      value={cityInput}
-                      onChange={e => setCityInput(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCity(); } }}
-                      placeholder="City, e.g. Austin"
-                    />
                     <select
                       style={{ ...inputStyle, flex: 1 }}
                       value={stateInput}
-                      onChange={e => setStateInput(e.target.value)}
+                      onChange={e => { setStateInput(e.target.value); setCitySelectValue(''); setCustomCityText(''); }}
                     >
-                      <option value="">State</option>
-                      {ALL_STATES.map(s => <option key={s.code} value={s.code}>{s.code}</option>)}
+                      <option value="">Select a state</option>
+                      {ALL_STATES.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
                     </select>
-                    <button
-                      type="button"
-                      onClick={addCity}
-                      disabled={!cityInput.trim() || !stateInput}
-                      style={{ padding: '11px 18px', border: 'none', borderRadius: 9, background: (!cityInput.trim() || !stateInput) ? '#cbd5e1' : PRIMARY, color: 'white', fontWeight: 700, fontSize: 13.5, cursor: (!cityInput.trim() || !stateInput) ? 'not-allowed' : 'pointer', flexShrink: 0 }}
+                    <select
+                      style={{ ...inputStyle, flex: 2 }}
+                      value={citySelectValue}
+                      onChange={handleCitySelect}
+                      disabled={!stateInput}
                     >
-                      Add
-                    </button>
+                      <option value="">{stateInput ? 'Select a city' : 'Select a state first'}</option>
+                      {citiesForState.map(c => (
+                        <option key={c.city} value={c.city}>{c.city} &mdash; {c.tier === 'major' ? 'Major' : 'Minor'} ${c.price}/mo</option>
+                      ))}
+                      {stateInput && <option value="__other__">My city isn't listed...</option>}
+                    </select>
                   </div>
+                  {citySelectValue === '__other__' && (
+                    <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                      <input
+                        style={{ ...inputStyle, flex: 2 }}
+                        value={customCityText}
+                        onChange={e => setCustomCityText(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustomCity(); } }}
+                        placeholder="Type your city name"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={addCustomCity}
+                        disabled={!customCityText.trim()}
+                        style={{ padding: '11px 18px', border: 'none', borderRadius: 9, background: !customCityText.trim() ? '#cbd5e1' : PRIMARY, color: 'white', fontWeight: 700, fontSize: 13.5, cursor: !customCityText.trim() ? 'not-allowed' : 'pointer', flexShrink: 0 }}
+                      >
+                        Add
+                      </button>
+                    </div>
+                  )}
                   {cityList.length > 0 && (
                     <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {cityList.map((c, i) => (
