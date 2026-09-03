@@ -34,6 +34,21 @@ export default function ClientAuthPage({ onAuth }) {
       if (!supabase) throw new Error('Authentication is not configured. Set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY.');
 
       if (mode === 'signup') {
+        // Check for a matching active partner listing BEFORE creating an
+        // account -- otherwise anyone can sign up and confirm a real
+        // Supabase Auth account only to hit "no listing found" afterward.
+        const { data: matches } = await supabase
+          .from('partners')
+          .select('id')
+          .ilike('email', email.trim())
+          .eq('active', true)
+          .limit(1);
+        if (!matches || matches.length === 0) {
+          setError("We couldn't find an active partner listing using this email address. Make sure you're using the exact email your listing was set up with.");
+          setLoading(false);
+          return;
+        }
+
         const { data, error: err } = await supabase.auth.signUp({
           email,
           password,
