@@ -1,9 +1,14 @@
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 // Lead capture (LeadCaptureStep.js) tells visitors "we'll email your
-// estimate" -- this is what actually makes that true. Uses plain SMTP
-// (Hostinger) rather than a third-party email API since the domain's
-// mailbox is already paid for and already used for Supabase Auth emails.
+// estimate" -- this is what actually makes that true. Sends via
+// Hostinger's HTTPS Email API rather than raw SMTP -- Railway (and most
+// PaaS platforms) block or unreliably route outbound SMTP ports for
+// spam-prevention reasons, which is what caused the original SMTP-based
+// version to fail with "Connection timeout" in production. An HTTPS API
+// call on port 443 doesn't hit that problem.
+
+const HOSTINGER_API_BASE = 'https://api.mail.hostinger.com';
 
 const SERVICE_LABELS = {
   home_residential: 'House Cleaning',
@@ -16,21 +21,6 @@ const SERVICE_LABELS = {
   mold_remediation: 'Mold Remediation',
   water_damage: 'Water Damage Restoration',
 };
-
-let _transporter = null;
-function getTransporter() {
-  if (_transporter) return _transporter;
-  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
-  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) return null;
-
-  _transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: parseInt(SMTP_PORT, 10),
-    secure: parseInt(SMTP_PORT, 10) === 465,
-    auth: { user: SMTP_USER, pass: SMTP_PASS },
-  });
-  return _transporter;
-}
 
 function fmtMoney(n) {
   return `$${Math.round(n).toLocaleString('en-US')}`;
@@ -79,25 +69,29 @@ function buildHtml({ name, serviceType, priceLow, priceHigh, state, companyConfi
 }
 
 // Fire-and-forget from the caller's perspective: never throws, returns
-// false (and logs why) instead so a missing SMTP config or a delivery
-// failure never breaks the /api/calculate response.
+// false (and logs why) instead so a missing config or a delivery failure
+// never breaks the /api/calculate response.
 async function sendEstimateEmail({ to, name, serviceType, priceLow, priceHigh, state, companyConfig }) {
-  const transporter = getTransporter();
-  if (!transporter) {
-    console.warn('sendEstimateEmail skipped: SMTP not configured (SMTP_HOST/PORT/USER/PASS)');
+  const { HOSTINGER_API_TOKEN, HOSTINGER_MAILBOX_ID } = process.env;
+  if (!HOSTINGER_API_TOKEN || !HOSTINGER_MAILBOX_ID) {
+    console.warn('sendEstimateEmail skipped: Hostinger API not configured (HOSTINGER_API_TOKEN/HOSTINGER_MAILBOX_ID)');
     return false;
   }
 
   try {
-    await transporter.sendMail({
-      from: `"${companyConfig?.companyName || 'Clean Estimator'}" <${process.env.SMTP_USER}>`,
-      to,
-      subject: `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate: ${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}`,
-      html: buildHtml({ name, serviceType, priceLow, priceHigh, state, companyConfig }),
-    });
+    await axios.post(
+      `${HOSTINGER_API_BASE}/api/v1/mailboxes/${HOSTINGER_MAILBOX_ID}/send`,
+      {
+        to: [to],
+        subject: `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate: ${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}`,
+        html: buildHtml({ name, serviceType, priceLow, priceHigh, state, companyConfig }),
+        displayName: companyConfig?.companyName || 'Clean Estimator',
+      },
+      { headers: { Authorization: `Bearer ${HOSTINGER_API_TOKEN}`, 'Content-Type': 'application/json' } }
+    );
     return true;
   } catch (err) {
-    console.warn('sendEstimateEmail failed:', err.message);
+    console.warn('sendEstimateEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
     return false;
   }
 }
