@@ -1,14 +1,15 @@
 const axios = require('axios');
 
 // Lead capture (LeadCaptureStep.js) tells visitors "we'll email your
-// estimate" -- this is what actually makes that true. Sends via
-// Hostinger's HTTPS Email API rather than raw SMTP -- Railway (and most
-// PaaS platforms) block or unreliably route outbound SMTP ports for
-// spam-prevention reasons, which is what caused the original SMTP-based
-// version to fail with "Connection timeout" in production. An HTTPS API
-// call on port 443 doesn't hit that problem.
+// estimate" -- this is what actually makes that true. Sends via Resend
+// (a transactional email API) rather than raw SMTP or Hostinger's Email
+// API: SMTP got blocked by Railway's outbound network restrictions, and
+// Hostinger's customer-facing API token (hPanel > API) turned out to be
+// for their general hosting/VPS/domains API, not the separate Email API
+// -- there's no self-service token for that from a normal account. Resend
+// is purpose-built for this exact "app sends transactional email" case.
 
-const HOSTINGER_API_BASE = 'https://api.mail.hostinger.com';
+const RESEND_API_BASE = 'https://api.resend.com';
 
 const SERVICE_LABELS = {
   home_residential: 'House Cleaning',
@@ -72,22 +73,25 @@ function buildHtml({ name, serviceType, priceLow, priceHigh, state, companyConfi
 // false (and logs why) instead so a missing config or a delivery failure
 // never breaks the /api/calculate response.
 async function sendEstimateEmail({ to, name, serviceType, priceLow, priceHigh, state, companyConfig }) {
-  const { HOSTINGER_API_TOKEN, HOSTINGER_MAILBOX_ID } = process.env;
-  if (!HOSTINGER_API_TOKEN || !HOSTINGER_MAILBOX_ID) {
-    console.warn('sendEstimateEmail skipped: Hostinger API not configured (HOSTINGER_API_TOKEN/HOSTINGER_MAILBOX_ID)');
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendEstimateEmail skipped: Resend not configured (RESEND_API_KEY)');
     return false;
   }
 
+  const brandName = companyConfig?.companyName || 'Clean Estimator';
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
   try {
     await axios.post(
-      `${HOSTINGER_API_BASE}/api/v1/mailboxes/${HOSTINGER_MAILBOX_ID}/send`,
+      `${RESEND_API_BASE}/emails`,
       {
+        from: `${brandName} <${fromAddress}>`,
         to: [to],
         subject: `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate: ${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}`,
         html: buildHtml({ name, serviceType, priceLow, priceHigh, state, companyConfig }),
-        displayName: companyConfig?.companyName || 'Clean Estimator',
       },
-      { headers: { Authorization: `Bearer ${HOSTINGER_API_TOKEN}`, 'Content-Type': 'application/json' } }
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
     );
     return true;
   } catch (err) {
