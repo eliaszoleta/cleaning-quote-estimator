@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
 
 const PRIMARY = '#2563eb';
 const AUTO_ADVANCE_MS = 4000;
@@ -17,15 +18,28 @@ const SLIDES = [
 export default function PartnerGallery() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (paused) return undefined;
+    if (paused || lightboxOpen) return undefined;
     timerRef.current = setInterval(() => {
       setIndex(i => (i + 1) % SLIDES.length);
     }, AUTO_ADVANCE_MS);
     return () => clearInterval(timerRef.current);
-  }, [paused]);
+  }, [paused, lightboxOpen]);
+
+  useEffect(() => {
+    if (!lightboxOpen) return undefined;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setLightboxOpen(false);
+      if (e.key === 'ArrowLeft') go(index - 1);
+      if (e.key === 'ArrowRight') go(index + 1);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightboxOpen, index]);
 
   const go = (i) => setIndex(((i % SLIDES.length) + SLIDES.length) % SLIDES.length);
 
@@ -42,15 +56,24 @@ export default function PartnerGallery() {
               key={slide.src}
               src={slide.src}
               alt={slide.title}
+              onClick={() => i === index && setLightboxOpen(true)}
               style={{
                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                 objectFit: 'cover', objectPosition: 'top',
                 opacity: i === index ? 1 : 0,
                 transition: 'opacity 0.5s ease',
                 pointerEvents: i === index ? 'auto' : 'none',
+                cursor: i === index ? 'zoom-in' : 'default',
               }}
             />
           ))}
+          {/* Zoom hint */}
+          <div
+            onClick={() => setLightboxOpen(true)}
+            style={{ position: 'absolute', bottom: 12, left: 12, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(15,23,42,0.6)', color: 'white', fontSize: 12, fontWeight: 600, padding: '6px 10px', borderRadius: 20, cursor: 'pointer' }}
+          >
+            <ZoomIn size={13} /> Click to enlarge
+          </div>
         </div>
 
         <button
@@ -87,6 +110,55 @@ export default function PartnerGallery() {
           />
         ))}
       </div>
+
+      {lightboxOpen && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={SLIDES[index].title}
+          onClick={() => setLightboxOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(6,10,20,0.92)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(16px, 4vw, 48px)' }}
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxOpen(false)}
+            aria-label="Close"
+            style={{ position: 'absolute', top: 20, right: 20, width: 40, height: 40, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.12)', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <X size={20} />
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); go(index - 1); }}
+            aria-label="Previous screenshot"
+            style={{ position: 'absolute', top: '50%', left: 'clamp(8px, 3vw, 32px)', transform: 'translateY(-50%)', width: 44, height: 44, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.12)', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <ChevronLeft size={22} />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); go(index + 1); }}
+            aria-label="Next screenshot"
+            style={{ position: 'absolute', top: '50%', right: 'clamp(8px, 3vw, 32px)', transform: 'translateY(-50%)', width: 44, height: 44, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.12)', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <ChevronRight size={22} />
+          </button>
+
+          <div style={{ maxWidth: '92vw', maxHeight: '86vh', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }} onClick={e => e.stopPropagation()}>
+            <img
+              src={SLIDES[index].src}
+              alt={SLIDES[index].title}
+              style={{ maxWidth: '92vw', maxHeight: '78vh', objectFit: 'contain', borderRadius: 10, boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}
+            />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: 'white', marginBottom: 3 }}>{SLIDES[index].title}</div>
+              <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>{index + 1} of {SLIDES.length}</p>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
