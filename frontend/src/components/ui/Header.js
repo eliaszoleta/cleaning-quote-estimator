@@ -30,8 +30,14 @@ const styles = {
     fontWeight: 800,
     fontSize: 20,
     color: '#0f172a',
-    flexShrink: 0,
     letterSpacing: '-0.01em',
+    minWidth: 0,
+  },
+  logoText: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    minWidth: 0,
   },
   logoIcon: {
     width: 34,
@@ -119,17 +125,13 @@ function isNavItemActive(href, pathname, hash) {
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
-  const [narrowMobile, setNarrowMobile] = useState(() => window.innerWidth <= 360);
   const [location, setLocation] = useState(() => ({
     pathname: window.location.pathname,
     hash: window.location.hash,
   }));
 
   useEffect(() => {
-    const onResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-      setNarrowMobile(window.innerWidth <= 360);
-    };
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -150,11 +152,11 @@ export default function Header() {
       <div style={styles.inner}>
         <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
           <span style={styles.logoIcon} aria-hidden="true"><Sparkles size={17} strokeWidth={2.25} /></span>
-          {!(isMobile && narrowMobile) && 'Clean Estimator'}
+          <span style={styles.logoText}>Clean Estimator</span>
         </a>
 
         {isMobile ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <a
               href="/partner-with-us"
               style={styles.ctaMobile}
