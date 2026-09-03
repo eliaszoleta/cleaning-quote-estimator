@@ -13,11 +13,8 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
   useEffect(() => {
     if (embedded) return;
-    // TEMPORARY TEST OVERRIDE — call unconditionally so the mock partner
-    // still shows even if geolocation fails. Revert alongside the rest of
-    // the override in utils/partnerLookup.js.
     getUserLocation().then(loc => {
-      findPartner(loc?.city, loc?.state).then(setPartner);
+      if (loc) findPartner(loc.city, loc.state).then(setPartner);
     });
   }, [embedded]);
 
