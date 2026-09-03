@@ -3,11 +3,27 @@ import { getAllStates } from '../../data/statePricing';
 import { getAllCityTierEntries } from '../../data/partnerCityTiers';
 
 const PRIMARY = '#2563eb';
+const MINOR = '#9333ea';
 
 function formatPopulation(population) {
   if (population >= 1000000) return `${(population / 1000000).toFixed(population % 1000000 === 0 ? 0 : 1)}M`;
   return `${Math.round(population / 1000)}K`;
 }
+
+const th = { textAlign: 'left', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#94a3b8', padding: '7px 8px', background: '#f8fafc', whiteSpace: 'nowrap' };
+const td = { padding: '7px 8px', fontSize: 12.5, verticalAlign: 'middle', whiteSpace: 'nowrap' };
+
+const TierBadge = ({ tier }) => (
+  <span
+    style={{
+      display: 'inline-block', padding: '1.5px 7px', borderRadius: 99, fontSize: 10.5, fontWeight: 700,
+      background: tier === 'major' ? '#dbeafe' : '#f3e8ff',
+      color: tier === 'major' ? PRIMARY : MINOR,
+    }}
+  >
+    {tier === 'major' ? 'Major' : 'Minor'}
+  </span>
+);
 
 const IconArrow = ({ size = 16, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 6 }}>
@@ -87,13 +103,27 @@ export default function CityTierBrowser({ alwaysOpen = false }) {
                     <span style={{ fontSize: 12, color: '#64748b' }}>{majorCount} major &middot; {s.cities.length - majorCount} minor</span>
                   </button>
                   {isOpen && (
-                    <div style={{ borderTop: '1px solid #f1f5f9' }}>
-                      {s.cities.map((c, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', fontSize: 13, borderTop: i === 0 ? 'none' : '1px solid #f8fafc' }}>
-                          <span style={{ color: '#374151' }}>{c.city} <span style={{ color: '#94a3b8', fontSize: 11.5, fontWeight: 500 }}>&middot; pop. {formatPopulation(c.population)}</span></span>
-                          <span style={{ fontWeight: 700, color: c.tier === 'major' ? PRIMARY : '#9333ea' }}>${c.price}/mo</span>
-                        </div>
-                      ))}
+                    <div style={{ borderTop: '1px solid #f1f5f9', overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                          <tr>
+                            <th style={th}>City</th>
+                            <th style={th}>Pop.</th>
+                            <th style={th}>Tier</th>
+                            <th style={{ ...th, textAlign: 'right' }}>Price</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {s.cities.map((c, i) => (
+                            <tr key={i} style={{ borderTop: i === 0 ? 'none' : '1px solid #f8fafc' }}>
+                              <td style={{ ...td, fontWeight: 600, color: '#0f172a' }}>{c.city}</td>
+                              <td style={{ ...td, fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace', color: '#64748b' }}>{formatPopulation(c.population)}</td>
+                              <td style={td}><TierBadge tier={c.tier} /></td>
+                              <td style={{ ...td, textAlign: 'right', fontWeight: 700, color: c.tier === 'major' ? PRIMARY : MINOR }}>${c.price}/mo</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </div>
