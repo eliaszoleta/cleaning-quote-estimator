@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { getAllStates, getStateByCode } from '../../data/statePricing';
 import { getCityTier, POPULATION_THRESHOLD, MAJOR_CITY_PRICE, MINOR_CITY_PRICE } from '../../data/partnerCityTiers';
 import CityTierBrowser, { STATES_WITH_CITIES } from '../partners/CityTierBrowser';
+import PartnerGallery from '../partners/PartnerGallery';
 
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
@@ -198,6 +199,17 @@ export default function PartnerWithUs() {
           <StatBadge number="100%" label="Organic, targeted traffic" />
           <StatBadge number="1" label="Partner per city" />
           <StatBadge number="$175-$350" label="Per city / month" />
+        </div>
+      </div>
+
+      {/* Proof gallery */}
+      <div style={{ padding: 'clamp(48px, 8vw, 80px) 24px', background: '#f8fafc' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>See It In Action</h2>
+            <p style={{ fontSize: 15, color: '#64748b', maxWidth: 540, margin: '0 auto' }}>Real placements, real Google rankings, real traffic — not promises.</p>
+          </div>
+          <PartnerGallery />
         </div>
       </div>
 
