@@ -21,6 +21,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 12,
   },
   logo: {
     display: 'flex',
@@ -30,8 +31,13 @@ const styles = {
     fontWeight: 800,
     fontSize: 20,
     color: '#0f172a',
-    flexShrink: 0,
+    minWidth: 0,
     letterSpacing: '-0.01em',
+  },
+  logoText: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   logoIcon: {
     width: 34,
@@ -150,11 +156,11 @@ export default function Header() {
       <div style={styles.inner}>
         <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
           <span style={styles.logoIcon} aria-hidden="true"><Sparkles size={17} strokeWidth={2.25} /></span>
-          {!(isMobile && narrowMobile) && 'Clean Estimator'}
+          {!(isMobile && narrowMobile) && <span style={styles.logoText}>Clean Estimator</span>}
         </a>
 
         {isMobile ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <a
               href="/partner-with-us"
               style={styles.ctaMobile}
