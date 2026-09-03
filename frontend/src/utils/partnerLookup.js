@@ -6,13 +6,13 @@ import { supabase } from '../lib/supabase';
 // this block (and the check for it in findPartner below) once they've
 // confirmed and/or once the real partner row is added via the admin panel.
 const TEST_MOCK_PARTNER = {
-  id: 'test-northstone-mn',
-  business_name: 'NorthStone',
-  phone: '(612) 314-9044',
-  email: 'info@northstonemn.com',
-  address: 'Minneapolis & St. Paul, MN',
-  website: 'https://northstonemn.com/',
-  logo_url: 'https://northstonemn.com/logo.png',
+  id: 'sample-screenshot-demo',
+  business_name: 'Sparkle Clean Co.',
+  phone: '(555) 123-4567',
+  email: 'hello@sparklecleanco.com',
+  address: 'Austin, TX',
+  website: 'https://example.com/',
+  logo_url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjI0IiBmaWxsPSIjMjU2M2ViIi8+PHRleHQgeD0iNjAiIHk9Ijc1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDgiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TQzwvdGV4dD48L3N2Zz4=',
   active: true,
 };
 
@@ -37,8 +37,10 @@ export async function getUserLocation() {
 // visitor's city/state. partners!inner lets the .eq('partners.active', ...)
 // filter apply to the joined table (a plain left join would ignore it).
 export async function findPartner(city, state) {
-  // TEMPORARY TEST OVERRIDE — see comment above. Remove this line once done.
-  if (city && city.trim().toLowerCase() === 'minneapolis') return TEST_MOCK_PARTNER;
+  // TEMPORARY TEST OVERRIDE — showing to EVERY visitor right now so the
+  // user can take their own screenshots. Revert once done -- see comment
+  // above (this replaces the earlier Minneapolis-only NorthStone test).
+  return TEST_MOCK_PARTNER;
 
   if (!supabase || !city || !state) return null;
   const { data } = await supabase
@@ -61,7 +63,9 @@ export async function getCachedPartnerMatch() {
   } catch { /* sessionStorage unavailable — fall through and fetch live */ }
 
   const loc = await getUserLocation();
-  const partner = loc ? await findPartner(loc.city, loc.state) : null;
+  // TEMPORARY TEST OVERRIDE — call unconditionally so the mock still shows
+  // even if the geolocation fetch itself fails. Revert alongside the rest.
+  const partner = await findPartner(loc?.city, loc?.state);
 
   try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(partner)); } catch { /* ignore quota/private-mode errors */ }
 
