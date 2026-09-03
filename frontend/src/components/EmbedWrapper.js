@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { PauseCircle } from 'lucide-react';
 import CleaningCalculator from './calculator/CleaningCalculator';
 import { getCompanyPublic } from '../utils/api';
 
@@ -34,9 +35,19 @@ export default function EmbedWrapper({ companyId }) {
 
   if (paused) return (
     <div style={{ padding: '40px 24px', textAlign: 'center', background: '#f8fafc', borderRadius: 12 }}>
-      <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
-      <div style={{ fontWeight: 700, fontSize: 16, color: '#374151', marginBottom: 8 }}>Widget Temporarily Unavailable</div>
-      <p style={{ color: '#64748b', fontSize: 14 }}>This cleaning cost calculator is temporarily unavailable. Please contact the company directly for a quote.</p>
+      <div style={{ width: 56, height: 56, background: '#fef3c7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+        <PauseCircle size={28} color="#d97706" strokeWidth={2} />
+      </div>
+      <div style={{ fontWeight: 700, fontSize: 16, color: '#374151', marginBottom: 8 }}>Calculator Paused</div>
+      <p style={{ color: '#64748b', fontSize: 14, marginBottom: 16 }}>This cleaning cost calculator is currently paused due to an inactive subscription. If you're the site owner, log in to your dashboard to reactivate it.</p>
+      <a
+        href="https://cleanestimator.com/company"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#2563eb', color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: 13.5, padding: '10px 20px', borderRadius: 8 }}
+      >
+        Go to Dashboard →
+      </a>
     </div>
   );
 
