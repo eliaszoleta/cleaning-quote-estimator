@@ -70,7 +70,7 @@ export default function ClientDashboard({ user, onLogout }) {
         <div style={{ maxWidth: 480, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
           <div style={{ fontWeight: 800, fontSize: 20, color: '#0f172a', marginBottom: 10 }}>No listing found for {user.email}</div>
           <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7 }}>
-            We couldn't find a partner listing using this email address. Make sure you signed up with the exact email your listing was set up with, or contact us if you think this is a mistake.
+            We couldn't find a partner listing using this email address. Make sure you signed up with the exact email your listing was set up with, or email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb', fontWeight: 600 }}>info@cleanestimator.com</a> if you think this is a mistake.
           </p>
         </div>
       </div>
@@ -128,7 +128,7 @@ export default function ClientDashboard({ user, onLogout }) {
         </div>
 
         <p style={{ fontSize: 12.5, color: '#94a3b8', textAlign: 'center', marginTop: 24 }}>
-          These numbers reflect how often your listing was shown and called from cleanestimator.com. Questions? Reach out to your account contact.
+          These numbers reflect how often your listing was shown and called from cleanestimator.com. Questions? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a>.
         </p>
       </div>
     </div>

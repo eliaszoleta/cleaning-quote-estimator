@@ -118,7 +118,10 @@ export default function Footer() {
             <span style={s.logoIcon}><Sparkles size={15} strokeWidth={2.25} /></span>
             <span style={{ color: 'white', fontWeight: 700 }}>Clean Estimator</span>
           </div>
-          <div style={s.copy}>© {new Date().getFullYear()} Clean Estimator. All rights reserved.</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <a href="mailto:info@cleanestimator.com" style={{ ...s.copy, color: '#94a3b8', textDecoration: 'none' }}>info@cleanestimator.com</a>
+            <div style={s.copy}>© {new Date().getFullYear()} Clean Estimator. All rights reserved.</div>
+          </div>
         </div>
       </div>
       <div style={s.disclaimer}>

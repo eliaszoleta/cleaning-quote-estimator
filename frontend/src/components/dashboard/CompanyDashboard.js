@@ -258,6 +258,10 @@ export default function CompanyDashboard({ user, onLogout }) {
               {tab}
             </div>
           ))}
+
+          <p style={{ fontSize: 12.5, color: '#94a3b8', textAlign: 'center', marginTop: 32 }}>
+            Need help? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a>
+          </p>
         </main>
       </div>
     </div>

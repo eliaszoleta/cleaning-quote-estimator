@@ -48,6 +48,9 @@ export default function EmbedWrapper({ companyId }) {
       >
         Go to Dashboard →
       </a>
+      <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14 }}>
+        Or email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a>
+      </p>
     </div>
   );
 
