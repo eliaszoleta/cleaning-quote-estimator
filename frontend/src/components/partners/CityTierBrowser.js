@@ -4,6 +4,11 @@ import { getAllCityTierEntries } from '../../data/partnerCityTiers';
 
 const PRIMARY = '#2563eb';
 
+function formatPopulation(population) {
+  if (population >= 1000000) return `${(population / 1000000).toFixed(population % 1000000 === 0 ? 0 : 1)}M`;
+  return `${Math.round(population / 1000)}K`;
+}
+
 const IconArrow = ({ size = 16, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 6 }}>
     <line x1="5" y1="12" x2="19" y2="12" />
@@ -85,7 +90,7 @@ export default function CityTierBrowser({ alwaysOpen = false }) {
                     <div style={{ borderTop: '1px solid #f1f5f9' }}>
                       {s.cities.map((c, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', fontSize: 13, borderTop: i === 0 ? 'none' : '1px solid #f8fafc' }}>
-                          <span style={{ color: '#374151' }}>{c.city}</span>
+                          <span style={{ color: '#374151' }}>{c.city} <span style={{ color: '#94a3b8', fontSize: 11.5, fontWeight: 500 }}>&middot; pop. {formatPopulation(c.population)}</span></span>
                           <span style={{ fontWeight: 700, color: c.tier === 'major' ? PRIMARY : '#9333ea' }}>${c.price}/mo</span>
                         </div>
                       ))}
