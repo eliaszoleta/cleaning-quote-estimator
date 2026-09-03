@@ -4,6 +4,7 @@ const { calculateCleaning } = require('../services/cleaningCalculation');
 const { STATE_PRICING_MULTIPLIERS, STATE_AVERAGE_HOME_CLEANING_COST, STATE_NAMES } = require('../config/defaults');
 const { getCompanyConfig } = require('../services/companyConfig');
 const { saveLead } = require('./leads');
+const { sendEstimateEmail } = require('../services/email');
 
 const VALID_SERVICE_TYPES = [
   'home_residential', 'apartment', 'commercial', 'carpet',
@@ -55,6 +56,18 @@ router.post('/', async (req, res) => {
       } catch (leadErr) {
         console.warn('Lead save failed (non-critical):', leadErr.message);
       }
+
+      // Fire-and-forget: sendEstimateEmail never throws, so this never
+      // blocks or breaks the response on email delivery.
+      sendEstimateEmail({
+        to: leadInfo.email,
+        name: leadInfo.name,
+        serviceType,
+        priceLow: result.totalLow,
+        priceHigh: result.totalHigh,
+        state: result.state,
+        companyConfig,
+      });
     }
 
     res.json({ success: true, data: result });
