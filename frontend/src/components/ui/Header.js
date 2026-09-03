@@ -119,17 +119,13 @@ function isNavItemActive(href, pathname, hash) {
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
-  const [narrowMobile, setNarrowMobile] = useState(() => window.innerWidth <= 360);
   const [location, setLocation] = useState(() => ({
     pathname: window.location.pathname,
     hash: window.location.hash,
   }));
 
   useEffect(() => {
-    const onResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-      setNarrowMobile(window.innerWidth <= 360);
-    };
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -150,7 +146,7 @@ export default function Header() {
       <div style={styles.inner}>
         <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
           <span style={styles.logoIcon} aria-hidden="true"><Sparkles size={17} strokeWidth={2.25} /></span>
-          {!(isMobile && narrowMobile) && 'Clean Estimator'}
+          {!isMobile && 'Clean Estimator'}
         </a>
 
         {isMobile ? (
