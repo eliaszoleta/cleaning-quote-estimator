@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, AlertTriangle, Zap, Phone, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
@@ -8,8 +8,22 @@ import PartnerCard from '../partners/PartnerCard';
 export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner }) {
   const [shared, setShared] = useState(false);
   const [partner, setPartner] = useState(null);
+  const rootRef = useRef(null);
 
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, []);
+  // Scrolling the window to y=0 assumed the results were at the top of the
+  // page, which is true for the standalone /results flow but not for a
+  // siteLanding page (CalculatorPage, PartnerDemoPage, etc.) where a hero
+  // and other content sit above the embedded calculator -- there, y=0
+  // landed back on the hero instead of the results the visitor just got.
+  // Scrolls this component's own root into view instead, offset for the
+  // sticky navbar (same 70px CleaningCalculator's own step-change scroll
+  // uses) so the top of the results isn't tucked underneath it.
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const navbarHeight = 70;
+    const top = rootRef.current.getBoundingClientRect().top + window.scrollY - navbarHeight;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, []);
 
   useEffect(() => {
     if (embedded || demoPartner) return;
@@ -75,7 +89,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
         </Helmet>
       )}
 
-      <div style={{ padding: embedded ? '0' : '40px 16px', background: embedded ? 'white' : '#f8fafc', minHeight: embedded ? 'auto' : '100vh' }}>
+      <div ref={rootRef} style={{ padding: embedded ? '0' : '40px 16px', background: embedded ? 'white' : '#f8fafc', minHeight: embedded ? 'auto' : '100vh' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
           <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: embedded ? 'none' : '0 8px 40px rgba(0,0,0,0.10)', border: embedded ? 'none' : '1px solid #e2e8f0', marginBottom: 20 }}>
