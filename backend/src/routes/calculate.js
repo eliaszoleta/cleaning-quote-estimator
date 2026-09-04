@@ -15,16 +15,6 @@ const VALID_SERVICE_TYPES = [
 router.post('/', async (req, res) => {
   const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo } = req.body;
 
-  // TEMPORARY DEBUG — remove once the partner-match email issue is found.
-  console.log('[EMAIL-DEBUG] request received:', {
-    hasLeadInfo: !!leadInfo,
-    leadName: leadInfo?.name,
-    leadEmail: leadInfo?.email,
-    hasPartnerInfo: !!partnerInfo,
-    partnerBusinessName: partnerInfo?.business_name,
-    bodyBytes: JSON.stringify(req.body || {}).length,
-  });
-
   // Validate
   if (!serviceType || !VALID_SERVICE_TYPES.includes(serviceType)) {
     return res.status(400).json({ success: false, error: 'Invalid or missing serviceType' });
@@ -45,17 +35,16 @@ router.post('/', async (req, res) => {
       companyConfig
     );
 
-    // TEMPORARY DEBUG — remove once the partner-match email issue is found.
-    console.log('[EMAIL-DEBUG] gate check:', {
-      willSendEmail: !!(leadInfo && leadInfo.name && leadInfo.email),
-    });
-
-    // Save lead if lead info provided
-    if (leadInfo && leadInfo.name && leadInfo.email) {
+    // Save lead / send the estimate email based on email alone -- the
+    // lead-capture form marks name as optional (no `required` attribute,
+    // labeled "(optional)"), so gating on both silently dropped this whole
+    // block whenever a visitor left name blank. sendEstimateEmail's own
+    // buildHtml already falls back to "there" when name is missing.
+    if (leadInfo && leadInfo.email) {
       try {
         await saveLead({
           companyId: companyId || null,
-          name: leadInfo.name,
+          name: leadInfo.name || null,
           email: leadInfo.email,
           phone: leadInfo.phone || null,
           serviceType,
@@ -77,7 +66,6 @@ router.post('/', async (req, res) => {
       // result (breakdown, key factors, recurring pricing) and the
       // already-resolved partner match so the email mirrors exactly what
       // the results page showed, not just the top-line price range.
-      console.log('[EMAIL-DEBUG] calling sendEstimateEmail now');
       sendEstimateEmail({
         to: leadInfo.email,
         name: leadInfo.name,
@@ -85,9 +73,7 @@ router.post('/', async (req, res) => {
         result,
         companyConfig,
         partner: partnerInfo || null,
-      })
-        .then(sent => console.log('[EMAIL-DEBUG] sendEstimateEmail resolved:', sent))
-        .catch(err => console.error('[EMAIL-DEBUG] sendEstimateEmail UNHANDLED rejection:', err));
+      }).catch(err => console.error('Estimate email failed:', err.message));
     }
 
     res.json({ success: true, data: result });
