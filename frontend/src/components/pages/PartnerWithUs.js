@@ -184,7 +184,7 @@ export default function PartnerWithUs() {
             <span style={{ display: 'block', color: '#93c5fd' }}> Ready to Hire a Cleaner</span>
           </h1>
           <p style={{ fontSize: 'clamp(15px, 2.5vw, 18px)', color: '#cbd5e1', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 36px' }}>
-            Clean Estimator gets <strong style={{ color: 'white' }}>20,000&ndash;30,000 organic visits per month &mdash; and growing every month</strong> &mdash; from people actively using our cost calculator, not casual browsers, but homeowners and renters with a real cleaning job in mind and a budget in hand.
+            Clean Estimator gets <strong style={{ color: 'white' }}>20,000&ndash;30,000 organic visits per month, and climbing</strong> &mdash; from people actively using our cost calculator, not casual browsers, but homeowners and renters with a real cleaning job in mind and a budget in hand.
           </p>
           <a href="#apply" style={{ display: 'inline-flex', alignItems: 'center', background: PRIMARY_GRADIENT, color: 'white', padding: '15px 36px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 17, letterSpacing: '-0.2px', gap: 4, boxShadow: '0 8px 24px rgba(29,78,216,0.4)' }}>
             Get My City <IconArrow size={18} color="white" />
