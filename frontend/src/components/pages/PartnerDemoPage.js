@@ -57,7 +57,7 @@ export default function PartnerDemoPage() {
             See Exactly How Your Listing Will Look
           </h1>
           <p style={{ fontSize: 15.5, color: '#64748b', lineHeight: 1.65, maxWidth: 560, margin: '0 auto' }}>
-            This page is live, not a mockup — the floating banner in the corner and the recommended-cleaner card below are both real, using a sample business ("Sparkle Clean Co.") so you can see your own future placement without needing to already be a partner in your city.
+            This page is live, not a mockup — using a sample business ("Sparkle Clean Co.") so you can see your own future placement without needing to already be a partner in your city. There are two real placements to look for, one right away and one after you try the calculator below.
           </p>
         </div>
 
@@ -72,15 +72,15 @@ export default function PartnerDemoPage() {
         )}
 
         <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '16px 20px', marginBottom: 28, fontSize: 13.5, color: '#475569', lineHeight: 1.6 }}>
-          <strong style={{ color: '#0f172a' }}>1. The floating banner</strong> — look in the bottom-right corner. That's what follows a visitor across every page in your city once you're live, not just this one.
+          <strong style={{ color: '#0f172a' }}>1. The floating banner — look now.</strong> It should already be showing in the bottom-right corner. That's what follows a visitor across every page in your city once you're live, not just this one.
+        </div>
+
+        <div style={{ background: '#eff6ff', border: `1px solid #bfdbfe`, borderRadius: 14, padding: '16px 20px', marginBottom: 16, fontSize: 13.5, color: '#1e40af', lineHeight: 1.6 }}>
+          <strong>2. The results-page card — try it below.</strong> This second placement only appears after a visitor completes an estimate, so run one through the calculator (any service works) to see it appear with your price.
         </div>
 
         <div style={{ maxWidth: 620, margin: '0 auto', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <CleaningCalculator embedded siteLanding demoPartner={SAMPLE_PARTNER} />
-        </div>
-
-        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '16px 20px', marginTop: 28, fontSize: 13.5, color: '#475569', lineHeight: 1.6 }}>
-          <strong style={{ color: '#0f172a' }}>2. The results-page card</strong> — run an estimate above (any service works). The "Recommended Cleaner Near You" card that appears with your price is the second placement — shown on every estimate completed by a visitor in your city.
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 44 }}>
