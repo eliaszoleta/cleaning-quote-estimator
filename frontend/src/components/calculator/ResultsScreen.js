@@ -5,23 +5,30 @@ import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '.
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import PartnerCard from '../partners/PartnerCard';
 
-export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset }) {
+export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner }) {
   const [shared, setShared] = useState(false);
   const [partner, setPartner] = useState(null);
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, []);
 
   useEffect(() => {
-    if (embedded) return;
+    if (embedded || demoPartner) return;
     // The lead-capture step (CleaningCalculator's handleLeadNext) already
     // resolves and caches this exact match before the estimate email is
     // sent -- reusing that cache here (instead of a second independent
     // getUserLocation()+findPartner() round trip) is what makes the card
     // appear immediately instead of after its own multi-second geo lookup.
     getCachedPartnerMatch().then(setPartner);
-  }, [embedded]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [embedded, demoPartner]);
 
   if (!result) return null;
+
+  // /partner-demo feeds a sample partner in here to show prospects exactly
+  // this card without needing a real geo match -- takes priority over
+  // embedded's usual "no partner card" rule and over any real match.
+  const effectivePartner = demoPartner || partner;
+  const showPartnerCard = !!demoPartner || (!!partner && !embedded);
 
   const {
     totalLow, totalHigh, stateName, stateMultiplier,
@@ -158,9 +165,9 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 </span>
               </div>
 
-              {partner && !embedded && <PartnerCard partner={partner} />}
+              {showPartnerCard && <PartnerCard partner={effectivePartner} />}
 
-              {!(partner && !embedded) && (
+              {!showPartnerCard && (
                 <div style={{ background: embedded && companyName ? `${primaryColor}08` : '#f8fafc', border: `1px solid ${embedded && companyName ? primaryColor + '28' : '#e2e8f0'}`, borderRadius: 12, padding: '18px 20px' }}>
                   <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>
                     {companyName ? `Ready to book with ${companyName}?` : 'Ready to get real quotes?'}

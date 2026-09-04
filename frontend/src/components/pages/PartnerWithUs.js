@@ -213,6 +213,11 @@ export default function PartnerWithUs() {
             <p style={{ fontSize: 15, color: '#64748b', maxWidth: 540, margin: '0 auto' }}>Real placements, real Google rankings, real traffic — not promises.</p>
           </div>
           <PartnerGallery />
+          <div style={{ textAlign: 'center', marginTop: 28 }}>
+            <a href="/partner-demo" style={{ color: PRIMARY, fontWeight: 700, fontSize: 14.5, textDecoration: 'none' }}>
+              Don't just take our word for it — try the live demo →
+            </a>
+          </div>
         </div>
       </div>
 

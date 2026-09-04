@@ -44,7 +44,7 @@ const DETAIL_STEP_COMPONENT = {
 
 const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Send', 'Results'];
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null }) {
   const cardRef = useRef(null);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
   const [serviceType, setServiceType] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? initialService : null);
@@ -175,6 +175,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         companyConfig={companyConfig}
         embedded={embedded && !siteLanding}
         onReset={handleReset}
+        demoPartner={demoPartner}
       />
     );
   }
