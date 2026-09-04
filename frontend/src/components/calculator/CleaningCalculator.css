@@ -15,12 +15,8 @@
 }
 
 .calc-hero__title {
-  /* Matches ServiceSelect.js's own "What service do you need?" heading
-     exactly (22px desktop / 18px mobile, same isMobile <= 640px cutoff
-     used there) -- fixed sizes rather than a clamp, on purpose, so it's
-     never even a fraction of a pixel off from that heading. */
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 700;
   color: #0f172a;
   line-height: 1.2;
   margin-bottom: 8px;
@@ -53,11 +49,9 @@
   }
 }
 
-/* Same 640px cutoff ServiceSelect.js's own isMobile check uses, so the
-   title switches to 18px at the exact same width "What service do you
-   need?" does. */
 @media (max-width: 640px) {
   .calc-hero__title {
     font-size: 18px;
+    font-weight: 800;
   }
 }
