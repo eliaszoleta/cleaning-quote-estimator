@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search, X, ArrowRight, Loader2, ShieldCheck } from 'lucide-react';
 import { STATES_WITH_CITIES } from '../partners/CityTierBrowser';
-import { postPartnerCheckout } from '../../utils/api';
+import { postPartnerCheckout, getTakenCities } from '../../utils/api';
 
 const PRIMARY = '#2563eb';
 const MINOR = '#9333ea';
@@ -30,7 +30,14 @@ const TierBadge = ({ tier }) => (
   </span>
 );
 
-function CityPicker({ selected, onAdd }) {
+// Matches the backend's own key format ({stateName}|{city}, both
+// lowercased) so a city already covered by an active partner shows as
+// unavailable here instead of only failing once checkout is submitted.
+function cityKey(city, stateName) {
+  return `${(stateName || '').trim().toLowerCase()}|${(city || '').trim().toLowerCase()}`;
+}
+
+function CityPicker({ selected, onAdd, takenKeys }) {
   const [search, setSearch] = useState('');
   const q = search.trim().toLowerCase();
 
@@ -62,17 +69,25 @@ function CityPicker({ selected, onAdd }) {
               No matches. We may not have pricing for this city yet &mdash; <a href="/partner-with-us#apply" style={{ color: PRIMARY }}>apply manually</a> instead and we'll confirm your rate.
             </div>
           )}
-          {results.map(c => (
-            <button
-              key={`${c.stateCode}|${c.city}`}
-              type="button"
-              onClick={() => { onAdd(c); setSearch(''); }}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, background: 'none', border: 'none', borderTop: '1px solid #f1f5f9', padding: '10px 14px', cursor: 'pointer', textAlign: 'left' }}
-            >
-              <span style={{ fontSize: 13.5, color: '#0f172a' }}>{c.city}, {c.stateCode} <TierBadge tier={c.tier} /></span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: c.tier === 'major' ? PRIMARY : MINOR, flexShrink: 0 }}>${c.price}/mo</span>
-            </button>
-          ))}
+          {results.map(c => {
+            const taken = takenKeys.has(cityKey(c.city, c.stateName));
+            return (
+              <button
+                key={`${c.stateCode}|${c.city}`}
+                type="button"
+                onClick={() => { if (!taken) { onAdd(c); setSearch(''); } }}
+                disabled={taken}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, background: 'none', border: 'none', borderTop: '1px solid #f1f5f9', padding: '10px 14px', cursor: taken ? 'default' : 'pointer', textAlign: 'left', opacity: taken ? 0.55 : 1 }}
+              >
+                <span style={{ fontSize: 13.5, color: '#0f172a' }}>{c.city}, {c.stateCode} <TierBadge tier={c.tier} /></span>
+                {taken ? (
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: '#94a3b8', flexShrink: 0 }}>Already taken</span>
+                ) : (
+                  <span style={{ fontSize: 13, fontWeight: 700, color: c.tier === 'major' ? PRIMARY : MINOR, flexShrink: 0 }}>${c.price}/mo</span>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -84,6 +99,13 @@ export default function BuyCityPlacement() {
   const [form, setForm] = useState({ business_name: '', email: '', phone: '', address: '', website: '', logo_url: '' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [takenKeys, setTakenKeys] = useState(() => new Set());
+
+  useEffect(() => {
+    getTakenCities()
+      .then(({ data }) => setTakenKeys(new Set((data || []).map(r => cityKey(r.city, r.state)))))
+      .catch(() => { /* picker just won't gray anything out client-side; /checkout still enforces it */ });
+  }, []);
 
   const total = cities.reduce((sum, c) => sum + c.price, 0);
 
@@ -111,6 +133,22 @@ export default function BuyCityPlacement() {
       });
       window.location.href = data.url;
     } catch (err) {
+      const taken = err.responseData?.takenCities;
+      if (Array.isArray(taken) && taken.length > 0) {
+        // A city in the cart got claimed by someone else between when the
+        // picker last checked and now -- drop it from the cart and mark it
+        // taken so the buyer can immediately retry with what's left, rather
+        // than hitting the same error again.
+        setCities(prev => prev.filter(c => !taken.some(t => t.stateCode === c.stateCode && t.city === c.city)));
+        setTakenKeys(prev => {
+          const next = new Set(prev);
+          taken.forEach(t => {
+            const match = ALL_CITIES.find(c => c.stateCode === t.stateCode && c.city === t.city);
+            if (match) next.add(cityKey(match.city, match.stateName));
+          });
+          return next;
+        });
+      }
       setError(err.message || 'Something went wrong starting checkout. Please try again.');
       setSubmitting(false);
     }
@@ -142,7 +180,7 @@ export default function BuyCityPlacement() {
             <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>1. Choose your cities</div>
             <p style={{ fontSize: 12.5, color: '#64748b', margin: '0 0 14px' }}>Up to {MAX_CITIES} cities. Exclusive per city &mdash; only one partner per listing.</p>
 
-            <CityPicker selected={cities} onAdd={addCity} />
+            <CityPicker selected={cities} onAdd={addCity} takenKeys={takenKeys} />
 
             {cities.length > 0 && (
               <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>

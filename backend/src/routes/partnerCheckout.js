@@ -19,6 +19,48 @@ function getSupabase() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
+function normalizeKey(str) {
+  return (str || '').toString().trim().toLowerCase();
+}
+
+// Every city currently covered by an *active* partner, as `state|city` keys
+// (state stored as the full name, matching AdminPartners.js's convention and
+// what provisionPartner writes) -- the source of truth for "is this city
+// already taken," used both to filter the picker and to block checkout.
+async function getActiveLocationKeys() {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('partner_locations')
+    .select('city, state, partners!inner(active)')
+    .eq('partners.active', true);
+  if (error) {
+    console.error('getActiveLocationKeys error:', error.message);
+    return new Set();
+  }
+  return new Set((data || []).map(r => `${normalizeKey(r.state)}|${normalizeKey(r.city)}`));
+}
+
+// GET /api/partner-checkout/taken-cities -- public, read-only. Lets the
+// picker on /buy-city-placement gray out cities that already have an active
+// partner before the buyer even tries to add them to their cart. This is a
+// convenience only -- /checkout re-validates authoritatively regardless of
+// what this returned, since a stale client-side list can't be trusted for
+// anything that actually blocks a purchase.
+router.get('/taken-cities', async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('partner_locations')
+      .select('city, state, partners!inner(active)')
+      .eq('partners.active', true);
+    if (error) throw error;
+    res.json({ success: true, data: (data || []).map(r => ({ city: r.city, state: r.state })) });
+  } catch (err) {
+    console.error('taken-cities error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to load taken cities' });
+  }
+});
+
 // Re-derives { city, stateCode, stateName, tier, price } for every requested
 // city server-side -- never trusts a client-supplied price, so a tampered
 // request can't buy a major-city placement at the minor-city rate.
@@ -59,6 +101,21 @@ router.post('/checkout', async (req, res) => {
   if (cityError) return res.status(400).json({ success: false, error: cityError });
 
   try {
+    // Exclusivity check -- one partner per city, so block checkout entirely
+    // if any requested city already has an active partner. Authoritative:
+    // never trust the picker's client-side filtering, which is only a
+    // convenience and can be stale.
+    const takenKeys = await getActiveLocationKeys();
+    const takenCities = resolvedCities.filter(c => takenKeys.has(`${normalizeKey(c.stateName)}|${normalizeKey(c.city)}`));
+    if (takenCities.length > 0) {
+      const names = takenCities.map(c => `${c.city}, ${c.stateCode}`).join(' and ');
+      return res.status(409).json({
+        success: false,
+        error: `${names} already ${takenCities.length > 1 ? 'have' : 'has'} an active partner. Remove ${takenCities.length > 1 ? 'them' : 'it'} from your cart to continue.`,
+        takenCities: takenCities.map(c => ({ city: c.city, stateCode: c.stateCode })),
+      });
+    }
+
     const stripe = getStripe();
 
     const lineItems = resolvedCities.map(c => ({
@@ -161,13 +218,33 @@ async function provisionPartner(session) {
     throw insertErr;
   }
 
-  const locationRows = cities.map(([city, stateCode]) => ({
+  // Re-check exclusivity right before writing locations -- the checkout-time
+  // check only guarantees the cities were free when the Stripe session was
+  // created. If a second buyer completed payment for the same city in the
+  // (normally very short) window between then and now, skip that city here
+  // rather than create a second active listing for it. The partner still
+  // gets provisioned and billed for the cities that are still free; any
+  // skipped city needs a human to sort out (refund that line item, or
+  // reassign once the conflicting listing frees up) -- logged loudly since
+  // there's no other alerting wired up for it.
+  const takenKeys = await getActiveLocationKeys();
+  const availableCities = cities.filter(([city, stateCode]) =>
+    !takenKeys.has(`${normalizeKey(stateNameFromCode(stateCode))}|${normalizeKey(city)}`)
+  );
+  const skippedCities = cities.filter(c => !availableCities.includes(c));
+  if (skippedCities.length > 0) {
+    console.error(`provisionPartner: MANUAL FOLLOW-UP NEEDED -- partner ${partner.id} (${partner.business_name}, session ${session.id}) paid for ${skippedCities.map(([c, s]) => `${c}, ${s}`).join(' | ')} but it became taken before provisioning. Refund that line item or reassign once available.`);
+  }
+
+  const locationRows = availableCities.map(([city, stateCode]) => ({
     partner_id: partner.id,
     city,
     state: stateNameFromCode(stateCode),
   }));
-  const { error: locErr } = await supabase.from('partner_locations').insert(locationRows);
-  if (locErr) console.error(`provisionPartner: location insert failed for partner ${partner.id}:`, locErr.message);
+  if (locationRows.length > 0) {
+    const { error: locErr } = await supabase.from('partner_locations').insert(locationRows);
+    if (locErr) console.error(`provisionPartner: location insert failed for partner ${partner.id}:`, locErr.message);
+  }
 
   console.log(`Provisioned partner ${partner.id} (${partner.business_name}) for session ${session.id}, ${locationRows.length} location(s)`);
   return partner;

@@ -8,7 +8,11 @@ async function apiFetch(path, options = {}) {
     headers: { 'Content-Type': 'application/json', ...(optHeaders || {}) },
   });
   const data = await res.json();
-  if (!res.ok || !data.success) throw new Error(data.error || `Request failed (${res.status})`);
+  if (!res.ok || !data.success) {
+    const err = new Error(data.error || `Request failed (${res.status})`);
+    err.responseData = data;
+    throw err;
+  }
   return data;
 }
 
@@ -56,6 +60,10 @@ export async function verifyCheckout(token, sessionId) {
 
 export async function postPartnerCheckout(payload) {
   return apiFetch('/api/partner-checkout/checkout', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+export async function getTakenCities() {
+  return apiFetch('/api/partner-checkout/taken-cities');
 }
 
 export async function verifyPartnerCheckout(sessionId) {
