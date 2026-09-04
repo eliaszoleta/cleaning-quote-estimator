@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Search, X, ArrowRight, Loader2, ShieldCheck, Upload } from 'lucide-react';
+import { Search, X, ArrowRight, Loader2, Lock, Upload } from 'lucide-react';
 import { STATES_WITH_CITIES } from '../partners/CityTierBrowser';
 import { postPartnerCheckout, getTakenCities, uploadPartnerLogo } from '../../utils/api';
 
@@ -217,11 +217,11 @@ export default function BuyCityPlacement() {
     setSubmitting(true);
     setError('');
     try {
-      const { data } = await postPartnerCheckout({
+      const res = await postPartnerCheckout({
         ...form,
         cities: cities.map(c => ({ city: c.city, stateCode: c.stateCode })),
       });
-      window.location.href = data.url;
+      window.location.href = res.url;
     } catch (err) {
       const taken = err.responseData?.takenCities;
       if (Array.isArray(taken) && taken.length > 0) {
@@ -344,8 +344,11 @@ export default function BuyCityPlacement() {
             )}
           </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14, fontSize: 12, color: '#94a3b8' }}>
-            <ShieldCheck size={13} /> Secure checkout via Stripe. Cancel anytime.
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, padding: '11px 18px', background: 'white', border: '1px solid #e2e8f0', borderRadius: 10 }}>
+            <Lock size={13} color="#16a34a" />
+            <span style={{ fontSize: 12.5, color: '#475569' }}>
+              Secure checkout powered by <span style={{ fontWeight: 800, color: '#635bff', letterSpacing: '-0.01em' }}>stripe</span> &middot; Cancel anytime
+            </span>
           </div>
         </form>
       </div>
