@@ -2,15 +2,44 @@ import React, { useState, useEffect } from 'react';
 import { LogOut, MapPin, Phone, Eye, PhoneCall, TrendingUp } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
+// This month and last month's boundaries, computed once per mount --
+// re-deriving off `new Date()` on every render would shift a visitor's
+// "this month" bucket mid-session right as midnight on the 1st ticks over.
+function getMonthRanges() {
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return {
+    thisMonth: { start: thisMonthStart, end: nextMonthStart, label: thisMonthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) },
+    lastMonth: { start: lastMonthStart, end: thisMonthStart, label: lastMonthStart.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) },
+  };
+}
+
+function countsInRange(events, start, end) {
+  const inRange = events.filter(e => {
+    const t = new Date(e.created_at);
+    return t >= start && t < end;
+  });
+  return {
+    impressions: inRange.filter(e => e.event_type === 'impression').length,
+    calls: inRange.filter(e => e.event_type === 'call_click').length,
+  };
+}
+
 // Matches the logged-in partner to their `partners` row by email (the same
 // email they signed up the account with), then shows their service areas
-// and floating-banner KPIs (partner_banner_stats). Read-only -- editing
-// listing details is still done by the site owner via /admin/partners.
+// and floating-banner KPIs (partner_banner_stats), filterable by All
+// Time/This Month/Last Month. Read-only -- editing listing details is
+// still done by the site owner via /admin/partners.
 export default function ClientDashboard({ user, onLogout }) {
   const [state, setState] = useState('loading'); // loading | not_found | ready | error
   const [partner, setPartner] = useState(null);
   const [locations, setLocations] = useState([]);
   const [stats, setStats] = useState(null);
+  const [monthlyEvents, setMonthlyEvents] = useState([]);
+  const [period, setPeriod] = useState('all'); // 'all' | 'this_month' | 'last_month'
+  const [ranges] = useState(getMonthRanges);
 
   useEffect(() => {
     if (!supabase || !user?.email) { setState('error'); return; }
@@ -29,16 +58,18 @@ export default function ClientDashboard({ user, onLogout }) {
       const p = partnerRows[0];
       setPartner(p);
 
-      const [{ data: locData }, { data: statsData }] = await Promise.all([
+      const [{ data: locData }, { data: statsData }, { data: eventsData }] = await Promise.all([
         supabase.from('partner_locations').select('*').eq('partner_id', p.id).order('city'),
         supabase.from('partner_banner_stats').select('*').eq('partner_id', p.id).maybeSingle(),
+        supabase.from('partner_banner_events').select('event_type, created_at').eq('partner_id', p.id).gte('created_at', ranges.lastMonth.start.toISOString()),
       ]);
 
       setLocations(locData || []);
       setStats(statsData || { impressions: 0, calls: 0 });
+      setMonthlyEvents(eventsData || []);
       setState('ready');
     })();
-  }, [user]);
+  }, [user, ranges]);
 
   const shellStyle = { minHeight: '100vh', background: '#f8fafc' };
   const headerStyle = { background: 'white', borderBottom: '1px solid #e2e8f0', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' };
@@ -77,8 +108,12 @@ export default function ClientDashboard({ user, onLogout }) {
     );
   }
 
-  const impressions = stats?.impressions || 0;
-  const calls = stats?.calls || 0;
+  const allTime = { impressions: stats?.impressions || 0, calls: stats?.calls || 0 };
+  const thisMonth = countsInRange(monthlyEvents, ranges.thisMonth.start, ranges.thisMonth.end);
+  const lastMonth = countsInRange(monthlyEvents, ranges.lastMonth.start, ranges.lastMonth.end);
+  const current = period === 'this_month' ? thisMonth : period === 'last_month' ? lastMonth : allTime;
+
+  const { impressions, calls } = current;
   const ctr = impressions > 0 ? ((calls / impressions) * 100).toFixed(1) : '0.0';
 
   return (
@@ -104,6 +139,10 @@ export default function ClientDashboard({ user, onLogout }) {
           <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 600, color: partner.active ? '#16a34a' : '#94a3b8', background: partner.active ? '#f0fdf4' : '#f8fafc', border: `1px solid ${partner.active ? '#bbf7d0' : '#e2e8f0'}`, borderRadius: 6, padding: '4px 10px', flexShrink: 0 }}>
             {partner.active ? 'Live' : 'Inactive'}
           </span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+          <PeriodPicker period={period} setPeriod={setPeriod} ranges={ranges} />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 20 }}>
@@ -146,6 +185,43 @@ export default function ClientDashboard({ user, onLogout }) {
           Questions about your listing or these numbers? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a>.
         </p>
       </div>
+    </div>
+  );
+}
+
+const PERIOD_OPTIONS = [
+  { key: 'all', label: 'All Time' },
+  { key: 'this_month', label: 'This Month' },
+  { key: 'last_month', label: 'Last Month' },
+];
+
+function PeriodPicker({ period, setPeriod, ranges }) {
+  return (
+    <div style={{ display: 'inline-flex', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 9, padding: 3, gap: 2 }}>
+      {PERIOD_OPTIONS.map(opt => {
+        const active = period === opt.key;
+        const sublabel = opt.key === 'this_month' ? ranges.thisMonth.label : opt.key === 'last_month' ? ranges.lastMonth.label : null;
+        return (
+          <button
+            key={opt.key}
+            onClick={() => setPeriod(opt.key)}
+            title={sublabel || undefined}
+            style={{
+              border: 'none',
+              borderRadius: 7,
+              padding: '7px 14px',
+              fontSize: 12.5,
+              fontWeight: 600,
+              cursor: 'pointer',
+              background: active ? 'white' : 'transparent',
+              color: active ? '#0f172a' : '#64748b',
+              boxShadow: active ? '0 1px 2px rgba(15,23,42,0.08)' : 'none',
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
