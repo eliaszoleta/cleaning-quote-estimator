@@ -83,6 +83,58 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
     </p>`;
 }
 
+// A plain-text alternative alongside the HTML body (multipart/alternative)
+// -- sending HTML-only is itself a signal Gmail's classifier associates
+// with bulk/marketing mail, on top of the styling itself.
+function buildText({ name, serviceType, result, companyConfig, partner }) {
+  const {
+    totalLow, totalHigh, stateName, unit,
+    adjustments = [], recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
+  } = result;
+
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const brandName = companyConfig?.companyName || 'Clean Estimator';
+  const firstName = (name || '').trim().split(' ')[0] || 'there';
+
+  const lines = [
+    `Hi ${firstName},`,
+    '',
+    `Here's your ${serviceLabel.toLowerCase()} estimate${stateName ? ` for ${stateName}` : ''}:`,
+    '',
+    `${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
+  ];
+
+  if (recurringMonthlyLow && unit !== 'per_month') {
+    lines.push(`Recurring: ${fmtMoney(recurringMonthlyLow)} - ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` (save ~${fmtMoney(recurringAnnualSavings)}/year)` : ''}`);
+  }
+
+  lines.push('', 'Price breakdown:');
+  adjustments.filter(a => !a.separate).forEach(a => {
+    lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
+  });
+  lines.push(`  Estimated total: ${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)}`);
+
+  if (partner) {
+    lines.push('', 'Recommended cleaner near you:', partner.business_name);
+    if (partner.address) lines.push(partner.address);
+    if (partner.phone) lines.push(`Phone: ${partner.phone}`);
+    if (partner.website) lines.push(`Website: ${partner.website}`);
+  } else {
+    const ctaText = companyConfig?.ctaButtonText || 'Get an exact quote';
+    const ctaUrl = companyConfig?.ctaButtonUrl || 'https://www.cleanestimator.com';
+    lines.push('', `${ctaText}: ${ctaUrl}`);
+    if (companyConfig?.ctaPhone) lines.push(`Or call ${companyConfig.ctaPhone}`);
+  }
+
+  lines.push(
+    '',
+    "This is an estimate only — actual pricing may vary based on your home's condition and specific requirements.",
+    `${brandName} - cleanestimator.com`
+  );
+
+  return lines.join('\n');
+}
+
 function buildHtml({ name, serviceType, result, companyConfig, partner }) {
   const {
     totalLow, totalHigh, stateName, unit,
@@ -155,6 +207,7 @@ async function sendEstimateEmail({ to, name, serviceType, result, companyConfig,
         to: [to],
         subject: `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate: ${fmtMoney(result.totalLow)} – ${fmtMoney(result.totalHigh)}`,
         html: buildHtml({ name, serviceType, result, companyConfig, partner }),
+        text: buildText({ name, serviceType, result, companyConfig, partner }),
       },
       { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
     );
