@@ -218,4 +218,89 @@ async function sendEstimateEmail({ to, name, serviceType, result, companyConfig,
   }
 }
 
-module.exports = { sendEstimateEmail };
+function fmtCityList(cities) {
+  // cities: array of "City, ST" strings
+  if (cities.length === 1) return cities[0];
+  if (cities.length === 2) return `${cities[0]} and ${cities[1]}`;
+  return `${cities.slice(0, -1).join(', ')}, and ${cities[cities.length - 1]}`;
+}
+
+function buildPartnerWelcomeText({ businessName, cities }) {
+  const cityList = fmtCityList(cities);
+  return [
+    `Congratulations, ${businessName}!`,
+    '',
+    `You're officially a Clean Estimator partner in ${cityList}. Your listing is live now -- on the results card, the floating banner, and the estimate email in every city you bought.`,
+    '',
+    'Next: set up your dashboard',
+    "Go to https://www.cleanestimator.com/client and sign up with this same email address to unlock your KPI dashboard -- impressions, calls, and click-through-rate for every city.",
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildPartnerWelcomeHtml({ businessName, cities }) {
+  const cityList = fmtCityList(cities);
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Congratulations, ${businessName}!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    You're officially a Clean Estimator partner in <strong>${cityList}</strong>. Your listing is live now — on the results card, the floating banner, and the estimate email in every city you bought.
+  </p>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Next: set up your dashboard</p>
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Go to <a href="https://www.cleanestimator.com/client" style="color:#2563eb;">cleanestimator.com/client</a> and sign up with this same email address to unlock your KPI dashboard — impressions, calls, and click-through-rate for every city.
+  </p>
+
+  <p style="margin:8px 0 0;">
+    <a href="https://www.cleanestimator.com/client" style="color:#2563eb;font-size:14px;font-weight:600;">Set up my dashboard →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent right after a self-serve "buy city placement" checkout provisions a
+// new active partner (backend/src/routes/partnerCheckout.js) -- the in-app
+// success page shows the same congrats + /client instructions, but a
+// buyer who closes that tab before it loads (or never sees it, e.g. the
+// webhook provisioned them after they'd already navigated away) would
+// otherwise have no way to find out their listing is live or how to get
+// dashboard access. Fire-and-forget, same as sendEstimateEmail.
+async function sendPartnerWelcomeEmail({ to, businessName, cities }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendPartnerWelcomeEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendPartnerWelcomeEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: `Welcome to the Clean Estimator Partner Program, ${businessName}!`,
+        html: buildPartnerWelcomeHtml({ businessName, cities }),
+        text: buildPartnerWelcomeText({ businessName, cities }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendPartnerWelcomeEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+module.exports = { sendEstimateEmail, sendPartnerWelcomeEmail };

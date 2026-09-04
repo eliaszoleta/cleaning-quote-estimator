@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getCityTier, stateNameFromCode } = require('../data/partnerCityTiers');
+const { sendPartnerWelcomeEmail } = require('../services/email');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 const MAX_CITIES = 10;
@@ -294,6 +295,22 @@ async function provisionPartner(session) {
   }
 
   console.log(`Provisioned partner ${partner.id} (${partner.business_name}) for session ${session.id}, ${locationRows.length} location(s)`);
+
+  // Only reached once per session, on the branch that actually just
+  // inserted the partner row (the early "already exists" return above, and
+  // the race-loser branch on unique-violation, both return before this
+  // point) -- so this can't double-send even with the webhook and
+  // verify-checkout both calling provisionPartner for the same payment.
+  // Fire-and-forget: a failed send here shouldn't fail the request, since
+  // the success page shows the same message regardless.
+  if (availableCities.length > 0) {
+    sendPartnerWelcomeEmail({
+      to: partner.email,
+      businessName: partner.business_name,
+      cities: availableCities.map(([city, stateCode]) => `${city}, ${stateCode}`),
+    });
+  }
+
   return partner;
 }
 
