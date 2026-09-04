@@ -15,6 +15,16 @@ const VALID_SERVICE_TYPES = [
 router.post('/', async (req, res) => {
   const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo } = req.body;
 
+  // TEMPORARY DEBUG — remove once the partner-match email issue is found.
+  console.log('[EMAIL-DEBUG] request received:', {
+    hasLeadInfo: !!leadInfo,
+    leadName: leadInfo?.name,
+    leadEmail: leadInfo?.email,
+    hasPartnerInfo: !!partnerInfo,
+    partnerBusinessName: partnerInfo?.business_name,
+    bodyBytes: JSON.stringify(req.body || {}).length,
+  });
+
   // Validate
   if (!serviceType || !VALID_SERVICE_TYPES.includes(serviceType)) {
     return res.status(400).json({ success: false, error: 'Invalid or missing serviceType' });
@@ -34,6 +44,11 @@ router.post('/', async (req, res) => {
       { serviceType, zip: zip || null, state: state || null, serviceDetails: serviceDetails || {} },
       companyConfig
     );
+
+    // TEMPORARY DEBUG — remove once the partner-match email issue is found.
+    console.log('[EMAIL-DEBUG] gate check:', {
+      willSendEmail: !!(leadInfo && leadInfo.name && leadInfo.email),
+    });
 
     // Save lead if lead info provided
     if (leadInfo && leadInfo.name && leadInfo.email) {
@@ -62,6 +77,7 @@ router.post('/', async (req, res) => {
       // result (breakdown, key factors, recurring pricing) and the
       // already-resolved partner match so the email mirrors exactly what
       // the results page showed, not just the top-line price range.
+      console.log('[EMAIL-DEBUG] calling sendEstimateEmail now');
       sendEstimateEmail({
         to: leadInfo.email,
         name: leadInfo.name,
@@ -69,7 +85,9 @@ router.post('/', async (req, res) => {
         result,
         companyConfig,
         partner: partnerInfo || null,
-      });
+      })
+        .then(sent => console.log('[EMAIL-DEBUG] sendEstimateEmail resolved:', sent))
+        .catch(err => console.error('[EMAIL-DEBUG] sendEstimateEmail UNHANDLED rejection:', err));
     }
 
     res.json({ success: true, data: result });
