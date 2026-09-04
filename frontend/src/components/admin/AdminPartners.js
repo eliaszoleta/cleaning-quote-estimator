@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
+import { normalizeStateName } from '../../utils/partnerLookup';
 import { Plus, Trash2, ToggleLeft, ToggleRight, X } from 'lucide-react';
 
 const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || 'admin123';
@@ -82,7 +83,7 @@ export default function AdminPartners() {
 
     const { locations, ...partnerFields } = form;
     const validLocations = locations
-      .map(l => ({ city: l.city.trim(), state: l.state.trim() }))
+      .map(l => ({ city: l.city.trim(), state: normalizeStateName(l.state) }))
       .filter(l => l.city && l.state);
 
     if (validLocations.length === 0) {

@@ -1,10 +1,38 @@
 import { supabase } from '../lib/supabase';
+import { getAllStates } from '../data/statePricing';
 
 // Shared by ResultsScreen (inline partner card) and FloatingPartnerBanner
 // (sitewide corner banner) so both use the same match logic and, for the
 // banner, the same cached result -- avoids hitting ipapi.co and Supabase
 // again on every page load in this multi-page (non-SPA-routed) site.
 const CACHE_KEY = 'cleanestimator_partner_match';
+
+// The admin form's state field is free text with no validation ("full name,
+// e.g. Nevada"), and ipapi.co returns full state names. A mismatch like "MN"
+// vs "Minnesota" -- an abbreviation typed into that field, a stray space,
+// different casing -- silently breaks matching entirely, with no error
+// shown anywhere, since the underlying query is an exact match. This maps
+// either form to both, so a visitor matches a partner regardless of which
+// form ended up stored.
+const STATE_CODE_TO_NAME = new Map(getAllStates().map(s => [s.code.toUpperCase(), s.name]));
+const STATE_NAME_TO_CODE = new Map(getAllStates().map(s => [s.name.toUpperCase(), s.code]));
+
+// Returns { name, code } for a state given either its full name or 2-letter
+// code (case/whitespace-insensitive) -- code is null if unrecognized.
+function resolveState(input) {
+  const trimmed = (input || '').trim();
+  const upper = trimmed.toUpperCase();
+  if (STATE_CODE_TO_NAME.has(upper)) return { name: STATE_CODE_TO_NAME.get(upper), code: upper };
+  if (STATE_NAME_TO_CODE.has(upper)) return { name: trimmed, code: STATE_NAME_TO_CODE.get(upper) };
+  return { name: trimmed, code: null };
+}
+
+// Exported so /admin/partners can normalize a typed state (e.g. "MN") to
+// its canonical full name ("Minnesota") at save time -- self-correcting
+// regardless of which form gets typed into that free-text field.
+export function normalizeStateName(input) {
+  return resolveState(input).name;
+}
 
 export async function getUserLocation() {
   try {
@@ -22,12 +50,16 @@ export async function getUserLocation() {
 // filter apply to the joined table (a plain left join would ignore it).
 export async function findPartner(city, state) {
   if (!supabase || !city || !state) return null;
+
+  const { name, code } = resolveState(state);
+  const stateFilter = code ? `state.ilike.${name},state.ilike.${code}` : `state.ilike.${name}`;
+
   const { data } = await supabase
     .from('partner_locations')
     .select('*, partners!inner(*)')
     .eq('partners.active', true)
     .ilike('city', city)
-    .ilike('state', state)
+    .or(stateFilter)
     .limit(1);
   return data?.[0]?.partners || null;
 }
