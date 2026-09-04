@@ -1,14 +1,15 @@
 /* Shared hero block for the standalone calculator/estimator landing pages
-   (CalculatorPage, EstimatorPage, ServiceCalculatorPage) -- desktop sizing
-   stays as designed, but on narrow phones the breadcrumb + h1 + subtitle
-   used to push the actual calculator (the thing people came for) below the
-   fold. Mirrors the same compacting CleaningCalculator.css already does for
-   the homepage's own hero (.calc-hero) at the same breakpoint. */
+   (CalculatorPage, EstimatorPage, ServiceCalculatorPage) -- sized to match
+   the homepage's own hero (.calc-hero in CleaningCalculator.css) at every
+   breakpoint, not just mobile. The original inline styles here (h1 up to
+   42px, 17px/1.7 paragraph, 36px margin) were noticeably larger than the
+   homepage even on desktop, pushing the actual calculator down further
+   than it needs to for a page whose whole point is the calculator. */
 
 .page-hero-wrap {
   max-width: 900px;
   margin: 0 auto;
-  padding: 48px 24px 64px;
+  padding: 40px 24px 64px;
 }
 
 .page-hero-breadcrumb {
@@ -16,30 +17,30 @@
   gap: 6px;
   font-size: 13px;
   color: #94a3b8;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
 .page-hero-block {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 24px;
 }
 
 .page-hero-title {
-  font-size: clamp(28px, 5vw, 42px);
-  font-weight: 900;
+  font-size: clamp(18px, 3.5vw, 34px);
+  font-weight: 800;
   color: #0f172a;
-  line-height: 1.15;
-  margin-bottom: 14px;
+  line-height: 1.2;
+  margin-bottom: 8px;
   letter-spacing: -0.02em;
 }
 
 .page-hero-subtitle {
-  font-size: 17px;
+  font-size: 15px;
   color: #64748b;
   max-width: 640px;
   margin: 0 auto;
-  line-height: 1.7;
+  line-height: 1.55;
 }
 
 @media (max-width: 480px) {
@@ -54,11 +55,11 @@
     margin-bottom: 16px;
   }
   .page-hero-title {
-    font-size: 19px;
+    font-size: 17px;
     margin-bottom: 6px;
   }
   .page-hero-subtitle {
     font-size: 12.5px;
-    line-height: 1.5;
+    line-height: 1.45;
   }
 }
