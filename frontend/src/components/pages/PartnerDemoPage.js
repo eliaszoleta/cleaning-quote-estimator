@@ -7,6 +7,12 @@ import { PartnerBannerCard } from '../partners/FloatingPartnerBanner';
 
 const PRIMARY = '#2563eb';
 
+// A generic "SC" mark, inlined as a data URI so the demo doesn't depend on
+// an external image file -- just here to show that a logo (when a real
+// partner has one) renders on both placements, not left blank like a
+// partner without a logo would look.
+const SAMPLE_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><circle cx='48' cy='48' r='48' fill='%232563eb'/><text x='48' y='49' font-family='Arial,Helvetica,sans-serif' font-size='36' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='middle'>SC</text></svg>";
+
 // Sample data only -- shown to prospects on this page regardless of their
 // own location, so a business anywhere can open this link and see exactly
 // how their own listing will look once they're an active partner in their
@@ -17,7 +23,7 @@ const SAMPLE_PARTNER = {
   address: '123 Main St, Austin, TX',
   phone: '(555) 123-4567',
   website: 'https://example.com',
-  logo_url: null,
+  logo_url: SAMPLE_LOGO,
 };
 
 // Shared by a partner-recruitment sales pitch: a link to send prospects so
