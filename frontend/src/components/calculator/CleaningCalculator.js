@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import './CleaningCalculator.css';
 import { AlertCircle, MapPin, BarChart3, ShieldOff, Zap } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
+import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import ServiceSelect from './steps/ServiceSelect';
 import LocationStep from './steps/LocationStep';
 import HomeStep from './steps/HomeStep';
@@ -116,6 +117,10 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setError(null);
     setLoading(true);
     try {
+      // Same match ResultsScreen shows on-page (skipped when embedded, same
+      // as ResultsScreen's own guard) -- forwarded so the estimate email can
+      // include the same recommended-partner card, not a separate lookup.
+      const partnerMatch = embedded ? null : await getCachedPartnerMatch();
       const res = await postCalculate({
         serviceType,
         zip: location.zip || null,
@@ -123,6 +128,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         serviceDetails,
         companyId: companyConfig?.companyId || null,
         leadInfo: lead?.email ? lead : null,
+        partnerInfo: partnerMatch,
       });
       setResult(res.data);
       goNext();

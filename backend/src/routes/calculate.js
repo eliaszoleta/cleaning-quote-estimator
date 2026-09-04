@@ -13,7 +13,7 @@ const VALID_SERVICE_TYPES = [
 
 // POST /api/calculate
 router.post('/', async (req, res) => {
-  const { serviceType, zip, state, serviceDetails, companyId, leadInfo } = req.body;
+  const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo } = req.body;
 
   // Validate
   if (!serviceType || !VALID_SERVICE_TYPES.includes(serviceType)) {
@@ -58,15 +58,17 @@ router.post('/', async (req, res) => {
       }
 
       // Fire-and-forget: sendEstimateEmail never throws, so this never
-      // blocks or breaks the response on email delivery.
+      // blocks or breaks the response on email delivery. Passes the full
+      // result (breakdown, key factors, recurring pricing) and the
+      // already-resolved partner match so the email mirrors exactly what
+      // the results page showed, not just the top-line price range.
       sendEstimateEmail({
         to: leadInfo.email,
         name: leadInfo.name,
         serviceType,
-        priceLow: result.totalLow,
-        priceHigh: result.totalHigh,
-        state: result.state,
+        result,
         companyConfig,
+        partner: partnerInfo || null,
       });
     }
 
