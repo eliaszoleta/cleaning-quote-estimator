@@ -295,7 +295,7 @@ function PartnerBannerStats({ stats }) {
   return (
     <div style={{ display: 'flex', gap: 12, marginTop: 6, fontSize: 12, color: '#374151' }}>
       <span><strong>{impressions.toLocaleString()}</strong> banner views</span>
-      <span><strong>{calls.toLocaleString()}</strong> calls</span>
+      <span><strong>{calls.toLocaleString()}</strong> call button taps</span>
       <span style={{ color: '#94a3b8' }}>{ctr}% CTR</span>
     </div>
   );

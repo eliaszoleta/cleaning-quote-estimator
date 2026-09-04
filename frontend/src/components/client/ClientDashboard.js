@@ -106,10 +106,25 @@ export default function ClientDashboard({ user, onLogout }) {
           </span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 20 }}>
           <StatCard icon={Eye} label="Banner Views" value={impressions.toLocaleString()} color="#2563eb" bg="#eff6ff" />
-          <StatCard icon={PhoneCall} label="Calls Generated" value={calls.toLocaleString()} color="#16a34a" bg="#f0fdf4" />
+          <StatCard icon={PhoneCall} label="Call Button Taps" value={calls.toLocaleString()} color="#16a34a" bg="#f0fdf4" />
           <StatCard icon={TrendingUp} label="Click-Through Rate" value={`${ctr}%`} color="#7c3aed" bg="#f5f3ff" />
+        </div>
+
+        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '20px 24px', marginBottom: 24 }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', marginBottom: 10 }}>How these numbers work</div>
+          <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.7 }}>
+            <p style={{ margin: '0 0 10px' }}>
+              <strong style={{ color: '#0f172a' }}>Banner Views</strong> — how many times your listing appeared on cleanestimator.com to a visitor located in one of your service areas.
+            </p>
+            <p style={{ margin: '0 0 10px' }}>
+              <strong style={{ color: '#0f172a' }}>Call Button Taps</strong> — how many times a visitor tapped the "Call" button on your listing. That opens their phone's dialer with your number already filled in: it's someone actively choosing to call your business over every other cleaner they could have picked. We can't see whether the call itself connected or how long it lasted — that happens on their phone, off our site — so this counts the tap, not a confirmed call.
+            </p>
+            <p style={{ margin: 0 }}>
+              <strong style={{ color: '#0f172a' }}>Click-Through Rate</strong> — the share of banner views that turned into a call tap. It's the clearest read on how compelling your listing is once someone actually sees it, and a good number to watch as your service areas or listing details change.
+            </p>
+          </div>
         </div>
 
         <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '22px 28px' }}>
@@ -128,7 +143,7 @@ export default function ClientDashboard({ user, onLogout }) {
         </div>
 
         <p style={{ fontSize: 12.5, color: '#94a3b8', textAlign: 'center', marginTop: 24 }}>
-          These numbers reflect how often your listing was shown and called from cleanestimator.com. Questions? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a>.
+          Questions about your listing or these numbers? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a>.
         </p>
       </div>
     </div>
