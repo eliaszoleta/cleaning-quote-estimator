@@ -56,8 +56,12 @@ const IconSuccess = () => (
 
 function StatBadge({ number, label }) {
   return (
-    <div style={{ textAlign: 'center', padding: '24px 20px' }}>
-      <div style={{ fontSize: 'clamp(36px, 6vw, 52px)', fontWeight: 900, color: PRIMARY, lineHeight: 1, letterSpacing: '-2px' }}>{number}</div>
+    <div style={{ textAlign: 'center', padding: '24px 20px', minWidth: 0 }}>
+      {/* Floor lowered from 36px -- on a narrow phone, a 2-column grid cell
+          (roughly 155px wide after padding) can't fit "$175-$350" at a
+          36px-minimum font size, so it overflowed straight past the cell's
+          own padding to the edge of the screen. */}
+      <div style={{ fontSize: 'clamp(22px, 6vw, 52px)', fontWeight: 900, color: PRIMARY, lineHeight: 1, letterSpacing: '-2px' }}>{number}</div>
       <div style={{ fontSize: 14, color: '#64748b', marginTop: 6, fontWeight: 500 }}>{label}</div>
     </div>
   );
@@ -193,7 +197,7 @@ export default function PartnerWithUs() {
 
       {/* Stats bar */}
       <div style={{ borderBottom: '1px solid #e2e8f0', borderTop: '1px solid #e2e8f0' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 12px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
           <StatBadge number="20K+" label="Monthly visitors, growing" />
           <StatBadge number="100%" label="Organic, targeted traffic" />
           <StatBadge number="1" label="Partner per city" />

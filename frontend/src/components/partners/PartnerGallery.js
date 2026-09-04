@@ -44,6 +44,25 @@ export default function PartnerGallery() {
 
   const go = (i) => setIndex(((i % SLIDES.length) + SLIDES.length) % SLIDES.length);
 
+  // Swipe navigation for the lightbox -- the prev/next chevrons are the
+  // only way to move between images on a touch device otherwise, and
+  // swiping is the interaction people actually reach for on a phone.
+  const touchStart = useRef(null);
+  const onLightboxTouchStart = (e) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  };
+  const onLightboxTouchEnd = (e) => {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const dx = e.changedTouches[0].clientX - start.x;
+    const dy = e.changedTouches[0].clientY - start.y;
+    // Require a clearly horizontal, deliberate swipe so a vertical drag or
+    // a plain tap-to-close doesn't get misread as a navigation gesture.
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    go(index + (dx < 0 ? 1 : -1));
+  };
+
   return (
     <div
       style={{ maxWidth: 860, margin: '0 auto' }}
@@ -118,6 +137,8 @@ export default function PartnerGallery() {
           aria-modal="true"
           aria-label={SLIDES[index].title}
           onClick={() => setLightboxOpen(false)}
+          onTouchStart={onLightboxTouchStart}
+          onTouchEnd={onLightboxTouchEnd}
           style={{ position: 'fixed', inset: 0, background: 'rgba(6,10,20,0.92)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(16px, 4vw, 48px)' }}
         >
           <button
