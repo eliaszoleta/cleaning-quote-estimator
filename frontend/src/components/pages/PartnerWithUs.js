@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Plus, Trash2 } from 'lucide-react';
 import { getAllStates, getStateByCode } from '../../data/statePricing';
 import { getCityTier, POPULATION_THRESHOLD, MAJOR_CITY_PRICE, MINOR_CITY_PRICE } from '../../data/partnerCityTiers';
 import CityTierBrowser, { STATES_WITH_CITIES } from '../partners/CityTierBrowser';
@@ -84,44 +85,42 @@ function Check({ children }) {
 }
 
 const ALL_STATES = getAllStates();
+const EMPTY_ROW = { state: '', city: '', customCity: false, customText: '' };
 
 export default function PartnerWithUs() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', message: '' });
-  const [cityList, setCityList] = useState([]);
-  const [stateInput, setStateInput] = useState('');
-  const [citySelectValue, setCitySelectValue] = useState('');
-  const [customCityText, setCustomCityText] = useState('');
+  const [rows, setRows] = useState([{ ...EMPTY_ROW }]);
 
-  const citiesForState = stateInput ? (STATES_WITH_CITIES.find(s => s.code === stateInput)?.cities || []) : [];
+  const citiesForState = (stateCode) => stateCode ? (STATES_WITH_CITIES.find(s => s.code === stateCode)?.cities || []) : [];
 
-  const addCity = (city) => {
-    if (!city || !stateInput) return;
-    const tierInfo = getCityTier(city, stateInput);
-    const stateObj = getStateByCode(stateInput);
-    setCityList(list => [...list, { city, stateCode: stateInput, stateName: stateObj ? stateObj.name : stateInput, tierInfo }]);
+  const updateRow = (index, field, value) => {
+    setRows(list => list.map((r, i) => {
+      if (i !== index) return r;
+      if (field === 'state') return { ...EMPTY_ROW, state: value };
+      if (field === 'city') {
+        if (value === '__other__') return { ...r, city: '', customCity: true, customText: '' };
+        return { ...r, city: value, customCity: false, customText: '' };
+      }
+      return { ...r, [field]: value };
+    }));
   };
 
-  const handleCitySelect = (e) => {
-    const val = e.target.value;
-    setCitySelectValue(val);
-    if (val && val !== '__other__') {
-      addCity(val);
-      setCitySelectValue('');
-    }
-  };
+  const addRow = () => setRows(list => [...list, { ...EMPTY_ROW }]);
+  const removeRow = (index) => setRows(list => list.filter((_, i) => i !== index));
 
-  const addCustomCity = () => {
-    const city = customCityText.trim();
-    if (!city) return;
-    addCity(city);
-    setCustomCityText('');
-    setCitySelectValue('');
-  };
-
-  const removeCity = (idx) => setCityList(list => list.filter((_, i) => i !== idx));
+  // A row counts once it has a state and either a picked city or typed
+  // custom-city text -- resolved here (rather than stored per-row) so
+  // editing the dropdown always reflects the latest tier price/name.
+  const cityList = rows
+    .filter(r => r.state && (r.city || r.customText.trim()))
+    .map(r => {
+      const city = r.customCity ? r.customText.trim() : r.city;
+      const stateObj = getStateByCode(r.state);
+      return { city, stateCode: r.state, stateName: stateObj ? stateObj.name : r.state, tierInfo: getCityTier(city, r.state) };
+    });
 
   const monthlyTotal = cityList.reduce((sum, c) => sum + (c.tierInfo ? c.tierInfo.price : 0), 0);
   const unmatchedCities = cityList.filter(c => !c.tierInfo);
@@ -368,70 +367,86 @@ export default function PartnerWithUs() {
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cities You Want to Cover *</label>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <select
-                      style={{ ...inputStyle, flex: 1 }}
-                      value={stateInput}
-                      onChange={e => { setStateInput(e.target.value); setCitySelectValue(''); setCustomCityText(''); }}
-                    >
-                      <option value="">Select a state</option>
-                      {ALL_STATES.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
-                    </select>
-                    <select
-                      style={{ ...inputStyle, flex: 2 }}
-                      value={citySelectValue}
-                      onChange={handleCitySelect}
-                      disabled={!stateInput}
-                    >
-                      <option value="">{stateInput ? 'Select a city' : 'Select a state first'}</option>
-                      {citiesForState.map(c => (
-                        <option key={c.city} value={c.city}>{c.city} &mdash; {c.tier === 'major' ? 'Major' : 'Minor'} ${c.price}/mo</option>
-                      ))}
-                      {stateInput && <option value="__other__">My city isn't listed...</option>}
-                    </select>
-                  </div>
-                  {citySelectValue === '__other__' && (
-                    <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                      <input
-                        style={{ ...inputStyle, flex: 2 }}
-                        value={customCityText}
-                        onChange={e => setCustomCityText(e.target.value)}
-                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustomCity(); } }}
-                        placeholder="Type your city name"
-                        autoFocus
-                      />
-                      <button
-                        type="button"
-                        onClick={addCustomCity}
-                        disabled={!customCityText.trim()}
-                        style={{ padding: '11px 18px', border: 'none', borderRadius: 9, background: !customCityText.trim() ? '#cbd5e1' : PRIMARY, color: 'white', fontWeight: 700, fontSize: 13.5, cursor: !customCityText.trim() ? 'not-allowed' : 'pointer', flexShrink: 0 }}
-                      >
-                        Add
-                      </button>
-                    </div>
-                  )}
-                  {cityList.length > 0 && (
-                    <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {cityList.map((c, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'white', border: '1px solid #e2e8f0', borderRadius: 9, padding: '9px 12px' }}>
-                          <div style={{ fontSize: 13.5, color: '#0f172a' }}>
-                            <strong>{c.city}, {c.stateCode}</strong>
-                            {c.tierInfo ? (
-                              <span style={{ marginLeft: 8, color: c.tierInfo.tier === 'major' ? PRIMARY : '#9333ea', fontWeight: 700 }}>
-                                {c.tierInfo.tier === 'major' ? 'Major' : 'Minor'} &mdash; ${c.tierInfo.price}/mo
-                              </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {rows.map((row, i) => {
+                      const cities = citiesForState(row.state);
+                      const resolved = row.state && (row.city || row.customText.trim())
+                        ? getCityTier(row.customCity ? row.customText.trim() : row.city, row.state)
+                        : null;
+                      return (
+                        <div key={i}>
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                            <select
+                              style={{ ...inputStyle, flex: 1 }}
+                              value={row.state}
+                              onChange={e => updateRow(i, 'state', e.target.value)}
+                            >
+                              <option value="">Select a state</option>
+                              {ALL_STATES.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
+                            </select>
+                            {row.customCity ? (
+                              <input
+                                style={{ ...inputStyle, flex: 2 }}
+                                value={row.customText}
+                                onChange={e => updateRow(i, 'customText', e.target.value)}
+                                placeholder="Type your city name"
+                                autoFocus
+                              />
                             ) : (
-                              <span style={{ marginLeft: 8, color: '#94a3b8', fontStyle: 'italic' }}>we'll confirm this city's tier</span>
+                              <select
+                                style={{ ...inputStyle, flex: 2 }}
+                                value={row.city}
+                                onChange={e => updateRow(i, 'city', e.target.value)}
+                                disabled={!row.state}
+                              >
+                                <option value="">{row.state ? 'Select a city' : 'Select a state first'}</option>
+                                {cities.map(c => (
+                                  <option key={c.city} value={c.city}>{c.city} &mdash; {c.tier === 'major' ? 'Major' : 'Minor'} ${c.price}/mo</option>
+                                ))}
+                                {row.state && <option value="__other__">My city isn't listed...</option>}
+                              </select>
                             )}
+                            <button
+                              type="button"
+                              onClick={() => removeRow(i)}
+                              disabled={rows.length === 1}
+                              aria-label="Remove city"
+                              style={{ background: 'none', border: 'none', cursor: rows.length === 1 ? 'not-allowed' : 'pointer', color: rows.length === 1 ? '#cbd5e1' : '#ef4444', padding: 4, flexShrink: 0 }}
+                            >
+                              <Trash2 size={16} />
+                            </button>
                           </div>
-                          <button type="button" onClick={() => removeCity(i)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: 4 }} aria-label="Remove city">&times;</button>
+                          {row.customCity && (
+                            <button
+                              type="button"
+                              onClick={() => updateRow(i, 'city', '')}
+                              style={{ background: 'none', border: 'none', color: PRIMARY, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, padding: '4px 0 0' }}
+                            >
+                              &larr; Choose from list instead
+                            </button>
+                          )}
+                          {resolved && (
+                            <div style={{ fontSize: 12.5, marginTop: 4, color: resolved.tier === 'major' ? PRIMARY : '#9333ea', fontWeight: 700 }}>
+                              {resolved.tier === 'major' ? 'Major' : 'Minor'} city &mdash; ${resolved.price}/mo
+                            </div>
+                          )}
+                          {row.state && (row.city || row.customText.trim()) && !resolved && (
+                            <div style={{ fontSize: 12.5, marginTop: 4, color: '#94a3b8', fontStyle: 'italic' }}>we'll confirm this city's tier</div>
+                          )}
                         </div>
-                      ))}
-                      {monthlyTotal > 0 && (
-                        <div style={{ fontSize: 13.5, color: '#0f172a', fontWeight: 700, textAlign: 'right', paddingTop: 2 }}>
-                          Estimated total: ${monthlyTotal}/month{unmatchedCities.length ? '+' : ''}
-                        </div>
-                      )}
+                      );
+                    })}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addRow}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'none', border: '1.5px dashed #cbd5e1', borderRadius: 8, padding: '7px 14px', marginTop: 10, cursor: 'pointer', fontWeight: 600, fontSize: 12.5, color: PRIMARY }}
+                  >
+                    <Plus size={13} /> Add another city
+                  </button>
+                  {monthlyTotal > 0 && (
+                    <div style={{ fontSize: 13.5, color: '#0f172a', fontWeight: 700, textAlign: 'right', marginTop: 10 }}>
+                      Estimated total: ${monthlyTotal}/month{unmatchedCities.length ? '+' : ''}
                     </div>
                   )}
                 </div>
