@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { ChevronDown, Check } from 'lucide-react';
 import { getServiceBySlug, getRelatedServices } from '../../data/services';
 import CleaningCalculator from '../calculator/CleaningCalculator';
+import './PageHero.css';
 
 function FaqAccordion({ faqs }) {
   const [openIndex, setOpenIndex] = useState(0);
@@ -97,15 +98,15 @@ export default function ServiceCalculatorPage({ slug }) {
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
 
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 24px 64px' }}>
-        <div style={{ display: 'flex', gap: 6, fontSize: 13, color: '#94a3b8', marginBottom: 20, flexWrap: 'wrap' }}>
+      <div className="page-hero-wrap">
+        <div className="page-hero-breadcrumb">
           <a href="/" style={{ color: '#64748b', textDecoration: 'none' }}>Home</a><span>&rsaquo;</span>
           <span style={{ color: '#0f172a' }}>{service.name} Cost Calculator</span>
         </div>
 
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <h1 style={{ fontSize: 'clamp(28px,5vw,42px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.15, marginBottom: 14 }}>{service.name} Cost Calculator</h1>
-          <p style={{ fontSize: 17, color: '#64748b', maxWidth: 640, margin: '0 auto', lineHeight: 1.7 }}>
+        <div className="page-hero-block">
+          <h1 className="page-hero-title">{service.name} Cost Calculator</h1>
+          <p className="page-hero-subtitle">
             Get an instant, ZIP-code accurate {service.name.toLowerCase()} estimate — enter a few details and see a real price range in under 60 seconds. {service.tagline}
           </p>
         </div>

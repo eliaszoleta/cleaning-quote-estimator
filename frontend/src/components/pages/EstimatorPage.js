@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ChevronDown, BarChart3, ListChecks, Lock, Repeat } from 'lucide-react';
 import CleaningCalculator from '../calculator/CleaningCalculator';
+import './PageHero.css';
 
 const WHY_POINTS = [
   { Icon: BarChart3, title: 'Real Market Pricing', body: 'This cleaning cost estimator pulls from actual state-by-state pricing data, not a generic industry average.' },
@@ -91,15 +92,15 @@ export default function EstimatorPage() {
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
 
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 24px 64px' }}>
-        <div style={{ display: 'flex', gap: 6, fontSize: 13, color: '#94a3b8', marginBottom: 20, flexWrap: 'wrap' }}>
+      <div className="page-hero-wrap">
+        <div className="page-hero-breadcrumb">
           <a href="/" style={{ color: '#64748b', textDecoration: 'none' }}>Home</a><span>&rsaquo;</span>
           <span style={{ color: '#0f172a' }}>Cleaning Cost Estimator</span>
         </div>
 
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <h1 style={{ fontSize: 'clamp(28px,5vw,42px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.15, marginBottom: 14 }}>Cleaning Cost Estimator</h1>
-          <p style={{ fontSize: 17, color: '#64748b', maxWidth: 640, margin: '0 auto', lineHeight: 1.7 }}>
+        <div className="page-hero-block">
+          <h1 className="page-hero-title">Cleaning Cost Estimator</h1>
+          <p className="page-hero-subtitle">
             Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and 6 other services — enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation.
           </p>
         </div>
