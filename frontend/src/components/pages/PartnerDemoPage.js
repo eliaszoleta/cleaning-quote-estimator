@@ -78,7 +78,7 @@ export default function PartnerDemoPage() {
         )}
 
         <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '16px 20px', marginBottom: 28, fontSize: 13.5, color: '#475569', lineHeight: 1.6 }}>
-          <strong style={{ color: '#0f172a' }}>1. The floating banner — look now.</strong> It should already be showing in the bottom-right corner. That's what follows a visitor across every page in your city once you're live, not just this one.
+          <strong style={{ color: '#0f172a' }}>1. The floating banner — look now.</strong> It should already be showing in the corner of your screen (top-right on desktop, bottom-right on mobile). That's what follows a visitor across every page in your city once you're live, not just this one.
         </div>
 
         <div style={{ background: '#eff6ff', border: `1px solid #bfdbfe`, borderRadius: 14, padding: '16px 20px', marginBottom: 16, fontSize: 13.5, color: '#1e40af', lineHeight: 1.6 }}>
