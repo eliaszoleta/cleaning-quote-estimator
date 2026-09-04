@@ -19,6 +19,53 @@ function getSupabase() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
+const LOGO_BUCKET = 'partner-logos';
+const MAX_LOGO_BYTES = 3 * 1024 * 1024; // 3MB
+const ALLOWED_LOGO_TYPES = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+};
+
+// POST /api/partner-checkout/upload-logo -- public, no auth. Takes a small
+// image as base64 JSON (not multipart -- avoids adding a multer dependency
+// for what's a rare, small upload) and stores it in Supabase Storage via
+// the service role key, so the browser never gets direct storage write
+// access. Returns a public URL that slots straight into the same logo_url
+// field a pasted URL would have filled -- nothing downstream (Stripe
+// metadata, provisioning) needs to know the logo came from an upload.
+router.post('/upload-logo', async (req, res) => {
+  const { contentType, dataBase64 } = req.body || {};
+  const ext = ALLOWED_LOGO_TYPES[contentType];
+  if (!ext) return res.status(400).json({ success: false, error: 'Logo must be a PNG, JPEG, or WebP image' });
+  if (!dataBase64) return res.status(400).json({ success: false, error: 'No file data received' });
+
+  let buffer;
+  try {
+    buffer = Buffer.from(dataBase64, 'base64');
+  } catch {
+    return res.status(400).json({ success: false, error: 'Could not read that file' });
+  }
+  if (buffer.length === 0) return res.status(400).json({ success: false, error: 'That file appears to be empty' });
+  if (buffer.length > MAX_LOGO_BYTES) return res.status(400).json({ success: false, error: 'Logo must be under 3MB' });
+
+  try {
+    const { v4: uuidv4 } = require('uuid');
+    const path = `${uuidv4()}.${ext}`;
+    const supabase = getSupabase();
+    const { error: uploadErr } = await supabase.storage
+      .from(LOGO_BUCKET)
+      .upload(path, buffer, { contentType, upsert: false });
+    if (uploadErr) throw uploadErr;
+
+    const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(path);
+    res.json({ success: true, data: { url: data.publicUrl } });
+  } catch (err) {
+    console.error('Logo upload error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to upload logo. You can paste an image URL instead.' });
+  }
+});
+
 function normalizeKey(str) {
   return (str || '').toString().trim().toLowerCase();
 }

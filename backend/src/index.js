@@ -72,6 +72,12 @@ app.post('/api/partner-checkout/webhook',
   partnerCheckoutRouter.webhookHandler
 );
 
+// Logo uploads carry a base64-encoded image, well over the 10kb default
+// below — register a larger-limit parser for just this path first (the
+// body-parser guard skips re-parsing a body it's already parsed, same
+// trick the webhook route above relies on).
+app.use('/api/partner-checkout/upload-logo', express.json({ limit: '5mb' }));
+
 // Body parsing — after webhook
 app.use(express.json({ limit: '10kb' }));
 

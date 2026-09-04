@@ -66,6 +66,12 @@ export async function getTakenCities() {
   return apiFetch('/api/partner-checkout/taken-cities');
 }
 
+export async function uploadPartnerLogo({ contentType, dataBase64 }) {
+  return apiFetch('/api/partner-checkout/upload-logo', {
+    method: 'POST', body: JSON.stringify({ contentType, dataBase64 }),
+  });
+}
+
 export async function verifyPartnerCheckout(sessionId) {
   return apiFetch('/api/partner-checkout/verify-checkout', { method: 'POST', body: JSON.stringify({ sessionId }) });
 }
