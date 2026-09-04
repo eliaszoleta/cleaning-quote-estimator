@@ -8,6 +8,7 @@ const AUTO_ADVANCE_MS = 4000;
 const SLIDES = [
   { src: '/images/partner-gallery/floating-partner-banner.png', title: 'Your listing follows visitors sitewide', desc: 'A floating banner shows your business on every page a visitor in your city browses — not just the results page.' },
   { src: '/images/partner-gallery/results-page-partner-card.png', title: 'Featured on every estimate result', desc: 'Right after someone gets their price estimate, your business appears as the recommended local cleaner — with your phone, website, and email one tap away.' },
+  { src: '/images/partner-gallery/estimate-email-partner-recommendation.png', title: 'You\'re in the estimate email too', desc: 'When a visitor opts in for their estimate by email, your business shows up right there as their recommended local cleaner — another touchpoint, not just the site.' },
   { src: '/images/partner-gallery/google-search-cleaning-estimator.png', title: 'Ranking in Google for real search traffic', desc: 'Clean Estimator shows up in Google’s AI Overview and organic results for searches like "cleaning estimator."' },
   { src: '/images/partner-gallery/google-search-cleaning-cost-calculator.png', title: 'Cited by Google’s AI Overview', desc: 'For "cleaning cost calculator," Google’s AI Overview cites Clean Estimator directly as a source.' },
   { src: '/images/partner-gallery/google-search-free-cleaning-estimate-calculator.png', title: 'Showing up for high-intent searches', desc: 'Ranking for "free cleaning estimate calculator" — exactly what homeowners search before hiring.' },
