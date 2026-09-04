@@ -300,6 +300,19 @@ export default function PartnerWithUs() {
               <strong>Example:</strong> A business covering a major metro like Dallas (${MAJOR_CITY_PRICE}/mo) plus a smaller city like Waco (${MINOR_CITY_PRICE}/mo) pays ${MAJOR_CITY_PRICE + MINOR_CITY_PRICE}/month total. Type your cities into the form below and we'll show you the exact tier and price for each.
             </div>
           </div>
+
+          <div style={{ maxWidth: 700, margin: '20px auto 0', textAlign: 'center' }}>
+            <a
+              href="/buy-city-placement"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 32px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 16, letterSpacing: '-0.2px', boxShadow: '0 8px 24px rgba(29,78,216,0.35)' }}
+            >
+              Buy City Placement Now →
+            </a>
+            <p style={{ fontSize: 12.5, color: '#94a3b8', margin: '10px 0 0' }}>
+              Instant checkout &mdash; pick your city, pay, and you're live. Prefer to talk first? <a href="#apply" style={{ color: PRIMARY }}>Apply here</a> instead.
+            </p>
+          </div>
+
           <CityTierBrowser />
         </div>
       </div>

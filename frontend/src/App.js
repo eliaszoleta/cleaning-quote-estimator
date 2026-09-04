@@ -17,6 +17,8 @@ import CompanyLanding from './components/pages/CompanyLanding';
 import PartnerWithUs from './components/pages/PartnerWithUs';
 import PartnerCityPricing from './components/pages/PartnerCityPricing';
 import PartnerDemoPage from './components/pages/PartnerDemoPage';
+import BuyCityPlacement from './components/pages/BuyCityPlacement';
+import PartnerCheckoutSuccess from './components/pages/PartnerCheckoutSuccess';
 import About from './components/pages/About';
 import Contact from './components/pages/Contact';
 import PrivacyPolicy from './components/pages/PrivacyPolicy';
@@ -49,6 +51,8 @@ const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
 const isPartnerCityPricing = pathname === '/partner-city-pricing';
 const isPartnerDemo = pathname === '/partner-demo';
+const isBuyCityPlacementSuccess = pathname === '/buy-city-placement/success';
+const isBuyCityPlacement = pathname === '/buy-city-placement';
 const isServicePage = pathname.startsWith('/cleaning-services/');
 const isCityPage = pathname.startsWith('/cleaning-cost/city/');
 const isStatePage = pathname.startsWith('/cleaning-cost/') && !isCityPage;
@@ -165,6 +169,26 @@ export default function App() {
       <div className="app">
         <Header />
         <main><PartnerDemoPage /></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (isBuyCityPlacementSuccess) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><PartnerCheckoutSuccess /></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (isBuyCityPlacement) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><BuyCityPlacement /></main>
         <Footer />
       </div>
     </HelmetProvider>

@@ -1,0 +1,93 @@
+// Backend copy of frontend/src/data/partnerCityTiers.js -- kept in sync
+// manually since backend/frontend don't share a module tree. This is the
+// SERVER-SIDE source of truth for city-tier pricing: the /api/partner-checkout
+// route recomputes price from here rather than trusting a client-supplied
+// price, so a tampered request can't buy a major-city placement at the
+// minor-city rate. If you add/edit cities in the frontend file, mirror the
+// change here too.
+
+const POPULATION_THRESHOLD = 150000;
+const MAJOR_CITY_PRICE = 350;
+const MINOR_CITY_PRICE = 175;
+
+// [stateCode, city, population]
+const CITY_POPULATIONS = [
+["AL","Huntsville",223000],["AL","Birmingham",197000],["AL","Montgomery",200000],["AL","Mobile",185000],["AL","Tuscaloosa",100000],["AL","Hoover",92000],["AL","Dothan",71000],["AL","Auburn",76000],["AL","Decatur",57000],["AL","Madison",56000],["AL","Florence",40000],["AL","Phenix City",38000],["AL","Vestavia Hills",38000],["AL","Prattville",38000],["AL","Gadsden",33000],["AK","Anchorage",291000],["AK","Fairbanks",32000],["AK","Juneau",32000],["AK","Wasilla",10500],["AK","Sitka",8500],["AK","Ketchikan",8200],["AK","Kenai",7500],["AZ","Phoenix",1650000],["AZ","Tucson",545000],["AZ","Mesa",512000],["AZ","Chandler",279000],["AZ","Gilbert",275000],["AZ","Glendale",251000],["AZ","Scottsdale",243000],["AZ","Tempe",182000],["AZ","Peoria",190000],["AZ","Surprise",150000],["AZ","Yuma",95000],["AZ","Avondale",90000],["AZ","Goodyear",95000],["AZ","Flagstaff",76000],["AZ","Buckeye",100000],["AZ","Casa Grande",55000],["AZ","Lake Havasu City",57000],["AZ","Maricopa",60000],["AZ","Oro Valley",47000],["AZ","Prescott",45000],["AZ","Bullhead City",41000],["AZ","Sierra Vista",43000],["AR","Little Rock",202000],["AR","Fayetteville",95000],["AR","Fort Smith",89000],["AR","Springdale",85000],["AR","Jonesboro",78000],["AR","North Little Rock",65000],["AR","Conway",68000],["AR","Rogers",70000],["AR","Bentonville",55000],["AR","Pine Bluff",40000],["AR","Hot Springs",39000],["AR","Benton",37000],["CA","Los Angeles",3820000],["CA","San Diego",1385000],["CA","San Jose",1013000],["CA","San Francisco",842000],["CA","Fresno",545000],["CA","Sacramento",525000],["CA","Long Beach",466000],["CA","Oakland",440000],["CA","Bakersfield",410000],["CA","Anaheim",346000],["CA","Riverside",317000],["CA","Stockton",320000],["CA","Irvine",314000],["CA","Santa Ana",310000],["CA","Chula Vista",275000],["CA","Fremont",230000],["CA","Modesto",218000],["CA","Fontana",210000],["CA","Oxnard",202000],["CA","Moreno Valley",208000],["CA","Huntington Beach",198000],["CA","Glendale",196000],["CA","Santa Clarita",228000],["CA","Garden Grove",171000],["CA","Oceanside",175000],["CA","Rancho Cucamonga",175000],["CA","Santa Rosa",178000],["CA","Ontario",175000],["CA","Elk Grove",176000],["CA","Corona",169000],["CA","Lancaster",160000],["CA","Palmdale",157000],["CA","Salinas",155000],["CA","Pomona",149000],["CA","Hayward",159000],["CA","Escondido",151000],["CA","Torrance",145000],["CA","Sunnyvale",155000],["CA","Pasadena",138000],["CA","Orange",139000],["CA","Fullerton",138000],["CA","Thousand Oaks",126000],["CA","Visalia",141000],["CA","Simi Valley",125000],["CA","Concord",129000],["CA","Roseville",141000],["CA","Victorville",134000],["CA","Santa Clara",130000],["CA","Vallejo",122000],["CA","Berkeley",124000],["CA","El Monte",109000],["CA","Downey",111000],["CA","Costa Mesa",111000],["CO","Denver",717000],["CO","Colorado Springs",480000],["CO","Aurora",397000],["CO","Fort Collins",170000],["CO","Lakewood",156000],["CO","Thornton",141000],["CO","Arvada",124000],["CO","Westminster",113000],["CO","Pueblo",112000],["CO","Centennial",108000],["CO","Boulder",105000],["CO","Greeley",108000],["CO","Longmont",98000],["CO","Loveland",76000],["CO","Grand Junction",65000],["CT","Bridgeport",148000],["CT","New Haven",135000],["CT","Stamford",135000],["CT","Hartford",121000],["CT","Waterbury",114000],["CT","Norwalk",91000],["CT","Danbury",84000],["CT","New Britain",72000],["CT","West Hartford",63000],["CT","Greenwich",63000],["CT","Meriden",59000],["DE","Wilmington",70000],["DE","Dover",40000],["DE","Newark",33000],["DE","Middletown",25000],["DE","Smyrna",13000],["FL","Jacksonville",972000],["FL","Miami",442000],["FL","Tampa",399000],["FL","Orlando",316000],["FL","St. Petersburg",259000],["FL","Hialeah",223000],["FL","Fort Lauderdale",183000],["FL","Tallahassee",201000],["FL","Cape Coral",194000],["FL","Port St. Lucie",217000],["FL","Pembroke Pines",172000],["FL","Hollywood",154000],["FL","Gainesville",143000],["FL","Miramar",140000],["FL","Coral Springs",134000],["FL","Palm Bay",119000],["FL","West Palm Beach",117000],["FL","Clearwater",117000],["FL","Lakeland",112000],["FL","Pompano Beach",112000],["FL","Miami Gardens",111000],["FL","Davie",105000],["FL","Boca Raton",99000],["FL","Sunrise",95000],["FL","Deltona",93000],["FL","Plantation",92000],["FL","Fort Myers",87000],["GA","Atlanta",499000],["GA","Columbus",206000],["GA","Augusta",202000],["GA","Savannah",147000],["GA","Athens",128000],["GA","Sandy Springs",108000],["GA","Roswell",95000],["GA","Macon",157000],["GA","Johns Creek",84000],["GA","Albany",68000],["GA","Warner Robins",80000],["GA","Alpharetta",68000],["GA","Marietta",60000],["GA","Valdosta",55000],["GA","Smyrna",56000],["HI","Honolulu",345000],["HI","Hilo",45000],["HI","Kailua",40000],["HI","Pearl City",47000],["HI","Waipahu",40000],["HI","Kaneohe",35000],["ID","Boise",235000],["ID","Meridian",117000],["ID","Nampa",100000],["ID","Idaho Falls",65000],["ID","Pocatello",56000],["ID","Caldwell",65000],["ID","Coeur d'Alene",55000],["ID","Twin Falls",51000],["IL","Chicago",2665000],["IL","Aurora",180000],["IL","Naperville",149000],["IL","Rockford",146000],["IL","Joliet",148000],["IL","Springfield",114000],["IL","Peoria",112000],["IL","Elgin",114000],["IL","Waukegan",87000],["IL","Cicero",81000],["IL","Champaign",88000],["IL","Bloomington",78000],["IL","Decatur",70000],["IL","Evanston",78000],["IL","Schaumburg",78000],["IN","Indianapolis",887000],["IN","Fort Wayne",270000],["IN","Evansville",118000],["IN","South Bend",103000],["IN","Carmel",103000],["IN","Bloomington",85000],["IN","Hammond",76000],["IN","Gary",68000],["IN","Muncie",65000],["IN","Anderson",54000],["IN","Terre Haute",58000],["IN","Noblesville",70000],["IA","Des Moines",214000],["IA","Cedar Rapids",137000],["IA","Davenport",101000],["IA","Sioux City",82000],["IA","Iowa City",75000],["IA","Waterloo",67000],["IA","Council Bluffs",62000],["IA","Ames",66000],["KS","Wichita",397000],["KS","Overland Park",197000],["KS","Kansas City",152000],["KS","Topeka",125000],["KS","Olathe",141000],["KS","Lawrence",96000],["KS","Manhattan",54000],["KS","Salina",46000],["KY","Louisville",628000],["KY","Lexington",322000],["KY","Bowling Green",73000],["KY","Owensboro",60000],["KY","Covington",41000],["KY","Richmond",36000],["KY","Georgetown",37000],["KY","Florence",33000],["LA","New Orleans",383000],["LA","Baton Rouge",227000],["LA","Shreveport",183000],["LA","Lafayette",121000],["LA","Lake Charles",84000],["LA","Kenner",66000],["LA","Bossier City",68000],["LA","Monroe",47000],["LA","Alexandria",44000],["ME","Portland",68000],["ME","Lewiston",37000],["ME","Bangor",32000],["ME","South Portland",26000],["ME","Auburn",23000],["ME","Biddeford",22000],["MD","Baltimore",585000],["MD","Frederick",78000],["MD","Rockville",68000],["MD","Gaithersburg",68000],["MD","Columbia",104000],["MD","Germantown",90000],["MD","Silver Spring",81000],["MD","Waldorf",82000],["MD","Glen Burnie",70000],["MD","Ellicott City",76000],["MD","Bethesda",65000],["MD","Bowie",59000],["MA","Boston",654000],["MA","Worcester",206000],["MA","Springfield",155000],["MA","Cambridge",118000],["MA","Lowell",115000],["MA","Brockton",105000],["MA","New Bedford",101000],["MA","Quincy",101000],["MA","Lynn",101000],["MA","Fall River",94000],["MA","Newton",88000],["MA","Somerville",81000],["MI","Detroit",633000],["MI","Grand Rapids",198000],["MI","Warren",139000],["MI","Sterling Heights",132000],["MI","Ann Arbor",123000],["MI","Lansing",112000],["MI","Flint",80000],["MI","Dearborn",109000],["MI","Livonia",94000],["MI","Troy",87000],["MI","Westland",84000],["MI","Farmington Hills",80000],["MI","Kalamazoo",74000],["MN","Minneapolis",429000],["MN","Saint Paul",311000],["MN","Rochester",121000],["MN","Duluth",86000],["MN","Bloomington",89000],["MN","Brooklyn Park",86000],["MN","Plymouth",81000],["MN","St. Cloud",68000],["MN","Woodbury",75000],["MS","Jackson",145000],["MS","Gulfport",72000],["MS","Southaven",55000],["MS","Biloxi",46000],["MS","Hattiesburg",48000],["MS","Meridian",34000],["MS","Tupelo",38000],["MO","Kansas City",509000],["MO","St. Louis",301000],["MO","Springfield",169000],["MO","Columbia",127000],["MO","Independence",122000],["MO","Lee's Summit",101000],["MO","O'Fallon",91000],["MO","St. Joseph",71000],["MO","St. Charles",71000],["MO","Blue Springs",58000],["MT","Billings",120000],["MT","Missoula",75000],["MT","Great Falls",60000],["MT","Bozeman",56000],["MT","Butte",34000],["MT","Helena",34000],["NE","Omaha",486000],["NE","Lincoln",292000],["NE","Bellevue",65000],["NE","Grand Island",53000],["NE","Kearney",34000],["NV","Las Vegas",651000],["NV","Henderson",320000],["NV","Reno",273000],["NV","North Las Vegas",262000],["NV","Sparks",108000],["NV","Carson City",58000],["NV","Elko",21000],["NH","Manchester",115000],["NH","Nashua",91000],["NH","Concord",44000],["NH","Rochester",32000],["NH","Dover",32000],["NH","Keene",23000],["NJ","Newark",305000],["NJ","Jersey City",292000],["NJ","Paterson",159000],["NJ","Elizabeth",137000],["NJ","Trenton",90000],["NJ","Camden",71000],["NJ","Clifton",91000],["NJ","Passaic",71000],["NJ","Union City",68000],["NJ","East Orange",65000],["NJ","Bayonne",68000],["NJ","Vineland",61000],["NJ","New Brunswick",57000],["NM","Albuquerque",561000],["NM","Las Cruces",112000],["NM","Santa Fe",88000],["NM","Rio Rancho",105000],["NM","Roswell",48000],["NM","Farmington",46000],["NY","New York",8258000],["NY","Buffalo",278000],["NY","Rochester",211000],["NY","Yonkers",211000],["NY","Syracuse",148000],["NY","Albany",99000],["NY","New Rochelle",79000],["NY","Mount Vernon",68000],["NY","Schenectady",65000],["NY","Utica",64000],["NY","White Plains",60000],["NY","Troy",50000],["NY","Niagara Falls",48000],["NY","Binghamton",47000],["NC","Charlotte",897000],["NC","Raleigh",476000],["NC","Greensboro",299000],["NC","Durham",285000],["NC","Winston-Salem",250000],["NC","Fayetteville",211000],["NC","Cary",179000],["NC","Wilmington",123000],["NC","High Point",114000],["NC","Concord",105000],["NC","Asheville",94000],["NC","Greenville",90000],["NC","Gastonia",82000],["NC","Jacksonville",72000],["NC","Chapel Hill",61000],["NC","Huntersville",61000],["ND","Fargo",130000],["ND","Bismarck",75000],["ND","Grand Forks",59000],["ND","Minot",48000],["ND","West Fargo",40000],["ND","Dickinson",25000],["OH","Columbus",913000],["OH","Cleveland",373000],["OH","Cincinnati",309000],["OH","Toledo",267000],["OH","Akron",188000],["OH","Dayton",137000],["OH","Parma",79000],["OH","Canton",70000],["OH","Youngstown",60000],["OH","Lorain",65000],["OH","Hamilton",62000],["OH","Springfield",58000],["OH","Kettering",55000],["OH","Elyria",53000],["OK","Oklahoma City",695000],["OK","Tulsa",411000],["OK","Norman",128000],["OK","Broken Arrow",113000],["OK","Edmond",94000],["OK","Lawton",90000],["OK","Moore",63000],["OR","Portland",635000],["OR","Eugene",176000],["OR","Salem",175000],["OR","Gresham",114000],["OR","Hillsboro",106000],["OR","Bend",100000],["OR","Beaverton",98000],["OR","Medford",86000],["OR","Springfield",62000],["PA","Philadelphia",1550000],["PA","Pittsburgh",303000],["PA","Allentown",125000],["PA","Erie",95000],["PA","Reading",95000],["PA","Scranton",76000],["PA","Bethlehem",75000],["PA","Lancaster",58000],["PA","Harrisburg",50000],["PA","Altoona",43000],["PA","York",44000],["RI","Providence",190000],["RI","Cranston",82000],["RI","Warwick",82000],["RI","Pawtucket",75000],["RI","East Providence",47000],["RI","Woonsocket",41000],["SC","Charleston",155000],["SC","Columbia",137000],["SC","North Charleston",115000],["SC","Greenville",73000],["SC","Rock Hill",74000],["SC","Mount Pleasant",90000],["SC","Summerville",52000],["SC","Spartanburg",38000],["SC","Sumter",40000],["SD","Sioux Falls",205000],["SD","Rapid City",78000],["SD","Aberdeen",28000],["SD","Brookings",24000],["SD","Watertown",22000],["TN","Nashville",690000],["TN","Memphis",621000],["TN","Knoxville",190000],["TN","Chattanooga",181000],["TN","Clarksville",166000],["TN","Murfreesboro",152000],["TN","Franklin",83000],["TN","Jackson",68000],["TN","Johnson City",71000],["TN","Hendersonville",61000],["TN","Kingsport",54000],["TX","Houston",2314000],["TX","San Antonio",1495000],["TX","Dallas",1300000],["TX","Austin",975000],["TX","Fort Worth",958000],["TX","El Paso",682000],["TX","Arlington",398000],["TX","Corpus Christi",317000],["TX","Plano",288000],["TX","Lubbock",262000],["TX","Irving",260000],["TX","Laredo",260000],["TX","Garland",246000],["TX","Amarillo",200000],["TX","Grand Prairie",196000],["TX","Brownsville",186000],["TX","McKinney",195000],["TX","Frisco",200000],["TX","Pasadena",151000],["TX","Killeen",153000],["TX","McAllen",143000],["TX","Mesquite",143000],["TX","Denton",148000],["TX","Midland",132000],["TX","Waco",138000],["TX","Carrollton",133000],["TX","Round Rock",133000],["TX","Abilene",125000],["TX","Pearland",125000],["TX","Richardson",121000],["TX","College Station",120000],["TX","Sugar Land",118000],["TX","League City",114000],["TX","Beaumont",115000],["TX","Odessa",116000],["UT","Salt Lake City",200000],["UT","West Valley City",140000],["UT","Provo",117000],["UT","West Jordan",116000],["UT","Orem",98000],["UT","Sandy",96000],["UT","Ogden",87000],["UT","St. George",95000],["UT","Layton",82000],["VT","Burlington",45000],["VT","South Burlington",20000],["VT","Rutland",15000],["VT","Barre",8500],["VA","Virginia Beach",459000],["VA","Chesapeake",250000],["VA","Norfolk",238000],["VA","Richmond",227000],["VA","Arlington",232000],["VA","Alexandria",159000],["VA","Newport News",186000],["VA","Hampton",137000],["VA","Roanoke",100000],["VA","Portsmouth",94000],["VA","Suffolk",94000],["VA","Lynchburg",82000],["VA","Harrisonburg",53000],["WA","Seattle",749000],["WA","Spokane",230000],["WA","Tacoma",219000],["WA","Vancouver",190000],["WA","Bellevue",151000],["WA","Everett",111000],["WA","Kent",136000],["WA","Yakima",96000],["WA","Renton",106000],["WA","Spokane Valley",106000],["WA","Federal Way",101000],["WA","Bellingham",95000],["WA","Kennewick",84000],["WA","Auburn",88000],["WA","Pasco",78000],["WA","Marysville",71000],["WA","Lakewood",63000],["WA","Redmond",73000],["WA","Olympia",55000],["WA","Kirkland",92000],["WA","Burien",52000],["WA","Sammamish",68000],["WA","Richland",60000],["WA","Puyallup",43000],["DC","Washington",690000],["WV","Charleston",48000],["WV","Huntington",45000],["WV","Morgantown",30000],["WV","Parkersburg",28000],["WV","Wheeling",26000],["WV","Weirton",18000],["WI","Milwaukee",577000],["WI","Madison",270000],["WI","Green Bay",107000],["WI","Kenosha",100000],["WI","Racine",76000],["WI","Appleton",75000],["WI","Waukesha",72000],["WI","Eau Claire",69000],["WI","Oshkosh",67000],["WY","Cheyenne",65000],["WY","Casper",59000],["WY","Gillette",33000],["WY","Laramie",32000],["WY","Rock Springs",23000],
+];
+
+const STATE_CODE_TO_NAME = new Map([
+  ['AL', 'Alabama'],
+  ['AK', 'Alaska'],
+  ['AZ', 'Arizona'],
+  ['AR', 'Arkansas'],
+  ['CA', 'California'],
+  ['CO', 'Colorado'],
+  ['CT', 'Connecticut'],
+  ['DE', 'Delaware'],
+  ['DC', 'Washington DC'],
+  ['FL', 'Florida'],
+  ['GA', 'Georgia'],
+  ['HI', 'Hawaii'],
+  ['ID', 'Idaho'],
+  ['IL', 'Illinois'],
+  ['IN', 'Indiana'],
+  ['IA', 'Iowa'],
+  ['KS', 'Kansas'],
+  ['KY', 'Kentucky'],
+  ['LA', 'Louisiana'],
+  ['ME', 'Maine'],
+  ['MD', 'Maryland'],
+  ['MA', 'Massachusetts'],
+  ['MI', 'Michigan'],
+  ['MN', 'Minnesota'],
+  ['MS', 'Mississippi'],
+  ['MO', 'Missouri'],
+  ['MT', 'Montana'],
+  ['NE', 'Nebraska'],
+  ['NV', 'Nevada'],
+  ['NH', 'New Hampshire'],
+  ['NJ', 'New Jersey'],
+  ['NM', 'New Mexico'],
+  ['NY', 'New York'],
+  ['NC', 'North Carolina'],
+  ['ND', 'North Dakota'],
+  ['OH', 'Ohio'],
+  ['OK', 'Oklahoma'],
+  ['OR', 'Oregon'],
+  ['PA', 'Pennsylvania'],
+  ['RI', 'Rhode Island'],
+  ['SC', 'South Carolina'],
+  ['SD', 'South Dakota'],
+  ['TN', 'Tennessee'],
+  ['TX', 'Texas'],
+  ['UT', 'Utah'],
+  ['VT', 'Vermont'],
+  ['VA', 'Virginia'],
+  ['WA', 'Washington'],
+  ['WV', 'West Virginia'],
+  ['WI', 'Wisconsin'],
+  ['WY', 'Wyoming'],
+]);
+
+function normalize(name) {
+  return name.toLowerCase().trim().replace(/\./g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+const LOOKUP = new Map();
+CITY_POPULATIONS.forEach(([stateCode, city, population]) => {
+  LOOKUP.set(`${stateCode}|${normalize(city)}`, population);
+});
+
+function getCityTier(cityName, stateCode) {
+  if (!cityName || !stateCode) return null;
+  const population = LOOKUP.get(`${stateCode.toUpperCase()}|${normalize(cityName)}`);
+  if (population == null) return null;
+  const tier = population >= POPULATION_THRESHOLD ? 'major' : 'minor';
+  return { tier, population, price: tier === 'major' ? MAJOR_CITY_PRICE : MINOR_CITY_PRICE };
+}
+
+function stateNameFromCode(code) {
+  return STATE_CODE_TO_NAME.get((code || '').toUpperCase()) || code;
+}
+
+module.exports = { POPULATION_THRESHOLD, MAJOR_CITY_PRICE, MINOR_CITY_PRICE, getCityTier, stateNameFromCode };

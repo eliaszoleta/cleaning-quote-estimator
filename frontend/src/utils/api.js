@@ -54,6 +54,14 @@ export async function verifyCheckout(token, sessionId) {
   });
 }
 
+export async function postPartnerCheckout(payload) {
+  return apiFetch('/api/partner-checkout/checkout', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+export async function verifyPartnerCheckout(sessionId) {
+  return apiFetch('/api/partner-checkout/verify-checkout', { method: 'POST', body: JSON.stringify({ sessionId }) });
+}
+
 export async function getCompanyLeads(token) {
   return apiFetch('/api/company-leads/company', { headers: { Authorization: `Bearer ${token}` } });
 }

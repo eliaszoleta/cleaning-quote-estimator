@@ -9,6 +9,7 @@ const companyRouter = require('./routes/company');
 const authRouter = require('./routes/auth');
 const subscriptionRouter = require('./routes/subscription');
 const leadsRouter = require('./routes/leads');
+const partnerCheckoutRouter = require('./routes/partnerCheckout');
 const { requireAuth } = require('./middleware/auth');
 const { computeSubscriptionStatus } = require('./services/subscriptionStatus');
 const { DEFAULT_COMPANY_CONFIG } = require('./config/defaults');
@@ -50,10 +51,25 @@ app.use('/api/calculate', rateLimit({
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }));
 
+// Rate limiting on the public partner-checkout endpoints (unauthenticated,
+// creates real Stripe sessions) — generous enough for a real buyer retrying
+// a typo, tight enough to blunt scripted abuse.
+app.use('/api/partner-checkout', rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
 // ─── CRITICAL: Stripe webhook MUST be registered before express.json() ────────
 app.post('/api/subscription/webhook',
   express.raw({ type: 'application/json' }),
   subscriptionRouter.webhookHandler
+);
+app.post('/api/partner-checkout/webhook',
+  express.raw({ type: 'application/json' }),
+  partnerCheckoutRouter.webhookHandler
 );
 
 // Body parsing — after webhook
@@ -90,6 +106,10 @@ app.get('/api/company/:id/public', async (req, res) => {
 
 // Public leads API (API key auth handled inside router)
 app.use('/api/leads', leadsRouter);
+
+// Public partner-checkout API — anonymous prospects on /buy-city-placement
+// aren't logged-in company users, so this can't sit behind requireAuth.
+app.use('/api/partner-checkout', partnerCheckoutRouter);
 
 // ─── Auth-protected routes ────────────────────────────────────────────────────
 app.use('/api/company', requireAuth, companyRouter);
