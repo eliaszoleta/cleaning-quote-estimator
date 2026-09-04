@@ -85,6 +85,10 @@ export default function PartnerDemoPage() {
           <strong>2. The results-page card — try it below.</strong> This second placement only appears after a visitor completes an estimate, so run one through the calculator (any service works) to see it appear with your price.
         </div>
 
+        <p style={{ fontSize: 12.5, color: '#94a3b8', textAlign: 'center', margin: '0 0 28px' }}>
+          There's actually a third placement too — the same card shows up in the estimate email if a visitor opts in to get one — just not something this sandboxed demo can show live, since entering a real email below would trigger a real (partner-free) estimate email rather than one with sample data in it.
+        </p>
+
         <div style={{ maxWidth: 620, margin: '0 auto', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <CleaningCalculator embedded siteLanding demoPartner={SAMPLE_PARTNER} />
         </div>
