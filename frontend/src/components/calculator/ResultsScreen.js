@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, AlertTriangle, Zap, Phone, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
-import { getUserLocation, findPartner } from '../../utils/partnerLookup';
+import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import PartnerCard from '../partners/PartnerCard';
 
 export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset }) {
@@ -13,9 +13,12 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
   useEffect(() => {
     if (embedded) return;
-    getUserLocation().then(loc => {
-      if (loc) findPartner(loc.city, loc.state).then(setPartner);
-    });
+    // The lead-capture step (CleaningCalculator's handleLeadNext) already
+    // resolves and caches this exact match before the estimate email is
+    // sent -- reusing that cache here (instead of a second independent
+    // getUserLocation()+findPartner() round trip) is what makes the card
+    // appear immediately instead of after its own multi-second geo lookup.
+    getCachedPartnerMatch().then(setPartner);
   }, [embedded]);
 
   if (!result) return null;
