@@ -81,11 +81,17 @@ export async function findPartner(city, state) {
 
 // Resolves the visitor's matched partner (or null), reusing a sessionStorage
 // cache so repeated page loads in the same browsing session don't re-run
-// the geolocation + Supabase lookup every time.
+// the geolocation + Supabase lookup every time. Only a cached POSITIVE
+// match is trusted -- a cached "no partner found" is never reused, so one
+// transient failure (a slow geo lookup, a momentary network hiccup) can't
+// silently suppress the banner/card for the rest of the session.
 export async function getCachedPartnerMatch() {
   try {
     const cached = sessionStorage.getItem(CACHE_KEY);
-    if (cached) return JSON.parse(cached) || null;
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed) return parsed;
+    }
   } catch { /* sessionStorage unavailable — fall through and fetch live */ }
 
   const loc = await getUserLocation();
