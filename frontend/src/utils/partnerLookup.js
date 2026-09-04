@@ -34,7 +34,20 @@ export function normalizeStateName(input) {
   return resolveState(input).name;
 }
 
+// Tries the first-party /api/geo endpoint first (Vercel's own edge
+// geolocation headers -- see api/geo.js) since it's a same-origin request
+// that ad/tracker blockers can't single out the way they do a third-party
+// IP-lookup domain. Falls back to ipapi.co directly if that's unavailable
+// (e.g. local dev, where Vercel's geo headers don't exist).
 export async function getUserLocation() {
+  try {
+    const res = await fetch('/api/geo');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.city && data.state) return { city: data.city, state: data.state };
+    }
+  } catch { /* fall through to ipapi.co */ }
+
   try {
     const res = await fetch('https://ipapi.co/json/');
     const data = await res.json();
