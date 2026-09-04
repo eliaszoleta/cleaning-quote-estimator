@@ -223,16 +223,16 @@ export default function PartnerWithUs() {
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>Why This Traffic Converts</h2>
             <p style={{ fontSize: 15, color: '#64748b', maxWidth: 540, margin: '0 auto', lineHeight: 1.65 }}>Most advertising reaches people who aren&apos;t looking. Our visitors are different.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'clamp(12px, 3vw, 20px)' }}>
             {[
               { icon: <IconHome />, title: 'They already want the service', body: 'Every visitor used our estimator to price out a cleaning job. They came here because they need a cleaner &mdash; not because an ad interrupted them.' },
               { icon: <IconPin />, title: 'They give us their location', body: 'Users enter their ZIP code or city to get an accurate local estimate. We know exactly where they are and match them to you.' },
               { icon: <IconWallet />, title: 'They have a budget', body: "Our estimator gives them a price range. By the time they see your recommendation, they already know what to expect to pay and they're ready to book." },
             ].map((card, i) => (
-              <div key={i} style={{ background: '#f8fafc', borderRadius: 14, padding: '28px 24px', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(15,23,42,0.05)' }}>
-                <div style={{ width: 52, height: 52, background: '#eff6ff', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>{card.icon}</div>
-                <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 8 }}>{card.title}</div>
-                <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: card.body }} />
+              <div key={i} style={{ background: '#f8fafc', borderRadius: 14, padding: 'clamp(18px, 5vw, 28px) clamp(16px, 4vw, 24px)', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(15,23,42,0.05)' }}>
+                <div style={{ width: 'clamp(40px, 11vw, 52px)', height: 'clamp(40px, 11vw, 52px)', background: '#eff6ff', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 'clamp(10px, 3vw, 16px)' }}>{card.icon}</div>
+                <div style={{ fontWeight: 700, fontSize: 'clamp(14.5px, 3.8vw, 16px)', color: '#0f172a', marginBottom: 'clamp(5px, 1.5vw, 8px)' }}>{card.title}</div>
+                <div style={{ fontSize: 'clamp(12.5px, 3.4vw, 14px)', color: '#64748b', lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: card.body }} />
               </div>
             ))}
           </div>
@@ -262,22 +262,22 @@ export default function PartnerWithUs() {
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>Simple, Size-Based Pricing</h2>
             <p style={{ fontSize: 15, color: '#64748b' }}>Priced by city size, not a one-size-fits-all rate. No setup fees. No commissions. Cancel anytime.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, maxWidth: 700, margin: '0 auto 20px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: '1px solid #bfdbfe', borderRadius: 18, padding: 'clamp(24px, 4vw, 32px)' }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: PRIMARY, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Major City</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'clamp(12px, 3vw, 20px)', maxWidth: 700, margin: '0 auto 20px' }}>
+            <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: '1px solid #bfdbfe', borderRadius: 18, padding: 'clamp(16px, 5vw, 32px)' }}>
+              <div style={{ fontSize: 'clamp(11px, 3vw, 12.5px)', fontWeight: 700, color: PRIMARY, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'clamp(5px, 2vw, 8px)' }}>Major City</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
-                <span style={{ fontSize: 44, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px', lineHeight: 1 }}>${MAJOR_CITY_PRICE}</span>
-                <span style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>/month</span>
+                <span style={{ fontSize: 'clamp(28px, 8vw, 44px)', fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px', lineHeight: 1 }}>${MAJOR_CITY_PRICE}</span>
+                <span style={{ fontSize: 'clamp(12.5px, 3.5vw, 15px)', color: '#64748b', fontWeight: 500 }}>/month</span>
               </div>
-              <div style={{ fontSize: 13, color: '#64748b' }}>About {POPULATION_THRESHOLD.toLocaleString()}+ residents &mdash; e.g. Dallas, Seattle, Atlanta</div>
+              <div style={{ fontSize: 'clamp(11.5px, 3vw, 13px)', color: '#64748b' }}>About {POPULATION_THRESHOLD.toLocaleString()}+ residents &mdash; e.g. Dallas, Seattle, Atlanta</div>
             </div>
-            <div style={{ background: 'linear-gradient(135deg, #fdf4ff, #fef9ff)', border: '1px solid #e9d5ff', borderRadius: 18, padding: 'clamp(24px, 4vw, 32px)' }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#9333ea', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Smaller City</div>
+            <div style={{ background: 'linear-gradient(135deg, #fdf4ff, #fef9ff)', border: '1px solid #e9d5ff', borderRadius: 18, padding: 'clamp(16px, 5vw, 32px)' }}>
+              <div style={{ fontSize: 'clamp(11px, 3vw, 12.5px)', fontWeight: 700, color: '#9333ea', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'clamp(5px, 2vw, 8px)' }}>Smaller City</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
-                <span style={{ fontSize: 44, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px', lineHeight: 1 }}>${MINOR_CITY_PRICE}</span>
-                <span style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>/month</span>
+                <span style={{ fontSize: 'clamp(28px, 8vw, 44px)', fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px', lineHeight: 1 }}>${MINOR_CITY_PRICE}</span>
+                <span style={{ fontSize: 'clamp(12.5px, 3.5vw, 15px)', color: '#64748b', fontWeight: 500 }}>/month</span>
               </div>
-              <div style={{ fontSize: 13, color: '#64748b' }}>Under {POPULATION_THRESHOLD.toLocaleString()} residents &mdash; half the major-city rate</div>
+              <div style={{ fontSize: 'clamp(11.5px, 3vw, 13px)', color: '#64748b' }}>Under {POPULATION_THRESHOLD.toLocaleString()} residents &mdash; half the major-city rate</div>
             </div>
           </div>
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(24px, 4vw, 36px)', maxWidth: 700, margin: '0 auto' }}>
