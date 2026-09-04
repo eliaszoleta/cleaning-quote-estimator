@@ -111,6 +111,16 @@ export default function BlogPost({ slug }) {
     ],
   };
 
+  // Optional per-post FAQ schema -- only posts that define `faqs` get this
+  // block, so it's additive and doesn't affect posts without one. Directly
+  // targets AI Overviews / rich results, which pull heavily from FAQPage
+  // structured data for exactly this kind of Q&A content.
+  const faqSchema = post.faqs?.length ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: post.faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  } : null;
+
   return (
     <>
       <Helmet>
@@ -135,6 +145,7 @@ export default function BlogPost({ slug }) {
         <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         <script type="application/ld+json">{JSON.stringify(schema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
+        {faqSchema && <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>}
       </Helmet>
 
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '60px 24px' }}>

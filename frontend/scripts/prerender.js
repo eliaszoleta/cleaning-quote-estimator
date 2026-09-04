@@ -215,6 +215,15 @@ function renderBlogPost(post, cat, assets) {
     ],
   });
 
+  // Mirrors BlogPost.js's optional FAQPage schema -- only posts that define
+  // `faqs` get this block. Prerendered here too since this script generates
+  // the static HTML independently rather than server-rendering BlogPost.js.
+  const faqSchemaStr = (post.faqs && post.faqs.length) ? JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: post.faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  }) : null;
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -248,6 +257,7 @@ function renderBlogPost(post, cat, assets) {
   <meta name="twitter:image" content="${DOMAIN}/og-image.svg">
   <script type="application/ld+json">${articleSchemaStr}</script>
   <script type="application/ld+json">${breadcrumbSchemaStr}</script>
+  ${faqSchemaStr ? `<script type="application/ld+json">${faqSchemaStr}</script>` : ''}
   ${assets.cssLinks}
 </head>
 <body>
