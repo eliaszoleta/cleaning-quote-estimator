@@ -3,8 +3,15 @@ import { getAllStates } from '../data/statePricing';
 
 // Shared by ResultsScreen (inline partner card) and FloatingPartnerBanner
 // (sitewide corner banner) so both use the same match logic and, for the
-// banner, the same cached result -- avoids hitting ipapi.co and Supabase
-// again on every page load in this multi-page (non-SPA-routed) site.
+// banner, the same cached result -- avoids hitting Supabase again on every
+// page load in this multi-page (non-SPA-routed) site. Keyed by the detected
+// city/state (not just a flat "we have a match" flag) so a real location
+// change -- e.g. switching VPN servers -- invalidates it immediately on the
+// next load instead of only after sessionStorage itself is cleared (a new
+// tab). That distinction matters for partners themselves checking coverage
+// via VPN: without it, their own banner would keep showing everywhere they
+// reload, since the cache couldn't tell "still the same city" apart from
+// "just navigated to another page."
 const CACHE_KEY = 'cleanestimator_partner_match';
 
 // The admin form's state field is free text with no validation ("full name,
@@ -79,25 +86,33 @@ export async function findPartner(city, state) {
   return data?.[0]?.partners || null;
 }
 
-// Resolves the visitor's matched partner (or null), reusing a sessionStorage
-// cache so repeated page loads in the same browsing session don't re-run
-// the geolocation + Supabase lookup every time. Only a cached POSITIVE
-// match is trusted -- a cached "no partner found" is never reused, so one
-// transient failure (a slow geo lookup, a momentary network hiccup) can't
-// silently suppress the banner/card for the rest of the session.
+// Resolves the visitor's matched partner (or null). Always re-checks the
+// (cheap, same-origin) geolocation first, then reuses the cached partner
+// only if it was resolved for that exact city/state -- so the (comparatively
+// expensive) Supabase lookup is skipped on every same-location page load,
+// but a genuine location change (VPN switch, real travel) is picked up on
+// the very next load instead of persisting for the rest of the tab's
+// session. If geolocation itself fails, skip the cache entirely rather than
+// guessing -- better to show nothing for this load than serve a stale city.
 export async function getCachedPartnerMatch() {
+  const loc = await getUserLocation();
+  if (!loc) return null;
+
   try {
     const cached = sessionStorage.getItem(CACHE_KEY);
     if (cached) {
       const parsed = JSON.parse(cached);
-      if (parsed) return parsed;
+      if (parsed && parsed.city === loc.city && parsed.state === loc.state) {
+        return parsed.partner;
+      }
     }
   } catch { /* sessionStorage unavailable — fall through and fetch live */ }
 
-  const loc = await getUserLocation();
-  const partner = loc ? await findPartner(loc.city, loc.state) : null;
+  const partner = await findPartner(loc.city, loc.state);
 
-  try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(partner)); } catch { /* ignore quota/private-mode errors */ }
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ city: loc.city, state: loc.state, partner }));
+  } catch { /* ignore quota/private-mode errors */ }
 
   return partner;
 }
