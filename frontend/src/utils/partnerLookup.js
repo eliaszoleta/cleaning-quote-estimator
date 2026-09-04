@@ -34,21 +34,19 @@ export function normalizeStateName(input) {
   return resolveState(input).name;
 }
 
-// Tries the first-party /api/geo endpoint first (backend/src/index.js --
-// reads the x-vercel-ip-* headers Vercel's edge attaches to every request
-// before proxying to Railway) since it's a same-origin request that ad/
-// tracker blockers can't single out the way they do a third-party IP-lookup
-// domain. Deliberately a plain relative fetch, not routed through
-// REACT_APP_API_URL like other API calls -- it has to hit this same origin
-// (www.cleanestimator.com) so the request actually passes through Vercel's
-// edge network and picks up those headers in the first place. Falls back
+// Tries the first-party /api/geo endpoint first (a Vercel Function, see
+// api/geo.js) since it's a same-origin request that ad/tracker blockers
+// can't single out the way they do a third-party IP-lookup domain. Has to
+// be an actual Vercel Function, not routed through the Railway proxy --
+// confirmed Vercel's x-vercel-ip-* geolocation headers aren't present on
+// requests that only pass through a rewrite-to-external-URL. Falls back
 // to ipapi.co directly if unavailable (e.g. local dev).
 export async function getUserLocation() {
   try {
     const res = await fetch('/api/geo');
     if (res.ok) {
-      const { data } = await res.json();
-      if (data?.city && data?.state) return { city: data.city, state: data.state };
+      const data = await res.json();
+      if (data.city && data.state) return { city: data.city, state: data.state };
     }
   } catch { /* fall through to ipapi.co */ }
 

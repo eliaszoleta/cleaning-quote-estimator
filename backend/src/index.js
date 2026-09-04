@@ -88,23 +88,6 @@ app.get('/api/company/:id/public', async (req, res) => {
   }
 });
 
-// Visitor geolocation for partner matching (see frontend's partnerLookup.js)
-// -- reads the x-vercel-ip-* headers Vercel's edge network attaches before
-// proxying here, so the site can detect location without the browser
-// calling a third-party IP-lookup API (ipapi.co), which ad/tracker
-// blockers -- Brave Shields, VPN "threat protection" features, etc. --
-// commonly block outright, silently breaking location detection.
-app.get('/api/geo', publicCors, (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      city: req.headers['x-vercel-ip-city'] ? decodeURIComponent(req.headers['x-vercel-ip-city']) : null,
-      state: req.headers['x-vercel-ip-country-region'] || null,
-      country: req.headers['x-vercel-ip-country'] || null,
-    },
-  });
-});
-
 // Public leads API (API key auth handled inside router)
 app.use('/api/leads', leadsRouter);
 

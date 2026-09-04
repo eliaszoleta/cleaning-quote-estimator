@@ -3,6 +3,10 @@
   "outputDirectory": "frontend/build",
   "rewrites": [
     {
+      "source": "/api/geo",
+      "destination": "/api/geo"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://cleaning-quote-estimator-production.up.railway.app/api/:path*"
     },
