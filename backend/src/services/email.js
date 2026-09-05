@@ -303,4 +303,123 @@ async function sendPartnerWelcomeEmail({ to, businessName, cities }) {
   }
 }
 
-module.exports = { sendEstimateEmail, sendPartnerWelcomeEmail };
+const TIMELINE_LABELS = {
+  asap: 'ASAP',
+  week: 'This week',
+  month: 'This month',
+  planning: 'Just planning',
+};
+
+function buildLeadContactLines({ leadEmail, leadPhone, zip, timeline, preferredContact }) {
+  return [
+    leadEmail ? `Email: ${leadEmail}` : null,
+    leadPhone ? `Phone: ${leadPhone}` : null,
+    zip ? `ZIP: ${zip}` : null,
+    timeline ? `Timeline: ${TIMELINE_LABELS[timeline] || timeline}` : null,
+    preferredContact ? `Prefers to be contacted by: ${preferredContact}` : null,
+  ].filter(Boolean);
+}
+
+function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, preferredContact }) {
+  const name = leadName || 'A visitor';
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline, preferredContact });
+
+  return [
+    'New lead in your area!',
+    '',
+    `${name} just got a ${serviceLabel.toLowerCase()} estimate on Clean Estimator: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}.`,
+    '',
+    'Contact info:',
+    ...contactLines.map(l => `  ${l}`),
+    '',
+    'Reply to this email to reach them directly, or use the contact info above.',
+    '',
+    "They opted in to be connected with a local cleaning professional -- that's you, as our exclusive partner in this area.",
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, preferredContact }) {
+  const name = leadName || 'A visitor';
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline, preferredContact });
+
+  const contactRows = contactLines.map(l => {
+    const [label, ...rest] = l.split(': ');
+    const value = rest.join(': ');
+    return `
+    <tr>
+      <td style="padding:5px 0;color:#666666;font-size:13.5px;">${label}</td>
+      <td style="padding:5px 0;text-align:right;font-size:13.5px;color:#111111;font-weight:600;">${value}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead in your area!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on Clean Estimator: <strong>${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</strong>.
+  </p>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
+  <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
+    ${contactRows}
+  </table>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Reply to this email to reach them directly, or use the contact info above.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    They opted in to be connected with a local cleaning professional — that's you, as our exclusive partner in this area.<br>
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent to the matched partner the moment a visitor in their (exclusive)
+// city opts in for their estimate email -- turns the partnership from
+// "shows up passively on the results page/banner/email" into an actual
+// warm lead landing in the partner's inbox, ready to call or reply to.
+// Fire-and-forget, same as the other partner emails; only called from
+// calculate.js when partnerInfo is present and has an email on file.
+async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, zip, timeline, preferredContact }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendPartnerLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!partnerEmail) {
+    console.warn('sendPartnerLeadEmail skipped: no partner email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+  const args = { leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, preferredContact };
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [partnerEmail],
+        // Lets the partner just hit "reply" in their inbox to reach the
+        // lead directly, without ever needing to copy the contact info out.
+        reply_to: leadEmail || undefined,
+        subject: `New lead in your area: ${SERVICE_LABELS[serviceType] || 'cleaning'} — ${fmtMoney(priceLow)}-${fmtMoney(priceHigh)}`,
+        html: buildPartnerLeadHtml(args),
+        text: buildPartnerLeadText(args),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendPartnerLeadEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+module.exports = { sendEstimateEmail, sendPartnerWelcomeEmail, sendPartnerLeadEmail };

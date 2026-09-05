@@ -4,12 +4,45 @@ const { calculateCleaning } = require('../services/cleaningCalculation');
 const { STATE_PRICING_MULTIPLIERS, STATE_AVERAGE_HOME_CLEANING_COST, STATE_NAMES } = require('../config/defaults');
 const { getCompanyConfig } = require('../services/companyConfig');
 const { saveLead } = require('./leads');
-const { sendEstimateEmail } = require('../services/email');
+const { sendEstimateEmail, sendPartnerLeadEmail } = require('../services/email');
 
 const VALID_SERVICE_TYPES = [
   'home_residential', 'apartment', 'commercial', 'carpet',
   'air_duct', 'dryer_vent', 'tile_grout', 'mold_remediation', 'water_damage',
 ];
+
+function getSupabase() {
+  const { createClient } = require('@supabase/supabase-js');
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key, { auth: { persistSession: false } });
+}
+
+// req.body.partnerInfo is whatever the browser's own (client-side, anon-key)
+// partner match produced -- never trust its .email for anything that sends
+// mail, or anyone could POST directly to this endpoint with a fabricated
+// partnerInfo.email and get us to send an arbitrary "new lead" email to any
+// address, using our domain's sending reputation. This re-looks-up the
+// partner by id against our own database and only ever sends to the email
+// on file there, only if that partner is still active.
+async function getVerifiedPartnerEmail(partnerId) {
+  if (!partnerId) return null;
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  try {
+    const { data } = await supabase
+      .from('partners')
+      .select('email, active')
+      .eq('id', partnerId)
+      .eq('active', true)
+      .maybeSingle();
+    return data?.email || null;
+  } catch (err) {
+    console.warn('getVerifiedPartnerEmail failed:', err.message);
+    return null;
+  }
+}
 
 // POST /api/calculate
 router.post('/', async (req, res) => {
@@ -74,6 +107,30 @@ router.post('/', async (req, res) => {
         companyConfig,
         partner: partnerInfo || null,
       }).catch(err => console.error('Estimate email failed:', err.message));
+
+      // Forward the same lead to the matched partner, if any -- the
+      // lead-capture form already tells visitors "we'll connect you with
+      // local cleaning professionals," so this makes that a proactive
+      // handoff instead of just a passive listing they might not click.
+      if (partnerInfo && partnerInfo.id) {
+        getVerifiedPartnerEmail(partnerInfo.id)
+          .then(partnerEmail => {
+            if (!partnerEmail) return;
+            return sendPartnerLeadEmail({
+              partnerEmail,
+              leadName: leadInfo.name,
+              leadEmail: leadInfo.email,
+              leadPhone: leadInfo.phone,
+              serviceType,
+              priceLow: result.totalLow,
+              priceHigh: result.totalHigh,
+              zip: zip || null,
+              timeline: leadInfo.timeline || null,
+              preferredContact: leadInfo.preferredContact || null,
+            });
+          })
+          .catch(err => console.error('Partner lead email failed:', err.message));
+      }
     }
 
     res.json({ success: true, data: result });
