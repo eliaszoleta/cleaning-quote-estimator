@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, MapPin, Phone, Eye, PhoneCall, TrendingUp, ChevronDown, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { LogOut, MapPin, Phone, Eye, PhoneCall, TrendingUp, ChevronDown, ArrowUpRight, ArrowDownRight, Minus, Mail } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 // Small hover/entrance touches that inline styles can't express (:hover,
@@ -37,6 +37,7 @@ function countsInRange(events, start, end) {
   return {
     impressions: inRange.filter(e => e.event_type === 'impression').length,
     calls: inRange.filter(e => e.event_type === 'call_click').length,
+    leads: inRange.filter(e => e.event_type === 'lead_email').length,
   };
 }
 
@@ -122,12 +123,12 @@ export default function ClientDashboard({ user, onLogout }) {
     );
   }
 
-  const allTime = { impressions: stats?.impressions || 0, calls: stats?.calls || 0 };
+  const allTime = { impressions: stats?.impressions || 0, calls: stats?.calls || 0, leads: stats?.leads || 0 };
   const thisMonth = countsInRange(monthlyEvents, ranges.thisMonth.start, ranges.thisMonth.end);
   const lastMonth = countsInRange(monthlyEvents, ranges.lastMonth.start, ranges.lastMonth.end);
   const current = period === 'this_month' ? thisMonth : period === 'last_month' ? lastMonth : allTime;
 
-  const { impressions, calls } = current;
+  const { impressions, calls, leads } = current;
   const ctr = impressions > 0 ? ((calls / impressions) * 100).toFixed(1) : '0.0';
 
   const showTrend = period === 'this_month';
@@ -171,6 +172,10 @@ export default function ClientDashboard({ user, onLogout }) {
             icon={PhoneCall} label="Call Button Taps" value={calls.toLocaleString()} color="#16a34a" bg="#f0fdf4"
             trend={showTrend && <TrendBadge current={thisMonth.calls} previous={lastMonth.calls} />}
           />
+          <StatCard
+            icon={Mail} label="Leads Emailed to You" value={leads.toLocaleString()} color="#ea580c" bg="#fff7ed"
+            trend={showTrend && <TrendBadge current={thisMonth.leads} previous={lastMonth.leads} />}
+          />
           <StatCard icon={TrendingUp} label="Click-Through Rate" value={`${ctr}%`} color="#7c3aed" bg="#f5f3ff" />
         </div>
 
@@ -190,6 +195,9 @@ export default function ClientDashboard({ user, onLogout }) {
               </p>
               <p style={{ margin: '0 0 10px' }}>
                 <strong style={{ color: '#0f172a' }}>Call Button Taps</strong> — how many times a visitor tapped the "Call" button on your listing. That opens their phone's dialer with your number already filled in: it's someone actively choosing to call your business over every other cleaner they could have picked. We can't see whether the call itself connected or how long it lasted — that happens on their phone, off our site — so this counts the tap, not a confirmed call. Your number is also printed right on the listing, so some visitors call by dialing it themselves instead of tapping — meaning your actual call volume from cleanestimator.com is likely a bit higher than this number.
+              </p>
+              <p style={{ margin: '0 0 10px' }}>
+                <strong style={{ color: '#0f172a' }}>Leads Emailed to You</strong> — every time a visitor in one of your service areas gets their estimate emailed to them, we send you that same lead's name, contact info, and timeline directly, with reply-to set to their email so you can just hit reply. This is the most actionable number on this dashboard — these are people who already have their price and are actively looking, not just someone who saw your banner.
               </p>
               <p style={{ margin: 0 }}>
                 <strong style={{ color: '#0f172a' }}>Click-Through Rate</strong> — the share of banner views that turned into a call tap. It's the clearest read on how compelling your listing is once someone actually sees it, and a good number to watch as your service areas or listing details change.

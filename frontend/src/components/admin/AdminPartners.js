@@ -290,12 +290,14 @@ export default function AdminPartners() {
 function PartnerBannerStats({ stats }) {
   const impressions = stats?.impressions || 0;
   const calls = stats?.calls || 0;
-  if (!impressions && !calls) return null;
+  const leads = stats?.leads || 0;
+  if (!impressions && !calls && !leads) return null;
   const ctr = impressions > 0 ? ((calls / impressions) * 100).toFixed(1) : '0.0';
   return (
     <div style={{ display: 'flex', gap: 12, marginTop: 6, fontSize: 12, color: '#374151' }}>
       <span><strong>{impressions.toLocaleString()}</strong> banner views</span>
       <span><strong>{calls.toLocaleString()}</strong> call button taps</span>
+      <span><strong>{leads.toLocaleString()}</strong> leads emailed</span>
       <span style={{ color: '#94a3b8' }}>{ctr}% CTR</span>
     </div>
   );

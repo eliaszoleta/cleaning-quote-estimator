@@ -44,6 +44,19 @@ async function getVerifiedPartnerEmail(partnerId) {
   }
 }
 
+// Same table logBannerEvent() in partnerLookup.js writes impression/call_click
+// rows to (from the browser, anon key) -- this is the backend's equivalent
+// for the one event type that only ever happens server-side.
+async function logLeadEmailEvent(partnerId) {
+  const supabase = getSupabase();
+  if (!supabase) return;
+  try {
+    await supabase.from('partner_banner_events').insert({ partner_id: partnerId, event_type: 'lead_email' });
+  } catch (err) {
+    console.warn('logLeadEmailEvent failed:', err.message);
+  }
+}
+
 // POST /api/calculate
 router.post('/', async (req, res) => {
   const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo } = req.body;
@@ -113,10 +126,11 @@ router.post('/', async (req, res) => {
       // local cleaning professionals," so this makes that a proactive
       // handoff instead of just a passive listing they might not click.
       if (partnerInfo && partnerInfo.id) {
-        getVerifiedPartnerEmail(partnerInfo.id)
-          .then(partnerEmail => {
+        const partnerIdForLead = partnerInfo.id;
+        getVerifiedPartnerEmail(partnerIdForLead)
+          .then(async partnerEmail => {
             if (!partnerEmail) return;
-            return sendPartnerLeadEmail({
+            const sent = await sendPartnerLeadEmail({
               partnerEmail,
               leadName: leadInfo.name,
               leadEmail: leadInfo.email,
@@ -127,6 +141,11 @@ router.post('/', async (req, res) => {
               zip: zip || null,
               timeline: leadInfo.timeline || null,
             });
+            // Logged as a partner_banner_events row (same table/pattern as
+            // banner impressions and call-button taps) so it shows up
+            // alongside those in the partner's KPI dashboard. Only counted
+            // on an actual successful send, not just an attempt.
+            if (sent) await logLeadEmailEvent(partnerIdForLead);
           })
           .catch(err => console.error('Partner lead email failed:', err.message));
       }
