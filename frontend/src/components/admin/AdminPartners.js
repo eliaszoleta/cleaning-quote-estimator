@@ -12,7 +12,8 @@ const EMPTY_FORM = {
   business_name: '',
   address: '',
   phone: '',
-  email: '',
+  personal_email: '',
+  business_email: '',
   website: '',
   logo_url: '',
   active: true,
@@ -127,7 +128,8 @@ export default function AdminPartners() {
       business_name: p.business_name,
       address: p.address || '',
       phone: p.phone || '',
-      email: p.email || '',
+      personal_email: p.personal_email || '',
+      business_email: p.business_email || '',
       website: p.website || '',
       logo_url: p.logo_url || '',
       active: p.active,
@@ -220,8 +222,14 @@ export default function AdminPartners() {
                   <input style={inputStyle} type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Email</label>
-                  <input type="email" style={inputStyle} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Personal Email</label>
+                  <input type="email" style={inputStyle} value={form.personal_email} onChange={e => setForm(f => ({ ...f, personal_email: e.target.value }))} />
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>What they sign in with at /client for their KPI dashboard. Never shown publicly.</div>
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Business Email</label>
+                  <input type="email" style={inputStyle} value={form.business_email} onChange={e => setForm(f => ({ ...f, business_email: e.target.value }))} />
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>Where opted-in leads get forwarded, and shown on the results card/banner.</div>
                 </div>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Website URL</label>
@@ -261,6 +269,13 @@ export default function AdminPartners() {
                   <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{p.business_name}</div>
                   {(p.address || p.phone) && (
                     <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 2 }}>{p.address}{p.address && p.phone && ' · '}{p.phone}</div>
+                  )}
+                  {(p.personal_email || p.business_email) && (
+                    <div style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 2 }}>
+                      {p.personal_email && <>Personal: {p.personal_email}</>}
+                      {p.personal_email && p.business_email && '  ·  '}
+                      {p.business_email && <>Business: {p.business_email}</>}
+                    </div>
                   )}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 6 }}>
                     {(locationsByPartner[p.id] || []).map((loc, i) => (

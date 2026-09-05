@@ -41,10 +41,12 @@ function countsInRange(events, start, end) {
   };
 }
 
-// Matches the logged-in partner to their `partners` row by email (the same
-// email they signed up the account with), then shows their service areas
-// and floating-banner KPIs (partner_banner_stats), filterable by All
-// Time/This Month/Last Month. Read-only -- editing listing details is
+// Matches the logged-in partner to their `partners` row by personal_email
+// (the same email they signed up the account with -- separate from
+// business_email, the public one leads get forwarded to), then shows
+// their service areas and floating-banner KPIs (partner_banner_stats),
+// filterable by All Time/This Month/Last Month. Read-only -- editing
+// listing details is
 // still done by the site owner via /admin/partners.
 export default function ClientDashboard({ user, onLogout }) {
   const [state, setState] = useState('loading'); // loading | not_found | ready | error
@@ -63,7 +65,7 @@ export default function ClientDashboard({ user, onLogout }) {
       const { data: partnerRows, error: pErr } = await supabase
         .from('partners')
         .select('*')
-        .ilike('email', user.email)
+        .ilike('personal_email', user.email)
         .limit(1);
 
       if (pErr || !partnerRows || partnerRows.length === 0) {

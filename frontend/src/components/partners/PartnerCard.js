@@ -52,8 +52,8 @@ export default function PartnerCard({ partner }) {
             <Globe size={13} /> Visit Website
           </a>
         )}
-        {partner.email && (
-          <a href={`mailto:${partner.email}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: '1.5px solid #cbd5e1', color: '#374151', padding: '9px 18px', borderRadius: 8, textDecoration: 'none', fontWeight: 600, fontSize: 13.5, background: 'white' }}>
+        {partner.business_email && (
+          <a href={`mailto:${partner.business_email}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: '1.5px solid #cbd5e1', color: '#374151', padding: '9px 18px', borderRadius: 8, textDecoration: 'none', fontWeight: 600, fontSize: 13.5, background: 'white' }}>
             <Mail size={13} /> Email
           </a>
         )}

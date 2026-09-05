@@ -5,9 +5,11 @@ import { supabase } from '../../lib/supabase';
 // Partner-facing login/signup, adapted from dashboard/AuthPage.js (the
 // company portal's auth screen) -- same real Supabase Auth flow, just
 // without the "company name" signup field and with partner-specific
-// branding/copy. A partner signs up with the SAME email their `partners`
-// row was created with; ClientDashboard matches on that email to find
-// their data. No admin-generated passwords, no backend/service-role work.
+// branding/copy. A partner signs up with their `partners` row's
+// personal_email (deliberately separate from business_email, which is
+// public and used for lead forwarding); ClientDashboard matches on
+// personal_email to find their data. No admin-generated passwords, no
+// backend/service-role work.
 export default function ClientAuthPage({ onAuth }) {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
@@ -40,11 +42,11 @@ export default function ClientAuthPage({ onAuth }) {
         const { data: matches } = await supabase
           .from('partners')
           .select('id')
-          .ilike('email', email.trim())
+          .ilike('personal_email', email.trim())
           .eq('active', true)
           .limit(1);
         if (!matches || matches.length === 0) {
-          setError("We couldn't find an active partner listing using this email address. Make sure you're using the exact email your listing was set up with.");
+          setError("We couldn't find an active partner listing using this email address. Make sure you're using the exact personal email your listing was set up with.");
           setLoading(false);
           return;
         }
@@ -155,7 +157,7 @@ export default function ClientAuthPage({ onAuth }) {
               onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
               onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
             {mode === 'signup' && (
-              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>Must match the email on file for your business listing.</p>
+              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>Must match the personal email on file for your business listing.</p>
             )}
           </div>
 

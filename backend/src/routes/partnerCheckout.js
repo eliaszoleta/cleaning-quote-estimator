@@ -139,10 +139,11 @@ function resolveCities(rawCities) {
 // logged-in company user yet). Creates one Stripe subscription checkout
 // session with one line item per city, priced from our own city-tier data.
 router.post('/checkout', async (req, res) => {
-  const { business_name, address, phone, email, website, logo_url, cities } = req.body || {};
+  const { business_name, address, phone, personal_email, business_email, website, logo_url, cities } = req.body || {};
 
   if (!business_name || !business_name.trim()) return res.status(400).json({ success: false, error: 'Business name is required' });
-  if (!email || !email.trim()) return res.status(400).json({ success: false, error: 'Email is required' });
+  if (!personal_email || !personal_email.trim()) return res.status(400).json({ success: false, error: 'Personal email is required' });
+  if (!business_email || !business_email.trim()) return res.status(400).json({ success: false, error: 'Business email is required' });
   if (!phone || !phone.trim()) return res.status(400).json({ success: false, error: 'Phone is required' });
 
   const { cities: resolvedCities, error: cityError } = resolveCities(cities);
@@ -180,7 +181,10 @@ router.post('/checkout', async (req, res) => {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: lineItems,
-      customer_email: email.trim(),
+      // The buyer -- the human doing the checkout and receiving Stripe's
+      // own billing receipts -- is the personal email, not the shared
+      // business inbox leads get forwarded to.
+      customer_email: personal_email.trim(),
       success_url: `${FRONTEND_URL}/buy-city-placement/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/buy-city-placement`,
       metadata: {
@@ -188,7 +192,8 @@ router.post('/checkout', async (req, res) => {
         business_name: business_name.trim(),
         address: (address || '').trim(),
         phone: phone.trim(),
-        email: email.trim(),
+        personal_email: personal_email.trim(),
+        business_email: business_email.trim(),
         website: (website || '').trim(),
         logo_url: (logo_url || '').trim(),
         cities: JSON.stringify(resolvedCities.map(c => [c.city, c.stateCode])),
@@ -240,7 +245,8 @@ async function provisionPartner(session) {
       business_name: meta.business_name,
       address: meta.address || null,
       phone: meta.phone || null,
-      email: meta.email || null,
+      personal_email: meta.personal_email || null,
+      business_email: meta.business_email || null,
       website: meta.website || null,
       logo_url: meta.logo_url || null,
       active: true,
@@ -305,7 +311,10 @@ async function provisionPartner(session) {
   // the success page shows the same message regardless.
   if (availableCities.length > 0) {
     sendPartnerWelcomeEmail({
-      to: partner.email,
+      // Personal email, not business_email -- this is addressed to the
+      // human who just bought the placement and needs to know how to sign
+      // up at /client, not the shared business inbox.
+      to: partner.personal_email,
       businessName: partner.business_name,
       cities: availableCities.map(([city, stateCode]) => `${city}, ${stateCode}`),
     });
@@ -339,7 +348,7 @@ router.post('/verify-checkout', async (req, res) => {
       data: {
         paid: true,
         businessName: partner.business_name,
-        email: partner.email,
+        personalEmail: partner.personal_email,
       },
     });
   } catch (err) {

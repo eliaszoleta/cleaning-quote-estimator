@@ -24,8 +24,10 @@ function getSupabase() {
 // mail, or anyone could POST directly to this endpoint with a fabricated
 // partnerInfo.email and get us to send an arbitrary "new lead" email to any
 // address, using our domain's sending reputation. This re-looks-up the
-// partner by id against our own database and only ever sends to the email
-// on file there, only if that partner is still active.
+// partner by id against our own database and only ever sends to the
+// business_email on file there (not personal_email, which is only for
+// /client login and never used for lead forwarding), only if that partner
+// is still active.
 async function getVerifiedPartnerEmail(partnerId) {
   if (!partnerId) return null;
   const supabase = getSupabase();
@@ -33,11 +35,11 @@ async function getVerifiedPartnerEmail(partnerId) {
   try {
     const { data } = await supabase
       .from('partners')
-      .select('email, active')
+      .select('business_email, active')
       .eq('id', partnerId)
       .eq('active', true)
       .maybeSingle();
-    return data?.email || null;
+    return data?.business_email || null;
   } catch (err) {
     console.warn('getVerifiedPartnerEmail failed:', err.message);
     return null;

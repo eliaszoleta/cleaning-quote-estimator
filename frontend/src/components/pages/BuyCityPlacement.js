@@ -187,7 +187,7 @@ function LogoField({ value, onChange }) {
 
 export default function BuyCityPlacement() {
   const [cities, setCities] = useState([]);
-  const [form, setForm] = useState({ business_name: '', email: '', phone: '', address: '', website: '', logo_url: '' });
+  const [form, setForm] = useState({ business_name: '', business_email: '', personal_email: '', phone: '', address: '', website: '', logo_url: '' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [takenKeys, setTakenKeys] = useState(() => new Set());
@@ -210,7 +210,7 @@ export default function BuyCityPlacement() {
 
   const setField = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }));
 
-  const canSubmit = cities.length > 0 && form.business_name.trim() && form.email.trim() && form.phone.trim() && !submitting;
+  const canSubmit = cities.length > 0 && form.business_name.trim() && form.business_email.trim() && form.personal_email.trim() && form.phone.trim() && !submitting;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -304,9 +304,9 @@ export default function BuyCityPlacement() {
               <input style={inputStyle} value={form.business_name} onChange={setField('business_name')} placeholder="Sparkle Clean Co." required />
             </div>
             <div style={{ marginBottom: 14 }}>
-              <label style={labelStyle}>Email *</label>
-              <input style={inputStyle} type="email" value={form.email} onChange={setField('email')} placeholder="you@yourbusiness.com" required />
-              <p style={{ fontSize: 11.5, color: '#94a3b8', margin: '5px 0 0' }}>Use the email you'll sign in with at /client for your dashboard &mdash; it has to match exactly.</p>
+              <label style={labelStyle}>Business email *</label>
+              <input style={inputStyle} type="email" value={form.business_email} onChange={setField('business_email')} placeholder="contact@yourbusiness.com" required />
+              <p style={{ fontSize: 11.5, color: '#94a3b8', margin: '5px 0 0' }}>Shown publicly on your listing, and where opted-in leads get emailed. Can be a shared inbox.</p>
             </div>
             <div style={{ marginBottom: 14 }}>
               <label style={labelStyle}>Phone *</label>
@@ -321,6 +321,16 @@ export default function BuyCityPlacement() {
               <input style={inputStyle} value={form.website} onChange={setField('website')} placeholder="https://yourbusiness.com" />
             </div>
             <LogoField value={form.logo_url} onChange={url => setForm(f => ({ ...f, logo_url: url }))} />
+          </div>
+
+          <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e2e8f0', padding: 'clamp(18px, 4vw, 26px)', marginBottom: 20 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>3. Your account</div>
+            <p style={{ fontSize: 12.5, color: '#64748b', margin: '0 0 14px' }}>For your KPI dashboard login &mdash; kept separate from your business email above, so leads never land in your personal inbox.</p>
+            <div>
+              <label style={labelStyle}>Personal email *</label>
+              <input style={inputStyle} type="email" value={form.personal_email} onChange={setField('personal_email')} placeholder="you@gmail.com" required />
+              <p style={{ fontSize: 11.5, color: '#94a3b8', margin: '5px 0 0' }}>What you'll sign in with at /client to see your KPI dashboard &mdash; never shown publicly.</p>
+            </div>
           </div>
 
           {error && (
