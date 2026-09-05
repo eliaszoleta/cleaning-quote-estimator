@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search, X, ArrowRight, Loader2, Lock, Upload } from 'lucide-react';
+import { formatPhoneInput } from '../../utils/formatPhone';
 import { STATES_WITH_CITIES } from '../partners/CityTierBrowser';
 import { postPartnerCheckout, getTakenCities, uploadPartnerLogo } from '../../utils/api';
 
@@ -309,7 +310,7 @@ export default function BuyCityPlacement() {
             </div>
             <div style={{ marginBottom: 14 }}>
               <label style={labelStyle}>Phone *</label>
-              <input style={inputStyle} type="tel" value={form.phone} onChange={setField('phone')} placeholder="(555) 123-4567" required />
+              <input style={inputStyle} type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 123-4567" required />
             </div>
             <div style={{ marginBottom: 14 }}>
               <label style={labelStyle}>Address</label>

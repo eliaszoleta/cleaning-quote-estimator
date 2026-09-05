@@ -32,6 +32,21 @@ function fmtMoney(n) {
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }
 
+// Normalizes any phone string to (XXX) XXX-XXXX for display in an email,
+// regardless of how it was stored -- older partner rows, admin-entered
+// numbers, or a lead who pasted digits some other way might not already
+// be in that format even though every phone <input> in the app now
+// formats as-you-type. Only reformats a clean 10-digit US number (or 11
+// with a leading 1); anything else (extension, international, garbled)
+// is left exactly as stored rather than risking corrupting it.
+function fmtPhone(value) {
+  if (!value) return value;
+  let digits = String(value).replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1);
+  if (digits.length !== 10) return value;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
 function fmtAdjustment(adj) {
   if (adj.low === 0 && adj.high === 0) return 'Included';
   if (adj.low < 0 || adj.high < 0) return `−${fmtMoney(Math.abs(adj.low))} – −${fmtMoney(Math.abs(adj.high))}`;
@@ -65,7 +80,7 @@ function buildPartnerSection(partner) {
   if (!partner) return '';
   const lines = [
     partner.address || '',
-    partner.phone ? `Phone: ${partner.phone}` : '',
+    partner.phone ? `Phone: ${fmtPhone(partner.phone)}` : '',
     partner.website ? `Website: <a href="${partner.website}" style="color:#2563eb;">${partner.website.replace(/^https?:\/\//, '')}</a>` : '',
   ].filter(Boolean).join('<br>');
 
@@ -117,7 +132,7 @@ function buildText({ name, serviceType, result, companyConfig, partner }) {
   if (partner) {
     lines.push('', 'Recommended cleaner near you:', partner.business_name);
     if (partner.address) lines.push(partner.address);
-    if (partner.phone) lines.push(`Phone: ${partner.phone}`);
+    if (partner.phone) lines.push(`Phone: ${fmtPhone(partner.phone)}`);
     if (partner.website) lines.push(`Website: ${partner.website}`);
   } else {
     const ctaText = companyConfig?.ctaButtonText || 'Get an exact quote';
@@ -313,7 +328,7 @@ const TIMELINE_LABELS = {
 function buildLeadContactLines({ leadEmail, leadPhone, zip, timeline }) {
   return [
     leadEmail ? `Email: ${leadEmail}` : null,
-    leadPhone ? `Phone: ${leadPhone}` : null,
+    leadPhone ? `Phone: ${fmtPhone(leadPhone)}` : null,
     zip ? `ZIP: ${zip}` : null,
     timeline ? `Timeline: ${TIMELINE_LABELS[timeline] || timeline}` : null,
   ].filter(Boolean);

@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-
-// Progressively formats digits as (XXX) XXX-XXXX while typing -- matches
-// the placeholder's own format instead of leaving the raw digit string
-// on screen. US-only, consistent with the rest of the site (all 50
-// states + DC, no international numbers anywhere else in this flow).
-// Caps at 10 digits so pasting a longer string doesn't overflow the mask.
-function formatPhoneInput(value) {
-  const digits = value.replace(/\D/g, '').slice(0, 10);
-  if (digits.length === 0) return '';
-  if (digits.length < 4) return `(${digits}`;
-  if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-}
+import { formatPhoneInput } from '../../../utils/formatPhone';
 
 export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor, customQuestions = [], companyConfig }) {
   const [name, setName] = useState('');
