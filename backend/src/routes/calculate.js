@@ -126,7 +126,6 @@ router.post('/', async (req, res) => {
               priceHigh: result.totalHigh,
               zip: zip || null,
               timeline: leadInfo.timeline || null,
-              preferredContact: leadInfo.preferredContact || null,
             });
           })
           .catch(err => console.error('Partner lead email failed:', err.message));

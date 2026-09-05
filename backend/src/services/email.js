@@ -205,7 +205,7 @@ async function sendEstimateEmail({ to, name, serviceType, result, companyConfig,
       {
         from: `${brandName} <${fromAddress}>`,
         to: [to],
-        subject: `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate: ${fmtMoney(result.totalLow)} – ${fmtMoney(result.totalHigh)}`,
+        subject: `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate is ready`,
         html: buildHtml({ name, serviceType, result, companyConfig, partner }),
         text: buildText({ name, serviceType, result, companyConfig, partner }),
       },
@@ -310,20 +310,19 @@ const TIMELINE_LABELS = {
   planning: 'Just planning',
 };
 
-function buildLeadContactLines({ leadEmail, leadPhone, zip, timeline, preferredContact }) {
+function buildLeadContactLines({ leadEmail, leadPhone, zip, timeline }) {
   return [
     leadEmail ? `Email: ${leadEmail}` : null,
     leadPhone ? `Phone: ${leadPhone}` : null,
     zip ? `ZIP: ${zip}` : null,
     timeline ? `Timeline: ${TIMELINE_LABELS[timeline] || timeline}` : null,
-    preferredContact ? `Prefers to be contacted by: ${preferredContact}` : null,
   ].filter(Boolean);
 }
 
-function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, preferredContact }) {
+function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline, preferredContact });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
 
   return [
     'New lead in your area!',
@@ -341,18 +340,22 @@ function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, lead
   ].join('\n');
 }
 
-function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, preferredContact }) {
+function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline, preferredContact });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
 
+  // No width:100% -- that stretches the value column to the far edge of
+  // the email, leaving a wide, disconnected gap between label and value.
+  // Left-aligned with a little breathing room instead, so the value sits
+  // right next to its label the way a normal label:value pair reads.
   const contactRows = contactLines.map(l => {
     const [label, ...rest] = l.split(': ');
     const value = rest.join(': ');
     return `
     <tr>
-      <td style="padding:5px 0;color:#666666;font-size:13.5px;">${label}</td>
-      <td style="padding:5px 0;text-align:right;font-size:13.5px;color:#111111;font-weight:600;">${value}</td>
+      <td style="padding:5px 0;color:#666666;font-size:13.5px;white-space:nowrap;">${label}</td>
+      <td style="padding:5px 0 5px 14px;text-align:left;font-size:13.5px;color:#111111;font-weight:600;">${value}</td>
     </tr>`;
   }).join('');
 
@@ -365,7 +368,7 @@ function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, lead
   </p>
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
-  <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
     ${contactRows}
   </table>
 
@@ -386,7 +389,7 @@ function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, lead
 // warm lead landing in the partner's inbox, ready to call or reply to.
 // Fire-and-forget, same as the other partner emails; only called from
 // calculate.js when partnerInfo is present and has an email on file.
-async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, zip, timeline, preferredContact }) {
+async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, zip, timeline }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendPartnerLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -398,7 +401,7 @@ async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPho
   }
 
   const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-  const args = { leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, preferredContact };
+  const args = { leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline };
 
   try {
     await axios.post(
@@ -409,7 +412,7 @@ async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPho
         // Lets the partner just hit "reply" in their inbox to reach the
         // lead directly, without ever needing to copy the contact info out.
         reply_to: leadEmail || undefined,
-        subject: `New lead in your area: ${SERVICE_LABELS[serviceType] || 'cleaning'} — ${fmtMoney(priceLow)}-${fmtMoney(priceHigh)}`,
+        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead in your area`,
         html: buildPartnerLeadHtml(args),
         text: buildPartnerLeadText(args),
       },
