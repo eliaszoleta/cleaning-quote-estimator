@@ -118,10 +118,10 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
           </Card>
 
           <Card title="Results Page Call-to-Action" subtitle="Shown after the visitor already has their estimate">
-            <Field label="Phone number" hint="Adds a 'Call Now' button on results">
+            <Field label="Phone number" hint="Shown as a tap-to-call button on the results page, and a clickable link in the estimate email they receive">
               <input style={input} value={form.ctaPhone} onChange={e => set('ctaPhone', e.target.value)} placeholder="(555) 123-4567" />
             </Field>
-            <Field label="Business email" hint="Adds an 'Email Us' button on results, and shows on the estimate email they receive">
+            <Field label="Business email" hint="Shown on the results page and in the estimate email they receive">
               <input style={input} type="email" value={form.ctaEmail} onChange={e => set('ctaEmail', e.target.value)} placeholder="contact@yourcompany.com" />
             </Field>
           </Card>
