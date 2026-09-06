@@ -93,3 +93,13 @@ export async function patchLead(token, leadId, updates) {
 export async function getAdminCompanies(adminKey) {
   return apiFetch('/api/admin/companies', { headers: { 'x-admin-key': adminKey } });
 }
+
+export async function getTrialEmailPreview(adminKey) {
+  return apiFetch('/api/admin/companies/trial-email-preview', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function sendTrialEmails(adminKey) {
+  return apiFetch('/api/admin/companies/send-trial-email', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true }),
+  });
+}

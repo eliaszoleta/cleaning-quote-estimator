@@ -706,6 +706,9 @@ function buildCompanyWelcomeText({ companyId }) {
     'Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard:',
     'https://www.cleanestimator.com/company?tab=branding',
     '',
+    'New to Clean Estimator? Log in to your dashboard and open the Help & Docs tab — it walks through how the calculator works, how pricing is calculated (with the real data behind it), and answers to the most common questions:',
+    'https://www.cleanestimator.com/company?tab=help',
+    '',
     "You can always get this same code later from the Embed Widget tab.",
     '',
     'Clean Estimator - cleanestimator.com',
@@ -736,6 +739,10 @@ function buildCompanyWelcomeHtml({ companyId }) {
     <a href="https://www.cleanestimator.com/company?tab=branding" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Set up my dashboard →</a>
   </p>
 
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    New to Clean Estimator? Open the <a href="https://www.cleanestimator.com/company?tab=help" style="color:#2563eb;font-weight:700;">Help &amp; Docs</a> tab in your dashboard — it walks through how the calculator works, how pricing is calculated (with the real data behind it), and answers to the most common questions.
+  </p>
+
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
     You can always get this same code later from the <strong>Embed Widget</strong> tab.
   </p>
@@ -751,7 +758,11 @@ function buildCompanyWelcomeHtml({ companyId }) {
 // email and log in for the first time. Gets their embed code in front of
 // them immediately instead of relying on them to find the Embed Widget tab
 // themselves. Fire-and-forget, same pattern as the other company emails.
-async function sendCompanyWelcomeEmail({ to, companyId }) {
+// `subject` is overridable so the same content can be reused for a
+// one-off manual broadcast to existing accounts (see admin.js's
+// trial-email preview/send routes) with wording suited to "your trial is
+// already active" rather than "your account was just created".
+async function sendCompanyWelcomeEmail({ to, companyId, subject }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendCompanyWelcomeEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -770,7 +781,7 @@ async function sendCompanyWelcomeEmail({ to, companyId }) {
       {
         from: `Clean Estimator <${fromAddress}>`,
         to: [to],
-        subject: 'Your Clean Estimator account is ready — here\'s your embed code',
+        subject: subject || 'Your Clean Estimator account is ready — here\'s your embed code',
         html: buildCompanyWelcomeHtml({ companyId }),
         text: buildCompanyWelcomeText({ companyId }),
       },

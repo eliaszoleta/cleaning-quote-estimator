@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox } from 'lucide-react';
-import { getAdminCompanies } from '../../utils/api';
+import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye } from 'lucide-react';
+import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails } from '../../utils/api';
 
 const STORAGE_KEY = 'admin_companies_key';
 
@@ -37,6 +37,15 @@ export default function AdminCompanies() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  // Trial-activation broadcast email -- preview (read-only) must be loaded
+  // before Send becomes clickable, and Send still needs an explicit
+  // window.confirm on top of that. Nothing here fires on page load.
+  const [trialPreview, setTrialPreview] = useState(null);
+  const [trialPreviewLoading, setTrialPreviewLoading] = useState(false);
+  const [trialPreviewError, setTrialPreviewError] = useState(null);
+  const [trialSending, setTrialSending] = useState(false);
+  const [trialSendResult, setTrialSendResult] = useState(null);
+
   const load = useCallback(async (key) => {
     setLoading(true);
     setError(null);
@@ -69,6 +78,35 @@ export default function AdminCompanies() {
       setLoginError(err.message || 'Incorrect admin key');
     } finally {
       setLoggingIn(false);
+    }
+  };
+
+  const loadTrialPreview = async () => {
+    setTrialPreviewLoading(true);
+    setTrialPreviewError(null);
+    setTrialSendResult(null);
+    try {
+      const res = await getTrialEmailPreview(adminKey);
+      setTrialPreview(res);
+    } catch (err) {
+      setTrialPreviewError(err.message);
+    } finally {
+      setTrialPreviewLoading(false);
+    }
+  };
+
+  const handleSendTrialEmails = async () => {
+    if (!trialPreview) return;
+    const ok = window.confirm(`Send the trial-activation email to ${trialPreview.recipientCount} compan${trialPreview.recipientCount === 1 ? 'y' : 'ies'}? This cannot be undone.`);
+    if (!ok) return;
+    setTrialSending(true);
+    try {
+      const res = await sendTrialEmails(adminKey);
+      setTrialSendResult(res);
+    } catch (err) {
+      setTrialPreviewError(err.message);
+    } finally {
+      setTrialSending(false);
     }
   };
 
@@ -126,6 +164,55 @@ export default function AdminCompanies() {
               <div style={{ fontSize: 26, fontWeight: 800, color: '#0f172a' }}>{loading ? '—' : value}</div>
             </div>
           ))}
+        </div>
+
+        {/* Trial-activation broadcast email */}
+        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 20px', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>
+            <Mail size={15} color="#2563eb" /> Trial Activation Email
+          </div>
+          <div style={{ fontSize: 12.5, color: '#94a3b8', marginBottom: 14 }}>
+            Sends every company with an email on file their embed code + a pointer to the Help &amp; Docs tab. Nothing sends until you click Send below, and only after you've loaded the preview.
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: trialPreview ? 14 : 0 }}>
+            <button onClick={loadTrialPreview} disabled={trialPreviewLoading} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 9, padding: '9px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+              <Eye size={14} /> {trialPreviewLoading ? 'Loading preview…' : 'Preview recipients & copy'}
+            </button>
+            {trialPreview && (
+              <button onClick={handleSendTrialEmails} disabled={trialSending || trialSendResult} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: trialSendResult ? '#94a3b8' : '#16a34a', border: 'none', borderRadius: 9, padding: '9px 16px', fontWeight: 700, fontSize: 13, cursor: (trialSending || trialSendResult) ? 'not-allowed' : 'pointer', color: 'white' }}>
+                <Send size={14} /> {trialSending ? 'Sending…' : trialSendResult ? 'Sent' : `Send to ${trialPreview.recipientCount} compan${trialPreview.recipientCount === 1 ? 'y' : 'ies'}`}
+              </button>
+            )}
+          </div>
+
+          {trialPreviewError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: 12.5, marginTop: 6 }}>{trialPreviewError}</div>}
+
+          {trialSendResult && (
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '12px 14px', color: '#15803d', fontSize: 13, fontWeight: 600 }}>
+              Sent to {trialSendResult.sentCount} compan{trialSendResult.sentCount === 1 ? 'y' : 'ies'}.
+              {trialSendResult.failedCount > 0 && <span style={{ color: '#dc2626' }}> {trialSendResult.failedCount} failed.</span>}
+              {trialSendResult.skippedCount > 0 && <span style={{ color: '#94a3b8' }}> {trialSendResult.skippedCount} skipped (no email on file).</span>}
+            </div>
+          )}
+
+          {trialPreview && !trialSendResult && (
+            <div>
+              <div style={{ fontSize: 12, color: '#374151', marginBottom: 8 }}>
+                <strong>Subject:</strong> {trialPreview.subject}
+              </div>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
+                {trialPreview.recipientCount} recipient{trialPreview.recipientCount === 1 ? '' : 's'}{trialPreview.skippedCount > 0 ? ` · ${trialPreview.skippedCount} skipped (no email on file)` : ''}
+              </div>
+              <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid #f1f5f9', borderRadius: 8 }}>
+                {trialPreview.recipients.map(r => (
+                  <div key={r.companyId} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 12px', borderBottom: '1px solid #f8fafc', fontSize: 12.5 }}>
+                    <span style={{ fontWeight: 600, color: '#0f172a' }}>{r.companyName}</span>
+                    <span style={{ color: '#64748b' }}>{r.email}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Filters */}
