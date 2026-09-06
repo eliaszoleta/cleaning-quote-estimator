@@ -84,10 +84,14 @@ export default function LeadsTab({ user }) {
   };
 
   const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Service', 'State', 'ZIP', 'Estimate Low', 'Estimate High', 'Timeline', 'Date', 'Notes'];
+    // City only ever comes from a company-scoped calculator's dropdown (see
+    // CleaningCalculator.js), so it lives in service_details, not its own
+    // lead column -- pulled out here so it's an actual CSV column instead of
+    // something only visible by opening each lead's Service Details panel.
+    const headers = ['Name', 'Email', 'Phone', 'Service', 'City', 'State', 'ZIP', 'Estimate Low', 'Estimate High', 'Timeline', 'Date', 'Notes'];
     const rows = filtered.map(l => [
       l.name || '', l.email || '', l.phone || '', serviceTypeLabel(l.service_type),
-      l.state || '', l.zip || '',
+      l.service_details?.city || '', l.state || '', l.zip || '',
       l.estimated_price_low || '', l.estimated_price_high || '',
       l.timeline || '', new Date(l.created_at).toLocaleDateString(), l.notes || '',
     ]);
@@ -208,7 +212,7 @@ export default function LeadsTab({ user }) {
               ['Email',    selectedLead.email,  `mailto:${selectedLead.email}`],
               ['Phone',    selectedLead.phone,  `tel:${selectedLead.phone}`],
               ['Service',  serviceTypeLabel(selectedLead.service_type), null],
-              ['Location', `${selectedLead.zip || ''}${selectedLead.zip && selectedLead.state ? ' · ' : ''}${selectedLead.state || ''}`, null],
+              ['Location', [selectedLead.service_details?.city, selectedLead.zip, selectedLead.state].filter(Boolean).join(' · '), null],
               ['Estimate', selectedLead.estimated_price_low ? `${formatPrice(selectedLead.estimated_price_low)} – ${formatPrice(selectedLead.estimated_price_high)}` : '—', null],
               ['Timeline', selectedLead.timeline || '—', null],
             ].filter(([, val]) => val && val !== '—' && val !== '').map(([label, val, href]) => (
@@ -222,11 +226,12 @@ export default function LeadsTab({ user }) {
             ))}
           </div>
 
-          {selectedLead.service_details && Object.keys(selectedLead.service_details).length > 0 && (
+          {selectedLead.service_details && Object.keys(selectedLead.service_details).filter(k => k !== 'city').length > 0 && (
             <div>
               <div style={{ fontWeight: 700, fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Service Details</div>
               <div style={{ background: '#f8fafc', borderRadius: 8, padding: '11px 13px' }}>
-                {Object.entries(selectedLead.service_details).map(([k, v]) => (
+                {/* city is already shown above in Location -- skip it here so it's not listed twice */}
+                {Object.entries(selectedLead.service_details).filter(([k]) => k !== 'city').map(([k, v]) => (
                   <div key={k} style={{ fontSize: 12, color: '#374151', marginBottom: 4 }}>
                     <span style={{ fontWeight: 600, color: '#64748b', textTransform: 'capitalize' }}>{k.replace(/([A-Z])/g, ' $1').trim()}: </span>
                     {Array.isArray(v) ? v.join(', ') : String(v)}

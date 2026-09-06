@@ -376,10 +376,14 @@ const TIMELINE_LABELS = {
   planning: 'Just planning',
 };
 
-function buildLeadContactLines({ leadEmail, leadPhone, zip, timeline }) {
+function buildLeadContactLines({ leadEmail, leadPhone, city, zip, timeline }) {
   return [
     leadEmail ? `Email: ${leadEmail}` : null,
     leadPhone ? `Phone: ${fmtPhone(leadPhone)}` : null,
+    // city only ever comes from a company-scoped calculator's dropdown (see
+    // CleaningCalculator.js) -- shown here alongside ZIP instead of only
+    // buried in the generic Service Details dump further down the email.
+    city ? `City: ${city}` : null,
     zip ? `ZIP: ${zip}` : null,
     timeline ? `Timeline: ${TIMELINE_LABELS[timeline] || timeline}` : null,
   ].filter(Boolean);
@@ -508,14 +512,17 @@ function formatDetailValue(v) {
   return Array.isArray(v) ? v.join(', ') : String(v);
 }
 
+// city is excluded here -- it's already shown up in the Contact info
+// section (see buildLeadContactLines) alongside ZIP, so listing it again
+// in this generic dump would just duplicate it.
 function buildServiceDetailsText(serviceDetails) {
-  const entries = Object.entries(serviceDetails || {}).filter(([, v]) => v !== null && v !== undefined && v !== '');
+  const entries = Object.entries(serviceDetails || {}).filter(([k, v]) => k !== 'city' && v !== null && v !== undefined && v !== '');
   if (!entries.length) return [];
   return ['', 'Service details:', ...entries.map(([k, v]) => `  ${formatDetailKey(k)}: ${formatDetailValue(v)}`)];
 }
 
 function buildServiceDetailsHtml(serviceDetails) {
-  const entries = Object.entries(serviceDetails || {}).filter(([, v]) => v !== null && v !== undefined && v !== '');
+  const entries = Object.entries(serviceDetails || {}).filter(([k, v]) => k !== 'city' && v !== null && v !== undefined && v !== '');
   if (!entries.length) return '';
   const rows = entries.map(([k, v]) => `
     <tr>
@@ -532,7 +539,7 @@ function buildServiceDetailsHtml(serviceDetails) {
 function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, zip, timeline });
 
   const lines = [
     `New lead on your ${companyName} calculator!`,
@@ -570,7 +577,7 @@ function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, pr
 function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, zip, timeline });
 
   const contactRows = contactLines.map(l => {
     const [label, ...rest] = l.split(': ');
