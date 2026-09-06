@@ -4,6 +4,7 @@ const axios = require('axios');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { getCompanyConfig, saveCompanyConfig } = require('../services/companyConfig');
+const { sendCompanyWelcomeEmail } = require('../services/email');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SERVICE_KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -36,6 +37,10 @@ router.get('/:id', async (req, res) => {
         },
       };
       await saveCompanyConfig(id, config);
+      // Fire-and-forget: gets their embed code in front of them immediately
+      // rather than relying on them to find the Embed Widget tab themselves.
+      sendCompanyWelcomeEmail({ to: req.user.email, companyId: id })
+        .catch(err => console.error('Company welcome email failed:', err.message));
     } else if (!config.subscription?.trialStartedAt && !config.subscription?.stripeSubscriptionId) {
       // Backfill: any existing account missing trialStartedAt that also hasn't
       // subscribed yet (covers old trialType:'stripe' accounts from before this

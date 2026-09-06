@@ -647,6 +647,125 @@ async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, lead
   }
 }
 
+// ─── Company welcome email ──────────────────────────────────────────────────
+
+// Keep this iframe/script string identical to the "Standard iFrame" snippet
+// EmbedTab.js generates (same id convention, same resize-listener script) --
+// this is the one place outside the dashboard that hands a company their
+// embed code, and it should never drift from what "Copy Code" gives them.
+function buildEmbedIframeCode(companyId) {
+  const iframeId = `cleancalc-iframe-${companyId}`;
+  return `<iframe
+  id="${iframeId}"
+  src="https://www.cleanestimator.com/embed?company=${companyId}"
+  width="100%"
+  height="700"
+  style="border:none;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.10);"
+  title="Cleaning Cost Estimator"
+  loading="lazy">
+</iframe>
+<script>
+  (function(){
+    var iframe=document.getElementById('${iframeId}');
+    window.addEventListener('message',function(e){
+      if(e.data&&e.data.type==='cleancalc-resize'&&e.source===iframe.contentWindow){
+        iframe.style.height=Math.max(e.data.height,300)+'px';
+      }
+    });
+  })();
+</script>`;
+}
+
+function buildCompanyWelcomeText({ companyId }) {
+  return [
+    'Welcome to Clean Estimator!',
+    '',
+    "Your account is live and your embedded calculator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:",
+    '',
+    buildEmbedIframeCode(companyId),
+    '',
+    "Paste that anywhere in your website's HTML — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The calculator will appear right there and resize itself to fit.",
+    '',
+    'Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard:',
+    'https://www.cleanestimator.com/company?tab=branding',
+    '',
+    "You can always get this same code later from the Embed Widget tab.",
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildCompanyWelcomeHtml({ companyId }) {
+  const code = buildEmbedIframeCode(companyId);
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Welcome to Clean Estimator!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your account is live and your embedded calculator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:
+  </p>
+
+  <pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-family:'Menlo','Monaco',monospace;font-size:11.5px;line-height:1.6;color:#334155;white-space:pre-wrap;word-break:break-all;margin:0 0 20px;">${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Paste that anywhere in your website's HTML — a <strong>Custom HTML / Embed block</strong> in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The calculator will appear right there and resize itself to fit.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=branding" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Set up my dashboard →</a>
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    You can always get this same code later from the <strong>Embed Widget</strong> tab.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the moment a company's config row is first created (see
+// company.js's GET /:id handler) -- i.e. right after they confirm their
+// email and log in for the first time. Gets their embed code in front of
+// them immediately instead of relying on them to find the Embed Widget tab
+// themselves. Fire-and-forget, same pattern as the other company emails.
+async function sendCompanyWelcomeEmail({ to, companyId }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendCompanyWelcomeEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendCompanyWelcomeEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: 'Your Clean Estimator account is ready — here\'s your embed code',
+        html: buildCompanyWelcomeHtml({ companyId }),
+        text: buildCompanyWelcomeText({ companyId }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendCompanyWelcomeEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
 // ─── Trial reminder emails ─────────────────────────────────────────────────
 
 function buildTrialEndingSoonText({ companyName, daysLeft }) {
@@ -794,6 +913,7 @@ module.exports = {
   sendPartnerWelcomeEmail,
   sendPartnerLeadEmail,
   sendCompanyLeadEmail,
+  sendCompanyWelcomeEmail,
   sendTrialEndingSoonEmail,
   sendTrialEndedEmail,
 };
