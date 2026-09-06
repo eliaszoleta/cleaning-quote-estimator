@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   HelpCircle, Calculator, SlidersHorizontal, MapPin, Map, ToggleRight,
-  Paintbrush, Code2, ChevronDown,
+  Paintbrush, Code2, ChevronDown, Layers,
 } from 'lucide-react';
 
 const cardStyle = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' };
@@ -47,6 +47,19 @@ const FAQ = [
     a: "No — you can't, and you don't need to. Clean Estimator maintains the underlying pricing data (by state, by service, by job size/condition/frequency) so it stays accurate over time. Your job is just markup, minimums, which services you offer, and your branding.",
   },
 ];
+
+function MiniTable({ rows, highlight }) {
+  return (
+    <div style={{ background: '#f8fafc', borderRadius: 8, padding: '4px 16px', marginBottom: 10 }}>
+      {rows.map(([label, val], i) => (
+        <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '9px 0', borderBottom: i < rows.length - 1 ? '1px solid #e2e8f0' : 'none', fontSize: 13 }}>
+          <span style={{ color: '#64748b' }}>{label}</span>
+          <span style={{ fontWeight: 700, color: highlight === label ? '#2563eb' : '#0f172a', whiteSpace: 'nowrap' }}>{val}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function FaqItem({ q, a }) {
   const [open, setOpen] = useState(false);
@@ -140,6 +153,45 @@ export default function HelpTab() {
         <p style={{ ...pStyle, marginBottom: 0 }}>
           The visitor sees this same breakdown, line by line, on their results screen and in their emailed estimate — nothing here is hidden from them either.
         </p>
+      </div>
+
+      <div style={cardStyle}>
+        <div style={sectionTitle}>
+          <div style={iconBadge('#eef2ff')}><Layers size={16} color="#4f46e5" /></div>
+          Four scenarios, side by side
+        </div>
+        <p style={pStyle}>
+          Same House Cleaning job (1,500–2,000 sq ft, 3 bed / 2 bath, standard, good condition, one-time) unless noted — real numbers from the calculator, not rounded for illustration.
+        </p>
+
+        <p style={{ ...pStyle, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>A. Same job, different states — your markup stays at 1.0</p>
+        <MiniTable rows={[
+          ['Mississippi (0.78×)', '$174 – $205'],
+          ['Texas (1.05×)', '$234 – $276'],
+          ['California (1.40×)', '$312 – $368'],
+        ]} />
+        <p style={pStyle}>Same house, same subscriber settings — the visitor just happens to be in a pricier state.</p>
+
+        <p style={{ ...pStyle, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>B. Same job, same state (Texas) — only your markup changes</p>
+        <MiniTable rows={[
+          ['Markup 0.9 (undercutting)', '$211 – $249'],
+          ['Markup 1.0 (as calculated)', '$234 – $276'],
+          ['Markup 1.3 (premium)', '$304 – $359'],
+        ]} />
+        <p style={pStyle}>This is the only lever in the whole calculation that's actually yours.</p>
+
+        <p style={{ ...pStyle, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>C. Minimum charge floor</p>
+        <MiniTable rows={[
+          ['Tiny 1bd/1ba in Mississippi, min charge $100', '$100 – $100'],
+        ]} />
+        <p style={pStyle}>The math alone would come out lower — your minimum charge overrides it so you're never quoted below what's worth the trip.</p>
+
+        <p style={{ ...pStyle, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>D. Job details move the price too — not just location and markup</p>
+        <MiniTable rows={[
+          ['Standard clean', '$234 – $276'],
+          ['Deep clean (same house, same state, same markup)', '$393 – $511'],
+        ]} />
+        <p style={{ ...pStyle, marginBottom: 0 }}>State and markup aren't the only inputs — what the visitor answers about the job itself (size, condition, cleaning type, add-ons) moves the number just as much.</p>
       </div>
 
       <div style={cardStyle}>
