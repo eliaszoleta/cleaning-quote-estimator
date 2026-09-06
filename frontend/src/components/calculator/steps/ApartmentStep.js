@@ -17,9 +17,9 @@ const CLEANING_TYPES = [
 
 const FREQUENCY = [
   { id: 'one_time', label: 'One-Time' },
-  { id: 'weekly', label: 'Weekly', discount: '15% off' },
-  { id: 'biweekly', label: 'Bi-Weekly', discount: '10% off' },
-  { id: 'monthly', label: 'Monthly', discount: '5% off' },
+  { id: 'weekly', label: 'Weekly' },
+  { id: 'biweekly', label: 'Bi-Weekly' },
+  { id: 'monthly', label: 'Monthly' },
 ];
 
 const EXTRAS = [
@@ -31,7 +31,11 @@ const EXTRAS = [
   { id: 'balcony', label: 'Balcony / Patio' },
 ];
 
-export default function ApartmentStep({ value, onBack, onNext, primaryColor }) {
+export default function ApartmentStep({ value, onBack, onNext, primaryColor, companyConfig }) {
+  // Only reflects a real, company-set discount (Discount tab) -- off by
+  // default, so a fresh account shows no "% off" tag on any frequency
+  // until the company actually configures one.
+  const frequencyDiscounts = companyConfig?.services?.apartment?.frequencyDiscounts || {};
   const [size, setSize] = useState(value.size || '2br');
   const [bathrooms, setBathrooms] = useState(value.bathrooms || '1');
   const [cleaningType, setCleaningType] = useState(value.cleaningType || 'standard');
@@ -68,11 +72,14 @@ export default function ApartmentStep({ value, onBack, onNext, primaryColor }) {
 
       <Section label="Frequency">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {FREQUENCY.map(f => (
-            <button key={f.id} onClick={() => setFrequency(f.id)} style={{ padding: '10px 18px', borderRadius: 8, border: `2px solid ${frequency === f.id ? primaryColor : '#e2e8f0'}`, background: frequency === f.id ? primaryColor : 'white', color: frequency === f.id ? 'white' : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-              {f.label}{f.discount && <span style={{ fontSize: 11, marginLeft: 4, opacity: 0.85 }}>({f.discount})</span>}
-            </button>
-          ))}
+          {FREQUENCY.map(f => {
+            const discountPct = Math.round((frequencyDiscounts[f.id] || 0) * 100);
+            return (
+              <button key={f.id} onClick={() => setFrequency(f.id)} style={{ padding: '10px 18px', borderRadius: 8, border: `2px solid ${frequency === f.id ? primaryColor : '#e2e8f0'}`, background: frequency === f.id ? primaryColor : 'white', color: frequency === f.id ? 'white' : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+                {f.label}{discountPct > 0 && <span style={{ fontSize: 11, marginLeft: 4, opacity: 0.85 }}>({discountPct}% off)</span>}
+              </button>
+            );
+          })}
         </div>
       </Section>
 

@@ -306,6 +306,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 onNext={handleDetailsNext}
                 primaryColor={primaryColor}
                 location={location}
+                companyConfig={companyConfig}
               />
             )}
             {currentStep === 'lead' && (
