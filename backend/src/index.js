@@ -10,6 +10,7 @@ const authRouter = require('./routes/auth');
 const subscriptionRouter = require('./routes/subscription');
 const leadsRouter = require('./routes/leads');
 const partnerCheckoutRouter = require('./routes/partnerCheckout');
+const adminRouter = require('./routes/admin');
 const { requireAuth } = require('./middleware/auth');
 const { checkTrialReminders } = require('./services/trialScheduler');
 
@@ -105,6 +106,19 @@ app.use('/api/partner-checkout', partnerCheckoutRouter);
 app.use('/api/company', companyRouter);
 app.use('/api/subscription', requireAuth, subscriptionRouter);
 app.use('/api/company-leads', requireAuth, leadsRouter);
+
+// ─── Internal admin routes ───────────────────────────────────────────────────
+// Own auth (x-admin-key header, see requireAdminKey in admin.js), not
+// requireAuth -- this isn't a subscriber viewing their own account, it's the
+// platform owner viewing every subscriber's account, so the usual
+// req.user.id === :id ownership check doesn't apply here at all.
+app.use('/api/admin', rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}), adminRouter);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 // Includes the exact commit this process was built from (RAILWAY_GIT_COMMIT_SHA

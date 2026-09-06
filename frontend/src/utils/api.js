@@ -85,3 +85,11 @@ export async function patchLead(token, leadId, updates) {
     method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(updates),
   });
 }
+
+// adminKey is whatever the admin typed into AdminCompanies.js's login form,
+// forwarded as-is -- never a REACT_APP_* env var, since those are baked
+// into the public JS bundle at build time and this key guards an endpoint
+// backed by the Supabase service role key.
+export async function getAdminCompanies(adminKey) {
+  return apiFetch('/api/admin/companies', { headers: { 'x-admin-key': adminKey } });
+}
