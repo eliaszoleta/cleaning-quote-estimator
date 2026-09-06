@@ -109,6 +109,11 @@ router.get('/:id/public', async (req, res) => {
       ctaHeadline, ctaSubtext, ctaButtonText, ctaPhone, ctaButtonUrl,
       serviceStates, serviceCities, frameHeight, borderRadius, services,
     } = config;
+    // Same no-store as the authed GET /:id -- a subscriber who just changed
+    // their Service Area/branding and reloaded their own widget to check it
+    // should never see a stale cached response, from the browser or any
+    // intermediary.
+    res.set('Cache-Control', 'no-store');
     res.json({
       success: true,
       data: {
