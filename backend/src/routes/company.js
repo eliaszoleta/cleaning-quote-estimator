@@ -122,7 +122,7 @@ router.get('/:id/public', async (req, res) => {
     const sub = computeSubscriptionStatus(config);
     const {
       companyName, logo, primaryColor, accentColor, fontFamily,
-      ctaHeadline, ctaSubtext, ctaButtonText, ctaPhone, ctaButtonUrl,
+      ctaHeadline, ctaSubtext, ctaPhone, ctaEmail,
       serviceStates, frameHeight, borderRadius, services,
     } = config;
     // Same no-store as the authed GET /:id -- a subscriber who just changed
@@ -134,7 +134,7 @@ router.get('/:id/public', async (req, res) => {
       success: true,
       data: {
         companyName, logo, primaryColor, accentColor, fontFamily,
-        ctaHeadline, ctaSubtext, ctaButtonText, ctaPhone, ctaButtonUrl,
+        ctaHeadline, ctaSubtext, ctaPhone, ctaEmail,
         serviceStates, serviceCities: normalizeServiceCities(config), frameHeight, borderRadius, services,
         paused: !sub.active,
         trialDaysLeft: sub.daysLeft,

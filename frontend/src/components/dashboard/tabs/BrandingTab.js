@@ -5,7 +5,7 @@ import CleaningCalculator from '../../calculator/CleaningCalculator';
 export default function BrandingTab({ config, update, onSave, saving, saved }) {
   const [form, setForm] = useState({
     companyName: '', logo: '', primaryColor: '#2563eb', accentColor: '#16a34a',
-    ctaHeadline: '', ctaSubtext: '', ctaButtonText: '', ctaPhone: '', ctaButtonUrl: '',
+    ctaHeadline: '', ctaSubtext: '', ctaPhone: '', ctaEmail: '',
     fontFamily: 'Inter', frameHeight: '700', borderRadius: '12',
   });
   const initialized = useRef(false);
@@ -20,9 +20,8 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
         accentColor: config.accentColor || '#16a34a',
         ctaHeadline: config.ctaHeadline || '',
         ctaSubtext: config.ctaSubtext || '',
-        ctaButtonText: config.ctaButtonText || '',
         ctaPhone: config.ctaPhone || '',
-        ctaButtonUrl: config.ctaButtonUrl || '',
+        ctaEmail: config.ctaEmail || '',
         fontFamily: config.fontFamily || 'Inter',
         frameHeight: String(config.frameHeight || '700'),
         borderRadius: String(config.borderRadius || '12'),
@@ -41,9 +40,8 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
         accentColor: next.accentColor,
         ctaHeadline: next.ctaHeadline,
         ctaSubtext: next.ctaSubtext,
-        ctaButtonText: next.ctaButtonText,
         ctaPhone: next.ctaPhone,
-        ctaButtonUrl: next.ctaButtonUrl,
+        ctaEmail: next.ctaEmail,
         fontFamily: next.fontFamily,
         frameHeight: parseInt(next.frameHeight) || 700,
         borderRadius: parseInt(next.borderRadius) || 12,
@@ -58,9 +56,8 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
     accentColor: form.accentColor,
     ctaHeadline: form.ctaHeadline || 'Get Your Instant Estimate',
     ctaSubtext: form.ctaSubtext,
-    ctaButtonText: form.ctaButtonText || 'Get Free Quotes →',
     ctaPhone: form.ctaPhone,
-    ctaButtonUrl: form.ctaButtonUrl,
+    ctaEmail: form.ctaEmail,
   };
 
   const input = {
@@ -105,15 +102,12 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
           </Card>
 
           {/* These two used to be one "Call to Action" card, which made it
-              easy to assume all four fields belonged to the same button --
+              easy to assume all fields belonged to the same button --
               Headline/Subtext actually show on the lead-capture form
-              (before the estimate), while Button text/Phone/URL show on
-              the results page (after it). A subscriber filling in "Button
-              text" right under "Headline" naturally read them as one
-              continuous CTA and typed wording that only made sense before
-              the estimate ("See Free Estimate") into a button that only
-              ever appears after it -- split into two clearly-scoped cards
-              so that mistake isn't the default path anymore. */}
+              (before the estimate), while Phone/Email show on the results
+              page (after it), as direct contact info rather than a button --
+              split into two clearly-scoped cards so that mistake isn't the
+              default path anymore. */}
           <Card title="Lead Capture Form" subtitle="Shown before the visitor sees their estimate">
             <Field label="Headline">
               <input style={input} value={form.ctaHeadline} onChange={e => set('ctaHeadline', e.target.value)} placeholder="Get Your Instant Estimate" />
@@ -124,14 +118,11 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
           </Card>
 
           <Card title="Results Page Call-to-Action" subtitle="Shown after the visitor already has their estimate">
-            <Field label="Button text" hint="They already have their number — word this as an invitation to contact you, not another estimate. E.g. 'Schedule My Free Estimate' or 'Get My Exact Quote', not 'See Free Estimate'.">
-              <input style={input} value={form.ctaButtonText} onChange={e => set('ctaButtonText', e.target.value)} placeholder="Schedule My Free Estimate" />
-            </Field>
             <Field label="Phone number" hint="Adds a 'Call Now' button on results">
               <input style={input} value={form.ctaPhone} onChange={e => set('ctaPhone', e.target.value)} placeholder="(555) 123-4567" />
             </Field>
-            <Field label="CTA button URL" hint="Where the button above links to">
-              <input style={input} value={form.ctaButtonUrl} onChange={e => set('ctaButtonUrl', e.target.value)} placeholder="https://yoursite.com/contact" />
+            <Field label="Business email" hint="Adds an 'Email Us' button on results, and shows on the estimate email they receive">
+              <input style={input} type="email" value={form.ctaEmail} onChange={e => set('ctaEmail', e.target.value)} placeholder="contact@yourcompany.com" />
             </Field>
           </Card>
 

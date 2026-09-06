@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { MapPin, AlertTriangle, Zap, Phone, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
+import { MapPin, AlertTriangle, Zap, Phone, Mail, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import PartnerCard from '../partners/PartnerCard';
@@ -53,8 +53,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
   const primaryColor = companyConfig?.primaryColor || '#2563eb';
   const ctaPhone = companyConfig?.ctaPhone || null;
-  const ctaButtonText = companyConfig?.ctaButtonText || 'Get Free Quotes from Local Pros →';
-  const ctaButtonUrl = companyConfig?.ctaButtonUrl || null;
+  const ctaEmail = companyConfig?.ctaEmail || null;
   const companyName = companyConfig?.companyName || null;
 
   const urgColor = urgencyColor(urgencyLevel);
@@ -190,10 +189,10 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                     {companyName ? 'Contact us for a free, no-obligation on-site quote.' : 'Compare quotes from vetted local cleaning professionals.'}
                   </p>
                   <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap' }}>
-                    {ctaButtonUrl && (
-                      <a href={ctaButtonUrl} target="_blank" rel="noopener noreferrer"
-                        style={{ background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
-                        {ctaButtonText}
+                    {ctaEmail && (
+                      <a href={`mailto:${ctaEmail}`}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
+                        <Mail size={14} /> Email Us
                       </a>
                     )}
                     {ctaPhone && (
@@ -202,9 +201,9 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                         <Phone size={14} /> Call {ctaPhone}
                       </a>
                     )}
-                    {!ctaButtonUrl && !ctaPhone && (
+                    {!ctaEmail && !ctaPhone && (
                       <a href="/" style={{ background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
-                        {ctaButtonText}
+                        Contact Us
                       </a>
                     )}
                   </div>

@@ -103,22 +103,23 @@ function buildPartnerSection(partner) {
 // Shown instead of the generic CTA when the estimate came from a
 // subscribed company's own embedded widget (as opposed to the main
 // cleanestimator.com site) -- they're paying to have their business in
-// front of these visitors, so their name/phone/logo should actually show
-// up, not just an anonymous "Schedule Free Estimate" link. Same visual
-// treatment as buildPartnerSection so both read as "this is the business
-// behind this estimate."
-function buildCompanySection({ companyName, logo, ctaButtonText, ctaButtonUrl, ctaPhone }) {
+// front of these visitors, so their name/phone/email/logo should actually
+// show up. Just phone and email as plain contact lines now, no separate
+// "Schedule Free Estimate"-style link button -- the visitor already has
+// their estimate by the time they see this, so a second "get an estimate"
+// action read as redundant/confusing next to the Call/Email actions.
+function buildCompanySection({ companyName, logo, ctaEmail, ctaPhone }) {
   const logoImg = logo ? `<img src="${logo}" alt="${companyName}" style="max-height:36px;margin:0 0 10px;display:block;">` : '';
-  const infoLine = ctaPhone ? `Phone: ${fmtPhone(ctaPhone)}` : '';
+  const infoLines = [
+    ctaPhone ? `Phone: ${fmtPhone(ctaPhone)}` : '',
+    ctaEmail ? `Email: <a href="mailto:${ctaEmail}" style="color:#2563eb;">${ctaEmail}</a>` : '',
+  ].filter(Boolean).join('<br>');
 
   return `
     <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Contact</p>
     ${logoImg}
     <p style="font-size:15px;color:#111111;font-weight:600;margin:0 0 4px;">${companyName}</p>
-    ${infoLine ? `<p style="font-size:14px;color:#333333;line-height:1.7;margin:0 0 12px;">${infoLine}</p>` : ''}
-    <p style="margin:${infoLine ? '0' : '8px 0 0'};">
-      <a href="${ctaButtonUrl || 'https://www.cleanestimator.com'}" style="color:#2563eb;font-size:14px;font-weight:600;">${ctaButtonText || 'Schedule Free Estimate'} →</a>
-    </p>`;
+    ${infoLines ? `<p style="font-size:14px;color:#333333;line-height:1.7;margin:0;">${infoLines}</p>` : ''}`;
 }
 
 function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
@@ -168,11 +169,9 @@ function buildText({ name, serviceType, result, companyConfig, partner }) {
   } else if (companyConfig?.companyName) {
     lines.push('', 'Contact:', companyConfig.companyName);
     if (companyConfig.ctaPhone) lines.push(`Phone: ${fmtPhone(companyConfig.ctaPhone)}`);
-    lines.push(`${companyConfig.ctaButtonText || 'Schedule Free Estimate'}: ${companyConfig.ctaButtonUrl || 'https://www.cleanestimator.com'}`);
+    if (companyConfig.ctaEmail) lines.push(`Email: ${companyConfig.ctaEmail}`);
   } else {
-    const ctaText = companyConfig?.ctaButtonText || 'Get an exact quote';
-    const ctaUrl = companyConfig?.ctaButtonUrl || 'https://www.cleanestimator.com';
-    lines.push('', `${ctaText}: ${ctaUrl}`);
+    lines.push('', 'Get an exact quote: https://www.cleanestimator.com');
     if (companyConfig?.ctaPhone) lines.push(`Or call ${companyConfig.ctaPhone}`);
   }
 
@@ -206,13 +205,12 @@ function buildHtml({ name, serviceType, result, companyConfig, partner }) {
     ? buildCompanySection({
         companyName: companyConfig.companyName,
         logo: companyConfig.logo,
-        ctaButtonText: companyConfig.ctaButtonText,
-        ctaButtonUrl: companyConfig.ctaButtonUrl,
+        ctaEmail: companyConfig.ctaEmail,
         ctaPhone: companyConfig.ctaPhone,
       })
     : buildGenericCta({
-        ctaUrl: companyConfig?.ctaButtonUrl || 'https://www.cleanestimator.com',
-        ctaText: companyConfig?.ctaButtonText || 'Get an exact quote',
+        ctaUrl: 'https://www.cleanestimator.com',
+        ctaText: 'Get an exact quote',
         ctaPhone: companyConfig?.ctaPhone || '',
       });
 
