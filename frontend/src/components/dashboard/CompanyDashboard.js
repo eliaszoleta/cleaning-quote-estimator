@@ -165,10 +165,10 @@ export default function CompanyDashboard({ user, onLogout }) {
   })() : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f1f5f9' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #f8fafc 0%, #eef1f6 100%)' }}>
       {/* Header */}
       <header style={{
-        background: '#0f172a', color: 'white', height: 60,
+        background: 'linear-gradient(135deg, #0f172a 0%, #16213b 100%)', color: 'white', height: 60,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 24px', position: 'sticky', top: 0, zIndex: 100,
         borderBottom: '1px solid #1e293b',
@@ -274,7 +274,7 @@ export default function CompanyDashboard({ user, onLogout }) {
               <span style={{ flex: 1 }}>{label}</span>
               {id === 'leads' && config?.leadsCount > 0 && (
                 <span style={{
-                  background: activeTab === 'leads' ? '#2563eb' : '#e2e8f0',
+                  background: activeTab === 'leads' ? 'rgba(255,255,255,0.22)' : '#e2e8f0',
                   color: activeTab === 'leads' ? 'white' : '#64748b',
                   borderRadius: 20, padding: '1px 7px', fontSize: 11, fontWeight: 700,
                 }}>

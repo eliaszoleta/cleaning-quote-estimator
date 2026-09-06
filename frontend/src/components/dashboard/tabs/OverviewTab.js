@@ -29,10 +29,10 @@ export default function OverviewTab({ config, subStatus, user }) {
     : 0;
 
   const stats = [
-    { label: 'Total Leads',    value: leads.length,                                              Icon: Users,       color: '#2563eb', bg: '#eff6ff' },
-    { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a', bg: '#f0fdf4' },
-    { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate) : '—',         Icon: DollarSign,  color: '#d97706', bg: '#fffbeb' },
-    { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—', Icon: Globe,       color: subStatus?.active ? '#16a34a' : '#dc2626', bg: subStatus?.active ? '#f0fdf4' : '#fef2f2' },
+    { label: 'Total Leads',    value: leads.length,                                              Icon: Users,       color: '#1e40af' },
+    { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a' },
+    { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate) : '—',         Icon: DollarSign,  color: '#d97706' },
+    { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—', Icon: Globe,       color: subStatus?.active ? '#16a34a' : '#dc2626' },
   ];
 
   const quickActions = [
@@ -55,22 +55,17 @@ export default function OverviewTab({ config, subStatus, user }) {
 
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 24 }}>
-        {stats.map(({ label, value, Icon, color, bg }) => (
-          <div key={label} className="stat-card">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div className="stat-label">{label}</div>
-              <div className="stat-icon" style={{ background: bg }}>
-                <Icon size={18} color={color} strokeWidth={2} />
-              </div>
-            </div>
-            <div className="stat-value" style={{ color }}>{value}</div>
+        {stats.map(({ label, value, Icon, color }) => (
+          <div key={label} className="stat-card" style={{ '--stat-color': color }}>
+            <div className="stat-label"><Icon size={14} color={color} strokeWidth={2.4} />{label}</div>
+            <div className="stat-value">{value}</div>
           </div>
         ))}
       </div>
 
       {/* Quick actions */}
       <div style={{ background: 'white', borderRadius: 12, border: '1px solid #e2e8f0', padding: '20px 22px', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: 11.5, color: '#94a3b8' }}>Quick Actions</h3>
+        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, color: '#0f172a' }}>Quick Actions</h3>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {quickActions.map(({ label, href, Icon }) => (
             <a
