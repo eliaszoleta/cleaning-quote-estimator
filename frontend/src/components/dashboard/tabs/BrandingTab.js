@@ -104,20 +104,33 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
             </Field>
           </Card>
 
-          <Card title="Call to Action">
+          {/* These two used to be one "Call to Action" card, which made it
+              easy to assume all four fields belonged to the same button --
+              Headline/Subtext actually show on the lead-capture form
+              (before the estimate), while Button text/Phone/URL show on
+              the results page (after it). A subscriber filling in "Button
+              text" right under "Headline" naturally read them as one
+              continuous CTA and typed wording that only made sense before
+              the estimate ("See Free Estimate") into a button that only
+              ever appears after it -- split into two clearly-scoped cards
+              so that mistake isn't the default path anymore. */}
+          <Card title="Lead Capture Form" subtitle="Shown before the visitor sees their estimate">
             <Field label="Headline">
               <input style={input} value={form.ctaHeadline} onChange={e => set('ctaHeadline', e.target.value)} placeholder="Get Your Instant Estimate" />
             </Field>
             <Field label="Subtext">
               <input style={input} value={form.ctaSubtext} onChange={e => set('ctaSubtext', e.target.value)} placeholder="Optional — we'll connect you with local pros." />
             </Field>
-            <Field label="Button text">
-              <input style={input} value={form.ctaButtonText} onChange={e => set('ctaButtonText', e.target.value)} placeholder="Get Free Quotes →" />
+          </Card>
+
+          <Card title="Results Page Call-to-Action" subtitle="Shown after the visitor already has their estimate">
+            <Field label="Button text" hint="They already have their number — word this as an invitation to contact you, not another estimate. E.g. 'Schedule My Free Estimate' or 'Get My Exact Quote', not 'See Free Estimate'.">
+              <input style={input} value={form.ctaButtonText} onChange={e => set('ctaButtonText', e.target.value)} placeholder="Schedule My Free Estimate" />
             </Field>
             <Field label="Phone number" hint="Adds a 'Call Now' button on results">
               <input style={input} value={form.ctaPhone} onChange={e => set('ctaPhone', e.target.value)} placeholder="(555) 123-4567" />
             </Field>
-            <Field label="CTA button URL" hint="Where the main CTA button links to">
+            <Field label="CTA button URL" hint="Where the button above links to">
               <input style={input} value={form.ctaButtonUrl} onChange={e => set('ctaButtonUrl', e.target.value)} placeholder="https://yoursite.com/contact" />
             </Field>
           </Card>
@@ -172,11 +185,12 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
   );
 }
 
-function Card({ title, children }) {
+function Card({ title, subtitle, children }) {
   return (
     <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
       <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9' }}>
         <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{title}</div>
+        {subtitle && <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>{subtitle}</div>}
       </div>
       <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>{children}</div>
     </div>

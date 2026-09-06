@@ -241,7 +241,7 @@ export default function HelpTab() {
           Making it look like yours (Branding tab)
         </div>
         <p style={pStyle}>
-          Your logo, brand colors, and the headline/subtext/button visitors see before they start — all live in the Branding tab. None of this affects pricing, only appearance and the call-to-action copy.
+          Your logo and brand colors live here, along with two separate pieces of copy: the <strong>Lead Capture Form</strong> card controls the headline/subtext visitors see <em>before</em> their estimate, while the <strong>Results Page Call-to-Action</strong> card controls the button/phone/link they see <em>after</em> — worth wording that one as "contact us," not another estimate, since they already have theirs by then. None of this affects pricing, only appearance and copy.
         </p>
       </div>
 
