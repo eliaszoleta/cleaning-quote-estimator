@@ -32,7 +32,7 @@ export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [subStatus, setSubStatus] = useState(null);
   const [localConfig, setLocalConfig] = useState(null);
-  const { config, loading, saving, saved, error, saveConfig, patchServices } = useCompanyConfig(user.id);
+  const { config, loading, saving, saved, error, saveConfig, patchServices, refetch } = useCompanyConfig(user.id);
 
   const localConfigReady = useRef(false);
   useEffect(() => {
@@ -131,6 +131,7 @@ export default function CompanyDashboard({ user, onLogout }) {
   };
 
   const isPaused = subStatus && !subStatus.active;
+  const deletionPending = config?.pendingDeletion;
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9' }}>
@@ -152,7 +153,7 @@ export default function CompanyDashboard({ user, onLogout }) {
     leads:        <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab {...tabProps} />,
     api:          <APIKeysTab {...tabProps} />,
-    settings:     <SettingsTab user={user} onLogout={onLogout} />,
+    settings:     <SettingsTab user={user} config={config} refetchConfig={refetch} onLogout={onLogout} />,
   };
 
   const subBadge = subStatus ? (() => {
@@ -247,8 +248,21 @@ export default function CompanyDashboard({ user, onLogout }) {
         </div>
       </header>
 
+      {/* Pending account deletion banner */}
+      {deletionPending && (
+        <div style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#dc2626', fontWeight: 600, fontSize: 13 }}>
+            <AlertCircle size={15} />
+            Your account is scheduled for deletion on {new Date(deletionPending.scheduledFor).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Your widget is paused in the meantime.
+          </div>
+          <button onClick={() => setActiveTab('settings')} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+            Cancel Deletion →
+          </button>
+        </div>
+      )}
+
       {/* Subscription expired banner */}
-      {isPaused && (
+      {!deletionPending && isPaused && (
         <div style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#dc2626', fontWeight: 600, fontSize: 13 }}>
             <AlertCircle size={15} />

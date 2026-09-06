@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Mail, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
+const API_URL = process.env.REACT_APP_API_URL || '';
+
 export default function AuthPage({ onAuth }) {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
@@ -10,6 +12,8 @@ export default function AuthPage({ onAuth }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [company, setCompany] = useState('');
+  const [phone, setPhone] = useState('');
+  const [website, setWebsite] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [emailSent, setEmailSent] = useState(false);
@@ -53,11 +57,31 @@ export default function AuthPage({ onAuth }) {
       if (!supabase) throw new Error('Authentication is not configured. Set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY.');
 
       if (mode === 'signup') {
+        // Checked before signUp() creates the account -- catches the same
+        // business signing up twice (different email) by company name,
+        // phone, or website, so we can block it and point them back to
+        // their existing account instead of letting a duplicate through.
+        try {
+          const dupRes = await fetch(`${API_URL}/api/company/check-duplicate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ companyName: company, phone, website }),
+          });
+          const dupData = await dupRes.json();
+          if (dupData.duplicate) {
+            const fieldLabel = { companyName: 'company name', phone: 'phone number', website: 'website' }[dupData.field] || 'details';
+            throw new Error(`An account already exists with this ${fieldLabel}. Please log back in to it instead.`);
+          }
+        } catch (dupErr) {
+          if (dupErr.message?.startsWith('An account already exists')) throw dupErr;
+          // Duplicate check itself failed (network, etc.) -- don't block a legitimate signup over it.
+        }
+
         const { data, error: err } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { company_name: company },
+            data: { company_name: company, phone, website },
             emailRedirectTo: `${window.location.origin}/company`,
           },
         });
@@ -237,8 +261,28 @@ export default function AuthPage({ onAuth }) {
           {mode === 'signup' && (
             <div>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Company name</label>
-              <input type="text" value={company} onChange={e => setCompany(e.target.value)}
+              <input type="text" required value={company} onChange={e => setCompany(e.target.value)}
                 placeholder="Sparkle Clean Co." style={inputStyle}
+                onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
+                onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
+            </div>
+          )}
+
+          {mode === 'signup' && (
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Phone number</label>
+              <input type="tel" required value={phone} onChange={e => setPhone(e.target.value)}
+                placeholder="(555) 123-4567" style={inputStyle}
+                onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
+                onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
+            </div>
+          )}
+
+          {mode === 'signup' && (
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Website</label>
+              <input type="text" required value={website} onChange={e => setWebsite(e.target.value)}
+                placeholder="www.yourcompany.com" style={inputStyle}
                 onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
                 onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
             </div>

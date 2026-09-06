@@ -942,6 +942,87 @@ async function sendTrialEndedEmail({ to, companyName }) {
   }
 }
 
+// ─── Account deletion (30-day grace period) ────────────────────────────────
+
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function buildAccountDeletionScheduledText({ companyName, scheduledFor }) {
+  const dateStr = formatDate(scheduledFor);
+  return [
+    `Hi ${companyName},`,
+    '',
+    `We've received your request to delete your Clean Estimator account. Your account, leads, and settings are scheduled to be permanently deleted on ${dateStr} (30 days from today).`,
+    '',
+    "Your embedded calculator has been paused in the meantime, but nothing has been deleted yet -- you can still log in any time before then to change your mind.",
+    '',
+    'Changed your mind? Log in and click "Cancel Deletion" in Settings:',
+    'https://www.cleanestimator.com/company?tab=settings',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildAccountDeletionScheduledHtml({ companyName, scheduledFor }) {
+  const dateStr = formatDate(scheduledFor);
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    We've received your request to delete your Clean Estimator account. Your account, leads, and settings are scheduled to be permanently deleted on <strong>${dateStr}</strong> (30 days from today).
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your embedded calculator has been paused in the meantime, but nothing has been deleted yet — you can still log in any time before then to change your mind.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=settings" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Log in to cancel deletion →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the moment a company requests account deletion (see company.js's
+// DELETE /account handler), which now schedules a 30-day grace-period
+// deletion instead of deleting immediately.
+async function sendAccountDeletionScheduledEmail({ to, companyName, scheduledFor }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendAccountDeletionScheduledEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendAccountDeletionScheduledEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: 'Your Clean Estimator account deletion is scheduled',
+        html: buildAccountDeletionScheduledHtml({ companyName, scheduledFor }),
+        text: buildAccountDeletionScheduledText({ companyName, scheduledFor }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendAccountDeletionScheduledEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
 module.exports = {
   sendEstimateEmail,
   sendPartnerWelcomeEmail,
@@ -950,4 +1031,5 @@ module.exports = {
   sendCompanyWelcomeEmail,
   sendTrialEndingSoonEmail,
   sendTrialEndedEmail,
+  sendAccountDeletionScheduledEmail,
 };

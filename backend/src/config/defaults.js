@@ -51,6 +51,12 @@ const STATE_MARKET_MATURITY = {
 // ─────────────────────────────────────────────────────────────────────────────
 const DEFAULT_COMPANY_CONFIG = {
   companyName: '',
+  // Owner-provided phone/website, collected once at signup and used to
+  // detect duplicate accounts (see companyConfig.js's findDuplicateCompany)
+  // -- distinct from ctaPhone/ctaEmail below, which are the contact info
+  // shown to visitors on the results page and are optional/edited any time.
+  phone: '',
+  website: '',
   logo: '',
   primaryColor: '#2563eb',
   accentColor: '#16a34a',

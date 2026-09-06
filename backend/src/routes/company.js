@@ -1,18 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
-const { sendCompanyWelcomeEmail } = require('../services/email');
+const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, findDuplicateCompany } = require('../services/companyConfig');
+const { sendCompanyWelcomeEmail, sendAccountDeletionScheduledEmail } = require('../services/email');
 const { requireAuth } = require('../middleware/auth');
-
-const SUPABASE_URL = process.env.SUPABASE_URL || '';
-const SERVICE_KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
-function dbHeaders() {
-  const key = SERVICE_KEY();
-  return { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
-}
 
 // serviceCities used to be a flat array (before cities were scoped per
 // state), so any account that set it before this change still has that
@@ -31,6 +23,22 @@ function normalizeServiceCities(config) {
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
+// POST /api/company/check-duplicate — no auth (runs before signup creates a
+// session) -- lets AuthPage.js block signup client-side when the company
+// name, phone, or website already belongs to an existing account, instead of
+// letting them create a second account for the same business.
+router.post('/check-duplicate', async (req, res) => {
+  const { companyName, phone, website } = req.body || {};
+  try {
+    const match = await findDuplicateCompany({ companyName, phone, website });
+    res.json({ success: true, duplicate: !!match, field: match?.field || null });
+  } catch (err) {
+    console.error('POST check-duplicate error:', err.message);
+    // Fail open -- a lookup error shouldn't block a legitimate signup.
+    res.json({ success: true, duplicate: false, field: null });
+  }
+});
+
 // GET /api/company/:id — get full config (auth required via middleware)
 router.get('/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
@@ -43,7 +51,11 @@ router.get('/:id', requireAuth, async (req, res) => {
     // backfill trialStartedAt on old accounts missing it) means whichever
     // request wins the race still gets the right answer, instead of the
     // loser reading "no config yet" and reporting requires_trial_setup.
-    const { config, created } = await getOrCreateCompanyConfig(id);
+    const { config, created } = await getOrCreateCompanyConfig(id, {
+      companyName: req.user.metadata?.company_name,
+      phone: req.user.metadata?.phone,
+      website: req.user.metadata?.website,
+    });
     console.log(`[GET config] user=${id} created=${created} | ${Object.entries(config.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') || 'none'}`);
     if (created) {
       // Fire-and-forget: gets their embed code in front of them immediately
@@ -120,6 +132,10 @@ router.get('/:id/public', async (req, res) => {
   try {
     const config = (await getCompanyConfig(req.params.id)) || DEFAULT_COMPANY_CONFIG;
     const sub = computeSubscriptionStatus(config);
+    // Deletion was requested -- pause the widget for the whole grace period
+    // even if the subscription itself is still active, since the owner
+    // asked for the account to go away.
+    const deletionPending = !!config.pendingDeletion;
     const {
       companyName, logo, primaryColor, accentColor, fontFamily,
       ctaHeadline, ctaSubtext, ctaPhone, ctaEmail,
@@ -136,7 +152,7 @@ router.get('/:id/public', async (req, res) => {
         companyName, logo, primaryColor, accentColor, fontFamily,
         ctaHeadline, ctaSubtext, ctaPhone, ctaEmail,
         serviceStates, serviceCities: normalizeServiceCities(config), frameHeight, borderRadius, services,
-        paused: !sub.active,
+        paused: !sub.active || deletionPending,
         trialDaysLeft: sub.daysLeft,
       },
     });
@@ -145,33 +161,45 @@ router.get('/:id/public', async (req, res) => {
   }
 });
 
-// DELETE /api/company/account — permanently delete account and all associated data
+// DELETE /api/company/account — schedule account deletion for 30 days out
+// instead of deleting immediately, so a change of mind doesn't require
+// support intervention. The Supabase Auth user is left untouched here (only
+// checkPendingDeletions, once the grace period elapses, ever removes it),
+// so login keeps working the entire time and the account can be recovered
+// via POST /account/cancel-deletion below.
 router.delete('/account', requireAuth, async (req, res) => {
   const companyId = req.user.id;
   try {
-    if (SERVICE_KEY()) {
-      // Delete leads (non-fatal)
-      await axios.delete(
-        `${SUPABASE_URL}/rest/v1/leads?company_id=eq.${encodeURIComponent(companyId)}`,
-        { headers: dbHeaders() }
-      ).catch(e => console.warn('Delete leads warning:', e.message));
+    const config = (await getCompanyConfig(companyId)) || { ...DEFAULT_COMPANY_CONFIG };
+    const scheduledFor = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const updated = { ...config, pendingDeletion: { requestedAt: new Date().toISOString(), scheduledFor } };
+    await saveCompanyConfig(companyId, updated);
 
-      // Delete company config
-      await axios.delete(
-        `${SUPABASE_URL}/rest/v1/cleaning_company_configs?company_id=eq.${encodeURIComponent(companyId)}`,
-        { headers: dbHeaders() }
-      ).catch(e => console.warn('Delete config warning:', e.message));
+    sendAccountDeletionScheduledEmail({ to: req.user.email, companyName: config.companyName || 'there', scheduledFor })
+      .catch(err => console.error('sendAccountDeletionScheduledEmail failed:', err.message));
 
-      // Delete Supabase auth user (must come last)
-      await axios.delete(
-        `${SUPABASE_URL}/auth/v1/admin/users/${companyId}`,
-        { headers: { apikey: SERVICE_KEY(), Authorization: `Bearer ${SERVICE_KEY()}` } }
-      );
+    res.json({ success: true, scheduledFor });
+  } catch (err) {
+    console.error('Delete account error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to schedule account deletion. Please try again.' });
+  }
+});
+
+// POST /api/company/account/cancel-deletion — clears a pending deletion,
+// e.g. the owner changed their mind and logged back in within the 30-day
+// grace period started by DELETE /account above.
+router.post('/account/cancel-deletion', requireAuth, async (req, res) => {
+  const companyId = req.user.id;
+  try {
+    const config = await getCompanyConfig(companyId);
+    if (config?.pendingDeletion) {
+      const { pendingDeletion, ...rest } = config;
+      await saveCompanyConfig(companyId, rest);
     }
     res.json({ success: true });
   } catch (err) {
-    console.error('Delete account error:', err.message);
-    res.status(500).json({ success: false, error: 'Failed to delete account. Please try again.' });
+    console.error('Cancel account deletion error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to cancel deletion. Please try again.' });
   }
 });
 

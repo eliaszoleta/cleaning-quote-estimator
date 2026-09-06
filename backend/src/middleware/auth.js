@@ -17,7 +17,7 @@ async function requireAuth(req, res, next) {
       },
       timeout: 5000,
     });
-    req.user = { id: data.id, email: data.email };
+    req.user = { id: data.id, email: data.email, metadata: data.user_metadata || {} };
     next();
   } catch (err) {
     return res.status(401).json({ success: false, error: 'Invalid or expired session' });

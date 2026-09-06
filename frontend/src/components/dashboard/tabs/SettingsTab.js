@@ -4,7 +4,7 @@ import { supabase } from '../../../lib/supabase';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
-export default function SettingsTab({ user, onLogout }) {
+export default function SettingsTab({ user, config, refetchConfig }) {
   const [pwNew, setPwNew] = useState('');
   const [pwConfirm, setPwConfirm] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
@@ -12,6 +12,9 @@ export default function SettingsTab({ user, onLogout }) {
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [scheduledFor, setScheduledFor] = useState(config?.pendingDeletion?.scheduledFor || null);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelError, setCancelError] = useState('');
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -32,9 +35,13 @@ export default function SettingsTab({ user, onLogout }) {
     }
   };
 
+  // Schedules deletion 30 days out instead of deleting immediately -- the
+  // account stays fully logged-in and functional (minus the paused widget)
+  // for the whole grace period, so we deliberately do NOT sign out here.
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== 'DELETE') return;
     setDeleteLoading(true);
+    setDeleteError('');
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -44,11 +51,34 @@ export default function SettingsTab({ user, onLogout }) {
       });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Delete failed');
-      await supabase.auth.signOut();
-      if (onLogout) onLogout();
+      setScheduledFor(data.scheduledFor);
+      setDeleteConfirm('');
+      if (refetchConfig) refetchConfig();
     } catch (err) {
       setDeleteError(err.message || 'Failed to delete account. Please try again.');
+    } finally {
       setDeleteLoading(false);
+    }
+  };
+
+  const handleCancelDeletion = async () => {
+    setCancelLoading(true);
+    setCancelError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch(`${API_URL}/api/company/account/cancel-deletion`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Failed to cancel deletion');
+      setScheduledFor(null);
+      if (refetchConfig) refetchConfig();
+    } catch (err) {
+      setCancelError(err.message || 'Failed to cancel deletion. Please try again.');
+    } finally {
+      setCancelLoading(false);
     }
   };
 
@@ -117,40 +147,71 @@ export default function SettingsTab({ user, onLogout }) {
           <AlertTriangle size={15} color="#dc2626" />
           <div style={{ fontSize: 11, fontWeight: 700, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Danger Zone</div>
         </div>
-        <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.6 }}>
-          Permanently deletes your account, all leads, settings, and branding. Your embedded widget will stop working immediately. <strong>This cannot be undone.</strong>
-        </p>
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
-            Type <strong>DELETE</strong> to confirm
-          </label>
-          <input
-            type="text"
-            value={deleteConfirm}
-            onChange={e => setDeleteConfirm(e.target.value)}
-            placeholder="DELETE"
-            style={{ width: '100%', padding: '8px 12px', border: '1px solid #fecaca', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
-          />
-        </div>
-        {deleteError && (
-          <div style={{ marginBottom: 12, fontSize: 13, padding: '8px 12px', borderRadius: 7, color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca' }}>
-            {deleteError}
-          </div>
+        {scheduledFor ? (
+          <>
+            <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.6 }}>
+              Your account is scheduled to be permanently deleted on{' '}
+              <strong>{new Date(scheduledFor).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</strong>.
+              Your embedded widget is paused until then. Changed your mind? You can cancel any time before that date and keep your account.
+            </p>
+            {cancelError && (
+              <div style={{ marginBottom: 12, fontSize: 13, padding: '8px 12px', borderRadius: 7, color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca' }}>
+                {cancelError}
+              </div>
+            )}
+            <button
+              onClick={handleCancelDeletion}
+              disabled={cancelLoading}
+              style={{
+                padding: '9px 20px',
+                background: cancelLoading ? '#f1f5f9' : '#16a34a',
+                color: cancelLoading ? '#94a3b8' : 'white',
+                border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                cursor: cancelLoading ? 'not-allowed' : 'pointer',
+                transition: 'background 0.15s, color 0.15s',
+              }}
+            >
+              {cancelLoading ? 'Canceling…' : 'Cancel Deletion'}
+            </button>
+          </>
+        ) : (
+          <>
+            <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.6 }}>
+              Schedules your account for deletion in <strong>30 days</strong>. Your embedded widget pauses right away, but nothing is deleted immediately — you can log back in and cancel any time before then.
+            </p>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
+                Type <strong>DELETE</strong> to confirm
+              </label>
+              <input
+                type="text"
+                value={deleteConfirm}
+                onChange={e => setDeleteConfirm(e.target.value)}
+                placeholder="DELETE"
+                style={{ width: '100%', padding: '8px 12px', border: '1px solid #fecaca', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
+              />
+            </div>
+            {deleteError && (
+              <div style={{ marginBottom: 12, fontSize: 13, padding: '8px 12px', borderRadius: 7, color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca' }}>
+                {deleteError}
+              </div>
+            )}
+            <button
+              onClick={handleDeleteAccount}
+              disabled={deleteConfirm !== 'DELETE' || deleteLoading}
+              style={{
+                padding: '9px 20px',
+                background: deleteConfirm === 'DELETE' && !deleteLoading ? '#dc2626' : '#f1f5f9',
+                color: deleteConfirm === 'DELETE' && !deleteLoading ? 'white' : '#94a3b8',
+                border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                cursor: deleteConfirm === 'DELETE' && !deleteLoading ? 'pointer' : 'not-allowed',
+                transition: 'background 0.15s, color 0.15s',
+              }}
+            >
+              {deleteLoading ? 'Scheduling…' : 'Delete My Account'}
+            </button>
+          </>
         )}
-        <button
-          onClick={handleDeleteAccount}
-          disabled={deleteConfirm !== 'DELETE' || deleteLoading}
-          style={{
-            padding: '9px 20px',
-            background: deleteConfirm === 'DELETE' && !deleteLoading ? '#dc2626' : '#f1f5f9',
-            color: deleteConfirm === 'DELETE' && !deleteLoading ? 'white' : '#94a3b8',
-            border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700,
-            cursor: deleteConfirm === 'DELETE' && !deleteLoading ? 'pointer' : 'not-allowed',
-            transition: 'background 0.15s, color 0.15s',
-          }}
-        >
-          {deleteLoading ? 'Deleting…' : 'Delete My Account'}
-        </button>
       </div>
     </div>
   );

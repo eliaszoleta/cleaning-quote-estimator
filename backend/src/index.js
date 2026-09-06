@@ -13,6 +13,7 @@ const partnerCheckoutRouter = require('./routes/partnerCheckout');
 const adminRouter = require('./routes/admin');
 const { requireAuth } = require('./middleware/auth');
 const { checkTrialReminders } = require('./services/trialScheduler');
+const { checkPendingDeletions } = require('./services/deletionScheduler');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -193,8 +194,10 @@ app.listen(PORT, () => {
   // trial reminder emails going out on time without adding a new
   // dependency or requiring a separate scheduled service to be configured.
   checkTrialReminders().catch(err => console.error('checkTrialReminders (startup run) failed:', err.message));
+  checkPendingDeletions().catch(err => console.error('checkPendingDeletions (startup run) failed:', err.message));
   setInterval(() => {
     checkTrialReminders().catch(err => console.error('checkTrialReminders failed:', err.message));
+    checkPendingDeletions().catch(err => console.error('checkPendingDeletions failed:', err.message));
   }, 60 * 60 * 1000);
 });
 

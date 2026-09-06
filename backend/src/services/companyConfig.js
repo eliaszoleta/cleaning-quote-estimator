@@ -91,13 +91,16 @@ async function saveCompanyConfig(companyId, config) {
 // the window for two near-simultaneous first calls both deciding to create.
 const recentlyCreated = new Set();
 
-async function getOrCreateCompanyConfig(companyId) {
+async function getOrCreateCompanyConfig(companyId, seed = {}) {
   let config = await getCompanyConfig(companyId);
   if (!config) {
     const created = !recentlyCreated.has(companyId);
     recentlyCreated.add(companyId);
     config = {
       ...DEFAULT_COMPANY_CONFIG,
+      companyName: seed.companyName || DEFAULT_COMPANY_CONFIG.companyName,
+      phone: seed.phone || DEFAULT_COMPANY_CONFIG.phone,
+      website: seed.website || DEFAULT_COMPANY_CONFIG.website,
       subscription: {
         ...DEFAULT_COMPANY_CONFIG.subscription,
         trialStartedAt: new Date().toISOString(),
@@ -134,4 +137,45 @@ async function listAllCompanyConfigs() {
   return Array.from(fileCache.entries()).map(([companyId, config]) => ({ companyId, config }));
 }
 
-module.exports = { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, listAllCompanyConfigs, DEFAULT_COMPANY_CONFIG };
+// ─── Duplicate-account detection ───────────────────────────────────────────
+// Called from the signup form (company.js's POST /check-duplicate, before
+// supabase.auth.signUp() runs) to stop the same real-world business from
+// creating a second account under a different email. Normalizes each field
+// before comparing so "ABC Cleaning Co." vs "abc cleaning co" or
+// "(555) 123-4567" vs "555-123-4567" still match.
+function normalizeName(v) {
+  return String(v || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function normalizePhone(v) {
+  return String(v || '').replace(/\D/g, '').slice(-10);
+}
+function normalizeWebsite(v) {
+  return String(v || '').toLowerCase().trim()
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .replace(/\/+$/, '');
+}
+
+async function findDuplicateCompany({ companyName, phone, website }) {
+  const nName = normalizeName(companyName);
+  const nPhone = normalizePhone(phone);
+  const nWebsite = normalizeWebsite(website);
+
+  let rows;
+  try {
+    rows = await listAllCompanyConfigs();
+  } catch (err) {
+    console.error('[companyConfig] findDuplicateCompany: list failed:', err.message);
+    return null;
+  }
+
+  for (const { config } of rows) {
+    if (!config) continue;
+    if (nName && normalizeName(config.companyName) === nName) return { field: 'companyName' };
+    if (nPhone && nPhone.length === 10 && normalizePhone(config.phone) === nPhone) return { field: 'phone' };
+    if (nWebsite && normalizeWebsite(config.website) === nWebsite) return { field: 'website' };
+  }
+  return null;
+}
+
+module.exports = { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, listAllCompanyConfigs, findDuplicateCompany, DEFAULT_COMPANY_CONFIG };
