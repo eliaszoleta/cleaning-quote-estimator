@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
-  Users, CreditCard, KeyRound, Settings, Loader2, Check, LogOut, AlertCircle, Save,
+  Users, CreditCard, KeyRound, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
@@ -14,9 +14,11 @@ import LeadsTab from './tabs/LeadsTab';
 import SubscriptionTab from './tabs/SubscriptionTab';
 import APIKeysTab from './tabs/APIKeysTab';
 import SettingsTab from './tabs/SettingsTab';
+import HelpTab from './tabs/HelpTab';
 
 const NAV = [
   { id: 'overview',      Icon: LayoutDashboard,   label: 'Overview' },
+  { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
   { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
   { id: 'embed',         Icon: Code2,              label: 'Embed Widget' },
@@ -107,6 +109,7 @@ export default function CompanyDashboard({ user, onLogout }) {
 
   const TABS = {
     overview:     <OverviewTab {...tabProps} />,
+    help:         <HelpTab />,
     branding:     <BrandingTab config={localConfig} update={update} />,
     services:     <ServicesTab config={localConfig} update={update} />,
     embed:        <EmbedTab {...tabProps} />,

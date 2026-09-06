@@ -4,7 +4,7 @@ const { calculateCleaning } = require('../services/cleaningCalculation');
 const { STATE_PRICING_MULTIPLIERS, STATE_AVERAGE_HOME_CLEANING_COST, STATE_NAMES } = require('../config/defaults');
 const { getCompanyConfig } = require('../services/companyConfig');
 const { saveLead } = require('./leads');
-const { sendEstimateEmail, sendPartnerLeadEmail } = require('../services/email');
+const { sendEstimateEmail, sendPartnerLeadEmail, sendCompanyLeadEmail } = require('../services/email');
 
 const VALID_SERVICE_TYPES = [
   'home_residential', 'apartment', 'commercial', 'carpet',
@@ -42,6 +42,25 @@ async function getVerifiedPartnerEmail(partnerId) {
     return data?.business_email || null;
   } catch (err) {
     console.warn('getVerifiedPartnerEmail failed:', err.message);
+    return null;
+  }
+}
+
+// Looks up a company's own signup email via the Supabase Auth admin API --
+// companyId is the Supabase Auth user id (same value req.user.id resolves
+// to on the authenticated company routes). Used to notify a company about
+// leads on THEIR embedded widget at the same address they signed up with,
+// not a separately configurable one, per how this was asked for.
+async function getCompanyOwnerEmail(companyId) {
+  if (!companyId) return null;
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  try {
+    const { data, error } = await supabase.auth.admin.getUserById(companyId);
+    if (error) return null;
+    return data?.user?.email || null;
+  } catch (err) {
+    console.warn('getCompanyOwnerEmail failed:', err.message);
     return null;
   }
 }
@@ -150,6 +169,29 @@ router.post('/', async (req, res) => {
             if (sent) await logLeadEmailEvent(partnerIdForLead);
           })
           .catch(err => console.error('Partner lead email failed:', err.message));
+      }
+
+      // Notify the company (embed subscriber) about leads on their own
+      // widget -- previously the only way to find out was checking the
+      // Leads tab manually. Sent to the same email they signed up with.
+      if (companyId) {
+        getCompanyOwnerEmail(companyId)
+          .then(ownerEmail => {
+            if (!ownerEmail) return;
+            return sendCompanyLeadEmail({
+              to: ownerEmail,
+              companyName: companyConfig.companyName || 'Clean Estimator',
+              leadName: leadInfo.name,
+              leadEmail: leadInfo.email,
+              leadPhone: leadInfo.phone,
+              serviceType,
+              priceLow: result.totalLow,
+              priceHigh: result.totalHigh,
+              zip: zip || null,
+              timeline: leadInfo.timeline || null,
+            });
+          })
+          .catch(err => console.error('Company lead email failed:', err.message));
       }
     }
 

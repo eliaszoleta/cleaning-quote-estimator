@@ -63,9 +63,9 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   const sc = statusConfig[status] || { Icon: AlertTriangle, iconColor: '#94a3b8', bg: '#f8fafc', border: '#e2e8f0', title: 'No Active Plan' };
 
   const statusDetail = (() => {
-    if (status === 'requires_trial_setup') return 'Get 7 days free — credit card required, cancel anytime before your trial ends.';
-    if (status === 'trialing' && subStatus?.daysLeft > 0) return `${subStatus.daysLeft} days remaining in your trial.`;
-    if (status === 'trialing') return 'Your trial ends today.';
+    if (status === 'requires_trial_setup') return 'Get 30 days free — no credit card required.';
+    if (status === 'trialing' && subStatus?.daysLeft > 0) return `${subStatus.daysLeft} days remaining in your free trial — no credit card on file, subscribe anytime to keep your widget running after it ends.`;
+    if (status === 'trialing') return 'Your trial ends today. Subscribe now to keep your widget from pausing.';
     if (status === 'active' && subStatus?.currentPeriodEnd) return `Renews on ${new Date(subStatus.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`;
     if (status === 'active_canceling' && subStatus?.currentPeriodEnd) return `Active until ${new Date(subStatus.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Will not renew.`;
     if (status === 'past_due') return 'Your payment failed. Update your payment method to keep your widget active.';
@@ -102,7 +102,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
             {(!isActive || status === 'trialing') && (
               <button onClick={handleCheckout} disabled={loading === 'checkout'}
                 style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'checkout' ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer' }}>
-                {loading === 'checkout' ? <><Loader2 size={14} className="spin" /> Redirecting…</> : status === 'requires_trial_setup' ? 'Start 7-Day Trial →' : status === 'trialing' ? 'Subscribe Now →' : 'Reactivate →'}
+                {loading === 'checkout' ? <><Loader2 size={14} className="spin" /> Redirecting…</> : status === 'requires_trial_setup' ? 'Get Started →' : status === 'trialing' ? 'Subscribe Now →' : 'Reactivate →'}
               </button>
             )}
             {(status === 'active' || status === 'active_canceling' || status === 'past_due') && (

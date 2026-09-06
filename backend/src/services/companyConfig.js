@@ -80,4 +80,21 @@ async function saveCompanyConfig(companyId, config) {
   fileSave(fileCache);
 }
 
-module.exports = { getCompanyConfig, saveCompanyConfig, DEFAULT_COMPANY_CONFIG };
+// Bulk read for the trial-reminder scheduler (services/trialScheduler.js),
+// which needs to scan every company's trial state rather than look one up
+// by id.
+async function listAllCompanyConfigs() {
+  const sb = getSupabase();
+  if (sb) {
+    const { data, error } = await sb.from('cleaning_company_configs').select('company_id, config');
+    if (error) {
+      console.error('[companyConfig] LIST error:', error.message, error.code);
+      throw new Error(error.message);
+    }
+    return (data || []).map(row => ({ companyId: row.company_id, config: row.config }));
+  }
+
+  return Array.from(fileCache.entries()).map(([companyId, config]) => ({ companyId, config }));
+}
+
+module.exports = { getCompanyConfig, saveCompanyConfig, listAllCompanyConfigs, DEFAULT_COMPANY_CONFIG };

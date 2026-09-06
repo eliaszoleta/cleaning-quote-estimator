@@ -440,4 +440,249 @@ async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPho
   }
 }
 
-module.exports = { sendEstimateEmail, sendPartnerWelcomeEmail, sendPartnerLeadEmail };
+function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline }) {
+  const name = leadName || 'A visitor';
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
+
+  return [
+    `New lead on your ${companyName} calculator!`,
+    '',
+    `${name} just got a ${serviceLabel.toLowerCase()} estimate on your embedded calculator: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}.`,
+    '',
+    'Contact info:',
+    ...contactLines.map(l => `  ${l}`),
+    '',
+    'Reply to this email to reach them directly, or use the contact info above.',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline }) {
+  const name = leadName || 'A visitor';
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
+
+  const contactRows = contactLines.map(l => {
+    const [label, ...rest] = l.split(': ');
+    const value = rest.join(': ');
+    return `
+    <tr>
+      <td style="padding:5px 0;color:#666666;font-size:13.5px;white-space:nowrap;">${label}</td>
+      <td style="padding:5px 0 5px 14px;text-align:left;font-size:13.5px;color:#111111;font-weight:600;">${value}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead on your ${companyName} calculator!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on your embedded calculator: <strong>${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</strong>.
+  </p>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
+    ${contactRows}
+  </table>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Reply to this email to reach them directly, or use the contact info above.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent to a company subscriber the moment a visitor completes an estimate
+// on THEIR embedded calculator widget (as opposed to sendEstimateEmail,
+// which goes to the visitor themselves). Reply-to is the lead's own email
+// so the company can just hit reply, same pattern as sendPartnerLeadEmail.
+// Fire-and-forget, called from calculate.js whenever companyId is present.
+async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, zip, timeline }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendCompanyLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendCompanyLeadEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline };
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        reply_to: leadEmail || undefined,
+        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead on your calculator`,
+        html: buildCompanyLeadHtml(args),
+        text: buildCompanyLeadText(args),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendCompanyLeadEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+// ─── Trial reminder emails ─────────────────────────────────────────────────
+
+function buildTrialEndingSoonText({ companyName, daysLeft }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    `Your free Clean Estimator trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. After that, your embedded calculator will pause on your website until you subscribe.`,
+    '',
+    'Subscribe now to keep it running without interruption:',
+    'https://www.cleanestimator.com/company?tab=subscription',
+    '',
+    'No action needed if you plan to subscribe before then -- this is just a heads up.',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialEndingSoonHtml({ companyName, daysLeft }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your free Clean Estimator trial ends in <strong>${daysLeft} day${daysLeft === 1 ? '' : 's'}</strong>. After that, your embedded calculator will pause on your website until you subscribe.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Subscribe now →</a>
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    No action needed if you already plan to subscribe before then — this is just a heads up.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, 2 days before a company's 30-day free trial ends (see
+// checkTrialReminders in services/trialScheduler.js). Deduped via
+// config.subscription.trialEndingSoonEmailSentAt so it only ever goes out once.
+async function sendTrialEndingSoonEmail({ to, companyName, daysLeft }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialEndingSoonEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialEndingSoonEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: `Your Clean Estimator trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`,
+        html: buildTrialEndingSoonHtml({ companyName, daysLeft }),
+        text: buildTrialEndingSoonText({ companyName, daysLeft }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialEndingSoonEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+function buildTrialEndedText({ companyName }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    "Your 30-day free Clean Estimator trial has ended, and your embedded calculator is now paused on your website -- visitors will see a paused notice instead of the calculator until you subscribe.",
+    '',
+    'Subscribe now to turn it back on:',
+    'https://www.cleanestimator.com/company?tab=subscription',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialEndedHtml({ companyName }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your 30-day free Clean Estimator trial has ended, and your embedded calculator is now <strong>paused</strong> on your website — visitors will see a paused notice instead of the calculator until you subscribe.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Subscribe to reactivate →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the day a company's 30-day free trial actually ends and their
+// widget gets paused (see checkTrialReminders). Deduped via
+// config.subscription.trialEndedEmailSentAt.
+async function sendTrialEndedEmail({ to, companyName }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialEndedEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialEndedEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: 'Your Clean Estimator calculator has been paused',
+        html: buildTrialEndedHtml({ companyName }),
+        text: buildTrialEndedText({ companyName }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialEndedEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+module.exports = {
+  sendEstimateEmail,
+  sendPartnerWelcomeEmail,
+  sendPartnerLeadEmail,
+  sendCompanyLeadEmail,
+  sendTrialEndingSoonEmail,
+  sendTrialEndedEmail,
+};

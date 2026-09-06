@@ -34,14 +34,18 @@ router.post('/checkout', async (req, res) => {
     const config = (await getCompanyConfig(companyId)) || {};
     const existingCustomerId = config.subscription?.stripeCustomerId;
 
+    // No Stripe-side trial here -- the 30-day free trial is app-managed
+    // (subscription.trialStartedAt, started at signup in company.js, see
+    // subscriptionStatus.js). By the time someone actually completes this
+    // checkout, they're converting to a real paid subscription billed
+    // immediately, whether that's during their free trial (upgrading early)
+    // or after it's ended.
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
-      payment_method_collection: 'always',
       line_items: [{ price: priceId, quantity: 1 }],
       customer: existingCustomerId || undefined,
       customer_email: existingCustomerId ? undefined : req.user.email,
-      subscription_data: { trial_period_days: 7 },
       metadata: { companyId },
       success_url: `${FRONTEND_URL}/company?subscribed=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/company?tab=subscription`,

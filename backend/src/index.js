@@ -14,6 +14,7 @@ const { requireAuth } = require('./middleware/auth');
 const { computeSubscriptionStatus } = require('./services/subscriptionStatus');
 const { DEFAULT_COMPANY_CONFIG } = require('./config/defaults');
 const { getCompanyConfig } = require('./services/companyConfig');
+const { checkTrialReminders } = require('./services/trialScheduler');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -172,6 +173,16 @@ app.listen(PORT, () => {
   console.log(`CleanCalc API running on port ${PORT}`);
   console.log(`Supabase: ${process.env.SUPABASE_URL ? 'configured' : 'not configured (file fallback active)'}`);
   console.log(`Stripe: ${process.env.STRIPE_SECRET_KEY ? 'configured' : 'not configured'}`);
+
+  // No cron infrastructure in this app (no Railway cron service, no
+  // node-cron dependency) -- this is a single always-on Railway service
+  // (railway.toml), so a plain setInterval is enough to keep the 30-day
+  // trial reminder emails going out on time without adding a new
+  // dependency or requiring a separate scheduled service to be configured.
+  checkTrialReminders().catch(err => console.error('checkTrialReminders (startup run) failed:', err.message));
+  setInterval(() => {
+    checkTrialReminders().catch(err => console.error('checkTrialReminders failed:', err.message));
+  }, 60 * 60 * 1000);
 });
 
 module.exports = app;

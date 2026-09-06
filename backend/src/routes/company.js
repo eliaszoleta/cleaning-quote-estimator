@@ -24,17 +24,24 @@ router.get('/:id', async (req, res) => {
     const svcStates = config ? Object.entries(config.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') : 'none';
     console.log(`[GET config] user=${id} found=${!!config} | ${svcStates}`);
     if (!config) {
-      // First login — new account requires Stripe checkout to start 7-day trial (CC required)
+      // First login — 30-day free trial starts immediately, no card required.
+      // computeSubscriptionStatus's trialStartedAt branch (subscriptionStatus.js)
+      // already treats this as active for 30 days with no Stripe subscription
+      // needed at all -- this is what makes the embed widget work right away.
       config = {
         ...DEFAULT_COMPANY_CONFIG,
         subscription: {
           ...DEFAULT_COMPANY_CONFIG.subscription,
-          trialType: 'stripe',
+          trialStartedAt: new Date().toISOString(),
         },
       };
       await saveCompanyConfig(id, config);
-    } else if (!config.subscription?.trialStartedAt && config.subscription?.trialType !== 'stripe') {
-      // Legacy backfill: existing accounts missing trialStartedAt (keep 30-day free trial)
+    } else if (!config.subscription?.trialStartedAt && !config.subscription?.stripeSubscriptionId) {
+      // Backfill: any existing account missing trialStartedAt that also hasn't
+      // subscribed yet (covers old trialType:'stripe' accounts from before this
+      // change, so nobody who signed up under the old CC-required flow gets
+      // stuck on requires_trial_setup forever) -- give them the same 30-day
+      // trial starting now.
       config.subscription = {
         ...DEFAULT_COMPANY_CONFIG.subscription,
         ...(config.subscription || {}),
