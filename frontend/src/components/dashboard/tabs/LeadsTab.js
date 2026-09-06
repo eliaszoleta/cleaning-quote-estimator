@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw } from 'lucide-react';
 import { getCompanyLeads, patchLead, deleteLeadForever } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
@@ -17,7 +17,10 @@ export default function LeadsTab({ user }) {
   const [search, setSearch] = useState('');
   const [selectedLead, setSelectedLead] = useState(null);
   const [notes, setNotes] = useState('');
-  const [savingNote, setSavingNote] = useState(false);
+  // '' | 'saving' | 'saved' -- drives the small inline status text next to
+  // the Internal Notes label, replacing the old explicit Save Note button.
+  const [noteStatus, setNoteStatus] = useState('');
+  const notesTimer = useRef(null);
   // "Archive" only ever soft-deletes (sets deleted_at) -- the lead was never
   // actually gone, but with no way to see or restore it, that's exactly how
   // it looked. This view toggle plus the Restore/Delete Forever actions
@@ -25,6 +28,7 @@ export default function LeadsTab({ user }) {
   const [view, setView] = useState('active');
 
   useEffect(() => { loadLeads(); }, []);
+  useEffect(() => () => { if (notesTimer.current) clearTimeout(notesTimer.current); }, []);
 
   const loadLeads = async () => {
     setLoading(true);
@@ -69,19 +73,46 @@ export default function LeadsTab({ user }) {
 
   const switchView = (v) => { setView(v); setFilter('all'); setSelectedLead(null); };
 
-  const openLead = (lead) => { setSelectedLead(lead); setNotes(lead.notes || ''); };
+  const openLead = (lead) => {
+    // Switching leads with a pending debounce still in flight would otherwise
+    // save the previous lead's notes value onto the newly selected one a
+    // moment later -- clear it first.
+    if (notesTimer.current) clearTimeout(notesTimer.current);
+    setSelectedLead(lead);
+    setNotes(lead.notes || '');
+    setNoteStatus('');
+  };
 
-  const saveNote = async () => {
-    setSavingNote(true);
+  const saveNote = async (val, leadId) => {
+    setNoteStatus('saving');
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-      await patchLead(token, selectedLead.id, { notes });
-      setLeads(prev => prev.map(l => l.id === selectedLead.id ? { ...l, notes } : l));
-      setSelectedLead(prev => ({ ...prev, notes }));
-    } catch {} finally {
-      setSavingNote(false);
+      await patchLead(token, leadId, { notes: val });
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, notes: val } : l));
+      setSelectedLead(prev => (prev?.id === leadId ? { ...prev, notes: val } : prev));
+      setNoteStatus('saved');
+    } catch {
+      setNoteStatus('');
     }
+  };
+
+  // Auto-save, replacing the old explicit Save Note button -- debounced so
+  // it doesn't fire a request on every keystroke, and flushed immediately
+  // on blur so clicking away doesn't leave a pending save hanging.
+  const handleNotesChange = (val) => {
+    setNotes(val);
+    setNoteStatus('');
+    if (notesTimer.current) clearTimeout(notesTimer.current);
+    const leadId = selectedLead.id;
+    notesTimer.current = setTimeout(() => saveNote(val, leadId), 900);
+  };
+
+  const flushNoteSave = () => {
+    if (!notesTimer.current || !selectedLead) return;
+    clearTimeout(notesTimer.current);
+    notesTimer.current = null;
+    saveNote(notes, selectedLead.id);
   };
 
   const archiveLead = async (leadId) => {
@@ -296,22 +327,21 @@ export default function LeadsTab({ user }) {
             </div>
           )}
 
-          {/* Notes */}
+          {/* Notes -- auto-saves (debounced + flushed on blur), no explicit
+              Save button. */}
           <div>
-            <div style={{ fontWeight: 700, fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Internal Notes</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}>
+              <div style={{ fontWeight: 700, fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Internal Notes</div>
+              {noteStatus === 'saving' && <span style={{ fontSize: 11, color: '#94a3b8' }}>Saving…</span>}
+              {noteStatus === 'saved' && <span style={{ fontSize: 11, color: '#16a34a', fontWeight: 600 }}>Saved</span>}
+            </div>
             <textarea
               value={notes}
-              onChange={e => setNotes(e.target.value)}
+              onChange={e => handleNotesChange(e.target.value)}
+              onBlur={flushNoteSave}
               placeholder="Add notes about this lead…"
               style={{ width: '100%', padding: '9px 11px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, resize: 'vertical', minHeight: 80, outline: 'none', color: '#0f172a', fontFamily: 'inherit' }}
             />
-            <button
-              onClick={saveNote}
-              disabled={savingNote}
-              style={{ marginTop: 6, padding: '7px 14px', background: '#2563eb', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
-            >
-              {savingNote ? 'Saving…' : 'Save Note'}
-            </button>
           </div>
 
           {/* Actions -- two stacked rows instead of cramming everything into
