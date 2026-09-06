@@ -88,7 +88,12 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
         </Helmet>
       )}
 
-      <div ref={rootRef} style={{ padding: embedded ? '0' : '40px 16px', background: embedded ? 'white' : '#f8fafc', minHeight: embedded ? 'auto' : '100vh' }}>
+      {/* Bottom padding still applies when embedded, even though top/sides
+          don't -- the disclaimer paragraph below the New Estimate button is
+          hidden in embedded mode, so without this the button row was the
+          very last thing rendered with zero space before the iframe's own
+          edge, reading as cut off rather than intentionally placed. */}
+      <div ref={rootRef} style={{ padding: embedded ? '0 0 24px' : '40px 16px', background: embedded ? 'white' : '#f8fafc', minHeight: embedded ? 'auto' : '100vh' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
           <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: embedded ? 'none' : '0 8px 40px rgba(0,0,0,0.10)', border: embedded ? 'none' : '1px solid #e2e8f0', marginBottom: 20 }}>
