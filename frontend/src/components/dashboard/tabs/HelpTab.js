@@ -11,6 +11,14 @@ const pStyle = { fontSize: 13.5, color: '#374151', lineHeight: 1.7, margin: '0 0
 
 const FAQ = [
   {
+    q: 'Why does it show a price range instead of one exact number?',
+    a: "So it reads as an estimate, not a quote you're bound to. Actual price still depends on things only an in-person look can confirm (real condition, access, etc.) — a range sets that expectation upfront instead of a visitor holding you to a single number sight-unseen. Every price on both the public cleanestimator.com calculator and your embedded widget works this way.",
+  },
+  {
+    q: 'Is my embedded widget the same calculator as the public cleanestimator.com site?',
+    a: "Same pricing engine and same range-based output, yes — the only difference is your branding, your markup/minimums, and which services and states you've enabled. A visitor on your widget and a visitor on the public site entering identical job details get the identical base calculation before your markup is applied.",
+  },
+  {
     q: 'A price came out wrong — what should I check first?',
     a: 'Almost always the markup on that specific service, in the Services tab. Every price starts from Clean Estimator\'s own base pricing for that service and state, then gets multiplied by your markup (1.0 = unchanged, 1.2 = 20% higher, 0.8 = 20% lower). If a service looks off across the board, that\'s the number to adjust — not something to report as a bug.',
   },
@@ -99,6 +107,39 @@ export default function HelpTab() {
             <p style={{ ...pStyle, margin: 0 }}><strong style={{ color: '#0f172a' }}>Your markup</strong> — a multiplier you control per service, in the Services tab. <code style={{ background: '#f1f5f9', padding: '1px 5px', borderRadius: 4, fontSize: 12.5 }}>1.0</code> shows the price exactly as calculated. <code style={{ background: '#f1f5f9', padding: '1px 5px', borderRadius: 4, fontSize: 12.5 }}>1.2</code> shows it 20% higher. <code style={{ background: '#f1f5f9', padding: '1px 5px', borderRadius: 4, fontSize: 12.5 }}>0.85</code> shows it 15% lower. This is the number to change if your prices don't match what you'd actually quote.</p>
           </div>
         </div>
+      </div>
+
+      <div style={cardStyle}>
+        <div style={sectionTitle}>
+          <div style={iconBadge('#fefce8')}><Calculator size={16} color="#ca8a04" /></div>
+          A real example, worked out
+        </div>
+        <p style={pStyle}>
+          House Cleaning, 1,500–2,000 sq ft, 3 bedrooms / 2 bathrooms, standard clean, good condition, one-time visit, visitor in Texas, your markup left at the default <code style={{ background: '#f1f5f9', padding: '1px 5px', borderRadius: 4, fontSize: 12.5 }}>1.0</code>:
+        </p>
+        <div style={{ background: '#f8fafc', borderRadius: 8, padding: '4px 16px', marginBottom: 10 }}>
+          {[
+            ['Base price for that home size', '$158 – $198'],
+            ['+ 3 bedrooms', '+$30'],
+            ['+ 2 bathrooms', '+$35'],
+            ['× Texas cost-of-living (1.05) × your markup (1.0)', '$234 – $276'],
+          ].map(([label, val]) => (
+            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '9px 0', borderBottom: '1px solid #e2e8f0', fontSize: 13 }}>
+              <span style={{ color: '#64748b' }}>{label}</span>
+              <span style={{ fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap' }}>{val}</span>
+            </div>
+          ))}
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '9px 0', fontSize: 13.5 }}>
+            <span style={{ fontWeight: 700, color: '#0f172a' }}>Visitor sees</span>
+            <span style={{ fontWeight: 800, color: '#2563eb' }}>$234 – $276</span>
+          </div>
+        </div>
+        <p style={pStyle}>
+          Standard clean, no extras, and good condition don't change the price here — deep-clean, move-in/out, extras, or a "needs attention" condition would each add their own line on top, the same way bedrooms and bathrooms just did. Bump your markup to <code style={{ background: '#f1f5f9', padding: '1px 5px', borderRadius: 4, fontSize: 12.5 }}>1.15</code> and this exact same job becomes <strong>$269 – $318</strong> instead — that's the only number in this whole calculation that's actually yours to move.
+        </p>
+        <p style={{ ...pStyle, marginBottom: 0 }}>
+          The visitor sees this same breakdown, line by line, on their results screen and in their emailed estimate — nothing here is hidden from them either.
+        </p>
       </div>
 
       <div style={cardStyle}>
