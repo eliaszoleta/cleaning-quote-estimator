@@ -38,7 +38,12 @@ const dashboardOrigins = [
 app.use(cors({
   origin: dashboardOrigins,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  // x-admin-key is a custom header (AdminCompanies.js), so the browser
+  // sends a CORS preflight before the real request -- without it listed
+  // here, the preflight response doesn't allow it and the browser blocks
+  // the actual request client-side before it ever reaches admin.js, surfacing
+  // only as a generic "Failed to fetch" with nothing useful in the response.
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-key'],
 }));
 
 // Rate limiting on calculate endpoint
