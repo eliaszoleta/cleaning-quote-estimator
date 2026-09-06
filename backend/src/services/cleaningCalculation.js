@@ -285,7 +285,13 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'Day porter (monthly)', low: porterMonthlyLow, high: porterMonthlyHigh });
   }
 
-  const restroomSurcharge = restrooms > 2 ? (restrooms - 2) * 30 : 0;
+  // $30/restroom beyond the 2 included -- same as the base sqft rate and
+  // day porter above, this needs stateMultiplier * markup applied too, or
+  // it silently ignores both: a company's own markup wouldn't apply to
+  // this line, and two identical buildings in different states would
+  // show the exact same restroom surcharge despite everything else in
+  // the quote correctly reflecting the cost difference.
+  const restroomSurcharge = restrooms > 2 ? Math.round((restrooms - 2) * 30 * stateMultiplier * markup) : 0;
   if (restroomSurcharge > 0) adjustments.push({ label: `${restrooms} restrooms surcharge`, low: restroomSurcharge, high: restroomSurcharge });
 
   return {
