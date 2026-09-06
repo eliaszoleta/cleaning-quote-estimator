@@ -237,7 +237,7 @@ function buildHtml({ name, serviceType, result, companyConfig, partner }) {
 // Fire-and-forget from the caller's perspective: never throws, returns
 // false (and logs why) instead so a missing config or a delivery failure
 // never breaks the /api/calculate response.
-async function sendEstimateEmail({ to, name, serviceType, result, companyConfig, partner }) {
+async function sendEstimateEmail({ to, name, serviceType, result, companyConfig, partner, replyTo }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendEstimateEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -253,6 +253,14 @@ async function sendEstimateEmail({ to, name, serviceType, result, companyConfig,
       {
         from: `${brandName} <${fromAddress}>`,
         to: [to],
+        // On a subscribed company's widget, replies should reach the
+        // company (their own inbox), not our sending address -- the From
+        // address itself has to stay ours (Resend can only send through a
+        // domain we've verified with SPF/DKIM; putting the company's own
+        // domain there would fail authentication and get flagged as
+        // spoofed), but reply_to lets "Reply" in the visitor's mail client
+        // route straight to the business anyway.
+        reply_to: replyTo || undefined,
         subject: `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate is ready`,
         html: buildHtml({ name, serviceType, result, companyConfig, partner }),
         text: buildText({ name, serviceType, result, companyConfig, partner }),

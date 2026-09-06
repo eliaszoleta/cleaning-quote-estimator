@@ -128,19 +128,29 @@ router.post('/', async (req, res) => {
         console.warn('Lead save failed (non-critical):', leadErr.message);
       }
 
+      // Resolved once and reused below for both the visitor's estimate
+      // email (as reply-to, so hitting "Reply" reaches the company
+      // directly instead of our own sending address) and the company's own
+      // lead-notification email (as the recipient) -- avoids looking up
+      // the same Supabase Auth user twice per lead.
+      const companyOwnerEmailPromise = companyId ? getCompanyOwnerEmail(companyId) : Promise.resolve(null);
+
       // Fire-and-forget: sendEstimateEmail never throws, so this never
       // blocks or breaks the response on email delivery. Passes the full
       // result (breakdown, key factors, recurring pricing) and the
       // already-resolved partner match so the email mirrors exactly what
       // the results page showed, not just the top-line price range.
-      sendEstimateEmail({
-        to: leadInfo.email,
-        name: leadInfo.name,
-        serviceType,
-        result,
-        companyConfig,
-        partner: partnerInfo || null,
-      }).catch(err => console.error('Estimate email failed:', err.message));
+      companyOwnerEmailPromise
+        .then(ownerEmail => sendEstimateEmail({
+          to: leadInfo.email,
+          name: leadInfo.name,
+          serviceType,
+          result,
+          companyConfig,
+          partner: partnerInfo || null,
+          replyTo: ownerEmail || undefined,
+        }))
+        .catch(err => console.error('Estimate email failed:', err.message));
 
       // Forward the same lead to the matched partner, if any -- the
       // lead-capture form already tells visitors "we'll connect you with
@@ -175,7 +185,7 @@ router.post('/', async (req, res) => {
       // widget -- previously the only way to find out was checking the
       // Leads tab manually. Sent to the same email they signed up with.
       if (companyId) {
-        getCompanyOwnerEmail(companyId)
+        companyOwnerEmailPromise
           .then(ownerEmail => {
             if (!ownerEmail) return;
             return sendCompanyLeadEmail({
