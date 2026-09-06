@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Save, Check, Loader2 } from 'lucide-react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
 
-export default function BrandingTab({ config, update }) {
+export default function BrandingTab({ config, update, onSave, saving, saved }) {
   const [form, setForm] = useState({
     companyName: '', logo: '', primaryColor: '#2563eb', accentColor: '#16a34a',
     ctaHeadline: '', ctaSubtext: '', ctaButtonText: '', ctaPhone: '', ctaButtonUrl: '',
@@ -138,6 +139,34 @@ export default function BrandingTab({ config, update }) {
             <CleaningCalculator companyConfig={previewConfig} embedded={true} />
           </div>
         </div>
+      </div>
+
+      {/* Save Changes repeated here -- the header button is easy to miss
+          after scrolling down through the settings column, so this gives
+          people a save action right where they finish editing. */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 24, paddingTop: 20, borderTop: '1px solid #e2e8f0' }}>
+        <button
+          onClick={onSave}
+          disabled={saving}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 7,
+            padding: '11px 22px',
+            background: saving ? '#334155' : '#2563eb',
+            color: 'white', border: 'none', borderRadius: 8,
+            fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer',
+            fontSize: 14, transition: 'background 0.15s',
+          }}
+        >
+          {saving
+            ? <><Loader2 size={14} className="spin" /> Saving…</>
+            : <><Save size={14} /> Save Changes</>
+          }
+        </button>
+        {saved && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#16a34a', fontSize: 13.5, fontWeight: 600 }}>
+            <Check size={15} strokeLinecap="square" strokeLinejoin="miter" /> Saved
+          </div>
+        )}
       </div>
     </div>
   );

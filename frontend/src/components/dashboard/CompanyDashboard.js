@@ -32,7 +32,7 @@ export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [subStatus, setSubStatus] = useState(null);
   const [localConfig, setLocalConfig] = useState(null);
-  const { config, loading, saving, saved, error, saveConfig } = useCompanyConfig(user.id);
+  const { config, loading, saving, saved, error, saveConfig, patchServices } = useCompanyConfig(user.id);
 
   const localConfigReady = useRef(false);
   useEffect(() => {
@@ -49,6 +49,16 @@ export default function CompanyDashboard({ user, onLogout }) {
   const handleGlobalSave = () => {
     if (localConfig) saveConfig(localConfig);
   };
+
+  // Wraps the hook's patchServices so localConfig (what the header's Save
+  // Changes button submits) reflects the just-persisted toggle too --
+  // otherwise a later global save would overwrite the auto-saved change
+  // with whatever stale services value localConfig still had from before
+  // the toggle.
+  const patchServiceToggle = useCallback(async (services) => {
+    const data = await patchServices(services);
+    if (data) update({ services: data.services });
+  }, [patchServices, update]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -110,8 +120,8 @@ export default function CompanyDashboard({ user, onLogout }) {
   const TABS = {
     overview:     <OverviewTab {...tabProps} />,
     help:         <HelpTab />,
-    branding:     <BrandingTab config={localConfig} update={update} />,
-    services:     <ServicesTab config={localConfig} update={update} />,
+    branding:     <BrandingTab config={localConfig} update={update} onSave={handleGlobalSave} saving={saving} saved={saved} />,
+    services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} />,
     embed:        <EmbedTab {...tabProps} />,
     leads:        <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab {...tabProps} />,

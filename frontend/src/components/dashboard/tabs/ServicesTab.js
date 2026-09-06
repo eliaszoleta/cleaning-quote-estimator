@@ -18,7 +18,7 @@ const SERVICES = [
 
 const DEFAULT_SVC = { enabled: true, markup: 1.0, minimumCharge: null };
 
-export default function ServicesTab({ config, update }) {
+export default function ServicesTab({ config, update, patchServices }) {
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
   const [customQuestions, setCustomQuestions] = useState([]);
@@ -52,6 +52,19 @@ export default function ServicesTab({ config, update }) {
       if (update) update({ services: next });
       return next;
     });
+  };
+
+  // Enable/disable saves immediately instead of waiting on the header's
+  // Save Changes button -- a company turning a service off expects it gone
+  // from their live widget right away, not just staged for the next manual
+  // save. Markup/minimumCharge edits still go through Save Changes as
+  // before (auto-saving those on every keystroke would be excessive).
+  const toggleService = (id) => {
+    const nextSvc = { ...getSvc(id), enabled: !getSvc(id).enabled };
+    const next = { ...services, [id]: nextSvc };
+    setServices(next);
+    if (update) update({ services: next });
+    if (patchServices) patchServices({ [id]: nextSvc });
   };
 
   const setLeadCapture = (val) => {
@@ -89,7 +102,7 @@ export default function ServicesTab({ config, update }) {
     <div>
       <div style={{ marginBottom: 22 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Services & Pricing</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Toggle services and set pricing. Click <strong>Save Changes</strong> in the header when done.</p>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Toggling a service on/off saves instantly. For markup and minimum price changes, click <strong>Save Changes</strong> in the header when done.</p>
       </div>
 
       {/* Service area */}
@@ -202,7 +215,7 @@ export default function ServicesTab({ config, update }) {
                 {/* Toggle */}
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <label style={{ position: 'relative', display: 'inline-block', width: 42, height: 23, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={s.enabled} onChange={e => setSvc(id, 'enabled', e.target.checked)}
+                    <input type="checkbox" checked={s.enabled} onChange={() => toggleService(id)}
                       style={{ opacity: 0, width: 0, height: 0 }} />
                     <span style={{ position: 'absolute', inset: 0, borderRadius: 23, background: s.enabled ? '#2563eb' : '#cbd5e1', transition: 'background 0.2s' }}>
                       <span style={{ position: 'absolute', top: 2.5, left: s.enabled ? 21 : 2.5, width: 18, height: 18, borderRadius: '50%', background: 'white', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
