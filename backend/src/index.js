@@ -11,9 +11,6 @@ const subscriptionRouter = require('./routes/subscription');
 const leadsRouter = require('./routes/leads');
 const partnerCheckoutRouter = require('./routes/partnerCheckout');
 const { requireAuth } = require('./middleware/auth');
-const { computeSubscriptionStatus } = require('./services/subscriptionStatus');
-const { DEFAULT_COMPANY_CONFIG } = require('./config/defaults');
-const { getCompanyConfig } = require('./services/companyConfig');
 const { checkTrialReminders } = require('./services/trialScheduler');
 
 const app = express();
@@ -88,29 +85,6 @@ app.use('/api/auth', authRouter);
 // ─── Public routes ────────────────────────────────────────────────────────────
 app.use('/api/calculate', calculateRouter);
 
-// Public company config (for widget) — no auth
-app.get('/api/company/:id/public', async (req, res) => {
-  try {
-    const config = (await getCompanyConfig(req.params.id)) || DEFAULT_COMPANY_CONFIG;
-    const sub = computeSubscriptionStatus(config);
-    const { companyName, logo, primaryColor, accentColor, fontFamily,
-      ctaHeadline, ctaSubtext, ctaButtonText, ctaPhone, ctaButtonUrl,
-      serviceStates, frameHeight, borderRadius, services } = config;
-    res.json({
-      success: true,
-      data: {
-        companyName, logo, primaryColor, accentColor, fontFamily,
-        ctaHeadline, ctaSubtext, ctaButtonText, ctaPhone, ctaButtonUrl,
-        serviceStates, frameHeight, borderRadius, services,
-        paused: !sub.active,
-        trialDaysLeft: sub.daysLeft,
-      },
-    });
-  } catch {
-    res.json({ success: true, data: { ...DEFAULT_COMPANY_CONFIG, paused: false } });
-  }
-});
-
 // Public leads API (API key auth handled inside router)
 app.use('/api/leads', leadsRouter);
 
@@ -119,7 +93,16 @@ app.use('/api/leads', leadsRouter);
 app.use('/api/partner-checkout', partnerCheckoutRouter);
 
 // ─── Auth-protected routes ────────────────────────────────────────────────────
-app.use('/api/company', requireAuth, companyRouter);
+// requireAuth is applied per-route inside companyRouter, not blanket here --
+// GET /:id/public must stay reachable without auth (it's what the embedded
+// widget on a visitor's browser calls). A prior version of this file had a
+// second, standalone /api/company/:id/public route registered above,
+// specifically to dodge a blanket requireAuth here -- since Express matches
+// routes in registration order, that older route silently shadowed every
+// update made to company.js's own /public handler (serviceCities support,
+// Cache-Control) for as long as both existed. Removed the duplicate;
+// company.js is now the single source of truth for this path.
+app.use('/api/company', companyRouter);
 app.use('/api/subscription', requireAuth, subscriptionRouter);
 app.use('/api/company-leads', requireAuth, leadsRouter);
 

@@ -5,6 +5,7 @@ const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
 const { sendCompanyWelcomeEmail } = require('../services/email');
+const { requireAuth } = require('../middleware/auth');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SERVICE_KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -16,7 +17,7 @@ function dbHeaders() {
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
 // GET /api/company/:id — get full config (auth required via middleware)
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
   if (req.user.id !== id) return res.status(403).json({ success: false, error: 'Forbidden' });
 
@@ -44,7 +45,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // PUT /api/company/:id — update config (auth required)
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
   if (req.user.id !== id) return res.status(403).json({ success: false, error: 'Forbidden' });
 
@@ -74,7 +75,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // PATCH /api/company/:id/services — save ONLY services (deep merge, dedicated endpoint)
-router.patch('/:id/services', async (req, res) => {
+router.patch('/:id/services', requireAuth, async (req, res) => {
   const { id } = req.params;
   if (req.user.id !== id) return res.status(403).json({ success: false, error: 'Forbidden' });
 
@@ -130,7 +131,7 @@ router.get('/:id/public', async (req, res) => {
 });
 
 // DELETE /api/company/account — permanently delete account and all associated data
-router.delete('/account', async (req, res) => {
+router.delete('/account', requireAuth, async (req, res) => {
   const companyId = req.user.id;
   try {
     if (SERVICE_KEY()) {
