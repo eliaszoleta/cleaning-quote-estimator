@@ -18,7 +18,7 @@ const SERVICES = [
 
 const DEFAULT_SVC = { enabled: true, markup: 1.0, minimumCharge: null };
 
-export default function ServicesTab({ config, update, patchServices }) {
+export default function ServicesTab({ config, update, patchServices, autoSave }) {
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
   const [customQuestions, setCustomQuestions] = useState([]);
@@ -39,10 +39,17 @@ export default function ServicesTab({ config, update, patchServices }) {
     }
   }, [config]);
 
+  // Service Area (states + cities) saves immediately, same as the service
+  // on/off toggles below -- these are discrete add/remove actions, not
+  // continuous typing, so there's no "excessive autosave" concern, and
+  // leaving them staged behind Save Changes was exactly the "did my change
+  // actually take effect on the widget?" confusion the toggle autosave
+  // already fixed once.
   const toggleState = (code) => {
     setServiceStates(prev => {
       const next = prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code];
-      if (update) update({ serviceStates: next });
+      if (autoSave) autoSave({ serviceStates: next });
+      else if (update) update({ serviceStates: next });
       return next;
     });
   };
@@ -53,7 +60,8 @@ export default function ServicesTab({ config, update, patchServices }) {
     setServiceCities(prev => {
       if (prev.some(c => c.toLowerCase() === trimmed.toLowerCase())) return prev;
       const next = [...prev, trimmed];
-      if (update) update({ serviceCities: next });
+      if (autoSave) autoSave({ serviceCities: next });
+      else if (update) update({ serviceCities: next });
       return next;
     });
   };
@@ -61,7 +69,8 @@ export default function ServicesTab({ config, update, patchServices }) {
   const removeCity = (name) => {
     setServiceCities(prev => {
       const next = prev.filter(c => c !== name);
-      if (update) update({ serviceCities: next });
+      if (autoSave) autoSave({ serviceCities: next });
+      else if (update) update({ serviceCities: next });
       return next;
     });
   };
@@ -124,7 +133,7 @@ export default function ServicesTab({ config, update, patchServices }) {
     <div>
       <div style={{ marginBottom: 22 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Services & Pricing</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Toggling a service on/off saves instantly. For markup and minimum price changes, click <strong>Save Changes</strong> in the header when done.</p>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Service Area and toggling a service on/off save instantly. For markup and minimum price changes, click <strong>Save Changes</strong> in the header when done.</p>
       </div>
 
       {/* Service area */}

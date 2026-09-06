@@ -60,6 +60,18 @@ export default function CompanyDashboard({ user, onLogout }) {
     if (data) update({ services: data.services });
   }, [patchServices, update]);
 
+  // Same immediate-save treatment as service toggles, for Service Area
+  // (states + cities) -- adding a city or state via plain update() only
+  // staged it in localConfig until the header's Save Changes was clicked,
+  // which is exactly the "did it actually take effect?" confusion the
+  // service-toggle auto-save already fixed once. saveConfig's PUT merges
+  // just the given field into whatever's already saved server-side, so
+  // this is safe to fire alongside the same optimistic local update().
+  const autoSave = useCallback((partial) => {
+    update(partial);
+    saveConfig(partial);
+  }, [update, saveConfig]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
@@ -121,7 +133,7 @@ export default function CompanyDashboard({ user, onLogout }) {
     overview:     <OverviewTab {...tabProps} />,
     help:         <HelpTab />,
     branding:     <BrandingTab config={localConfig} update={update} onSave={handleGlobalSave} saving={saving} saved={saved} />,
-    services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} />,
+    services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} autoSave={autoSave} />,
     embed:        <EmbedTab {...tabProps} />,
     leads:        <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab {...tabProps} />,
