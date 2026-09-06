@@ -19,10 +19,17 @@ export default function EmbedWrapper({ companyId }) {
       .finally(() => setLoading(false));
   }, [companyId]);
 
-  // Keep parent iframe height synced
+  // Keep parent iframe height synced -- measured off document.body rather
+  // than document.documentElement, since a root html element's scrollHeight
+  // is clamped to be at least the layout viewport height (i.e. the iframe's
+  // OWN currently-applied height), so it can only ever report growth, never
+  // shrink back down once the parent has sized the iframe taller for a
+  // previous step. body has no such floor as long as nothing gives it an
+  // explicit height/min-height (it doesn't here), so its scrollHeight
+  // tracks the calculator's actual rendered content in both directions.
   useEffect(() => {
     const observer = new ResizeObserver(() => {
-      const h = document.documentElement.scrollHeight;
+      const h = document.body.scrollHeight;
       window.parent?.postMessage({ type: 'cleancalc-resize', height: h }, '*');
     });
     observer.observe(document.body);

@@ -10,14 +10,27 @@ export default function EmbedTab({ config, user }) {
   const height = config?.frameHeight || 700;
   const radius = config?.borderRadius || 12;
 
+  const iframeId = `cleancalc-iframe-${companyId}`;
+
   const iframeCode = `<iframe
+  id="${iframeId}"
   src="${SITE_URL}/embed?company=${companyId}"
   width="100%"
   height="${height}"
   style="border:none;border-radius:${radius}px;box-shadow:0 4px 24px rgba(0,0,0,0.10);"
   title="Cleaning Cost Estimator"
   loading="lazy">
-</iframe>`;
+</iframe>
+<script>
+  (function(){
+    var iframe=document.getElementById('${iframeId}');
+    window.addEventListener('message',function(e){
+      if(e.data&&e.data.type==='cleancalc-resize'&&e.source===iframe.contentWindow){
+        iframe.style.height=Math.max(e.data.height,300)+'px';
+      }
+    });
+  })();
+</script>`;
 
   const scriptCode = `<div id="cleancalc-widget"></div>
 <script>
@@ -28,6 +41,11 @@ export default function EmbedTab({ config, user }) {
     el.style.cssText='border:none;border-radius:${radius}px;box-shadow:0 4px 24px rgba(0,0,0,.10);';
     el.title='Cleaning Cost Estimator';el.loading='lazy';
     document.getElementById('cleancalc-widget').appendChild(el);
+    window.addEventListener('message',function(e){
+      if(e.data&&e.data.type==='cleancalc-resize'&&e.source===el.contentWindow){
+        el.style.height=Math.max(e.data.height,300)+'px';
+      }
+    });
   })();
 </script>`;
 
