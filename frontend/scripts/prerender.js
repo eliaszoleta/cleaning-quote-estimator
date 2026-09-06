@@ -1223,10 +1223,12 @@ function renderForCompanies(assets) {
   const features = [
     ['White-label branding', 'Your logo, colors, and call-to-action text. Visitors never see the Clean Estimator name.'],
     ['Lead capture built-in', 'Collect name, email, phone, and timeline from every visitor before they see the estimate.'],
+    ['Instant lead alerts — zero setup', "The moment someone gets an estimate on your site, you get an email with their name, phone, and full price breakdown. No CRM, no Zapier, nothing to configure — it works the day you embed the widget."],
+    ['Every estimate email is branded as yours', "Visitors get a follow-up email carrying your logo, your phone number, and your call-to-action — not ours. Every completed estimate is another touchpoint with your business sitting in their inbox."],
     ['ZIP-code accurate pricing', 'State-specific pricing multipliers ensure your quotes reflect your local market.'],
     ['Per-service markup control', 'Adjust pricing up or down per service. Set your own minimum charges.'],
     ['Easy one-line embed', 'Paste one line of HTML to add the calculator to any website, Wix, Squarespace, or WordPress.'],
-    ['API for CRM sync', 'Pull leads via REST API into HubSpot, Salesforce, or any CRM using Zapier or Make.'],
+    ['API for CRM sync', 'Already have a CRM? Pull leads via REST API into HubSpot, Salesforce, or any tool using Zapier or Make — optional, on top of the email alerts you get by default.'],
   ];
   const steps = [
     ['1', 'Sign up', 'Create your account and start your 7-day free trial — credit card required.'],
@@ -1239,12 +1241,12 @@ function renderForCompanies(assets) {
     ['James R.', 'Pro Restoration Group — Denver, CO', "The water damage and mold calculators are exactly what we needed. Customers come in already understanding the price range, so there's less sticker shock on-site."],
     ['Maria L.', 'Crystal Clean Commercial — Miami, FL', "Setup took about 20 minutes. The embed is seamless — my website visitors don't even realize it's a third-party tool."],
   ];
-  const planFeatures = ['Unlimited calculator sessions', 'White-label branding', 'Lead capture dashboard', 'API access', 'All 9 service calculators', 'CSV export', 'Priority support'];
+  const planFeatures = ['Unlimited calculator sessions', 'White-label branding', 'Lead capture dashboard', 'Instant email alerts on every lead', 'Branded follow-up emails to visitors', 'API access', 'All 9 service calculators', 'CSV export', 'Priority support'];
 
   const body = `<div style="background:linear-gradient(135deg,#0f172a,#1e293b);color:white;padding:64px 32px;border-radius:16px;text-align:center;margin-bottom:48px">
     <div style="display:inline-block;background:rgba(37,99,235,0.25);color:#93c5fd;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:22px;border:1px solid rgba(37,99,235,0.35)">For cleaning companies</div>
     <h1 style="font-size:clamp(28px,5vw,48px);font-weight:800;line-height:1.15;margin-bottom:18px">Add a Branded Cleaning Cost Calculator to Your Website</h1>
-    <p style="font-size:17px;color:#94a3b8;max-width:540px;margin:0 auto 32px;line-height:1.6">Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7.</p>
+    <p style="font-size:17px;color:#94a3b8;max-width:540px;margin:0 auto 32px;line-height:1.6">Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7 — and emails you the second someone's ready to book.</p>
     <a href="/company" style="background:${PRIMARY};color:white;padding:15px 30px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px">Start Free Trial &#8594;</a>
     <p style="color:#475569;font-size:13.5px;margin-top:14px">$159/mo after 7 days &middot; Cancel anytime</p>
   </div>

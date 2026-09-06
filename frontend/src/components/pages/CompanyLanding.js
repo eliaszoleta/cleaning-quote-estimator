@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star } from 'lucide-react';
+import { Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star, BellRing, Send } from 'lucide-react';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
 
@@ -9,10 +9,12 @@ const PRIMARY_GRADIENT = '#1d4ed8';
 const FEATURES = [
   { Icon: Palette,       color: '#7c3aed', bg: '#f5f3ff', title: 'White-label branding',       desc: 'Your logo, colors, and call-to-action text. Visitors never see the Clean Estimator name.' },
   { Icon: ClipboardList, color: '#2563eb', bg: '#eff6ff', title: 'Lead capture built-in',       desc: 'Collect name, email, phone, and timeline from every visitor before they see the estimate.' },
+  { Icon: BellRing,      color: '#dc2626', bg: '#fef2f2', title: 'Instant lead alerts — zero setup', desc: "The moment someone gets an estimate on your site, you get an email with their name, phone, and full price breakdown. No CRM, no Zapier, nothing to configure — it works the day you embed the widget." },
+  { Icon: Send,          color: '#0d9488', bg: '#f0fdfa', title: 'Every estimate email is branded as yours', desc: "Visitors get a follow-up email carrying your logo, your phone number, and your call-to-action — not ours. Every completed estimate is another touchpoint with your business sitting in their inbox." },
   { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',   desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
   { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',  desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
   { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Easy one-line embed',         desc: 'Paste one line of HTML to add the calculator to any website, Wix, Squarespace, or WordPress.' },
-  { Icon: Key,           color: '#d97706', bg: '#fffbeb', title: 'API for CRM sync',            desc: 'Pull leads via REST API into HubSpot, Salesforce, or any CRM using Zapier or Make.' },
+  { Icon: Key,           color: '#d97706', bg: '#fffbeb', title: 'API for CRM sync',            desc: 'Already have a CRM? Pull leads via REST API into HubSpot, Salesforce, or any tool using Zapier or Make — optional, on top of the email alerts you get by default.' },
 ];
 
 const STEPS = [
@@ -32,6 +34,8 @@ const PLAN_FEATURES = [
   'Unlimited calculator sessions',
   'White-label branding',
   'Lead capture dashboard',
+  'Instant email alerts on every lead',
+  'Branded follow-up emails to visitors',
   'API access',
   'All 9 service calculators',
   'CSV export',
@@ -61,7 +65,7 @@ export default function CompanyLanding() {
                 <span style={{ color: '#60a5fa' }}>an instant cleaning estimate<br />on your website</span>
               </h1>
               <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 540, margin: '0 auto 32px', lineHeight: 1.6 }}>
-                Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7.
+                Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7 — and emails you the second someone's ready to book.
               </p>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <a href="/company" style={{ background: PRIMARY_GRADIENT, color: 'white', padding: '15px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 16, boxShadow: '0 8px 24px rgba(29,78,216,0.4)' }}>Start Free Trial →</a>
