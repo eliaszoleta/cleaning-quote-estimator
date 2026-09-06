@@ -24,6 +24,8 @@ export default function ServicesTab({ config, update, patchServices }) {
   const [customQuestions, setCustomQuestions] = useState([]);
   const [serviceStates, setServiceStates] = useState([]);
   const [stateSearch, setStateSearch] = useState('');
+  const [serviceCities, setServiceCities] = useState([]);
+  const [citySearch, setCitySearch] = useState('');
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export default function ServicesTab({ config, update, patchServices }) {
       setEnableLeadCapture(config.enableLeadCapture !== false);
       setCustomQuestions(config.customLeadQuestions || []);
       setServiceStates(config.serviceStates || []);
+      setServiceCities(config.serviceCities || []);
     }
   }, [config]);
 
@@ -40,6 +43,25 @@ export default function ServicesTab({ config, update, patchServices }) {
     setServiceStates(prev => {
       const next = prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code];
       if (update) update({ serviceStates: next });
+      return next;
+    });
+  };
+
+  const addCity = (name) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setServiceCities(prev => {
+      if (prev.some(c => c.toLowerCase() === trimmed.toLowerCase())) return prev;
+      const next = [...prev, trimmed];
+      if (update) update({ serviceCities: next });
+      return next;
+    });
+  };
+
+  const removeCity = (name) => {
+    setServiceCities(prev => {
+      const next = prev.filter(c => c !== name);
+      if (update) update({ serviceCities: next });
       return next;
     });
   };
@@ -156,6 +178,57 @@ export default function ServicesTab({ config, update, patchServices }) {
           )}
         </div>
       </div>
+
+      {/* Cities/towns you serve -- only relevant once at least one state is
+          set, since the city question only ever shows up once a state (or
+          the single fixed state) is known. Free-typed by the company, not
+          drawn from any external database: most cleaners serve a specific
+          metro area within a state, not literally every town in it, so
+          asking them what THEY cover is more accurate than any generic
+          list would be anyway. */}
+      {serviceStates.length > 0 && (
+        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{ fontWeight: 700, fontSize: 14 }}>Cities/Towns You Serve <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: 12 }}>(optional)</span></div>
+            <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
+              List the specific cities/towns you cover and your widget shows visitors a dropdown of just those instead of a free-text box. Leave empty and visitors can type any city.
+            </div>
+          </div>
+          <div style={{ padding: '14px 18px' }}>
+            {serviceCities.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                {serviceCities.map(city => (
+                  <span key={city} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0', borderRadius: 20, padding: '4px 6px 4px 12px', fontSize: 12.5, fontWeight: 600 }}>
+                    {city}
+                    <button type="button" onClick={() => removeCity(city)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#15803d', display: 'flex', padding: 2 }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                style={{ ...inp, flex: 1, boxSizing: 'border-box' }}
+                placeholder="Type a city or town and press Enter…"
+                value={citySearch}
+                onChange={e => setCitySearch(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { e.preventDefault(); addCity(citySearch); setCitySearch(''); }
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => { addCity(citySearch); setCitySearch(''); }}
+                disabled={!citySearch.trim()}
+                style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: citySearch.trim() ? '#16a34a' : '#e2e8f0', color: citySearch.trim() ? 'white' : '#94a3b8', fontWeight: 700, fontSize: 13, cursor: citySearch.trim() ? 'pointer' : 'not-allowed' }}
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Services list */}
       <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>

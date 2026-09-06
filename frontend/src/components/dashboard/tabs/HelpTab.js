@@ -163,6 +163,9 @@ export default function HelpTab() {
         <p style={pStyle}>
           Leave it empty and visitors pick from a generic list of all 50 states, same as the main cleanestimator.com calculator. Add exactly <strong>one</strong> state and that question disappears entirely — visitors just tell you their <strong>city</strong> instead, which is more relevant to a business that only serves one state anyway. Add a <strong>few</strong> states and they pick from just those, not the full US list.
         </p>
+        <p style={{ ...pStyle, marginBottom: 0 }}>
+          Once you've added a state, a second list appears below it — <strong>Cities/Towns You Serve</strong>. List the specific ones you cover and visitors pick from a dropdown of just those instead of typing a city freely. Leave it empty and they can type anything.
+        </p>
       </div>
 
       <div style={cardStyle}>

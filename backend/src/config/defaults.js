@@ -63,6 +63,7 @@ const DEFAULT_COMPANY_CONFIG = {
   frameHeight: '700px',
   borderRadius: '12px',
   serviceStates: [],
+  serviceCities: [],
   customSteps: [],
   subscription: {
     status: 'trialing',

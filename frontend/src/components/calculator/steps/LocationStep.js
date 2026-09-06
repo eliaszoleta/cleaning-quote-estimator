@@ -15,7 +15,7 @@ const US_STATES = [
   ['DC','Washington D.C.'],
 ];
 
-export default function LocationStep({ value, onBack, onNext, primaryColor, serviceStates = [] }) {
+export default function LocationStep({ value, onBack, onNext, primaryColor, serviceStates = [], serviceCities = [] }) {
   const [zip, setZip] = useState(value.zip || '');
   const [state, setState] = useState(value.state || (serviceStates.length === 1 ? serviceStates[0] : ''));
   const [city, setCity] = useState(value.city || '');
@@ -99,16 +99,29 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
       ) : singleState ? (
         <div>
           <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Your city</label>
-          <input
-            type="text" value={city}
-            onChange={e => setCity(e.target.value)}
-            placeholder={`e.g. a city in ${scopedStates[0]?.[1] || serviceStates[0]}`}
-            style={{ ...inputStyle, letterSpacing: 0 }}
-            onFocus={e => { e.target.style.borderColor = primaryColor; }}
-            onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
-            onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
-            autoFocus
-          />
+          {serviceCities.length > 0 ? (
+            <select
+              value={city} onChange={e => setCity(e.target.value)}
+              style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer' }}
+              onFocus={e => { e.target.style.borderColor = primaryColor; }}
+              onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+              autoFocus
+            >
+              <option value="">Select your city…</option>
+              {serviceCities.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          ) : (
+            <input
+              type="text" value={city}
+              onChange={e => setCity(e.target.value)}
+              placeholder={`e.g. a city in ${scopedStates[0]?.[1] || serviceStates[0]}`}
+              style={{ ...inputStyle, letterSpacing: 0 }}
+              onFocus={e => { e.target.style.borderColor = primaryColor; }}
+              onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+              onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
+              autoFocus
+            />
+          )}
           <p style={{ color: '#94a3b8', fontSize: 12.5, marginTop: 5 }}>Serving {scopedStates[0]?.[1] || serviceStates[0]}</p>
         </div>
       ) : (
@@ -126,15 +139,27 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
           {scoped && (
             <div style={{ marginTop: 14 }}>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Your city</label>
-              <input
-                type="text" value={city}
-                onChange={e => setCity(e.target.value)}
-                placeholder="e.g. your city"
-                style={{ ...inputStyle, letterSpacing: 0 }}
-                onFocus={e => { e.target.style.borderColor = primaryColor; }}
-                onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
-                onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
-              />
+              {serviceCities.length > 0 ? (
+                <select
+                  value={city} onChange={e => setCity(e.target.value)}
+                  style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer' }}
+                  onFocus={e => { e.target.style.borderColor = primaryColor; }}
+                  onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+                >
+                  <option value="">Select your city…</option>
+                  {serviceCities.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              ) : (
+                <input
+                  type="text" value={city}
+                  onChange={e => setCity(e.target.value)}
+                  placeholder="e.g. your city"
+                  style={{ ...inputStyle, letterSpacing: 0 }}
+                  onFocus={e => { e.target.style.borderColor = primaryColor; }}
+                  onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+                  onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
+                />
+              )}
             </div>
           )}
         </div>

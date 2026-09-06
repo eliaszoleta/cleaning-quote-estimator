@@ -121,14 +121,14 @@ router.get('/:id/public', async (req, res) => {
     const {
       companyName, logo, primaryColor, accentColor, fontFamily,
       ctaHeadline, ctaSubtext, ctaButtonText, ctaPhone, ctaButtonUrl,
-      serviceStates, frameHeight, borderRadius, services,
+      serviceStates, serviceCities, frameHeight, borderRadius, services,
     } = config;
     res.json({
       success: true,
       data: {
         companyName, logo, primaryColor, accentColor, fontFamily,
         ctaHeadline, ctaSubtext, ctaButtonText, ctaPhone, ctaButtonUrl,
-        serviceStates, frameHeight, borderRadius, services,
+        serviceStates, serviceCities, frameHeight, borderRadius, services,
         paused: !sub.active,
         trialDaysLeft: sub.daysLeft,
       },
