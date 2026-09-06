@@ -189,6 +189,9 @@ router.post('/', async (req, res) => {
               priceHigh: result.totalHigh,
               zip: zip || null,
               timeline: leadInfo.timeline || null,
+              adjustments: result.adjustments,
+              keyFactors: result.keyFactors,
+              serviceDetails: serviceDetails || {},
             });
           })
           .catch(err => console.error('Company lead email failed:', err.message));

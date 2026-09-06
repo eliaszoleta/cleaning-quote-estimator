@@ -440,26 +440,83 @@ async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPho
   }
 }
 
-function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline }) {
+// Same key-formatting LeadsTab.js's detail panel applies to
+// lead.service_details (insert a space before each capital, then
+// capitalize every word) -- so a company sees identical labels ("Sqft
+// Tier", "Cleaning Type") whether they're reading the email or the
+// dashboard. Values are left exactly as stored (e.g. "under_1000",
+// "one_time"), same as the dashboard.
+function formatDetailKey(key) {
+  return key
+    .replace(/([A-Z])/g, ' $1')
+    .trim()
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatDetailValue(v) {
+  return Array.isArray(v) ? v.join(', ') : String(v);
+}
+
+function buildServiceDetailsText(serviceDetails) {
+  const entries = Object.entries(serviceDetails || {}).filter(([, v]) => v !== null && v !== undefined && v !== '');
+  if (!entries.length) return [];
+  return ['', 'Service details:', ...entries.map(([k, v]) => `  ${formatDetailKey(k)}: ${formatDetailValue(v)}`)];
+}
+
+function buildServiceDetailsHtml(serviceDetails) {
+  const entries = Object.entries(serviceDetails || {}).filter(([, v]) => v !== null && v !== undefined && v !== '');
+  if (!entries.length) return '';
+  const rows = entries.map(([k, v]) => `
+    <tr>
+      <td style="padding:5px 0;color:#666666;font-size:13.5px;white-space:nowrap;">${formatDetailKey(k)}</td>
+      <td style="padding:5px 0 5px 14px;text-align:left;font-size:13.5px;color:#111111;font-weight:600;">${formatDetailValue(v)}</td>
+    </tr>`).join('');
+  return `
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Service details</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
+    ${rows}
+  </table>`;
+}
+
+function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
   const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
 
-  return [
+  const lines = [
     `New lead on your ${companyName} calculator!`,
     '',
     `${name} just got a ${serviceLabel.toLowerCase()} estimate on your embedded calculator: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}.`,
     '',
     'Contact info:',
     ...contactLines.map(l => `  ${l}`),
+  ];
+
+  if (adjustments.length) {
+    lines.push('', 'Price breakdown:');
+    adjustments.filter(a => !a.separate).forEach(a => {
+      lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
+    });
+    lines.push(`  Estimated total: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}`);
+  }
+
+  if (keyFactors.length) {
+    lines.push('', `Key factors: ${keyFactors.map(f => `${f.label}: ${f.impact}`.replace(/_/g, ' ')).join(' · ')}`);
+  }
+
+  lines.push(...buildServiceDetailsText(serviceDetails));
+
+  lines.push(
     '',
     'Reply to this email to reach them directly, or use the contact info above.',
     '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
+    'Clean Estimator - cleanestimator.com'
+  );
+
+  return lines.join('\n');
 }
 
-function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline }) {
+function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
   const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
@@ -474,6 +531,17 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
     </tr>`;
   }).join('');
 
+  const breakdownHtml = adjustments.length ? `
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Price breakdown</p>
+  <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;">
+    ${buildBreakdownRows(adjustments)}
+    <tr>
+      <td style="padding:8px 0 0;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
+      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</td>
+    </tr>
+  </table>
+  ${buildKeyFactors(keyFactors)}` : '';
+
   return `
 <div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead on your ${companyName} calculator!</p>
@@ -486,6 +554,8 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
   <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
     ${contactRows}
   </table>
+  ${breakdownHtml}
+  ${buildServiceDetailsHtml(serviceDetails)}
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
     Reply to this email to reach them directly, or use the contact info above.
@@ -502,7 +572,7 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
 // which goes to the visitor themselves). Reply-to is the lead's own email
 // so the company can just hit reply, same pattern as sendPartnerLeadEmail.
 // Fire-and-forget, called from calculate.js whenever companyId is present.
-async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, zip, timeline }) {
+async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, zip, timeline, adjustments, keyFactors, serviceDetails }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendCompanyLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -514,7 +584,7 @@ async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, lead
   }
 
   const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline };
+  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, adjustments, keyFactors, serviceDetails };
 
   try {
     await axios.post(
