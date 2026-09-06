@@ -217,7 +217,7 @@ function buildHtml({ name, serviceType, result, companyConfig, partner }) {
       });
 
   return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+<div style="max-width:520px;margin:0;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:14px;margin:0 0 20px;">Hi ${firstName},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${stateName ? ` for ${stateName}` : ''}:</p>
@@ -308,7 +308,7 @@ function buildPartnerWelcomeText({ businessName, cities }) {
 function buildPartnerWelcomeHtml({ businessName, cities }) {
   const cityList = fmtCityList(cities);
   return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+<div style="max-width:520px;margin:0;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Congratulations, ${businessName}!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
@@ -430,7 +430,7 @@ function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, lead
   }).join('');
 
   return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+<div style="max-width:520px;margin:0;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead in your area!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
@@ -601,7 +601,7 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
   ${buildKeyFactors(keyFactors)}` : '';
 
   return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+<div style="max-width:520px;margin:0;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead on your ${companyName} calculator!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
@@ -720,7 +720,7 @@ function buildCompanyWelcomeText({ companyId }) {
 function buildCompanyWelcomeHtml({ companyId }) {
   const code = buildEmbedIframeCode(companyId);
   return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+<div style="max-width:520px;margin:0;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Welcome to Clean Estimator!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
@@ -819,7 +819,7 @@ function buildTrialEndingSoonText({ companyName, daysLeft }) {
 
 function buildTrialEndingSoonHtml({ companyName, daysLeft }) {
   return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+<div style="max-width:520px;margin:0;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
@@ -890,7 +890,7 @@ function buildTrialEndedText({ companyName }) {
 
 function buildTrialEndedHtml({ companyName }) {
   return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+<div style="max-width:520px;margin:0;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
