@@ -1277,15 +1277,15 @@ function renderForCompanies(assets) {
     </div>`).join('\n    ')}
   </div>
 
-  <div id="pricing" style="background:linear-gradient(135deg,#f0f7ff,#f8fafc);border:1px solid #e2e8f0;border-radius:16px;padding:40px 32px;text-align:center;margin-bottom:48px">
-    <h2 style="font-size:22px;font-weight:700;color:#0f172a;margin-bottom:8px">Simple, transparent pricing</h2>
-    <p style="color:#64748b;font-size:13px;margin-bottom:20px">One plan. Everything included. No surprises.</p>
-    <div style="font-size:34px;font-weight:900;color:#0f172a">$159<span style="font-size:13px;color:#64748b;font-weight:600">/month</span></div>
-    <p style="color:#16a34a;font-weight:600;font-size:12px;margin-bottom:16px">$159/mo after 7 days &middot; Cancel anytime</p>
-    <ul style="list-style:none;padding:0;max-width:280px;margin:0 auto 20px;text-align:left">
-      ${planFeatures.map(f => `<li style="font-size:13px;color:#374151;margin-bottom:8px">&#10003; ${esc(f)}</li>`).join('\n      ')}
+  <div id="pricing" style="background:linear-gradient(135deg,#f0f7ff,#f8fafc);border:1.5px solid #1d4ed8;border-radius:16px;padding:40px 32px;text-align:center;margin-bottom:48px;max-width:420px;margin-left:auto;margin-right:auto">
+    <h2 style="font-size:32px;font-weight:700;color:#0f172a;margin-bottom:10px">Simple, transparent pricing</h2>
+    <p style="color:#64748b;font-size:16px;margin-bottom:28px">One plan. Everything included. No surprises.</p>
+    <div style="font-size:40px;font-weight:900;color:#0f172a">$159<span style="font-size:14px;color:#64748b;font-weight:600">/month</span></div>
+    <p style="color:#16a34a;font-weight:600;font-size:13px;margin-bottom:20px">$159/mo after your 30-day free trial &middot; No card required</p>
+    <ul style="list-style:none;padding:0;max-width:320px;margin:0 auto 22px;text-align:left">
+      ${planFeatures.map(f => `<li style="font-size:14px;color:#374151;margin-bottom:10px">&#10003; ${esc(f)}</li>`).join('\n      ')}
     </ul>
-    <a href="/company" style="display:inline-block;background:${PRIMARY};color:white;padding:11px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Start Free Trial &#8594;</a>
+    <a href="/company" style="display:inline-block;background:${PRIMARY};color:white;padding:13px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Start Free Trial &#8594;</a>
   </div>
 
   <div style="text-align:center">

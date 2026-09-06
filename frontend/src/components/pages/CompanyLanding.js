@@ -128,30 +128,30 @@ export default function CompanyLanding() {
           </div>
 
           {/* Pricing */}
-          <div id="pricing" style={{ background: 'linear-gradient(135deg, #f0f7ff, #f8fafc)', padding: '56px 24px 42px', borderTop: '1px solid #e2e8f0' }}>
-            <div style={{ maxWidth: 350, margin: '0 auto', textAlign: 'center' }}>
-              <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 8, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
-              <p style={{ color: '#64748b', fontSize: 13, marginBottom: 24 }}>One plan. Everything included. No surprises.</p>
-              <div style={{ background: 'white', border: '2px solid #1d4ed8', borderRadius: 16, padding: '26px 24px', boxShadow: '0 12px 36px rgba(29,78,216,0.16)' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 3, marginBottom: 3 }}>
-                  <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$159</span>
-                  <span style={{ fontSize: 13, color: '#64748b' }}>/month</span>
+          <div id="pricing" style={{ background: 'linear-gradient(135deg, #f0f7ff, #f8fafc)', padding: '80px 24px', borderTop: '1px solid #e2e8f0' }}>
+            <div style={{ maxWidth: 420, margin: '0 auto', textAlign: 'center' }}>
+              <h2 style={{ fontSize: 32, fontWeight: 700, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
+              <p style={{ color: '#64748b', fontSize: 16, marginBottom: 32 }}>One plan. Everything included. No surprises.</p>
+              <div style={{ background: 'white', border: '1.5px solid #1d4ed8', borderRadius: 16, padding: '32px 28px', boxShadow: '0 12px 36px rgba(29,78,216,0.16)' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 3, marginBottom: 4 }}>
+                  <span style={{ fontSize: 40, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$159</span>
+                  <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
                 </div>
-                <div style={{ color: '#16a34a', fontWeight: 600, fontSize: 12, marginBottom: 20 }}>$159/mo after your 30-day free trial · No card required</div>
-                <ul style={{ listStyle: 'none', padding: 0, marginBottom: 20, textAlign: 'left' }}>
+                <div style={{ color: '#16a34a', fontWeight: 600, fontSize: 13, marginBottom: 22 }}>$159/mo after your 30-day free trial · No card required</div>
+                <ul style={{ listStyle: 'none', padding: 0, marginBottom: 22, textAlign: 'left' }}>
                   {PLAN_FEATURES.map(item => (
-                    <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#374151' }}>
-                      <span style={{ width: 16, height: 16, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Check size={9} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" />
+                    <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10, fontSize: 14, color: '#374151' }}>
+                      <span style={{ width: 17, height: 17, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <Check size={10} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" />
                       </span>
                       {item}
                     </li>
                   ))}
                 </ul>
-                <a href="/company" style={{ display: 'block', background: PRIMARY_GRADIENT, color: 'white', padding: '11px 0', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14, textAlign: 'center', boxShadow: '0 6px 18px rgba(29,78,216,0.32)' }}>
+                <a href="/company" style={{ display: 'block', background: PRIMARY_GRADIENT, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15, textAlign: 'center', boxShadow: '0 6px 18px rgba(29,78,216,0.32)' }}>
                   Start Free Trial →
                 </a>
-                <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 8, textAlign: 'center' }}>$159/mo after your 30-day free trial · No card required</p>
+                <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 10, textAlign: 'center' }}>$159/mo after your 30-day free trial · No card required</p>
               </div>
             </div>
           </div>
