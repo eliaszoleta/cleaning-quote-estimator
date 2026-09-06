@@ -47,6 +47,16 @@ function fmtPhone(value) {
   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
 }
 
+// Appended to lead-notification subject lines so each one is unique --
+// otherwise every lead for the same service type shares the exact same
+// subject text ("New House Cleaning lead on your calculator"), and Gmail
+// (and most other clients) groups emails with matching subjects into one
+// conversation thread, burying every lead but the first under "N more"
+// instead of each landing as its own visible email.
+function fmtSubjectTimestamp() {
+  return new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' });
+}
+
 function fmtAdjustment(adj) {
   if (adj.low === 0 && adj.high === 0) return 'Included';
   if (adj.low < 0 || adj.high < 0) return `−${fmtMoney(Math.abs(adj.low))} – −${fmtMoney(Math.abs(adj.high))}`;
@@ -468,7 +478,7 @@ async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPho
         // Lets the partner just hit "reply" in their inbox to reach the
         // lead directly, without ever needing to copy the contact info out.
         reply_to: leadEmail || undefined,
-        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead in your area`,
+        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead in your area — ${fmtSubjectTimestamp()}`,
         html: buildPartnerLeadHtml(args),
         text: buildPartnerLeadText(args),
       },
@@ -634,7 +644,7 @@ async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, lead
         from: `Clean Estimator <${fromAddress}>`,
         to: [to],
         reply_to: leadEmail || undefined,
-        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead on your calculator`,
+        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead on your calculator — ${fmtSubjectTimestamp()}`,
         html: buildCompanyLeadHtml(args),
         text: buildCompanyLeadText(args),
       },
