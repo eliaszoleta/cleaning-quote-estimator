@@ -291,8 +291,13 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
   // this line, and two identical buildings in different states would
   // show the exact same restroom surcharge despite everything else in
   // the quote correctly reflecting the cost difference.
-  const restroomSurcharge = restrooms > 2 ? Math.round((restrooms - 2) * 30 * stateMultiplier * markup) : 0;
-  if (restroomSurcharge > 0) adjustments.push({ label: `${restrooms} restrooms surcharge`, low: restroomSurcharge, high: restroomSurcharge });
+  const extraRestrooms = restrooms > 2 ? restrooms - 2 : 0;
+  const restroomSurcharge = Math.round(extraRestrooms * 30 * stateMultiplier * markup);
+  // Spell out the "2 included" baseline instead of just showing the raw
+  // restroom count -- a label like "14 restrooms surcharge: $360" reads as
+  // if all 14 are being charged, when only the 12 beyond the base-rate
+  // baseline actually are.
+  if (restroomSurcharge > 0) adjustments.push({ label: `${extraRestrooms} extra restrooms (${restrooms} total, 2 included) surcharge`, low: restroomSurcharge, high: restroomSurcharge });
 
   return {
     serviceType: 'commercial',
