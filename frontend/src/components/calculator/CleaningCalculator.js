@@ -30,6 +30,23 @@ const SERVICE_STEPS = {
   water_damage: ['service', 'location', 'water_damage', 'lead', 'results'],
 };
 
+// Maps a serviceType (snake_case, as used above and by /api/calculate) to
+// the camelCase key the dashboard's Services tab actually toggles in
+// companyConfig.services -- same mapping ServiceSelect.js uses to filter
+// its grid, needed here too so a ?service=... URL param can't reach a
+// service the company has disabled just because it skips that grid.
+const SERVICE_CONFIG_KEYS = {
+  home_residential: 'homeResidential',
+  apartment: 'apartment',
+  commercial: 'commercial',
+  carpet: 'carpet',
+  air_duct: 'airDuct',
+  dryer_vent: 'dryerVent',
+  tile_grout: 'tileGrout',
+  mold_remediation: 'moldRemediation',
+  water_damage: 'waterDamage',
+};
+
 const DETAIL_STEP_COMPONENT = {
   home: HomeStep,
   apartment: ApartmentStep,
@@ -66,14 +83,18 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   }, []);
 
   // Pre-select service from URL param (skipped if initialService already set it)
+  // -- gated on the service actually being enabled, so a disabled service
+  // isn't just hidden from the picker grid while still reachable by
+  // appending ?service=... to the embed URL directly.
   useEffect(() => {
     if (initialService) return;
     const param = new URLSearchParams(window.location.search).get('service');
-    if (param && SERVICE_STEPS[param]) {
+    const configKey = SERVICE_CONFIG_KEYS[param];
+    if (param && SERVICE_STEPS[param] && companyConfig?.services?.[configKey]?.enabled !== false) {
       setServiceType(param);
       setStepIndex(1);
     }
-  }, [initialService]);
+  }, [initialService, companyConfig]);
 
   // Scroll to card on step change, accounting for sticky navbar height
   useEffect(() => {
@@ -266,7 +287,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           {/* Steps */}
           <div style={{ padding: embedded ? '20px 16px' : isMobile ? '20px 16px' : '32px 40px' }}>
             {currentStep === 'service' && (
-              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} />
+              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} services={companyConfig?.services} />
             )}
             {currentStep === 'location' && (
               <LocationStep
