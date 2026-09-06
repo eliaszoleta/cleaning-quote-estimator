@@ -9,17 +9,24 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
   const [timeline, setTimeline] = useState('');
   const [preferredContact, setPreferredContact] = useState('email');
   const [customAnswers, setCustomAnswers] = useState({});
+  const [touched, setTouched] = useState({});
 
   const ctaHeadline = companyConfig?.ctaHeadline || 'Get Your Instant Estimate';
-  const ctaSubtext = companyConfig?.ctaSubtext || "Optional — we'll email your results and connect you with local cleaning professionals.";
-  const ctaButtonText = companyConfig?.ctaButtonText || 'See My Estimate';
+  const ctaSubtext = companyConfig?.ctaSubtext || "We'll email your results and connect you with local cleaning professionals.";
 
-  const emailValid = !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const canSubmit = !loading && emailValid;
+  const nameValid = name.trim().length > 0;
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const phoneValid = phone.replace(/\D/g, '').length === 10;
+  const canSubmit = !loading && nameValid && emailValid && phoneValid;
+
+  const touch = (field) => setTouched(prev => ({ ...prev, [field]: true }));
+  const showError = (field, valid) => touched[field] && !valid;
 
   const handleSubmit = (e) => {
     e?.preventDefault();
-    onNext({ name: name.trim() || null, email: email.trim() || null, phone: phone.trim() || null, timeline, preferredContact, customAnswers });
+    setTouched({ name: true, email: true, phone: true });
+    if (!canSubmit) return;
+    onNext({ name: name.trim(), email: email.trim(), phone: phone.trim(), timeline, preferredContact, customAnswers });
   };
 
   const inputStyle = {
@@ -37,37 +44,35 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
       <form onSubmit={handleSubmit}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
-            <label style={labelStyle}>
-              Name <span style={{ color: '#94a3b8', fontWeight: 400 }}>(optional)</span>
-            </label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith"
-              style={inputStyle}
-              onFocus={e => { e.target.style.borderColor = primaryColor; }}
-              onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+            <label style={labelStyle}>Name</label>
+            <input type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith"
+              style={{ ...inputStyle, borderColor: showError('name', nameValid) ? '#dc2626' : '#e2e8f0' }}
+              onFocus={e => { e.target.style.borderColor = showError('name', nameValid) ? '#dc2626' : primaryColor; }}
+              onBlur={e => { touch('name'); e.target.style.borderColor = !nameValid ? '#dc2626' : '#e2e8f0'; }}
             />
+            {showError('name', nameValid) && <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please enter your name.</p>}
           </div>
 
           <div>
             <label style={labelStyle}>
-              Email <span style={{ color: '#94a3b8', fontWeight: 400 }}>(optional — we'll send your estimate)</span>
+              Email <span style={{ color: '#94a3b8', fontWeight: 400 }}>(we'll send your estimate here)</span>
             </label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jane@example.com"
-              style={{ ...inputStyle, borderColor: email && !emailValid ? '#dc2626' : '#e2e8f0' }}
-              onFocus={e => { e.target.style.borderColor = email && !emailValid ? '#dc2626' : primaryColor; }}
-              onBlur={e => { e.target.style.borderColor = email && !emailValid ? '#dc2626' : '#e2e8f0'; }}
+            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="jane@example.com"
+              style={{ ...inputStyle, borderColor: showError('email', emailValid) ? '#dc2626' : '#e2e8f0' }}
+              onFocus={e => { e.target.style.borderColor = showError('email', emailValid) ? '#dc2626' : primaryColor; }}
+              onBlur={e => { touch('email'); e.target.style.borderColor = !emailValid ? '#dc2626' : '#e2e8f0'; }}
             />
-            {email && !emailValid && <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please enter a valid email.</p>}
+            {showError('email', emailValid) && <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please enter a valid email.</p>}
           </div>
 
           <div>
-            <label style={labelStyle}>
-              Phone <span style={{ color: '#94a3b8', fontWeight: 400 }}>(optional)</span>
-            </label>
-            <input type="tel" value={phone} onChange={e => setPhone(formatPhoneInput(e.target.value))} placeholder="(555) 000-0000"
-              style={inputStyle}
-              onFocus={e => { e.target.style.borderColor = primaryColor; }}
-              onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+            <label style={labelStyle}>Phone</label>
+            <input type="tel" required value={phone} onChange={e => setPhone(formatPhoneInput(e.target.value))} placeholder="(555) 000-0000"
+              style={{ ...inputStyle, borderColor: showError('phone', phoneValid) ? '#dc2626' : '#e2e8f0' }}
+              onFocus={e => { e.target.style.borderColor = showError('phone', phoneValid) ? '#dc2626' : primaryColor; }}
+              onBlur={e => { touch('phone'); e.target.style.borderColor = !phoneValid ? '#dc2626' : '#e2e8f0'; }}
             />
+            {showError('phone', phoneValid) && <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please enter a valid phone number.</p>}
           </div>
 
           <div>
@@ -116,14 +121,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
             disabled={!canSubmit}
             style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '13px 20px', borderRadius: 10, border: 'none', cursor: canSubmit ? 'pointer' : 'not-allowed', fontSize: 14, fontWeight: 700, color: 'white', background: canSubmit ? primaryColor : '#cbd5e1', transition: 'all 0.15s' }}
           >
-            {loading ? <><Loader2 size={15} className="spin" /> Calculating…</> : `${ctaButtonText} →`}
-          </button>
-        </div>
-
-        <div style={{ textAlign: 'center', marginTop: 10 }}>
-          <button type="button" onClick={() => onNext({})} disabled={loading}
-            style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: 12.5, cursor: 'pointer', textDecoration: 'underline' }}>
-            Skip and see estimate anyway
+            {loading ? <><Loader2 size={15} className="spin" /> Calculating…</> : 'See Free Estimate →'}
           </button>
         </div>
 
