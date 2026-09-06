@@ -15,16 +15,33 @@ const US_STATES = [
   ['DC','Washington D.C.'],
 ];
 
-export default function LocationStep({ value, onBack, onNext, primaryColor }) {
+export default function LocationStep({ value, onBack, onNext, primaryColor, serviceStates = [] }) {
   const [zip, setZip] = useState(value.zip || '');
-  const [state, setState] = useState(value.state || '');
+  const [state, setState] = useState(value.state || (serviceStates.length === 1 ? serviceStates[0] : ''));
+  const [city, setCity] = useState(value.city || '');
   const [mode, setMode] = useState(value.zip ? 'zip' : 'state');
 
-  const canContinue = mode === 'zip' ? /^\d{5}$/.test(zip) : !!state;
+  // A company that's told us which states it actually serves doesn't need
+  // its visitors picking from a generic 50-state list -- pricing only ever
+  // needs the state (city has zero effect on the math, see
+  // cleaningCalculation.js), but asking for a state that isn't in their
+  // service area is just confusing/irrelevant, and a single-state operator
+  // gets to skip the state question entirely and ask something actually
+  // useful instead: which city, for lead context.
+  const scoped = serviceStates.length > 0;
+  const singleState = serviceStates.length === 1;
+  const scopedStates = US_STATES.filter(([abbr]) => serviceStates.includes(abbr));
+
+  const canContinue = mode === 'zip'
+    ? /^\d{5}$/.test(zip)
+    : scoped
+      ? (singleState ? city.trim().length > 0 : !!state && city.trim().length > 0)
+      : !!state;
 
   const handleNext = () => {
     if (!canContinue) return;
-    onNext(mode === 'zip' ? { zip, state: '' } : { zip: '', state });
+    if (mode === 'zip') { onNext({ zip, state: '', city: '' }); return; }
+    onNext({ zip: '', state: singleState ? serviceStates[0] : state, city: scoped ? city.trim() : '' });
   };
 
   const inputStyle = {
@@ -47,7 +64,7 @@ export default function LocationStep({ value, onBack, onNext, primaryColor }) {
 
       {/* Mode toggle */}
       <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 9, padding: 3, marginBottom: 20, width: 'fit-content' }}>
-        {[['zip', 'ZIP Code'], ['state', 'State']].map(([m, label]) => (
+        {[['zip', 'ZIP Code'], ['state', singleState ? 'City' : 'State']].map(([m, label]) => (
           <button
             key={m} onClick={() => setMode(m)}
             style={{
@@ -79,6 +96,21 @@ export default function LocationStep({ value, onBack, onNext, primaryColor }) {
           />
           {zip && zip.length < 5 && <p style={{ color: '#94a3b8', fontSize: 12.5, marginTop: 5 }}>Enter all 5 digits</p>}
         </div>
+      ) : singleState ? (
+        <div>
+          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Your city</label>
+          <input
+            type="text" value={city}
+            onChange={e => setCity(e.target.value)}
+            placeholder={`e.g. a city in ${scopedStates[0]?.[1] || serviceStates[0]}`}
+            style={{ ...inputStyle, letterSpacing: 0 }}
+            onFocus={e => { e.target.style.borderColor = primaryColor; }}
+            onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+            onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
+            autoFocus
+          />
+          <p style={{ color: '#94a3b8', fontSize: 12.5, marginTop: 5 }}>Serving {scopedStates[0]?.[1] || serviceStates[0]}</p>
+        </div>
       ) : (
         <div>
           <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>State</label>
@@ -89,8 +121,22 @@ export default function LocationStep({ value, onBack, onNext, primaryColor }) {
             onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
           >
             <option value="">Select your state…</option>
-            {US_STATES.map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
+            {(scoped ? scopedStates : US_STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
           </select>
+          {scoped && (
+            <div style={{ marginTop: 14 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Your city</label>
+              <input
+                type="text" value={city}
+                onChange={e => setCity(e.target.value)}
+                placeholder="e.g. your city"
+                style={{ ...inputStyle, letterSpacing: 0 }}
+                onFocus={e => { e.target.style.borderColor = primaryColor; }}
+                onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+                onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
+              />
+            </div>
+          )}
         </div>
       )}
 

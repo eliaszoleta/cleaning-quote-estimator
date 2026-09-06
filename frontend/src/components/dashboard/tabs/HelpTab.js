@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  HelpCircle, Calculator, SlidersHorizontal, MapPin, ToggleRight,
+  HelpCircle, Calculator, SlidersHorizontal, MapPin, Map, ToggleRight,
   Paintbrush, Code2, ChevronDown,
 } from 'lucide-react';
 
@@ -17,6 +17,10 @@ const FAQ = [
   {
     q: 'Can I set different prices for different cities or states?',
     a: 'Not per-city. The state cost-of-living adjustment is already baked into the base price automatically (a home cleaning in California is priced higher than the same job in Alabama, before your markup even applies) — your markup is a single multiplier on top of that, the same everywhere you operate.',
+  },
+  {
+    q: 'I only serve one state — why are visitors picking from all 50?',
+    a: "You haven't set your Service Area yet. Go to the Services tab and add the state(s) you actually operate in. Add just one and the state question disappears entirely, replaced with a simple \"what city are you in\" — one less irrelevant question for someone who already knows you only serve their state.",
   },
   {
     q: 'What happens if I disable a service?',
@@ -109,7 +113,20 @@ export default function HelpTab() {
 
       <div style={cardStyle}>
         <div style={sectionTitle}>
-          <div style={iconBadge('#fff7ed')}><MapPin size={16} color="#ea580c" /></div>
+          <div style={iconBadge('#eff6ff')}><MapPin size={16} color="#2563eb" /></div>
+          Telling us where you actually operate (Services tab)
+        </div>
+        <p style={pStyle}>
+          At the top of the Services tab, add the state(s) your business actually serves. This doesn't change any pricing math — the state cost-of-living adjustment already applies automatically regardless — it changes what your visitors get <em>asked</em>.
+        </p>
+        <p style={pStyle}>
+          Leave it empty and visitors pick from a generic list of all 50 states, same as the main cleanestimator.com calculator. Add exactly <strong>one</strong> state and that question disappears entirely — visitors just tell you their <strong>city</strong> instead, which is more relevant to a business that only serves one state anyway. Add a <strong>few</strong> states and they pick from just those, not the full US list.
+        </p>
+      </div>
+
+      <div style={cardStyle}>
+        <div style={sectionTitle}>
+          <div style={iconBadge('#fff7ed')}><Map size={16} color="#ea580c" /></div>
           What actually moves the price, per job
         </div>
         <p style={pStyle}>Beyond your markup, the price a specific visitor sees depends on details only they control, entered right in the calculator:</p>

@@ -125,7 +125,12 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         serviceType,
         zip: location.zip || null,
         state: location.state || null,
-        serviceDetails,
+        // city only ever comes from a company-scoped LocationStep (see
+        // serviceStates) -- doesn't affect pricing (state is what the
+        // calculation engine actually uses), just stashed in
+        // serviceDetails' existing free-form JSONB column as lead
+        // context, no schema change needed.
+        serviceDetails: location.city ? { ...serviceDetails, city: location.city } : serviceDetails,
         companyId: companyConfig?.companyId || null,
         leadInfo: lead?.email ? lead : null,
         partnerInfo: partnerMatch,
@@ -269,6 +274,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 onBack={goBack}
                 onNext={handleLocationNext}
                 primaryColor={primaryColor}
+                serviceStates={companyConfig?.serviceStates || []}
               />
             )}
             {DetailComponent && (

@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets } from 'lucide-react';
+import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X } from 'lucide-react';
+import { getAllStates } from '../../../data/statePricing';
+
+const ALL_STATES = getAllStates();
 
 const SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning',      Icon: Home          },
@@ -19,6 +22,8 @@ export default function ServicesTab({ config, update }) {
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
   const [customQuestions, setCustomQuestions] = useState([]);
+  const [serviceStates, setServiceStates] = useState([]);
+  const [stateSearch, setStateSearch] = useState('');
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -27,8 +32,17 @@ export default function ServicesTab({ config, update }) {
       setServices(config.services || {});
       setEnableLeadCapture(config.enableLeadCapture !== false);
       setCustomQuestions(config.customLeadQuestions || []);
+      setServiceStates(config.serviceStates || []);
     }
   }, [config]);
+
+  const toggleState = (code) => {
+    setServiceStates(prev => {
+      const next = prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code];
+      if (update) update({ serviceStates: next });
+      return next;
+    });
+  };
 
   const getSvc = (id) => ({ ...DEFAULT_SVC, ...(services[id] || {}) });
 
@@ -76,6 +90,58 @@ export default function ServicesTab({ config, update }) {
       <div style={{ marginBottom: 22 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Services & Pricing</h2>
         <p style={{ color: '#64748b', fontSize: 14 }}>Toggle services and set pricing. Click <strong>Save Changes</strong> in the header when done.</p>
+      </div>
+
+      {/* Service area */}
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14 }}>
+            <MapPin size={15} color="#2563eb" /> Service Area
+          </div>
+          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
+            Which state(s) do you actually operate in? Leave empty to serve all 50 states with the standard state picker. Pick one state and your widget skips the state question entirely and just asks visitors for their city instead — pick a few and it shows only those states, not the full US list.
+          </div>
+        </div>
+        <div style={{ padding: '14px 18px' }}>
+          {serviceStates.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+              {serviceStates.map(code => {
+                const s = ALL_STATES.find(st => st.code === code);
+                return (
+                  <span key={code} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: 20, padding: '4px 6px 4px 12px', fontSize: 12.5, fontWeight: 600 }}>
+                    {s?.name || code}
+                    <button type="button" onClick={() => toggleState(code)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1d4ed8', display: 'flex', padding: 2 }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
+          <input
+            style={{ ...inp, width: '100%', boxSizing: 'border-box', marginBottom: 10 }}
+            placeholder="Search states to add..."
+            value={stateSearch}
+            onChange={e => setStateSearch(e.target.value)}
+          />
+          {stateSearch.trim() && (
+            <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 8 }}>
+              {ALL_STATES.filter(s =>
+                !serviceStates.includes(s.code) &&
+                (s.name.toLowerCase().includes(stateSearch.trim().toLowerCase()) || s.code.toLowerCase() === stateSearch.trim().toLowerCase())
+              ).slice(0, 8).map(s => (
+                <button
+                  key={s.code}
+                  type="button"
+                  onClick={() => { toggleState(s.code); setStateSearch(''); }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', background: 'none', border: 'none', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', fontSize: 13 }}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Services list */}
