@@ -8,7 +8,7 @@ const PRIMARY_GRADIENT = '#1d4ed8';
 
 const FEATURES = [
   { Icon: Palette,       color: '#7c3aed', bg: '#f5f3ff', title: 'White-label branding',       desc: 'Your logo, colors, and call-to-action text. Visitors never see the Clean Estimator name.' },
-  { Icon: ClipboardList, color: '#2563eb', bg: '#eff6ff', title: 'Lead capture built-in',       desc: 'Collect name, email, phone, and timeline from every visitor before they see the estimate.' },
+  { Icon: ClipboardList, color: '#2563eb', bg: '#eff6ff', title: 'Every lead is 100% yours',    desc: 'Name, email, phone, timeline, and the exact price they were quoted — stored permanently in your own dashboard. Never shared with other cleaners, never resold, never visible to anyone but you.' },
   { Icon: BellRing,      color: '#dc2626', bg: '#fef2f2', title: 'Instant lead alerts — zero setup', desc: "The moment someone gets an estimate on your site, you get an email with their name, phone, and full price breakdown. No CRM, no Zapier, nothing to configure — it works the day you embed the widget." },
   { Icon: Send,          color: '#0d9488', bg: '#f0fdfa', title: 'Every estimate email is branded as yours', desc: "Visitors get a follow-up email carrying your logo, your phone number, and your call-to-action — not ours. Every completed estimate is another touchpoint with your business sitting in their inbox." },
   { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',   desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
@@ -33,7 +33,7 @@ const TESTIMONIALS = [
 const PLAN_FEATURES = [
   'Unlimited calculator sessions',
   'White-label branding',
-  'Lead capture dashboard',
+  'Every lead 100% yours, never shared',
   'Instant email alerts on every lead',
   'Branded follow-up emails to visitors',
   'API access',

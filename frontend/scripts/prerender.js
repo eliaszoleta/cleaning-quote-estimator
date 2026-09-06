@@ -1222,7 +1222,7 @@ function renderForCompanies(assets) {
   const seoDesc = 'Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 7-day free trial. $159/month.';
   const features = [
     ['White-label branding', 'Your logo, colors, and call-to-action text. Visitors never see the Clean Estimator name.'],
-    ['Lead capture built-in', 'Collect name, email, phone, and timeline from every visitor before they see the estimate.'],
+    ['Every lead is 100% yours', 'Name, email, phone, timeline, and the exact price they were quoted — stored permanently in your own dashboard. Never shared with other cleaners, never resold, never visible to anyone but you.'],
     ['Instant lead alerts — zero setup', "The moment someone gets an estimate on your site, you get an email with their name, phone, and full price breakdown. No CRM, no Zapier, nothing to configure — it works the day you embed the widget."],
     ['Every estimate email is branded as yours', "Visitors get a follow-up email carrying your logo, your phone number, and your call-to-action — not ours. Every completed estimate is another touchpoint with your business sitting in their inbox."],
     ['ZIP-code accurate pricing', 'State-specific pricing multipliers ensure your quotes reflect your local market.'],
@@ -1241,7 +1241,7 @@ function renderForCompanies(assets) {
     ['James R.', 'Pro Restoration Group — Denver, CO', "The water damage and mold calculators are exactly what we needed. Customers come in already understanding the price range, so there's less sticker shock on-site."],
     ['Maria L.', 'Crystal Clean Commercial — Miami, FL', "Setup took about 20 minutes. The embed is seamless — my website visitors don't even realize it's a third-party tool."],
   ];
-  const planFeatures = ['Unlimited calculator sessions', 'White-label branding', 'Lead capture dashboard', 'Instant email alerts on every lead', 'Branded follow-up emails to visitors', 'API access', 'All 9 service calculators', 'CSV export', 'Priority support'];
+  const planFeatures = ['Unlimited calculator sessions', 'White-label branding', 'Every lead 100% yours, never shared', 'Instant email alerts on every lead', 'Branded follow-up emails to visitors', 'API access', 'All 9 service calculators', 'CSV export', 'Priority support'];
 
   const body = `<div style="background:linear-gradient(135deg,#0f172a,#1e293b);color:white;padding:64px 32px;border-radius:16px;text-align:center;margin-bottom:48px">
     <div style="display:inline-block;background:rgba(37,99,235,0.25);color:#93c5fd;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:22px;border:1px solid rgba(37,99,235,0.35)">For cleaning companies</div>
