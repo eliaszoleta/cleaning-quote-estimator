@@ -561,7 +561,7 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'Grout recoloring', low: adj.low, high: adj.high });
   }
   if (services.includes('caulk_replacement') && caulkLinearFt > 0) {
-    const adj = { low: Math.round(caulkLinearFt * TILE_SERVICE_ADDONS.caulk_replacement.perLinFt.low), high: Math.round(caulkLinearFt * TILE_SERVICE_ADDONS.caulk_replacement.perLinFt.high) };
+    const adj = { low: Math.round(caulkLinearFt * TILE_SERVICE_ADDONS.caulk_replacement.perLinFt.low * stateMultiplier * markup), high: Math.round(caulkLinearFt * TILE_SERVICE_ADDONS.caulk_replacement.perLinFt.high * stateMultiplier * markup) };
     range = addRange(range, adj);
     adjustments.push({ label: `Caulk replacement (${caulkLinearFt} lin ft)`, low: adj.low, high: adj.high });
   }
@@ -602,6 +602,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.moldRemediation || {};
   const markup = cfg.markup || 1.0;
+  const minCharge = cfg.minimumCharge || 0;
 
   const baseTier = MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium;
   const typeMult = MOLD_TYPE_MULTIPLIERS[moldType] || MOLD_TYPE_MULTIPLIERS.not_sure;
@@ -636,6 +637,11 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     const adj = applyMultiplier(MOLD_ADDONS.clearance_test, stateMultiplier * markup);
     range = addRange(range, adj);
     adjustments.push({ label: 'Post-remediation clearance test', low: adj.low, high: adj.high });
+  }
+
+  if (minCharge > 0) {
+    range.low = Math.max(range.low, minCharge);
+    range.high = Math.max(range.high, minCharge);
   }
 
   const sourceWarning = sourceFixed === 'not_fixed' || sourceFixed === 'not_sure';
@@ -675,6 +681,7 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.waterDamage || {};
   const markup = cfg.markup || 1.0;
+  const minCharge = cfg.minimumCharge || 0;
 
   const catMult = WATER_CATEGORY_MULTIPLIERS[waterCategory] || WATER_CATEGORY_MULTIPLIERS.clean;
 
@@ -713,6 +720,11 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'Furniture / contents pack-out & cleaning', low: adj.low, high: adj.high });
   }
 
+  if (minCharge > 0) {
+    range.low = Math.max(range.low, minCharge);
+    range.high = Math.max(range.high, minCharge);
+  }
+
   const urgencyMsg = whenHappened === 'today' || whenHappened === '24_48h'
     ? 'Act now — mold can begin growing within 24–48 hours of water damage.'
     : 'Mold growth is likely after this time period. Remediation may be required in addition to restoration.';
@@ -724,7 +736,7 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
       low: Math.max(sqft * WATER_FULL_RESTORATION_PER_SQFT.low, WATER_FULL_RESTORATION_MINIMUM.low),
       high: Math.max(sqft * WATER_FULL_RESTORATION_PER_SQFT.high, WATER_FULL_RESTORATION_MINIMUM.high),
     };
-    const adj = applyMultiplier(fullRestoration, stateMultiplier);
+    const adj = applyMultiplier(fullRestoration, stateMultiplier * markup);
     adjustments.push({ label: 'Full restoration (drywall, flooring) — separate estimate, not included above', low: adj.low, high: adj.high, separate: true });
   }
 
