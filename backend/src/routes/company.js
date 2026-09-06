@@ -3,7 +3,7 @@ const router = express.Router();
 const axios = require('axios');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { getCompanyConfig, saveCompanyConfig } = require('../services/companyConfig');
+const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
 const { sendCompanyWelcomeEmail } = require('../services/email');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -21,38 +21,19 @@ router.get('/:id', async (req, res) => {
   if (req.user.id !== id) return res.status(403).json({ success: false, error: 'Forbidden' });
 
   try {
-    let config = await getCompanyConfig(id);
-    const svcStates = config ? Object.entries(config.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') : 'none';
-    console.log(`[GET config] user=${id} found=${!!config} | ${svcStates}`);
-    if (!config) {
-      // First login — 30-day free trial starts immediately, no card required.
-      // computeSubscriptionStatus's trialStartedAt branch (subscriptionStatus.js)
-      // already treats this as active for 30 days with no Stripe subscription
-      // needed at all -- this is what makes the embed widget work right away.
-      config = {
-        ...DEFAULT_COMPANY_CONFIG,
-        subscription: {
-          ...DEFAULT_COMPANY_CONFIG.subscription,
-          trialStartedAt: new Date().toISOString(),
-        },
-      };
-      await saveCompanyConfig(id, config);
+    // getOrCreateCompanyConfig also runs from GET /api/subscription/status,
+    // since the dashboard calls both endpoints in parallel on load with no
+    // ordering guarantee -- sharing this logic (30-day trial on first login,
+    // backfill trialStartedAt on old accounts missing it) means whichever
+    // request wins the race still gets the right answer, instead of the
+    // loser reading "no config yet" and reporting requires_trial_setup.
+    const { config, created } = await getOrCreateCompanyConfig(id);
+    console.log(`[GET config] user=${id} created=${created} | ${Object.entries(config.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') || 'none'}`);
+    if (created) {
       // Fire-and-forget: gets their embed code in front of them immediately
       // rather than relying on them to find the Embed Widget tab themselves.
       sendCompanyWelcomeEmail({ to: req.user.email, companyId: id })
         .catch(err => console.error('Company welcome email failed:', err.message));
-    } else if (!config.subscription?.trialStartedAt && !config.subscription?.stripeSubscriptionId) {
-      // Backfill: any existing account missing trialStartedAt that also hasn't
-      // subscribed yet (covers old trialType:'stripe' accounts from before this
-      // change, so nobody who signed up under the old CC-required flow gets
-      // stuck on requires_trial_setup forever) -- give them the same 30-day
-      // trial starting now.
-      config.subscription = {
-        ...DEFAULT_COMPANY_CONFIG.subscription,
-        ...(config.subscription || {}),
-        trialStartedAt: new Date().toISOString(),
-      };
-      await saveCompanyConfig(id, config);
     }
     res.set('Cache-Control', 'no-store');
     res.json({ success: true, data: config });

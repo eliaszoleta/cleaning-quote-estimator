@@ -80,6 +80,43 @@ async function saveCompanyConfig(companyId, config) {
   fileSave(fileCache);
 }
 
+// Companies hit this from two different routes on dashboard load in
+// parallel -- GET /api/company/:id and GET /api/subscription/status -- with
+// no ordering guarantee between them. Both need the exact same "create with
+// a 30-day trial if this is a brand-new account, backfill trialStartedAt if
+// it's missing on an old one" logic, or whichever request loses the race
+// reads a config that doesn't exist yet and reports requires_trial_setup
+// even though the other request is about to create it a moment later. A
+// module-level flag (set synchronously, before the first await below) closes
+// the window for two near-simultaneous first calls both deciding to create.
+const recentlyCreated = new Set();
+
+async function getOrCreateCompanyConfig(companyId) {
+  let config = await getCompanyConfig(companyId);
+  if (!config) {
+    const created = !recentlyCreated.has(companyId);
+    recentlyCreated.add(companyId);
+    config = {
+      ...DEFAULT_COMPANY_CONFIG,
+      subscription: {
+        ...DEFAULT_COMPANY_CONFIG.subscription,
+        trialStartedAt: new Date().toISOString(),
+      },
+    };
+    await saveCompanyConfig(companyId, config);
+    return { config, created };
+  }
+  if (!config.subscription?.trialStartedAt && !config.subscription?.stripeSubscriptionId) {
+    config.subscription = {
+      ...DEFAULT_COMPANY_CONFIG.subscription,
+      ...(config.subscription || {}),
+      trialStartedAt: new Date().toISOString(),
+    };
+    await saveCompanyConfig(companyId, config);
+  }
+  return { config, created: false };
+}
+
 // Bulk read for the trial-reminder scheduler (services/trialScheduler.js),
 // which needs to scan every company's trial state rather than look one up
 // by id.
@@ -97,4 +134,4 @@ async function listAllCompanyConfigs() {
   return Array.from(fileCache.entries()).map(([companyId, config]) => ({ companyId, config }));
 }
 
-module.exports = { getCompanyConfig, saveCompanyConfig, listAllCompanyConfigs, DEFAULT_COMPANY_CONFIG };
+module.exports = { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, listAllCompanyConfigs, DEFAULT_COMPANY_CONFIG };

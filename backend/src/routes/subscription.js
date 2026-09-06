@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getCompanyConfig, saveCompanyConfig } = require('../services/companyConfig');
+const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
+const { sendCompanyWelcomeEmail } = require('../services/email');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
@@ -16,7 +17,11 @@ function getStripe() {
 // GET /api/subscription/status
 router.get('/status', async (req, res) => {
   try {
-    const config = (await getCompanyConfig(req.user.id)) || {};
+    const { config, created } = await getOrCreateCompanyConfig(req.user.id);
+    if (created) {
+      sendCompanyWelcomeEmail({ to: req.user.email, companyId: req.user.id })
+        .catch(err => console.error('Company welcome email failed:', err.message));
+    }
     res.json({ success: true, data: computeSubscriptionStatus(config) });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to get subscription status' });
