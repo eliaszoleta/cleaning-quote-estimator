@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   HelpCircle, Calculator, SlidersHorizontal, MapPin, Map, ToggleRight,
-  Paintbrush, Code2, ChevronDown, Layers,
+  Paintbrush, Code2, ChevronDown, Layers, Database,
 } from 'lucide-react';
 
 const cardStyle = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' };
@@ -10,6 +10,14 @@ const iconBadge = (bg) => ({ width: 30, height: 30, borderRadius: 8, background:
 const pStyle = { fontSize: 13.5, color: '#374151', lineHeight: 1.7, margin: '0 0 10px' };
 
 const FAQ = [
+  {
+    q: 'How do I know the pricing isn\'t just made up?',
+    a: (
+      <>
+        It's built from published rate surveys and provider pricing data across the industry, not invented — our House Cleaning base price, for example, lands right inside the range independently published by Angi and HomeAdvisor for the same job. Full methodology and the complete comparison table: <a href="https://www.cleanestimator.com/how-we-calculate-prices" target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontWeight: 600 }}>cleanestimator.com/how-we-calculate-prices</a>.
+      </>
+    ),
+  },
   {
     q: 'Why does it show a price range instead of one exact number?',
     a: "So it reads as an estimate, not a quote you're bound to. Actual price still depends on things only an in-person look can confirm (real condition, access, etc.) — a range sets that expectation upfront instead of a visitor holding you to a single number sight-unseen. Every price on both the public cleanestimator.com calculator and your embedded widget works this way.",
@@ -95,6 +103,28 @@ export default function HelpTab() {
         </p>
         <p style={pStyle}>
           Clean Estimator calculates a price range from that: a base rate for the service, adjusted for their state's typical cost of living, adjusted again for the specific details they entered, and finally multiplied by <strong>your</strong> markup. They see an instant price range, no phone call needed — and if they leave their email, you get notified with their contact info the moment it happens (check your inbox, or the Leads tab).
+        </p>
+      </div>
+
+      <div style={cardStyle}>
+        <div style={sectionTitle}>
+          <div style={iconBadge('#f0fdfa')}><Database size={16} color="#0d9488" /></div>
+          Where the pricing data actually comes from
+        </div>
+        <p style={pStyle}>
+          Every base price in the calculator is built from real market research — published rate surveys, provider pricing pages, and industry cost data across residential and commercial cleaning companies nationwide. Nothing is invented and worked backward from a "nice-looking" number.
+        </p>
+        <p style={pStyle}>
+          As one concrete check: our House Cleaning base for a 1,500–2,000 sq ft home is <strong>$158–$198</strong>. Independently published guides from Angi and HomeAdvisor put the same job at <strong>$118–$238</strong> (averaging ~$176) — squarely inside that range. Same pattern holds for carpet cleaning, air duct cleaning, mold remediation, and dryer vent cleaning.
+        </p>
+        <p style={pStyle}>
+          <strong>On state pricing</strong>: the multiplier per state (Texas 1.05×, California 1.40×, Mississippi 0.78×, etc.) is built from real regional labor-cost and cost-of-living differences, not a guess — the same reason a haircut, an oil change, or rent itself costs more in California than Mississippi is exactly why a cleaning job does too.
+        </p>
+        <p style={pStyle}>
+          <strong>On city pricing</strong>: cities intentionally reuse their state's data rather than getting invented city-specific numbers. Reliable, verifiable pricing data doesn't exist at neighborhood granularity for most markets — showing a number we can actually stand behind beats one that only looks more precise.
+        </p>
+        <p style={{ ...pStyle, marginBottom: 0 }}>
+          Full methodology, the complete comparison table against Angi/HomeAdvisor/HomeGuide/Housecall Pro, and every external source we cite: <a href="https://www.cleanestimator.com/how-we-calculate-prices" target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontWeight: 600 }}>cleanestimator.com/how-we-calculate-prices</a> — worth sending to a visitor or your own customer who asks "where did this number come from?"
         </p>
       </div>
 
@@ -200,7 +230,32 @@ export default function HelpTab() {
           Choosing what you offer (Services tab)
         </div>
         <p style={pStyle}>
-          Each of the 9 services has its own on/off switch, markup, and minimum charge — set them independently. Turn off anything you don't actually do; visitors will never see it as an option. Set a <strong>minimum charge</strong> for a service if you don't want the calculator quoting a price below what's worth sending someone out for, regardless of how small the job details make the math come out.
+          Each of the 9 services has its own on/off switch, markup, and minimum charge — set them independently. Turn off anything you don't actually do; visitors will never see it as an option.
+        </p>
+      </div>
+
+      <div style={cardStyle}>
+        <div style={sectionTitle}>
+          <div style={iconBadge('#fef2f2')}><SlidersHorizontal size={16} color="#dc2626" /></div>
+          What "Min $" actually does
+        </div>
+        <p style={pStyle}>
+          It's a price floor for that service — the lowest number the calculator will ever show, no matter how small the job is.
+        </p>
+        <p style={pStyle}>
+          Here's why it exists: your pricing formula calculates based on job size (sqft, bedrooms, etc.). For a tiny job — say a studio apartment — the math might come out to something like $65. But driving out, bringing supplies, and cleaning a house isn't worth doing for $65 for most businesses. So instead of showing that low number, you set a floor, and the calculator shows that instead.
+        </p>
+        <p style={{ ...pStyle, marginBottom: 6 }}>A real example, using typical minimum charges:</p>
+        <ul style={{ ...pStyle, margin: '0 0 10px', paddingLeft: 20 }}>
+          <li><strong>House Cleaning: Min $100</strong> — if the formula calculates $70 for a tiny job, the visitor sees $100, not $70.</li>
+          <li><strong>Air Duct Cleaning: Min $300</strong> — same idea, just a higher floor because that job type has more fixed setup cost regardless of size.</li>
+          <li><strong>Carpet Cleaning: Min $90</strong> — same concept, lower floor since it's typically a cheaper/faster job.</li>
+        </ul>
+        <p style={pStyle}>
+          It only ever <em>raises</em> a price that would've calculated too low — it never lowers anything. If the formula naturally comes out above your minimum (e.g. a big 4-bedroom house), the minimum does nothing at all; the visitor just sees the real calculated price.
+        </p>
+        <p style={{ ...pStyle, marginBottom: 0 }}>
+          Leave it blank for any service and there's simply no floor — the calculator will show whatever the math produces, even if that's very low for a very small job.
         </p>
       </div>
 
