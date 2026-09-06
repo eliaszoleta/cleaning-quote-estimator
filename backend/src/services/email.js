@@ -110,8 +110,10 @@ function buildPartnerSection(partner) {
 // action read as redundant/confusing next to the Call/Email actions.
 function buildCompanySection({ companyName, logo, ctaEmail, ctaPhone }) {
   const logoImg = logo ? `<img src="${logo}" alt="${companyName}" style="max-height:36px;margin:0 0 10px;display:block;">` : '';
+  // tel: link -- on mobile this taps straight into the dialer instead of
+  // requiring the visitor to copy/retype the number.
   const infoLines = [
-    ctaPhone ? `Phone: ${fmtPhone(ctaPhone)}` : '',
+    ctaPhone ? `Phone: <a href="tel:${ctaPhone}" style="color:#2563eb;">${fmtPhone(ctaPhone)}</a>` : '',
     ctaEmail ? `Email: <a href="mailto:${ctaEmail}" style="color:#2563eb;">${ctaEmail}</a>` : '',
   ].filter(Boolean).join('<br>');
 
