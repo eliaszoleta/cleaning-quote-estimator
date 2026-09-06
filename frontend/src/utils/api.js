@@ -76,13 +76,24 @@ export async function verifyPartnerCheckout(sessionId) {
   return apiFetch('/api/partner-checkout/verify-checkout', { method: 'POST', body: JSON.stringify({ sessionId }) });
 }
 
-export async function getCompanyLeads(token) {
-  return apiFetch('/api/company-leads/company', { headers: { Authorization: `Bearer ${token}` } });
+// includeDeleted also fetches archived (Trash) leads alongside active ones,
+// so LeadsTab.js can split them into two views from one request instead of
+// fetching twice.
+export async function getCompanyLeads(token, includeDeleted = false) {
+  return apiFetch(`/api/company-leads/company${includeDeleted ? '?deleted=true' : ''}`, { headers: { Authorization: `Bearer ${token}` } });
 }
 
 export async function patchLead(token, leadId, updates) {
   return apiFetch(`/api/company-leads/company/${leadId}`, {
     method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(updates),
+  });
+}
+
+// Permanent delete -- only ever called from the Trash view, on a lead
+// that's already been archived (soft-deleted) first.
+export async function deleteLeadForever(token, leadId) {
+  return apiFetch(`/api/company-leads/company/${leadId}`, {
+    method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
   });
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Download, Inbox, Mail, Phone, X } from 'lucide-react';
-import { getCompanyLeads, patchLead } from '../../../utils/api';
+import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw } from 'lucide-react';
+import { getCompanyLeads, patchLead, deleteLeadForever } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 import { formatPrice, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
 
@@ -18,6 +18,11 @@ export default function LeadsTab({ user }) {
   const [selectedLead, setSelectedLead] = useState(null);
   const [notes, setNotes] = useState('');
   const [savingNote, setSavingNote] = useState(false);
+  // "Archive" only ever soft-deletes (sets deleted_at) -- the lead was never
+  // actually gone, but with no way to see or restore it, that's exactly how
+  // it looked. This view toggle plus the Restore/Delete Forever actions
+  // below are what a soft-delete needs to actually behave like one.
+  const [view, setView] = useState('active');
 
   useEffect(() => { loadLeads(); }, []);
 
@@ -27,16 +32,18 @@ export default function LeadsTab({ user }) {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
       if (!token) return;
-      const res = await getCompanyLeads(token);
+      const res = await getCompanyLeads(token, true);
       const loaded = res.data || [];
       setLeads(loaded);
-      // Auto-open the most recent lead instead of making someone click into
-      // an empty-looking panel to discover the details are even there --
-      // only on load/refresh when nothing's already open, so a manual
-      // Refresh never yanks the panel away from whatever they were looking at.
-      if (!selectedLead && loaded.length > 0) {
-        setSelectedLead(loaded[0]);
-        setNotes(loaded[0].notes || '');
+      // Auto-open the most recent active lead instead of making someone
+      // click into an empty-looking panel to discover the details are even
+      // there -- only on load/refresh when nothing's already open, so a
+      // manual Refresh never yanks the panel away from whatever they were
+      // looking at.
+      const activeLoaded = loaded.filter(l => !l.deleted_at);
+      if (!selectedLead && activeLoaded.length > 0) {
+        setSelectedLead(activeLoaded[0]);
+        setNotes(activeLoaded[0].notes || '');
       }
     } catch (err) {
       console.error('Error loading leads:', err.message);
@@ -45,8 +52,11 @@ export default function LeadsTab({ user }) {
     }
   };
 
-  const filtered = leads.filter(l => {
-    if (l.deleted_at) return false;
+  const baseLeads = leads.filter(l => (view === 'trash' ? !!l.deleted_at : !l.deleted_at));
+  const activeCount = leads.filter(l => !l.deleted_at).length;
+  const trashCount = leads.filter(l => l.deleted_at).length;
+
+  const filtered = baseLeads.filter(l => {
     if (filter !== 'all' && l.service_type !== filter) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -55,7 +65,9 @@ export default function LeadsTab({ user }) {
     return true;
   });
 
-  const serviceTypes = [...new Set(leads.filter(l => !l.deleted_at).map(l => l.service_type))];
+  const serviceTypes = [...new Set(baseLeads.map(l => l.service_type))];
+
+  const switchView = (v) => { setView(v); setFilter('all'); setSelectedLead(null); };
 
   const openLead = (lead) => { setSelectedLead(lead); setNotes(lead.notes || ''); };
 
@@ -72,13 +84,35 @@ export default function LeadsTab({ user }) {
     }
   };
 
-  const deleteLead = async (leadId) => {
-    if (!window.confirm('Archive this lead?')) return;
+  const archiveLead = async (leadId) => {
+    if (!window.confirm('Move this lead to Trash? You can restore it later from the Trash tab.')) return;
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-      await patchLead(token, leadId, { deleted_at: new Date().toISOString() });
-      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, deleted_at: new Date().toISOString() } : l));
+      const deletedAt = new Date().toISOString();
+      await patchLead(token, leadId, { deleted_at: deletedAt });
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, deleted_at: deletedAt } : l));
+      if (selectedLead?.id === leadId) setSelectedLead(null);
+    } catch {}
+  };
+
+  const restoreLead = async (leadId) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      await patchLead(token, leadId, { deleted_at: null });
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, deleted_at: null } : l));
+      if (selectedLead?.id === leadId) setSelectedLead(null);
+    } catch {}
+  };
+
+  const hardDeleteLead = async (leadId) => {
+    if (!window.confirm('Permanently delete this lead? This cannot be undone.')) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      await deleteLeadForever(token, leadId);
+      setLeads(prev => prev.filter(l => l.id !== leadId));
       if (selectedLead?.id === leadId) setSelectedLead(null);
     } catch {}
   };
@@ -122,6 +156,23 @@ export default function LeadsTab({ user }) {
               </button>
             </div>
           </div>
+          <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 8, padding: 3, marginBottom: 10, width: 'fit-content' }}>
+            {[['active', `Active (${activeCount})`], ['trash', `Trash (${trashCount})`]].map(([v, label]) => (
+              <button
+                key={v} onClick={() => switchView(v)}
+                style={{
+                  padding: '7px 14px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                  fontWeight: 700, fontSize: 12.5,
+                  background: view === v ? 'white' : 'transparent',
+                  color: view === v ? '#0f172a' : '#64748b',
+                  boxShadow: view === v ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <input
               value={search}
@@ -148,10 +199,14 @@ export default function LeadsTab({ user }) {
               <Inbox size={24} color="#94a3b8" />
             </div>
             <div style={{ fontWeight: 700, fontSize: 15, color: '#374151', marginBottom: 5 }}>
-              {search || filter !== 'all' ? 'No matching leads' : 'No leads yet'}
+              {search || filter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
             </div>
             <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', maxWidth: 280, margin: 0 }}>
-              {search || filter !== 'all' ? 'Try changing your search or filter.' : 'Embed your calculator to start capturing leads.'}
+              {search || filter !== 'all'
+                ? 'Try changing your search or filter.'
+                : view === 'trash'
+                  ? "Leads you archive show up here, and can be restored."
+                  : 'Embed your calculator to start capturing leads.'}
             </p>
           </div>
         ) : (
@@ -271,12 +326,29 @@ export default function LeadsTab({ user }) {
                 <Phone size={13} /> Call
               </a>
             )}
-            <button
-              onClick={() => deleteLead(selectedLead.id)}
-              style={{ padding: '9px 13px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
-            >
-              Archive
-            </button>
+            {selectedLead.deleted_at ? (
+              <>
+                <button
+                  onClick={() => restoreLead(selectedLead.id)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 13px', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                >
+                  <RotateCcw size={13} /> Restore
+                </button>
+                <button
+                  onClick={() => hardDeleteLead(selectedLead.id)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 13px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                >
+                  <Trash2 size={13} /> Delete Forever
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => archiveLead(selectedLead.id)}
+                style={{ padding: '9px 13px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+              >
+                Archive
+              </button>
+            )}
           </div>
         </div>
       )}

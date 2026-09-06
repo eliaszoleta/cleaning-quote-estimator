@@ -186,5 +186,34 @@ router.patch('/company/:id', async (req, res) => {
   }
 });
 
+// DELETE /api/company-leads/:id — permanently remove a lead. Distinct from
+// the PATCH above's deleted_at soft-delete ("Archive" in the dashboard) --
+// this is the actual "delete forever" action, only ever exposed from the
+// Trash view, so an accidental archive is always recoverable first.
+router.delete('/company/:id', async (req, res) => {
+  const companyId = req.user.id;
+  const leadId = req.params.id;
+
+  try {
+    if (SERVICE_KEY() && SUPABASE_URL) {
+      await axios.delete(
+        `${SUPABASE_URL}/rest/v1/leads?id=eq.${leadId}&company_id=eq.${encodeURIComponent(companyId)}`,
+        { headers: dbHeaders() }
+      );
+      return res.json({ success: true });
+    }
+
+    const leads = loadLeadsFile();
+    const idx = leads.findIndex(l => l.id === leadId && l.company_id === companyId);
+    if (idx === -1) return res.status(404).json({ success: false, error: 'Lead not found' });
+    leads.splice(idx, 1);
+    saveLeadsFile(leads);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete lead error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to delete lead' });
+  }
+});
+
 module.exports = router;
 module.exports.saveLead = saveLead;
