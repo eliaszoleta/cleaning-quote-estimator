@@ -89,14 +89,17 @@ const DEFAULT_COMPANY_CONFIG = {
       basePricePerSqft: 0.10,
       minimumCharge: 100,
       markup: 1.0,
-      recurringDiscount: 0.15,
+      // Off by default (see DiscountTab.js) -- no recurring-frequency
+      // discount is applied on the estimate unless the company explicitly
+      // sets one for weekly/biweekly/monthly.
+      frequencyDiscounts: { weekly: 0, biweekly: 0, monthly: 0 },
     },
     apartment: {
       enabled: true,
       basePricePerSqft: 0.09,
       minimumCharge: 85,
       markup: 1.0,
-      recurringDiscount: 0.15,
+      frequencyDiscounts: { weekly: 0, biweekly: 0, monthly: 0 },
     },
     commercial: {
       enabled: true,
@@ -166,14 +169,6 @@ const CLEANING_TYPE_MULTIPLIERS = {
   deep:             { low: 1.68, high: 1.85 },
   move_in_out:      { low: 1.88, high: 2.05 },
   post_construction:{ low: 2.18, high: 2.35 },
-};
-
-// Frequency discounts
-const FREQUENCY_DISCOUNTS = {
-  one_time:  0,
-  weekly:    0.20,
-  biweekly:  0.15,
-  monthly:   0.10,
 };
 
 // Extra add-on costs (residential/apartment)
@@ -423,7 +418,6 @@ module.exports = {
   BEDROOM_ADDON,
   BATHROOM_ADDON,
   CLEANING_TYPE_MULTIPLIERS,
-  FREQUENCY_DISCOUNTS,
   HOME_EXTRAS,
   CONDITION_MULTIPLIERS,
   APARTMENT_SIZE_PRICES,

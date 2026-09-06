@@ -5,7 +5,6 @@ const {
   BEDROOM_ADDON,
   BATHROOM_ADDON,
   CLEANING_TYPE_MULTIPLIERS,
-  FREQUENCY_DISCOUNTS,
   HOME_EXTRAS,
   CONDITION_MULTIPLIERS,
   APARTMENT_SIZE_PRICES,
@@ -164,8 +163,9 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
   // Minimum
   range = applyMinCharge(range, minCharge, adjustments);
 
-  // Frequency discount
-  const discount = FREQUENCY_DISCOUNTS[frequency] || 0;
+  // Frequency discount -- off by default (0%) unless the company has set
+  // one for this frequency in the Discount tab (cfg.frequencyDiscounts).
+  const discount = cfg.frequencyDiscounts?.[frequency] || 0;
   let recurringLow = null, recurringHigh = null, annualSavings = null;
   if (frequency !== 'one_time' && discount > 0) {
     recurringLow = Math.round(range.low * (1 - discount));
@@ -252,13 +252,14 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
 
   range = applyMinCharge(range, minCharge, adjustments);
 
-  const discount = FREQUENCY_DISCOUNTS[frequency] || 0;
+  const discount = cfg.frequencyDiscounts?.[frequency] || 0;
   let recurringLow = null, recurringHigh = null, annualSavings = null;
   if (frequency !== 'one_time' && discount > 0) {
     recurringLow = Math.round(range.low * (1 - discount));
     recurringHigh = Math.round(range.high * (1 - discount));
     const visitsPerYear = { weekly: 52, biweekly: 26, monthly: 12 }[frequency] || 12;
     annualSavings = Math.round(((range.low + range.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
+    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: -Math.round(range.low * discount), high: -Math.round(range.high * discount) });
   }
 
   return {

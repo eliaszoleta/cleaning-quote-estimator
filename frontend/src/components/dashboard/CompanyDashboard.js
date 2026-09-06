@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
-  Users, CreditCard, KeyRound, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle,
+  Users, CreditCard, KeyRound, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle, Percent,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
@@ -9,6 +9,7 @@ import { supabase } from '../../lib/supabase';
 import OverviewTab from './tabs/OverviewTab';
 import BrandingTab from './tabs/BrandingTab';
 import ServicesTab from './tabs/ServicesTab';
+import DiscountTab from './tabs/DiscountTab';
 import EmbedTab from './tabs/EmbedTab';
 import LeadsTab from './tabs/LeadsTab';
 import SubscriptionTab from './tabs/SubscriptionTab';
@@ -21,6 +22,7 @@ const NAV = [
   { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
   { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
+  { id: 'discount',      Icon: Percent,            label: 'Discount' },
   { id: 'embed',         Icon: Code2,              label: 'Embed Widget' },
   { id: 'leads',         Icon: Users,              label: 'Leads' },
   { id: 'subscription',  Icon: CreditCard,         label: 'Subscription' },
@@ -149,6 +151,7 @@ export default function CompanyDashboard({ user, onLogout }) {
     help:         <HelpTab />,
     branding:     <BrandingTab config={localConfig} update={update} onSave={handleGlobalSave} saving={saving} saved={saved} />,
     services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} autoSave={autoSave} />,
+    discount:     <DiscountTab config={localConfig} update={update} />,
     embed:        <EmbedTab {...tabProps} />,
     leads:        <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab {...tabProps} />,
