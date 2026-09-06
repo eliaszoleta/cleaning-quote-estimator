@@ -275,7 +275,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 onNext={handleLocationNext}
                 primaryColor={primaryColor}
                 serviceStates={companyConfig?.serviceStates || []}
-                serviceCities={companyConfig?.serviceCities || []}
+                serviceCities={companyConfig?.serviceCities || {}}
               />
             )}
             {DetailComponent && (

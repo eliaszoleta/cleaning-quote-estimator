@@ -24,8 +24,12 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
   const [customQuestions, setCustomQuestions] = useState([]);
   const [serviceStates, setServiceStates] = useState([]);
   const [stateSearch, setStateSearch] = useState('');
-  const [serviceCities, setServiceCities] = useState([]);
-  const [citySearch, setCitySearch] = useState('');
+  // { [stateCode]: string[] } -- keyed by state so a company serving
+  // multiple states gets each state's own city list, instead of every
+  // state's cities showing up mixed together in one shared dropdown no
+  // matter which state a visitor picked.
+  const [serviceCities, setServiceCities] = useState({});
+  const [citySearch, setCitySearch] = useState({});
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -35,7 +39,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
       setEnableLeadCapture(config.enableLeadCapture !== false);
       setCustomQuestions(config.customLeadQuestions || []);
       setServiceStates(config.serviceStates || []);
-      setServiceCities(config.serviceCities || []);
+      setServiceCities(config.serviceCities || {});
     }
   }, [config]);
 
@@ -46,29 +50,44 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
   // actually take effect on the widget?" confusion the toggle autosave
   // already fixed once.
   const toggleState = (code) => {
+    const removing = serviceStates.includes(code);
     setServiceStates(prev => {
-      const next = prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code];
+      const next = removing ? prev.filter(c => c !== code) : [...prev, code];
       if (autoSave) autoSave({ serviceStates: next });
       else if (update) update({ serviceStates: next });
       return next;
     });
+    // Drop that state's cities too when the state itself is removed --
+    // otherwise they sit around orphaned, unreachable from the UI but
+    // still saved.
+    if (removing) {
+      setServiceCities(prev => {
+        if (!(code in prev)) return prev;
+        const next = { ...prev };
+        delete next[code];
+        if (autoSave) autoSave({ serviceCities: next });
+        else if (update) update({ serviceCities: next });
+        return next;
+      });
+    }
   };
 
-  const addCity = (name) => {
+  const addCity = (stateCode, name) => {
     const trimmed = name.trim();
     if (!trimmed) return;
     setServiceCities(prev => {
-      if (prev.some(c => c.toLowerCase() === trimmed.toLowerCase())) return prev;
-      const next = [...prev, trimmed];
+      const existing = prev[stateCode] || [];
+      if (existing.some(c => c.toLowerCase() === trimmed.toLowerCase())) return prev;
+      const next = { ...prev, [stateCode]: [...existing, trimmed] };
       if (autoSave) autoSave({ serviceCities: next });
       else if (update) update({ serviceCities: next });
       return next;
     });
   };
 
-  const removeCity = (name) => {
+  const removeCity = (stateCode, name) => {
     setServiceCities(prev => {
-      const next = prev.filter(c => c !== name);
+      const next = { ...prev, [stateCode]: (prev[stateCode] || []).filter(c => c !== name) };
       if (autoSave) autoSave({ serviceCities: next });
       else if (update) update({ serviceCities: next });
       return next;
@@ -200,41 +219,51 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
           <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>Cities/Towns You Serve <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: 12 }}>(optional)</span></div>
             <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
-              List the specific cities/towns you cover and your widget shows visitors a dropdown of just those instead of a free-text box. Leave empty and visitors can type any city.
+              List the specific cities/towns you cover in each state and your widget shows visitors a dropdown of just those instead of a free-text box. Leave a state's list empty and visitors can type any city for it.
             </div>
           </div>
-          <div style={{ padding: '14px 18px' }}>
-            {serviceCities.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-                {serviceCities.map(city => (
-                  <span key={city} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0', borderRadius: 20, padding: '4px 6px 4px 12px', fontSize: 12.5, fontWeight: 600 }}>
-                    {city}
-                    <button type="button" onClick={() => removeCity(city)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#15803d', display: 'flex', padding: 2 }}>
-                      <X size={12} />
+          <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+            {serviceStates.map(code => {
+              const stateName = ALL_STATES.find(s => s.code === code)?.name || code;
+              const cities = serviceCities[code] || [];
+              const search = citySearch[code] || '';
+              return (
+                <div key={code}>
+                  <div style={{ fontWeight: 700, fontSize: 12.5, color: '#374151', marginBottom: 8 }}>{stateName}</div>
+                  {cities.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+                      {cities.map(city => (
+                        <span key={city} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0', borderRadius: 20, padding: '4px 6px 4px 12px', fontSize: 12.5, fontWeight: 600 }}>
+                          {city}
+                          <button type="button" onClick={() => removeCity(code, city)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#15803d', display: 'flex', padding: 2 }}>
+                            <X size={12} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      style={{ ...inp, flex: 1, boxSizing: 'border-box' }}
+                      placeholder={`Add a city in ${stateName} and press Enter…`}
+                      value={search}
+                      onChange={e => setCitySearch(prev => ({ ...prev, [code]: e.target.value }))}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') { e.preventDefault(); addCity(code, search); setCitySearch(prev => ({ ...prev, [code]: '' })); }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { addCity(code, search); setCitySearch(prev => ({ ...prev, [code]: '' })); }}
+                      disabled={!search.trim()}
+                      style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: search.trim() ? '#16a34a' : '#e2e8f0', color: search.trim() ? 'white' : '#94a3b8', fontWeight: 700, fontSize: 13, cursor: search.trim() ? 'pointer' : 'not-allowed' }}
+                    >
+                      Add
                     </button>
-                  </span>
-                ))}
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input
-                style={{ ...inp, flex: 1, boxSizing: 'border-box' }}
-                placeholder="Type a city or town and press Enter…"
-                value={citySearch}
-                onChange={e => setCitySearch(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') { e.preventDefault(); addCity(citySearch); setCitySearch(''); }
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => { addCity(citySearch); setCitySearch(''); }}
-                disabled={!citySearch.trim()}
-                style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: citySearch.trim() ? '#16a34a' : '#e2e8f0', color: citySearch.trim() ? 'white' : '#94a3b8', fontWeight: 700, fontSize: 13, cursor: citySearch.trim() ? 'pointer' : 'not-allowed' }}
-              >
-                Add
-              </button>
-            </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

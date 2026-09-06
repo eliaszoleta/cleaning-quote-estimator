@@ -15,7 +15,7 @@ const US_STATES = [
   ['DC','Washington D.C.'],
 ];
 
-export default function LocationStep({ value, onBack, onNext, primaryColor, serviceStates = [], serviceCities = [] }) {
+export default function LocationStep({ value, onBack, onNext, primaryColor, serviceStates = [], serviceCities = {} }) {
   const [zip, setZip] = useState(value.zip || '');
   const [state, setState] = useState(value.state || (serviceStates.length === 1 ? serviceStates[0] : ''));
   const [city, setCity] = useState(value.city || '');
@@ -31,6 +31,16 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
   const scoped = serviceStates.length > 0;
   const singleState = serviceStates.length === 1;
   const scopedStates = US_STATES.filter(([abbr]) => serviceStates.includes(abbr));
+  // serviceCities is keyed by state -- a company serving multiple states
+  // only ever wants the cities THEY listed for whichever state is actually
+  // selected, not every city they've entered across every state mixed
+  // into one list.
+  const citiesForState = serviceCities[singleState ? serviceStates[0] : state] || [];
+
+  const selectState = (code) => {
+    setState(code);
+    setCity(''); // a city picked for the old state won't belong to the new one
+  };
 
   const canContinue = mode === 'zip'
     ? /^\d{5}$/.test(zip)
@@ -98,8 +108,8 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
         </div>
       ) : singleState ? (
         <div>
-          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Your city</label>
-          {serviceCities.length > 0 ? (
+          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>City</label>
+          {citiesForState.length > 0 ? (
             <select
               value={city} onChange={e => setCity(e.target.value)}
               style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer' }}
@@ -108,7 +118,7 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
               autoFocus
             >
               <option value="">Select your city…</option>
-              {serviceCities.map(c => <option key={c} value={c}>{c}</option>)}
+              {citiesForState.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           ) : (
             <input
@@ -128,7 +138,7 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
         <div>
           <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>State</label>
           <select
-            value={state} onChange={e => setState(e.target.value)}
+            value={state} onChange={e => selectState(e.target.value)}
             style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer' }}
             onFocus={e => { e.target.style.borderColor = primaryColor; }}
             onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
@@ -138,8 +148,8 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
           </select>
           {scoped && (
             <div style={{ marginTop: 14 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Your city</label>
-              {serviceCities.length > 0 ? (
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>City</label>
+              {citiesForState.length > 0 ? (
                 <select
                   value={city} onChange={e => setCity(e.target.value)}
                   style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer' }}
@@ -147,7 +157,7 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
                   onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
                 >
                   <option value="">Select your city…</option>
-                  {serviceCities.map(c => <option key={c} value={c}>{c}</option>)}
+                  {citiesForState.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               ) : (
                 <input

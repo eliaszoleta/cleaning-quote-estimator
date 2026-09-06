@@ -14,6 +14,21 @@ function dbHeaders() {
   return { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
 }
 
+// serviceCities used to be a flat array (before cities were scoped per
+// state), so any account that set it before this change still has that
+// shape sitting in the database. Normalizes on read so both routes below
+// -- and every client consuming them -- can always assume the
+// { [stateCode]: string[] } map shape, no migration script required: a
+// flat array only ever made sense for a single-state account, so it maps
+// onto that one state; anything already in the new shape passes through.
+function normalizeServiceCities(config) {
+  if (Array.isArray(config.serviceCities)) {
+    const onlyState = (config.serviceStates || [])[0];
+    return onlyState ? { [onlyState]: config.serviceCities } : {};
+  }
+  return config.serviceCities || {};
+}
+
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
 // GET /api/company/:id — get full config (auth required via middleware)
@@ -37,7 +52,7 @@ router.get('/:id', requireAuth, async (req, res) => {
         .catch(err => console.error('Company welcome email failed:', err.message));
     }
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, data: config });
+    res.json({ success: true, data: { ...config, serviceCities: normalizeServiceCities(config) } });
   } catch (err) {
     console.error('GET company config error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to load configuration' });
@@ -108,7 +123,7 @@ router.get('/:id/public', async (req, res) => {
     const {
       companyName, logo, primaryColor, accentColor, fontFamily,
       ctaHeadline, ctaSubtext, ctaButtonText, ctaPhone, ctaButtonUrl,
-      serviceStates, serviceCities, frameHeight, borderRadius, services,
+      serviceStates, frameHeight, borderRadius, services,
     } = config;
     // Same no-store as the authed GET /:id -- a subscriber who just changed
     // their Service Area/branding and reloaded their own widget to check it
@@ -120,7 +135,7 @@ router.get('/:id/public', async (req, res) => {
       data: {
         companyName, logo, primaryColor, accentColor, fontFamily,
         ctaHeadline, ctaSubtext, ctaButtonText, ctaPhone, ctaButtonUrl,
-        serviceStates, serviceCities, frameHeight, borderRadius, services,
+        serviceStates, serviceCities: normalizeServiceCities(config), frameHeight, borderRadius, services,
         paused: !sub.active,
         trialDaysLeft: sub.daysLeft,
       },

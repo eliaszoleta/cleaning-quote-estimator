@@ -63,7 +63,11 @@ const DEFAULT_COMPANY_CONFIG = {
   frameHeight: '700px',
   borderRadius: '12px',
   serviceStates: [],
-  serviceCities: [],
+  // Map of state code -> city names, e.g. { TX: ['Austin','Houston'], OK: ['Tulsa'] }
+  // -- keyed by state so a company serving multiple states gets each
+  // state's own city list in the widget instead of one pool shared/mixed
+  // across every state they operate in.
+  serviceCities: {},
   customSteps: [],
   subscription: {
     status: 'trialing',
