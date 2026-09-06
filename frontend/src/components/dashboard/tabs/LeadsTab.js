@@ -314,39 +314,47 @@ export default function LeadsTab({ user }) {
             </button>
           </div>
 
-          {/* Actions */}
-          <div style={{ display: 'flex', gap: 7, paddingTop: 8, borderTop: '1px solid #f1f5f9' }}>
-            {selectedLead.email && (
-              <a href={`mailto:${selectedLead.email}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#2563eb', color: 'white', textAlign: 'center', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 13 }}>
-                <Mail size={13} /> Email
-              </a>
-            )}
-            {selectedLead.phone && (
-              <a href={`tel:${selectedLead.phone}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#16a34a', color: 'white', textAlign: 'center', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 13 }}>
-                <Phone size={13} /> Call
-              </a>
+          {/* Actions -- two stacked rows instead of cramming everything into
+              one, which broke down to 4 buttons squeezed into a 340px panel
+              on a trashed lead (Email/Call/Restore/Delete Forever all in a
+              row). Contact actions on their own row, the
+              archive/restore/delete action(s) on their own row below. */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, paddingTop: 8, borderTop: '1px solid #f1f5f9' }}>
+            {(selectedLead.email || selectedLead.phone) && (
+              <div style={{ display: 'flex', gap: 7 }}>
+                {selectedLead.email && (
+                  <a href={`mailto:${selectedLead.email}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#2563eb', color: 'white', textAlign: 'center', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 13 }}>
+                    <Mail size={13} /> Email
+                  </a>
+                )}
+                {selectedLead.phone && (
+                  <a href={`tel:${selectedLead.phone}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#16a34a', color: 'white', textAlign: 'center', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 13 }}>
+                    <Phone size={13} /> Call
+                  </a>
+                )}
+              </div>
             )}
             {selectedLead.deleted_at ? (
-              <>
+              <div style={{ display: 'flex', gap: 7 }}>
                 <button
                   onClick={() => restoreLead(selectedLead.id)}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 13px', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                  style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
                 >
                   <RotateCcw size={13} /> Restore
                 </button>
                 <button
                   onClick={() => hardDeleteLead(selectedLead.id)}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 13px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                  style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
                 >
                   <Trash2 size={13} /> Delete Forever
                 </button>
-              </>
+              </div>
             ) : (
               <button
                 onClick={() => archiveLead(selectedLead.id)}
-                style={{ padding: '9px 13px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
               >
-                Archive
+                <Trash2 size={13} /> Move to Trash
               </button>
             )}
           </div>
