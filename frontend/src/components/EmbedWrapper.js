@@ -42,8 +42,8 @@ export default function EmbedWrapper({ companyId }) {
 
   if (paused) return (
     <div style={{ padding: '40px 24px', textAlign: 'center', background: '#f8fafc', borderRadius: 12 }}>
-      <div style={{ width: 56, height: 56, background: '#fef3c7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-        <Pause size={24} color="#d97706" strokeWidth={2.5} fill="#d97706" />
+      <div style={{ width: 56, height: 56, background: '#f59e0b', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 4px 12px rgba(245,158,11,0.35)' }}>
+        <Pause size={24} color="white" strokeWidth={0} fill="white" />
       </div>
       <div style={{ fontWeight: 700, fontSize: 16, color: '#374151', marginBottom: 8 }}>Calculator Paused</div>
       <p style={{ color: '#64748b', fontSize: 14, marginBottom: 16 }}>This cleaning cost calculator is currently paused due to an inactive subscription. If you're the site owner, log in to your dashboard to reactivate it.</p>

@@ -188,8 +188,6 @@ export default function CompanyDashboard({ user, onLogout }) {
             </div>
             <span style={{ color: 'white', fontWeight: 700, fontSize: 15, letterSpacing: '-0.2px' }}>Clean Estimator</span>
           </a>
-          <span style={{ color: '#334155', fontSize: 13 }}>/</span>
-          <span style={{ color: '#94a3b8', fontSize: 13 }}>Dashboard</span>
         </div>
 
         {/* Right: badge, save, user */}
