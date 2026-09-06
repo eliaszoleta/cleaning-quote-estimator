@@ -98,9 +98,9 @@ export async function getTrialEmailPreview(adminKey) {
   return apiFetch('/api/admin/companies/trial-email-preview', { headers: { 'x-admin-key': adminKey } });
 }
 
-export async function sendTrialEmails(adminKey) {
+export async function sendTrialEmails(adminKey, companyIds) {
   return apiFetch('/api/admin/companies/send-trial-email', {
-    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true }),
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true, companyIds }),
   });
 }
 

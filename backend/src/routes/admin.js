@@ -153,11 +153,16 @@ router.get('/companies/trial-email-preview', async (req, res) => {
   }
 });
 
-// POST /api/admin/companies/send-trial-email — the real send, to every
-// company with an email on file. Requires { confirm: true } in the body on
-// top of the x-admin-key header, as a second deliberate step so this can
-// never fire from a GET, a bookmarked link, or a stray retry -- this sends
-// real email to every current subscriber.
+// POST /api/admin/companies/send-trial-email — the real send. Requires
+// { confirm: true } in the body on top of the x-admin-key header, as a
+// second deliberate step so this can never fire from a GET, a bookmarked
+// link, or a stray retry -- this sends real email to real subscribers.
+// Optional { companyIds: [...] } restricts the send to just those accounts
+// (matched against the preview list) -- the account list mixes real
+// subscribers with what look like personal test accounts (multiple
+// eliaszoleta*@gmail.com addresses), so defaulting to "every company" was
+// too blunt. Omit companyIds (or leave it out entirely) to send to
+// everyone with an email on file, same as before.
 router.post('/companies/send-trial-email', async (req, res) => {
   if (req.body?.confirm !== true) {
     return res.status(400).json({ success: false, error: 'Refusing to send without { confirm: true } in the request body.' });
@@ -167,7 +172,11 @@ router.post('/companies/send-trial-email', async (req, res) => {
 
   try {
     const rows = await listCompaniesWithConfig(sb);
-    const recipients = rows.filter(r => r.email);
+    let recipients = rows.filter(r => r.email);
+    if (Array.isArray(req.body?.companyIds)) {
+      const wanted = new Set(req.body.companyIds);
+      recipients = recipients.filter(r => wanted.has(r.companyId));
+    }
 
     const results = await Promise.all(recipients.map(async r => {
       const sent = await sendCompanyWelcomeEmail({ to: r.email, companyId: r.companyId, subject: TRIAL_EMAIL_SUBJECT });
@@ -179,7 +188,11 @@ router.post('/companies/send-trial-email', async (req, res) => {
       success: true,
       sentCount,
       failedCount: results.length - sentCount,
-      skippedCount: rows.length - recipients.length,
+      // Always "no email on file", regardless of any companyIds filter
+      // above -- keeps this meaning the same thing it did before selective
+      // sending existed, rather than also counting deliberately-excluded
+      // recipients as "skipped".
+      skippedCount: rows.filter(r => !r.email).length,
       results,
     });
   } catch (err) {

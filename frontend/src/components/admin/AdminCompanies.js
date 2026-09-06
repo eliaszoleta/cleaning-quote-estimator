@@ -45,6 +45,7 @@ export default function AdminCompanies() {
   const [trialPreviewError, setTrialPreviewError] = useState(null);
   const [trialSending, setTrialSending] = useState(false);
   const [trialSendResult, setTrialSendResult] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(new Set());
 
   const [previewToEmail, setPreviewToEmail] = useState('');
   const [previewSending, setPreviewSending] = useState(false);
@@ -93,6 +94,11 @@ export default function AdminCompanies() {
     try {
       const res = await getTrialEmailPreview(adminKey);
       setTrialPreview(res);
+      // Default to everyone selected -- the list mixes real subscribers
+      // with what look like personal test accounts, so this still needs a
+      // deliberate uncheck, not a deliberate opt-in, to keep "send to
+      // everyone" a one-click action when that's actually what's wanted.
+      setSelectedIds(new Set((res.recipients || []).map(r => r.companyId)));
     } catch (err) {
       setTrialPreviewError(err.message);
     } finally {
@@ -100,13 +106,28 @@ export default function AdminCompanies() {
     }
   };
 
-  const handleSendTrialEmails = async () => {
+  const toggleSelected = (companyId) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(companyId)) next.delete(companyId); else next.add(companyId);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
     if (!trialPreview) return;
-    const ok = window.confirm(`Send the trial-activation email to ${trialPreview.recipientCount} compan${trialPreview.recipientCount === 1 ? 'y' : 'ies'}? This cannot be undone.`);
+    setSelectedIds(prev =>
+      prev.size === trialPreview.recipients.length ? new Set() : new Set(trialPreview.recipients.map(r => r.companyId))
+    );
+  };
+
+  const handleSendTrialEmails = async () => {
+    if (!trialPreview || selectedIds.size === 0) return;
+    const ok = window.confirm(`Send the trial-activation email to ${selectedIds.size} compan${selectedIds.size === 1 ? 'y' : 'ies'}? This cannot be undone.`);
     if (!ok) return;
     setTrialSending(true);
     try {
-      const res = await sendTrialEmails(adminKey);
+      const res = await sendTrialEmails(adminKey, Array.from(selectedIds));
       setTrialSendResult(res);
     } catch (err) {
       setTrialPreviewError(err.message);
@@ -192,7 +213,7 @@ export default function AdminCompanies() {
             <Mail size={15} color="#2563eb" /> Trial Activation Email
           </div>
           <div style={{ fontSize: 12.5, color: '#94a3b8', marginBottom: 14 }}>
-            Sends every company with an email on file their embed code + a pointer to the Help &amp; Docs tab. Nothing sends until you click Send below, and only after you've loaded the preview.
+            Sends the selected companies their embed code + a pointer to the Help &amp; Docs tab. Nothing sends until you click Send below, and only after you've loaded the preview and picked who gets it.
           </div>
 
           <form onSubmit={handleSendPreview} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f1f5f9' }}>
@@ -213,8 +234,8 @@ export default function AdminCompanies() {
               <Eye size={14} /> {trialPreviewLoading ? 'Loading preview…' : 'Preview recipients & copy'}
             </button>
             {trialPreview && (
-              <button onClick={handleSendTrialEmails} disabled={trialSending || trialSendResult} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: trialSendResult ? '#94a3b8' : '#16a34a', border: 'none', borderRadius: 9, padding: '9px 16px', fontWeight: 700, fontSize: 13, cursor: (trialSending || trialSendResult) ? 'not-allowed' : 'pointer', color: 'white' }}>
-                <Send size={14} /> {trialSending ? 'Sending…' : trialSendResult ? 'Sent' : `Send to ${trialPreview.recipientCount} compan${trialPreview.recipientCount === 1 ? 'y' : 'ies'}`}
+              <button onClick={handleSendTrialEmails} disabled={trialSending || trialSendResult || selectedIds.size === 0} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: trialSendResult ? '#94a3b8' : selectedIds.size === 0 ? '#cbd5e1' : '#16a34a', border: 'none', borderRadius: 9, padding: '9px 16px', fontWeight: 700, fontSize: 13, cursor: (trialSending || trialSendResult || selectedIds.size === 0) ? 'not-allowed' : 'pointer', color: 'white' }}>
+                <Send size={14} /> {trialSending ? 'Sending…' : trialSendResult ? 'Sent' : `Send to ${selectedIds.size} selected compan${selectedIds.size === 1 ? 'y' : 'ies'}`}
               </button>
             )}
           </div>
@@ -234,15 +255,23 @@ export default function AdminCompanies() {
               <div style={{ fontSize: 12, color: '#374151', marginBottom: 8 }}>
                 <strong>Subject:</strong> {trialPreview.subject}
               </div>
-              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
-                {trialPreview.recipientCount} recipient{trialPreview.recipientCount === 1 ? '' : 's'}{trialPreview.skippedCount > 0 ? ` · ${trialPreview.skippedCount} skipped (no email on file)` : ''}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <div style={{ fontSize: 12, color: '#64748b' }}>
+                  {selectedIds.size} of {trialPreview.recipientCount} selected{trialPreview.skippedCount > 0 ? ` · ${trialPreview.skippedCount} skipped (no email on file)` : ''}
+                </div>
+                <button onClick={toggleSelectAll} style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 600, fontSize: 12, cursor: 'pointer', padding: 0 }}>
+                  {selectedIds.size === trialPreview.recipients.length ? 'Deselect all' : 'Select all'}
+                </button>
               </div>
               <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid #f1f5f9', borderRadius: 8 }}>
                 {trialPreview.recipients.map(r => (
-                  <div key={r.companyId} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 12px', borderBottom: '1px solid #f8fafc', fontSize: 12.5 }}>
-                    <span style={{ fontWeight: 600, color: '#0f172a' }}>{r.companyName}</span>
-                    <span style={{ color: '#64748b' }}>{r.email}</span>
-                  </div>
+                  <label key={r.companyId} style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', padding: '7px 12px', borderBottom: '1px solid #f8fafc', fontSize: 12.5, cursor: 'pointer', background: selectedIds.has(r.companyId) ? 'white' : '#fafafa' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
+                      <input type="checkbox" checked={selectedIds.has(r.companyId)} onChange={() => toggleSelected(r.companyId)} style={{ cursor: 'pointer', flexShrink: 0 }} />
+                      <span style={{ fontWeight: 600, color: selectedIds.has(r.companyId) ? '#0f172a' : '#94a3b8' }}>{r.companyName}</span>
+                    </div>
+                    <span style={{ color: selectedIds.has(r.companyId) ? '#64748b' : '#cbd5e1' }}>{r.email}</span>
+                  </label>
                 ))}
               </div>
             </div>
