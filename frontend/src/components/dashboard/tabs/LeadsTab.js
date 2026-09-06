@@ -28,7 +28,16 @@ export default function LeadsTab({ user }) {
       const token = session?.access_token;
       if (!token) return;
       const res = await getCompanyLeads(token);
-      setLeads(res.data || []);
+      const loaded = res.data || [];
+      setLeads(loaded);
+      // Auto-open the most recent lead instead of making someone click into
+      // an empty-looking panel to discover the details are even there --
+      // only on load/refresh when nothing's already open, so a manual
+      // Refresh never yanks the panel away from whatever they were looking at.
+      if (!selectedLead && loaded.length > 0) {
+        setSelectedLead(loaded[0]);
+        setNotes(loaded[0].notes || '');
+      }
     } catch (err) {
       console.error('Error loading leads:', err.message);
     } finally {
