@@ -193,13 +193,18 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                   <p style={{ fontSize: 13, color: '#64748b', marginBottom: 14, margin: '4px 0 14px' }}>
                     {companyName ? 'Contact us for a free, no-obligation on-site quote.' : 'Compare quotes from vetted local cleaning professionals.'}
                   </p>
+                  {/* Just the email itself, not a big "Email Us" button --
+                      the Call button next to it is a real distinct action
+                      (opens the phone dialer), but "Email Us" duplicated
+                      that same weight for something that's really just
+                      contact info to read and copy. */}
+                  {ctaEmail && (
+                    <p style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13.5, color: '#374151', margin: '0 0 12px' }}>
+                      <Mail size={14} color="#64748b" />
+                      <a href={`mailto:${ctaEmail}`} style={{ color: '#374151', textDecoration: 'none' }}>{ctaEmail}</a>
+                    </p>
+                  )}
                   <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap' }}>
-                    {ctaEmail && (
-                      <a href={`mailto:${ctaEmail}`}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
-                        <Mail size={14} /> Email Us
-                      </a>
-                    )}
                     {ctaPhone && (
                       <a href={`tel:${ctaPhone}`}
                         style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#16a34a', color: 'white', padding: '11px 22px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
