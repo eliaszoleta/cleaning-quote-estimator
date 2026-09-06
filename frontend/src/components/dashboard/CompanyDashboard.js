@@ -50,14 +50,28 @@ export default function CompanyDashboard({ user, onLogout }) {
     if (localConfig) saveConfig(localConfig);
   };
 
+  // Every auto-save (service toggles, Service Area states/cities) chains
+  // onto this one queue. Both PATCH /:id/services and PUT /:id do their own
+  // read-existing-then-merge-then-write server-side, so firing several of
+  // these back to back -- toggling a service, removing two cities, adding
+  // four more, all within a few seconds -- lets a later request read the
+  // row before an earlier request's write has landed, then save from that
+  // stale snapshot and silently revert it. Chaining every auto-save (across
+  // both kinds) onto one promise makes each fully complete, round trip
+  // included, before the next is even sent, so a rapid sequence of edits
+  // always lands in the order made instead of racing each other.
+  const autoSaveQueue = useRef(Promise.resolve());
+
   // Wraps the hook's patchServices so localConfig (what the header's Save
   // Changes button submits) reflects the just-persisted toggle too --
   // otherwise a later global save would overwrite the auto-saved change
   // with whatever stale services value localConfig still had from before
   // the toggle.
-  const patchServiceToggle = useCallback(async (services) => {
-    const data = await patchServices(services);
-    if (data) update({ services: data.services });
+  const patchServiceToggle = useCallback((services) => {
+    autoSaveQueue.current = autoSaveQueue.current.then(async () => {
+      const data = await patchServices(services);
+      if (data) update({ services: data.services });
+    });
   }, [patchServices, update]);
 
   // Same immediate-save treatment as service toggles, for Service Area
@@ -69,7 +83,7 @@ export default function CompanyDashboard({ user, onLogout }) {
   // this is safe to fire alongside the same optimistic local update().
   const autoSave = useCallback((partial) => {
     update(partial);
-    saveConfig(partial);
+    autoSaveQueue.current = autoSaveQueue.current.then(() => saveConfig(partial));
   }, [update, saveConfig]);
 
   useEffect(() => {
