@@ -103,3 +103,9 @@ export async function sendTrialEmails(adminKey) {
     method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true }),
   });
 }
+
+export async function sendTrialEmailPreview(adminKey, to) {
+  return apiFetch('/api/admin/companies/send-trial-email-preview', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ to }),
+  });
+}

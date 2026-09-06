@@ -188,4 +188,21 @@ router.post('/companies/send-trial-email', async (req, res) => {
   }
 });
 
+// POST /api/admin/companies/send-trial-email-preview — sends the exact same
+// email content to a single address of the admin's choosing (not tied to
+// any real subscriber), so it can be reviewed as an actual received email
+// before ever running the real broadcast. Uses a placeholder company id
+// (there's no real one to embed for a preview), so the embed code in the
+// preview is obviously not a live one.
+router.post('/companies/send-trial-email-preview', async (req, res) => {
+  const to = (req.body?.to || '').trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+    return res.status(400).json({ success: false, error: 'A valid "to" email address is required.' });
+  }
+
+  const sent = await sendCompanyWelcomeEmail({ to, companyId: 'PREVIEW-COMPANY-ID', subject: `[Preview] ${TRIAL_EMAIL_SUBJECT}` });
+  if (!sent) return res.status(502).json({ success: false, error: 'Send failed -- check Resend is configured (RESEND_API_KEY) on the backend.' });
+  res.json({ success: true, to });
+});
+
 module.exports = router;

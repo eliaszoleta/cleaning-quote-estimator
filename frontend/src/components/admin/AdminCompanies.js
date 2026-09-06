@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye } from 'lucide-react';
-import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails } from '../../utils/api';
+import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails, sendTrialEmailPreview } from '../../utils/api';
 
 const STORAGE_KEY = 'admin_companies_key';
 
@@ -45,6 +45,11 @@ export default function AdminCompanies() {
   const [trialPreviewError, setTrialPreviewError] = useState(null);
   const [trialSending, setTrialSending] = useState(false);
   const [trialSendResult, setTrialSendResult] = useState(null);
+
+  const [previewToEmail, setPreviewToEmail] = useState('');
+  const [previewSending, setPreviewSending] = useState(false);
+  const [previewSendResult, setPreviewSendResult] = useState(null);
+  const [previewSendError, setPreviewSendError] = useState(null);
 
   const load = useCallback(async (key) => {
     setLoading(true);
@@ -107,6 +112,21 @@ export default function AdminCompanies() {
       setTrialPreviewError(err.message);
     } finally {
       setTrialSending(false);
+    }
+  };
+
+  const handleSendPreview = async (e) => {
+    e.preventDefault();
+    setPreviewSending(true);
+    setPreviewSendError(null);
+    setPreviewSendResult(null);
+    try {
+      const res = await sendTrialEmailPreview(adminKey, previewToEmail);
+      setPreviewSendResult(res.to);
+    } catch (err) {
+      setPreviewSendError(err.message);
+    } finally {
+      setPreviewSending(false);
     }
   };
 
@@ -174,6 +194,20 @@ export default function AdminCompanies() {
           <div style={{ fontSize: 12.5, color: '#94a3b8', marginBottom: 14 }}>
             Sends every company with an email on file their embed code + a pointer to the Help &amp; Docs tab. Nothing sends until you click Send below, and only after you've loaded the preview.
           </div>
+
+          <form onSubmit={handleSendPreview} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f1f5f9' }}>
+            <input
+              type="email" required placeholder="you@example.com"
+              value={previewToEmail} onChange={e => { setPreviewToEmail(e.target.value); setPreviewSendResult(null); setPreviewSendError(null); }}
+              style={{ ...inputStyle, flex: 1, minWidth: 200 }}
+            />
+            <button type="submit" disabled={previewSending} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#eff6ff', border: '1.5px solid #bfdbfe', borderRadius: 9, padding: '9px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#1d4ed8', whiteSpace: 'nowrap' }}>
+              <Send size={13} /> {previewSending ? 'Sending…' : 'Email me a preview'}
+            </button>
+          </form>
+          {previewSendResult && <div style={{ fontSize: 12.5, color: '#16a34a', fontWeight: 600, marginTop: -10, marginBottom: 14 }}>Sent to {previewSendResult} — check your inbox.</div>}
+          {previewSendError && <div style={{ fontSize: 12.5, color: '#dc2626', fontWeight: 600, marginTop: -10, marginBottom: 14 }}>{previewSendError}</div>}
+
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: trialPreview ? 14 : 0 }}>
             <button onClick={loadTrialPreview} disabled={trialPreviewLoading} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 9, padding: '9px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
               <Eye size={14} /> {trialPreviewLoading ? 'Loading preview…' : 'Preview recipients & copy'}
