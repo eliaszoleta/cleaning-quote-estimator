@@ -16,7 +16,7 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { n: '1', title: 'Sign up',                  desc: 'Create your account and start your 7-day free trial — credit card required.' },
+  { n: '1', title: 'Sign up',                  desc: 'Create your account and start your 30-day free trial — no credit card required.' },
   { n: '2', title: 'Customize your widget',    desc: 'Add your logo, set your brand colors, configure which services you offer, and write your CTA.' },
   { n: '3', title: 'Embed on your site',       desc: "Copy one line of code and paste it anywhere on your website. That's it." },
   { n: '4', title: 'Capture leads',            desc: 'Watch leads flow in. Manage them in your dashboard or sync to your CRM.' },
@@ -43,7 +43,7 @@ export default function CompanyLanding() {
     <>
       <Helmet>
         <title>Embed a Cleaning Cost Calculator on Your Website | Clean Estimator for Companies</title>
-        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 7-day free trial. $159/month." />
+        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 30-day free trial, no credit card required. $159/month." />
         <link rel="canonical" href="https://www.cleanestimator.com/for-companies" />
       </Helmet>
       <div className="app">
@@ -67,7 +67,7 @@ export default function CompanyLanding() {
                 <a href="/company" style={{ background: PRIMARY_GRADIENT, color: 'white', padding: '15px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 16, boxShadow: '0 8px 24px rgba(29,78,216,0.4)' }}>Start Free Trial →</a>
                 <a href="/?service=home_residential" style={{ background: 'rgba(255,255,255,0.08)', color: 'white', padding: '15px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 16, border: '1px solid rgba(255,255,255,0.15)' }}>See Demo</a>
               </div>
-              <p style={{ color: '#475569', fontSize: 13.5, marginTop: 14 }}>$159/mo after 7 days · Cancel anytime</p>
+              <p style={{ color: '#475569', fontSize: 13.5, marginTop: 14 }}>$159/mo after your 30-day free trial · No card required</p>
             </div>
           </div>
 
@@ -133,7 +133,7 @@ export default function CompanyLanding() {
                   <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$159</span>
                   <span style={{ fontSize: 13, color: '#64748b' }}>/month</span>
                 </div>
-                <div style={{ color: '#16a34a', fontWeight: 600, fontSize: 12, marginBottom: 20 }}>$159/mo after 7 days · Cancel anytime</div>
+                <div style={{ color: '#16a34a', fontWeight: 600, fontSize: 12, marginBottom: 20 }}>$159/mo after your 30-day free trial · No card required</div>
                 <ul style={{ listStyle: 'none', padding: 0, marginBottom: 20, textAlign: 'left' }}>
                   {PLAN_FEATURES.map(item => (
                     <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#374151' }}>
@@ -147,7 +147,7 @@ export default function CompanyLanding() {
                 <a href="/company" style={{ display: 'block', background: PRIMARY_GRADIENT, color: 'white', padding: '11px 0', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14, textAlign: 'center', boxShadow: '0 6px 18px rgba(29,78,216,0.32)' }}>
                   Start Free Trial →
                 </a>
-                <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 8, textAlign: 'center' }}>$159/mo after 7 days · Cancel anytime</p>
+                <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 8, textAlign: 'center' }}>$159/mo after your 30-day free trial · No card required</p>
               </div>
             </div>
           </div>

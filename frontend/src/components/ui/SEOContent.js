@@ -187,7 +187,7 @@ export default function SEOContent() {
       'Every service asks about size, scope, and frequency — not just ZIP code',
       'ZIP-code specific pricing across all 50 US states',
       'Local Partner Program: exclusive, one-partner-per-city placement recommending a local cleaning company to homeowners, $350/month per city',
-      'Website Integration: embeddable, white-labeled cleaning cost calculator for cleaning company websites, $159/month after a 7-day free trial',
+      'Website Integration: embeddable, white-labeled cleaning cost calculator for cleaning company websites, $159/month after a 30-day free trial, no credit card required',
       'House cleaning cost calculator',
       'Carpet cleaning cost estimator',
       'Air duct cleaning cost calculator',
@@ -416,7 +416,7 @@ export default function SEOContent() {
               <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 26px' }}>
                 <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Website Integration</h3>
                 <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: '0 0 14px' }}>
-                  Embed a branded, white-labeled cleaning cost calculator directly on your own website to capture leads. $159/month after a 7-day free trial.
+                  Embed a branded, white-labeled cleaning cost calculator directly on your own website to capture leads. $159/month after a 30-day free trial, no credit card required.
                 </p>
                 <a href="/for-companies" style={{ fontSize: 13.5, color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>See embeddable calculator details &rarr;</a>
               </div>

@@ -216,10 +216,10 @@ export default function CompanyDashboard({ user, onLogout }) {
         <div style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#dc2626', fontWeight: 600, fontSize: 13 }}>
             <AlertCircle size={15} />
-            Your widget is currently paused — {subStatus.status === 'requires_trial_setup' ? 'start your 7-day free trial to activate' : subStatus.status === 'expired' ? 'your trial has expired' : 'subscription issue'}.
+            Your widget is currently paused — {subStatus.status === 'requires_trial_setup' ? 'reload the page or reach out if this doesn\'t clear on its own' : subStatus.status === 'expired' ? 'your 30-day free trial has ended' : 'subscription issue'}.
           </div>
           <button onClick={() => setActiveTab('subscription')} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
-            {subStatus.status === 'requires_trial_setup' ? 'Start Trial →' : 'Reactivate →'}
+            {subStatus.status === 'requires_trial_setup' ? 'Get Started →' : 'Reactivate →'}
           </button>
         </div>
       )}
