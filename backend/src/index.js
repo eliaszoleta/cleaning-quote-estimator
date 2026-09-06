@@ -124,7 +124,18 @@ app.use('/api/subscription', requireAuth, subscriptionRouter);
 app.use('/api/company-leads', requireAuth, leadsRouter);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
-app.get('/health', (req, res) => res.json({ status: 'ok', service: 'CleanCalc API', version: '1.0.0' }));
+// Includes the exact commit this process was built from (RAILWAY_GIT_COMMIT_SHA
+// is auto-injected by Railway on every deploy) -- a way to check what code is
+// ACTUALLY running on a given domain/service without having to interpret
+// Railway's dashboard, which can show a deployment as "successful" without
+// that necessarily being the one currently serving traffic.
+app.get('/health', (req, res) => res.json({
+  status: 'ok',
+  service: 'CleanCalc API',
+  version: '1.0.0',
+  commit: process.env.RAILWAY_GIT_COMMIT_SHA || null,
+  deploymentId: process.env.RAILWAY_DEPLOYMENT_ID || null,
+}));
 
 // ─── DB connectivity check ────────────────────────────────────────────────────
 app.get('/api/debug/db', async (req, res) => {
