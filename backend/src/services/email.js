@@ -703,6 +703,8 @@ function buildCompanyWelcomeText({ companyId }) {
     '',
     "Paste that anywhere in your website's HTML — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The calculator will appear right there and resize itself to fit.",
     '',
+    "Two things are already working, no setup needed: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.",
+    '',
     'Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard:',
     'https://www.cleanestimator.com/company?tab=branding',
     '',
@@ -729,6 +731,10 @@ function buildCompanyWelcomeHtml({ companyId }) {
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
     Paste that anywhere in your website's HTML — a <strong>Custom HTML / Embed block</strong> in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The calculator will appear right there and resize itself to fit.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Two things are already working, no setup needed: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
