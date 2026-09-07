@@ -43,25 +43,32 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick })
         width: isMobile ? 218 : DESKTOP_BANNER_WIDTH,
         maxWidth: 'calc(100vw - 20px)',
         background: 'white',
-        border: `1.5px solid #2563eb`,
-        borderRadius: isMobile ? 12 : 14,
-        boxShadow: '0 10px 34px rgba(15,23,42,0.16)',
+        border: '1px solid rgba(15,23,42,0.07)',
+        borderRadius: isMobile ? 14 : 16,
+        overflow: 'hidden',
+        boxShadow: '0 2px 6px rgba(15,23,42,0.05), 0 18px 38px rgba(37,99,235,0.14)',
         padding: isMobile ? '10px 12px' : '14px 16px',
         animation: `partnerBannerIn 0.25s ease-out`,
       }}
     >
       <style>{`@keyframes partnerBannerIn { from { opacity: 0; transform: translateY(${isMobile ? 8 : -8}px); } to { opacity: 1; transform: translateY(0); } }`}</style>
 
+      {/* Thin brand-color accent instead of a full outline -- a nod to the
+          blue border this replaced, without boxing the whole card in it. */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, #2563eb, #7c3aed)' }} />
+
       <button
         onClick={onDismiss}
         aria-label="Dismiss"
-        style={{ position: 'absolute', top: isMobile ? 5 : 8, right: isMobile ? 5 : 8, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#94a3b8', display: 'flex' }}
+        style={{ position: 'absolute', top: isMobile ? 7 : 10, right: isMobile ? 5 : 8, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#94a3b8', display: 'flex' }}
       >
         <X size={isMobile ? 12 : 14} />
       </button>
 
-      <div style={{ fontSize: isMobile ? 8.5 : 10.5, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: isMobile ? 5 : 8, textAlign: 'center' }}>
-        Local Cleaner Near You
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 7 : 10 }}>
+        <div style={{ fontSize: isMobile ? 8 : 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '3px 8px' : '4px 10px', borderRadius: 20 }}>
+          Local Cleaner Near You
+        </div>
       </div>
 
       {partner.logo_url && (
