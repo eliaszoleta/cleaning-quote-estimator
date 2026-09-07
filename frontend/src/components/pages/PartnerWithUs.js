@@ -278,8 +278,8 @@ export default function PartnerWithUs() {
               </div>
               <div style={{ fontSize: 'clamp(11.5px, 3vw, 13px)', color: '#64748b' }}>About {POPULATION_THRESHOLD.toLocaleString()}+ residents &mdash; e.g. Dallas, Seattle, Atlanta</div>
             </div>
-            <div style={{ background: 'linear-gradient(135deg, #fdf4ff, #fef9ff)', border: '1px solid #e9d5ff', borderRadius: 18, padding: 'clamp(16px, 5vw, 32px)' }}>
-              <div style={{ fontSize: 'clamp(11px, 3vw, 12.5px)', fontWeight: 700, color: '#9333ea', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'clamp(5px, 2vw, 8px)' }}>Smaller City</div>
+            <div style={{ background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', border: '1px solid #e2e8f0', borderRadius: 18, padding: 'clamp(16px, 5vw, 32px)' }}>
+              <div style={{ fontSize: 'clamp(11px, 3vw, 12.5px)', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 'clamp(5px, 2vw, 8px)' }}>Smaller City</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
                 <span style={{ fontSize: 'clamp(28px, 8vw, 44px)', fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px', lineHeight: 1 }}>${MINOR_CITY_PRICE}</span>
                 <span style={{ fontSize: 'clamp(12.5px, 3.5vw, 15px)', color: '#64748b', fontWeight: 500 }}>/month</span>
