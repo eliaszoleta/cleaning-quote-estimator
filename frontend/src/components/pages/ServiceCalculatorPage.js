@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { ChevronDown, Check } from 'lucide-react';
 import { getServiceBySlug, getRelatedServices } from '../../data/services';
 import CleaningCalculator from '../calculator/CleaningCalculator';
+import AffiliateSidebar from '../ui/AffiliateSidebar';
 import './PageHero.css';
 
 function FaqAccordion({ faqs }) {
@@ -113,6 +114,14 @@ export default function ServiceCalculatorPage({ slug }) {
 
         <div style={showingResults ? undefined : { maxWidth: 720, margin: '0 auto', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <CleaningCalculator embedded siteLanding initialService={service.id} onShowResults={setShowingResults} />
+        </div>
+
+        {/* Same page-hero-wrap column (900px) runs the whole page, so
+            unlike the homepage there's no wider section further down for a
+            fixed sidebar to run into -- desktopBreakpoint is raised from
+            the 720/760px default to clear this page's wider column. */}
+        <div style={{ marginTop: 40 }}>
+          <AffiliateSidebar contentMaxWidth={900} padded={false} desktopBreakpoint={1360} />
         </div>
 
         <div style={{ marginTop: 48 }}>

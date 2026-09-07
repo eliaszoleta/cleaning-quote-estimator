@@ -36,10 +36,12 @@ const LEFT_OFFSET = 16;
 // always report 1280px+ of CSS viewport width even on a 13" screen, so
 // this covers virtually all of them; only tablets, a non-maximized window,
 // or a zoomed-in browser fall below it.
+// Default only -- a wider content column needs a higher cutoff of its own,
+// passed in via the desktopBreakpoint prop below.
 const DESKTOP_BREAKPOINT = 1220;
 
-function computeIsDesktop() {
-  return window.innerWidth >= DESKTOP_BREAKPOINT;
+function computeIsDesktop(breakpoint) {
+  return window.innerWidth >= breakpoint;
 }
 
 function ProductCard({ product, compact }) {
@@ -147,14 +149,22 @@ function SidebarInner({ compact }) {
 // but stops sticking -- scrolling away with the rest of the page -- the
 // moment that wrapper's bottom edge (the end of the calculator section)
 // scrolls past the sticky offset, before the wider section ever begins.
-export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true, mode = 'fixed' }) {
-  const [isDesktop, setIsDesktop] = useState(computeIsDesktop);
+// desktopBreakpoint: overrides DESKTOP_BREAKPOINT for pages whose content
+// column is wider than the 720/760px this default was computed for. The
+// standalone calculator landing pages (CalculatorPage, EstimatorPage,
+// ServiceCalculatorPage) wrap their whole page -- calculator card, FAQ,
+// everything -- in a single 900px-wide column, so the default 1220px
+// cutoff (which only guarantees clearance against a 760px column) would
+// let the sidebar overlap that wider content between ~1220-1360px.
+export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true, mode = 'fixed', desktopBreakpoint = DESKTOP_BREAKPOINT }) {
+  const [isDesktop, setIsDesktop] = useState(() => computeIsDesktop(desktopBreakpoint));
 
   useEffect(() => {
-    const onResize = () => setIsDesktop(computeIsDesktop());
+    const onResize = () => setIsDesktop(computeIsDesktop(desktopBreakpoint));
+    onResize();
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, []);
+  }, [desktopBreakpoint]);
 
   if (isDesktop && mode === 'sticky') {
     // No portal needed: unlike 'fixed', position:sticky is scoped to this
