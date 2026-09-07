@@ -193,16 +193,16 @@ export default function ClientDashboard({ user, onLogout }) {
           {howOpen && (
             <div className="cd-fade-in" style={{ fontSize: 13, color: '#475569', lineHeight: 1.7, marginTop: 14 }}>
               <p style={{ margin: '0 0 10px' }}>
-                <strong style={{ color: '#0f172a' }}>Banner Views</strong> — how many times your listing appeared on cleanestimator.com to a visitor located in one of your service areas.
+                <strong style={{ color: '#0f172a' }}>Banner Views</strong> — how many times your listing appeared on cleanestimator.com to a visitor in one of your service areas.
               </p>
               <p style={{ margin: '0 0 10px' }}>
-                <strong style={{ color: '#0f172a' }}>Call Button Taps</strong> — how many times a visitor tapped the "Call" button on your listing. That opens their phone's dialer with your number already filled in: it's someone actively choosing to call your business over every other cleaner they could have picked. We can't see whether the call itself connected or how long it lasted — that happens on their phone, off our site — so this counts the tap, not a confirmed call. Your number is also printed right on the listing, so some visitors call by dialing it themselves instead of tapping — meaning your actual call volume from cleanestimator.com is likely a bit higher than this number.
+                <strong style={{ color: '#0f172a' }}>Call Button Taps</strong> — how many times a visitor tapped "Call," opening their dialer with your number ready — a stronger signal than just seeing the banner. We can't confirm the call actually connected (that happens on their phone, not ours), and since your number's also printed on the listing, some visitors dial it directly instead of tapping — so your real call volume is likely a bit higher than this.
               </p>
               <p style={{ margin: '0 0 10px' }}>
-                <strong style={{ color: '#0f172a' }}>Leads Emailed to You</strong> — every time a visitor in one of your service areas gets their estimate emailed to them, we send you that same lead's name, contact info, and timeline directly, with reply-to set to their email so you can just hit reply. This is the most actionable number on this dashboard — these are people who already have their price and are actively looking, not just someone who saw your banner.
+                <strong style={{ color: '#0f172a' }}>Leads Emailed to You</strong> — every time a visitor in your service area emails themselves their estimate, we forward you that same lead's name, contact info, and timeline, with reply-to set to them so you can just hit reply. The most actionable number here: these people already have their price and are actively looking, not just browsing.
               </p>
               <p style={{ margin: 0 }}>
-                <strong style={{ color: '#0f172a' }}>Click-Through Rate</strong> — the share of banner views that turned into a call tap. It's the clearest read on how compelling your listing is once someone actually sees it, and a good number to watch as your service areas or listing details change.
+                <strong style={{ color: '#0f172a' }}>Click-Through Rate</strong> — the share of banner views that turned into a call tap. The clearest read on how compelling your listing is once someone sees it, worth watching as your service areas or details change.
               </p>
             </div>
           )}
