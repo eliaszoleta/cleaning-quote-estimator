@@ -22,22 +22,24 @@ const PRODUCTS = [
   },
 ];
 
-// contentMaxWidth defaults to CleaningCalculator.js's card width (same
-// constant FloatingPartnerBanner.js uses on the right) -- used to work out
-// whether there's real space in the LEFT margin for this sidebar before
-// docking it there, instead of a guessed viewport-width breakpoint. Callers
-// on a page with a differently-sized content column (e.g. BlogPost.js's
-// 760px article) pass their own so the room check stays accurate -- using
-// the calculator's 720 on a 760-wide page would overestimate the real
-// margin by 20px per side.
-const DEFAULT_CONTENT_MAX_WIDTH = 720;
 const SIDEBAR_WIDTH = 208;
 const LEFT_OFFSET = 16;
-const SAFE_GAP = 24;
 
-function computeHasRoom(contentMaxWidth) {
-  const margin = (window.innerWidth - contentMaxWidth) / 2;
-  return margin >= LEFT_OFFSET + SIDEBAR_WIDTH + SAFE_GAP;
+// Flat "laptop and up" cutoff, precomputed to be the actual minimum width
+// where the sidebar (LEFT_OFFSET + SIDEBAR_WIDTH = 224px) clears the wider
+// of the two content columns this mounts next to (BlogPost.js's 760px --
+// the homepage calculator's 720px needs less) without touching it: 760 +
+// 2*224 = 1208, rounded up for a small buffer. Below this, real laptops
+// showed a genuine overlap with the content, not just an overly-cautious
+// threshold -- confirmed by screenshotting 1024px, where the sidebar's
+// right edge visibly cut into the calculator card. Modern laptops almost
+// always report 1280px+ of CSS viewport width even on a 13" screen, so
+// this covers virtually all of them; only tablets, a non-maximized window,
+// or a zoomed-in browser fall below it.
+const DESKTOP_BREAKPOINT = 1220;
+
+function computeIsDesktop() {
+  return window.innerWidth >= DESKTOP_BREAKPOINT;
 }
 
 function ProductCard({ product, compact }) {
@@ -108,14 +110,13 @@ function SidebarInner({ compact }) {
 }
 
 // Mounted on the homepage (720px calculator card) and every blog post
-// (760px article column) -- contentMaxWidth tells it which. On a wide
-// viewport it floats in the left margin next to that content column,
-// mirroring how FloatingPartnerBanner docks in the right margin -- both
-// only ever show up where there's real space, never overlapping the
-// centered content column. Below that width it renders inline, in normal
-// document flow, right where <AffiliateSidebar /> is placed in the page --
-// stacked under the content instead of squeezed into a margin that isn't
-// there.
+// (760px article column) -- contentMaxWidth tells it which, used only for
+// the stacked fallback's own width below. On a laptop-or-wider viewport it
+// always floats in the left margin next to that content column, mirroring
+// how FloatingPartnerBanner docks in the right margin. Below that width it
+// renders inline, in normal document flow, right where <AffiliateSidebar />
+// is placed in the page -- stacked under the content instead of squeezed
+// into a margin that isn't there (tablets and phones don't have one).
 // padded: whether the inline/stacked fallback needs its own horizontal
 // gutter. True by default (the homepage mounts this as a bare sibling
 // under an unpadded <main>, so it supplies its own edge padding, matching
@@ -123,17 +124,16 @@ function SidebarInner({ compact }) {
 // since it's nested inside an already-padded, already-760-wide content
 // column -- adding padding on top of that would double-inset it relative
 // to the article text right above it.
-export default function AffiliateSidebar({ contentMaxWidth = DEFAULT_CONTENT_MAX_WIDTH, padded = true }) {
-  const [hasRoom, setHasRoom] = useState(() => computeHasRoom(contentMaxWidth));
+export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true }) {
+  const [isDesktop, setIsDesktop] = useState(computeIsDesktop);
 
   useEffect(() => {
-    const onResize = () => setHasRoom(computeHasRoom(contentMaxWidth));
-    onResize();
+    const onResize = () => setIsDesktop(computeIsDesktop());
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [contentMaxWidth]);
+  }, []);
 
-  if (hasRoom) {
+  if (isDesktop) {
     // Portal to document.body for the same reason FloatingPartnerBanner
     // does -- Header's backdropFilter creates a new CSS containing block
     // for any position:fixed descendant, which would anchor this to the
