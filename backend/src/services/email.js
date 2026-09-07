@@ -389,31 +389,50 @@ function buildLeadContactLines({ leadEmail, leadPhone, city, zip, timeline }) {
   ].filter(Boolean);
 }
 
-function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline }) {
+function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, zip, timeline });
 
-  return [
+  const lines = [
     'New lead in your area!',
     '',
     `${name} just got a ${serviceLabel.toLowerCase()} estimate on Clean Estimator: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}.`,
     '',
     'Contact info:',
     ...contactLines.map(l => `  ${l}`),
+  ];
+
+  if (adjustments.length) {
+    lines.push('', 'Price breakdown:');
+    adjustments.filter(a => !a.separate).forEach(a => {
+      lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
+    });
+    lines.push(`  Estimated total: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}`);
+  }
+
+  if (keyFactors.length) {
+    lines.push('', `Key factors: ${keyFactors.map(f => `${f.label}: ${f.impact}`.replace(/_/g, ' ')).join(' · ')}`);
+  }
+
+  lines.push(...buildServiceDetailsText(serviceDetails));
+
+  lines.push(
     '',
     'Reply to this email to reach them directly, or use the contact info above.',
     '',
     "They opted in to be connected with a local cleaning professional -- that's you, as our exclusive partner in this area.",
     '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
+    'Clean Estimator - cleanestimator.com'
+  );
+
+  return lines.join('\n');
 }
 
-function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline }) {
+function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, zip, timeline });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, zip, timeline });
 
   // No width:100% -- that stretches the value column to the far edge of
   // the email, leaving a wide, disconnected gap between label and value.
@@ -429,6 +448,17 @@ function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, lead
     </tr>`;
   }).join('');
 
+  const breakdownHtml = adjustments.length ? `
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Price breakdown</p>
+  <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;">
+    ${buildBreakdownRows(adjustments)}
+    <tr>
+      <td style="padding:8px 0 0;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
+      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</td>
+    </tr>
+  </table>
+  ${buildKeyFactors(keyFactors)}` : '';
+
   return `
 <div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead in your area!</p>
@@ -441,6 +471,8 @@ function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, lead
   <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
     ${contactRows}
   </table>
+  ${breakdownHtml}
+  ${buildServiceDetailsHtml(serviceDetails)}
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
     Reply to this email to reach them directly, or use the contact info above.
@@ -459,7 +491,10 @@ function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, lead
 // warm lead landing in the partner's inbox, ready to call or reply to.
 // Fire-and-forget, same as the other partner emails; only called from
 // calculate.js when partnerInfo is present and has an email on file.
-async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, zip, timeline }) {
+// Includes the same full price breakdown/key factors/service details as
+// sendCompanyLeadEmail, not just the top-line range -- a partner deciding
+// whether to call back needs the same context a subscribed company gets.
+async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, zip, timeline, adjustments, keyFactors, serviceDetails }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendPartnerLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -471,7 +506,7 @@ async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPho
   }
 
   const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-  const args = { leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline };
+  const args = { leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, zip, timeline, adjustments, keyFactors, serviceDetails };
 
   try {
     await axios.post(

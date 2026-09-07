@@ -178,6 +178,9 @@ router.post('/', async (req, res) => {
               priceHigh: result.totalHigh,
               zip: zip || null,
               timeline: leadInfo.timeline || null,
+              adjustments: result.adjustments,
+              keyFactors: result.keyFactors,
+              serviceDetails: serviceDetails || {},
             });
             // Logged as a partner_banner_events row (same table/pattern as
             // banner impressions and call-button taps) so it shows up
