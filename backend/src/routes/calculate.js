@@ -160,7 +160,14 @@ router.post('/', async (req, res) => {
         const partnerIdForLead = partnerInfo.id;
         getVerifiedPartnerEmail(partnerIdForLead)
           .then(async partnerEmail => {
-            if (!partnerEmail) return;
+            if (!partnerEmail) {
+              // partnerInfo.id didn't resolve to a currently-active partner
+              // with a business_email on file -- logged so this is
+              // diagnosable from server logs instead of just "no email
+              // arrived" with no trace of why.
+              console.warn(`Partner lead email skipped: partner ${partnerIdForLead} not found, inactive, or missing business_email`);
+              return;
+            }
             const sent = await sendPartnerLeadEmail({
               partnerEmail,
               leadName: leadInfo.name,
@@ -177,8 +184,17 @@ router.post('/', async (req, res) => {
             // alongside those in the partner's KPI dashboard. Only counted
             // on an actual successful send, not just an attempt.
             if (sent) await logLeadEmailEvent(partnerIdForLead);
+            else console.warn(`Partner lead email send failed for partner ${partnerIdForLead} (see sendPartnerLeadEmail warning above)`);
           })
           .catch(err => console.error('Partner lead email failed:', err.message));
+      } else {
+        // No client-supplied partner match at all -- either there's
+        // genuinely no active partner in this visitor's city, or the
+        // browser's own geolocation/Supabase lookup (partnerLookup.js)
+        // didn't resolve one in time. Can't tell which from here, but at
+        // least this is now visible in server logs instead of a lead
+        // silently never reaching a partner with no trace of why.
+        console.log(`No partner match on this lead (serviceType=${serviceType}, state=${result.state || state || 'unknown'})`);
       }
 
       // Notify the company (embed subscriber) about leads on their own

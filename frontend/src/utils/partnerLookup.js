@@ -70,20 +70,31 @@ export async function getUserLocation() {
 // so the match is: any active partner with a service-area row matching the
 // visitor's city/state. partners!inner lets the .eq('partners.active', ...)
 // filter apply to the joined table (a plain left join would ignore it).
-export async function findPartner(city, state) {
-  if (!supabase || !city || !state) return null;
+// Returns { partner, ok } rather than just the partner -- `data` alone used
+// to be destructured with the query's `error` silently dropped, so a failed
+// request (network blip, ad blocker, rate limit) looked identical to a
+// confirmed "no partner in this city" and got cached exactly the same way
+// by getCachedPartnerMatch() below. `ok: false` lets that caller tell the
+// two apart and only cache a result it can actually trust.
+async function findPartner(city, state) {
+  if (!supabase || !city || !state) return { partner: null, ok: true };
 
   const { name, code } = resolveState(state);
   const stateFilter = code ? `state.ilike.${name},state.ilike.${code}` : `state.ilike.${name}`;
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('partner_locations')
     .select('*, partners!inner(*)')
     .eq('partners.active', true)
     .ilike('city', city)
     .or(stateFilter)
     .limit(1);
-  return data?.[0]?.partners || null;
+
+  if (error) {
+    console.warn('findPartner lookup failed:', error.message);
+    return { partner: null, ok: false };
+  }
+  return { partner: data?.[0]?.partners || null, ok: true };
 }
 
 // Resolves the visitor's matched partner (or null). Always re-checks the
@@ -108,11 +119,18 @@ export async function getCachedPartnerMatch() {
     }
   } catch { /* sessionStorage unavailable — fall through and fetch live */ }
 
-  const partner = await findPartner(loc.city, loc.state);
+  const { partner, ok } = await findPartner(loc.city, loc.state);
 
-  try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ city: loc.city, state: loc.state, partner }));
-  } catch { /* ignore quota/private-mode errors */ }
+  // Only cache a lookup that actually completed. Caching a failed one would
+  // make every later call in this tab -- the banner on the next page, then
+  // the lead-capture step, etc. -- silently reuse that failure (and so skip
+  // forwarding the lead to a partner who does exist) instead of getting a
+  // fresh chance to find the real match.
+  if (ok) {
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ city: loc.city, state: loc.state, partner }));
+    } catch { /* ignore quota/private-mode errors */ }
+  }
 
   return partner;
 }
