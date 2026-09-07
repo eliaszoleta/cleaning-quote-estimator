@@ -228,6 +228,19 @@ export default function App() {
   if (isServiceCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><ServiceCalculatorPage slug={pathname.slice(1)} /></main><Footer /></div></HelmetProvider>;
 
   if (isCompany) {
+    // No page-specific <title> existed here before -- every state fell back
+    // to index.html's generic site-wide title, leaving Google to guess a
+    // label for this page in search results (the same gap that made /client
+    // show up as a sitelink titled "Back"). noindex since a login gate has
+    // no content value to a searcher.
+    const companyHelmet = (
+      <Helmet>
+        <title>Company Login | Clean Estimator</title>
+        <meta name="description" content="Log in to your Clean Estimator company dashboard to manage your embedded calculator and leads." />
+        <meta name="robots" content="noindex, follow" />
+      </Helmet>
+    );
+
     if (authLoading) return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a' }}>
         <div style={{ color: 'white', fontSize: 16 }}>Loading...</div>
@@ -235,15 +248,16 @@ export default function App() {
     );
     if (!user && !supabase) return (
       <HelmetProvider>
+        {companyHelmet}
         <div className="app"><Header /><main style={{ padding: 40, textAlign: 'center' }}>
           <h2>Supabase not configured</h2>
           <p style={{ color: '#64748b', marginTop: 8 }}>Set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY to enable authentication.</p>
         </main><Footer /></div>
       </HelmetProvider>
     );
-    if (passwordRecovery) return <HelmetProvider><ResetPasswordPage onDone={() => setPasswordRecovery(false)} /></HelmetProvider>;
-    if (!user) return <HelmetProvider><AuthPage onAuth={setUser} /></HelmetProvider>;
-    return <HelmetProvider><CompanyDashboard user={user} onLogout={handleLogout} /></HelmetProvider>;
+    if (passwordRecovery) return <HelmetProvider>{companyHelmet}<ResetPasswordPage onDone={() => setPasswordRecovery(false)} /></HelmetProvider>;
+    if (!user) return <HelmetProvider>{companyHelmet}<AuthPage onAuth={setUser} /></HelmetProvider>;
+    return <HelmetProvider>{companyHelmet}<CompanyDashboard user={user} onLogout={handleLogout} /></HelmetProvider>;
   }
 
   return (
