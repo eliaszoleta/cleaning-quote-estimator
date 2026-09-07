@@ -8,6 +8,15 @@ const path = require('path');
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SERVICE_KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+// Lead ids are always server-generated UUIDs (see saveLead below) -- this
+// gate rejects anything else before it ever reaches a query, on top of the
+// encodeURIComponent() on the value itself. Belt and suspenders: :id comes
+// from the URL path and was being spliced unescaped into a PostgREST
+// filter string, so a crafted id containing "&" could inject extra query
+// filters (e.g. its own company_id=eq.<value>) alongside the real
+// ownership check below instead of just being treated as a literal id.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 function dbHeaders() {
   const key = SERVICE_KEY();
   return { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=representation' };
@@ -158,6 +167,7 @@ router.get('/company', async (req, res) => {
 router.patch('/company/:id', async (req, res) => {
   const companyId = req.user.id;
   const leadId = req.params.id;
+  if (!UUID_RE.test(leadId)) return res.status(400).json({ success: false, error: 'Invalid lead id' });
   const { notes, deleted_at } = req.body;
 
   try {
@@ -166,7 +176,7 @@ router.patch('/company/:id', async (req, res) => {
       if (notes !== undefined) updates.notes = notes;
       if (deleted_at !== undefined) updates.deleted_at = deleted_at;
       await axios.patch(
-        `${SUPABASE_URL}/rest/v1/leads?id=eq.${leadId}&company_id=eq.${encodeURIComponent(companyId)}`,
+        `${SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(leadId)}&company_id=eq.${encodeURIComponent(companyId)}`,
         updates,
         { headers: dbHeaders() }
       );
@@ -193,11 +203,12 @@ router.patch('/company/:id', async (req, res) => {
 router.delete('/company/:id', async (req, res) => {
   const companyId = req.user.id;
   const leadId = req.params.id;
+  if (!UUID_RE.test(leadId)) return res.status(400).json({ success: false, error: 'Invalid lead id' });
 
   try {
     if (SERVICE_KEY() && SUPABASE_URL) {
       await axios.delete(
-        `${SUPABASE_URL}/rest/v1/leads?id=eq.${leadId}&company_id=eq.${encodeURIComponent(companyId)}`,
+        `${SUPABASE_URL}/rest/v1/leads?id=eq.${encodeURIComponent(leadId)}&company_id=eq.${encodeURIComponent(companyId)}`,
         { headers: dbHeaders() }
       );
       return res.json({ success: true });

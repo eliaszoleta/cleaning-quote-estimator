@@ -67,6 +67,52 @@ app.use('/api/partner-checkout', rateLimit({
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }));
 
+// GET /api/company/:id/public — every embedded widget hits this on every
+// page load, from every visitor's own IP, so real traffic is naturally
+// spread across many different IPs already; this limit is per-IP and only
+// ever bites a single IP hammering one company's endpoint directly.
+app.use('/api/company/:id/public', rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
+// POST /api/company/check-duplicate — unauthenticated and scans every
+// company's config on each call (see findDuplicateCompany), so it's both
+// cheaper to abuse and more expensive to serve than a typical public route.
+app.use('/api/company/check-duplicate', rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
+// GET /api/leads — API-key gated already, but a leaked/guessed key (or
+// someone brute-forcing one) shouldn't get unlimited attempts.
+app.use('/api/leads', rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
+// /api/auth/* isn't actually used by the dashboard (AuthPage.js calls
+// Supabase directly) but stays mounted and reachable regardless -- a thin
+// proxy to Supabase's own login/signup endpoints with no rate limit would
+// otherwise let someone brute-force real accounts' passwords or mass-create
+// signups through our own API with no throttle at all.
+app.use('/api/auth', rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
 // ─── CRITICAL: Stripe webhook MUST be registered before express.json() ────────
 app.post('/api/subscription/webhook',
   express.raw({ type: 'application/json' }),
