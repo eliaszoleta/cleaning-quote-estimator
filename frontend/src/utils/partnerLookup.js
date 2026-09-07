@@ -76,6 +76,16 @@ export async function getUserLocation() {
 // confirmed "no partner in this city" and got cached exactly the same way
 // by getCachedPartnerMatch() below. `ok: false` lets that caller tell the
 // two apart and only cache a result it can actually trust.
+//
+// The joined partners(...) column list is deliberately explicit, not `*` --
+// this runs with the public anon key from every visitor's browser (the
+// banner and results-page card mount sitewide), so whatever's selected here
+// is sent to the client regardless of whether the UI renders it. `*` was
+// pulling personal_email (the partner's private /client login address --
+// explicitly "never shown publicly" per 007_split_partner_emails.sql) and
+// the Stripe customer/subscription/checkout-session ids from
+// 004_partner_checkout.sql into every page load. Only the fields the public
+// cards (PartnerBannerCard, PartnerCard) actually render belong here.
 async function findPartner(city, state) {
   if (!supabase || !city || !state) return { partner: null, ok: true };
 
@@ -84,7 +94,7 @@ async function findPartner(city, state) {
 
   const { data, error } = await supabase
     .from('partner_locations')
-    .select('*, partners!inner(*)')
+    .select('*, partners!inner(id, business_name, address, phone, business_email, website, logo_url)')
     .eq('partners.active', true)
     .ilike('city', city)
     .or(stateFilter)
