@@ -187,8 +187,11 @@ export default function PartnerWithUs() {
             Get Recommended to Thousands of Homeowners
             <span style={{ display: 'block', color: '#93c5fd' }}> Ready to Hire a Cleaner</span>
           </h1>
+          <p style={{ fontSize: 'clamp(15px, 2.5vw, 18px)', color: '#cbd5e1', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 18px' }}>
+            Clean Estimator gets <strong style={{ color: 'white' }}>20&ndash;30K organic visits per month</strong> and continues to grow. These aren&rsquo;t just casual visitors &mdash; they&rsquo;re homeowners and renters actively using our cost calculators because they have a real cleaning job in mind and a budget they&rsquo;re ready to spend.
+          </p>
           <p style={{ fontSize: 'clamp(15px, 2.5vw, 18px)', color: '#cbd5e1', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 36px' }}>
-            Clean Estimator gets <strong style={{ color: 'white' }}>20,000&ndash;30,000 organic visits per month, and climbing</strong> &mdash; from people actively using our cost calculator, not casual browsers, but homeowners and renters with a real cleaning job in mind and a budget in hand.
+            We&rsquo;re generating leads every day, but the problem is that many of those leads go to waste when they come from cities where we don&rsquo;t yet have a cleaning partner.
           </p>
           <a href="#apply" style={{ display: 'inline-flex', alignItems: 'center', background: PRIMARY_GRADIENT, color: 'white', padding: '15px 36px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 17, letterSpacing: '-0.2px', gap: 4, boxShadow: '0 8px 24px rgba(29,78,216,0.4)' }}>
             Get My City <IconArrow size={18} color="white" />
