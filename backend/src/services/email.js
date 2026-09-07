@@ -910,6 +910,244 @@ async function sendTrialEndingSoonEmail({ to, companyName, daysLeft }) {
   }
 }
 
+// ─── Trial check-in emails ──────────────────────────────────────────────────
+// Fill the gap between the day-0 welcome email and the day-28/30 reminders
+// above -- there was previously no contact at all for the ~27 days in
+// between. Sent once each via checkTrialReminders in trialScheduler.js
+// (day 7 / 14 / 21, deduped the same way as the reminder emails), so a
+// company that stops engaging mid-trial gets a nudge, a pointer to Help &
+// Docs, and an easy reply-to path before they forget the tool exists.
+
+function buildTrialCheckin1Text({ companyName }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    "You're about a week into your free trial — just checking in.",
+    '',
+    "If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's one line of code — grab it from the Embed Your Widget tab in your dashboard.",
+    '',
+    "If anything's confusing or not working the way you expected, just reply to this email or check the Help & Docs tab — happy to help.",
+    '',
+    'https://www.cleanestimator.com/company',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialCheckin1Html({ companyName }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    You're about a week into your free trial — just checking in.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's one line of code — grab it from the Embed Your Widget tab in your dashboard.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    If anything's confusing or not working the way you expected, just reply to this email or check the Help &amp; Docs tab — happy to help.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Go to my dashboard →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the first time a company's trial reaches 7 days elapsed (see
+// checkTrialReminders in services/trialScheduler.js). Deduped via
+// trialCheckin1EmailSentAt on config.subscription.
+async function sendTrialCheckin1Email({ to, companyName }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialCheckin1Email skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialCheckin1Email skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: "How's Clean Estimator working out so far?",
+        html: buildTrialCheckin1Html({ companyName }),
+        text: buildTrialCheckin1Text({ companyName }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialCheckin1Email failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+function buildTrialCheckin2Text({ companyName }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    "Two weeks into your trial. A couple of things worth a look if you haven't found them yet:",
+    '',
+    '- Branding tab -- set your logo, colors, and call-to-action so the cleaning cost estimator looks like it\'s actually yours',
+    '- Leads tab -- every completed estimate lands here automatically, with the visitor\'s full contact info and price',
+    '',
+    'Questions about either (or anything else)? Just reply -- a real person reads these.',
+    '',
+    'https://www.cleanestimator.com/company?tab=help',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialCheckin2Html({ companyName }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 16px;">
+    Two weeks into your trial. A couple of things worth a look if you haven't found them yet:
+  </p>
+
+  <ul style="font-size:14px;line-height:1.7;margin:0 0 20px;padding-left:20px;">
+    <li><strong>Branding tab</strong> — set your logo, colors, and call-to-action so the cleaning cost estimator looks like it's actually yours</li>
+    <li><strong>Leads tab</strong> — every completed estimate lands here automatically, with the visitor's full contact info and price</li>
+  </ul>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Questions about either (or anything else)? Just reply — a real person reads these.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=help" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Open Help &amp; Docs →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the first time a company's trial reaches 14 days elapsed.
+// Deduped via trialCheckin2EmailSentAt.
+async function sendTrialCheckin2Email({ to, companyName }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialCheckin2Email skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialCheckin2Email skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: 'Two weeks in — a couple of things worth checking out',
+        html: buildTrialCheckin2Html({ companyName }),
+        text: buildTrialCheckin2Text({ companyName }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialCheckin2Email failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+function buildTrialCheckin3Text({ companyName }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    "Your 30-day trial wraps up in about a week -- flagging it now so it doesn't catch you off guard.",
+    '',
+    "If it's been useful, no action needed -- we'll send the official heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends.",
+    '',
+    'https://www.cleanestimator.com/company',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialCheckin3Html({ companyName }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your 30-day trial wraps up in about a week — flagging it now so it doesn't catch you off guard.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    If it's been useful, no action needed — we'll send the official heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View my dashboard →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the first time a company's trial reaches 21 days elapsed.
+// Deduped via trialCheckin3EmailSentAt. Deliberately softer than the
+// day-28 "ending soon" email (no urgency framing) -- that one still does
+// the actual countdown.
+async function sendTrialCheckin3Email({ to, companyName }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialCheckin3Email skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialCheckin3Email skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: 'About a week left on your trial',
+        html: buildTrialCheckin3Html({ companyName }),
+        text: buildTrialCheckin3Text({ companyName }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialCheckin3Email failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
 function buildTrialEndedText({ companyName }) {
   return [
     `Hi ${companyName},`,
@@ -1066,5 +1304,8 @@ module.exports = {
   sendCompanyWelcomeEmail,
   sendTrialEndingSoonEmail,
   sendTrialEndedEmail,
+  sendTrialCheckin1Email,
+  sendTrialCheckin2Email,
+  sendTrialCheckin3Email,
   sendAccountDeletionScheduledEmail,
 };
