@@ -13,6 +13,7 @@ import ClientPortal from './components/client/ClientPortal';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import SEOContent from './components/ui/SEOContent';
+import AffiliateSidebar from './components/ui/AffiliateSidebar';
 import BlogIndex from './components/blog/BlogIndex';
 import BlogPost from './components/blog/BlogPost';
 import BlogCategory from './components/blog/BlogCategory';
@@ -280,6 +281,7 @@ export default function App() {
         <Header />
         <main>
           <CleaningCalculator />
+          <AffiliateSidebar />
           <SEOContent />
         </main>
         <Footer />
