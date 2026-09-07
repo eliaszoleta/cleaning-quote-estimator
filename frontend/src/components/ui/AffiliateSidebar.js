@@ -94,6 +94,14 @@ function SidebarInner({ compact }) {
         borderRadius: compact ? 0 : 16,
         padding: compact ? 0 : 14,
         boxShadow: compact ? 'none' : '0 4px 20px rgba(15,23,42,0.06)',
+        // Floating (non-compact) card only: on a short laptop viewport, 3
+        // full-size product cards stacked under the top:90 offset can run
+        // past the bottom of the screen with no way to reach the last one.
+        // Capping height and scrolling internally keeps every card
+        // reachable regardless of screen height, instead of silently
+        // clipping the last card off-screen.
+        maxHeight: compact ? 'none' : 'calc(100vh - 110px)',
+        overflowY: compact ? 'visible' : 'auto',
       }}
     >
       <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10, padding: compact ? '0 2px' : 0 }}>
@@ -124,7 +132,22 @@ function SidebarInner({ compact }) {
 // since it's nested inside an already-padded, already-760-wide content
 // column -- adding padding on top of that would double-inset it relative
 // to the article text right above it.
-export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true }) {
+// mode: 'fixed' (default) portals to document.body and stays glued to the
+// same screen position for the page's entire scroll -- correct for
+// BlogPost.js, whose 760px article column keeps the same width top to
+// bottom, so there's always room in the left margin. The homepage isn't
+// uniform: the calculator card is 720px wide, but SEOContent's services/
+// pricing/FAQ section further down is 1100px wide, leaving too little
+// margin for the sidebar there -- a fixed position can't tell the
+// difference and ends up overlapping that wider content once scrolled
+// into it. mode="sticky" fixes that: the caller wraps just the calculator
+// section in a `position: relative` box, and the sidebar renders in
+// normal flow (no portal) as a zero-height position:sticky element inside
+// it, so it floats alongside the calculator exactly like 'fixed' does,
+// but stops sticking -- scrolling away with the rest of the page -- the
+// moment that wrapper's bottom edge (the end of the calculator section)
+// scrolls past the sticky offset, before the wider section ever begins.
+export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true, mode = 'fixed' }) {
   const [isDesktop, setIsDesktop] = useState(computeIsDesktop);
 
   useEffect(() => {
@@ -132,6 +155,23 @@ export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true 
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+
+  if (isDesktop && mode === 'sticky') {
+    // No portal needed: unlike 'fixed', position:sticky is scoped to this
+    // element's own place in the DOM, so it doesn't need to escape any
+    // ancestor's containing block. height:0 keeps this from adding any
+    // layout height of its own to the wrapper the caller sized around the
+    // calculator; the actual card is an absolutely-positioned child, anchored
+    // to this sticky element's own box (which spans the wrapper's full
+    // width), so it lands LEFT_OFFSET from the left edge same as 'fixed'.
+    return (
+      <div style={{ position: 'sticky', top: 90, height: 0, overflow: 'visible', zIndex: 40 }}>
+        <div style={{ position: 'absolute', top: 0, left: LEFT_OFFSET }}>
+          <SidebarInner compact={false} />
+        </div>
+      </div>
+    );
+  }
 
   if (isDesktop) {
     // Portal to document.body for the same reason FloatingPartnerBanner

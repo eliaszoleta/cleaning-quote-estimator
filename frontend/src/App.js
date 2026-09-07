@@ -280,8 +280,21 @@ export default function App() {
       <div className="app">
         <Header />
         <main>
-          <CleaningCalculator />
-          <AffiliateSidebar />
+          {/* position:relative scopes the sticky sidebar's stick range to
+              just the calculator's own height -- see AffiliateSidebar's
+              mode="sticky" comment. Once this box scrolls past (into
+              SEOContent's wider #services section below), the sidebar
+              scrolls away with it instead of overlapping that content. */}
+          <div style={{ position: 'relative' }}>
+            {/* Rendered before CleaningCalculator on purpose: this has
+                height:0, so it doesn't affect layout, but its natural
+                (non-stuck) flow position is what position:sticky measures
+                from -- placed first, that position is the very top of this
+                box, letting it stick from top:90 immediately instead of
+                only after scrolling past the calculator's own height. */}
+            <AffiliateSidebar mode="sticky" />
+            <CleaningCalculator />
+          </div>
           <SEOContent />
         </main>
         <Footer />
