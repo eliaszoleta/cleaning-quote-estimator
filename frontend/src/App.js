@@ -282,9 +282,15 @@ export default function App() {
         <main>
           {/* position:relative scopes the sticky sidebar's stick range to
               just the calculator's own height -- see AffiliateSidebar's
-              mode="sticky" comment. Once this box scrolls past (into
-              SEOContent's wider #services section below), the sidebar
-              scrolls away with it instead of overlapping that content. */}
+              mode="sticky" comment. Below wideBreakpoint, once this box
+              scrolls past (into SEOContent's wider #services section
+              below, 1100px wide), the sidebar scrolls away with it instead
+              of overlapping that content. wideBreakpoint=1560 is that
+              content's width (1100) plus twice the sidebar's own reach
+              (224 -- see LEFT_OFFSET + SIDEBAR_WIDTH), rounded up: above
+              it there's already enough margin next to the wider section
+              too, so the sidebar stays visible for the whole page instead
+              of disappearing there. */}
           <div style={{ position: 'relative' }}>
             {/* Rendered before CleaningCalculator on purpose: this has
                 height:0, so it doesn't affect layout, but its natural
@@ -292,7 +298,7 @@ export default function App() {
                 from -- placed first, that position is the very top of this
                 box, letting it stick from top:90 immediately instead of
                 only after scrolling past the calculator's own height. */}
-            <AffiliateSidebar mode="sticky" />
+            <AffiliateSidebar mode="sticky" wideBreakpoint={1560} />
             <CleaningCalculator />
           </div>
           <SEOContent />

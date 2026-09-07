@@ -173,21 +173,30 @@ function SidebarInner({ floating, dense }) {
 // everything -- in a single 900px-wide column, so the default 1220px
 // cutoff (which only guarantees clearance against a 760px column) would
 // let the sidebar overlap that wider content between ~1220-1360px.
-export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true, mode = 'fixed', desktopBreakpoint = DESKTOP_BREAKPOINT }) {
+// wideBreakpoint: only meaningful with mode="sticky". Sticky mode exists
+// so the sidebar doesn't overlap a wider section further down the page --
+// but on a big enough monitor, there's already plenty of margin next to
+// that wider section too, so disappearing there is overly cautious, not
+// a real overlap risk. Once the viewport clears this width, mode="sticky"
+// is upgraded in place to the same always-visible behavior as mode="fixed"
+// instead of stopping at the calculator.
+export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true, mode = 'fixed', desktopBreakpoint = DESKTOP_BREAKPOINT, wideBreakpoint = null }) {
   const [isDesktop, setIsDesktop] = useState(() => computeIsDesktop(desktopBreakpoint));
   const [isDense, setIsDense] = useState(computeIsDense);
+  const [isWide, setIsWide] = useState(() => wideBreakpoint != null && computeIsDesktop(wideBreakpoint));
 
   useEffect(() => {
     const onResize = () => {
       setIsDesktop(computeIsDesktop(desktopBreakpoint));
       setIsDense(computeIsDense());
+      setIsWide(wideBreakpoint != null && computeIsDesktop(wideBreakpoint));
     };
     onResize();
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [desktopBreakpoint]);
+  }, [desktopBreakpoint, wideBreakpoint]);
 
-  if (isDesktop && mode === 'sticky') {
+  if (isDesktop && mode === 'sticky' && !isWide) {
     // No portal needed: unlike 'fixed', position:sticky is scoped to this
     // element's own place in the DOM, so it doesn't need to escape any
     // ancestor's containing block. height:0 keeps this from adding any
