@@ -231,6 +231,17 @@ export default function LeadsTab({ user }) {
     setSelectedIds(new Set());
   };
 
+  // Every lead field here (name, notes, etc.) is attacker-reachable -- it
+  // came straight from a public form submission. A cell starting with
+  // =, +, -, or @ opens as a formula in Excel/Sheets instead of text, so a
+  // lead submitted with a name like "=cmd|'/c calc'!A1" could execute when
+  // the export is later opened. Prefixing with a leading apostrophe forces
+  // spreadsheet apps to treat it as literal text.
+  const sanitizeCsvCell = (value) => {
+    const str = String(value);
+    return /^[=+\-@]/.test(str) ? `'${str}` : str;
+  };
+
   const toCSV = (rowsSource) => {
     // City only ever comes from a company-scoped calculator's dropdown (see
     // CleaningCalculator.js), so it lives in service_details, not its own
@@ -243,7 +254,7 @@ export default function LeadsTab({ user }) {
       l.estimated_price_low || '', l.estimated_price_high || '',
       l.timeline || '', new Date(l.created_at).toLocaleDateString(), l.notes || '',
     ]);
-    return [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    return [headers, ...rows].map(r => r.map(c => `"${sanitizeCsvCell(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   };
 
   // Exports the current selection if anything is checked, otherwise every
