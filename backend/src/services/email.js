@@ -16,29 +16,6 @@ const axios = require('axios');
 
 const RESEND_API_BASE = 'https://api.resend.com';
 
-// Same 3 Amazon Associates picks as the on-site AffiliateSidebar
-// (frontend/src/components/ui/AffiliateSidebar.js) -- duplicated here
-// rather than imported since the frontend and backend are separate
-// codebases/deploys, and this renders to email HTML/text instead of
-// React. Keep the two lists in sync by hand if the products change.
-const AMAZON_PRODUCTS = [
-  {
-    name: 'BISSELL TurboClean PET Upright Carpet & Upholstery Cleaner',
-    image: 'https://m.media-amazon.com/images/I/71V4Vf4AMSL._AC_SL1500_.jpg',
-    url: 'https://amzn.to/4gBlwJ2',
-  },
-  {
-    name: 'BISSELL Little Green Max Pet SmartMix Carpet Cleaner',
-    image: 'https://m.media-amazon.com/images/I/71IEytWCclL._AC_SL1500_.jpg',
-    url: 'https://amzn.to/4imhIg9',
-  },
-  {
-    name: 'Electric Spin Scrubber, Bathroom Shower Cleaning Brush',
-    image: 'https://m.media-amazon.com/images/I/71aQbSwuNxL._AC_SL1500_.jpg',
-    url: 'https://amzn.to/4xbDeYA',
-  },
-];
-
 const SERVICE_LABELS = {
   home_residential: 'House Cleaning',
   apartment: 'Apartment Cleaning',
@@ -155,30 +132,6 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
     </p>`;
 }
 
-// Only appended when there's neither a matched partner nor an embedding
-// company to point the visitor to (see bottomHtml below) -- a real local
-// recommendation always outranks a product pitch, and a white-labeled
-// company's email shouldn't carry Amazon links that have nothing to do
-// with that company. Sales opportunity otherwise going unused: a visitor
-// with no local partner in their area was getting nothing but a generic
-// "get an exact quote" link.
-function buildProductsSection() {
-  const rows = AMAZON_PRODUCTS.map(p => `
-    <tr>
-      <td style="padding:8px 8px 8px 0;vertical-align:top;width:48px;">
-        <a href="${p.url}" target="_blank" rel="nofollow sponsored noopener"><img src="${p.image}" alt="${p.name}" width="48" height="48" style="width:48px;height:48px;object-fit:contain;background:#f8fafc;border:1px solid #e0e0e0;border-radius:6px;display:block;"></a>
-      </td>
-      <td style="padding:8px 0;vertical-align:middle;">
-        <a href="${p.url}" target="_blank" rel="nofollow sponsored noopener" style="color:#111111;font-size:13px;font-weight:600;text-decoration:none;line-height:1.4;">${p.name}</a>
-      </td>
-    </tr>`).join('');
-
-  return `
-    <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Cleaning products we recommend</p>
-    <table style="width:100%;border-collapse:collapse;">${rows}</table>
-    <p style="font-size:11px;color:#999999;margin:6px 0 0;">As an Amazon Associate, we earn from qualifying purchases.</p>`;
-}
-
 // A plain-text alternative alongside the HTML body (multipart/alternative)
 // -- sending HTML-only is itself a signal Gmail's classifier associates
 // with bulk/marketing mail, on top of the styling itself.
@@ -222,9 +175,6 @@ function buildText({ name, serviceType, result, companyConfig, partner }) {
   } else {
     lines.push('', 'Get an exact quote: https://www.cleanestimator.com');
     if (companyConfig?.ctaPhone) lines.push(`Or call ${companyConfig.ctaPhone}`);
-    lines.push('', 'Cleaning products we recommend:');
-    AMAZON_PRODUCTS.forEach(p => lines.push(`  ${p.name} - ${p.url}`));
-    lines.push('(As an Amazon Associate, we earn from qualifying purchases.)');
   }
 
   lines.push(
@@ -264,7 +214,7 @@ function buildHtml({ name, serviceType, result, companyConfig, partner }) {
         ctaUrl: 'https://www.cleanestimator.com',
         ctaText: 'Get an exact quote',
         ctaPhone: companyConfig?.ctaPhone || '',
-      }) + buildProductsSection();
+      });
 
   return `
 <div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
