@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Save, Check, Loader2 } from 'lucide-react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
+import { FONT_OPTIONS, getFontStack } from '../../../utils/fonts';
 
 export default function BrandingTab({ config, update, onSave, saving, saved }) {
   const [form, setForm] = useState({
@@ -58,6 +59,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
     ctaSubtext: form.ctaSubtext,
     ctaPhone: form.ctaPhone,
     ctaEmail: form.ctaEmail,
+    fontFamily: form.fontFamily,
   };
 
   const input = {
@@ -98,6 +100,20 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
                 <input type="color" value={form.accentColor} onChange={e => set('accentColor', e.target.value)} style={{ width: 48, height: 38, borderRadius: 6, border: '1px solid #e2e8f0', cursor: 'pointer', padding: 2 }} />
                 <input style={{ ...input, width: 120 }} value={form.accentColor} onChange={e => set('accentColor', e.target.value)} placeholder="#16a34a" />
               </div>
+            </Field>
+          </Card>
+
+          <Card title="Typography">
+            <Field label="Widget font" hint="Match the font your own website already uses -- shown across every step of the calculator, not just the results page.">
+              <select
+                value={form.fontFamily}
+                onChange={e => set('fontFamily', e.target.value)}
+                style={{ ...input, cursor: 'pointer', fontFamily: getFontStack(form.fontFamily) }}
+              >
+                {FONT_OPTIONS.map(f => (
+                  <option key={f.id} value={f.id} style={{ fontFamily: f.stack }}>{f.label}</option>
+                ))}
+              </select>
             </Field>
           </Card>
 

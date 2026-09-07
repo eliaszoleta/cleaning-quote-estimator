@@ -4,6 +4,7 @@ import './CleaningCalculator.css';
 import { AlertCircle, MapPin, BarChart3, ShieldOff, Zap } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
+import { getFontStack, getGoogleFontHref } from '../../utils/fonts';
 import ServiceSelect from './steps/ServiceSelect';
 import LocationStep from './steps/LocationStep';
 import HomeStep from './steps/HomeStep';
@@ -112,6 +113,23 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     onShowResults?.(currentStep === 'results' && !!result);
   }, [currentStep, result, onShowResults]);
 
+  // Lazy-loads the Google Font behind a company's chosen widget font (see
+  // BrandingTab.js) the moment it's actually needed, instead of every
+  // possible font being preloaded on every page load. No-op for web-safe
+  // choices (Arial, Georgia, etc.) and for the no-companyConfig public site.
+  const fontFamily = companyConfig?.fontFamily || null;
+  useEffect(() => {
+    const href = getGoogleFontHref(fontFamily);
+    if (!href) return;
+    const linkId = `cc-font-${fontFamily.replace(/\s+/g, '-')}`;
+    if (document.getElementById(linkId)) return;
+    const link = document.createElement('link');
+    link.id = linkId;
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  }, [fontFamily]);
+
   const goNext = () => setStepIndex(i => Math.min(i + 1, steps.length - 1));
   const goBack = () => setStepIndex(i => Math.max(i - 1, 0));
 
@@ -195,14 +213,16 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // it) -- only a real third-party embed (EmbedWrapper) needs it flush too.
   if (currentStep === 'results' && result) {
     return (
-      <ResultsScreen
-        result={result}
-        serviceDetails={serviceDetails}
-        companyConfig={companyConfig}
-        embedded={embedded && !siteLanding}
-        onReset={handleReset}
-        demoPartner={demoPartner}
-      />
+      <div style={fontFamily ? { fontFamily: getFontStack(fontFamily) } : undefined}>
+        <ResultsScreen
+          result={result}
+          serviceDetails={serviceDetails}
+          companyConfig={companyConfig}
+          embedded={embedded && !siteLanding}
+          onReset={handleReset}
+          demoPartner={demoPartner}
+        />
+      </div>
     );
   }
 
@@ -232,6 +252,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
       <div style={{
         background: embedded ? 'white' : 'linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%)',
         padding: embedded ? '0' : '28px 16px',
+        fontFamily: fontFamily ? getFontStack(fontFamily) : undefined,
       }}>
         {/* Hero (non-embedded only) */}
         {!embedded && currentStep === 'service' && (
