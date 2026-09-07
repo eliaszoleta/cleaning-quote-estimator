@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, MapPin, Phone, Eye, PhoneCall, TrendingUp, ChevronDown, ArrowUpRight, ArrowDownRight, Minus, Mail } from 'lucide-react';
+import { LogOut, MapPin, Phone, Eye, PhoneCall, TrendingUp, ChevronDown, ArrowUpRight, ArrowDownRight, Minus, Mail, Pencil, X, Globe, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { formatPhoneInput } from '../../utils/formatPhone';
+import { updateClientPartner } from '../../utils/api';
+import LogoField from '../partners/LogoField';
 
 // Small hover/entrance touches that inline styles can't express (:hover,
 // @keyframes) -- kept to a few rules so the dashboard feels alive without
@@ -13,7 +16,15 @@ const DASHBOARD_STYLES = `
   .cd-howto-toggle:hover .cd-howto-title { color: #2563eb; }
   .cd-fade-in { animation: cdFadeIn 0.2s ease; }
   @keyframes cdFadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+  .cd-spin { animation: cdSpin 0.8s linear infinite; }
+  @keyframes cdSpin { to { transform: rotate(360deg); } }
 `;
+
+const inputStyle = {
+  width: '100%', padding: '10px 13px', border: '1.5px solid #e2e8f0', borderRadius: 8,
+  fontSize: 14, outline: 'none', boxSizing: 'border-box', color: '#0f172a', background: 'white',
+};
+const labelStyle = { display: 'block', fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 };
 
 // This month and last month's boundaries, computed once per mount --
 // re-deriving off `new Date()` on every render would shift a visitor's
@@ -45,9 +56,12 @@ function countsInRange(events, start, end) {
 // (the same email they signed up the account with -- separate from
 // business_email, the public one leads get forwarded to), then shows
 // their service areas and floating-banner KPIs (partner_banner_stats),
-// filterable by All Time/This Month/Last Month. Read-only -- editing
-// listing details is
-// still done by the site owner via /admin/partners.
+// filterable by All Time/This Month/Last Month. Partners can edit their own
+// business info (name, address, phone, business email, website, logo) --
+// saved through PUT /api/client/partner (backend/src/routes/client.js),
+// which updates the same `partners` row /admin/partners and the public
+// listings (results card, floating banner) already read from. Service-area
+// cities and login email stay site-owner/checkout-only, not editable here.
 export default function ClientDashboard({ user, onLogout }) {
   const [state, setState] = useState('loading'); // loading | not_found | ready | error
   const [partner, setPartner] = useState(null);
@@ -57,6 +71,10 @@ export default function ClientDashboard({ user, onLogout }) {
   const [period, setPeriod] = useState('all'); // 'all' | 'this_month' | 'last_month'
   const [ranges] = useState(getMonthRanges);
   const [howOpen, setHowOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     if (!supabase || !user?.email) { setState('error'); return; }
@@ -87,6 +105,35 @@ export default function ClientDashboard({ user, onLogout }) {
       setState('ready');
     })();
   }, [user, ranges]);
+
+  const startEdit = () => {
+    setForm({
+      business_name: partner.business_name || '',
+      address: partner.address || '',
+      phone: partner.phone || '',
+      business_email: partner.business_email || '',
+      website: partner.website || '',
+      logo_url: partner.logo_url || '',
+    });
+    setSaveError('');
+    setEditing(true);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      const { data } = await updateClientPartner(token, form);
+      setPartner(data);
+      setEditing(false);
+    } catch (err) {
+      setSaveError(err.message || 'Failed to save changes. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const shellStyle = { minHeight: '100vh', background: '#f8fafc' };
   const headerStyle = { background: 'white', borderBottom: '1px solid #e2e8f0', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' };
@@ -141,24 +188,94 @@ export default function ClientDashboard({ user, onLogout }) {
       <Header />
       <div style={{ maxWidth: 780, margin: '0 auto', padding: '36px 24px 64px' }}>
 
-        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 28px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16 }}>
-          {partner.logo_url && <img src={partner.logo_url} alt={partner.business_name} style={{ height: 52, width: 52, objectFit: 'contain', borderRadius: 8, border: '1px solid #e2e8f0', flexShrink: 0 }} />}
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 800, fontSize: 19, color: '#0f172a' }}>{partner.business_name}</div>
-            {partner.address && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#64748b', marginTop: 4 }}>
-                <MapPin size={12} color="#94a3b8" /> {partner.address}
+        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 28px', marginBottom: 24 }}>
+          {!editing ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              {partner.logo_url && <img src={partner.logo_url} alt={partner.business_name} style={{ height: 52, width: 52, objectFit: 'contain', borderRadius: 8, border: '1px solid #e2e8f0', flexShrink: 0 }} />}
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 800, fontSize: 19, color: '#0f172a' }}>{partner.business_name}</div>
+                {partner.address && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#64748b', marginTop: 4 }}>
+                    <MapPin size={12} color="#94a3b8" /> {partner.address}
+                  </div>
+                )}
+                {partner.phone && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#64748b', marginTop: 2 }}>
+                    <Phone size={12} color="#94a3b8" /> {partner.phone}
+                  </div>
+                )}
+                {partner.business_email && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#64748b', marginTop: 2 }}>
+                    <Mail size={12} color="#94a3b8" /> {partner.business_email}
+                  </div>
+                )}
+                {partner.website && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#64748b', marginTop: 2 }}>
+                    <Globe size={12} color="#94a3b8" /> {partner.website}
+                  </div>
+                )}
               </div>
-            )}
-            {partner.phone && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#64748b', marginTop: 2 }}>
-                <Phone size={12} color="#94a3b8" /> {partner.phone}
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: partner.active ? '#16a34a' : '#94a3b8', background: partner.active ? '#f0fdf4' : '#f8fafc', border: `1px solid ${partner.active ? '#bbf7d0' : '#e2e8f0'}`, borderRadius: 6, padding: '4px 10px' }}>
+                  {partner.active ? 'Live' : 'Inactive'}
+                </span>
+                <button
+                  onClick={startEdit}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 8, padding: '7px 13px', cursor: 'pointer', fontWeight: 600, fontSize: 12.5, color: '#374151' }}
+                >
+                  <Pencil size={13} /> Edit
+                </button>
               </div>
-            )}
-          </div>
-          <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 600, color: partner.active ? '#16a34a' : '#94a3b8', background: partner.active ? '#f0fdf4' : '#f8fafc', border: `1px solid ${partner.active ? '#bbf7d0' : '#e2e8f0'}`, borderRadius: 6, padding: '4px 10px', flexShrink: 0 }}>
-            {partner.active ? 'Live' : 'Inactive'}
-          </span>
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 15, color: '#0f172a', marginBottom: 16 }}>Edit Business Info</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+                <div>
+                  <label style={labelStyle}>Business Name</label>
+                  <input style={inputStyle} value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Sparkle Clean Co." />
+                </div>
+                <div>
+                  <label style={labelStyle}>Business Email</label>
+                  <input style={inputStyle} type="email" value={form.business_email} onChange={e => setForm(f => ({ ...f, business_email: e.target.value }))} placeholder="contact@yourbusiness.com" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Phone</label>
+                  <input style={inputStyle} type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 123-4567" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Website</label>
+                  <input style={inputStyle} value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} placeholder="https://yourbusiness.com" />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={labelStyle}>Address</label>
+                  <input style={inputStyle} value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} placeholder="123 Main St, Austin, TX" />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <LogoField value={form.logo_url} onChange={url => setForm(f => ({ ...f, logo_url: url }))} inputStyle={inputStyle} />
+                </div>
+              </div>
+
+              {saveError && <p style={{ fontSize: 12.5, color: '#dc2626', margin: '0 0 12px' }}>{saveError}</p>}
+
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#2563eb', border: 'none', borderRadius: 8, padding: '9px 18px', cursor: saving ? 'default' : 'pointer', fontWeight: 700, fontSize: 13, color: 'white', opacity: saving ? 0.75 : 1 }}
+                >
+                  {saving ? <><Loader2 size={14} className="cd-spin" /> Saving...</> : 'Save Changes'}
+                </button>
+                <button
+                  onClick={() => setEditing(false)}
+                  disabled={saving}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 8, padding: '9px 16px', cursor: saving ? 'default' : 'pointer', fontWeight: 600, fontSize: 13, color: '#374151' }}
+                >
+                  <X size={14} /> Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>

@@ -11,6 +11,7 @@ const subscriptionRouter = require('./routes/subscription');
 const leadsRouter = require('./routes/leads');
 const partnerCheckoutRouter = require('./routes/partnerCheckout');
 const adminRouter = require('./routes/admin');
+const clientRouter = require('./routes/client');
 const { requireAuth } = require('./middleware/auth');
 const { checkTrialReminders } = require('./services/trialScheduler');
 const { checkPendingDeletions } = require('./services/deletionScheduler');
@@ -158,6 +159,11 @@ app.use('/api/partner-checkout', partnerCheckoutRouter);
 app.use('/api/company', companyRouter);
 app.use('/api/subscription', requireAuth, subscriptionRouter);
 app.use('/api/company-leads', requireAuth, leadsRouter);
+
+// ─── Partner self-service routes ──────────────────────────────────────────────
+// requireAuth is applied inside client.js itself (every route there needs
+// it, unlike companyRouter's mix of public/private paths).
+app.use('/api/client', clientRouter);
 
 // ─── Internal admin routes ───────────────────────────────────────────────────
 // Own auth (x-admin-key header, see requireAdminKey in admin.js), not

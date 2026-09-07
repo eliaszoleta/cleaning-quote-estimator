@@ -76,6 +76,16 @@ export async function verifyPartnerCheckout(sessionId) {
   return apiFetch('/api/partner-checkout/verify-checkout', { method: 'POST', body: JSON.stringify({ sessionId }) });
 }
 
+// ClientDashboard.js -- a logged-in partner editing their own listing's
+// business details. token is the partner's own Supabase Auth session
+// token (requireAuth on the backend resolves their own partner row from it,
+// same as the company dashboard's token-based routes).
+export async function updateClientPartner(token, payload) {
+  return apiFetch('/api/client/partner', {
+    method: 'PUT', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload),
+  });
+}
+
 // includeDeleted also fetches archived (Trash) leads alongside active ones,
 // so LeadsTab.js can split them into two views from one request instead of
 // fetching twice.
