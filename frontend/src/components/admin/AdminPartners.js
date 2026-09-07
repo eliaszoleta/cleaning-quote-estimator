@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { normalizeStateName } from '../../utils/partnerLookup';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { Plus, Trash2, ToggleLeft, ToggleRight, X } from 'lucide-react';
+import { useConfirm } from '../dashboard/ConfirmDialog';
 
 const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || 'admin123';
 
@@ -33,6 +34,7 @@ export default function AdminPartners() {
   const [saving, setSaving] = useState(false);
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState(null);
+  const { confirm, dialog: confirmDialog } = useConfirm();
 
   const load = useCallback(async () => {
     if (!supabase) return;
@@ -145,7 +147,8 @@ export default function AdminPartners() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this partner?')) return;
+    const ok = await confirm({ title: 'Delete this partner?', confirmLabel: 'Delete', danger: true });
+    if (!ok) return;
     await supabase.from('partners').delete().eq('id', id);
     load();
   };
@@ -297,6 +300,8 @@ export default function AdminPartners() {
           </div>
         )}
       </div>
+
+      {confirmDialog}
     </div>
   );
 }

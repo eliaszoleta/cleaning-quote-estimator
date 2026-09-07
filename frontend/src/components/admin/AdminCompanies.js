@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye } from 'lucide-react';
 import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails, sendTrialEmailPreview } from '../../utils/api';
+import { useConfirm } from '../dashboard/ConfirmDialog';
 
 const STORAGE_KEY = 'admin_companies_key';
 
@@ -39,13 +40,14 @@ export default function AdminCompanies() {
 
   // Trial-activation broadcast email -- preview (read-only) must be loaded
   // before Send becomes clickable, and Send still needs an explicit
-  // window.confirm on top of that. Nothing here fires on page load.
+  // confirm dialog on top of that. Nothing here fires on page load.
   const [trialPreview, setTrialPreview] = useState(null);
   const [trialPreviewLoading, setTrialPreviewLoading] = useState(false);
   const [trialPreviewError, setTrialPreviewError] = useState(null);
   const [trialSending, setTrialSending] = useState(false);
   const [trialSendResult, setTrialSendResult] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const { confirm, dialog: confirmDialog } = useConfirm();
 
   const [previewToEmail, setPreviewToEmail] = useState('');
   const [previewSending, setPreviewSending] = useState(false);
@@ -123,7 +125,12 @@ export default function AdminCompanies() {
 
   const handleSendTrialEmails = async () => {
     if (!trialPreview || selectedIds.size === 0) return;
-    const ok = window.confirm(`Send the trial-activation email to ${selectedIds.size} compan${selectedIds.size === 1 ? 'y' : 'ies'}? This cannot be undone.`);
+    const ok = await confirm({
+      title: `Send the trial-activation email to ${selectedIds.size} compan${selectedIds.size === 1 ? 'y' : 'ies'}?`,
+      message: 'This cannot be undone.',
+      confirmLabel: 'Send',
+      danger: true,
+    });
     if (!ok) return;
     setTrialSending(true);
     try {
@@ -342,6 +349,8 @@ export default function AdminCompanies() {
           Read-only view. To pause, cancel, or delete a subscriber's account, use Stripe or Supabase directly for now.
         </div>
       </div>
+
+      {confirmDialog}
     </div>
   );
 }

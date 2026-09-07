@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Copy, Check, Eye, EyeOff, RotateCcw, AlertTriangle, Lightbulb } from 'lucide-react';
+import { useConfirm } from '../ConfirmDialog';
 
 export default function APIKeysTab({ config, saveConfig, saving }) {
   const [apiKey, setApiKey] = useState('');
   const [copied, setCopied] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [revealed, setRevealed] = useState(false);
+  const { confirm, dialog: confirmDialog } = useConfirm();
 
   useEffect(() => {
     if (config?.apiKey) setApiKey(config.apiKey);
@@ -76,7 +78,15 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
             </div>
 
             <button
-              onClick={() => { if (window.confirm('Generate a new key? Your old key will stop working immediately.')) generateKey(); }}
+              onClick={async () => {
+                const ok = await confirm({
+                  title: 'Generate a new key?',
+                  message: 'Your old key will stop working immediately.',
+                  confirmLabel: 'Generate New Key',
+                  danger: true,
+                });
+                if (ok) generateKey();
+              }}
               disabled={generating || saving}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: generating || saving ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: 13, color: '#374151', opacity: generating || saving ? 0.6 : 1 }}
             >
@@ -122,6 +132,8 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
           <p style={{ fontSize: 13, color: '#166534', margin: 0 }}>Use the Webhooks by Zapier action or Make's HTTP module to poll /api/leads and push new leads to HubSpot, Salesforce, Google Sheets, or any CRM.</p>
         </div>
       </div>
+
+      {confirmDialog}
     </div>
   );
 }

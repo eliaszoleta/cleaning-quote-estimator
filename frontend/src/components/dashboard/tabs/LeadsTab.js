@@ -3,6 +3,7 @@ import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw } from 'l
 import { getCompanyLeads, patchLead, deleteLeadForever } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 import { formatPrice, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
+import { useConfirm } from '../ConfirmDialog';
 
 const SERVICE_COLORS = {
   home_residential: '#2563eb', apartment: '#7c3aed', commercial: '#0891b2',
@@ -26,6 +27,12 @@ export default function LeadsTab({ user }) {
   // it looked. This view toggle plus the Restore/Delete Forever actions
   // below are what a soft-delete needs to actually behave like one.
   const [view, setView] = useState('active');
+  // Bulk selection -- ids of currently-checked leads within whatever view/
+  // filter is active. Cleared on view switch since Active and Trash offer
+  // different bulk actions and the ids selected in one view are never
+  // visible (or actionable) in the other.
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const { confirm, dialog: confirmDialog } = useConfirm();
 
   useEffect(() => { loadLeads(); }, []);
   useEffect(() => () => { if (notesTimer.current) clearTimeout(notesTimer.current); }, []);
@@ -71,7 +78,20 @@ export default function LeadsTab({ user }) {
 
   const serviceTypes = [...new Set(baseLeads.map(l => l.service_type))];
 
-  const switchView = (v) => { setView(v); setFilter('all'); setSelectedLead(null); };
+  const switchView = (v) => { setView(v); setFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const allFilteredSelected = filtered.length > 0 && filtered.every(l => selectedIds.has(l.id));
+  const toggleSelectAll = () => {
+    setSelectedIds(allFilteredSelected ? new Set() : new Set(filtered.map(l => l.id)));
+  };
 
   const openLead = (lead) => {
     // Switching leads with a pending debounce still in flight would otherwise
@@ -116,7 +136,13 @@ export default function LeadsTab({ user }) {
   };
 
   const archiveLead = async (leadId) => {
-    if (!window.confirm('Move this lead to Trash? You can restore it later from the Trash tab.')) return;
+    const ok = await confirm({
+      title: 'Move this lead to Trash?',
+      message: 'You can restore it later from the Trash tab.',
+      confirmLabel: 'Move to Trash',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -138,7 +164,13 @@ export default function LeadsTab({ user }) {
   };
 
   const hardDeleteLead = async (leadId) => {
-    if (!window.confirm('Permanently delete this lead? This cannot be undone.')) return;
+    const ok = await confirm({
+      title: 'Permanently delete this lead?',
+      message: 'This cannot be undone.',
+      confirmLabel: 'Delete Forever',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -148,19 +180,78 @@ export default function LeadsTab({ user }) {
     } catch {}
   };
 
-  const exportCSV = () => {
+  // Bulk actions -- fire the same per-lead PATCH/DELETE the single-lead
+  // actions above use, in parallel, then reconcile local state once. Lead
+  // counts here are small enough (dozens, not thousands) that this is
+  // simpler and just as reliable as adding dedicated bulk endpoints.
+  const bulkMoveToTrash = async () => {
+    const n = selectedIds.size;
+    const ok = await confirm({
+      title: `Move ${n} lead${n === 1 ? '' : 's'} to Trash?`,
+      message: `You can restore ${n === 1 ? 'it' : 'them'} later from the Trash tab.`,
+      confirmLabel: 'Move to Trash',
+      danger: true,
+    });
+    if (!ok) return;
+    const ids = [...selectedIds];
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const deletedAt = new Date().toISOString();
+    await Promise.all(ids.map(id => patchLead(token, id, { deleted_at: deletedAt }).catch(() => {})));
+    setLeads(prev => prev.map(l => ids.includes(l.id) ? { ...l, deleted_at: deletedAt } : l));
+    if (selectedLead && ids.includes(selectedLead.id)) setSelectedLead(null);
+    setSelectedIds(new Set());
+  };
+
+  const bulkRestore = async () => {
+    const ids = [...selectedIds];
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    await Promise.all(ids.map(id => patchLead(token, id, { deleted_at: null }).catch(() => {})));
+    setLeads(prev => prev.map(l => ids.includes(l.id) ? { ...l, deleted_at: null } : l));
+    if (selectedLead && ids.includes(selectedLead.id)) setSelectedLead(null);
+    setSelectedIds(new Set());
+  };
+
+  const bulkDeleteForever = async () => {
+    const n = selectedIds.size;
+    const ok = await confirm({
+      title: `Permanently delete ${n} lead${n === 1 ? '' : 's'}?`,
+      message: 'This cannot be undone.',
+      confirmLabel: 'Delete Forever',
+      danger: true,
+    });
+    if (!ok) return;
+    const ids = [...selectedIds];
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    await Promise.all(ids.map(id => deleteLeadForever(token, id).catch(() => {})));
+    setLeads(prev => prev.filter(l => !ids.includes(l.id)));
+    if (selectedLead && ids.includes(selectedLead.id)) setSelectedLead(null);
+    setSelectedIds(new Set());
+  };
+
+  const toCSV = (rowsSource) => {
     // City only ever comes from a company-scoped calculator's dropdown (see
     // CleaningCalculator.js), so it lives in service_details, not its own
     // lead column -- pulled out here so it's an actual CSV column instead of
     // something only visible by opening each lead's Service Details panel.
     const headers = ['Name', 'Email', 'Phone', 'Service', 'City', 'State', 'ZIP', 'Estimate Low', 'Estimate High', 'Timeline', 'Date', 'Notes'];
-    const rows = filtered.map(l => [
+    const rows = rowsSource.map(l => [
       l.name || '', l.email || '', l.phone || '', serviceTypeLabel(l.service_type),
       l.service_details?.city || '', l.state || '', l.zip || '',
       l.estimated_price_low || '', l.estimated_price_high || '',
       l.timeline || '', new Date(l.created_at).toLocaleDateString(), l.notes || '',
     ]);
-    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    return [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  };
+
+  // Exports the current selection if anything is checked, otherwise every
+  // lead matching the current search/filter -- one button that adapts
+  // instead of a separate "export selected" control.
+  const exportCSV = () => {
+    const rowsSource = selectedIds.size > 0 ? filtered.filter(l => selectedIds.has(l.id)) : filtered;
+    const csv = toCSV(rowsSource);
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = 'cleancalc-leads.csv'; a.click();
@@ -183,7 +274,7 @@ export default function LeadsTab({ user }) {
                 <RefreshCw size={13} /> Refresh
               </button>
               <button onClick={exportCSV} disabled={filtered.length === 0} style={{ ...btnStyle, opacity: filtered.length === 0 ? 0.5 : 1 }}>
-                <Download size={13} /> Export CSV
+                <Download size={13} /> {selectedIds.size > 0 ? `Export Selected (${selectedIds.size})` : 'Export CSV'}
               </button>
             </div>
           </div>
@@ -222,6 +313,40 @@ export default function LeadsTab({ user }) {
           </div>
         </div>
 
+        {/* Bulk selection bar -- select-all checkbox always visible once
+            there's something to select; the action buttons only appear
+            once at least one lead is actually checked, so the toolbar
+            doesn't sit there half-active with nothing to do. */}
+        {filtered.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 14px', marginBottom: 10, background: selectedIds.size > 0 ? '#eff6ff' : '#f8fafc', border: `1px solid ${selectedIds.size > 0 ? '#bfdbfe' : '#e2e8f0'}`, borderRadius: 8, transition: 'background 0.15s, border-color 0.15s' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, color: '#374151' }}>
+              <input type="checkbox" checked={allFilteredSelected} onChange={toggleSelectAll} style={{ width: 15, height: 15, cursor: 'pointer' }} />
+              {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
+            </label>
+            {selectedIds.size > 0 && (
+              <div style={{ display: 'flex', gap: 7, marginLeft: 'auto' }}>
+                {view === 'trash' ? (
+                  <>
+                    <button onClick={bulkRestore} style={{ ...btnStyle, background: '#f0fdf4', color: '#16a34a', borderColor: '#bbf7d0' }}>
+                      <RotateCcw size={13} /> Restore
+                    </button>
+                    <button onClick={bulkDeleteForever} style={{ ...btnStyle, background: '#fef2f2', color: '#dc2626', borderColor: '#fecaca' }}>
+                      <Trash2 size={13} /> Delete Forever
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={bulkMoveToTrash} style={{ ...btnStyle, background: '#fef2f2', color: '#dc2626', borderColor: '#fecaca' }}>
+                    <Trash2 size={13} /> Move to Trash
+                  </button>
+                )}
+                <button onClick={() => setSelectedIds(new Set())} style={btnStyle}>
+                  <X size={13} /> Clear
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {loading ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 14 }}>Loading…</div>
         ) : filtered.length === 0 ? (
@@ -245,6 +370,7 @@ export default function LeadsTab({ user }) {
             {filtered.map((lead, i) => {
               const color = SERVICE_COLORS[lead.service_type] || '#64748b';
               const isSelected = selectedLead?.id === lead.id;
+              const isChecked = selectedIds.has(lead.id);
               return (
                 <div
                   key={lead.id}
@@ -255,6 +381,13 @@ export default function LeadsTab({ user }) {
                     display: 'flex', gap: 13, alignItems: 'center', transition: 'background 0.1s',
                   }}
                 >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onClick={e => e.stopPropagation()}
+                    onChange={() => toggleSelect(lead.id)}
+                    style={{ width: 15, height: 15, cursor: 'pointer', flexShrink: 0 }}
+                  />
                   <div style={{ width: 36, height: 36, borderRadius: 9, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15, fontWeight: 700, color }}>
                     {lead.name ? lead.name[0].toUpperCase() : '?'}
                   </div>
@@ -390,6 +523,8 @@ export default function LeadsTab({ user }) {
           </div>
         </div>
       )}
+
+      {confirmDialog}
     </div>
   );
 }
