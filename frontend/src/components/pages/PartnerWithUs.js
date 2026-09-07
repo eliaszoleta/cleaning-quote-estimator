@@ -259,7 +259,7 @@ export default function PartnerWithUs() {
             <StepCard number="2" title="We add your business to our platform" desc="We set up your profile with your business name, address, phone number, website, and logo. No tech work needed on your end." />
             <StepCard number="3" title="We detect each visitor's city automatically — no guesswork" desc="The moment someone lands on the site, we detect their city automatically — no signup or location sharing needed. If it matches one of your listed cities, your listing shows up. If not, they never see it." />
             <StepCard number="4" title="You show up wherever your customers are — not just one page" desc="Once matched, your listing appears as a recommended local cleaner on their estimate results page, as a floating banner on every other page they visit — the home page, blog posts, cost guides, all of it — and again in their inbox if they opt in to get their estimate emailed to them. Three placements from one match, not one." />
-            <StepCard number="5" title="They call or visit your website directly" desc="There's no middleman and no lead fee. The customer contacts you directly. Every lead is yours, no commission, no strings." />
+            <StepCard number="5" title="Every lead lands straight in your inbox — you don't have to wait for a call" desc="The moment a matched visitor gets their estimate emailed to them, we email you that same lead's name, contact info, and timeline directly, reply-to set to them so you can just hit reply. On top of that, they can call or visit your website directly too — there's no middleman and no lead fee either way. Every lead is yours, no commission, no strings." />
             <StepCard number="6" title="You track exactly what it's earning you" desc="Log into your free partner dashboard anytime to see how many times your listing was shown and how many calls it generated — real numbers, not guesswork." />
           </div>
         </div>
@@ -294,7 +294,8 @@ export default function PartnerWithUs() {
             <div style={{ marginBottom: 24 }}>
               <Check>Exclusive placement &mdash; only 1 partner per city</Check>
               <Check>Your name, address, phone, website &amp; logo on every results page in your city, a floating recommendation banner sitewide, and in the estimate email if they opt in to get one</Check>
-              <Check>Direct contact &mdash; customers call or click you straight away</Check>
+              <Check>Every matched lead emailed straight to you &mdash; name, contact info, and timeline, reply-to set to them so you can just hit reply</Check>
+              <Check>Direct contact &mdash; customers can also call or click you straight away</Check>
               <Check>No lead fees, no commissions, no hidden costs</Check>
               <Check>Free performance dashboard &mdash; see your views, calls, and click-through rate anytime</Check>
               <Check>Cancel anytime with 30 days notice</Check>
