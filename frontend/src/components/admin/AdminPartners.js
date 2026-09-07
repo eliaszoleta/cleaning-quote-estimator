@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../lib/supabase';
 import { normalizeStateName } from '../../utils/partnerLookup';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { Plus, Trash2, ToggleLeft, ToggleRight, X } from 'lucide-react';
 import { useConfirm } from '../dashboard/ConfirmDialog';
+import { getAdminPartners, createAdminPartner, updateAdminPartner, toggleAdminPartner, deleteAdminPartner } from '../../utils/api';
 
-const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || 'admin123';
+const STORAGE_KEY = 'admin_partners_key';
 
 const EMPTY_LOCATION = { city: '', state: '' };
 
@@ -22,9 +22,11 @@ const EMPTY_FORM = {
 };
 
 export default function AdminPartners() {
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem('admin_authed') === '1');
-  const [pwInput, setPwInput] = useState('');
-  const [pwError, setPwError] = useState(false);
+  const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem(STORAGE_KEY) || '');
+  const [authed, setAuthed] = useState(() => !!sessionStorage.getItem(STORAGE_KEY));
+  const [keyInput, setKeyInput] = useState('');
+  const [loginError, setLoginError] = useState(null);
+  const [loggingIn, setLoggingIn] = useState(false);
   const [partners, setPartners] = useState([]);
   const [locationsByPartner, setLocationsByPartner] = useState({});
   const [stats, setStats] = useState({});
@@ -36,52 +38,57 @@ export default function AdminPartners() {
   const [error, setError] = useState(null);
   const { confirm, dialog: confirmDialog } = useConfirm();
 
-  const load = useCallback(async () => {
-    if (!supabase) return;
+  const load = useCallback(async (key) => {
     setLoading(true);
-    const { data, error } = await supabase.from('partners').select('*').order('created_at', { ascending: false });
-    setLoading(false);
-    if (!error) setPartners(data || []);
-    else setError(error.message);
+    setError(null);
+    try {
+      const res = await getAdminPartners(key);
+      const { partners: partnerRows, locations, stats: statsRows } = res.data;
+      setPartners(partnerRows || []);
 
-    // Every city/state a partner serves (one row per city -- see the setup
-    // SQL). Grouped by partner_id so the list and edit form can show all of
-    // a client's cities, not just one.
-    const { data: locData } = await supabase.from('partner_locations').select('*').order('city');
-    if (locData) {
+      // Every city/state a partner serves (one row per city -- see the setup
+      // SQL). Grouped by partner_id so the list and edit form can show all of
+      // a client's cities, not just one.
       const grouped = {};
-      for (const loc of locData) {
+      for (const loc of locations || []) {
         if (!grouped[loc.partner_id]) grouped[loc.partner_id] = [];
         grouped[loc.partner_id].push(loc);
       }
       setLocationsByPartner(grouped);
-    }
 
-    // Banner impressions/calls per partner, for reporting back to each
-    // paying partner what they're getting for the placement. Reads from the
-    // partner_banner_stats view (see the setup SQL) -- silently skipped if
-    // that view doesn't exist yet so it never breaks the main partner list.
-    const { data: statsData } = await supabase.from('partner_banner_stats').select('*');
-    if (statsData) {
-      setStats(Object.fromEntries(statsData.map(s => [s.partner_id, s])));
+      // Banner impressions/calls per partner, for reporting back to each
+      // paying partner what they're getting for the placement.
+      setStats(Object.fromEntries((statsRows || []).map(s => [s.partner_id, s])));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  useEffect(() => { if (authed) load(); }, [authed, load]);
+  useEffect(() => { if (authed && adminKey) load(adminKey); }, [authed, adminKey, load]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (pwInput === ADMIN_PASSWORD) {
-      sessionStorage.setItem('admin_authed', '1');
+    setLoggingIn(true);
+    setLoginError(null);
+    try {
+      // The login form doubles as the credential check -- there's no
+      // separate "verify key" endpoint, this just tries the real request
+      // and treats a 401 as a wrong key. Same pattern as AdminCompanies.js.
+      await getAdminPartners(keyInput);
+      sessionStorage.setItem(STORAGE_KEY, keyInput);
+      setAdminKey(keyInput);
       setAuthed(true);
-    } else {
-      setPwError(true);
+    } catch (err) {
+      setLoginError(err.message || 'Incorrect admin key');
+    } finally {
+      setLoggingIn(false);
     }
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!supabase) return;
     setSaving(true);
     setError(null);
 
@@ -96,32 +103,21 @@ export default function AdminPartners() {
       return;
     }
 
-    let partnerId = editId;
-    let err;
-    if (editId) {
-      ({ error: err } = await supabase.from('partners').update(partnerFields).eq('id', editId));
-    } else {
-      const { data, error: insertErr } = await supabase.from('partners').insert(partnerFields).select().single();
-      err = insertErr;
-      partnerId = data?.id;
-    }
-    if (err) { setSaving(false); setError(err.message); return; }
-
-    // Full-replace the partner's service areas: simplest way to keep them
-    // in sync with whatever the form currently has, added/removed/edited.
-    const { error: delErr } = await supabase.from('partner_locations').delete().eq('partner_id', partnerId);
-    if (!delErr) {
-      const { error: locErr } = await supabase.from('partner_locations').insert(
-        validLocations.map(l => ({ partner_id: partnerId, city: l.city, state: l.state }))
-      );
-      if (locErr) { setSaving(false); setError(locErr.message); return; }
+    try {
+      const payload = { ...partnerFields, locations: validLocations };
+      if (editId) await updateAdminPartner(adminKey, editId, payload);
+      else await createAdminPartner(adminKey, payload);
+    } catch (err) {
+      setSaving(false);
+      setError(err.message);
+      return;
     }
 
     setSaving(false);
     setShowForm(false);
     setEditId(null);
     setForm(EMPTY_FORM);
-    load();
+    load(adminKey);
   };
 
   const handleEdit = (p) => {
@@ -142,15 +138,23 @@ export default function AdminPartners() {
   };
 
   const handleToggle = async (p) => {
-    await supabase.from('partners').update({ active: !p.active }).eq('id', p.id);
-    load();
+    try {
+      await toggleAdminPartner(adminKey, p.id, !p.active);
+      load(adminKey);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleDelete = async (id) => {
     const ok = await confirm({ title: 'Delete this partner?', confirmLabel: 'Delete', danger: true });
     if (!ok) return;
-    await supabase.from('partners').delete().eq('id', id);
-    load();
+    try {
+      await deleteAdminPartner(adminKey, id);
+      load(adminKey);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const updateLocation = (index, field, value) => {
@@ -166,9 +170,11 @@ export default function AdminPartners() {
       <form onSubmit={handleLogin} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 36, width: 340, boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
         <div style={{ fontWeight: 800, fontSize: 20, color: '#0f172a', marginBottom: 6 }}>Admin Login</div>
         <div style={{ fontSize: 13, color: '#64748b', marginBottom: 24 }}>Clean Estimator Partner Management</div>
-        <input type="password" placeholder="Password" value={pwInput} onChange={e => { setPwInput(e.target.value); setPwError(false); }} style={{ ...inputStyle, marginBottom: 12, borderColor: pwError ? '#ef4444' : '#e2e8f0' }} autoFocus />
-        {pwError && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 10 }}>Incorrect password.</div>}
-        <button type="submit" style={{ width: '100%', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, padding: '11px 0', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>Log In</button>
+        <input type="password" placeholder="Admin key" value={keyInput} onChange={e => { setKeyInput(e.target.value); setLoginError(null); }} style={{ ...inputStyle, marginBottom: 12, borderColor: loginError ? '#ef4444' : '#e2e8f0' }} autoFocus />
+        {loginError && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 10 }}>{loginError}</div>}
+        <button type="submit" disabled={loggingIn} style={{ width: '100%', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, padding: '11px 0', fontWeight: 700, fontSize: 15, cursor: 'pointer', opacity: loggingIn ? 0.7 : 1 }}>
+          {loggingIn ? 'Checking...' : 'Log In'}
+        </button>
       </form>
     </div>
   );
@@ -186,7 +192,6 @@ export default function AdminPartners() {
           </button>
         </div>
         {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '12px 16px', color: '#dc2626', fontSize: 13, marginBottom: 20 }}>{error}</div>}
-        {!supabase && <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: '12px 16px', color: '#92400e', fontSize: 13, marginBottom: 20 }}>Supabase is not configured.</div>}
         {showForm && (
           <div style={{ background: 'white', border: '1.5px solid #2563eb', borderRadius: 14, padding: '24px 28px', marginBottom: 28 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>

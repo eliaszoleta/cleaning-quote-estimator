@@ -120,3 +120,31 @@ export async function sendTrialEmailPreview(adminKey, to) {
     method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ to }),
   });
 }
+
+// AdminPartners.js -- same adminKey convention as above. Replaces writing
+// straight to Supabase from the browser with the anon key.
+export async function getAdminPartners(adminKey) {
+  return apiFetch('/api/admin/partners', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function createAdminPartner(adminKey, payload) {
+  return apiFetch('/api/admin/partners', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function updateAdminPartner(adminKey, id, payload) {
+  return apiFetch(`/api/admin/partners/${id}`, {
+    method: 'PUT', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function toggleAdminPartner(adminKey, id, active) {
+  return apiFetch(`/api/admin/partners/${id}/toggle`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ active }),
+  });
+}
+
+export async function deleteAdminPartner(adminKey, id) {
+  return apiFetch(`/api/admin/partners/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
+}

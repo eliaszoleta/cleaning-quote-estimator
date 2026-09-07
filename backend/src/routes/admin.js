@@ -218,4 +218,140 @@ router.post('/companies/send-trial-email-preview', async (req, res) => {
   res.json({ success: true, to });
 });
 
+// ─── Partner management ─────────────────────────────────────────────────────
+// AdminPartners.js used to write straight to Supabase from the browser with
+// the anon key, gated only by a client-side password check (a REACT_APP_*
+// env var, baked into the public JS bundle) -- that's not a real access
+// boundary, and the matching RLS policies on partners/partner_locations were
+// wide open (anon insert/update/delete) to make it work at all. These routes
+// replace that: real auth via requireAdminKey above, real writes via the
+// service role key. See supabase/migrations/008_lock_down_rls.sql, which
+// must be run to actually close off the old anon write policies -- these
+// routes alone don't do that, the database still needs to be told.
+
+// GET /api/admin/partners — every partner + their service-area locations +
+// banner KPIs, same three-way fetch AdminPartners.js used to do directly.
+router.get('/partners', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  try {
+    const { data: partners, error: pErr } = await sb.from('partners').select('*').order('created_at', { ascending: false });
+    if (pErr) throw pErr;
+    const { data: locations, error: lErr } = await sb.from('partner_locations').select('*').order('city');
+    if (lErr) throw lErr;
+    const { data: stats, error: sErr } = await sb.from('partner_banner_stats').select('*');
+    if (sErr) throw sErr;
+
+    res.json({ success: true, data: { partners: partners || [], locations: locations || [], stats: stats || [] } });
+  } catch (err) {
+    console.error('Admin partners list error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to load partners' });
+  }
+});
+
+// POST /api/admin/partners — create a partner and its service-area rows in
+// one call. Body: { ...partner fields, locations: [{ city, state }] }.
+router.post('/partners', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { locations, ...partnerFields } = req.body || {};
+  const validLocations = (locations || []).filter(l => l?.city && l?.state);
+  if (validLocations.length === 0) {
+    return res.status(400).json({ success: false, error: 'Add at least one city/state this partner serves.' });
+  }
+
+  try {
+    const { data, error: insertErr } = await sb.from('partners').insert(partnerFields).select().single();
+    if (insertErr) throw insertErr;
+
+    const { error: locErr } = await sb.from('partner_locations').insert(
+      validLocations.map(l => ({ partner_id: data.id, city: l.city, state: l.state }))
+    );
+    if (locErr) throw locErr;
+
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('Admin create partner error:', err.message);
+    // Admin-only tool (x-admin-key gated, not public), so the actual DB
+    // error is useful here rather than something to hide -- e.g. a unique
+    // constraint violation on a duplicate Stripe checkout session id.
+    res.status(500).json({ success: false, error: err.message || 'Failed to create partner' });
+  }
+});
+
+// PUT /api/admin/partners/:id — update a partner's fields and full-replace
+// its service-area locations (same delete-then-insert approach the old
+// direct-from-browser version used).
+router.put('/partners/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { id } = req.params;
+  const { locations, ...partnerFields } = req.body || {};
+  const validLocations = (locations || []).filter(l => l?.city && l?.state);
+  if (validLocations.length === 0) {
+    return res.status(400).json({ success: false, error: 'Add at least one city/state this partner serves.' });
+  }
+
+  try {
+    const { error: updErr } = await sb.from('partners').update(partnerFields).eq('id', id);
+    if (updErr) throw updErr;
+
+    const { error: delErr } = await sb.from('partner_locations').delete().eq('partner_id', id);
+    if (delErr) throw delErr;
+
+    const { error: locErr } = await sb.from('partner_locations').insert(
+      validLocations.map(l => ({ partner_id: id, city: l.city, state: l.state }))
+    );
+    if (locErr) throw locErr;
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Admin update partner error:', err.message);
+    res.status(500).json({ success: false, error: err.message || 'Failed to update partner' });
+  }
+});
+
+// PATCH /api/admin/partners/:id/toggle — flip active on/off only, without
+// requiring the full form payload (mirrors the list view's quick toggle).
+router.patch('/partners/:id/toggle', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { id } = req.params;
+  const { active } = req.body || {};
+  if (typeof active !== 'boolean') {
+    return res.status(400).json({ success: false, error: 'active (boolean) is required' });
+  }
+
+  try {
+    const { error } = await sb.from('partners').update({ active }).eq('id', id);
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Admin toggle partner error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to update partner' });
+  }
+});
+
+// DELETE /api/admin/partners/:id — partner_locations rows cascade via the
+// ON DELETE CASCADE foreign key (see 002_partners.sql), no separate cleanup
+// needed here.
+router.delete('/partners/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { id } = req.params;
+  try {
+    const { error } = await sb.from('partners').delete().eq('id', id);
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Admin delete partner error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to delete partner' });
+  }
+});
+
 module.exports = router;
