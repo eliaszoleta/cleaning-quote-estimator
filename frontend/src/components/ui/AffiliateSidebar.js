@@ -44,7 +44,24 @@ function computeIsDesktop(breakpoint) {
   return window.innerWidth >= breakpoint;
 }
 
-function ProductCard({ product, compact }) {
+// Full-size cards (110px image, stacked top:90) run to roughly 700px tall
+// for all 3 products -- fine against a full laptop-height screen, but a
+// short browser window (shrunk taskbar-height Chrome, a laptop with the
+// bookmarks bar and a couple of tab rows eating into the viewport) doesn't
+// have that much room below the top:90 offset. Rather than scrolling the
+// sidebar internally (a scrollbar/scroll-nav inside a small marketing
+// widget reads as broken, and hides the 3rd product by default), switch to
+// smaller "dense" cards -- same row layout already used for the
+// mobile/stacked fallback -- once the viewport is too short for the
+// full-size version. 700 (3 cards) + 90 (top offset) + ~40 (label/footer/
+// padding) + buffer.
+const DENSE_HEIGHT_THRESHOLD = 860;
+
+function computeIsDense() {
+  return window.innerHeight < DENSE_HEIGHT_THRESHOLD;
+}
+
+function ProductCard({ product, dense }) {
   return (
     <a
       href={product.amazonUrl}
@@ -52,9 +69,9 @@ function ProductCard({ product, compact }) {
       rel="nofollow sponsored noopener noreferrer"
       style={{
         display: 'flex',
-        flexDirection: compact ? 'row' : 'column',
-        alignItems: compact ? 'center' : 'stretch',
-        gap: compact ? 12 : 8,
+        flexDirection: dense ? 'row' : 'column',
+        alignItems: dense ? 'center' : 'stretch',
+        gap: dense ? 12 : 8,
         textDecoration: 'none',
         background: 'white',
         border: '1px solid #e2e8f0',
@@ -70,8 +87,8 @@ function ProductCard({ product, compact }) {
         alt={product.name}
         loading="lazy"
         style={{
-          width: compact ? 64 : '100%',
-          height: compact ? 64 : 110,
+          width: dense ? 56 : '100%',
+          height: dense ? 56 : 110,
           objectFit: 'contain',
           flexShrink: 0,
           background: '#f8fafc',
@@ -86,33 +103,33 @@ function ProductCard({ product, compact }) {
   );
 }
 
-function SidebarInner({ compact }) {
+// floating: whether this renders as the bordered white card that overlays
+// the page margin (true for both desktop cases) vs. transparent/full-width
+// in normal document flow (mobile/stacked fallback).
+// dense: whether cards use the small row layout (56px image, text beside
+// it) vs. the full column layout (110px image on top, text below) -- an
+// independent axis from `floating`, since a floating card can still need
+// dense cards on a short viewport (see DENSE_HEIGHT_THRESHOLD above), and
+// the stacked fallback always uses dense/row cards regardless of height.
+function SidebarInner({ floating, dense }) {
   return (
     <div
       style={{
-        width: compact ? '100%' : SIDEBAR_WIDTH,
-        background: compact ? 'transparent' : 'white',
-        border: compact ? 'none' : '1px solid #e2e8f0',
-        borderRadius: compact ? 0 : 16,
-        padding: compact ? 0 : 14,
-        boxShadow: compact ? 'none' : '0 4px 20px rgba(15,23,42,0.06)',
-        // Floating (non-compact) card only: on a short laptop viewport, 3
-        // full-size product cards stacked under the top:90 offset can run
-        // past the bottom of the screen with no way to reach the last one.
-        // Capping height and scrolling internally keeps every card
-        // reachable regardless of screen height, instead of silently
-        // clipping the last card off-screen.
-        maxHeight: compact ? 'none' : 'calc(100vh - 110px)',
-        overflowY: compact ? 'visible' : 'auto',
+        width: floating ? SIDEBAR_WIDTH : '100%',
+        background: floating ? 'white' : 'transparent',
+        border: floating ? '1px solid #e2e8f0' : 'none',
+        borderRadius: floating ? 16 : 0,
+        padding: floating ? 14 : 0,
+        boxShadow: floating ? '0 4px 20px rgba(15,23,42,0.06)' : 'none',
       }}
     >
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10, padding: compact ? '0 2px' : 0 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10, padding: floating ? 0 : '0 2px' }}>
         Cleaning Products We Recommend
       </div>
-      <div style={{ display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(auto-fit, minmax(240px, 1fr))' : undefined, flexDirection: compact ? undefined : 'column', gap: 10 }}>
-        {PRODUCTS.map(p => <ProductCard key={p.amazonUrl} product={p} compact={compact} />)}
+      <div style={{ display: floating ? 'flex' : 'grid', gridTemplateColumns: floating ? undefined : 'repeat(auto-fit, minmax(240px, 1fr))', flexDirection: floating ? 'column' : undefined, gap: 10 }}>
+        {PRODUCTS.map(p => <ProductCard key={p.amazonUrl} product={p} dense={dense} />)}
       </div>
-      <div style={{ fontSize: 10.5, color: '#94a3b8', lineHeight: 1.5, marginTop: 12, padding: compact ? '0 2px' : 0 }}>
+      <div style={{ fontSize: 10.5, color: '#94a3b8', lineHeight: 1.5, marginTop: 12, padding: floating ? 0 : '0 2px' }}>
         As an Amazon Associate, we earn from qualifying purchases.
       </div>
     </div>
@@ -158,9 +175,13 @@ function SidebarInner({ compact }) {
 // let the sidebar overlap that wider content between ~1220-1360px.
 export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true, mode = 'fixed', desktopBreakpoint = DESKTOP_BREAKPOINT }) {
   const [isDesktop, setIsDesktop] = useState(() => computeIsDesktop(desktopBreakpoint));
+  const [isDense, setIsDense] = useState(computeIsDense);
 
   useEffect(() => {
-    const onResize = () => setIsDesktop(computeIsDesktop(desktopBreakpoint));
+    const onResize = () => {
+      setIsDesktop(computeIsDesktop(desktopBreakpoint));
+      setIsDense(computeIsDense());
+    };
     onResize();
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -177,7 +198,7 @@ export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true,
     return (
       <div style={{ position: 'sticky', top: 90, height: 0, overflow: 'visible', zIndex: 40 }}>
         <div style={{ position: 'absolute', top: 0, left: LEFT_OFFSET }}>
-          <SidebarInner compact={false} />
+          <SidebarInner floating dense={isDense} />
         </div>
       </div>
     );
@@ -190,7 +211,7 @@ export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true,
     // header's own (small) box instead of the real viewport.
     return createPortal(
       <div style={{ position: 'fixed', top: 90, left: LEFT_OFFSET, zIndex: 40 }}>
-        <SidebarInner compact={false} />
+        <SidebarInner floating dense={isDense} />
       </div>,
       document.body
     );
@@ -198,7 +219,7 @@ export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true,
 
   return (
     <div style={{ maxWidth: contentMaxWidth, margin: '0 auto', padding: padded ? '0 20px clamp(28px, 6vw, 44px)' : '0 0 clamp(28px, 6vw, 44px)' }}>
-      <SidebarInner compact />
+      <SidebarInner floating={false} dense />
     </div>
   );
 }
