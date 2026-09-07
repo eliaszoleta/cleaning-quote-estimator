@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, Eye } from 'lucide-react';
 import CleaningCalculator from '../calculator/CleaningCalculator';
-import { PartnerBannerCard } from '../partners/FloatingPartnerBanner';
+import { PartnerBannerCard, computeIsCompact } from '../partners/FloatingPartnerBanner';
 
 const PRIMARY = '#2563eb';
 
@@ -33,7 +33,7 @@ const SAMPLE_PARTNER = {
 export default function PartnerDemoPage() {
   const [bannerVisible, setBannerVisible] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(computeIsCompact);
 
   useEffect(() => {
     const t = setTimeout(() => setBannerVisible(true), 600);
@@ -41,7 +41,7 @@ export default function PartnerDemoPage() {
   }, []);
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    const onResize = () => setIsMobile(computeIsCompact());
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);

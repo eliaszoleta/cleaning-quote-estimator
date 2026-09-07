@@ -5,6 +5,26 @@ import { getCachedPartnerMatch, logBannerEvent } from '../../utils/partnerLookup
 
 const DISMISS_KEY = 'cleanestimator_partner_banner_dismissed';
 
+// Matches CleaningCalculator.js's card width (the widest centered content
+// column this banner shares a viewport with) -- used to work out whether
+// there's actually clear space to its right before docking the roomy
+// top-anchored card there, instead of a guessed viewport-width breakpoint.
+const CONTENT_MAX_WIDTH = 720;
+const DESKTOP_BANNER_WIDTH = 268;
+const DESKTOP_RIGHT_OFFSET = 16;
+const SAFE_GAP = 24;
+
+// True once the margin beside the centered content column is wide enough
+// for the full-size card to sit in without touching it. Below that width --
+// most laptops in the ~900-1280px range, where the 720px-wide column eats
+// most of the viewport -- we fall back to the small, bottom-corner "mobile"
+// treatment instead, which is a much smaller target to overlap and already
+// carries a dismiss button.
+export function computeIsCompact() {
+  const margin = (window.innerWidth - CONTENT_MAX_WIDTH) / 2;
+  return margin < DESKTOP_RIGHT_OFFSET + DESKTOP_BANNER_WIDTH + SAFE_GAP;
+}
+
 // The actual card, with no opinion on where its `partner` data comes from --
 // FloatingPartnerBanner below feeds it a real, geo-matched partner; the
 // /partner-demo page feeds it sample data directly so a prospect can see
@@ -18,9 +38,9 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick })
         position: 'fixed',
         top: isMobile ? 'auto' : 80,
         bottom: isMobile ? 12 : 'auto',
-        right: isMobile ? 10 : 16,
+        right: isMobile ? 10 : DESKTOP_RIGHT_OFFSET,
         zIndex: 90,
-        width: isMobile ? 218 : 268,
+        width: isMobile ? 218 : DESKTOP_BANNER_WIDTH,
         maxWidth: 'calc(100vw - 20px)',
         background: 'white',
         border: `1.5px solid #2563eb`,
@@ -86,10 +106,10 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick })
 export default function FloatingPartnerBanner() {
   const [partner, setPartner] = useState(null);
   const [visible, setVisible] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(computeIsCompact);
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    const onResize = () => setIsMobile(computeIsCompact());
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
