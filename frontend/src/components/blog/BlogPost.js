@@ -155,29 +155,35 @@ export default function BlogPost({ slug }) {
           <a href="/" style={{ color: '#94a3b8' }}>Home</a> › <a href="/blog" style={{ color: '#94a3b8' }}>Blog</a> › <a href={`/blog/category/${post.category}`} style={{ color: '#94a3b8' }}>{post.categoryLabel}</a>
         </div>
 
-        {/* Header */}
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-            <a href={`/blog/category/${post.category}`} style={{ color: '#1e40af', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>{post.categoryLabel}</a>
-            <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
-            <span style={{ color: '#94a3b8', fontSize: 13 }}>{post.readTime} read</span>
-            <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
-            <span style={{ color: '#94a3b8', fontSize: 13 }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+        {/* Header + CTA + article body -- one bordered white card, matching
+            the same content-card style ServicePage.js uses (background
+            white, 14px radius, 1px #e2e8f0 border) instead of sitting
+            directly on the page's gray background. */}
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '32px 36px', marginBottom: 24 }}>
+          {/* Header */}
+          <div style={{ marginBottom: 40 }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+              <a href={`/blog/category/${post.category}`} style={{ color: '#1e40af', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>{post.categoryLabel}</a>
+              <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
+              <span style={{ color: '#94a3b8', fontSize: 13 }}>{post.readTime} read</span>
+              <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
+              <span style={{ color: '#94a3b8', fontSize: 13 }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+            </div>
+            <h1 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.01em' }}>{post.title}</h1>
+            <p style={{ fontSize: 18, color: '#64748b', lineHeight: 1.6 }}>{post.excerpt}</p>
           </div>
-          <h1 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.01em' }}>{post.title}</h1>
-          <p style={{ fontSize: 18, color: '#64748b', lineHeight: 1.6 }}>{post.excerpt}</p>
-        </div>
 
-        {/* CTA box */}
-        <div style={{ background: 'linear-gradient(135deg,#eff6ff,#f5f8ff)', border: '1px solid #bfdbfe', borderRadius: 14, padding: '18px 22px', marginBottom: 36, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <span style={{ fontSize: 14, color: '#1e40af', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            <Lightbulb size={17} strokeWidth={2} /> Get a free local estimate for your project
-          </span>
-          <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '9px 20px', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: '0 2px 8px rgba(30,64,175,0.25)' }}>Use Free Calculator →</a>
-        </div>
+          {/* CTA box */}
+          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#f5f8ff)', border: '1px solid #bfdbfe', borderRadius: 14, padding: '18px 22px', marginBottom: 36, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+            <span style={{ fontSize: 14, color: '#1e40af', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <Lightbulb size={17} strokeWidth={2} /> Get a free local estimate for your project
+            </span>
+            <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '9px 20px', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: '0 2px 8px rgba(30,64,175,0.25)' }}>Use Free Calculator →</a>
+          </div>
 
-        {/* Content */}
-        <div style={{ lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
+          {/* Content */}
+          <div style={{ lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
+        </div>
 
         {/* Bottom CTA */}
         <div style={{ background: 'linear-gradient(135deg, #0b1220, #1e293b)', borderRadius: 18, padding: '36px 40px', marginTop: 48, color: 'white', textAlign: 'center', boxShadow: '0 12px 32px rgba(15,23,42,0.24)' }}>
