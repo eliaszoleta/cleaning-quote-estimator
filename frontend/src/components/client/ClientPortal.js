@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import ClientAuthPage from './ClientAuthPage';
 import ClientDashboard from './ClientDashboard';
+import ResetPasswordPage from '../dashboard/ResetPasswordPage';
 
 // Self-contained auth-gated portal for /client -- mirrors how App.js wires
 // up the /company portal (AuthPage + CompanyDashboard), just bundled into
@@ -9,6 +10,12 @@ import ClientDashboard from './ClientDashboard';
 export default function ClientPortal() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Clicking a password-reset link logs the partner in with a real
+  // (temporary) session -- same PASSWORD_RECOVERY event App.js watches for
+  // on the /company side, needed here too so a reset link drops them into a
+  // "set new password" screen instead of straight into the dashboard on
+  // whatever temporary session the link itself established.
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
@@ -19,7 +26,8 @@ export default function ClientPortal() {
       setLoading(false);
     }).catch(() => { clearTimeout(timeout); setLoading(false); });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -45,6 +53,8 @@ export default function ClientPortal() {
       </div>
     </div>
   );
+
+  if (passwordRecovery) return <ResetPasswordPage onDone={() => setPasswordRecovery(false)} />;
 
   if (!user) return <ClientAuthPage onAuth={setUser} />;
 
