@@ -4,9 +4,6 @@ import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle,
 import { getAllFaqs } from '../../data/faqs';
 import { getAllServices, typicalCost } from '../../data/services';
 import { getFeaturedStates } from '../../data/statePricing';
-import TornDivider from './TornDivider';
-
-const DARK = '#0f172a';
 
 const FAQ = getAllFaqs();
 
@@ -242,7 +239,7 @@ export default function SEOContent() {
 
       <div style={{ background: 'white' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(32px, 7vw, 56px) 20px 0', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 900, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px' }}>
+          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px' }}>
             Get a FREE Cleaning Cost Estimate Online
           </h2>
           <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
@@ -257,7 +254,7 @@ export default function SEOContent() {
         </div>
 
         <div style={{ maxWidth: 860, margin: 'clamp(28px, 6vw, 48px) auto 0', padding: '0 20px clamp(32px, 7vw, 56px)' }}>
-          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 900, color: '#0f172a', marginBottom: 16, textAlign: 'center' }}>Average Cleaning Costs (2026)</h2>
+          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 16, textAlign: 'center' }}>Average Cleaning Costs (2026)</h2>
           <ul style={{ margin: '0 0 40px', paddingLeft: 20, color: '#374151', fontSize: 15, lineHeight: 1.9 }}>
             <li><strong>Standard House Cleaning:</strong> $90–$338 per visit depending on home size — $158–$198 is typical for the most common 1,500–2,000 sq ft home.</li>
             <li><strong>Deep Cleaning:</strong> 68–85% more than a standard clean; move-in/move-out cleans run 88–105% more.</li>
@@ -266,7 +263,7 @@ export default function SEOContent() {
             <li><strong>Mold Remediation:</strong> $750–$1,050 for a small spot under 10 sq ft, up to $8,500–$13,000+ for 300+ sq ft.</li>
           </ul>
 
-          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 900, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>Key Pricing Factors</h2>
+          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>Key Pricing Factors</h2>
           <p style={{ textAlign: 'center', color: '#64748b', fontSize: 14.5, maxWidth: 620, margin: '0 auto 18px', lineHeight: 1.7 }}>
             Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 9 services, not just house cleaning.
           </p>
@@ -281,7 +278,7 @@ export default function SEOContent() {
             See the full breakdown on our <a href="/how-we-calculate-prices" style={{ color: '#2563eb', fontWeight: 600 }}>pricing methodology page</a>.
           </p>
 
-          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 900, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>What Affects Your Price, by Service</h2>
+          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>What Affects Your Price, by Service</h2>
           <p style={{ textAlign: 'center', color: '#64748b', fontSize: 14.5, maxWidth: 640, margin: '0 auto 24px', lineHeight: 1.7 }}>
             Every service on this cleaning cost estimator asks its own scope questions — not just square footage and ZIP code. Here's exactly what factors into each one.
           </p>
@@ -308,7 +305,7 @@ export default function SEOContent() {
 
           {/* Services grid */}
           <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 7vw, 52px)' }}>
-            <h2 style={{ fontSize: 'clamp(22px, 6vw, 32px)', fontWeight: 900, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.5px' }}>
+            <h2 style={{ fontSize: 'clamp(22px, 6vw, 32px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.5px' }}>
               Cleaning Cost Calculator — Every Service, Every State
             </h2>
             <p style={{ fontSize: 17, color: '#64748b', maxWidth: 580, margin: '0 auto' }}>
@@ -344,47 +341,39 @@ export default function SEOContent() {
             ))}
           </div>
 
-          {/* State pricing table -- a dark full-bleed band (same data, same
-              links, just re-banded) so the page gets a genuine dark/light
-              rhythm break instead of staying flat white top to bottom. */}
+          {/* State pricing table */}
           <div style={{ marginBottom: 'clamp(44px, 9vw, 80px)' }}>
-            <TornDivider topColor="white" bottomColor={DARK} fullBleed />
-            <div style={{ background: DARK, width: '100vw', marginLeft: 'calc(50% - 50vw)', padding: 'clamp(36px, 7vw, 60px) 20px' }}>
-              <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-                <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 900, color: 'white', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
-                  House Cleaning Cost by State — 2026 Averages
-                </h2>
-                <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 15, marginBottom: 'clamp(20px, 4.5vw, 32px)' }}>
-                  Average price for standard cleaning of a 2,000 sq ft home.
-                </p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
-                  {STATES_DATA.map(s => (
-                    <a key={s.state} href={s.href} style={{ textDecoration: 'none' }}>
-                      <div
-                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: '13px 16px', border: '1px solid rgba(255,255,255,0.1)', transition: 'border-color 0.15s, background 0.15s' }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(96,165,250,0.6)'; e.currentTarget.style.background = 'rgba(37,99,235,0.14)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-                      >
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontWeight: 700, fontSize: 14, color: 'white' }}><MapPin size={12} color="#60a5fa" />{s.state}</div>
-                          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{s.note}</div>
-                        </div>
-                        <div style={{ fontWeight: 800, fontSize: 15, color: '#60a5fa', whiteSpace: 'nowrap', marginLeft: 12 }}>{s.avg}</div>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-                <p style={{ textAlign: 'center', fontSize: 12.5, color: '#64748b', marginTop: 14 }}>
-                  Prices vary. <a href="/" style={{ color: '#60a5fa' }}>Use the calculator above</a> for a ZIP-code specific estimate.
-                </p>
-              </div>
+            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
+              House Cleaning Cost by State — 2026 Averages
+            </h2>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, marginBottom: 'clamp(20px, 4.5vw, 32px)' }}>
+              Average price for standard cleaning of a 2,000 sq ft home.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
+              {STATES_DATA.map(s => (
+                <a key={s.state} href={s.href} style={{ textDecoration: 'none' }}>
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f8fafc', borderRadius: 10, padding: '13px 16px', border: '1px solid #f1f5f9', transition: 'border-color 0.15s, background 0.15s' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#bfdbfe'; e.currentTarget.style.background = '#eff6ff'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#f1f5f9'; e.currentTarget.style.background = '#f8fafc'; }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontWeight: 700, fontSize: 14, color: '#0f172a' }}><MapPin size={12} color="#2563eb" />{s.state}</div>
+                      <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{s.note}</div>
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: '#2563eb', whiteSpace: 'nowrap', marginLeft: 12 }}>{s.avg}</div>
+                  </div>
+                </a>
+              ))}
             </div>
-            <TornDivider topColor={DARK} bottomColor="white" fullBleed />
+            <p style={{ textAlign: 'center', fontSize: 12.5, color: '#94a3b8', marginTop: 14 }}>
+              Prices vary. <a href="/" style={{ color: '#2563eb' }}>Use the calculator above</a> for a ZIP-code specific estimate.
+            </p>
           </div>
 
           {/* How the cleaning estimator calculates price */}
           <div style={{ marginBottom: 'clamp(44px, 9vw, 80px)' }}>
-            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 900, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
               How Our Cleaning Cost Calculator Estimates your Price
             </h2>
             <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, maxWidth: 640, margin: '0 auto 12px' }}>
@@ -410,7 +399,7 @@ export default function SEOContent() {
 
           {/* Key features for businesses */}
           <div style={{ marginBottom: 'clamp(44px, 9vw, 80px)' }}>
-            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 900, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
               Key Features for Businesses
             </h2>
             <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, maxWidth: 620, margin: '0 auto clamp(20px, 4.5vw, 32px)' }}>
@@ -442,7 +431,7 @@ export default function SEOContent() {
 
           {/* FAQ */}
           <div>
-            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 900, color: '#0f172a', textAlign: 'center', marginBottom: 'clamp(22px, 5vw, 36px)', letterSpacing: '-0.3px' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 'clamp(22px, 5vw, 36px)', letterSpacing: '-0.3px' }}>
               Frequently Asked Questions
             </h2>
             <div style={{ maxWidth: 820, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
