@@ -55,6 +55,45 @@ const IconSuccess = () => (
   </svg>
 );
 
+const IconX = ({ size = 15, color = '#94a3b8' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+// Row-by-row contrast for the "Why This Beats Paid Ads" table below --
+// pulled from claims already made elsewhere on this page (exclusive
+// placement, flat pricing, no setup work) so the comparison doesn't
+// introduce anything the rest of the page doesn't already back up.
+const AD_COMPARISON = [
+  {
+    label: 'Targeting',
+    ads: "Broad keyword or demographic guesses — you're paying to reach anyone who might be searching, not confirmed intent.",
+    us: 'Only shown to visitors who already priced out your exact service in your exact city — proven intent, not a guess.',
+  },
+  {
+    label: 'Cost model',
+    ads: 'Pay per click whether it converts or not, and rates climb as more businesses bid on the same keywords.',
+    us: 'One flat monthly rate per city. Unlimited views, calls, and leads — the price never moves no matter how well it performs.',
+  },
+  {
+    label: 'Competition',
+    ads: 'Your ad sits next to several competitors bidding on the exact same search — the homeowner picks whoever looks best that second.',
+    us: "Exclusive placement. You're the only cleaning business shown in your city — no competing listing next to yours, ever.",
+  },
+  {
+    label: "How it's shown",
+    ads: 'Labeled "Ad," often skipped, and blocked outright by ad blockers for a growing share of visitors.',
+    us: 'Shown as a recommended local cleaner right alongside their price estimate — not flagged as an ad, and immune to ad blockers.',
+  },
+  {
+    label: 'Setup & upkeep',
+    ads: 'Keyword research, bid management, ad copy testing, ongoing optimization — usually a part-time job on its own.',
+    us: 'We set up your listing for you. No campaigns to manage, no bids to monitor, no ad copy to write.',
+  },
+];
+
 function StatBadge({ number, label }) {
   return (
     <div style={{ textAlign: 'center', padding: '24px 20px', minWidth: 0 }}>
@@ -244,6 +283,34 @@ export default function PartnerWithUs() {
                 <div style={{ fontSize: 'clamp(12.5px, 3.4vw, 14px)', color: '#64748b', lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: card.body }} />
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Why not ads */}
+      <div style={{ padding: 'clamp(48px, 8vw, 80px) 24px', background: 'white' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>Why This Beats Paid Ads</h2>
+            <p style={{ fontSize: 15, color: '#64748b', maxWidth: 600, margin: '0 auto', lineHeight: 1.65 }}>Google and Facebook ads charge you for attention, whether it converts or not. This charges you for exclusive placement in front of people who already want a cleaner.</p>
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <div style={{ minWidth: 640, display: 'grid', gridTemplateColumns: '150px 1fr 1fr', gap: 1, background: '#e2e8f0', borderRadius: 14, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+              <div style={{ background: '#f8fafc' }} />
+              <div style={{ background: '#f1f5f9', padding: '14px 16px', fontWeight: 800, fontSize: 12.5, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center' }}>Search &amp; Social Ads</div>
+              <div style={{ background: PRIMARY_GRADIENT, padding: '14px 16px', fontWeight: 800, fontSize: 12.5, color: 'white', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center' }}>Clean Estimator Partnership</div>
+              {AD_COMPARISON.map((row, i) => (
+                <React.Fragment key={i}>
+                  <div style={{ background: 'white', padding: '16px', fontWeight: 700, fontSize: 13.5, color: '#0f172a', display: 'flex', alignItems: 'center' }}>{row.label}</div>
+                  <div style={{ background: 'white', padding: '16px', fontSize: 13, color: '#64748b', lineHeight: 1.6, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ marginTop: 2, flexShrink: 0 }}><IconX /></span>{row.ads}
+                  </div>
+                  <div style={{ background: '#eff6ff', padding: '16px', fontSize: 13, color: '#1e3a8a', lineHeight: 1.6, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ marginTop: 2, flexShrink: 0 }}><IconCheck size={14} /></span>{row.us}
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         </div>
       </div>
