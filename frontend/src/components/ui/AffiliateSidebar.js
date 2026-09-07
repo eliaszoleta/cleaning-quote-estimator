@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 // Cleaning-related Amazon Associates picks, shown alongside the homepage
@@ -59,6 +59,58 @@ const DENSE_HEIGHT_THRESHOLD = 860;
 
 function computeIsDense() {
   return window.innerHeight < DENSE_HEIGHT_THRESHOLD;
+}
+
+const TOP_OFFSET = 90;
+const FOOTER_GAP = 20;
+
+// Keeps a position:fixed floating card from ever sliding over the site
+// footer. A plain `position: fixed; top: 90` has no idea where the page
+// ends -- once the footer scrolls into view, the card just sits on top of
+// it, which is exactly what happened on blog posts (any page long enough
+// to scroll the footer above the fold with room to spare). This is the
+// classic "affix with a lower boundary" pattern: on every scroll, work out
+// where the card's top edge would need to land, in document coordinates,
+// to keep its bottom edge FOOTER_GAP above the footer's top -- once the
+// card's natural (viewport-fixed) position would go past that point,
+// switch it to position:absolute pinned at that document coordinate
+// instead, so it scrolls away with the rest of the page from then on,
+// docked just above the footer rather than overlapping it. Returns null
+// while the card should render normally fixed, or a doc-coordinate top
+// once it should be docked.
+function useFooterDockTop(active, cardHeight) {
+  const [dockTop, setDockTop] = useState(null);
+
+  useEffect(() => {
+    if (!active) { setDockTop(null); return undefined; }
+
+    let ticking = false;
+    const recompute = () => {
+      ticking = false;
+      const footer = document.querySelector('footer');
+      if (!footer || !cardHeight) { setDockTop(null); return; }
+      const scrollY = window.scrollY;
+      const footerDocTop = footer.getBoundingClientRect().top + scrollY;
+      const maxDocTop = footerDocTop - cardHeight - FOOTER_GAP;
+      const naturalDocTop = scrollY + TOP_OFFSET;
+      setDockTop(naturalDocTop > maxDocTop ? maxDocTop : null);
+    };
+    const onScrollOrResize = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(recompute);
+    };
+
+    recompute();
+    window.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', onScrollOrResize);
+      window.removeEventListener('resize', onScrollOrResize);
+    };
+  }, [active, cardHeight]);
+
+  return dockTop;
 }
 
 function ProductCard({ product, dense }) {
@@ -196,6 +248,19 @@ export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true,
     return () => window.removeEventListener('resize', onResize);
   }, [desktopBreakpoint, wideBreakpoint]);
 
+  // Only the portal/fixed rendering below (mode="fixed", or mode="sticky"
+  // once upgraded by wideBreakpoint) can ever reach the footer -- the
+  // sticky-scoped-to-calculator rendering already stops well above it, so
+  // there's nothing to measure or dock there.
+  const fixedStyleActive = isDesktop && (mode === 'fixed' || (mode === 'sticky' && isWide));
+  const cardRef = useRef(null);
+  const [cardHeight, setCardHeight] = useState(0);
+  useEffect(() => {
+    const h = cardRef.current ? cardRef.current.offsetHeight : 0;
+    if (h && h !== cardHeight) setCardHeight(h);
+  });
+  const dockTop = useFooterDockTop(fixedStyleActive, cardHeight);
+
   if (isDesktop && mode === 'sticky' && !isWide) {
     // No portal needed: unlike 'fixed', position:sticky is scoped to this
     // element's own place in the DOM, so it doesn't need to escape any
@@ -205,7 +270,7 @@ export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true,
     // to this sticky element's own box (which spans the wrapper's full
     // width), so it lands LEFT_OFFSET from the left edge same as 'fixed'.
     return (
-      <div style={{ position: 'sticky', top: 90, height: 0, overflow: 'visible', zIndex: 40 }}>
+      <div style={{ position: 'sticky', top: TOP_OFFSET, height: 0, overflow: 'visible', zIndex: 40 }}>
         <div style={{ position: 'absolute', top: 0, left: LEFT_OFFSET }}>
           <SidebarInner floating dense={isDense} />
         </div>
@@ -217,9 +282,15 @@ export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true,
     // Portal to document.body for the same reason FloatingPartnerBanner
     // does -- Header's backdropFilter creates a new CSS containing block
     // for any position:fixed descendant, which would anchor this to the
-    // header's own (small) box instead of the real viewport.
+    // header's own (small) box instead of the real viewport. Once dockTop
+    // is set (the footer is close enough that a fixed position would
+    // overlap it), switch to position:absolute pinned at that document
+    // coordinate instead -- see useFooterDockTop above.
+    const style = dockTop != null
+      ? { position: 'absolute', top: dockTop, left: LEFT_OFFSET, zIndex: 40 }
+      : { position: 'fixed', top: TOP_OFFSET, left: LEFT_OFFSET, zIndex: 40 };
     return createPortal(
-      <div style={{ position: 'fixed', top: 90, left: LEFT_OFFSET, zIndex: 40 }}>
+      <div ref={cardRef} style={style}>
         <SidebarInner floating dense={isDense} />
       </div>,
       document.body
