@@ -13,7 +13,7 @@ const SLIDES = [
   { src: '/images/partner-gallery/google-search-cleaning-cost-calculator.png', title: 'Cited by Google’s AI Overview', desc: 'For "cleaning cost calculator," Google’s AI Overview cites Clean Estimator directly as a source.' },
   { src: '/images/partner-gallery/google-search-free-cleaning-estimate-calculator.png', title: 'Showing up for high-intent searches', desc: 'Ranking for "free cleaning estimate calculator" — exactly what homeowners search before hiring.' },
   { src: '/images/partner-gallery/google-search-cleaning-estimate-online.png', title: 'Multiple keywords, consistent visibility', desc: 'Also ranking for "cleaning estimate online," reinforcing steady, ongoing organic traffic.' },
-  { src: '/images/partner-gallery/analytics-traffic.png', title: 'Real visitors, real traffic', desc: 'Live analytics showing thousands of active users and tens of thousands of monthly events — the audience your listing reaches.' },
+  { src: '/images/partner-gallery/Screenshot_452.png', title: 'Real visitors, real traffic', desc: '63k active users and 298k events in the last few months — the audience your listing reaches, straight from Google Analytics.' },
 ];
 
 export default function PartnerGallery() {
