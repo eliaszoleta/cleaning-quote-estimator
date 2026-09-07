@@ -22,19 +22,21 @@ const PRODUCTS = [
   },
 ];
 
-// Matches CleaningCalculator.js's card width (same constant
-// FloatingPartnerBanner.js uses on the right) -- used to work out whether
-// there's real space in the LEFT margin for this sidebar before docking it
-// there, instead of a guessed viewport-width breakpoint. A separate check
-// from the partner banner's (different width, different side), so the two
-// never fight over the same math.
-const CONTENT_MAX_WIDTH = 720;
+// contentMaxWidth defaults to CleaningCalculator.js's card width (same
+// constant FloatingPartnerBanner.js uses on the right) -- used to work out
+// whether there's real space in the LEFT margin for this sidebar before
+// docking it there, instead of a guessed viewport-width breakpoint. Callers
+// on a page with a differently-sized content column (e.g. BlogPost.js's
+// 760px article) pass their own so the room check stays accurate -- using
+// the calculator's 720 on a 760-wide page would overestimate the real
+// margin by 20px per side.
+const DEFAULT_CONTENT_MAX_WIDTH = 720;
 const SIDEBAR_WIDTH = 208;
 const LEFT_OFFSET = 16;
 const SAFE_GAP = 24;
 
-function computeHasRoom() {
-  const margin = (window.innerWidth - CONTENT_MAX_WIDTH) / 2;
+function computeHasRoom(contentMaxWidth) {
+  const margin = (window.innerWidth - contentMaxWidth) / 2;
   return margin >= LEFT_OFFSET + SIDEBAR_WIDTH + SAFE_GAP;
 }
 
@@ -105,22 +107,31 @@ function SidebarInner({ compact }) {
   );
 }
 
-// Sitewide-capable, currently only mounted on the homepage (App.js). On a
-// wide viewport it floats in the left margin next to the calculator card,
+// Mounted on the homepage (720px calculator card) and every blog post
+// (760px article column) -- contentMaxWidth tells it which. On a wide
+// viewport it floats in the left margin next to that content column,
 // mirroring how FloatingPartnerBanner docks in the right margin -- both
 // only ever show up where there's real space, never overlapping the
 // centered content column. Below that width it renders inline, in normal
 // document flow, right where <AffiliateSidebar /> is placed in the page --
-// stacked under the calculator instead of squeezed into a margin that
-// isn't there.
-export default function AffiliateSidebar() {
-  const [hasRoom, setHasRoom] = useState(computeHasRoom);
+// stacked under the content instead of squeezed into a margin that isn't
+// there.
+// padded: whether the inline/stacked fallback needs its own horizontal
+// gutter. True by default (the homepage mounts this as a bare sibling
+// under an unpadded <main>, so it supplies its own edge padding, matching
+// CleaningCalculator/SEOContent's own wrappers). BlogPost.js passes false
+// since it's nested inside an already-padded, already-760-wide content
+// column -- adding padding on top of that would double-inset it relative
+// to the article text right above it.
+export default function AffiliateSidebar({ contentMaxWidth = DEFAULT_CONTENT_MAX_WIDTH, padded = true }) {
+  const [hasRoom, setHasRoom] = useState(() => computeHasRoom(contentMaxWidth));
 
   useEffect(() => {
-    const onResize = () => setHasRoom(computeHasRoom());
+    const onResize = () => setHasRoom(computeHasRoom(contentMaxWidth));
+    onResize();
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, []);
+  }, [contentMaxWidth]);
 
   if (hasRoom) {
     // Portal to document.body for the same reason FloatingPartnerBanner
@@ -136,7 +147,7 @@ export default function AffiliateSidebar() {
   }
 
   return (
-    <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px clamp(28px, 6vw, 44px)' }}>
+    <div style={{ maxWidth: contentMaxWidth, margin: '0 auto', padding: padded ? '0 20px clamp(28px, 6vw, 44px)' : '0 0 clamp(28px, 6vw, 44px)' }}>
       <SidebarInner compact />
     </div>
   );
