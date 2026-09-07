@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
+import TornDivider from './TornDivider';
 
 const cols = [
   {
@@ -74,7 +75,7 @@ const cols = [
 ];
 
 const s = {
-  footer: { background: '#0b1220', color: '#94a3b8' },
+  footer: { background: '#0f172a', color: '#94a3b8' },
   inner: { maxWidth: 1200, margin: '0 auto', padding: '64px 24px 40px' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 40, marginBottom: 48 },
   colTitle: { color: 'white', fontWeight: 700, fontSize: 14, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em' },
@@ -94,6 +95,7 @@ const s = {
 export default function Footer() {
   return (
     <footer style={s.footer}>
+      <TornDivider topColor="#ffffff" bottomColor="#0f172a" />
       <div style={s.inner}>
         <div style={s.grid}>
           {cols.map(col => (
