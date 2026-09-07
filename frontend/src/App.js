@@ -8,6 +8,7 @@ import AuthPage from './components/dashboard/AuthPage';
 import ResetPasswordPage from './components/dashboard/ResetPasswordPage';
 import AdminPartners from './components/admin/AdminPartners';
 import AdminCompanies from './components/admin/AdminCompanies';
+import AdminHomepageLeads from './components/admin/AdminHomepageLeads';
 import ClientPortal from './components/client/ClientPortal';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
@@ -50,6 +51,7 @@ const isPrivacy = pathname === '/privacy-policy';
 const isTerms = pathname === '/terms-of-service';
 const isAdminPartners = pathname === '/admin/partners';
 const isAdminCompanies = pathname === '/admin/companies';
+const isAdminHomepageLeads = pathname === '/admin/leads';
 const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
 const isPartnerCityPricing = pathname === '/partner-city-pricing';
@@ -154,6 +156,8 @@ export default function App() {
   if (isAdminPartners) return <HelmetProvider><AdminPartners /></HelmetProvider>;
 
   if (isAdminCompanies) return <HelmetProvider><AdminCompanies /></HelmetProvider>;
+
+  if (isAdminHomepageLeads) return <HelmetProvider><AdminHomepageLeads /></HelmetProvider>;
 
   if (isClientPortal) return <HelmetProvider><ClientPortal /></HelmetProvider>;
 

@@ -218,6 +218,85 @@ router.post('/companies/send-trial-email-preview', async (req, res) => {
   res.json({ success: true, to });
 });
 
+// ─── Homepage leads ──────────────────────────────────────────────────────────
+// The main public calculator on cleanestimator.com's homepage (and any other
+// unbranded page -- /cleaning-cost-calculator, /cleaning-cost-estimator, the
+// service-specific calculator pages) never sends a companyId to /api/calculate,
+// so every lead it captures lands in the same `leads` table as every
+// embedded-widget subscriber's leads, just with company_id left null (see
+// saveLead in leads.js). There was no view of those rows anywhere -- a
+// subscriber sees their own via requireAuth-gated /api/company-leads, but
+// nothing surfaced the homepage's own leads to the site owner. These three
+// routes are that view, scoped the same way (company_id IS NULL instead of
+// company_id = a specific company), gated by the same requireAdminKey as
+// everything else in this file.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// GET /api/admin/homepage-leads
+router.get('/homepage-leads', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const includeDeleted = req.query.deleted === 'true';
+  const limit = Math.min(parseInt(req.query.limit, 10) || 1000, 2000);
+
+  try {
+    let query = sb.from('leads').select('*').is('company_id', null).order('created_at', { ascending: false }).limit(limit);
+    if (!includeDeleted) query = query.is('deleted_at', null);
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ success: true, count: data.length, data: data || [] });
+  } catch (err) {
+    console.error('Admin homepage-leads list error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to load leads' });
+  }
+});
+
+// PATCH /api/admin/homepage-leads/:id — notes and soft-delete/restore, same
+// shape as PATCH /api/company-leads/company/:id. The `company_id IS NULL`
+// filter stays on the update too, not just the list above, so this can never
+// be pointed at a subscriber's own lead by id.
+router.patch('/homepage-leads/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { id } = req.params;
+  if (!UUID_RE.test(id)) return res.status(400).json({ success: false, error: 'Invalid lead id' });
+
+  const { notes, deleted_at } = req.body || {};
+  const updates = {};
+  if (notes !== undefined) updates.notes = notes;
+  if (deleted_at !== undefined) updates.deleted_at = deleted_at;
+
+  try {
+    const { error } = await sb.from('leads').update(updates).eq('id', id).is('company_id', null);
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Admin update homepage lead error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to update lead' });
+  }
+});
+
+// DELETE /api/admin/homepage-leads/:id — permanent delete, only ever called
+// from the Trash view (mirrors DELETE /api/company-leads/company/:id).
+router.delete('/homepage-leads/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { id } = req.params;
+  if (!UUID_RE.test(id)) return res.status(400).json({ success: false, error: 'Invalid lead id' });
+
+  try {
+    const { error } = await sb.from('leads').delete().eq('id', id).is('company_id', null);
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Admin delete homepage lead error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to delete lead' });
+  }
+});
+
 // ─── Partner management ─────────────────────────────────────────────────────
 // AdminPartners.js used to write straight to Supabase from the browser with
 // the anon key, gated only by a client-side password check (a REACT_APP_*

@@ -158,3 +158,20 @@ export async function toggleAdminPartner(adminKey, id, active) {
 export async function deleteAdminPartner(adminKey, id) {
   return apiFetch(`/api/admin/partners/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
 }
+
+// AdminHomepageLeads.js -- leads captured by the main public calculator
+// (no companyId, so company_id is null on the row), same adminKey convention
+// as the rest of the admin API.
+export async function getAdminHomepageLeads(adminKey, includeDeleted = false) {
+  return apiFetch(`/api/admin/homepage-leads${includeDeleted ? '?deleted=true' : ''}`, { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function patchAdminHomepageLead(adminKey, id, updates) {
+  return apiFetch(`/api/admin/homepage-leads/${id}`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(updates),
+  });
+}
+
+export async function deleteAdminHomepageLeadForever(adminKey, id) {
+  return apiFetch(`/api/admin/homepage-leads/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
+}
