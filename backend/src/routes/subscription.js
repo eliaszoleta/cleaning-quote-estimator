@@ -59,7 +59,7 @@ router.post('/checkout', async (req, res) => {
     res.json({ success: true, url: session.url });
   } catch (err) {
     console.error('Stripe checkout error:', err.message);
-    res.status(500).json({ success: false, error: err.message || 'Failed to create checkout session' });
+    res.status(500).json({ success: false, error: 'Failed to create checkout session. Please try again.' });
   }
 });
 
