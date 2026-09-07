@@ -23,7 +23,7 @@ export default function TermsOfService() {
           ['Limitation of Liability', 'Clean Estimator\'s total liability to you for any claims arising from use of the service is limited to the amount you paid us in the 3 months prior to the claim, or $50, whichever is greater.'],
           ['Termination', 'We may suspend or terminate your account if you violate these terms. You may delete your account at any time by contacting support.'],
           ['Governing Law', 'These terms are governed by the laws of the State of Delaware, USA.'],
-          ['Contact', 'Questions about these terms? Email legal@cleanestimator.com.'],
+          ['Contact', 'Questions about these terms? Email info@cleanestimator.com.'],
         ].map(([title, body]) => (
           <div key={title} style={{ marginBottom: 28 }}>
             <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>{title}</h2>

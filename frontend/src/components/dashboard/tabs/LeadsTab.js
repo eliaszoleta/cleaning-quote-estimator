@@ -254,7 +254,7 @@ export default function LeadsTab({ user }) {
     const csv = toCSV(rowsSource);
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'cleancalc-leads.csv'; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = 'cleanestimator-leads.csv'; a.click();
     URL.revokeObjectURL(url);
   };
 

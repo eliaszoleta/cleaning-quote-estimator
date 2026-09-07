@@ -49,7 +49,7 @@ export default function EmbedTab({ config, user }) {
   })();
 </script>`;
 
-  const wordpressCode = `[cleancalc_widget company_id="${companyId}" height="${height}"]`;
+  const wordpressCode = `[cleanestimator_widget company_id="${companyId}" height="${height}"]`;
 
   const copy = async (text, key) => {
     try {

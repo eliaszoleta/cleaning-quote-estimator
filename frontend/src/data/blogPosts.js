@@ -2861,7 +2861,7 @@ Combines a membership fee with pay-per-lead pricing in most markets. Leads are s
 Pay-per-lead, but with the added "Google Guaranteed" badge (after a background check) that builds trust. Requires a separate application process from a standard Google Business Profile.
 
 ### 8. Exclusive Local Partner Programs
-Instead of paying per lead or sharing leads with competitors, an exclusive partner program gives one cleaning business per city guaranteed placement — no other cleaner competing for that spot. [Clean Estimator's Local Partner Program](/partner-with-us) works this way for $350/month per city, with your business shown on every cleaning estimate result for homeowners in your area.
+Instead of paying per lead or sharing leads with competitors, an exclusive partner program gives one cleaning business per city guaranteed placement — no other cleaner competing for that spot. [Clean Estimator's Local Partner Program](/partner-with-us) works this way from $175/month per city (major metros are $350/month), with your business shown on every cleaning estimate result for homeowners in your area.
 
 ## Comparison at a Glance
 
@@ -2889,7 +2889,7 @@ Google Business Profile and a referral program are effectively free and, for mos
 They can be, especially for newer businesses building volume — but your close rate has to be strong enough to justify the per-lead cost, since you're competing directly with other cleaners quoting the same job.
 
 **What does exclusive lead placement cost for a cleaning business?**
-Clean Estimator's Local Partner Program is $350/month per city, with no per-lead charges and no competing cleaning businesses shown for that city.
+Clean Estimator's Local Partner Program starts at $175/month per city (major metros are $350/month), with no per-lead charges and no competing cleaning businesses shown for that city.
 
 [See if your city is available](/partner-with-us) →
     `,
@@ -3192,7 +3192,7 @@ The biggest difference between cleaning lead platforms isn't the price — it's 
 ## Exclusive Local Partner Programs
 
 **Model**: Flat monthly fee for guaranteed, exclusive placement — one cleaning business per city, no competing quotes shown.
-**Cost**: [Clean Estimator's Local Partner Program](/partner-with-us) is $350/month per city, flat regardless of how many jobs you close.
+**Cost**: [Clean Estimator's Local Partner Program](/partner-with-us) starts at $175/month per city (major metros are $350/month), flat regardless of how many jobs you close.
 **Best for**: Businesses that want predictable costs and don't want to compete head-to-head on every single lead — your cost per booked job goes down as your close rate improves, unlike pay-per-lead models.
 
 ## Side-by-Side Comparison
@@ -3219,7 +3219,7 @@ Shared leads are sent to multiple cleaning businesses at once, who all compete t
 It depends on your stage — Thumbtack's shared, pay-per-lead model is flexible for businesses still building volume, while exclusive placement tends to produce a lower cost per booked job once you have the reviews and capacity to reliably close a steady stream of traffic.
 
 **How much does exclusive local lead placement cost for cleaning companies?**
-Clean Estimator's Local Partner Program is a flat $350/month per city, with only one cleaning business shown per city and no per-lead charges.
+Clean Estimator's Local Partner Program is a flat rate per city — $175/month in most cities, $350/month in major metros — with only one cleaning business shown per city and no per-lead charges.
 
 **Can I use multiple lead platforms at once?**
 Yes — most growing cleaning businesses run a mix, commonly one shared pay-per-lead platform for volume alongside one exclusive channel for predictable, non-competitive placement.

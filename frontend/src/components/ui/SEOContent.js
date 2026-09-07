@@ -186,7 +186,7 @@ export default function SEOContent() {
       'Free cleaning cost estimates with no signup',
       'Every service asks about size, scope, and frequency — not just ZIP code',
       'ZIP-code specific pricing across all 50 US states',
-      'Local Partner Program: exclusive, one-partner-per-city placement recommending a local cleaning company to homeowners, $350/month per city',
+      'Local Partner Program: exclusive, one-partner-per-city placement recommending a local cleaning company to homeowners, from $175/month per city ($350/month in major metros)',
       'Website Integration: embeddable, white-labeled cleaning cost calculator for cleaning company websites, $159/month after a 30-day free trial, no credit card required',
       'House cleaning cost calculator',
       'Carpet cleaning cost estimator',
@@ -409,7 +409,7 @@ export default function SEOContent() {
               <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 26px' }}>
                 <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Local Partner Program</h3>
                 <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: '0 0 14px' }}>
-                  Exclusive, one-partner-per-city placement — your business is recommended directly to homeowners in your city actively searching for cleaning services. $350/month per city, only one partner per city.
+                  Exclusive, one-partner-per-city placement — your business is recommended directly to homeowners in your city actively searching for cleaning services. From $175/month per city (major metros are $350/month), only one partner per city.
                 </p>
                 <a href="/partner-with-us" style={{ fontSize: 13.5, color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>See partner program details &rarr;</a>
               </div>

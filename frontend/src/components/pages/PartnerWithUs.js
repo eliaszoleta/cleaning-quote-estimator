@@ -162,10 +162,10 @@ export default function PartnerWithUs() {
       if (data.success) {
         setSent(true);
       } else {
-        setError('Something went wrong. Please try again or email us directly at eliaszoleta87@gmail.com');
+        setError('Something went wrong. Please try again or email us directly at info@cleanestimator.com');
       }
     } catch {
-      setError('Network error. Please try again or email us directly at eliaszoleta87@gmail.com');
+      setError('Network error. Please try again or email us directly at info@cleanestimator.com');
     } finally {
       setSending(false);
     }
