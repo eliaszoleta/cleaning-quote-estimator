@@ -15,10 +15,14 @@ function fileToBase64(file) {
   });
 }
 
-// Shared by BuyCityPlacement.js (checkout) and ClientDashboard.js (a partner
-// editing their own listing later) -- same upload flow either way, so it
-// only needs building and testing once.
-export default function LogoField({ value, onChange, inputStyle }) {
+// Shared by BuyCityPlacement.js (checkout), ClientDashboard.js (a partner
+// editing their own listing later), and BrandingTab.js (a company editing
+// their widget branding) -- same upload flow everywhere, so it only needs
+// building and testing once. upload: async ({contentType, dataBase64}) =>
+// {data: {url}} -- defaults to the public, no-auth partner-checkout
+// endpoint (the first two callers' case); BrandingTab.js passes its own,
+// bound to the company's auth token and account id.
+export default function LogoField({ value, onChange, inputStyle, upload = uploadPartnerLogo }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -42,7 +46,7 @@ export default function LogoField({ value, onChange, inputStyle }) {
     setUploading(true);
     try {
       const dataBase64 = await fileToBase64(file);
-      const { data } = await uploadPartnerLogo({ contentType: file.type, dataBase64 });
+      const { data } = await upload({ contentType: file.type, dataBase64 });
       onChange(data.url);
     } catch (err) {
       setError(err.message || 'Upload failed. You can paste an image URL instead.');

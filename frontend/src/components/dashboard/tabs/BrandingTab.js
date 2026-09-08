@@ -2,8 +2,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Save, Check, Loader2 } from 'lucide-react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
 import { FONT_OPTIONS, getFontStack } from '../../../utils/fonts';
+import LogoField from '../../partners/LogoField';
+import { uploadCompanyLogo } from '../../../utils/api';
+import { supabase } from '../../../lib/supabase';
 
 export default function BrandingTab({ config, update, onSave, saving, saved }) {
+  // Session is fetched per-upload (rather than once on mount) so a long
+  // idle stretch on this tab before uploading a logo can't hand
+  // uploadCompanyLogo a token that's since expired.
+  const uploadLogo = async ({ contentType, dataBase64 }) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Your session expired -- please refresh and log in again.');
+    return uploadCompanyLogo(session.access_token, session.user.id, { contentType, dataBase64 });
+  };
+
   const [form, setForm] = useState({
     companyName: '', logo: '', primaryColor: '#2563eb', accentColor: '#16a34a',
     ctaHeadline: '', ctaSubtext: '', ctaPhone: '', ctaEmail: '',
@@ -82,10 +94,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
             <Field label="Company name">
               <input style={input} value={form.companyName} onChange={e => set('companyName', e.target.value)} placeholder="ABC Cleaning Services" />
             </Field>
-            <Field label="Logo URL" hint="Paste a publicly hosted image URL">
-              <input style={input} value={form.logo} onChange={e => set('logo', e.target.value)} placeholder="https://yoursite.com/logo.png" />
-              {form.logo && <img src={form.logo} alt="logo preview" style={{ marginTop: 8, maxHeight: 50, borderRadius: 4 }} onError={e => { e.target.style.display = 'none'; }} />}
-            </Field>
+            <LogoField value={form.logo} onChange={url => set('logo', url)} inputStyle={input} upload={uploadLogo} />
           </Card>
 
           <Card title="Colors">

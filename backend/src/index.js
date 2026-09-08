@@ -129,6 +129,7 @@ app.post('/api/partner-checkout/webhook',
 // body-parser guard skips re-parsing a body it's already parsed, same
 // trick the webhook route above relies on).
 app.use('/api/partner-checkout/upload-logo', express.json({ limit: '5mb' }));
+app.use('/api/company/:id/upload-logo', express.json({ limit: '5mb' }));
 
 // Body parsing — after webhook
 app.use(express.json({ limit: '10kb' }));

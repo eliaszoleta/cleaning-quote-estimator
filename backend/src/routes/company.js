@@ -6,6 +6,27 @@ const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, findDupli
 const { sendCompanyWelcomeEmail, sendAccountDeletionScheduledEmail } = require('../services/email');
 const { requireAuth } = require('../middleware/auth');
 
+// Same upload-to-Supabase-Storage pattern as partnerCheckout.js's
+// /upload-logo (separate bucket, see 010_company_logo_storage.sql) --
+// kept local rather than shared since that route is intentionally a
+// standalone, no-auth endpoint for a pre-signup checkout flow, while this
+// one requires an authenticated company session.
+const LOGO_BUCKET = 'company-logos';
+const MAX_LOGO_BYTES = 3 * 1024 * 1024; // 3MB
+const ALLOWED_LOGO_TYPES = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+};
+
+function getStorageSupabase() {
+  const { createClient } = require('@supabase/supabase-js');
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new Error('Supabase is not configured');
+  return createClient(url, key, { auth: { persistSession: false } });
+}
+
 // serviceCities used to be a flat array (before cities were scoped per
 // state), so any account that set it before this change still has that
 // shape sitting in the database. Normalizes on read so both routes below
@@ -98,6 +119,49 @@ router.put('/:id', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('PUT company config error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to save configuration' });
+  }
+});
+
+// POST /api/company/:id/upload-logo — auth required. Takes a small image as
+// base64 JSON (not multipart -- avoids adding a multer dependency for what's
+// a rare, small upload, same reasoning as partnerCheckout.js's own
+// /upload-logo) and stores it in Supabase Storage via the service role key,
+// so the browser never gets direct storage write access. Returns a public
+// URL that slots straight into the same `logo` config field a pasted URL
+// would have filled -- BrandingTab.js still has to call PUT /:id afterward
+// to actually save it, same as any other field change.
+router.post('/:id/upload-logo', requireAuth, async (req, res) => {
+  const { id } = req.params;
+  if (req.user.id !== id) return res.status(403).json({ success: false, error: 'Forbidden' });
+
+  const { contentType, dataBase64 } = req.body || {};
+  const ext = ALLOWED_LOGO_TYPES[contentType];
+  if (!ext) return res.status(400).json({ success: false, error: 'Logo must be a PNG, JPEG, or WebP image' });
+  if (!dataBase64) return res.status(400).json({ success: false, error: 'No file data received' });
+
+  let buffer;
+  try {
+    buffer = Buffer.from(dataBase64, 'base64');
+  } catch {
+    return res.status(400).json({ success: false, error: 'Could not read that file' });
+  }
+  if (buffer.length === 0) return res.status(400).json({ success: false, error: 'That file appears to be empty' });
+  if (buffer.length > MAX_LOGO_BYTES) return res.status(400).json({ success: false, error: 'Logo must be under 3MB' });
+
+  try {
+    const { v4: uuidv4 } = require('uuid');
+    const path = `${id}/${uuidv4()}.${ext}`;
+    const supabase = getStorageSupabase();
+    const { error: uploadErr } = await supabase.storage
+      .from(LOGO_BUCKET)
+      .upload(path, buffer, { contentType, upsert: false });
+    if (uploadErr) throw uploadErr;
+
+    const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(path);
+    res.json({ success: true, data: { url: data.publicUrl } });
+  } catch (err) {
+    console.error('Company logo upload error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to upload logo. You can paste an image URL instead.' });
   }
 });
 

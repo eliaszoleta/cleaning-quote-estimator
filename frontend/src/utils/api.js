@@ -40,6 +40,15 @@ export async function patchCompanyServices(token, companyId, services) {
   });
 }
 
+// BrandingTab.js -- separate from uploadPartnerLogo below since this one
+// requires the company's own auth token (partner logo upload is a public,
+// no-auth endpoint used pre-signup during checkout).
+export async function uploadCompanyLogo(token, companyId, { contentType, dataBase64 }) {
+  return apiFetch(`/api/company/${companyId}/upload-logo`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ contentType, dataBase64 }),
+  });
+}
+
 export async function getSubscriptionStatus(token) {
   return apiFetch('/api/subscription/status', { headers: { Authorization: `Bearer ${token}` } });
 }
