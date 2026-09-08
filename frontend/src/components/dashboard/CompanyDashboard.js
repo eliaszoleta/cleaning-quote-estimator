@@ -19,15 +19,15 @@ import HelpTab from './tabs/HelpTab';
 
 const NAV = [
   { id: 'overview',      Icon: LayoutDashboard,   label: 'Overview' },
-  { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
-  { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
+  { id: 'leads',         Icon: Users,              label: 'Leads' },
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
+  { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
   { id: 'discount',      Icon: Percent,            label: 'Discount' },
   { id: 'embed',         Icon: Code2,              label: 'Embed Widget' },
-  { id: 'leads',         Icon: Users,              label: 'Leads' },
+  { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
   { id: 'subscription',  Icon: CreditCard,         label: 'Subscription' },
-  { id: 'api',           Icon: KeyRound,           label: 'API Keys' },
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
+  { id: 'api',           Icon: KeyRound,           label: 'API Keys' },
 ];
 
 export default function CompanyDashboard({ user, onLogout }) {
