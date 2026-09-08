@@ -8,6 +8,11 @@ export function useCompanyConfig(userId) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [saved, setSaved] = useState(false);
+  // true only on the very first fetch after account creation -- see the
+  // `created` comment on GET /api/company/:id. Used to show a one-time
+  // "first time here?" pointer to Help & Docs; not reset on refetch since
+  // a mid-session config reload shouldn't bring the welcome prompt back.
+  const [justCreated, setJustCreated] = useState(false);
 
   const fetchConfig = useCallback(async () => {
     if (!userId) return;
@@ -19,6 +24,7 @@ export function useCompanyConfig(userId) {
       if (!token) throw new Error('Not authenticated');
       const res = await getCompanyConfig(token, userId);
       setConfig(res.data);
+      if (res.created) setJustCreated(true);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -77,5 +83,5 @@ export function useCompanyConfig(userId) {
     }
   }, [userId]);
 
-  return { config, loading, saving, saved, error, saveConfig, patchServices, refetch: fetchConfig };
+  return { config, loading, saving, saved, error, saveConfig, patchServices, refetch: fetchConfig, justCreated };
 }

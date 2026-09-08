@@ -34,7 +34,8 @@ export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [subStatus, setSubStatus] = useState(null);
   const [localConfig, setLocalConfig] = useState(null);
-  const { config, loading, saving, saved, error, saveConfig, patchServices, refetch } = useCompanyConfig(user.id);
+  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
+  const { config, loading, saving, saved, error, saveConfig, patchServices, refetch, justCreated } = useCompanyConfig(user.id);
 
   const localConfigReady = useRef(false);
   useEffect(() => {
@@ -134,6 +135,7 @@ export default function CompanyDashboard({ user, onLogout }) {
 
   const isPaused = subStatus && !subStatus.active;
   const deletionPending = config?.pendingDeletion;
+  const showWelcome = justCreated && !welcomeDismissed;
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9' }}>
@@ -318,6 +320,46 @@ export default function CompanyDashboard({ user, onLogout }) {
           </p>
         </main>
       </div>
+
+      {/* First-time welcome pointer -- shown exactly once, on the very
+          first login after signup (see the `created` comment on
+          GET /api/company/:id and useCompanyConfig.js's justCreated).
+          Points straight at Help & Docs rather than dumping onboarding
+          content in a modal, since that tab already covers how pricing
+          works and how to set everything up -- no need to duplicate it. */}
+      {showWelcome && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 20 }}
+          onClick={() => setWelcomeDismissed(true)}
+        >
+          <div
+            style={{ background: 'white', borderRadius: 16, padding: '32px 30px', maxWidth: 420, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.35)', textAlign: 'center' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ width: 52, height: 52, borderRadius: 14, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <HelpCircle size={26} color="#2563eb" />
+            </div>
+            <h3 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Welcome to Clean Estimator!</h3>
+            <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, marginBottom: 24 }}>
+              New here? Start with <strong>Help &amp; Docs</strong> — it walks you through how pricing works and how to set up your branding, service area, and embed code before you dive in.
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              <button
+                onClick={() => { setActiveTab('help'); setWelcomeDismissed(true); }}
+                style={{ background: '#2563eb', color: 'white', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, cursor: 'pointer', fontSize: 13.5 }}
+              >
+                Go to Help &amp; Docs →
+              </button>
+              <button
+                onClick={() => setWelcomeDismissed(true)}
+                style={{ background: 'transparent', color: '#64748b', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: 13.5 }}
+              >
+                Maybe later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

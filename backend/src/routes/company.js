@@ -85,7 +85,12 @@ router.get('/:id', requireAuth, async (req, res) => {
         .catch(err => console.error('Company welcome email failed:', err.message));
     }
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, data: { ...config, serviceCities: normalizeServiceCities(config) } });
+    // created: true only on the account's very first GET, when this row
+    // didn't exist yet -- lets the dashboard show a first-time welcome
+    // pointer to the Help & Docs tab exactly once, without needing its own
+    // localStorage/dismissal tracking (every GET after this one for the
+    // same account returns false, forever).
+    res.json({ success: true, created, data: { ...config, serviceCities: normalizeServiceCities(config) } });
   } catch (err) {
     console.error('GET company config error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to load configuration' });
