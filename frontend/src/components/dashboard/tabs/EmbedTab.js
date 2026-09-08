@@ -69,7 +69,7 @@ export default function EmbedTab({ config, user }) {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <EmbedCard title="Standard iFrame" badge="Recommended" desc="Works on any website. Paste inside your page's HTML." code={iframeCode} onCopy={() => copy(iframeCode, 'iframe')} copied={copied === 'iframe'} />
+        <EmbedCard title="Standard iFrame" badge="Recommended" desc="Works on any website. Add a block or section wherever you want it to show up on the page — left, right, or centered — and paste this code there." code={iframeCode} onCopy={() => copy(iframeCode, 'iframe')} copied={copied === 'iframe'} />
         <EmbedCard title="JavaScript Snippet" desc="Dynamically injects the widget. Good for CMS platforms." code={scriptCode} onCopy={() => copy(scriptCode, 'script')} copied={copied === 'script'} />
         <EmbedCard title="WordPress Shortcode" desc="Install the Clean Estimator WordPress plugin, then paste this shortcode." code={wordpressCode} onCopy={() => copy(wordpressCode, 'wp')} copied={copied === 'wp'} />
 
