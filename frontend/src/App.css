@@ -227,6 +227,20 @@ img { max-width: 100%; height: auto; }
   text-transform: uppercase; letter-spacing: 0.05em;
 }
 
+/* ─── Homepage calculator/sidebar flex order ─────────────────────────────────
+   See App.js's comment on the flex wrapper around <CleaningCalculator> and
+   <AffiliateSidebar>: DOM order is calculator-then-sidebar (correct for
+   mobile's stacked fallback), but AffiliateSidebar's desktop sticky mode
+   needs to be visually first for its "stick immediately from top:90" trick
+   to work. `order` reconciles the two per breakpoint instead of needing
+   different DOM order for each. 1220px matches AffiliateSidebar's own
+   default desktop breakpoint (DESKTOP_BREAKPOINT in AffiliateSidebar.js) --
+   keep these in sync if that default ever changes. */
+.home-affiliate-slot { order: 1; }
+@media (min-width: 1220px) {
+  .home-affiliate-slot { order: -1; }
+}
+
 /* ─── Utility ─────────────────────────────────────────────────────────────── */
 .text-muted { color: var(--text-muted); }
 .text-sm { font-size: 13px; }

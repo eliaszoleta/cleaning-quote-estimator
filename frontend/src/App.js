@@ -290,16 +290,19 @@ export default function App() {
               (224 -- see LEFT_OFFSET + SIDEBAR_WIDTH), rounded up: above
               it there's already enough margin next to the wider section
               too, so the sidebar stays visible for the whole page instead
-              of disappearing there. */}
-          <div style={{ position: 'relative' }}>
-            {/* Rendered before CleaningCalculator on purpose: this has
-                height:0, so it doesn't affect layout, but its natural
-                (non-stuck) flow position is what position:sticky measures
-                from -- placed first, that position is the very top of this
-                box, letting it stick from top:90 immediately instead of
-                only after scrolling past the calculator's own height. */}
-            <AffiliateSidebar mode="sticky" wideBreakpoint={1560} />
+              of disappearing there.
+              display:flex + the "home-affiliate-slot" class (App.css) is
+              what lets DOM order stay natural (calculator, then sidebar)
+              while still satisfying two conflicting layout needs: on
+              desktop, the sticky mode needs its element to sit FIRST so
+              position:sticky's "natural" offset starts at the top of this
+              box, letting it stick from top:90 immediately; on mobile, the
+              stacked fallback needs to render AFTER the calculator, not
+              before it. CSS `order` (set per breakpoint in App.css)
+              reconciles both without duplicating DOM order per viewport. */}
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
             <CleaningCalculator />
+            <AffiliateSidebar mode="sticky" wideBreakpoint={1560} className="home-affiliate-slot" />
           </div>
           <SEOContent />
         </main>

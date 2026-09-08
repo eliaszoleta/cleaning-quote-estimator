@@ -225,6 +225,15 @@ function SidebarInner({ floating, dense }) {
 // everything -- in a single 900px-wide column, so the default 1220px
 // cutoff (which only guarantees clearance against a 760px column) would
 // let the sidebar overlap that wider content between ~1220-1360px.
+// className: applied to the in-flow root element only (the sticky-mode div
+// and the mobile/stacked fallback div) -- not the portal/fixed div, which
+// renders into document.body and isn't part of this component's layout
+// flow. Lets a caller control this element's position within its own flex
+// layout (e.g. via the `order` property) without needing DOM order itself
+// to differ between desktop and mobile -- see App.js's use of this for the
+// homepage, where mode="sticky" needs this element FIRST for the sticky
+// offset trick to work, but mobile's stacked fallback needs it visually
+// AFTER the calculator.
 // wideBreakpoint: only meaningful with mode="sticky". Sticky mode exists
 // so the sidebar doesn't overlap a wider section further down the page --
 // but on a big enough monitor, there's already plenty of margin next to
@@ -232,7 +241,7 @@ function SidebarInner({ floating, dense }) {
 // a real overlap risk. Once the viewport clears this width, mode="sticky"
 // is upgraded in place to the same always-visible behavior as mode="fixed"
 // instead of stopping at the calculator.
-export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true, mode = 'fixed', desktopBreakpoint = DESKTOP_BREAKPOINT, wideBreakpoint = null }) {
+export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true, mode = 'fixed', desktopBreakpoint = DESKTOP_BREAKPOINT, wideBreakpoint = null, className }) {
   const [isDesktop, setIsDesktop] = useState(() => computeIsDesktop(desktopBreakpoint));
   const [isDense, setIsDense] = useState(computeIsDense);
   const [isWide, setIsWide] = useState(() => wideBreakpoint != null && computeIsDesktop(wideBreakpoint));
@@ -270,7 +279,7 @@ export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true,
     // to this sticky element's own box (which spans the wrapper's full
     // width), so it lands LEFT_OFFSET from the left edge same as 'fixed'.
     return (
-      <div style={{ position: 'sticky', top: TOP_OFFSET, height: 0, overflow: 'visible', zIndex: 40 }}>
+      <div className={className} style={{ position: 'sticky', top: TOP_OFFSET, height: 0, overflow: 'visible', zIndex: 40 }}>
         <div style={{ position: 'absolute', top: 0, left: LEFT_OFFSET }}>
           <SidebarInner floating dense={isDense} />
         </div>
@@ -298,7 +307,7 @@ export default function AffiliateSidebar({ contentMaxWidth = 720, padded = true,
   }
 
   return (
-    <div style={{ maxWidth: contentMaxWidth, margin: '0 auto', padding: padded ? '0 20px clamp(28px, 6vw, 44px)' : '0 0 clamp(28px, 6vw, 44px)' }}>
+    <div className={className} style={{ maxWidth: contentMaxWidth, margin: '0 auto', padding: padded ? '0 20px clamp(28px, 6vw, 44px)' : '0 0 clamp(28px, 6vw, 44px)' }}>
       <SidebarInner floating={false} dense />
     </div>
   );
