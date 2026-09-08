@@ -189,7 +189,7 @@ export default function AdminCompanies() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
           <div>
             <div style={{ fontWeight: 800, fontSize: 24, color: '#0f172a' }}>Company Accounts</div>
-            <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Every business subscribed to the embeddable calculator.</div>
+            <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Every business subscribed to the embeddable estimator.</div>
           </div>
           <button onClick={() => load(adminKey)} disabled={loading} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 9, padding: '9px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
             <RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh

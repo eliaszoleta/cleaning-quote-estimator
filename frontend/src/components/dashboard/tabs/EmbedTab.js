@@ -65,7 +65,7 @@ export default function EmbedTab({ config, user }) {
     <div>
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Embed Your Widget</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Paste the code below anywhere on your website to embed your branded calculator.</p>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Paste the code below anywhere on your website to embed your branded estimator.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

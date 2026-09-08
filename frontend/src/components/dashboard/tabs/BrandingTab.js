@@ -83,7 +83,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
     <div>
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Widget Branding</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Customize how your calculator looks on your website.</p>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Customize how your estimator looks on your website.</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'start' }}>
@@ -113,7 +113,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
           </Card>
 
           <Card title="Typography">
-            <Field label="Widget font" hint="Match the font your own website already uses -- shown across every step of the calculator, not just the results page.">
+            <Field label="Widget font" hint="Match the font your own website already uses -- shown across every step of the estimator, not just the results page.">
               <select
                 value={form.fontFamily}
                 onChange={e => set('fontFamily', e.target.value)}

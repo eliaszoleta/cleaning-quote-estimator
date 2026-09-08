@@ -20,10 +20,10 @@ const FAQ = [
   },
   {
     q: 'Why does it show a price range instead of one exact number?',
-    a: "So it reads as an estimate, not a quote you're bound to. Actual price still depends on things only an in-person look can confirm (real condition, access, etc.) — a range sets that expectation upfront instead of a visitor holding you to a single number sight-unseen. Every price on both the public cleanestimator.com calculator and your embedded widget works this way.",
+    a: "So it reads as an estimate, not a quote you're bound to. Actual price still depends on things only an in-person look can confirm (real condition, access, etc.) — a range sets that expectation upfront instead of a visitor holding you to a single number sight-unseen. Every price on both cleanestimator.com and your embedded widget works this way.",
   },
   {
-    q: 'Is my embedded widget the same calculator as the public cleanestimator.com site?',
+    q: 'Is my embedded widget the same estimator as the public cleanestimator.com site?',
     a: "Same pricing engine and same range-based output, yes — the only difference is your branding, your markup/minimums, and which services and states you've enabled. A visitor on your widget and a visitor on the public site entering identical job details get the identical base calculation before your markup is applied.",
   },
   {
@@ -40,11 +40,11 @@ const FAQ = [
   },
   {
     q: 'What happens if I disable a service?',
-    a: 'It disappears from the "What service do you need?" screen on your embedded calculator entirely — visitors won\'t see it as an option at all, not even a grayed-out one.',
+    a: 'It disappears from the "What service do you need?" screen on your embedded estimator entirely — visitors won\'t see it as an option at all, not even a grayed-out one.',
   },
   {
     q: 'What does the minimum charge field actually do?',
-    a: 'It puts a floor under the calculated price for that service. If the formula would come out below your minimum for a very small job, the calculator shows your minimum instead. Leave it blank if you don\'t want a floor.',
+    a: 'It puts a floor under the calculated price for that service. If the formula would come out below your minimum for a very small job, the estimator shows your minimum instead. Leave it blank if you don\'t want a floor.',
   },
   {
     q: 'A visitor picked Weekly/Bi-Weekly/Monthly but the price didn\'t go down — why?',
@@ -94,16 +94,16 @@ export default function HelpTab() {
     <div style={{ maxWidth: 680 }}>
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Help &amp; Documentation</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>How the calculator works, and how to make it price things the way you want.</p>
+        <p style={{ color: '#64748b', fontSize: 14 }}>How the estimator works, and how to make it price things the way you want.</p>
       </div>
 
       <div style={cardStyle}>
         <div style={sectionTitle}>
           <div style={iconBadge('#eff6ff')}><Calculator size={16} color="#2563eb" /></div>
-          How the calculator works, end to end
+          How the estimator works, end to end
         </div>
         <p style={pStyle}>
-          A visitor lands on your website, opens the embedded calculator, and picks a service (house cleaning, carpet cleaning, etc. — whichever you've enabled). They answer a few quick questions about the job — home size, number of bedrooms/bathrooms, condition, how often they want service — and their location.
+          A visitor lands on your website, opens the embedded estimator, and picks a service (house cleaning, carpet cleaning, etc. — whichever you've enabled). They answer a few quick questions about the job — home size, number of bedrooms/bathrooms, condition, how often they want service — and their location.
         </p>
         <p style={pStyle}>
           Clean Estimator calculates a price range from that: a base rate for the service, adjusted for their state's typical cost of living, adjusted again for the specific details they entered, and finally multiplied by <strong>your</strong> markup. They see an instant price range, no phone call needed — and if they leave their email, you get notified with their contact info the moment it happens (check your inbox, or the Leads tab).
@@ -116,7 +116,7 @@ export default function HelpTab() {
           Where the pricing data actually comes from
         </div>
         <p style={pStyle}>
-          Every base price in the calculator is built from real market research — published rate surveys, provider pricing pages, and industry cost data across residential and commercial cleaning companies nationwide. Nothing is invented and worked backward from a "nice-looking" number.
+          Every base price in the estimator is built from real market research — published rate surveys, provider pricing pages, and industry cost data across residential and commercial cleaning companies nationwide. Nothing is invented and worked backward from a "nice-looking" number.
         </p>
         <p style={pStyle}>
           As one concrete check: our House Cleaning base for a 1,500–2,000 sq ft home is <strong>$158–$198</strong>. Independently published guides from Angi and HomeAdvisor put the same job at <strong>$118–$238</strong> (averaging ~$176) — squarely inside that range. Same pattern holds for carpet cleaning, air duct cleaning, mold remediation, and dryer vent cleaning.
@@ -195,7 +195,7 @@ export default function HelpTab() {
           Four scenarios, side by side
         </div>
         <p style={pStyle}>
-          Same House Cleaning job (1,500–2,000 sq ft, 3 bed / 2 bath, standard, good condition, one-time) unless noted — real numbers from the calculator, not rounded for illustration.
+          Same House Cleaning job (1,500–2,000 sq ft, 3 bed / 2 bath, standard, good condition, one-time) unless noted — real numbers from the estimator, not rounded for illustration.
         </p>
 
         <p style={{ ...pStyle, fontWeight: 700, color: '#0f172a', marginBottom: 6 }}>A. Same job, different states — your markup stays at 1.0</p>
@@ -260,10 +260,10 @@ export default function HelpTab() {
           What "Min $" actually does
         </div>
         <p style={pStyle}>
-          It's a price floor for that service — the lowest number the calculator will ever show, no matter how small the job is.
+          It's a price floor for that service — the lowest number the estimator will ever show, no matter how small the job is.
         </p>
         <p style={pStyle}>
-          Here's why it exists: your pricing formula calculates based on job size (sqft, bedrooms, etc.). For a tiny job — say a studio apartment — the math might come out to something like $65. But driving out, bringing supplies, and cleaning a house isn't worth doing for $65 for most businesses. So instead of showing that low number, you set a floor, and the calculator shows that instead.
+          Here's why it exists: your pricing formula calculates based on job size (sqft, bedrooms, etc.). For a tiny job — say a studio apartment — the math might come out to something like $65. But driving out, bringing supplies, and cleaning a house isn't worth doing for $65 for most businesses. So instead of showing that low number, you set a floor, and the estimator shows that instead.
         </p>
         <p style={{ ...pStyle, marginBottom: 6 }}>A real example, using typical minimum charges:</p>
         <ul style={{ ...pStyle, margin: '0 0 10px', paddingLeft: 20 }}>
@@ -275,7 +275,7 @@ export default function HelpTab() {
           It only ever <em>raises</em> a price that would've calculated too low — it never lowers anything. If the formula naturally comes out above your minimum (e.g. a big 4-bedroom house), the minimum does nothing at all; the visitor just sees the real calculated price.
         </p>
         <p style={{ ...pStyle, marginBottom: 0 }}>
-          Leave it blank for any service and there's simply no floor — the calculator will show whatever the math produces, even if that's very low for a very small job.
+          Leave it blank for any service and there's simply no floor — the estimator will show whatever the math produces, even if that's very low for a very small job.
         </p>
       </div>
 
@@ -288,7 +288,7 @@ export default function HelpTab() {
           At the top of the Services tab, add the state(s) your business actually serves. This doesn't change any pricing math — the state cost-of-living adjustment already applies automatically regardless — it changes what your visitors get <em>asked</em>.
         </p>
         <p style={pStyle}>
-          Leave it empty and visitors pick from a generic list of all 50 states, same as the main cleanestimator.com calculator. Add exactly <strong>one</strong> state and that question disappears entirely — visitors just tell you their <strong>city</strong> instead, which is more relevant to a business that only serves one state anyway. Add a <strong>few</strong> states and they pick from just those, not the full US list.
+          Leave it empty and visitors pick from a generic list of all 50 states, same as the main cleanestimator.com site. Add exactly <strong>one</strong> state and that question disappears entirely — visitors just tell you their <strong>city</strong> instead, which is more relevant to a business that only serves one state anyway. Add a <strong>few</strong> states and they pick from just those, not the full US list.
         </p>
         <p style={{ ...pStyle, marginBottom: 0 }}>
           Once you've added a state, a second list appears below it — <strong>Cities/Towns You Serve</strong>. List the specific ones you cover and visitors pick from a dropdown of just those instead of typing a city freely. Leave it empty and they can type anything.
@@ -300,7 +300,7 @@ export default function HelpTab() {
           <div style={iconBadge('#fff7ed')}><Map size={16} color="#ea580c" /></div>
           What actually moves the price, per job
         </div>
-        <p style={pStyle}>Beyond your markup, the price a specific visitor sees depends on details only they control, entered right in the calculator:</p>
+        <p style={pStyle}>Beyond your markup, the price a specific visitor sees depends on details only they control, entered right in the estimator:</p>
         <ul style={{ ...pStyle, margin: 0, paddingLeft: 20 }}>
           <li><strong>Size</strong> — square footage, bedrooms, bathrooms (house/apartment), or square footage alone (commercial, carpet, tile, air duct).</li>
           <li><strong>Condition</strong> — standard vs. deep-clean vs. move-in/move-out, or "how dirty is it" for carpet/tile/mold jobs.</li>

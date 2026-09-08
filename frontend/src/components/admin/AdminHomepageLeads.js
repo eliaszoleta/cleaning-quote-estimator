@@ -275,7 +275,7 @@ export default function AdminHomepageLeads() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
           <div>
             <div style={{ fontWeight: 800, fontSize: 24, color: '#0f172a' }}>Homepage Leads</div>
-            <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Everyone who opted in for their estimate by email through the main calculator on cleanestimator.com — not tied to any subscriber account.</div>
+            <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Everyone who opted in for their estimate by email through the main estimator on cleanestimator.com — not tied to any subscriber account.</div>
           </div>
         </div>
 
@@ -376,7 +376,7 @@ export default function AdminHomepageLeads() {
                     ? 'Try changing your search or filter.'
                     : view === 'trash'
                       ? 'Leads you archive show up here, and can be restored.'
-                      : 'Leads submitted through the main calculator on cleanestimator.com will show up here.'}
+                      : 'Leads submitted through the main estimator on cleanestimator.com will show up here.'}
                 </p>
               </div>
             ) : (

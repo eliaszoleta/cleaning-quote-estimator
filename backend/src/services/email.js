@@ -49,7 +49,7 @@ function fmtPhone(value) {
 
 // Appended to lead-notification subject lines so each one is unique --
 // otherwise every lead for the same service type shares the exact same
-// subject text ("New House Cleaning lead on your calculator"), and Gmail
+// subject text ("New House Cleaning lead on your estimator"), and Gmail
 // (and most other clients) groups emails with matching subjects into one
 // conversation thread, burying every lead but the first under "N more"
 // instead of each landing as its own visible email.
@@ -577,9 +577,9 @@ function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, pr
   const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, zip, timeline });
 
   const lines = [
-    `New lead on your ${companyName} calculator!`,
+    `New lead on your ${companyName} estimator!`,
     '',
-    `${name} just got a ${serviceLabel.toLowerCase()} estimate on your embedded calculator: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}.`,
+    `${name} just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}.`,
     '',
     'Contact info:',
     ...contactLines.map(l => `  ${l}`),
@@ -637,10 +637,10 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
 
   return `
 <div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead on your ${companyName} calculator!</p>
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead on your ${companyName} estimator!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on your embedded calculator: <strong>${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</strong>.
+    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: <strong>${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</strong>.
   </p>
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
@@ -661,7 +661,7 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
 }
 
 // Sent to a company subscriber the moment a visitor completes an estimate
-// on THEIR embedded calculator widget (as opposed to sendEstimateEmail,
+// on THEIR embedded estimator widget (as opposed to sendEstimateEmail,
 // which goes to the visitor themselves). Reply-to is the lead's own email
 // so the company can just hit reply, same pattern as sendPartnerLeadEmail.
 // Fire-and-forget, called from calculate.js whenever companyId is present.
@@ -686,7 +686,7 @@ async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, lead
         from: `Clean Estimator <${fromAddress}>`,
         to: [to],
         reply_to: leadEmail || undefined,
-        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead on your calculator — ${fmtSubjectTimestamp()}`,
+        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead on your estimator — ${fmtSubjectTimestamp()}`,
         html: buildCompanyLeadHtml(args),
         text: buildCompanyLeadText(args),
       },
@@ -732,18 +732,18 @@ function buildCompanyWelcomeText({ companyId }) {
   return [
     'Welcome to Clean Estimator!',
     '',
-    "Your account is live and your embedded calculator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:",
+    "Your account is live and your embedded estimator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:",
     '',
     buildEmbedIframeCode(companyId),
     '',
-    "Paste that anywhere in your website's HTML — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The calculator will appear right there and resize itself to fit.",
+    "Paste that anywhere in your website's HTML — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The estimator will appear right there and resize itself to fit.",
     '',
     "Two things are already working, no setup needed: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.",
     '',
     'Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard:',
     'https://www.cleanestimator.com/company?tab=branding',
     '',
-    'New to Clean Estimator? Log in to your dashboard and open the Help & Docs tab — it walks through how the calculator works, how pricing is calculated (with the real data behind it), and answers to the most common questions:',
+    'New to Clean Estimator? Log in to your dashboard and open the Help & Docs tab — it walks through how the estimator works, how pricing is calculated (with the real data behind it), and answers to the most common questions:',
     'https://www.cleanestimator.com/company?tab=help',
     '',
     "You can always get this same code later from the Embed Widget tab.",
@@ -759,13 +759,13 @@ function buildCompanyWelcomeHtml({ companyId }) {
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Welcome to Clean Estimator!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your account is live and your embedded calculator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:
+    Your account is live and your embedded estimator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:
   </p>
 
   <pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-family:'Menlo','Monaco',monospace;font-size:11.5px;line-height:1.6;color:#334155;white-space:pre-wrap;word-break:break-all;margin:0 0 20px;">${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Paste that anywhere in your website's HTML — a <strong>Custom HTML / Embed block</strong> in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The calculator will appear right there and resize itself to fit.
+    Paste that anywhere in your website's HTML — a <strong>Custom HTML / Embed block</strong> in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The estimator will appear right there and resize itself to fit.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
@@ -781,7 +781,7 @@ function buildCompanyWelcomeHtml({ companyId }) {
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    New to Clean Estimator? Open the <a href="https://www.cleanestimator.com/company?tab=help" style="color:#2563eb;font-weight:700;">Help &amp; Docs</a> tab in your dashboard — it walks through how the calculator works, how pricing is calculated (with the real data behind it), and answers to the most common questions.
+    New to Clean Estimator? Open the <a href="https://www.cleanestimator.com/company?tab=help" style="color:#2563eb;font-weight:700;">Help &amp; Docs</a> tab in your dashboard — it walks through how the estimator works, how pricing is calculated (with the real data behind it), and answers to the most common questions.
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
@@ -841,7 +841,7 @@ function buildTrialEndingSoonText({ companyName, daysLeft }) {
   return [
     `Hi ${companyName},`,
     '',
-    `Your free Clean Estimator trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. After that, your embedded calculator will pause on your website until you subscribe.`,
+    `Your free Clean Estimator trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. After that, your embedded estimator will pause on your website until you subscribe.`,
     '',
     'Subscribe now to keep it running without interruption:',
     'https://www.cleanestimator.com/company?tab=subscription',
@@ -858,7 +858,7 @@ function buildTrialEndingSoonHtml({ companyName, daysLeft }) {
   <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your free Clean Estimator trial ends in <strong>${daysLeft} day${daysLeft === 1 ? '' : 's'}</strong>. After that, your embedded calculator will pause on your website until you subscribe.
+    Your free Clean Estimator trial ends in <strong>${daysLeft} day${daysLeft === 1 ? '' : 's'}</strong>. After that, your embedded estimator will pause on your website until you subscribe.
   </p>
 
   <p style="margin:0 0 20px;">
@@ -1152,7 +1152,7 @@ function buildTrialEndedText({ companyName }) {
   return [
     `Hi ${companyName},`,
     '',
-    "Your 30-day free Clean Estimator trial has ended, and your embedded calculator is now paused on your website -- visitors will see a paused notice instead of the calculator until you subscribe.",
+    "Your 30-day free Clean Estimator trial has ended, and your embedded estimator is now paused on your website -- visitors will see a paused notice instead of the estimator until you subscribe.",
     '',
     'Subscribe now to turn it back on:',
     'https://www.cleanestimator.com/company?tab=subscription',
@@ -1167,7 +1167,7 @@ function buildTrialEndedHtml({ companyName }) {
   <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your 30-day free Clean Estimator trial has ended, and your embedded calculator is now <strong>paused</strong> on your website — visitors will see a paused notice instead of the calculator until you subscribe.
+    Your 30-day free Clean Estimator trial has ended, and your embedded estimator is now <strong>paused</strong> on your website — visitors will see a paused notice instead of the estimator until you subscribe.
   </p>
 
   <p style="margin:0 0 20px;">
@@ -1202,7 +1202,7 @@ async function sendTrialEndedEmail({ to, companyName }) {
       {
         from: `Clean Estimator <${fromAddress}>`,
         to: [to],
-        subject: 'Your Clean Estimator calculator has been paused',
+        subject: 'Your Clean Estimator widget has been paused',
         html: buildTrialEndedHtml({ companyName }),
         text: buildTrialEndedText({ companyName }),
       },
@@ -1228,7 +1228,7 @@ function buildAccountDeletionScheduledText({ companyName, scheduledFor }) {
     '',
     `We've received your request to delete your Clean Estimator account. Your account, leads, and settings are scheduled to be permanently deleted on ${dateStr} (30 days from today).`,
     '',
-    "Your embedded calculator has been paused in the meantime, but nothing has been deleted yet -- you can still log in any time before then to change your mind.",
+    "Your embedded estimator has been paused in the meantime, but nothing has been deleted yet -- you can still log in any time before then to change your mind.",
     '',
     'Changed your mind? Log in and click "Cancel Deletion" in Settings:',
     'https://www.cleanestimator.com/company?tab=settings',
@@ -1248,7 +1248,7 @@ function buildAccountDeletionScheduledHtml({ companyName, scheduledFor }) {
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your embedded calculator has been paused in the meantime, but nothing has been deleted yet — you can still log in any time before then to change your mind.
+    Your embedded estimator has been paused in the meantime, but nothing has been deleted yet — you can still log in any time before then to change your mind.
   </p>
 
   <p style="margin:0 0 20px;">

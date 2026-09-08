@@ -351,7 +351,7 @@ export default function AuthPage({ onAuth }) {
         )}
 
         <div style={{ textAlign: 'center', marginTop: 24, paddingTop: 22, borderTop: '1px solid #f1f5f9' }}>
-          <a href="/" style={{ color: '#94a3b8', fontSize: 13, textDecoration: 'none' }}>← Back to calculator</a>
+          <a href="/" style={{ color: '#94a3b8', fontSize: 13, textDecoration: 'none' }}>← Back to Clean Estimator</a>
         </div>
       </div>
     </div>

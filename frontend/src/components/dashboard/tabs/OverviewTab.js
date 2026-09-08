@@ -103,7 +103,7 @@ export default function OverviewTab({ config, subStatus, user }) {
             </div>
             <div style={{ fontWeight: 700, color: '#374151', marginBottom: 6, fontSize: 15 }}>No leads yet</div>
             <p style={{ color: '#94a3b8', fontSize: 13, maxWidth: 300, margin: '0 auto' }}>
-              Embed your calculator on your website to start capturing leads automatically.
+              Embed your estimator on your website to start capturing leads automatically.
             </p>
           </div>
         ) : (

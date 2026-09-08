@@ -4,14 +4,14 @@ import { postCheckout, postPortal } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 
 const FEATURES = [
-  { Icon: Globe,             text: 'Embeddable calculator widget on your website' },
+  { Icon: Globe,             text: 'Embeddable estimator widget on your website' },
   { Icon: Paintbrush,        text: 'Custom branding — colors, logo, CTA text' },
   { Icon: Users,             text: 'Lead capture & CRM dashboard' },
   { Icon: SlidersHorizontal, text: 'Per-service enable/disable and markup control' },
   { Icon: KeyRound,          text: 'API access for CRM integration' },
   { Icon: BarChart3,         text: 'Lead analytics and CSV export' },
   { Icon: Phone,             text: 'Priority support' },
-  { Icon: Infinity,          text: 'Unlimited calculator sessions per month' },
+  { Icon: Infinity,          text: 'Unlimited estimator sessions per month' },
 ];
 
 export default function SubscriptionTab({ subStatus, onSubRefresh }) {

@@ -373,7 +373,7 @@ export default function LeadsTab({ user }) {
                 ? 'Try changing your search or filter.'
                 : view === 'trash'
                   ? "Leads you archive show up here, and can be restored."
-                  : 'Embed your calculator to start capturing leads.'}
+                  : 'Embed your estimator to start capturing leads.'}
             </p>
           </div>
         ) : (
