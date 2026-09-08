@@ -190,7 +190,7 @@ export default function Header() {
               onMouseEnter={e => { e.target.style.background = '#eff6ff'; }}
               onMouseLeave={e => { e.target.style.background = 'transparent'; }}
             >
-              Partner With Us
+              Get Leads
             </a>
             <a
               href="/for-companies"
@@ -228,7 +228,7 @@ export default function Header() {
             );
           })}
           <a href="/partner-with-us" style={{ ...styles.navLink, display: 'block', padding: '10px 12px', color: '#1e40af', fontWeight: 700 }}>
-            Partner With Us
+            Get Leads
           </a>
           <a href="/company" style={{ ...styles.cta, display: 'block', textAlign: 'center', marginLeft: 0, marginTop: 8 }}>
             Company Login →
