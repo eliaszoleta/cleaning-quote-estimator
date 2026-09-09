@@ -2,7 +2,6 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FileQuestion, Lightbulb, ArrowRight } from 'lucide-react';
 import { getPostBySlug, BLOG_POSTS } from '../../data/blogPosts';
-import AffiliateSidebar from '../ui/AffiliateSidebar';
 
 // Simple markdown-to-HTML renderer (tables, headers, bold, lists, links)
 function renderMarkdown(md) {
@@ -190,16 +189,6 @@ export default function BlogPost({ slug }) {
           <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Get a Free Local Estimate</h3>
           <p style={{ color: '#94a3b8', marginBottom: 20, fontSize: 15 }}>Our calculator gives ZIP-code specific prices across all 50 states. Free and instant.</p>
           <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '14px 32px', borderRadius: 11, textDecoration: 'none', fontWeight: 700, fontSize: 16, boxShadow: '0 4px 16px rgba(37,99,235,0.3)' }}>Calculate My Cost →</a>
-        </div>
-
-        {/* Affiliate picks -- floats in the left margin on a wide viewport
-            (same as the homepage), or renders right here, stacked, on a
-            narrower one. Placed after the article body so a narrow-viewport
-            reader hits it after finishing the post, not before the title.
-            padded=false: already inside this page's own 760px, 24px-padded
-            content column, so it doesn't need its own gutter on top. */}
-        <div style={{ marginTop: 40 }}>
-          <AffiliateSidebar contentMaxWidth={760} padded={false} />
         </div>
 
         {/* Related posts */}

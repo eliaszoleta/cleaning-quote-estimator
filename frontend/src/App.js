@@ -13,7 +13,6 @@ import ClientPortal from './components/client/ClientPortal';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import SEOContent from './components/ui/SEOContent';
-import AffiliateSidebar from './components/ui/AffiliateSidebar';
 import BlogIndex from './components/blog/BlogIndex';
 import BlogPost from './components/blog/BlogPost';
 import BlogCategory from './components/blog/BlogCategory';
@@ -280,30 +279,7 @@ export default function App() {
       <div className="app">
         <Header />
         <main>
-          {/* position:relative scopes the sticky sidebar's stick range to
-              just the calculator's own height -- see AffiliateSidebar's
-              mode="sticky" comment. Below wideBreakpoint, once this box
-              scrolls past (into SEOContent's wider #services section
-              below, 1100px wide), the sidebar scrolls away with it instead
-              of overlapping that content. wideBreakpoint=1560 is that
-              content's width (1100) plus twice the sidebar's own reach
-              (224 -- see LEFT_OFFSET + SIDEBAR_WIDTH), rounded up: above
-              it there's already enough margin next to the wider section
-              too, so the sidebar stays visible for the whole page instead
-              of disappearing there.
-              display:flex + the "home-affiliate-slot" class (App.css) is
-              what lets DOM order stay natural (calculator, then sidebar)
-              while still satisfying two conflicting layout needs: on
-              desktop, the sticky mode needs its element to sit FIRST so
-              position:sticky's "natural" offset starts at the top of this
-              box, letting it stick from top:90 immediately; on mobile, the
-              stacked fallback needs to render AFTER the calculator, not
-              before it. CSS `order` (set per breakpoint in App.css)
-              reconciles both without duplicating DOM order per viewport. */}
-          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-            <CleaningCalculator />
-            <AffiliateSidebar mode="sticky" wideBreakpoint={1560} className="home-affiliate-slot" />
-          </div>
+          <CleaningCalculator />
           <SEOContent />
         </main>
         <Footer />
