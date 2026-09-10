@@ -85,7 +85,10 @@ function WidgetPreview() {
             yourcompany.com
           </div>
         </div>
-        <div style={{ height: 480, overflowY: 'auto' }}>
+        {/* ce-widget-mockup scopes the square-card look to just this preview
+            -- the real ServiceSelect cards (homepage, every embedded
+            widget) keep their normal rounded corners. */}
+        <div className="ce-widget-mockup" style={{ height: 480, overflowY: 'auto' }}>
           <CleaningCalculator embedded />
         </div>
       </div>
@@ -127,7 +130,7 @@ export default function CompanyLanding() {
               layout with a small static "product shot" of the widget so the
               page shows the thing it's selling instead of only describing it. */}
           <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: '96px 24px 110px' }}>
-            <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 56, alignItems: 'center' }}>
+            <div className="ce-hero-grid" style={{ maxWidth: 1320, margin: '0 auto', display: 'grid', gap: 56, alignItems: 'center' }}>
               <div>
                 <div style={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #3b82f6, #818cf8)', marginBottom: 22 }} />
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
@@ -151,7 +154,7 @@ export default function CompanyLanding() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <div style={{ width: '100%', maxWidth: 480 }}>
+                <div style={{ width: '100%', maxWidth: 700 }}>
                   <WidgetPreview />
                 </div>
               </div>
@@ -284,6 +287,11 @@ export default function CompanyLanding() {
           a live-status pulse on its "new lead" chip. Respects
           prefers-reduced-motion. */}
       <style>{`
+        .ce-hero-grid { grid-template-columns: minmax(300px, 1fr) minmax(520px, 700px); }
+        @media (max-width: 900px) { .ce-hero-grid { grid-template-columns: 1fr; } }
+        .ce-widget-mockup .cc-svc-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        .ce-widget-mockup .cc-svc-grid button { border-radius: 0 !important; }
+        .ce-widget-mockup .svc-tile { border-radius: 0 !important; }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
         .ce-feature-icon { transition: transform 0.2s ease; }
