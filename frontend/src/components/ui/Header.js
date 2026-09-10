@@ -105,7 +105,6 @@ const navItems = [
   { label: 'Cost Calculator', href: '/cleaning-cost-calculator' },
   { label: 'Services', href: '/#services' },
   { label: 'Blog', href: '/blog' },
-  { label: 'About', href: '/about' },
 ];
 
 function isNavItemActive(href, pathname, hash) {
@@ -190,7 +189,7 @@ export default function Header() {
               onMouseEnter={e => { e.target.style.background = '#eff6ff'; }}
               onMouseLeave={e => { e.target.style.background = 'transparent'; }}
             >
-              Get Leads
+              Become a Partner
             </a>
             <a
               href="/estimator"
@@ -228,7 +227,7 @@ export default function Header() {
             );
           })}
           <a href="/partner-with-us" style={{ ...styles.navLink, display: 'block', padding: '10px 12px', color: '#1e40af', fontWeight: 700 }}>
-            Get Leads
+            Become a Partner
           </a>
           <a href="/company" style={{ ...styles.cta, display: 'block', textAlign: 'center', marginLeft: 0, marginTop: 8 }}>
             Company Login →
