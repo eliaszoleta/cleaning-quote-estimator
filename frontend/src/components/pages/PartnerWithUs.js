@@ -397,7 +397,7 @@ export default function PartnerWithUs() {
             <p style={{ fontSize: 15, color: '#64748b', maxWidth: 600, margin: '0 auto', lineHeight: 1.65 }}>Google and Facebook ads charge you for attention, whether it converts or not. This charges you for exclusive placement in front of people who already want a cleaner.</p>
           </div>
           <div style={{ overflowX: 'auto' }}>
-            <div style={{ minWidth: 640, display: 'grid', gridTemplateColumns: '150px 1fr 1fr', gap: 1, background: '#e2e8f0', borderRadius: 14, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+            <div style={{ minWidth: 640, display: 'grid', gridTemplateColumns: '150px 1fr 1fr', gap: 1, background: '#e2e8f0', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
               <div style={{ background: '#f8fafc' }} />
               <div style={{ background: '#f1f5f9', padding: '14px 16px', fontWeight: 800, fontSize: 12.5, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center' }}>Search &amp; Social Ads</div>
               <div style={{ background: PRIMARY_GRADIENT, padding: '14px 16px', fontWeight: 800, fontSize: 12.5, color: 'white', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center' }}>Clean Estimator Partnership</div>
