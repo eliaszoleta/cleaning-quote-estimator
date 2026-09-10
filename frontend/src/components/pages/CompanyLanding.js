@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
-import CleaningCalculator from '../calculator/CleaningCalculator';
 
 const PRIMARY = '#1d4ed8';
 
@@ -68,11 +67,10 @@ function Arrow({ size }) {
   return <span className="ce-arrow"><ArrowRight size={size} /></span>;
 }
 
-// Browser chrome around the *actual* CleaningCalculator (embedded mode,
-// same component a company's own visitors use), not a redrawn approximation
-// -- so this stays accurate to the real product and a visitor can actually
-// click through it, plus a floating notification chip echoing the
-// instant-lead-alert feature.
+// Browser chrome around a static screenshot of the widget's front step --
+// a live embedded instance kept fighting the fixed-height frame (scroll or
+// clipping depending on how it was sized), so a plain image sidesteps that
+// entirely. Swap the image file to update what's shown.
 function WidgetPreview() {
   return (
     <div className="ce-float" style={{ position: 'relative' }}>
@@ -85,17 +83,11 @@ function WidgetPreview() {
             yourcompany.com
           </div>
         </div>
-        {/* ce-widget-mockup scopes the square-card look to just this preview
-            -- the real ServiceSelect cards (homepage, every embedded
-            widget) keep their normal rounded corners. Scaled down (rather
-            than scrolled) to fit the frame -- layout/columns are still
-            computed at full width before the scale is applied, so the
-            3-column grid above isn't affected by this. */}
-        <div style={{ height: 480, overflow: 'hidden' }}>
-          <div className="ce-widget-mockup" style={{ transform: 'scale(0.85)', transformOrigin: 'top center' }}>
-            <CleaningCalculator embedded />
-          </div>
-        </div>
+        <img
+          src="/images/marketing/estimator-hero.png"
+          alt="Clean Estimator widget — pick a service step"
+          style={{ display: 'block', width: '100%', height: 'auto' }}
+        />
       </div>
 
       {/* Floating lead-alert chip */}
@@ -294,9 +286,6 @@ export default function CompanyLanding() {
       <style>{`
         .ce-hero-grid { grid-template-columns: minmax(300px, 1fr) minmax(520px, 700px); }
         @media (max-width: 900px) { .ce-hero-grid { grid-template-columns: 1fr; } }
-        .ce-widget-mockup .cc-svc-grid { grid-template-columns: repeat(3, 1fr) !important; }
-        .ce-widget-mockup .cc-svc-grid button { border-radius: 0 !important; }
-        .ce-widget-mockup .svc-tile { border-radius: 0 !important; }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
         .ce-feature-icon { transition: transform 0.2s ease; }
