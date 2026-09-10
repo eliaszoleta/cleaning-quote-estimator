@@ -1,10 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Target, Calculator, Home, Building2, ShieldAlert, MessageCircle } from 'lucide-react';
+import { Target, Calculator, Home, Building2, ShieldAlert, MessageCircle, Users, Sparkles, Code2, Handshake } from 'lucide-react';
 
 const h2Style = { fontSize: 19, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' };
 const pStyle = { fontSize: 14.5, color: '#334155', lineHeight: 1.8, margin: 0 };
-const cardStyle = { background: 'white', borderRadius: 16, padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' };
+const cardStyle = { background: 'white', borderRadius: 10, padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' };
 
 function IconBadge({ Icon, color, bg }) {
   return (
@@ -19,6 +19,31 @@ function SectionHeading({ Icon, color, bg, children }) {
     <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
       <IconBadge Icon={Icon} color={color} bg={bg} />
       <h2 style={h2Style}>{children}</h2>
+    </div>
+  );
+}
+
+function ProductCard({ Icon, color, bg, title, children, href, linkLabel }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '22px 20px', background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
+      <IconBadge Icon={Icon} color={color} bg={bg} />
+      <h3 style={{ fontSize: 15.5, fontWeight: 800, color: '#0f172a', margin: 0 }}>{title}</h3>
+      <p style={{ ...pStyle, fontSize: 13.5, flex: 1 }}>{children}</p>
+      <a href={href} style={{ fontSize: 13, fontWeight: 700, color: '#2563eb', textDecoration: 'none' }}>{linkLabel} →</a>
+    </div>
+  );
+}
+
+function Step({ number, title, children }) {
+  return (
+    <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+      <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#1d4ed8', color: 'white', fontSize: 13.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        {number}
+      </div>
+      <div>
+        <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', margin: '0 0 4px' }}>{title}</h3>
+        <p style={{ ...pStyle, fontSize: 13.5 }}>{children}</p>
+      </div>
     </div>
   );
 }
@@ -76,6 +101,48 @@ export default function About() {
           </div>
         </section>
 
+        {/* What we offer -- the actual product lineup, not just the public
+            calculator: the embeddable widget and the local partner program
+            are both real, separate things a visitor might not know exist
+            from the hero copy alone. */}
+        <section style={{ marginBottom: 24 }}>
+          <div style={cardStyle}>
+            <SectionHeading Icon={Sparkles} color="#0f172a" bg="#f1f5f9">What We Offer</SectionHeading>
+            <p style={{ ...pStyle, marginBottom: 20 }}>
+              Clean Estimator is three things working together: a free pricing tool for anyone comparing cleaning costs, a white-labeled version of that same tool cleaning companies embed on their own site, and a local partner program that turns those estimates into real leads.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
+              <ProductCard Icon={Sparkles} color="#d97706" bg="#fffbeb" title="Free Cost Calculator" href="/cleaning-cost-calculator" linkLabel="Try it">
+                Instant price ranges for house cleaning, carpet cleaning, commercial cleaning, and 6 other services — no signup, no phone calls.
+              </ProductCard>
+              <ProductCard Icon={Code2} color="#0891b2" bg="#ecfeff" title="Embeddable Widget" href="/for-companies" linkLabel="For companies">
+                Cleaning companies embed our calculator on their own site — their logo, their colors, their own markup — to capture leads instead of losing visitors to a contact form.
+              </ProductCard>
+              <ProductCard Icon={Handshake} color="#db2777" bg="#fdf2f8" title="Local Partner Program" href="/partner-with-us" linkLabel="Get leads">
+                We connect visitors who want a real quote with an exclusive local cleaning partner in their city — a warm, ready-to-call lead instead of a cold listing.
+              </ProductCard>
+            </div>
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section style={{ marginBottom: 24 }}>
+          <div style={cardStyle}>
+            <h2 style={{ ...h2Style, marginBottom: 20 }}>How It Works</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+              <Step number={1} title="Pick a service">
+                House cleaning, carpet cleaning, commercial cleaning, mold remediation, and more — 9 services in total, each with its own quick questions.
+              </Step>
+              <Step number={2} title="Answer a few quick questions">
+                Home size, condition, how often you want service, and your state — that's it. No phone calls, no waiting on a callback.
+              </Step>
+              <Step number={3} title="Get your instant price range">
+                See a real, state-adjusted price range in under a minute, plus the full breakdown of exactly what's driving that number.
+              </Step>
+            </div>
+          </div>
+        </section>
+
         {/* How we calculate prices */}
         <section style={{ marginBottom: 24 }}>
           <div style={cardStyle}>
@@ -89,7 +156,7 @@ export default function About() {
         {/* Who we serve */}
         <section style={{ marginBottom: 24 }}>
           <div style={cardStyle}>
-            <h2 style={{ ...h2Style, marginBottom: 20 }}>Who We Serve</h2>
+            <SectionHeading Icon={Users} color="#4f46e5" bg="#eef2ff">Who We Serve</SectionHeading>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                 <IconBadge Icon={Home} color="#16a34a" bg="#f0fdf4" />
@@ -109,7 +176,7 @@ export default function About() {
 
         {/* Disclaimer note */}
         <section style={{ marginBottom: 32 }}>
-          <div style={{ background: '#eff6ff', borderRadius: 16, padding: '28px 32px', border: '1px solid #bfdbfe' }}>
+          <div style={{ background: '#eff6ff', borderRadius: 10, padding: '28px 32px', border: '1px solid #bfdbfe' }}>
             <SectionHeading Icon={ShieldAlert} color="#1e40af" bg="rgba(255,255,255,0.6)">Disclaimer</SectionHeading>
             <p style={pStyle}>
               Our estimates are starting points, not quotes. Actual cleaning service costs depend on the specific condition of the property, local market competition, the cleaning company's pricing, and many other factors. Always get multiple quotes from licensed, insured professionals before booking.
@@ -118,7 +185,7 @@ export default function About() {
         </section>
 
         {/* Contact CTA */}
-        <section style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a8a)', borderRadius: 20, padding: '40px 32px', textAlign: 'center' }}>
+        <section style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a8a)', borderRadius: 14, padding: '40px 32px', textAlign: 'center' }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
             <MessageCircle size={22} color="#93c5fd" strokeWidth={2.1} />
           </div>
