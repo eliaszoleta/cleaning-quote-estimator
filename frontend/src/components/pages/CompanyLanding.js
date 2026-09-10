@@ -151,7 +151,7 @@ export default function CompanyLanding() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <div style={{ width: '100%', maxWidth: 380 }}>
+                <div style={{ width: '100%', maxWidth: 480 }}>
                   <WidgetPreview />
                 </div>
               </div>
