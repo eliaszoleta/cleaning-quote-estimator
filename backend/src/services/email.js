@@ -384,9 +384,12 @@ function buildLeadContactLines({ leadEmail, leadPhone, city, state, zip, timelin
     // city only ever comes from a company-scoped calculator's dropdown (see
     // CleaningCalculator.js) -- shown here alongside state/ZIP instead of
     // only buried in the generic Service Details dump further down the
-    // email. state is whatever the visitor picked on the Location step
-    // (LocationStep.js is state-select-only now, no ZIP entry) -- shown as
-    // the full name for readability, same as sendEstimateEmail's opening line.
+    // email. state is whatever the visitor picked on the Location step,
+    // shown as the full name for readability (same as sendEstimateEmail's
+    // opening line). zip is optional there (LocationStep.js only shows it
+    // once a state is picked, and validates it against that state) -- so
+    // it's just as often null as not; omitted here whenever it wasn't
+    // collected rather than showing a blank "ZIP:" line.
     city ? `City: ${city}` : null,
     state ? `State: ${stateNameFromCode(state)}` : null,
     zip ? `ZIP: ${zip}` : null,
