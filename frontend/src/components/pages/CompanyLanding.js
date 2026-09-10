@@ -87,9 +87,14 @@ function WidgetPreview() {
         </div>
         {/* ce-widget-mockup scopes the square-card look to just this preview
             -- the real ServiceSelect cards (homepage, every embedded
-            widget) keep their normal rounded corners. */}
-        <div className="ce-widget-mockup" style={{ height: 480, overflowY: 'auto' }}>
-          <CleaningCalculator embedded />
+            widget) keep their normal rounded corners. Scaled down (rather
+            than scrolled) to fit the frame -- layout/columns are still
+            computed at full width before the scale is applied, so the
+            3-column grid above isn't affected by this. */}
+        <div style={{ height: 480, overflow: 'hidden' }}>
+          <div className="ce-widget-mockup" style={{ transform: 'scale(0.85)', transformOrigin: 'top center' }}>
+            <CleaningCalculator embedded />
+          </div>
         </div>
       </div>
 
