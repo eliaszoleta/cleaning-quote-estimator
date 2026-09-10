@@ -29,16 +29,20 @@ export function computeIsCompact() {
 // FloatingPartnerBanner below feeds it a real, geo-matched partner; the
 // /partner-demo page feeds it sample data directly so a prospect can see
 // this exact placement without needing to be in an active partner's city.
-export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick }) {
+// `fixed` (default true) is the only other seam: the real banner and the
+// live demo both pin it to the viewport, but the Get Leads page hero shows
+// this same card inside a small static mockup, where it needs to sit in
+// the corner of that mockup instead of the real browser window.
+export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, fixed = true }) {
   return (
     <div
       role="complementary"
       aria-label={`Recommended local cleaner: ${partner.business_name}`}
       style={{
-        position: 'fixed',
-        top: isMobile ? 'auto' : 80,
-        bottom: isMobile ? 12 : 'auto',
-        right: isMobile ? 10 : DESKTOP_RIGHT_OFFSET,
+        position: fixed ? 'fixed' : 'absolute',
+        top: fixed ? (isMobile ? 'auto' : 80) : 14,
+        bottom: fixed && isMobile ? 12 : 'auto',
+        right: fixed ? (isMobile ? 10 : DESKTOP_RIGHT_OFFSET) : 14,
         zIndex: 90,
         width: isMobile ? 218 : DESKTOP_BANNER_WIDTH,
         maxWidth: 'calc(100vw - 20px)',

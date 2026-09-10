@@ -1,15 +1,28 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Plus, Trash2, Star, MapPin } from 'lucide-react';
+import { Plus, Trash2, MapPin } from 'lucide-react';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { getAllStates, getStateByCode } from '../../data/statePricing';
 import { getCityTier, POPULATION_THRESHOLD, MAJOR_CITY_PRICE, MINOR_CITY_PRICE } from '../../data/partnerCityTiers';
 import CityTierBrowser, { STATES_WITH_CITIES } from '../partners/CityTierBrowser';
 import PartnerGallery from '../partners/PartnerGallery';
+import { PartnerBannerCard } from '../partners/FloatingPartnerBanner';
 
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
 const WEB3FORMS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
+
+// Same sample data /partner-demo uses -- a generic "SC" mark inlined as a
+// data URI so the hero mockup doesn't depend on an external image file.
+const SAMPLE_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><circle cx='48' cy='48' r='48' fill='%232563eb'/><text x='48' y='49' font-family='Arial,Helvetica,sans-serif' font-size='36' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='middle'>SC</text></svg>";
+const SAMPLE_PARTNER = {
+  id: 'demo',
+  business_name: 'Sparkle Clean Co.',
+  address: '123 Main St, Austin, TX',
+  phone: '(555) 123-4567',
+  website: 'https://example.com',
+  logo_url: SAMPLE_LOGO,
+};
 
 const IconHome = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -94,11 +107,11 @@ const AD_COMPARISON = [
   },
 ];
 
-// Purely decorative "product shot" for the hero -- same technique as the
-// estimator sales page's widget mockup: a fake browser chrome around a
-// miniature replica of a results page, showing exactly what a visitor
-// sees (their estimate, then the partner's own listing recommended right
-// below it). Static, no interaction.
+// The hero's "product shot" -- a fake browser chrome around a generic page
+// backdrop, with the *actual* PartnerBannerCard component (fixed={false},
+// same sample data as /partner-demo) pinned in the corner. This is the
+// real banner design, not a redrawn approximation, so it stays accurate
+// if that component ever changes.
 function PartnerPreview() {
   return (
     <div className="pw-float" style={{ position: 'relative' }}>
@@ -108,30 +121,20 @@ function PartnerPreview() {
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fcd34d' }} />
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#86efac' }} />
           <div style={{ marginLeft: 10, flex: 1, background: 'white', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 10px', fontSize: 11, color: '#94a3b8' }}>
-            cleanestimator.com/estimate
+            cleanestimator.com
           </div>
         </div>
-        <div style={{ padding: '24px 22px 22px' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-            Your estimate
-          </div>
-          <div style={{ fontSize: 30, fontWeight: 900, color: '#0f172a', letterSpacing: '-1px', marginBottom: 18 }}>
-            $249<span style={{ color: '#cbd5e1', fontWeight: 700 }}> &ndash; </span>$319
-          </div>
-          <div style={{ height: 1, background: '#f1f5f9', marginBottom: 18 }} />
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
-            Recommended local pro
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '12px 14px' }}>
-            <div style={{ width: 34, height: 34, borderRadius: 9, background: PRIMARY_GRADIENT, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>AC</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0f172a' }}>ABC Cleaning Co.</div>
-              <div style={{ display: 'flex', gap: 2, marginTop: 3 }}>
-                {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={10} color="#f59e0b" fill="#f59e0b" />)}
-              </div>
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'white', background: PRIMARY, padding: '6px 10px', borderRadius: 7, flexShrink: 0 }}>Call</div>
-          </div>
+        {/* Generic page backdrop -- just enough to read as "a page," since
+            the actual point of this mockup is the banner sitting on it. */}
+        <div style={{ position: 'relative', padding: '24px 22px', minHeight: 280 }}>
+          <div style={{ width: '70%', height: 14, borderRadius: 4, background: '#e2e8f0', marginBottom: 12 }} />
+          <div style={{ width: '90%', height: 9, borderRadius: 4, background: '#f1f5f9', marginBottom: 8 }} />
+          <div style={{ width: '80%', height: 9, borderRadius: 4, background: '#f1f5f9', marginBottom: 8 }} />
+          <div style={{ width: '85%', height: 9, borderRadius: 4, background: '#f1f5f9', marginBottom: 24 }} />
+          <div style={{ width: '60%', height: 9, borderRadius: 4, background: '#f1f5f9', marginBottom: 8 }} />
+          <div style={{ width: '75%', height: 9, borderRadius: 4, background: '#f1f5f9' }} />
+
+          <PartnerBannerCard partner={SAMPLE_PARTNER} isMobile={false} fixed={false} onDismiss={() => {}} onCallClick={() => {}} />
         </div>
       </div>
 
