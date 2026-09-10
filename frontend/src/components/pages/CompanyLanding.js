@@ -193,14 +193,18 @@ export default function CompanyLanding() {
             </div>
           </div>
 
-          {/* How it works */}
+          {/* How it works -- same card language as the Features grid above
+              (tinted badge, left-aligned copy) instead of free-floating
+              circles on bare background, so this section reads as part of
+              the same designed page rather than a separate template block. */}
           <div style={{ background: '#f8fafc', padding: '84px 24px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
-            <div style={{ maxWidth: 920, margin: '0 auto' }}>
-              <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 52, letterSpacing: '-0.4px' }}>Up and running in 30 minutes</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
+            <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+              <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Up and running in 30 minutes</h2>
+              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 52 }}>Four steps, no developer required.</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18 }}>
                 {STEPS.map(s => (
-                  <div key={s.n} style={{ textAlign: 'center' }}>
-                    <div style={{ width: 40, height: 40, background: PRIMARY, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 17, margin: '0 auto 16px', boxShadow: '0 6px 16px rgba(29,78,216,0.28)' }}>{s.n}</div>
+                  <div key={s.n} style={{ ...cardStyle, padding: '24px 22px' }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 9, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: PRIMARY, fontWeight: 800, fontSize: 14.5, marginBottom: 16 }}>{s.n}</div>
                     <h3 style={{ fontWeight: 700, fontSize: 15.5, color: '#0f172a', marginBottom: 8 }}>{s.title}</h3>
                     <p style={{ fontSize: 13.5, color: '#64748b', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
                   </div>
