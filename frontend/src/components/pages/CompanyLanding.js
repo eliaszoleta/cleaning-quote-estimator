@@ -229,43 +229,54 @@ export default function CompanyLanding() {
             </div>
           </div>
 
-          {/* Pricing */}
-          <div id="pricing" style={{ background: 'linear-gradient(135deg, #f0f7ff, #f8fafc)', padding: '84px 24px', borderTop: '1px solid #e2e8f0' }}>
-            <div style={{ maxWidth: 420, margin: '0 auto', textAlign: 'center' }}>
-              <h2 style={{ fontSize: 32, fontWeight: 700, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
-              <p style={{ color: '#64748b', fontSize: 16, marginBottom: 32 }}>One plan. Everything included. No surprises.</p>
-              <div style={{ background: 'white', border: `1.5px solid ${PRIMARY}`, borderRadius: 14, padding: '32px 28px', boxShadow: '0 20px 44px -12px rgba(29,78,216,0.22)' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 3, marginBottom: 4 }}>
-                  <span style={{ fontSize: 40, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$159</span>
-                  <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
-                </div>
-                <div style={{ color: '#16a34a', fontWeight: 600, fontSize: 13, marginBottom: 22 }}>$159/mo after your 30-day free trial &middot; No card required</div>
-                <ul style={{ listStyle: 'none', padding: 0, marginBottom: 22, textAlign: 'left' }}>
-                  {PLAN_FEATURES.map(item => (
-                    <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10, fontSize: 14, color: '#374151' }}>
-                      <span style={{ width: 17, height: 17, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Check size={10} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" />
-                      </span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <a href="/company" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
-                  Start Free Trial <ArrowRight size={15} />
-                </a>
-                <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 10, textAlign: 'center' }}>$159/mo after your 30-day free trial &middot; No card required</p>
-              </div>
-            </div>
-          </div>
+          {/* Pricing + closing CTA, merged into one section -- these used to
+              be two separate full-bleed blocks each ending in its own big
+              blue button, which read as a hard-sell "buy now, then buy
+              again" pattern rather than a normal SaaS pricing section. One
+              section, one plan, one call to action. */}
+          <div id="pricing" style={{ background: '#f8fafc', padding: '84px 24px', borderTop: '1px solid #e2e8f0' }}>
+            <div style={{ maxWidth: 980, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 56, alignItems: 'center' }}>
 
-          {/* CTA */}
-          <div style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', padding: '84px 24px', textAlign: 'center' }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 14, letterSpacing: '-0.4px', color: '#0f172a' }}>Ready to capture more leads?</h2>
-            <p style={{ fontSize: 16, color: '#64748b', marginBottom: 12, maxWidth: 460, margin: '0 auto 12px' }}>Join cleaning companies already using Clean Estimator to turn website visitors into booked jobs.</p>
-            <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 30 }}>No credit card required &middot; Cancel anytime</p>
-            <a href="/company" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '15px 36px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 16.5, boxShadow: '0 10px 28px rgba(29,78,216,0.32)' }}>
-              Get Started Free <ArrowRight size={17} />
-            </a>
+              <div>
+                <h2 style={{ fontSize: 32, fontWeight: 700, color: '#0f172a', marginBottom: 14, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
+                <p style={{ color: '#64748b', fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: 400 }}>
+                  One plan, everything included, no surprises. Built for independent cleaning companies who want more booked jobs from their own website.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {TRUST_BADGES.map(({ Icon, text }) => (
+                    <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#334155', fontSize: 14.5, fontWeight: 600 }}>
+                      <Icon size={16} color="#16a34a" strokeWidth={2.3} />
+                      {text}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ ...cardStyle, borderRadius: 14, padding: 0, overflow: 'hidden' }}>
+                <div style={{ height: 3, background: 'linear-gradient(90deg, #3b82f6, #818cf8)' }} />
+                <div style={{ padding: '30px 28px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: 6 }}>
+                    <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$159</span>
+                    <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
+                  </div>
+                  <div style={{ color: '#64748b', fontSize: 13, marginBottom: 22 }}>After your 30-day free trial &middot; cancel anytime</div>
+                  <ul style={{ listStyle: 'none', padding: 0, marginBottom: 24, textAlign: 'left' }}>
+                    {PLAN_FEATURES.map(item => (
+                      <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10, fontSize: 14, color: '#374151' }}>
+                        <span style={{ width: 17, height: 17, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <Check size={10} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" />
+                        </span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <a href="/company" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
+                    Start Free Trial <ArrowRight size={15} />
+                  </a>
+                </div>
+              </div>
+
+            </div>
           </div>
 
         </main>
