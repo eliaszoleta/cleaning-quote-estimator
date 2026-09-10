@@ -1,4 +1,4 @@
-const axios = require('axios');
+const { stateForZip } = require('../data/zipStateRanges');
 const {
   STATE_PRICING_MULTIPLIERS,
   HOME_SQFT_BASE_PRICES,
@@ -69,25 +69,6 @@ function applyMinCharge(range, minCharge, adjustments) {
     adjustments.push({ label: 'Brought up to minimum service charge', low: flooredLow - range.low, high: flooredHigh - range.high });
   }
   return { low: flooredLow, high: flooredHigh };
-}
-
-async function geocodeZip(zip) {
-  try {
-    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-      params: { postalcode: zip, country: 'US', format: 'json', limit: 1 },
-      headers: { 'User-Agent': 'CleanCalc/1.0 (cleaningcalculator.app)' },
-      timeout: 8000,
-    });
-    if (response.data && response.data.length > 0) {
-      const { display_name } = response.data[0];
-      const stateMatch = display_name.match(/,\s*([A-Z]{2}),\s*United States/);
-      const state = stateMatch ? stateMatch[1] : null;
-      return { state, display_name };
-    }
-  } catch (err) {
-    console.warn('Geocoding failed:', err.message);
-  }
-  return null;
 }
 
 function getStateMultiplier(state) {
@@ -879,12 +860,16 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
 async function calculateCleaning(inputs, companyConfig = {}) {
   const { serviceType, zip, state: providedState, serviceDetails = {} } = inputs;
 
-  // Resolve state
-  let resolvedState = providedState || 'TX';
-  if (zip) {
-    const geo = await geocodeZip(zip);
-    if (geo && geo.state) resolvedState = geo.state;
-  }
+  // Resolve state -- an explicitly provided state is authoritative and
+  // never overridden by a ZIP lookup, even when a ZIP was also given (the
+  // location step now only ever collects ZIP as an optional field once a
+  // state is already selected, validated client-side against that same
+  // state -- see frontend/src/data/zipStateRanges.js). ZIP-based
+  // resolution only runs as a fallback when no state was provided at all
+  // (a caller bypassing the normal flow, e.g. a direct API integration);
+  // an unresolved ZIP then leaves the state genuinely unknown (null)
+  // rather than guessing a real, price-affecting state.
+  const resolvedState = providedState || (zip ? stateForZip(zip) : null);
 
   const stateMultiplier = getStateMultiplier(resolvedState);
   const stateName = STATE_NAMES[resolvedState] || resolvedState;
@@ -912,4 +897,4 @@ async function calculateCleaning(inputs, companyConfig = {}) {
   };
 }
 
-module.exports = { calculateCleaning, geocodeZip };
+module.exports = { calculateCleaning };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, MapPin } from 'lucide-react';
+import { stateForZip } from '../../../data/zipStateRanges';
 
 const US_STATES = [
   ['AL','Alabama'],['AK','Alaska'],['AZ','Arizona'],['AR','Arkansas'],['CA','California'],
@@ -18,6 +19,7 @@ const US_STATES = [
 export default function LocationStep({ value, onBack, onNext, primaryColor, serviceStates = [], serviceCities = {} }) {
   const [state, setState] = useState(value.state || (serviceStates.length === 1 ? serviceStates[0] : ''));
   const [city, setCity] = useState(value.city || '');
+  const [zip, setZip] = useState(value.zip || '');
 
   // A company that's told us which states it actually serves doesn't need
   // its visitors picking from a generic 50-state list -- pricing only ever
@@ -38,15 +40,23 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
   const selectState = (code) => {
     setState(code);
     setCity(''); // a city picked for the old state won't belong to the new one
+    setZip(''); // ditto for a ZIP that was only valid in the old state
   };
 
-  const canContinue = scoped
+  // ZIP is optional -- this only ever flags a *confident* mismatch (the
+  // ZIP's prefix resolves to a real, different state), never an
+  // unrecognized prefix (US territory, or just not fully typed yet), so a
+  // legitimate ZIP is never blocked on a false positive.
+  const zipStateGuess = zip.length === 5 ? stateForZip(zip) : null;
+  const zipMismatch = !!zipStateGuess && zipStateGuess !== state;
+
+  const canContinue = (scoped
     ? (singleState ? city.trim().length > 0 : !!state && city.trim().length > 0)
-    : !!state;
+    : !!state) && !zipMismatch;
 
   const handleNext = () => {
     if (!canContinue) return;
-    onNext({ zip: '', state: singleState ? serviceStates[0] : state, city: scoped ? city.trim() : '' });
+    onNext({ zip, state: singleState ? serviceStates[0] : state, city: scoped ? city.trim() : '' });
   };
 
   const inputStyle = {
@@ -107,6 +117,32 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
             <option value="">Select your state…</option>
             {(scoped ? scopedStates : US_STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
           </select>
+
+          {/* ZIP only appears once a state is picked -- optional, and only
+              here as a sanity check against that state (see zipMismatch
+              above), not a second, independent way to set location. */}
+          {state && (
+            <div style={{ marginTop: 14 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>
+                ZIP Code <span style={{ fontWeight: 400, color: '#94a3b8' }}>(optional)</span>
+              </label>
+              <input
+                type="text" inputMode="numeric" maxLength={5} value={zip}
+                onChange={e => setZip(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                placeholder="e.g. 90210"
+                style={{ ...inputStyle, borderColor: zipMismatch ? '#dc2626' : '#e2e8f0' }}
+                onFocus={e => { e.target.style.borderColor = zipMismatch ? '#dc2626' : primaryColor; }}
+                onBlur={e => { e.target.style.borderColor = zipMismatch ? '#dc2626' : '#e2e8f0'; }}
+                onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
+              />
+              {zipMismatch && (
+                <p style={{ color: '#dc2626', fontSize: 12.5, marginTop: 5 }}>
+                  That ZIP isn't in {US_STATES.find(([abbr]) => abbr === state)?.[1] || state}.
+                </p>
+              )}
+            </div>
+          )}
+
           {scoped && (
             <div style={{ marginTop: 14 }}>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>City</label>
