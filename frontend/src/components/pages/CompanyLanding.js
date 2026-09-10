@@ -55,10 +55,16 @@ const cardStyle = { background: 'white', border: '1px solid #e2e8f0', borderRadi
 
 function FeatureIcon({ Icon, color, bg }) {
   return (
-    <div style={{ width: 42, height: 42, borderRadius: 11, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <div className="ce-feature-icon" style={{ width: 42, height: 42, borderRadius: 11, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       <Icon size={19} color={color} strokeWidth={1.9} />
     </div>
   );
+}
+
+// Nudges the icon 3px on hover -- applied inside any .ce-btn-* link so the
+// button feels responsive to the cursor instead of just changing color.
+function Arrow({ size }) {
+  return <span className="ce-arrow"><ArrowRight size={size} /></span>;
 }
 
 // Purely decorative "product shot" -- a fake browser chrome around a
@@ -67,7 +73,7 @@ function FeatureIcon({ Icon, color, bg }) {
 // interaction -- this is a mockup, not a second copy of the real widget.
 function WidgetPreview() {
   return (
-    <div style={{ position: 'relative' }}>
+    <div className="ce-float" style={{ position: 'relative' }}>
       <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: '0 30px 70px -20px rgba(2,6,23,0.55), 0 8px 20px rgba(2,6,23,0.25)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '11px 16px', background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fca5a5' }} />
@@ -111,7 +117,9 @@ function WidgetPreview() {
         </div>
         <div>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>New lead: Sarah M.</div>
-          <div style={{ fontSize: 10.5, color: '#94a3b8' }}>just now &middot; $249&ndash;$319 quoted</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10.5, color: '#94a3b8' }}>
+            <span className="ce-pulse-dot" /> just now &middot; $249&ndash;$319 quoted
+          </div>
         </div>
       </div>
     </div>
@@ -149,10 +157,10 @@ export default function CompanyLanding() {
                   Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7 — and emails you the second someone's ready to book.
                 </p>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  <a href="/company" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
-                    Start Free Trial <ArrowRight size={16} />
+                  <a href="/company" className="ce-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
+                    Start Free Trial <Arrow size={16} />
                   </a>
-                  <a href="/?service=home_residential" style={{ background: 'rgba(255,255,255,0.07)', color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 15.5, border: '1px solid rgba(255,255,255,0.15)' }}>
+                  <a href="/?service=home_residential" className="ce-btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,255,255,0.07)', color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 15.5, border: '1px solid rgba(255,255,255,0.15)' }}>
                     See Demo
                   </a>
                 </div>
@@ -184,7 +192,7 @@ export default function CompanyLanding() {
             <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 52 }}>No technical skills required. Set up in under 30 minutes.</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
               {FEATURES.map(({ Icon, color, bg, title, desc }) => (
-                <div key={title} style={{ ...cardStyle, padding: '24px 22px' }}>
+                <div key={title} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
                   <FeatureIcon Icon={Icon} color={color} bg={bg} />
                   <h3 style={{ fontSize: 15.5, fontWeight: 700, color: '#0f172a', margin: '16px 0 8px' }}>{title}</h3>
                   <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: 0 }}>{desc}</p>
@@ -203,8 +211,8 @@ export default function CompanyLanding() {
               <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 52 }}>Four steps, no developer required.</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18 }}>
                 {STEPS.map(s => (
-                  <div key={s.n} style={{ ...cardStyle, padding: '24px 22px' }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 9, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: PRIMARY, fontWeight: 800, fontSize: 14.5, marginBottom: 16 }}>{s.n}</div>
+                  <div key={s.n} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
+                    <div className="ce-step-badge" style={{ width: 34, height: 34, borderRadius: 9, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: PRIMARY, fontWeight: 800, fontSize: 14.5, marginBottom: 16 }}>{s.n}</div>
                     <h3 style={{ fontWeight: 700, fontSize: 15.5, color: '#0f172a', marginBottom: 8 }}>{s.title}</h3>
                     <p style={{ fontSize: 13.5, color: '#64748b', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
                   </div>
@@ -218,7 +226,7 @@ export default function CompanyLanding() {
             <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 44, letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
               {TESTIMONIALS.map(t => (
-                <div key={t.name} style={{ ...cardStyle, padding: '24px 22px' }}>
+                <div key={t.name} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
                   <Quote size={20} color="#dbeafe" fill="#dbeafe" style={{ marginBottom: 10 }} />
                   <div style={{ display: 'flex', gap: 2, marginBottom: 12 }}>
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -256,7 +264,7 @@ export default function CompanyLanding() {
                 </div>
               </div>
 
-              <div style={{ ...cardStyle, borderRadius: 14, padding: 0, overflow: 'hidden' }}>
+              <div className="ce-card" style={{ ...cardStyle, borderRadius: 14, padding: 0, overflow: 'hidden' }}>
                 <div style={{ height: 3, background: 'linear-gradient(90deg, #3b82f6, #818cf8)' }} />
                 <div style={{ padding: '30px 28px' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: 6 }}>
@@ -274,8 +282,8 @@ export default function CompanyLanding() {
                       </li>
                     ))}
                   </ul>
-                  <a href="/company" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
-                    Start Free Trial <ArrowRight size={15} />
+                  <a href="/company" className="ce-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
+                    Start Free Trial <Arrow size={15} />
                   </a>
                 </div>
               </div>
@@ -286,6 +294,33 @@ export default function CompanyLanding() {
         </main>
         <Footer />
       </div>
+
+      {/* Small, tasteful motion only -- a hover lift on cards/badges, an
+          arrow nudge on buttons, a slow idle float on the hero mockup, and
+          a live-status pulse on its "new lead" chip. Respects
+          prefers-reduced-motion. */}
+      <style>{`
+        .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+        .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
+        .ce-feature-icon { transition: transform 0.2s ease; }
+        .ce-card:hover .ce-feature-icon { transform: scale(1.08) rotate(-2deg); }
+        .ce-step-badge { transition: background 0.2s ease, color 0.2s ease; }
+        .ce-card:hover .ce-step-badge { background: ${PRIMARY}; color: white; }
+        .ce-btn-primary, .ce-btn-secondary { transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease; }
+        .ce-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(29,78,216,0.45); }
+        .ce-btn-secondary:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); }
+        .ce-arrow { display: inline-flex; transition: transform 0.15s ease; }
+        .ce-btn-primary:hover .ce-arrow, .ce-btn-secondary:hover .ce-arrow { transform: translateX(3px); }
+        @keyframes ce-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .ce-float { animation: ce-float 5s ease-in-out infinite; }
+        @keyframes ce-pulse-ring { 0% { transform: scale(0.9); opacity: 0.6; } 70%, 100% { transform: scale(2.1); opacity: 0; } }
+        .ce-pulse-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+        .ce-pulse-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #22c55e; animation: ce-pulse-ring 1.8s ease-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .ce-float, .ce-pulse-dot::after { animation: none; }
+          .ce-card, .ce-btn-primary, .ce-btn-secondary, .ce-feature-icon, .ce-step-badge, .ce-arrow { transition: none; }
+        }
+      `}</style>
     </>
   );
 }
