@@ -4943,7 +4943,7 @@ Not every "quote calculator" is built the same way. Before adding one to your si
 
 1. **Sign up** for a calculator that supports your services and covers the states you operate in.
 2. **Customize it** with your logo, brand colors, which services you offer, and your own pricing markup.
-3. **Copy one line of code** into your site — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself.
+3. **Copy the embed code** into your site — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself.
 4. **Start capturing leads** — every completed estimate becomes a lead in your dashboard automatically.
 
 [Clean Estimator](/estimator) does all four of these with a 30-day free trial and no credit card required to start.
@@ -5014,7 +5014,7 @@ A good calculator ends with your phone number and a call-to-action, so anyone wh
 No — it's what converts the traffic those channels bring you, not a replacement for them. See our guide on [where cleaning leads actually come from](/blog/where-to-find-cleaning-business-leads) for the acquisition side.
 
 **Is this hard to set up compared to a basic contact form plugin?**
-No — [Clean Estimator](/estimator) embeds with one line of code, same as most contact form plugins, but shows real pricing instead of a blank submission box.
+No — [Clean Estimator](/estimator) embeds with a short snippet of code, same as most contact form plugins, but shows real pricing instead of a blank submission box.
 
 [Try it free for 30 days →](/estimator)
     `,
@@ -5110,7 +5110,7 @@ Getting an estimate calculator running on your site doesn't require a developer:
 
 - Sign up and set your business name, colors, and which services you offer
 - Set your own markup and minimum charges per service
-- Copy one line of code into your website
+- Copy the embed code into your website
 - Leads start flowing into your dashboard (and your inbox) automatically
 
 [Clean Estimator](/estimator) covers house cleaning, apartments, commercial, carpet, air duct, dryer vent, tile & grout, mold remediation, and water damage — all 9 in one calculator, with a 30-day free trial and no credit card required.

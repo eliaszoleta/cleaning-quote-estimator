@@ -16,14 +16,14 @@ const FEATURES = [
   { Icon: Send,          color: '#0d9488', bg: '#f0fdfa', title: 'Every estimate email is branded as yours', desc: "Visitors get a follow-up email carrying your logo, your phone number, and your call-to-action — not ours. Every completed estimate is another touchpoint with your business sitting in their inbox." },
   { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',   desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
   { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',  desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
-  { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Easy one-line embed',         desc: 'Paste one line of HTML to add the calculator to any website, Wix, Squarespace, or WordPress.' },
+  { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Easy to embed',               desc: 'Paste the embed code to add the calculator to any website, Wix, Squarespace, or WordPress.' },
   { Icon: Key,           color: '#d97706', bg: '#fffbeb', title: 'API for CRM sync',            desc: 'Already have a CRM? Pull leads via REST API into HubSpot, Salesforce, or any tool using Zapier or Make — optional, on top of the email alerts you get by default.' },
 ];
 
 const STEPS = [
   { n: '1', title: 'Sign up',                  desc: 'Create your account and start your 30-day free trial — no credit card required.' },
   { n: '2', title: 'Customize your widget',    desc: 'Add your logo, set your brand colors, configure which services you offer, and write your CTA.' },
-  { n: '3', title: 'Embed on your site',       desc: "Copy one line of code and paste it anywhere on your website. That's it." },
+  { n: '3', title: 'Embed on your site',       desc: "Copy the embed code and paste it anywhere on your website. That's it." },
   { n: '4', title: 'Capture leads',            desc: 'Watch leads flow in. Manage them in your dashboard or sync to your CRM.' },
 ];
 

@@ -1227,13 +1227,13 @@ function renderForCompanies(assets) {
     ['Every estimate email is branded as yours', "Visitors get a follow-up email carrying your logo, your phone number, and your call-to-action — not ours. Every completed estimate is another touchpoint with your business sitting in their inbox."],
     ['ZIP-code accurate pricing', 'State-specific pricing multipliers ensure your quotes reflect your local market.'],
     ['Per-service markup control', 'Adjust pricing up or down per service. Set your own minimum charges.'],
-    ['Easy one-line embed', 'Paste one line of HTML to add the calculator to any website, Wix, Squarespace, or WordPress.'],
+    ['Easy to embed', 'Paste the embed code to add the calculator to any website, Wix, Squarespace, or WordPress.'],
     ['API for CRM sync', 'Already have a CRM? Pull leads via REST API into HubSpot, Salesforce, or any tool using Zapier or Make — optional, on top of the email alerts you get by default.'],
   ];
   const steps = [
     ['1', 'Sign up', 'Create your account and start your 7-day free trial — credit card required.'],
     ['2', 'Customize your widget', 'Add your logo, set your brand colors, configure which services you offer, and write your CTA.'],
-    ['3', 'Embed on your site', "Copy one line of code and paste it anywhere on your website. That's it."],
+    ['3', 'Embed on your site', "Copy the embed code and paste it anywhere on your website. That's it."],
     ['4', 'Capture leads', 'Watch leads flow in. Manage them in your dashboard or sync to your CRM.'],
   ];
   const testimonials = [

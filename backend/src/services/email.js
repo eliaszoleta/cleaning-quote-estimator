@@ -932,7 +932,7 @@ function buildTrialCheckin1Text({ companyName }) {
     '',
     "You're about a week into your free trial — just checking in.",
     '',
-    "If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's one line of code — grab it from the Embed Your Widget tab in your dashboard.",
+    "If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the Embed Your Widget tab in your dashboard.",
     '',
     "If anything's confusing or not working the way you expected, just reply to this email or check the Help & Docs tab — happy to help.",
     '',
@@ -952,7 +952,7 @@ function buildTrialCheckin1Html({ companyName }) {
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's one line of code — grab it from the Embed Your Widget tab in your dashboard.
+    If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the Embed Your Widget tab in your dashboard.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
