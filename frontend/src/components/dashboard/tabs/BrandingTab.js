@@ -19,6 +19,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
   const [form, setForm] = useState({
     companyName: '', logo: '', primaryColor: '#2563eb', accentColor: '#16a34a',
     ctaHeadline: '', ctaSubtext: '', ctaPhone: '', ctaEmail: '',
+    leadNotificationEmail: '',
     fontFamily: 'Inter', frameHeight: '700', borderRadius: '12',
   });
   const initialized = useRef(false);
@@ -35,6 +36,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
         ctaSubtext: config.ctaSubtext || '',
         ctaPhone: config.ctaPhone || '',
         ctaEmail: config.ctaEmail || '',
+        leadNotificationEmail: config.leadNotificationEmail || '',
         fontFamily: config.fontFamily || 'Inter',
         frameHeight: String(config.frameHeight || '700'),
         borderRadius: String(config.borderRadius || '12'),
@@ -55,6 +57,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
         ctaSubtext: next.ctaSubtext,
         ctaPhone: next.ctaPhone,
         ctaEmail: next.ctaEmail,
+        leadNotificationEmail: next.leadNotificationEmail,
         fontFamily: next.fontFamily,
         frameHeight: parseInt(next.frameHeight) || 700,
         borderRadius: parseInt(next.borderRadius) || 12,
@@ -95,6 +98,12 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
               <input style={input} value={form.companyName} onChange={e => set('companyName', e.target.value)} placeholder="ABC Cleaning Services" />
             </Field>
             <LogoField value={form.logo} onChange={url => set('logo', url)} inputStyle={input} upload={uploadLogo} />
+          </Card>
+
+          <Card title="Lead Notifications" subtitle="Where new leads on your widget get emailed">
+            <Field label="Send leads to" hint="Every time someone completes an estimate on your widget, we'll email the details here.">
+              <input style={input} type="email" value={form.leadNotificationEmail} onChange={e => set('leadNotificationEmail', e.target.value)} placeholder="leads@yourcompany.com" />
+            </Field>
           </Card>
 
           <Card title="Colors">

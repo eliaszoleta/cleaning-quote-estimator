@@ -65,6 +65,10 @@ const DEFAULT_COMPANY_CONFIG = {
   ctaSubtext: 'Our team is ready to provide a free, detailed estimate.',
   ctaPhone: '',
   ctaEmail: '',
+  // Where new-lead notifications get sent -- deliberately separate from the
+  // Supabase Auth signup email, since that's just a login credential, not
+  // necessarily an inbox anyone on the team actually checks for leads.
+  leadNotificationEmail: '',
   frameHeight: '700px',
   borderRadius: '12px',
   serviceStates: [],

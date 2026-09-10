@@ -46,25 +46,6 @@ async function getVerifiedPartnerEmail(partnerId) {
   }
 }
 
-// Looks up a company's own signup email via the Supabase Auth admin API --
-// companyId is the Supabase Auth user id (same value req.user.id resolves
-// to on the authenticated company routes). Used to notify a company about
-// leads on THEIR embedded widget at the same address they signed up with,
-// not a separately configurable one, per how this was asked for.
-async function getCompanyOwnerEmail(companyId) {
-  if (!companyId) return null;
-  const supabase = getSupabase();
-  if (!supabase) return null;
-  try {
-    const { data, error } = await supabase.auth.admin.getUserById(companyId);
-    if (error) return null;
-    return data?.user?.email || null;
-  } catch (err) {
-    console.warn('getCompanyOwnerEmail failed:', err.message);
-    return null;
-  }
-}
-
 // Same table logBannerEvent() in partnerLookup.js writes impression/call_click
 // rows to (from the browser, anon key) -- this is the backend's equivalent
 // for the one event type that only ever happens server-side.
@@ -128,29 +109,26 @@ router.post('/', async (req, res) => {
         console.warn('Lead save failed (non-critical):', leadErr.message);
       }
 
-      // Resolved once and reused below for both the visitor's estimate
-      // email (as reply-to, so hitting "Reply" reaches the company
-      // directly instead of our own sending address) and the company's own
-      // lead-notification email (as the recipient) -- avoids looking up
-      // the same Supabase Auth user twice per lead.
-      const companyOwnerEmailPromise = companyId ? getCompanyOwnerEmail(companyId) : Promise.resolve(null);
+      // Reply-to on the visitor's estimate email, so hitting "Reply" reaches
+      // the company directly -- uses the company-chosen lead-notification
+      // address, never the Supabase Auth signup email (that's just a login
+      // credential, not something to expose to visitors or route mail to).
+      const leadNotificationEmail = companyConfig.leadNotificationEmail || null;
 
       // Fire-and-forget: sendEstimateEmail never throws, so this never
       // blocks or breaks the response on email delivery. Passes the full
       // result (breakdown, key factors, recurring pricing) and the
       // already-resolved partner match so the email mirrors exactly what
       // the results page showed, not just the top-line price range.
-      companyOwnerEmailPromise
-        .then(ownerEmail => sendEstimateEmail({
-          to: leadInfo.email,
-          name: leadInfo.name,
-          serviceType,
-          result,
-          companyConfig,
-          partner: partnerInfo || null,
-          replyTo: ownerEmail || undefined,
-        }))
-        .catch(err => console.error('Estimate email failed:', err.message));
+      sendEstimateEmail({
+        to: leadInfo.email,
+        name: leadInfo.name,
+        serviceType,
+        result,
+        companyConfig,
+        partner: partnerInfo || null,
+        replyTo: leadNotificationEmail || undefined,
+      }).catch(err => console.error('Estimate email failed:', err.message));
 
       // Forward the same lead to the matched partner, if any -- the
       // lead-capture form already tells visitors "we'll connect you with
@@ -203,29 +181,30 @@ router.post('/', async (req, res) => {
 
       // Notify the company (embed subscriber) about leads on their own
       // widget -- previously the only way to find out was checking the
-      // Leads tab manually. Sent to the same email they signed up with.
+      // Leads tab manually. Sent to the address they configured in
+      // Branding > Lead Notifications, never the Auth signup email (see
+      // leadNotificationEmail above -- same reasoning).
       if (companyId) {
-        companyOwnerEmailPromise
-          .then(ownerEmail => {
-            if (!ownerEmail) return;
-            return sendCompanyLeadEmail({
-              to: ownerEmail,
-              companyName: companyConfig.companyName || 'Clean Estimator',
-              leadName: leadInfo.name,
-              leadEmail: leadInfo.email,
-              leadPhone: leadInfo.phone,
-              serviceType,
-              priceLow: result.totalLow,
-              priceHigh: result.totalHigh,
-              state: result.state,
-              zip: zip || null,
-              timeline: leadInfo.timeline || null,
-              adjustments: result.adjustments,
-              keyFactors: result.keyFactors,
-              serviceDetails: serviceDetails || {},
-            });
-          })
-          .catch(err => console.error('Company lead email failed:', err.message));
+        if (leadNotificationEmail) {
+          sendCompanyLeadEmail({
+            to: leadNotificationEmail,
+            companyName: companyConfig.companyName || 'Clean Estimator',
+            leadName: leadInfo.name,
+            leadEmail: leadInfo.email,
+            leadPhone: leadInfo.phone,
+            serviceType,
+            priceLow: result.totalLow,
+            priceHigh: result.totalHigh,
+            state: result.state,
+            zip: zip || null,
+            timeline: leadInfo.timeline || null,
+            adjustments: result.adjustments,
+            keyFactors: result.keyFactors,
+            serviceDetails: serviceDetails || {},
+          }).catch(err => console.error('Company lead email failed:', err.message));
+        } else {
+          console.warn(`Company lead email skipped: no leadNotificationEmail configured for company ${companyId}`);
+        }
       }
     }
 
