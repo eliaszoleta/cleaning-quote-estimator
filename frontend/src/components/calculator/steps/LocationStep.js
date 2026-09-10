@@ -16,10 +16,8 @@ const US_STATES = [
 ];
 
 export default function LocationStep({ value, onBack, onNext, primaryColor, serviceStates = [], serviceCities = {} }) {
-  const [zip, setZip] = useState(value.zip || '');
   const [state, setState] = useState(value.state || (serviceStates.length === 1 ? serviceStates[0] : ''));
   const [city, setCity] = useState(value.city || '');
-  const [mode, setMode] = useState(value.zip ? 'zip' : 'state');
 
   // A company that's told us which states it actually serves doesn't need
   // its visitors picking from a generic 50-state list -- pricing only ever
@@ -42,15 +40,12 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
     setCity(''); // a city picked for the old state won't belong to the new one
   };
 
-  const canContinue = mode === 'zip'
-    ? /^\d{5}$/.test(zip)
-    : scoped
-      ? (singleState ? city.trim().length > 0 : !!state && city.trim().length > 0)
-      : !!state;
+  const canContinue = scoped
+    ? (singleState ? city.trim().length > 0 : !!state && city.trim().length > 0)
+    : !!state;
 
   const handleNext = () => {
     if (!canContinue) return;
-    if (mode === 'zip') { onNext({ zip, state: '', city: '' }); return; }
     onNext({ zip: '', state: singleState ? serviceStates[0] : state, city: scoped ? city.trim() : '' });
   };
 
@@ -72,41 +67,7 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
         Prices vary significantly by location. We use this to give you an accurate local estimate.
       </p>
 
-      {/* Mode toggle */}
-      <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 9, padding: 3, marginBottom: 20, width: 'fit-content' }}>
-        {[['zip', 'ZIP Code'], ['state', singleState ? 'City' : 'State']].map(([m, label]) => (
-          <button
-            key={m} onClick={() => setMode(m)}
-            style={{
-              padding: '7px 18px', borderRadius: 7, border: 'none', cursor: 'pointer',
-              fontWeight: 600, fontSize: 13.5,
-              background: mode === m ? 'white' : 'transparent',
-              color: mode === m ? '#0f172a' : '#64748b',
-              boxShadow: mode === m ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-              transition: 'all 0.15s',
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {mode === 'zip' ? (
-        <div>
-          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>ZIP Code</label>
-          <input
-            type="text" inputMode="numeric" maxLength={5} value={zip}
-            onChange={e => setZip(e.target.value.replace(/\D/g, '').slice(0, 5))}
-            placeholder="e.g. 90210"
-            style={inputStyle}
-            onFocus={e => { e.target.style.borderColor = primaryColor; }}
-            onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
-            onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
-            autoFocus
-          />
-          {zip && zip.length < 5 && <p style={{ color: '#94a3b8', fontSize: 12.5, marginTop: 5 }}>Enter all 5 digits</p>}
-        </div>
-      ) : singleState ? (
+      {singleState ? (
         <div>
           <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>City</label>
           {citiesForState.length > 0 ? (
