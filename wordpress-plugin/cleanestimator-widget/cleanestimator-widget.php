@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Clean Estimator Widget
- * Plugin URI:        https://www.cleanestimator.com/for-companies
+ * Plugin URI:        https://www.cleanestimator.com/estimator
  * Description:       Embed your branded Clean Estimator cleaning cost calculator on any page or post with the [cleanestimator_widget] shortcode. Requires an active Clean Estimator subscription.
  * Version:           1.0.0
  * Requires at least: 5.8

@@ -43,7 +43,8 @@ const searchParams = new URLSearchParams(window.location.search);
 const isEmbed = pathname.startsWith('/embed');
 const isResults = pathname === '/results';
 const isCompany = pathname === '/company' || pathname.startsWith('/company');
-const isForCompanies = pathname === '/for-companies';
+const isEstimatorLanding = pathname === '/estimator';
+const isOldForCompanies = pathname === '/for-companies';
 const isBlog = pathname === '/blog' || pathname.startsWith('/blog/');
 const isAbout = pathname === '/about';
 const isContact = pathname === '/contact';
@@ -145,6 +146,13 @@ export default function App() {
     window.location.href = '/company';
   };
 
+  // The redirect lives server-side in vercel.json (permanent 301) -- this is
+  // just a client-side safety net for local dev / any edge cache gap.
+  if (isOldForCompanies) {
+    window.location.replace('/estimator' + window.location.search + window.location.hash);
+    return null;
+  }
+
   if (isEmbed) return (
     <HelmetProvider>
       <EmbedWrapper companyId={embedCompanyId} />
@@ -211,7 +219,7 @@ export default function App() {
     </HelmetProvider>
   );
 
-  if (isForCompanies) return <HelmetProvider><CompanyLanding /></HelmetProvider>;
+  if (isEstimatorLanding) return <HelmetProvider><CompanyLanding /></HelmetProvider>;
 
   if (isBlog) return <HelmetProvider><div className="app"><Header /><main><BlogRouter /></main><Footer /></div></HelmetProvider>;
 

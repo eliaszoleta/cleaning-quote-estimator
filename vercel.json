@@ -1,6 +1,13 @@
 {
   "buildCommand": "cd frontend && CI=false npm run build",
   "outputDirectory": "frontend/build",
+  "redirects": [
+    {
+      "source": "/for-companies",
+      "destination": "/estimator",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/geo",

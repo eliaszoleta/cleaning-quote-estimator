@@ -47,11 +47,11 @@ const cols = [
   {
     title: 'For Companies',
     links: [
-      { label: 'Embed the Calculator', href: '/for-companies' },
-      { label: 'Pricing & Plans', href: '/for-companies#pricing' },
+      { label: 'Embed the Calculator', href: '/estimator' },
+      { label: 'Pricing & Plans', href: '/estimator#pricing' },
       { label: 'Company Login', href: '/company' },
-      { label: 'API Access', href: '/for-companies#api' },
-      { label: 'White-label Widget', href: '/for-companies#widget' },
+      { label: 'API Access', href: '/estimator#api' },
+      { label: 'White-label Widget', href: '/estimator#widget' },
     ],
   },
   {

@@ -4946,7 +4946,7 @@ Not every "quote calculator" is built the same way. Before adding one to your si
 3. **Copy one line of code** into your site — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself.
 4. **Start capturing leads** — every completed estimate becomes a lead in your dashboard automatically.
 
-[Clean Estimator](/for-companies) does all four of these with a 30-day free trial and no credit card required to start.
+[Clean Estimator](/estimator) does all four of these with a 30-day free trial and no credit card required to start.
 
 ## What Happens the Moment Someone Gets an Estimate
 
@@ -4966,7 +4966,7 @@ A good calculator supports all your service types in one embed, so visitors pick
 **Does showing a price range scare off customers who'd pay more?**
 In practice it filters the opposite direction — visitors who see a realistic range and still submit their contact info are more likely to book than someone who had no price expectation going in.
 
-[See how it works and start your free trial →](/for-companies)
+[See how it works and start your free trial →](/estimator)
     `,
   },
   {
@@ -5014,9 +5014,9 @@ A good calculator ends with your phone number and a call-to-action, so anyone wh
 No — it's what converts the traffic those channels bring you, not a replacement for them. See our guide on [where cleaning leads actually come from](/blog/where-to-find-cleaning-business-leads) for the acquisition side.
 
 **Is this hard to set up compared to a basic contact form plugin?**
-No — [Clean Estimator](/for-companies) embeds with one line of code, same as most contact form plugins, but shows real pricing instead of a blank submission box.
+No — [Clean Estimator](/estimator) embeds with one line of code, same as most contact form plugins, but shows real pricing instead of a blank submission box.
 
-[Try it free for 30 days →](/for-companies)
+[Try it free for 30 days →](/estimator)
     `,
   },
   {
@@ -5059,7 +5059,7 @@ Asks a few questions (service, size, location) and shows a real price range imme
 
 If your site only has a contact form today, adding an instant quote calculator is usually the single highest-impact change you can make — it doesn't replace the form, it upgrades it, since a good calculator collects the same contact details a form would, just with a real price shown first. Booking widgets and live chat are worth layering in later, once you're consistently getting quote requests and need to help visitors take the next step faster.
 
-[Clean Estimator](/for-companies) covers all 9 major cleaning service types with one embeddable calculator, branded to your business, with lead alerts and a dashboard built in — a 30-day free trial with no credit card needed to start.
+[Clean Estimator](/estimator) covers all 9 major cleaning service types with one embeddable calculator, branded to your business, with lead alerts and a dashboard built in — a 30-day free trial with no credit card needed to start.
 
 ## FAQ
 
@@ -5072,7 +5072,7 @@ It can still help with basic FAQs, but for the specific job of converting a visi
 **What if my pricing varies too much to show a range?**
 Most cleaning pricing varies by a handful of known factors — size, location, service type, condition — which a well-built calculator accounts for directly rather than needing a flat, one-size-fits-all number.
 
-[See how the calculator works →](/for-companies)
+[See how the calculator works →](/estimator)
     `,
   },
   {
@@ -5113,7 +5113,7 @@ Getting an estimate calculator running on your site doesn't require a developer:
 - Copy one line of code into your website
 - Leads start flowing into your dashboard (and your inbox) automatically
 
-[Clean Estimator](/for-companies) covers house cleaning, apartments, commercial, carpet, air duct, dryer vent, tile & grout, mold remediation, and water damage — all 9 in one calculator, with a 30-day free trial and no credit card required.
+[Clean Estimator](/estimator) covers house cleaning, apartments, commercial, carpet, air duct, dryer vent, tile & grout, mold remediation, and water damage — all 9 in one calculator, with a 30-day free trial and no credit card required.
 
 ## FAQ
 
@@ -5126,7 +5126,7 @@ No — it converts the traffic those channels already bring you, it doesn't gene
 **What if I want to review every lead before an estimate goes out?**
 The estimate is instant by design — that's what drives the conversion benefit — but you still see every lead the moment it comes in and follow up personally from there.
 
-[Start your free trial →](/for-companies)
+[Start your free trial →](/estimator)
     `,
   },
 ];

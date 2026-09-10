@@ -112,7 +112,7 @@ function staticHeader() {
       <a href="/#how-it-works" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">How It Works</a>
       <a href="/blog" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">Blog</a>
       <a href="/#faq" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">FAQ</a>
-      <a href="/for-companies" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">For Companies</a>
+      <a href="/estimator" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">For Companies</a>
       <a href="/" style="background:${PRIMARY};color:white;padding:8px 18px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700">Get Estimate</a>
     </nav>
   </div>
@@ -492,7 +492,7 @@ function staticFooter() {
       </div>
       <div>
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">For Companies</div>
-        <a href="/for-companies" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Embed the Calculator</a>
+        <a href="/estimator" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Embed the Calculator</a>
         <a href="/company" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Company Login</a>
       </div>
       <div>
@@ -604,7 +604,7 @@ function renderCalculatorPage(assets) {
     { q: 'How accurate is the cleaning cost calculator?', a: 'The calculator uses real market pricing data with state-by-state cost-of-living adjustments, so your estimate reflects typical local pricing. Final prices from an actual cleaning company can vary based on the specific condition of your home and other in-person factors, so treat the result as a reliable starting range rather than a binding quote.' },
     { q: 'What information do I need to use the cleaning cost calculator?', a: 'Just your ZIP code, the type of cleaning service you need, and a few basic details about your space (like square footage or number of rooms). No email or phone number is required to see your price range.' },
     { q: 'Does the cleaning cost calculator work for businesses too?', a: 'Yes. In addition to house and apartment cleaning, the calculator includes commercial cleaning, carpet cleaning, air duct cleaning, dryer vent cleaning, tile & grout cleaning, mold remediation, and water damage restoration — for both residential and commercial properties.' },
-    { q: 'Can I embed this cleaning cost calculator on my own website?', a: 'Yes — cleaning companies can embed a white-labeled version of this calculator on their own site to capture leads with accurate, localized estimates. Visit our for-companies page for details.' },
+    { q: 'Can I embed this cleaning cost calculator on my own website?', a: 'Yes — cleaning companies can embed a white-labeled version of this calculator on their own site to capture leads with accurate, localized estimates. Visit our estimator page for details.' },
   ];
 
   const body = `  <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:14px;text-align:center">Cleaning Cost Calculator</h1>
@@ -1294,7 +1294,7 @@ function renderForCompanies(assets) {
     <a href="/company" style="background:${PRIMARY};color:white;padding:14px 34px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px">Get Started Free &#8594;</a>
   </div>`;
 
-  return renderStaticPage({ path: '/for-companies', seoTitle, seoDesc, bodyHtml: body, maxWidth: 1100, assets });
+  return renderStaticPage({ path: '/estimator', seoTitle, seoDesc, bodyHtml: body, maxWidth: 1100, assets });
 }
 
 // ─── 9. Homepage injection ────────────────────────────────────────────────────
@@ -1424,7 +1424,7 @@ function injectHomepage(posts, categories) {
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px">
           <h3 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px">Website Integration</h3>
           <p style="font-size:13px;color:#475569;line-height:1.65;margin:0 0 12px">Embed a branded, white-labeled cleaning cost calculator directly on your own website to capture leads. $159/month after a 7-day free trial.</p>
-          <a href="/for-companies" style="font-size:13px;color:${PRIMARY};font-weight:700;text-decoration:none">See embeddable calculator details &rarr;</a>
+          <a href="/estimator" style="font-size:13px;color:${PRIMARY};font-weight:700;text-decoration:none">See embeddable calculator details &rarr;</a>
         </div>
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px">
           <h3 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px">No Signup Needed for Consumers</h3>
@@ -1514,7 +1514,7 @@ function main() {
   count++;
   writeFile('terms-of-service', renderLegalPage('terms', assets));
   count++;
-  writeFile('for-companies', renderForCompanies(assets));
+  writeFile('estimator', renderForCompanies(assets));
   count++;
   writeFile('cleaning-cost-calculator', renderCalculatorPage(assets));
   count++;

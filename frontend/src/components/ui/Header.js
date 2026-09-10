@@ -152,7 +152,7 @@ export default function Header() {
         {isMobile ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <a
-              href="/for-companies"
+              href="/estimator"
               style={styles.ctaMobile}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 14px rgba(30,64,175,0.32)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(30,64,175,0.22)'; }}
@@ -193,7 +193,7 @@ export default function Header() {
               Get Leads
             </a>
             <a
-              href="/for-companies"
+              href="/estimator"
               style={styles.navLink}
               onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f1f5f9'; }}
               onMouseLeave={e => { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; }}

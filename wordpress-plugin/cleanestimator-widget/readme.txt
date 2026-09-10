@@ -14,7 +14,7 @@ Embed your branded Clean Estimator cleaning cost calculator on any page or post 
 
 Clean Estimator Widget embeds your white-label cleaning cost calculator directly into any WordPress page or post. Visitors answer a few questions about their space, service type, and condition, and get an instant, ZIP-code-accurate price estimate — branded as your business. Every completed estimate is emailed straight to you as a lead: name, phone, timeline, and the exact price they were quoted.
 
-**This plugin requires an active Clean Estimator subscription** ([cleanestimator.com/for-companies](https://www.cleanestimator.com/for-companies)). It doesn't create or host a calculator on its own — it embeds the one already configured on your Clean Estimator dashboard.
+**This plugin requires an active Clean Estimator subscription** ([cleanestimator.com/estimator](https://www.cleanestimator.com/estimator)). It doesn't create or host a calculator on its own — it embeds the one already configured on your Clean Estimator dashboard.
 
 = Features =
 
@@ -38,7 +38,7 @@ Log in to your Clean Estimator dashboard at cleanestimator.com/company, open the
 
 = Do I need a Clean Estimator account? =
 
-Yes. This plugin embeds the calculator configured on your Clean Estimator subscription. It doesn't work standalone — sign up at cleanestimator.com/for-companies.
+Yes. This plugin embeds the calculator configured on your Clean Estimator subscription. It doesn't work standalone — sign up at cleanestimator.com/estimator.
 
 = Can I use it more than once on the same site? =
 

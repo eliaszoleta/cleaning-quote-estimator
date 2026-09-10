@@ -48,7 +48,7 @@ export default function CompanyLanding() {
       <Helmet>
         <title>Embed a Cleaning Cost Calculator on Your Website | Clean Estimator for Companies</title>
         <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 30-day free trial, no credit card required. $159/month." />
-        <link rel="canonical" href="https://www.cleanestimator.com/for-companies" />
+        <link rel="canonical" href="https://www.cleanestimator.com/estimator" />
       </Helmet>
       <div className="app">
         <Header />
