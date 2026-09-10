@@ -2,10 +2,11 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star,
-  BellRing, Send, Home as HomeIcon, Quote, ShieldCheck, Zap, ArrowRight,
+  BellRing, Send, Quote, ShieldCheck, Zap, ArrowRight,
 } from 'lucide-react';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
+import CleaningCalculator from '../calculator/CleaningCalculator';
 
 const PRIMARY = '#1d4ed8';
 
@@ -67,10 +68,11 @@ function Arrow({ size }) {
   return <span className="ce-arrow"><ArrowRight size={size} /></span>;
 }
 
-// Purely decorative "product shot" -- a fake browser chrome around a
-// miniature replica of the actual widget's results step, plus a floating
-// notification chip echoing the instant-lead-alert feature. Static, no
-// interaction -- this is a mockup, not a second copy of the real widget.
+// Browser chrome around the *actual* CleaningCalculator (embedded mode,
+// same component a company's own visitors use), not a redrawn approximation
+// -- so this stays accurate to the real product and a visitor can actually
+// click through it, plus a floating notification chip echoing the
+// instant-lead-alert feature.
 function WidgetPreview() {
   return (
     <div className="ce-float" style={{ position: 'relative' }}>
@@ -83,26 +85,8 @@ function WidgetPreview() {
             yourcompany.com
           </div>
         </div>
-        <div style={{ padding: '26px 24px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-            <div style={{ width: 34, height: 34, borderRadius: 9, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <HomeIcon size={16} color={PRIMARY} strokeWidth={2} />
-            </div>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>House Cleaning</div>
-              <div style={{ fontSize: 11.5, color: '#94a3b8' }}>Austin, TX &middot; 1,800 sq ft</div>
-            </div>
-          </div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-            Your estimate
-          </div>
-          <div style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.2px', marginBottom: 18 }}>
-            $249<span style={{ color: '#cbd5e1', fontWeight: 700 }}> &ndash; </span>$319
-          </div>
-          <div style={{ height: 1, background: '#f1f5f9', marginBottom: 18 }} />
-          <div style={{ textAlign: 'center', padding: '12px 0', background: PRIMARY, color: 'white', borderRadius: 9, fontSize: 13, fontWeight: 700 }}>
-            Get My Free Quote
-          </div>
+        <div style={{ height: 480, overflowY: 'auto' }}>
+          <CleaningCalculator embedded />
         </div>
       </div>
 
