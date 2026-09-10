@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Star, MapPin } from 'lucide-react';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { getAllStates, getStateByCode } from '../../data/statePricing';
 import { getCityTier, POPULATION_THRESHOLD, MAJOR_CITY_PRICE, MINOR_CITY_PRICE } from '../../data/partnerCityTiers';
@@ -93,6 +93,67 @@ const AD_COMPARISON = [
     us: 'We set up your listing for you. No campaigns to manage, no bids to monitor, no ad copy to write.',
   },
 ];
+
+// Purely decorative "product shot" for the hero -- same technique as the
+// estimator sales page's widget mockup: a fake browser chrome around a
+// miniature replica of a results page, showing exactly what a visitor
+// sees (their estimate, then the partner's own listing recommended right
+// below it). Static, no interaction.
+function PartnerPreview() {
+  return (
+    <div className="pw-float" style={{ position: 'relative' }}>
+      <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: '0 30px 70px -20px rgba(2,6,23,0.55), 0 8px 20px rgba(2,6,23,0.25)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '11px 16px', background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fca5a5' }} />
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fcd34d' }} />
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#86efac' }} />
+          <div style={{ marginLeft: 10, flex: 1, background: 'white', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 10px', fontSize: 11, color: '#94a3b8' }}>
+            cleanestimator.com/estimate
+          </div>
+        </div>
+        <div style={{ padding: '24px 22px 22px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+            Your estimate
+          </div>
+          <div style={{ fontSize: 30, fontWeight: 900, color: '#0f172a', letterSpacing: '-1px', marginBottom: 18 }}>
+            $249<span style={{ color: '#cbd5e1', fontWeight: 700 }}> &ndash; </span>$319
+          </div>
+          <div style={{ height: 1, background: '#f1f5f9', marginBottom: 18 }} />
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+            Recommended local pro
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '12px 14px' }}>
+            <div style={{ width: 34, height: 34, borderRadius: 9, background: PRIMARY_GRADIENT, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>AC</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0f172a' }}>ABC Cleaning Co.</div>
+              <div style={{ display: 'flex', gap: 2, marginTop: 3 }}>
+                {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={10} color="#f59e0b" fill="#f59e0b" />)}
+              </div>
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'white', background: PRIMARY, padding: '6px 10px', borderRadius: 7, flexShrink: 0 }}>Call</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Floating exclusivity chip */}
+      <div style={{
+        position: 'absolute', left: -18, bottom: -22, display: 'flex', alignItems: 'center', gap: 10,
+        background: 'white', borderRadius: 12, padding: '11px 16px 11px 12px',
+        boxShadow: '0 14px 32px -8px rgba(2,6,23,0.35)', border: '1px solid #f1f5f9',
+      }}>
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <MapPin size={14} color={PRIMARY} strokeWidth={2.2} />
+        </div>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>Exclusive in this city</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10.5, color: '#94a3b8' }}>
+            <span className="pw-pulse-dot" /> Only 1 partner per city
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function StatBadge({ number, label }) {
   return (
@@ -219,24 +280,62 @@ export default function PartnerWithUs() {
         <meta name="description" content="Get your cleaning business recommended to thousands of homeowners actively searching for cleaning services in your city. Join Clean Estimator's partner network from $175/month per city (major metros are $350/month) — sitewide placement, multi-city support, and a free performance dashboard included." />
       </Helmet>
 
-      {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: 'clamp(60px, 10vw, 100px) 24px' }}>
-        <div style={{ maxWidth: 780, margin: '0 auto', textAlign: 'center' }}>
-          <h1 style={{ fontSize: 'clamp(32px, 6vw, 58px)', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-1.5px', marginBottom: 22 }}>
-            Get Recommended to Thousands of Homeowners
-            <span style={{ display: 'block', color: '#93c5fd' }}> Ready to Hire a Cleaner</span>
-          </h1>
-          <p style={{ fontSize: 'clamp(15px, 2.5vw, 18px)', color: '#cbd5e1', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 18px' }}>
-            Clean Estimator gets <strong style={{ color: 'white' }}>20&ndash;30K organic visits per month</strong> and continues to grow. These aren&rsquo;t just casual visitors &mdash; they&rsquo;re homeowners and renters actively using our cost calculators because they have a real cleaning job in mind and a budget they&rsquo;re ready to spend.
-          </p>
-          <p style={{ fontSize: 'clamp(15px, 2.5vw, 18px)', color: '#cbd5e1', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 36px' }}>
-            We&rsquo;re generating leads every day, but the problem is that many of those leads go to waste when they come from cities where we don&rsquo;t yet have a cleaning partner.
-          </p>
-          <a href="#apply" style={{ display: 'inline-flex', alignItems: 'center', background: PRIMARY_GRADIENT, color: 'white', padding: '15px 36px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 17, letterSpacing: '-0.2px', gap: 4, boxShadow: '0 8px 24px rgba(29,78,216,0.4)' }}>
-            Get My City <IconArrow size={18} color="white" />
-          </a>
+      {/* Hero -- same treatment as the estimator sales page: a restrained
+          accent line + eyebrow instead of relying on size/weight alone, a
+          two-column layout, and a static "product shot" showing exactly
+          what a visitor sees (their estimate, then the partner's listing
+          recommended right below it) instead of only describing it. */}
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: '96px 24px 110px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 56, alignItems: 'center' }}>
+          <div>
+            <div style={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #3b82f6, #818cf8)', marginBottom: 22 }} />
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
+              Local partner program
+            </div>
+            <h1 style={{ fontSize: 'clamp(30px,4.6vw,46px)', fontWeight: 800, lineHeight: 1.15, marginBottom: 18, letterSpacing: '-1px' }}>
+              Get recommended to thousands of homeowners<br />
+              <span style={{ color: '#60a5fa' }}>ready to hire a cleaner</span>
+            </h1>
+            <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 14, lineHeight: 1.65 }}>
+              Clean Estimator gets <strong style={{ color: 'white' }}>20&ndash;30K organic visits a month</strong> from homeowners actively pricing out a cleaning job, not casual browsers.
+            </p>
+            <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.65 }}>
+              Many of those leads go to waste in cities where we don&rsquo;t yet have a cleaning partner.
+            </p>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <a href="#apply" className="pw-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
+                Get My City <span className="pw-arrow"><IconArrow size={16} color="white" /></span>
+              </a>
+              <a href="/partner-demo" className="pw-btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,255,255,0.07)', color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 15.5, border: '1px solid rgba(255,255,255,0.15)' }}>
+                See Live Demo
+              </a>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: '100%', maxWidth: 380 }}>
+              <PartnerPreview />
+            </div>
+          </div>
         </div>
       </div>
+
+      <style>{`
+        .pw-btn-primary, .pw-btn-secondary { transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease; }
+        .pw-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(29,78,216,0.45); }
+        .pw-btn-secondary:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); }
+        .pw-arrow { display: inline-flex; transition: transform 0.15s ease; }
+        .pw-btn-primary:hover .pw-arrow { transform: translateX(3px); }
+        @keyframes pw-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .pw-float { animation: pw-float 5s ease-in-out infinite; }
+        @keyframes pw-pulse-ring { 0% { transform: scale(0.9); opacity: 0.6; } 70%, 100% { transform: scale(2.1); opacity: 0; } }
+        .pw-pulse-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+        .pw-pulse-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #22c55e; animation: pw-pulse-ring 1.8s ease-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .pw-float, .pw-pulse-dot::after { animation: none; }
+          .pw-btn-primary, .pw-btn-secondary, .pw-arrow { transition: none; }
+        }
+      `}</style>
 
       {/* Stats bar */}
       <div style={{ borderBottom: '1px solid #e2e8f0', borderTop: '1px solid #e2e8f0' }}>
