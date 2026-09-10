@@ -46,7 +46,7 @@ const PLAN_FEATURES = [
 ];
 
 const TRUST_BADGES = [
-  { Icon: ShieldCheck, text: 'No credit card required' },
+  { Icon: ShieldCheck, text: 'No credit card required for trial' },
   { Icon: Zap,          text: 'Live on your site in 30 minutes' },
   { Icon: Check,        text: 'Cancel anytime' },
 ];
