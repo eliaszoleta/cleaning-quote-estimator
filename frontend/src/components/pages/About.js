@@ -63,27 +63,34 @@ export default function About() {
         <link rel="canonical" href="https://www.cleanestimator.com/about" />
       </Helmet>
 
-      {/* Page Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: '64px 24px 0', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -60, right: -60, width: 280, height: 280, borderRadius: '50%', background: 'rgba(37,99,235,0.18)', filter: 'blur(50px)' }} />
-        <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(37,99,235,0.25)', border: '1px solid rgba(37,99,235,0.35)', borderRadius: 999, padding: '4px 14px', marginBottom: 20 }}>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#93c5fd', letterSpacing: '0.08em', textTransform: 'uppercase' }}>About Us</span>
+      {/* Page Hero -- deliberately restrained: no gradient blob, no pill
+          button. A thin accent rule + small-caps eyebrow do the "this is a
+          distinct section" job a badge used to, with less visual noise;
+          the stat row drops the boxed/bordered grid for plain numbers
+          separated by a hairline, closer to how a stat line reads in
+          editorial design than a dashboard widget. */}
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: '96px 24px 80px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 620, margin: '0 auto' }}>
+          <div style={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #3b82f6, #818cf8)', margin: '0 auto 24px' }} />
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
+            About Us
           </div>
-          <h1 style={{ fontSize: 'clamp(28px, 5vw, 44px)', fontWeight: 900, color: 'white', lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: 'clamp(30px, 5vw, 46px)', fontWeight: 800, color: 'white', lineHeight: 1.18, marginBottom: 20, letterSpacing: '-0.02em' }}>
             About Clean Estimator
           </h1>
-          <p style={{ fontSize: 17, color: '#cbd5e1', lineHeight: 1.7, maxWidth: 560, margin: '0 auto' }}>
+          <p style={{ fontSize: 17, color: '#94a3b8', lineHeight: 1.75, maxWidth: 540, margin: '0 auto' }}>
             We built Clean Estimator to solve a frustrating problem: no one knows what cleaning actually costs until they've already called 3 companies and waited for callbacks.
           </p>
         </div>
 
-        {/* Stat strip -- bridges the dark hero into the page instead of an abrupt cut to white cards */}
-        <div style={{ position: 'relative', maxWidth: 480, margin: '40px auto 0', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '52px auto 0' }}>
           {STATS.map((s, i) => (
-            <div key={s.label} style={{ textAlign: 'center', padding: '20px 8px', borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.12)' : 'none' }}>
-              <div style={{ fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 900, color: 'white', letterSpacing: '-0.02em' }}>{s.number}</div>
-              <div style={{ fontSize: 12, color: '#93c5fd', marginTop: 3 }}>{s.label}</div>
+            <div key={s.label} style={{ display: 'flex', alignItems: 'center' }}>
+              {i > 0 && <div style={{ width: 1, height: 30, background: 'rgba(255,255,255,0.14)', margin: '0 32px' }} />}
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 23, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>{s.number}</div>
+                <div style={{ fontSize: 11, color: '#64748b', marginTop: 5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+              </div>
             </div>
           ))}
         </div>
