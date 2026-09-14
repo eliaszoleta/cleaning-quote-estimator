@@ -29,6 +29,7 @@ export default function AdminHomepageLeads() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [stateFilter, setStateFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [selectedLead, setSelectedLead] = useState(null);
   const [notes, setNotes] = useState('');
@@ -84,6 +85,7 @@ export default function AdminHomepageLeads() {
 
   const filtered = baseLeads.filter(l => {
     if (filter !== 'all' && l.service_type !== filter) return false;
+    if (stateFilter !== 'all' && l.state !== stateFilter) return false;
     if (search) {
       const q = search.toLowerCase();
       return (l.name || '').toLowerCase().includes(q) || (l.email || '').toLowerCase().includes(q) || (l.zip || '').includes(q);
@@ -92,8 +94,9 @@ export default function AdminHomepageLeads() {
   });
 
   const serviceTypes = [...new Set(baseLeads.map(l => l.service_type))];
+  const states = [...new Set(baseLeads.map(l => l.state).filter(Boolean))].sort();
 
-  const switchView = (v) => { setView(v); setFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
+  const switchView = (v) => { setView(v); setFilter('all'); setStateFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
 
   const toggleSelect = (id) => {
     setSelectedIds(prev => {
@@ -328,6 +331,14 @@ export default function AdminHomepageLeads() {
                   <option value="all">All services</option>
                   {serviceTypes.map(t => <option key={t} value={t}>{serviceTypeLabel(t)}</option>)}
                 </select>
+                <select
+                  value={stateFilter}
+                  onChange={e => setStateFilter(e.target.value)}
+                  style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
+                >
+                  <option value="all">All states</option>
+                  {states.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
               </div>
             </div>
 
@@ -369,10 +380,10 @@ export default function AdminHomepageLeads() {
                   <Inbox size={24} color="#94a3b8" />
                 </div>
                 <div style={{ fontWeight: 700, fontSize: 15, color: '#374151', marginBottom: 5 }}>
-                  {search || filter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
+                  {search || filter !== 'all' || stateFilter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
                 </div>
                 <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', maxWidth: 300, margin: 0 }}>
-                  {search || filter !== 'all'
+                  {search || filter !== 'all' || stateFilter !== 'all'
                     ? 'Try changing your search or filter.'
                     : view === 'trash'
                       ? 'Leads you archive show up here, and can be restored.'
