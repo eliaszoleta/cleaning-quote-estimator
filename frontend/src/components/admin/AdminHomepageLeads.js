@@ -12,6 +12,17 @@ const SERVICE_COLORS = {
   tile_grout: '#64748b', mold_remediation: '#991b1b', water_damage: '#0284c7',
 };
 
+// 'this_month' / 'last_month' compare against the viewer's local calendar
+// month, not a rolling 30-day window -- matches how "this month" reads to
+// a person glancing at a calendar.
+function matchesDateFilter(createdAt, dateFilter) {
+  if (dateFilter === 'all') return true;
+  const d = new Date(createdAt);
+  const now = new Date();
+  const monthsAgo = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+  return dateFilter === 'this_month' ? monthsAgo === 0 : monthsAgo === 1;
+}
+
 // Site-owner view of every lead the main public calculator has ever
 // captured -- same `leads` table every embedded subscriber's leads live in
 // (see backend/src/routes/leads.js's saveLead), just the rows where
@@ -30,6 +41,7 @@ export default function AdminHomepageLeads() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [stateFilter, setStateFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [selectedLead, setSelectedLead] = useState(null);
   const [notes, setNotes] = useState('');
@@ -79,9 +91,13 @@ export default function AdminHomepageLeads() {
     }
   };
 
-  const baseLeads = leads.filter(l => (view === 'trash' ? !!l.deleted_at : !l.deleted_at));
-  const activeCount = leads.filter(l => !l.deleted_at).length;
-  const trashCount = leads.filter(l => l.deleted_at).length;
+  // Date filter narrows the whole pool first -- the Active/Trash tab counts
+  // and the list itself should agree on what "this month" includes, not
+  // just the visible list while the tab counts stay stuck at the total.
+  const dateFilteredLeads = leads.filter(l => matchesDateFilter(l.created_at, dateFilter));
+  const baseLeads = dateFilteredLeads.filter(l => (view === 'trash' ? !!l.deleted_at : !l.deleted_at));
+  const activeCount = dateFilteredLeads.filter(l => !l.deleted_at).length;
+  const trashCount = dateFilteredLeads.filter(l => l.deleted_at).length;
 
   const filtered = baseLeads.filter(l => {
     if (filter !== 'all' && l.service_type !== filter) return false;
@@ -96,7 +112,7 @@ export default function AdminHomepageLeads() {
   const serviceTypes = [...new Set(baseLeads.map(l => l.service_type))];
   const states = [...new Set(baseLeads.map(l => l.state).filter(Boolean))].sort();
 
-  const switchView = (v) => { setView(v); setFilter('all'); setStateFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
+  const switchView = (v) => { setView(v); setFilter('all'); setStateFilter('all'); setDateFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
 
   const toggleSelect = (id) => {
     setSelectedIds(prev => {
@@ -339,6 +355,15 @@ export default function AdminHomepageLeads() {
                   <option value="all">All states</option>
                   {states.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
+                <select
+                  value={dateFilter}
+                  onChange={e => setDateFilter(e.target.value)}
+                  style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
+                >
+                  <option value="all">All time</option>
+                  <option value="this_month">This month</option>
+                  <option value="last_month">Last month</option>
+                </select>
               </div>
             </div>
 
@@ -380,10 +405,10 @@ export default function AdminHomepageLeads() {
                   <Inbox size={24} color="#94a3b8" />
                 </div>
                 <div style={{ fontWeight: 700, fontSize: 15, color: '#374151', marginBottom: 5 }}>
-                  {search || filter !== 'all' || stateFilter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
+                  {search || filter !== 'all' || stateFilter !== 'all' || dateFilter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
                 </div>
                 <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', maxWidth: 300, margin: 0 }}>
-                  {search || filter !== 'all' || stateFilter !== 'all'
+                  {search || filter !== 'all' || stateFilter !== 'all' || dateFilter !== 'all'
                     ? 'Try changing your search or filter.'
                     : view === 'trash'
                       ? 'Leads you archive show up here, and can be restored.'
