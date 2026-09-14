@@ -7,7 +7,11 @@
 // homepage all pass embedded=true to CleaningCalculator for styling only,
 // so trackMetaEvent below stays a safe no-op there instead of double-gating.
 
-const PIXEL_ID = process.env.REACT_APP_META_PIXEL_ID;
+// Pixel IDs aren't secret -- they ship in cleartext to every visitor's
+// browser by design (the client has to call fbq('init', ID) itself), so
+// defaulting it here is fine. REACT_APP_META_PIXEL_ID still overrides it
+// per-deploy if this ever needs to point at a different Meta ad account.
+const PIXEL_ID = process.env.REACT_APP_META_PIXEL_ID || '1407282954925304';
 
 export function initMetaPixel() {
   if (!PIXEL_ID || typeof window === 'undefined' || window.fbq) return;
