@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw } from 'lucide-react';
+import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw, Target } from 'lucide-react';
 import { getAdminHomepageLeads, patchAdminHomepageLead, deleteAdminHomepageLeadForever } from '../../utils/api';
 import { formatPrice, serviceTypeLabel, formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
@@ -271,6 +271,42 @@ export default function AdminHomepageLeads() {
     URL.revokeObjectURL(url);
   };
 
+  // Meta's Customer List upload (Ads Manager > Audiences > Create Custom
+  // Audience > Customer List) auto-maps columns by these exact lowercase
+  // header names -- email/phone/fn/ln/ct/st/zip/country -- so a file built
+  // this way uploads with zero manual field-mapping on their end. Meta
+  // hashes everything itself on upload; the normalization here (lowercase,
+  // digits-only phone, split name) just improves match rate, same as their
+  // own documented guidance for pre-hash formatting. Only identity/location
+  // fields go out -- price, timeline, and notes have no matching value and
+  // no reason to leave this system.
+  const toFacebookCSV = (rowsSource) => {
+    const headers = ['email', 'phone', 'fn', 'ln', 'ct', 'st', 'zip', 'country'];
+    const rows = rowsSource.map(l => {
+      const [fn, ...lnParts] = (l.name || '').trim().split(/\s+/).filter(Boolean);
+      return [
+        (l.email || '').toLowerCase().trim(),
+        (l.phone || '').replace(/\D/g, ''),
+        (fn || '').toLowerCase(),
+        lnParts.join(' ').toLowerCase(),
+        (l.service_details?.city || '').toLowerCase().replace(/\s+/g, ''),
+        (l.state || '').toLowerCase(),
+        (l.zip || '').trim(),
+        'us',
+      ];
+    });
+    return [headers, ...rows].map(r => r.map(c => `"${sanitizeCsvCell(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  };
+
+  const exportFacebookCSV = () => {
+    const rowsSource = selectedIds.size > 0 ? filtered.filter(l => selectedIds.has(l.id)) : filtered;
+    const csv = toFacebookCSV(rowsSource);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'cleanestimator-leads-facebook-custom-audience.csv'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' };
   const btnStyle = { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 13px', border: '1px solid #e2e8f0', borderRadius: 7, background: 'white', cursor: 'pointer', fontSize: 12.5, fontWeight: 600, color: '#374151' };
 
@@ -312,6 +348,9 @@ export default function AdminHomepageLeads() {
                   </button>
                   <button onClick={exportCSV} disabled={filtered.length === 0} style={{ ...btnStyle, opacity: filtered.length === 0 ? 0.5 : 1 }}>
                     <Download size={13} /> {selectedIds.size > 0 ? `Export Selected (${selectedIds.size})` : 'Export CSV'}
+                  </button>
+                  <button onClick={exportFacebookCSV} disabled={filtered.length === 0} title="Formatted for Meta Ads Manager > Audiences > Custom Audience > Customer List" style={{ ...btnStyle, opacity: filtered.length === 0 ? 0.5 : 1 }}>
+                    <Target size={13} /> Export for Facebook
                   </button>
                 </div>
               </div>
