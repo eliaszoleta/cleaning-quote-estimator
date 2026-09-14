@@ -35,6 +35,7 @@ import MethodologyPage from './components/pages/MethodologyPage';
 import ServiceCalculatorPage, { calculatorSlugFor } from './components/pages/ServiceCalculatorPage';
 import { getAllServices } from './data/services';
 import EmbedWrapper from './components/EmbedWrapper';
+import { initMetaPixel } from './utils/metaPixel';
 import './App.css';
 
 const pathname = window.location.pathname.replace(/\/$/, '') || '/';
@@ -138,6 +139,13 @@ export default function App() {
       setAuthLoading(false);
     });
     return () => subscription.unsubscribe();
+  }, []);
+
+  // Never on /embed -- that route renders inside an iframe on a third-party
+  // company's own site, and firing our pixel there would attribute their
+  // visitors to our ad account.
+  useEffect(() => {
+    if (!isEmbed) initMetaPixel();
   }, []);
 
   const handleLogout = async () => {
