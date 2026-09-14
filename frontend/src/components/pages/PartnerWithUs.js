@@ -199,7 +199,7 @@ export default function PartnerWithUs() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', message: '' });
+  const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', website: '', message: '' });
   const [rows, setRows] = useState([{ ...EMPTY_ROW }]);
 
   const citiesForState = (stateCode) => stateCode ? (STATES_WITH_CITIES.find(s => s.code === stateCode)?.cities || []) : [];
@@ -256,6 +256,7 @@ export default function PartnerWithUs() {
           business: form.business,
           email: form.email,
           phone: form.phone || 'Not provided',
+          website: form.website || 'Not provided',
           cities: citiesSummary,
           estimated_monthly_total: unmatchedCities.length ? `$${monthlyTotal}+/mo (some cities need manual tier confirmation)` : `$${monthlyTotal}/mo`,
           message: form.message || 'No additional message',
@@ -563,6 +564,10 @@ export default function PartnerWithUs() {
                   <input type="tel" style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Website</label>
+                  <input type="url" style={inputStyle} value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} placeholder="https://yourbusiness.com" />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cities You Want to Cover *</label>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {rows.map((row, i) => {
@@ -649,7 +654,7 @@ export default function PartnerWithUs() {
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Anything else?</label>
-                  <textarea rows={3} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="Types of cleaning you offer, website URL, questions..." />
+                  <textarea rows={3} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="Types of cleaning you offer, questions..." />
                 </div>
               </div>
               {error && (
