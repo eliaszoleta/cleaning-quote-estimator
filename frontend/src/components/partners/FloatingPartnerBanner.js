@@ -47,11 +47,13 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
         width: isMobile ? 218 : DESKTOP_BANNER_WIDTH,
         maxWidth: 'calc(100vw - 20px)',
         background: 'white',
-        border: '1px solid rgba(15,23,42,0.07)',
-        borderRadius: isMobile ? 14 : 16,
+        border: isMobile ? '1px solid rgba(15,23,42,0.045)' : '1px solid rgba(15,23,42,0.07)',
+        borderRadius: isMobile ? 12 : 16,
         overflow: 'hidden',
-        boxShadow: '0 2px 6px rgba(15,23,42,0.05), 0 18px 38px rgba(37,99,235,0.14)',
-        padding: isMobile ? '10px 12px' : '14px 16px',
+        boxShadow: isMobile
+          ? '0 1px 3px rgba(15,23,42,0.04), 0 8px 18px rgba(37,99,235,0.10)'
+          : '0 2px 6px rgba(15,23,42,0.05), 0 18px 38px rgba(37,99,235,0.14)',
+        padding: isMobile ? '8px 10px' : '14px 16px',
         animation: `partnerBannerIn 0.25s ease-out`,
       }}
     >
@@ -59,18 +61,18 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
 
       {/* Thin brand-color accent instead of a full outline -- a nod to the
           blue border this replaced, without boxing the whole card in it. */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, #2563eb, #7c3aed)' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: isMobile ? 2 : 3, background: 'linear-gradient(90deg, #2563eb, #7c3aed)' }} />
 
       <button
         onClick={onDismiss}
         aria-label="Dismiss"
-        style={{ position: 'absolute', top: isMobile ? 7 : 10, right: isMobile ? 5 : 8, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#94a3b8', display: 'flex' }}
+        style={{ position: 'absolute', top: isMobile ? 6 : 10, right: isMobile ? 5 : 8, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#94a3b8', display: 'flex' }}
       >
         <X size={isMobile ? 12 : 14} />
       </button>
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 7 : 10 }}>
-        <div style={{ fontSize: isMobile ? 8 : 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '3px 8px' : '4px 10px', borderRadius: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 4 : 10 }}>
+        <div style={{ fontSize: isMobile ? 8 : 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
           Local Cleaner Near You
         </div>
       </div>
@@ -79,16 +81,16 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
         <img
           src={partner.logo_url}
           alt={partner.business_name}
-          style={{ maxWidth: '100%', maxHeight: isMobile ? 26 : 44, objectFit: 'contain', display: 'block', margin: isMobile ? '0 auto 6px' : '0 auto 10px' }}
+          style={{ maxWidth: '100%', maxHeight: isMobile ? 20 : 44, objectFit: 'contain', display: 'block', margin: isMobile ? '0 auto 4px' : '0 auto 10px' }}
         />
       )}
 
-      <div style={{ marginBottom: isMobile ? 8 : 12, textAlign: partner.logo_url ? 'center' : 'left' }}>
-        <div style={{ fontWeight: 800, fontSize: isMobile ? 11.5 : 14.5, color: '#0f172a', lineHeight: 1.25 }}>
+      <div style={{ marginBottom: isMobile ? 5 : 12, textAlign: partner.logo_url ? 'center' : 'left' }}>
+        <div style={{ fontWeight: 800, fontSize: isMobile ? 11.5 : 14.5, color: '#0f172a', lineHeight: isMobile ? 1.15 : 1.25 }}>
           {partner.business_name}
         </div>
         {partner.address && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: partner.logo_url ? 'center' : 'flex-start', gap: 4, fontSize: isMobile ? 10.5 : 12, color: '#64748b', marginTop: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: partner.logo_url ? 'center' : 'flex-start', gap: 4, fontSize: isMobile ? 10.5 : 12, color: '#64748b', marginTop: isMobile ? 1 : 2 }}>
             <MapPin size={isMobile ? 10 : 11} color="#94a3b8" /> {partner.address}
           </div>
         )}
@@ -98,7 +100,7 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
         <a
           href={`tel:${partner.phone}`}
           onClick={onCallClick}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#16a34a', color: 'white', padding: isMobile ? '7px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap' }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#16a34a', color: 'white', padding: isMobile ? '6px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap' }}
         >
           <Phone size={isMobile ? 11 : 13} /> Call {partner.phone}
         </a>
