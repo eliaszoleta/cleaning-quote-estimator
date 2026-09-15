@@ -177,7 +177,7 @@ function StepCard({ number, title, desc }) {
       <div style={{ width: 40, height: 40, borderRadius: '50%', background: PRIMARY_GRADIENT, color: 'white', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 6px 16px rgba(29,78,216,0.3)' }}>{number}</div>
       <div>
         <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 4 }}>{title}</div>
-        <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{desc}</div>
+        <div className="pw-step-desc" style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{desc}</div>
       </div>
     </div>
   );
@@ -345,6 +345,12 @@ export default function PartnerWithUs() {
         @media (prefers-reduced-motion: reduce) {
           .pw-float, .pw-pulse-dot::after { animation: none; }
           .pw-btn-primary, .pw-btn-secondary, .pw-arrow { transition: none; }
+        }
+        /* Justify only at desktop width -- on a narrow phone column it
+           stretches short lines into uneven whitespace gaps instead of
+           clean edges. */
+        @media (min-width: 768px) {
+          .pw-step-desc { text-align: justify; }
         }
       `}</style>
 
