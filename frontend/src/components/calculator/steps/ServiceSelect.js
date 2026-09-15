@@ -37,19 +37,6 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
 
   return (
     <div>
-      {/* Step indicator */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <span style={{
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          width: 24, height: 24, borderRadius: '50%',
-          background: primaryColor || '#2563eb', color: 'white',
-          fontSize: 12, fontWeight: 700, flexShrink: 0,
-        }}>1</span>
-        <span style={{ fontSize: 12, fontWeight: 600, color: '#64748b', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-          Step 1 of 4 — Pick a service
-        </span>
-      </div>
-
       <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: '#0f172a', marginBottom: 4, letterSpacing: '-0.3px' }}>
         {companyName ? `${companyName} — Get Your Quote` : 'What service do you need?'}
       </h2>

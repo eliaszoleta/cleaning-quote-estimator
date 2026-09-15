@@ -269,7 +269,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         {!embedded && currentStep === 'service' && (
           <div className="calc-hero">
             <div className="calc-hero__badge">Free • Instant • No signup required</div>
-            <h1 className="calc-hero__title">Free Cleaning Cost Calculator and Estimator</h1>
+            <h1 className="calc-hero__title">Free Cleaning Cost Calculator — Get an Estimate</h1>
             <p className="calc-hero__subtitle">Instant, ZIP-code accurate cleaning cost estimates for house cleaning, deep cleaning, move-out, carpet, air duct, mold remediation &amp; more.</p>
           </div>
         )}
