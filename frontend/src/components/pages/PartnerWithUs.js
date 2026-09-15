@@ -397,23 +397,29 @@ export default function PartnerWithUs() {
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 12 }}>Why This Beats Paid Ads</h2>
             <p style={{ fontSize: 15, color: '#64748b', maxWidth: 600, margin: '0 auto', lineHeight: 1.65 }}>Google and Facebook ads charge you for attention, whether it converts or not. This charges you for exclusive placement in front of people who already want a cleaner.</p>
           </div>
-          <div style={{ overflowX: 'auto' }}>
-            <div style={{ minWidth: 640, display: 'grid', gridTemplateColumns: '150px 1fr 1fr', gap: 1, background: '#e2e8f0', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-              <div style={{ background: '#f8fafc' }} />
-              <div style={{ background: '#f1f5f9', padding: '14px 16px', fontWeight: 800, fontSize: 12.5, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center' }}>Search &amp; Social Ads</div>
-              <div style={{ background: PRIMARY_GRADIENT, padding: '14px 16px', fontWeight: 800, fontSize: 12.5, color: 'white', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center' }}>Clean Estimator Partnership</div>
-              {AD_COMPARISON.map((row, i) => (
-                <React.Fragment key={i}>
-                  <div style={{ background: 'white', padding: '16px', fontWeight: 700, fontSize: 13.5, color: '#0f172a', display: 'flex', alignItems: 'center' }}>{row.label}</div>
-                  <div style={{ background: 'white', padding: '16px', fontSize: 13, color: '#64748b', lineHeight: 1.6, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                    <span style={{ marginTop: 2, flexShrink: 0 }}><IconX /></span>{row.ads}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {AD_COMPARISON.map((row, i) => (
+              <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, overflow: 'hidden' }}>
+                <div style={{ padding: '13px 18px', fontWeight: 800, fontSize: 13.5, color: '#0f172a', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>{row.label}</div>
+                {/* auto-fit lets ads/us sit side by side once there's room for both at
+                    220px+, and stack full-width on phones instead of forcing a fixed
+                    640px table width that clipped text off the edge of the screen. */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+                  <div style={{ padding: '16px 18px', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Search &amp; Social Ads</div>
+                    <div style={{ fontSize: 13.5, color: '#64748b', lineHeight: 1.65, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                      <span style={{ marginTop: 2, flexShrink: 0 }}><IconX /></span>{row.ads}
+                    </div>
                   </div>
-                  <div style={{ background: '#eff6ff', padding: '16px', fontSize: 13, color: '#1e3a8a', lineHeight: 1.6, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                    <span style={{ marginTop: 2, flexShrink: 0 }}><IconCheck size={14} /></span>{row.us}
+                  <div style={{ padding: '16px 18px', background: '#eff6ff' }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Clean Estimator Partnership</div>
+                    <div style={{ fontSize: 13.5, color: '#1e3a8a', lineHeight: 1.65, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                      <span style={{ marginTop: 2, flexShrink: 0 }}><IconCheck size={14} /></span>{row.us}
+                    </div>
                   </div>
-                </React.Fragment>
-              ))}
-            </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
