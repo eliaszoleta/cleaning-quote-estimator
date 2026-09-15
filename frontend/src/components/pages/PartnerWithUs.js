@@ -308,7 +308,7 @@ export default function PartnerWithUs() {
               <span style={{ color: '#60a5fa' }}>ready to hire a cleaner</span>
             </h1>
             <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 14, lineHeight: 1.5 }}>
-              Clean Estimator gets <strong style={{ color: 'white', fontWeight: 600 }}>20&ndash;30K organic visits a month</strong> from homeowners actively pricing out a cleaning job, not casual browsers.
+              Clean Estimator gets <span style={{ color: 'white', fontWeight: 400 }}>25&ndash;30K organic visits a month</span> from homeowners actively pricing out a cleaning job, not casual browsers.
             </p>
             <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.5 }}>
               Many of those leads go to waste in cities where we don&rsquo;t yet have a cleaning partner.
