@@ -473,7 +473,7 @@ export default function PartnerWithUs() {
               <div style={{ fontSize: 'clamp(11.5px, 3vw, 13px)', color: '#64748b' }}>Under {POPULATION_THRESHOLD.toLocaleString()} residents &mdash; half the major-city rate</div>
             </div>
           </div>
-          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(24px, 4vw, 36px)', maxWidth: 700, margin: '0 auto' }}>
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(16px, 4vw, 36px)', maxWidth: 700, margin: '0 auto' }}>
             <div style={{ marginBottom: 24 }}>
               <Check>Exclusive placement &mdash; only 1 partner per city</Check>
               <Check>Your name, address, phone, website &amp; logo on every results page in your city, a floating recommendation banner sitewide, and in the estimate email if they opt in to get one</Check>
@@ -558,7 +558,7 @@ export default function PartnerWithUs() {
               <div style={{ fontSize: 15, color: '#166534' }}>We'll review your application and get back to you within 48 hours to confirm availability in your city.</div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(24px, 4vw, 40px)' }}>
+            <form onSubmit={handleSubmit} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(16px, 4vw, 40px)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Your Name *</label>
