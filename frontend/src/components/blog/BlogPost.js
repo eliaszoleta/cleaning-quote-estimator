@@ -151,9 +151,9 @@ export default function BlogPost({ slug }) {
       {/* 880 instead of the old 760 -- on a wide desktop monitor, a narrow
           column surrounded by huge margins reads like a cramped WordPress
           Gutenberg default width instead of a real article layout. */}
-      <div style={{ maxWidth: 880, margin: '0 auto', padding: 'clamp(28px, 7vw, 60px) 20px' }}>
+      <div style={{ maxWidth: 880, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px' }}>
         {/* Breadcrumb */}
-        <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 'clamp(16px, 4vw, 24px)' }}>
+        <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 'clamp(8px, 4vw, 24px)' }}>
           <a href="/" style={{ color: '#94a3b8' }}>Home</a> › <a href="/blog" style={{ color: '#94a3b8' }}>Blog</a> › <a href={`/blog/category/${post.category}`} style={{ color: '#94a3b8' }}>{post.categoryLabel}</a>
         </div>
 
