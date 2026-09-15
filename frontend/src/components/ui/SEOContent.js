@@ -244,7 +244,7 @@ export default function SEOContent() {
               risking an off-screen clip if the estimate is slightly off on
               an unusually narrow device; it just wraps to 2 lines there
               instead, same as before. */}
-          <h2 style={{ fontSize: 'clamp(13.5px, 4vw, 21px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(14.5px, 4.4vw, 23px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px', textAlign: 'center' }}>
             Get a FREE Cleaning Cost Estimate Online
           </h2>
           <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
