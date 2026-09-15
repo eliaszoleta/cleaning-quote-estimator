@@ -103,7 +103,7 @@ const AD_COMPARISON = [
   {
     label: 'Setup & upkeep',
     ads: 'Keyword research, bid management, ad copy testing, ongoing optimization — usually a part-time job on its own.',
-    us: 'We set up your listing for you. No campaigns to manage, no bids to monitor, no ad copy to write.',
+    us: 'Your listing goes live from your own business details. No campaigns to manage, no bids to monitor, no ad copy to write.',
   },
 ];
 
@@ -439,7 +439,7 @@ export default function PartnerWithUs() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
             <StepCard number="1" title="You choose your city (or cities)" desc={`Tell us which cities or metro areas you serve — one city or several. Major metro areas (roughly ${POPULATION_THRESHOLD.toLocaleString()}+ residents) are $${MAJOR_CITY_PRICE}/month; smaller cities are $${MINOR_CITY_PRICE}/month — half price. Either way you get exclusive placement, only one partner per city.`} />
-            <StepCard number="2" title="We add your business to our platform" desc="We set up your profile with your business name, address, phone number, website, and logo. No tech work needed on your end." />
+            <StepCard number="2" title="Your business goes live on our platform" desc="Buy your city instantly and your profile — business name, address, phone number, website, and logo — goes live the moment payment clears, no waiting on us. Prefer to apply first? We'll set it up for you within 48 hours instead. Either way, no tech work needed on your end." />
             <StepCard number="3" title="We detect each visitor's city automatically — no guesswork" desc="The moment someone lands on the site, we detect their city automatically — no signup or location sharing needed. If it matches one of your listed cities, your listing shows up. If not, they never see it." />
             <StepCard number="4" title="You show up wherever your customers are — not just one page" desc="Once matched, your listing appears as a recommended local cleaner on their estimate results page, as a floating banner on every other page they visit — the home page, blog posts, cost guides, all of it — and again in their inbox if they opt in to get their estimate emailed to them. Three placements from one match, not one." />
             <StepCard number="5" title="Every lead lands straight in your inbox — you don't have to wait for a call" desc="The moment a matched visitor gets their estimate emailed to them, we email you that same lead's name, contact info, and timeline directly, reply-to set to them so you can just hit reply. On top of that, they can call or visit your website directly too — there's no middleman and no lead fee either way. Every lead is yours, no commission, no strings." />
