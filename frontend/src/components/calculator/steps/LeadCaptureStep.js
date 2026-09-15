@@ -11,7 +11,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
   const [customAnswers, setCustomAnswers] = useState({});
   const [touched, setTouched] = useState({});
 
-  const ctaHeadline = companyConfig?.ctaHeadline || 'Get Your Instant Estimate';
+  const ctaHeadline = companyConfig?.ctaHeadline || 'Get your instant estimate';
   const ctaSubtext = companyConfig?.ctaSubtext || "We'll email your results and, if there's a match in your area, recommend a local cleaning professional.";
 
   const nameValid = name.trim().length > 0;
