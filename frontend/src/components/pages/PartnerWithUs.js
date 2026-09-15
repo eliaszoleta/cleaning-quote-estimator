@@ -289,7 +289,7 @@ export default function PartnerWithUs() {
           two-column layout, and a static "product shot" showing exactly
           what a visitor sees (their estimate, then the partner's listing
           recommended right below it) instead of only describing it. */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: '96px 24px 110px' }}>
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: '64px 24px 110px' }}>
         {/* minmax(min(380px, 100%), 1fr) instead of a bare minmax(380px, 1fr) --
             on phones narrower than ~428px, 380px + 48px of side padding no
             longer fits inside the viewport, and a plain fixed floor forces
@@ -307,10 +307,10 @@ export default function PartnerWithUs() {
               Get recommended to thousands of homeowners<br />
               <span style={{ color: '#60a5fa' }}>ready to hire a cleaner</span>
             </h1>
-            <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 14, lineHeight: 1.65 }}>
-              Clean Estimator gets <strong style={{ color: 'white' }}>20&ndash;30K organic visits a month</strong> from homeowners actively pricing out a cleaning job, not casual browsers.
+            <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 14, lineHeight: 1.5 }}>
+              Clean Estimator gets <strong style={{ color: 'white', fontWeight: 600 }}>20&ndash;30K organic visits a month</strong> from homeowners actively pricing out a cleaning job, not casual browsers.
             </p>
-            <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.65 }}>
+            <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.5 }}>
               Many of those leads go to waste in cities where we don&rsquo;t yet have a cleaning partner.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
