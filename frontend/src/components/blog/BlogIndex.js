@@ -41,7 +41,7 @@ function PostCard({ post }) {
   const meta = CATEGORY_ICONS[post.category];
   const Icon = meta?.Icon;
   return (
-    <a href={`/blog/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: '24px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)' }}
+    <a href={`/blog/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(16px, 4.5vw, 24px)', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)' }}
       onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 8px rgba(15,23,42,0.04), 0 12px 28px rgba(30,64,175,0.12)'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = '#bfdbfe'; }}
       onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = '#e2e8f0'; }}
     >
@@ -113,12 +113,12 @@ export default function BlogIndex() {
           }
         })}</script>
       </Helmet>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '60px 24px' }}>
-        <h1 style={{ fontSize: 40, fontWeight: 900, color: '#0f172a', marginBottom: 8, letterSpacing: '-0.01em' }}>Cleaning Cost Guides</h1>
-        <p style={{ fontSize: 18, color: '#64748b', marginBottom: 28 }}>Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px' }}>
+        <h1 style={{ fontSize: 'clamp(28px, 6.5vw, 40px)', fontWeight: 900, color: '#0f172a', marginBottom: 8, letterSpacing: '-0.01em' }}>Cleaning Cost Guides</h1>
+        <p style={{ fontSize: 'clamp(15px, 3.8vw, 18px)', color: '#64748b', lineHeight: 1.5, marginBottom: 'clamp(18px, 4vw, 28px)' }}>Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
 
         {/* Search */}
-        <div style={{ position: 'relative', marginBottom: 32 }}>
+        <div style={{ position: 'relative', marginBottom: 'clamp(20px, 4vw, 32px)' }}>
           <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
           <input
             type="text"
@@ -162,7 +162,7 @@ export default function BlogIndex() {
         <>
 
         {/* Categories */}
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 40 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 'clamp(24px, 5vw, 40px)' }}>
           <CategoryPill id={null} label="All Posts" href="/blog" active />
           {CATEGORIES.map(c => (
             <CategoryPill key={c.id} id={c.id} label={c.label} href={`/blog/category/${c.id}`} />
@@ -171,7 +171,7 @@ export default function BlogIndex() {
 
         {/* Featured post */}
         {featured && (
-          <a href={`/blog/${featured.slug}`} style={{ display: 'block', background: 'linear-gradient(135deg, #eff6ff 0%, #f5f8ff 45%, #f0fdf4 100%)', border: '1px solid #bfdbfe', borderRadius: 18, padding: '36px 40px', marginBottom: 36, textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 8px 20px rgba(30,64,175,0.06)' }}
+          <a href={`/blog/${featured.slug}`} style={{ display: 'block', background: 'linear-gradient(135deg, #eff6ff 0%, #f5f8ff 45%, #f0fdf4 100%)', border: '1px solid #bfdbfe', borderRadius: 18, padding: 'clamp(20px, 5vw, 36px) clamp(18px, 4.5vw, 40px)', marginBottom: 'clamp(24px, 5vw, 36px)', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 8px 20px rgba(30,64,175,0.06)' }}
             onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 8px rgba(15,23,42,0.04), 0 16px 36px rgba(30,64,175,0.14)'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
             onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 2px rgba(15,23,42,0.03), 0 8px 20px rgba(30,64,175,0.06)'; e.currentTarget.style.transform = 'none'; }}
           >
@@ -179,8 +179,8 @@ export default function BlogIndex() {
               <span style={{ background: 'linear-gradient(135deg,#1e3a8a,#1d4ed8)', color: 'white', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700, boxShadow: '0 2px 8px rgba(30,64,175,0.25)' }}>Featured</span>
               <span style={{ fontSize: 13, color: '#64748b' }}>{featured.categoryLabel} · {featured.readTime} read</span>
             </div>
-            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#0f172a', marginBottom: 10, lineHeight: 1.3, letterSpacing: '-0.01em' }}>{featured.title}</h2>
-            <p style={{ fontSize: 16, color: '#374151', lineHeight: 1.6, marginBottom: 16 }}>{featured.excerpt}</p>
+            <h2 style={{ fontSize: 'clamp(20px, 4.5vw, 26px)', fontWeight: 800, color: '#0f172a', marginBottom: 10, lineHeight: 1.3, letterSpacing: '-0.01em' }}>{featured.title}</h2>
+            <p style={{ fontSize: 'clamp(14px, 3.6vw, 16px)', color: '#374151', lineHeight: 1.55, marginBottom: 16 }}>{featured.excerpt}</p>
             <span style={{ color: '#1e40af', fontWeight: 700, fontSize: 15, display: 'inline-flex', alignItems: 'center', gap: 6 }}>Read the full guide <ArrowRight size={16} strokeWidth={2.5} /></span>
           </a>
         )}
@@ -193,7 +193,7 @@ export default function BlogIndex() {
         )}
 
         {/* CTA */}
-        <div style={{ marginTop: 60, background: 'linear-gradient(135deg,#0f172a,#1e293b)', borderRadius: 18, padding: '36px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, boxShadow: '0 12px 32px rgba(15,23,42,0.24)' }}>
+        <div style={{ marginTop: 'clamp(36px, 8vw, 60px)', background: 'linear-gradient(135deg,#0f172a,#1e293b)', borderRadius: 18, padding: 'clamp(24px, 6vw, 36px) clamp(20px, 5vw, 40px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, boxShadow: '0 12px 32px rgba(15,23,42,0.24)' }}>
           <div>
             <div style={{ fontWeight: 800, fontSize: 20, color: 'white', marginBottom: 6 }}>Ready to get an estimate?</div>
             <p style={{ color: '#94a3b8', fontSize: 15 }}>Use our free calculator to get a ZIP-code specific price for any cleaning service.</p>

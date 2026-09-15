@@ -74,8 +74,8 @@ export default function BlogCategory({ category }) {
           "publisher": { "@type": "Organization", "name": "Clean Estimator", "url": "https://www.cleanestimator.com" }
         })}</script>
       </Helmet>
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 24px' }}>
-        <div style={{ marginBottom: 16 }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px' }}>
+        <div style={{ marginBottom: 'clamp(10px, 3vw, 16px)' }}>
           <a href="/blog" style={{ color: '#1e40af', fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}><ArrowLeft size={14} strokeWidth={2.5} /> All posts</a>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
@@ -84,12 +84,12 @@ export default function BlogCategory({ category }) {
               <HeaderIcon size={24} strokeWidth={2} />
             </span>
           )}
-          <h1 style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', letterSpacing: '-0.01em' }}>{title}</h1>
+          <h1 style={{ fontSize: 'clamp(26px, 6vw, 36px)', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.01em' }}>{title}</h1>
         </div>
-        <p style={{ color: '#64748b', fontSize: 16, marginBottom: 36 }}>{posts.length} guide{posts.length !== 1 ? 's' : ''}</p>
+        <p style={{ color: '#64748b', fontSize: 16, marginBottom: 'clamp(20px, 5vw, 36px)' }}>{posts.length} guide{posts.length !== 1 ? 's' : ''}</p>
 
         {/* Other categories */}
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 36 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 'clamp(20px, 5vw, 36px)' }}>
           {CATEGORIES.filter(c => c.id !== category).map(c => (
             <CategoryPill key={c.id} id={c.id} label={c.label} href={`/blog/category/${c.id}`} />
           ))}
@@ -100,7 +100,7 @@ export default function BlogCategory({ category }) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {posts.map(post => (
-              <a key={post.slug} href={`/blog/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: '24px 28px', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)' }}
+              <a key={post.slug} href={`/blog/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(16px, 4.5vw, 24px) clamp(16px, 5vw, 28px)', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#bfdbfe'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(15,23,42,0.04), 0 10px 26px rgba(30,64,175,0.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)'; e.currentTarget.style.transform = 'none'; }}
               >
