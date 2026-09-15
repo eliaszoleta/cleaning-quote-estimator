@@ -340,7 +340,7 @@ export default function AdminHomepageLeads() {
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
-                  Leads <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 400 }}>({filtered.length})</span>
+                  Leads
                 </h2>
                 <div style={{ display: 'flex', gap: 7 }}>
                   <button onClick={() => loadLeads(adminKey)} style={btnStyle}>
