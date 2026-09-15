@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
-  Users, CreditCard, KeyRound, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle, Percent,
+  Users, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle, Percent,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
@@ -12,8 +12,6 @@ import ServicesTab from './tabs/ServicesTab';
 import DiscountTab from './tabs/DiscountTab';
 import EmbedTab from './tabs/EmbedTab';
 import LeadsTab from './tabs/LeadsTab';
-import SubscriptionTab from './tabs/SubscriptionTab';
-import APIKeysTab from './tabs/APIKeysTab';
 import SettingsTab from './tabs/SettingsTab';
 import HelpTab from './tabs/HelpTab';
 
@@ -25,13 +23,15 @@ const NAV = [
   { id: 'discount',      Icon: Percent,            label: 'Discount' },
   { id: 'embed',         Icon: Code2,              label: 'Embed Widget' },
   { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
-  { id: 'subscription',  Icon: CreditCard,         label: 'Subscription' },
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
-  { id: 'api',           Icon: KeyRound,           label: 'API Keys' },
 ];
 
 export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
+  // Which pane the Settings tab shows -- Subscription and API Keys moved
+  // from their own sidebar items into sub-sections of Settings, so this is
+  // what deep links like ?tab=settings&section=subscription now target.
+  const [settingsSection, setSettingsSection] = useState('account');
   const [subStatus, setSubStatus] = useState(null);
   const [localConfig, setLocalConfig] = useState(null);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
@@ -92,12 +92,19 @@ export default function CompanyDashboard({ user, onLogout }) {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
-    if (tab && NAV.find(n => n.id === tab)) setActiveTab(tab);
+    if (tab && NAV.find(n => n.id === tab)) {
+      setActiveTab(tab);
+      if (tab === 'settings') {
+        const section = params.get('section');
+        if (section) setSettingsSection(section);
+      }
+    }
 
     const sessionId = params.get('session_id');
     const subscribed = params.get('subscribed');
     if (sessionId && subscribed === 'true') {
-      setActiveTab('subscription');
+      setActiveTab('settings');
+      setSettingsSection('subscription');
       verifyCheckoutSession(sessionId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,7 +134,7 @@ export default function CompanyDashboard({ user, onLogout }) {
       if (!token) return;
       const res = await verifyCheckout(token, sessionId);
       setSubStatus(res.data);
-      window.history.replaceState({}, '', '/company?tab=subscription');
+      window.history.replaceState({}, '', '/company?tab=settings&section=subscription');
     } catch (err) {
       console.warn('Checkout verification failed:', err.message);
     }
@@ -156,9 +163,7 @@ export default function CompanyDashboard({ user, onLogout }) {
     discount:     <DiscountTab config={localConfig} update={update} />,
     embed:        <EmbedTab {...tabProps} />,
     leads:        <LeadsTab {...tabProps} />,
-    subscription: <SubscriptionTab {...tabProps} />,
-    api:          <APIKeysTab {...tabProps} />,
-    settings:     <SettingsTab user={user} config={config} refetchConfig={refetch} onLogout={onLogout} />,
+    settings:     <SettingsTab user={user} config={config} saveConfig={saveConfig} saving={saving} refetchConfig={refetch} onLogout={onLogout} subStatus={subStatus} onSubRefresh={loadSubStatus} section={settingsSection} onSectionChange={setSettingsSection} />,
   };
 
   const subBadge = subStatus ? (() => {
@@ -258,7 +263,7 @@ export default function CompanyDashboard({ user, onLogout }) {
             <AlertCircle size={15} />
             Your account is scheduled for deletion on {new Date(deletionPending.scheduledFor).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Your widget is paused in the meantime.
           </div>
-          <button onClick={() => setActiveTab('settings')} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+          <button onClick={() => { setActiveTab('settings'); setSettingsSection('account'); }} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
             Cancel Deletion →
           </button>
         </div>
@@ -271,7 +276,7 @@ export default function CompanyDashboard({ user, onLogout }) {
             <AlertCircle size={15} />
             Your widget is currently paused — {subStatus.status === 'requires_trial_setup' ? 'reload the page or reach out if this doesn\'t clear on its own' : subStatus.status === 'expired' ? 'your 30-day free trial has ended' : 'subscription issue'}.
           </div>
-          <button onClick={() => setActiveTab('subscription')} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+          <button onClick={() => { setActiveTab('settings'); setSettingsSection('subscription'); }} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
             {subStatus.status === 'requires_trial_setup' ? 'Get Started →' : 'Reactivate →'}
           </button>
         </div>

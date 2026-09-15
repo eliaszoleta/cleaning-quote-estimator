@@ -1,10 +1,26 @@
 import React, { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, User, CreditCard, KeyRound } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
+import SubscriptionTab from './SubscriptionTab';
+import APIKeysTab from './APIKeysTab';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
-export default function SettingsTab({ user, config, refetchConfig }) {
+const SECTIONS = [
+  { id: 'account',      Icon: User,       label: 'Account' },
+  { id: 'subscription', Icon: CreditCard, label: 'Subscription' },
+  { id: 'api',          Icon: KeyRound,   label: 'API Keys' },
+];
+
+export default function SettingsTab({ user, config, refetchConfig, saveConfig, saving, subStatus, onSubRefresh, section: sectionProp, onSectionChange }) {
+  // Falls back to its own state when no section/onSectionChange is passed
+  // (defensive -- every current call site controls this from
+  // CompanyDashboard so deep links like ?tab=settings&section=subscription
+  // land on the right pane, but this keeps the component usable standalone).
+  const [sectionState, setSectionState] = useState('account');
+  const section = sectionProp || sectionState;
+  const setSection = onSectionChange || setSectionState;
+
   const [pwNew, setPwNew] = useState('');
   const [pwConfirm, setPwConfirm] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
@@ -83,12 +99,38 @@ export default function SettingsTab({ user, config, refetchConfig }) {
   };
 
   return (
-    <div style={{ maxWidth: 600 }}>
-      <div style={{ marginBottom: 24 }}>
+    <div>
+      <div style={{ marginBottom: 20 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Settings</h2>
         <p style={{ color: '#64748b', fontSize: 14 }}>Manage your account settings.</p>
       </div>
 
+      {/* Section switcher -- Subscription and API Keys used to be their own
+          top-level sidebar items; folded in here as sub-sections instead. */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 24, borderBottom: '1px solid #e2e8f0' }}>
+        {SECTIONS.map(({ id, Icon, label }) => (
+          <button
+            key={id}
+            onClick={() => setSection(id)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '9px 4px', marginBottom: -1,
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontSize: 13.5, fontWeight: 600,
+              color: section === id ? '#2563eb' : '#64748b',
+              borderBottom: `2px solid ${section === id ? '#2563eb' : 'transparent'}`,
+            }}
+          >
+            <Icon size={14} /> {label}
+          </button>
+        ))}
+      </div>
+
+      {section === 'subscription' && <SubscriptionTab subStatus={subStatus} onSubRefresh={onSubRefresh} />}
+      {section === 'api' && <APIKeysTab config={config} saveConfig={saveConfig} saving={saving} />}
+
+      {section === 'account' && (
+      <div style={{ maxWidth: 600 }}>
       {/* Account info + password */}
       <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Account</div>
@@ -213,6 +255,8 @@ export default function SettingsTab({ user, config, refetchConfig }) {
           </>
         )}
       </div>
+      </div>
+      )}
     </div>
   );
 }

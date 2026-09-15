@@ -39,7 +39,7 @@ export default function OverviewTab({ config, subStatus, user }) {
     { label: 'Customize Branding', href: '?tab=branding',      Icon: Paintbrush  },
     { label: 'Get Embed Code',     href: '?tab=embed',         Icon: Code2       },
     { label: 'View All Leads',     href: '?tab=leads',         Icon: Users       },
-    { label: 'Manage Billing',     href: '?tab=subscription',  Icon: CreditCard  },
+    { label: 'Manage Billing',     href: '?tab=settings&section=subscription',  Icon: CreditCard  },
   ];
 
   return (

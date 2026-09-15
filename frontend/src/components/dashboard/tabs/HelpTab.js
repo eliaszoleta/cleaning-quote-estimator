@@ -52,7 +52,7 @@ const FAQ = [
   },
   {
     q: 'Why did my widget suddenly show "paused" to visitors?',
-    a: 'Your 30-day free trial ended without subscribing, or a payment failed. Check the Subscription tab — reactivating takes one click and the widget comes back immediately, no visitor data is lost while paused.',
+    a: 'Your 30-day free trial ended without subscribing, or a payment failed. Check Settings → Subscription — reactivating takes one click and the widget comes back immediately, no visitor data is lost while paused.',
   },
   {
     q: 'Do I need to touch the base pricing formulas myself?',
