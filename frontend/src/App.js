@@ -36,6 +36,7 @@ import ServiceCalculatorPage, { calculatorSlugFor } from './components/pages/Ser
 import { getAllServices } from './data/services';
 import EmbedWrapper from './components/EmbedWrapper';
 import { initMetaPixel } from './utils/metaPixel';
+import { initNextdoorPixel } from './utils/nextdoorPixel';
 import './App.css';
 
 const pathname = window.location.pathname.replace(/\/$/, '') || '/';
@@ -142,10 +143,10 @@ export default function App() {
   }, []);
 
   // Never on /embed -- that route renders inside an iframe on a third-party
-  // company's own site, and firing our pixel there would attribute their
-  // visitors to our ad account.
+  // company's own site, and firing our pixels there would attribute their
+  // visitors to our ad accounts.
   useEffect(() => {
-    if (!isEmbed) initMetaPixel();
+    if (!isEmbed) { initMetaPixel(); initNextdoorPixel(); }
   }, []);
 
   const handleLogout = async () => {

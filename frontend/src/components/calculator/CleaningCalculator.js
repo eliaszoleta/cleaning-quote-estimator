@@ -5,6 +5,7 @@ import { AlertCircle, MapPin, BarChart3, ShieldOff, Zap } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import { trackMetaEvent } from '../../utils/metaPixel';
+import { trackNextdoorEvent } from '../../utils/nextdoorPixel';
 import { getFontStack, getGoogleFontHref } from '../../utils/fonts';
 import ServiceSelect from './steps/ServiceSelect';
 import LocationStep from './steps/LocationStep';
@@ -176,11 +177,15 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         partnerInfo: partnerMatch,
       });
       setResult(res.data);
-      // No-ops when the pixel isn't initialized (embed routes, ad blockers,
-      // no REACT_APP_META_PIXEL_ID) -- safe to call unconditionally rather
-      // than re-deriving the embed check the pixel already gated on.
+      // No-ops when a pixel isn't initialized (embed routes, ad blockers, no
+      // pixel ID configured) -- safe to call unconditionally rather than
+      // re-deriving the embed check each pixel already gated on.
       trackMetaEvent('EstimateCompleted', { service_type: serviceType, value: res.data.totalLow, currency: 'USD' });
-      if (lead?.email) trackMetaEvent('Lead', { service_type: serviceType });
+      trackNextdoorEvent('ESTIMATE_COMPLETED', { service_type: serviceType, value: res.data.totalLow, currency: 'USD' });
+      if (lead?.email) {
+        trackMetaEvent('Lead', { service_type: serviceType });
+        trackNextdoorEvent('LEAD', { service_type: serviceType });
+      }
       goNext();
     } catch (err) {
       setError(err.message || 'Calculation failed. Please try again.');
