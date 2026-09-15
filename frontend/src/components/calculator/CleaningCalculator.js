@@ -262,7 +262,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
       <div style={{
         background: embedded ? 'white' : 'linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%)',
-        padding: embedded ? '0' : '28px 16px',
+        padding: embedded ? '0' : '14px 16px 28px',
         fontFamily: fontFamily ? getFontStack(fontFamily) : undefined,
       }}>
         {/* Hero (non-embedded only) */}
