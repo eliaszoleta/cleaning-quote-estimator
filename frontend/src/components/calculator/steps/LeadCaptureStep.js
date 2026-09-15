@@ -12,7 +12,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
   const [touched, setTouched] = useState({});
 
   const ctaHeadline = companyConfig?.ctaHeadline || 'Get Your Instant Estimate';
-  const ctaSubtext = companyConfig?.ctaSubtext || "We'll email your results and connect you with local cleaning professionals.";
+  const ctaSubtext = companyConfig?.ctaSubtext || "We'll email your results and, if there's a match in your area, recommend a local cleaning professional.";
 
   const nameValid = name.trim().length > 0;
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
