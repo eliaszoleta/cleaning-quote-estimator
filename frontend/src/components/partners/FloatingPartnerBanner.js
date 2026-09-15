@@ -72,7 +72,7 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
       </button>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 4 : 10 }}>
-        <div style={{ fontSize: isMobile ? 8 : 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
+        <div style={{ fontSize: 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
           Local Cleaner Near You
         </div>
       </div>
@@ -91,7 +91,10 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
         </div>
         {partner.address && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: partner.logo_url ? 'center' : 'flex-start', gap: 4, fontSize: isMobile ? 10.5 : 12, color: '#64748b', marginTop: isMobile ? 1 : 2 }}>
-            <MapPin size={isMobile ? 10 : 11} color="#94a3b8" /> {partner.address}
+            {/* Pin icon dropped on mobile -- this card is only 218px wide there,
+                so the icon's width was pushing "4232 Mangum rd Houston Texas"
+                onto a second line instead of fitting on one. */}
+            {!isMobile && <MapPin size={11} color="#94a3b8" />} {partner.address}
           </div>
         )}
       </div>
