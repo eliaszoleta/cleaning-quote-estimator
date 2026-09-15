@@ -75,6 +75,13 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
     ctaPhone: form.ctaPhone,
     ctaEmail: form.ctaEmail,
     fontFamily: form.fontFamily,
+    // Left out entirely before -- the preview always showed all 9 services
+    // regardless of what was toggled off in the Services tab, since
+    // ServiceSelect.js treats a missing `services` object as "show
+    // everything." config.services is kept live by the shared `update()`
+    // callback both tabs write through, so this reflects toggles
+    // immediately, not just after Save Changes.
+    services: config?.services,
   };
 
   const input = {
