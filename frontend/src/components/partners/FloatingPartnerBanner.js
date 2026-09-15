@@ -49,7 +49,11 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
         // of always claiming the full 218px, which left a visible strip of
         // empty card on shorter business names/numbers.
         width: isMobile ? 'fit-content' : DESKTOP_BANNER_WIDTH,
-        maxWidth: isMobile ? 'min(218px, calc(100vw - 20px))' : 'calc(100vw - 20px)',
+        // 218px was clamping longer one-line addresses (e.g. "4232 Mangum rd
+        // Houston Texas 77092") into a wrap even though fit-content would
+        // otherwise size the card to fit it -- raised the cap so it has
+        // enough room, while still shrinking down for shorter listings.
+        maxWidth: isMobile ? 'min(260px, calc(100vw - 20px))' : 'calc(100vw - 20px)',
         background: 'white',
         border: isMobile ? '1px solid rgba(15,23,42,0.045)' : '1px solid rgba(15,23,42,0.07)',
         borderRadius: isMobile ? 6 : 16,
@@ -57,7 +61,7 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
         boxShadow: isMobile
           ? '0 1px 3px rgba(15,23,42,0.04), 0 8px 18px rgba(37,99,235,0.10)'
           : '0 2px 6px rgba(15,23,42,0.05), 0 18px 38px rgba(37,99,235,0.14)',
-        padding: isMobile ? '8px 10px' : '14px 16px',
+        padding: isMobile ? '8px 8px' : '14px 16px',
         animation: `partnerBannerIn 0.25s ease-out`,
       }}
     >
