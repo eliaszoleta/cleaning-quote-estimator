@@ -124,7 +124,7 @@ export default function CalculatorPage() {
           </div>
         </div>
 
-        <div style={{ marginTop: 48, background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: '32px 36px' }}>
+        <div style={{ marginTop: 48, background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(18px, 5vw, 32px) clamp(16px, 4.5vw, 36px)' }}>
           <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>Cleaning Cost Calculator FAQs</h2>
           <FaqAccordion faqs={CALCULATOR_FAQS} />
         </div>

@@ -87,7 +87,7 @@ export default function Contact() {
       {/* Hero */}
       <div style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%)',
-        padding: '60px 24px 92px',
+        padding: 'clamp(32px, 7vw, 60px) 20px 92px',
         textAlign: 'center',
         position: 'relative',
         overflow: 'hidden',

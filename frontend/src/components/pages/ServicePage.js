@@ -162,7 +162,7 @@ export default function ServicePage({ slug }) {
         <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
       </Helmet>
 
-      <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '40px 24px 64px' }}>
+      <div style={{ background: '#f8fafc', minHeight: '100vh', padding: 'clamp(20px, 5vw, 40px) 20px clamp(36px, 7vw, 64px)' }}>
         <div style={{ maxWidth: 780, margin: '0 auto' }}>
 
           <div style={{ display: 'flex', gap: 6, fontSize: 13, color: '#94a3b8', marginBottom: 24, flexWrap: 'wrap' }}>
@@ -171,7 +171,7 @@ export default function ServicePage({ slug }) {
             <span style={{ color: '#0f172a' }}>{service.name}</span>
           </div>
 
-          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '32px 36px', marginBottom: 24 }}>
+          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 32px) clamp(16px, 4.5vw, 36px)', marginBottom: 24 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
               <Icon size={22} color="#2563eb" strokeWidth={1.75} />
             </div>
@@ -205,7 +205,7 @@ export default function ServicePage({ slug }) {
             </a>
           </div>
 
-          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '32px 36px', marginBottom: 24 }}>
+          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 32px) clamp(16px, 4.5vw, 36px)', marginBottom: 24 }}>
             <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Pricing by Tier</h2>
             <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 4 }}>National average pricing — {service.unit}. <a href="/how-we-calculate-prices" style={{ color: '#2563eb', fontWeight: 600 }}>See how we calculate these prices →</a></p>
             <TiersTable service={service} />

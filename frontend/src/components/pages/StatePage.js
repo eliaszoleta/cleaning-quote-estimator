@@ -138,7 +138,7 @@ export default function StatePage({ slug }) {
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
 
-      <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '40px 24px 64px' }}>
+      <div style={{ background: '#f8fafc', minHeight: '100vh', padding: 'clamp(20px, 5vw, 40px) 20px clamp(36px, 7vw, 64px)' }}>
         <div style={{ maxWidth: 780, margin: '0 auto' }}>
 
           <div style={{ display: 'flex', gap: 6, fontSize: 13, color: '#94a3b8', marginBottom: 24, flexWrap: 'wrap' }}>
@@ -147,7 +147,7 @@ export default function StatePage({ slug }) {
             <span style={{ color: '#0f172a' }}>Cleaning Cost in {state.name}</span>
           </div>
 
-          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '32px 36px', marginBottom: 24 }}>
+          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 32px) clamp(16px, 4.5vw, 36px)', marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <MapPin size={18} color="#2563eb" />
               <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{state.name}</span>
@@ -172,7 +172,7 @@ export default function StatePage({ slug }) {
             </a>
           </div>
 
-          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '32px 36px', marginBottom: 24 }}>
+          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 32px) clamp(16px, 4.5vw, 36px)', marginBottom: 24 }}>
             <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Cost by Service in {state.name}</h2>
             <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 4 }}>Estimated typical job cost, adjusted for {state.name}'s labor rates. <a href="/how-we-calculate-prices" style={{ color: '#2563eb', fontWeight: 600 }}>See how we calculate these prices →</a></p>
             <ServiceStateTable state={state} />
