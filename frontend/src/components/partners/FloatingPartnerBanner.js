@@ -44,8 +44,12 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
         bottom: fixed && isMobile ? 12 : 'auto',
         right: fixed ? (isMobile ? 10 : DESKTOP_RIGHT_OFFSET) : 14,
         zIndex: 90,
-        width: isMobile ? 218 : DESKTOP_BANNER_WIDTH,
-        maxWidth: 'calc(100vw - 20px)',
+        // Mobile: shrink to whatever the content actually needs (usually the
+        // "Call ..." button, since the address is allowed to wrap) instead
+        // of always claiming the full 218px, which left a visible strip of
+        // empty card on shorter business names/numbers.
+        width: isMobile ? 'fit-content' : DESKTOP_BANNER_WIDTH,
+        maxWidth: isMobile ? 'min(218px, calc(100vw - 20px))' : 'calc(100vw - 20px)',
         background: 'white',
         border: isMobile ? '1px solid rgba(15,23,42,0.045)' : '1px solid rgba(15,23,42,0.07)',
         borderRadius: isMobile ? 6 : 16,
