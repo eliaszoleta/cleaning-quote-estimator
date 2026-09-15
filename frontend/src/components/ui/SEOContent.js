@@ -239,7 +239,12 @@ export default function SEOContent() {
 
       <div style={{ background: 'white' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(32px, 7vw, 56px) 20px 0' }}>
-          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px', textAlign: 'center' }}>
+          {/* Pure vw-based floor (no nowrap) -- text width and viewport width
+              both scale with vw, so the fit holds across phone sizes without
+              risking an off-screen clip if the estimate is slightly off on
+              an unusually narrow device; it just wraps to 2 lines there
+              instead, same as before. */}
+          <h2 style={{ fontSize: 'clamp(13.5px, 4vw, 21px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px', textAlign: 'center' }}>
             Get a FREE Cleaning Cost Estimate Online
           </h2>
           <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>

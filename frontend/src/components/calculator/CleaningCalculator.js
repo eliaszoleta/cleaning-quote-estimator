@@ -356,7 +356,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
         {/* Trust bar */}
         {!embedded && currentStep === 'service' && (
-          <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', gap: 28, flexWrap: 'wrap' }}>
+          <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', rowGap: 10, columnGap: 28, flexWrap: 'wrap' }}>
             {[
               { Icon: MapPin,    label: 'All 50 states',     color: '#059669' },
               { Icon: BarChart3, label: '9 service types',   color: '#2563eb' },
