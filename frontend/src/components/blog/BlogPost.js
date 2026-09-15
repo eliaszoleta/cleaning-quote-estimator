@@ -19,8 +19,8 @@ function renderMarkdown(md) {
   });
 
   // Headers
-  html = html.replace(/^### (.+)$/gm, '<h3 style="font-size:20px;font-weight:700;color:#0f172a;margin:28px 0 12px">$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2 style="font-size:26px;font-weight:800;color:#0f172a;margin:40px 0 16px;letter-spacing:-0.01em">$1</h2>');
+  html = html.replace(/^### (.+)$/gm, '<h3 style="font-size:clamp(17px,4.2vw,20px);font-weight:700;color:#0f172a;margin:clamp(20px,5vw,28px) 0 10px">$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2 style="font-size:clamp(21px,5vw,26px);font-weight:800;color:#0f172a;margin:clamp(28px,6vw,40px) 0 14px;letter-spacing:-0.01em">$1</h2>');
 
   // Horizontal rules
   html = html.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #e2e8f0;margin:32px 0">');
@@ -49,7 +49,7 @@ function renderMarkdown(md) {
   // Paragraphs (double newlines)
   html = html.split(/\n\n+/).map(para => {
     if (para.startsWith('<h') || para.startsWith('<ul') || para.startsWith('<ol') || para.startsWith('<div') || para.startsWith('<table') || para.startsWith('<hr')) return para;
-    return `<p style="font-size:16px;line-height:1.8;color:#374151;margin:0 0 16px">${para.replace(/\n/g, '<br>')}</p>`;
+    return `<p style="font-size:clamp(14.5px,3.8vw,16px);line-height:1.65;color:#374151;margin:0 0 14px">${para.replace(/\n/g, '<br>')}</p>`;
   }).join('\n');
 
   return html;
@@ -148,9 +148,9 @@ export default function BlogPost({ slug }) {
         {faqSchema && <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>}
       </Helmet>
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '60px 24px' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(28px, 7vw, 60px) 20px' }}>
         {/* Breadcrumb */}
-        <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 24 }}>
+        <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 'clamp(16px, 4vw, 24px)' }}>
           <a href="/" style={{ color: '#94a3b8' }}>Home</a> › <a href="/blog" style={{ color: '#94a3b8' }}>Blog</a> › <a href={`/blog/category/${post.category}`} style={{ color: '#94a3b8' }}>{post.categoryLabel}</a>
         </div>
 
@@ -158,9 +158,9 @@ export default function BlogPost({ slug }) {
             the same content-card style ServicePage.js uses (background
             white, 14px radius, 1px #e2e8f0 border) instead of sitting
             directly on the page's gray background. */}
-        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: '32px 36px', marginBottom: 24 }}>
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 36px) clamp(16px, 4.5vw, 36px)', marginBottom: 24 }}>
           {/* Header */}
-          <div style={{ marginBottom: 40 }}>
+          <div style={{ marginBottom: 'clamp(24px, 6vw, 40px)' }}>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
               <a href={`/blog/category/${post.category}`} style={{ color: '#1e40af', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>{post.categoryLabel}</a>
               <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
@@ -168,12 +168,12 @@ export default function BlogPost({ slug }) {
               <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
               <span style={{ color: '#94a3b8', fontSize: 13 }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
             </div>
-            <h1 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.01em' }}>{post.title}</h1>
-            <p style={{ fontSize: 18, color: '#64748b', lineHeight: 1.6 }}>{post.excerpt}</p>
+            <h1 style={{ fontSize: 'clamp(24px,4vw,40px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.2, marginBottom: 14, letterSpacing: '-0.01em' }}>{post.title}</h1>
+            <p style={{ fontSize: 'clamp(15px,3.6vw,18px)', color: '#64748b', lineHeight: 1.55 }}>{post.excerpt}</p>
           </div>
 
           {/* CTA box */}
-          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#f5f8ff)', border: '1px solid #bfdbfe', borderRadius: 14, padding: '18px 22px', marginBottom: 36, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#f5f8ff)', border: '1px solid #bfdbfe', borderRadius: 14, padding: 'clamp(14px, 4vw, 18px) clamp(14px, 4vw, 22px)', marginBottom: 'clamp(24px, 6vw, 36px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <span style={{ fontSize: 14, color: '#1e40af', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               <Lightbulb size={17} strokeWidth={2} /> Get a free local estimate for your project
             </span>
@@ -181,11 +181,11 @@ export default function BlogPost({ slug }) {
           </div>
 
           {/* Content */}
-          <div style={{ lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
+          <div style={{ lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
         </div>
 
         {/* Bottom CTA */}
-        <div style={{ background: 'linear-gradient(135deg, #0b1220, #1e293b)', borderRadius: 18, padding: '36px 40px', marginTop: 48, color: 'white', textAlign: 'center', boxShadow: '0 12px 32px rgba(15,23,42,0.24)' }}>
+        <div style={{ background: 'linear-gradient(135deg, #0b1220, #1e293b)', borderRadius: 18, padding: 'clamp(24px, 6vw, 36px) clamp(20px, 5vw, 40px)', marginTop: 48, color: 'white', textAlign: 'center', boxShadow: '0 12px 32px rgba(15,23,42,0.24)' }}>
           <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Get a Free Local Estimate</h3>
           <p style={{ color: '#94a3b8', marginBottom: 20, fontSize: 15 }}>Our calculator gives ZIP-code specific prices across all 50 states. Free and instant.</p>
           <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '14px 32px', borderRadius: 11, textDecoration: 'none', fontWeight: 700, fontSize: 16, boxShadow: '0 4px 16px rgba(37,99,235,0.3)' }}>Calculate My Cost →</a>
