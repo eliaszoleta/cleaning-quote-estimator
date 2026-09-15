@@ -357,7 +357,7 @@ export default function PartnerWithUs() {
       {/* Stats bar */}
       <div style={{ borderBottom: '1px solid #e2e8f0', borderTop: '1px solid #e2e8f0' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
-          <StatBadge number="20K+" label="Monthly visitors, growing" />
+          <StatBadge number="25K+" label="Monthly visitors, growing" />
           <StatBadge number="100%" label="Organic, targeted traffic" />
           <StatBadge number="1" label="Partner per city" />
           <StatBadge number="$175-$350" label="Per city / month" />
