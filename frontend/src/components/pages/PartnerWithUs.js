@@ -290,7 +290,14 @@ export default function PartnerWithUs() {
           what a visitor sees (their estimate, then the partner's listing
           recommended right below it) instead of only describing it. */}
       <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: '96px 24px 110px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 56, alignItems: 'center' }}>
+        {/* minmax(min(380px, 100%), 1fr) instead of a bare minmax(380px, 1fr) --
+            on phones narrower than ~428px, 380px + 48px of side padding no
+            longer fits inside the viewport, and a plain fixed floor forces
+            the grid track (and the whole page) to overflow horizontally by
+            the difference, showing as a sliver of page background down the
+            right edge. min(380px, 100%) caps the floor at whatever space is
+            actually available instead. */}
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', gap: 56, alignItems: 'center' }}>
           <div>
             <div style={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #3b82f6, #818cf8)', marginBottom: 22 }} />
             <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
