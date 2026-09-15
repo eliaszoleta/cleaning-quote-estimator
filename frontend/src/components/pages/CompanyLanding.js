@@ -126,7 +126,7 @@ export default function CompanyLanding() {
               badge (same language as the About page hero), and a two-column
               layout with a small static "product shot" of the widget so the
               page shows the thing it's selling instead of only describing it. */}
-          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: '96px 24px 110px' }}>
+          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(40px, 9vw, 96px) 20px clamp(48px, 9vw, 110px)' }}>
             <div className="ce-hero-grid" style={{ maxWidth: 1320, margin: '0 auto', display: 'grid', gap: 56, alignItems: 'center' }}>
               <div>
                 <div style={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #3b82f6, #818cf8)', marginBottom: 22 }} />
@@ -171,9 +171,9 @@ export default function CompanyLanding() {
           </div>
 
           {/* Features */}
-          <div style={{ padding: '84px 24px', maxWidth: 1120, margin: '0 auto' }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Everything you need</h2>
-            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 52 }}>No technical skills required. Set up in under 30 minutes.</p>
+          <div style={{ padding: 'clamp(40px, 9vw, 84px) 20px', maxWidth: 1120, margin: '0 auto' }}>
+            <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Everything you need</h2>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>No technical skills required. Set up in under 30 minutes.</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
               {FEATURES.map(({ Icon, color, bg, title, desc }) => (
                 <div key={title} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
@@ -189,10 +189,10 @@ export default function CompanyLanding() {
               (tinted badge, left-aligned copy) instead of free-floating
               circles on bare background, so this section reads as part of
               the same designed page rather than a separate template block. */}
-          <div style={{ background: '#f8fafc', padding: '84px 24px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
+          <div style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
             <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-              <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Up and running in 30 minutes</h2>
-              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 52 }}>Four steps, no developer required.</p>
+              <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Up and running in 30 minutes</h2>
+              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer required.</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18 }}>
                 {STEPS.map(s => (
                   <div key={s.n} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
@@ -206,8 +206,8 @@ export default function CompanyLanding() {
           </div>
 
           {/* Testimonials */}
-          <div style={{ padding: '84px 24px', maxWidth: 1120, margin: '0 auto' }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 44, letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
+          <div style={{ padding: 'clamp(40px, 9vw, 84px) 20px', maxWidth: 1120, margin: '0 auto' }}>
+            <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 'clamp(24px, 5vw, 44px)', letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
               {TESTIMONIALS.map(t => (
                 <div key={t.name} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
@@ -230,11 +230,11 @@ export default function CompanyLanding() {
               blue button, which read as a hard-sell "buy now, then buy
               again" pattern rather than a normal SaaS pricing section. One
               section, one plan, one call to action. */}
-          <div id="pricing" style={{ background: '#f8fafc', padding: '84px 24px', borderTop: '1px solid #e2e8f0' }}>
+          <div id="pricing" style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0' }}>
             <div style={{ maxWidth: 980, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 56, alignItems: 'center' }}>
 
               <div>
-                <h2 style={{ fontSize: 32, fontWeight: 700, color: '#0f172a', marginBottom: 14, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
+                <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, color: '#0f172a', marginBottom: 14, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
                 <p style={{ color: '#64748b', fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: 400 }}>
                   One plan, everything included, no surprises. Built for independent cleaning companies who want more booked jobs from their own website.
                 </p>

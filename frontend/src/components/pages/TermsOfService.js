@@ -8,9 +8,9 @@ export default function TermsOfService() {
         <title>Terms of Service | Clean Estimator</title>
         <link rel="canonical" href="https://www.cleanestimator.com/terms-of-service" />
       </Helmet>
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '60px 24px', lineHeight: 1.8 }}>
-        <h1 style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>Terms of Service</h1>
-        <p style={{ color: '#64748b', marginBottom: 40 }}>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px', lineHeight: 1.65 }}>
+        <h1 style={{ fontSize: 'clamp(26px, 6vw, 36px)', fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>Terms of Service</h1>
+        <p style={{ color: '#64748b', marginBottom: 'clamp(24px, 6vw, 40px)' }}>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
         {[
           ['Acceptance', 'By using Clean Estimator, you agree to these terms. If you don\'t agree, please don\'t use the service.'],
           ['Description of Service', 'Clean Estimator provides an online tool for estimating cleaning service costs. For cleaning companies, we provide an embeddable widget and lead management dashboard ("Company Services").'],

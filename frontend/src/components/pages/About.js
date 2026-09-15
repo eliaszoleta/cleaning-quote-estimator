@@ -3,8 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import { Target, Calculator, Home, Building2, ShieldAlert, MessageCircle, Users, Sparkles, Code2, Handshake } from 'lucide-react';
 
 const h2Style = { fontSize: 19, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' };
-const pStyle = { fontSize: 14.5, color: '#334155', lineHeight: 1.8, margin: 0 };
-const cardStyle = { background: 'white', borderRadius: 10, padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' };
+const pStyle = { fontSize: 14.5, color: '#334155', lineHeight: 1.65, margin: 0 };
+const cardStyle = { background: 'white', borderRadius: 10, padding: 'clamp(18px, 5vw, 32px)', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' };
 
 function IconBadge({ Icon, color, bg }) {
   return (
@@ -69,7 +69,7 @@ export default function About() {
           the stat row drops the boxed/bordered grid for plain numbers
           separated by a hairline, closer to how a stat line reads in
           editorial design than a dashboard widget. */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: '96px 24px 80px', textAlign: 'center' }}>
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(40px, 9vw, 96px) 20px clamp(36px, 7vw, 80px)', textAlign: 'center' }}>
         <div style={{ maxWidth: 620, margin: '0 auto' }}>
           <div style={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #3b82f6, #818cf8)', margin: '0 auto 24px' }} />
           <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
@@ -96,7 +96,7 @@ export default function About() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '48px 24px 80px' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(28px, 6vw, 48px) 20px clamp(36px, 7vw, 80px)' }}>
 
         {/* Our mission */}
         <section style={{ marginBottom: 24 }}>

@@ -8,9 +8,9 @@ export default function PrivacyPolicy() {
         <title>Privacy Policy | Clean Estimator</title>
         <link rel="canonical" href="https://www.cleanestimator.com/privacy-policy" />
       </Helmet>
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '60px 24px', lineHeight: 1.8 }}>
-        <h1 style={{ fontSize: 36, fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>Privacy Policy</h1>
-        <p style={{ color: '#64748b', marginBottom: 40 }}>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px', lineHeight: 1.65 }}>
+        <h1 style={{ fontSize: 'clamp(26px, 6vw, 36px)', fontWeight: 900, color: '#0f172a', marginBottom: 8 }}>Privacy Policy</h1>
+        <p style={{ color: '#64748b', marginBottom: 'clamp(24px, 6vw, 40px)' }}>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
         {[
           ['Information We Collect', 'When you use our calculator, we collect the answers you provide (service type, location, property details) to generate your estimate. If you choose to provide your name, email, or phone number in the lead capture form, we store that information. We also collect standard web analytics data (page views, browser type, referral source) through privacy-respecting analytics tools.'],
           ['How We Use Your Information', 'We use your calculator inputs solely to generate price estimates. If you provide contact information, it may be shared with the cleaning company whose widget you\'re using (if you\'re using an embedded widget on a company\'s site). We do not sell your personal information to third parties. We may use your email to send you a copy of your estimate if you request it.'],
