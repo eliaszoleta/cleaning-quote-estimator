@@ -238,8 +238,8 @@ export default function SEOContent() {
       </Helmet>
 
       <div style={{ background: 'white' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(32px, 7vw, 56px) 20px 0', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(32px, 7vw, 56px) 20px 0' }}>
+          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px', textAlign: 'center' }}>
             Get a FREE Cleaning Cost Estimate Online
           </h2>
           <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
