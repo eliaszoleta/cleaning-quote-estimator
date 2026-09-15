@@ -102,7 +102,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
 
           <Card title="Company Info">
             <Field label="Company name">
-              <input style={input} value={form.companyName} onChange={e => set('companyName', e.target.value)} placeholder="ABC Cleaning Services" />
+              <input style={input} value={form.companyName} onChange={e => set('companyName', e.target.value)} placeholder="Sparkle Cleaning Service" />
             </Field>
             <LogoField value={form.logo} onChange={url => set('logo', url)} inputStyle={input} upload={uploadLogo} />
           </Card>
@@ -151,10 +151,10 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
               default path anymore. */}
           <Card title="Lead Capture Form" subtitle="Shown before the visitor sees their estimate">
             <Field label="Headline">
-              <input style={input} value={form.ctaHeadline} onChange={e => set('ctaHeadline', e.target.value)} placeholder="Get Your Instant Estimate" />
+              <input style={input} value={form.ctaHeadline} onChange={e => set('ctaHeadline', e.target.value)} placeholder="Get your instant estimate" />
             </Field>
             <Field label="Subtext">
-              <input style={input} value={form.ctaSubtext} onChange={e => set('ctaSubtext', e.target.value)} placeholder="Optional — we'll connect you with local pros." />
+              <input style={input} value={form.ctaSubtext} onChange={e => set('ctaSubtext', e.target.value)} placeholder="We'll email your results and connect you with one of our team members" />
             </Field>
           </Card>
 
