@@ -48,7 +48,7 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
         maxWidth: 'calc(100vw - 20px)',
         background: 'white',
         border: isMobile ? '1px solid rgba(15,23,42,0.045)' : '1px solid rgba(15,23,42,0.07)',
-        borderRadius: isMobile ? 12 : 16,
+        borderRadius: isMobile ? 6 : 16,
         overflow: 'hidden',
         boxShadow: isMobile
           ? '0 1px 3px rgba(15,23,42,0.04), 0 8px 18px rgba(37,99,235,0.10)'
@@ -63,13 +63,17 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
           blue border this replaced, without boxing the whole card in it. */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: isMobile ? 2 : 3, background: 'linear-gradient(90deg, #2563eb, #7c3aed)' }} />
 
-      <button
-        onClick={onDismiss}
-        aria-label="Dismiss"
-        style={{ position: 'absolute', top: isMobile ? 6 : 10, right: isMobile ? 5 : 8, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#94a3b8', display: 'flex' }}
-      >
-        <X size={isMobile ? 12 : 14} />
-      </button>
+      {/* No dismiss control on mobile -- the card is already small and
+          non-blocking there, so there's no close affordance to give. */}
+      {!isMobile && (
+        <button
+          onClick={onDismiss}
+          aria-label="Dismiss"
+          style={{ position: 'absolute', top: 10, right: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#94a3b8', display: 'flex' }}
+        >
+          <X size={14} />
+        </button>
+      )}
 
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 4 : 10 }}>
         <div style={{ fontSize: 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
