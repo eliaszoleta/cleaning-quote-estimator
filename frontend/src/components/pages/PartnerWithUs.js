@@ -540,6 +540,7 @@ export default function PartnerWithUs() {
               { q: 'What counts as a city, and how is pricing decided?', a: `We go by city name as detected from the user's IP address. Pricing is size-based: cities with roughly ${POPULATION_THRESHOLD.toLocaleString()}+ residents are "major" and billed at $${MAJOR_CITY_PRICE}/month; smaller cities are "minor" and billed at $${MINOR_CITY_PRICE}/month, half price. Add your cities in the form below and we'll show you exactly which tier each one falls into before you commit.` },
               { q: 'What if traffic in my city is low?', a: "We can share an estimate of current monthly sessions for your city before you commit. You're still getting targeted, high-intent visitors for less than the cost of one Google Ads day." },
               { q: 'Can I cancel?', a: "Yes. Give us 30 days notice and we'll remove your listing at the end of the billing cycle. No long-term contracts." },
+              { q: "Don't have a website yet?", a: 'We also build and host websites with an AI chatbot included, for cleaning businesses that need one — see cleanestimator.com/website-for-cleaning-companies for details.' },
             ].map((item, i) => (
               <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)' }}>
                 <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 8 }}>{item.q}</div>

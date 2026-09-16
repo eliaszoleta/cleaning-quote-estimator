@@ -18,6 +18,7 @@ import BlogPost from './components/blog/BlogPost';
 import BlogCategory from './components/blog/BlogCategory';
 import CompanyLanding from './components/pages/CompanyLanding';
 import PartnerWithUs from './components/pages/PartnerWithUs';
+import WebsiteSubscription from './components/pages/WebsiteSubscription';
 import PartnerCityPricing from './components/pages/PartnerCityPricing';
 import PartnerDemoPage from './components/pages/PartnerDemoPage';
 import BuyCityPlacement from './components/pages/BuyCityPlacement';
@@ -57,6 +58,7 @@ const isAdminCompanies = pathname === '/admin/companies';
 const isAdminHomepageLeads = pathname === '/admin/leads';
 const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
+const isWebsiteSubscription = pathname === '/website-for-cleaning-companies';
 const isPartnerCityPricing = pathname === '/partner-city-pricing';
 const isPartnerDemo = pathname === '/partner-demo';
 const isBuyCityPlacementSuccess = pathname === '/buy-city-placement/success';
@@ -183,6 +185,16 @@ export default function App() {
       <div className="app">
         <Header />
         <main><PartnerWithUs /></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (isWebsiteSubscription) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><WebsiteSubscription /></main>
         <Footer />
       </div>
     </HelmetProvider>
