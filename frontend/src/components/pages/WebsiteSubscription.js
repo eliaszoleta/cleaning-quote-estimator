@@ -206,27 +206,44 @@ export default function WebsiteSubscription() {
         }
       `}</style>
 
-      {/* Why this matters */}
-      <div style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: '#f8fafc' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      {/* Why this matters -- a before/after split instead of another icon
+          card grid (used everywhere else on the site), so the contrast
+          itself does the persuading instead of three interchangeable cards. */}
+      <div style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'white' }}>
+        <div style={{ maxWidth: 920, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 44 }}>
             <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>Why This Actually Matters</h2>
             <p style={{ fontSize: 15, color: '#64748b', maxWidth: 560, margin: '0 auto', lineHeight: 1.6 }}>A Facebook page or Google listing alone isn't a website — and it's costing you jobs.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'clamp(12px, 3vw, 20px)' }}>
-            {[
-              { Icon: Search, title: 'People search before they call', body: 'Homeowners look a business up before hiring — no website (or an outdated one) reads as less established than a competitor who has one.' },
-              { Icon: PhoneMissed, title: 'Missed calls are missed jobs', body: "You're on a job, phone's off, and a lead moves on to the next result. A chatbot on your site can catch that visitor instead." },
-              { Icon: Globe, title: 'You need something you control', body: "A social page can get flagged, restricted, or buried by an algorithm change. A website is yours to point people to, always." },
-            ].map((card, i) => (
-              <div key={i} style={{ background: 'white', borderRadius: 14, padding: 'clamp(18px, 5vw, 28px) clamp(16px, 4vw, 24px)', border: '1px solid #e2e8f0', boxShadow: '0 2px 10px rgba(15,23,42,0.05)' }}>
-                <div style={{ width: 'clamp(40px, 11vw, 52px)', height: 'clamp(40px, 11vw, 52px)', background: '#eff6ff', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 'clamp(10px, 3vw, 16px)' }}>
-                  <card.Icon size={22} color={PRIMARY} strokeWidth={2} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: 0, borderRadius: 18, overflow: 'hidden', boxShadow: '0 8px 30px rgba(15,23,42,0.08)' }}>
+            <div style={{ background: '#f1f5f9', padding: 'clamp(24px, 5vw, 40px)' }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 20 }}>Without a website</div>
+              {[
+                'Homeowners can\'t find you when they search',
+                'Missed calls become missed jobs',
+                'Your only presence can vanish with one algorithm change',
+              ].map((line, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 16 }}>
+                  <span style={{ marginTop: 1 }}><IconX size={18} color="#94a3b8" /></span>
+                  <span style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.55 }}>{line}</span>
                 </div>
-                <div style={{ fontWeight: 700, fontSize: 'clamp(14.5px, 3.8vw, 16px)', color: '#0f172a', marginBottom: 'clamp(5px, 1.5vw, 8px)' }}>{card.title}</div>
-                <div style={{ fontSize: 'clamp(12.5px, 3.4vw, 14px)', color: '#64748b', lineHeight: 1.6 }}>{card.body}</div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', padding: 'clamp(24px, 5vw, 40px)' }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: '#bfdbfe', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 20 }}>With your own website</div>
+              {[
+                { Icon: Search, text: 'You show up like the established business you are' },
+                { Icon: PhoneMissed, text: "A chatbot catches leads while you're out on a job" },
+                { Icon: Globe, text: 'Something that\'s permanently yours — not rented from an algorithm' },
+              ].map(({ Icon, text }, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 16 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                    <Icon size={12} color="white" strokeWidth={2.5} />
+                  </div>
+                  <span style={{ fontSize: 14.5, color: 'white', lineHeight: 1.55, fontWeight: 500 }}>{text}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -280,41 +297,94 @@ export default function WebsiteSubscription() {
         </div>
       </div>
 
-      {/* How it works */}
+      {/* How it works -- grouped into two color-blocked stages (free preview,
+          then paid) instead of one flat numbered list, so the "you don't pay
+          until step 3" pitch is visible in the layout itself, not just the copy. */}
       <div style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'white' }}>
-        <div style={{ maxWidth: 680, margin: '0 auto' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 44 }}>
             <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>How It Works</h2>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            <StepCard number="1" title="Apply and tell us about your business" desc="Fill out the form below with a few details about your cleaning business and what you'd want on your site." />
-            <StepCard number="2" title="We build a sample website for you to review" desc="No payment required for this step. We put together a live, working sample of your site so you can see exactly what you'd be getting." />
-            <StepCard number="3" title="Like it? Pick your domain and subscribe" desc="Already own a domain? We'll use it. Starting fresh? We'll help you pick one. Billing only starts once you're happy with the sample." />
-            <StepCard number="4" title="Your site and chatbot go fully live" desc="Once you're subscribed, your website goes live on your domain with the chatbot active and capturing leads around the clock." />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))', gap: 20, alignItems: 'stretch' }}>
+            <div style={{ background: 'white', border: '2px solid #bbf7d0', borderRadius: 16, padding: 'clamp(20px, 5vw, 30px)', position: 'relative' }}>
+              <div style={{ display: 'inline-block', background: '#dcfce7', color: '#15803d', fontSize: 11.5, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '4px 12px', borderRadius: 20, marginBottom: 20 }}>
+                Stage 1 &middot; Free, no payment
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                <StepCard number="1" title="Apply and tell us about your business" desc="Fill out the form below with a few details about your cleaning business and what you'd want on your site." />
+                <StepCard number="2" title="We build a sample website for you to review" desc="A live, working sample of your site — built for you to look at, no payment involved." />
+              </div>
+            </div>
+            <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', borderRadius: 16, padding: 'clamp(20px, 5vw, 30px)', boxShadow: '0 10px 30px rgba(37,99,235,0.25)' }}>
+              <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', color: 'white', fontSize: 11.5, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '4px 12px', borderRadius: 20, marginBottom: 20 }}>
+                Stage 2 &middot; Only if you approve
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', color: 'white', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>3</div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 16, color: 'white', marginBottom: 4 }}>Like it? Pick your domain and subscribe</div>
+                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Already own a domain? We'll use it. Starting fresh? We'll help you pick one. Billing only starts here.</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', color: 'white', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>4</div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 16, color: 'white', marginBottom: 4 }}>Your site and chatbot go fully live</div>
+                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Live on your domain, chatbot active, capturing leads around the clock.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Pricing */}
+      {/* Pricing -- a "ticket stub" card (price half torn from the details
+          half) instead of the plain centered price card used elsewhere, so
+          this reads as a distinct moment on the page rather than another
+          bordered box. */}
       <div id="pricing" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: '#f8fafc' }}>
-        <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ maxWidth: 440, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
             <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>Simple, Flat Pricing</h2>
             <p style={{ fontSize: 15, color: '#64748b' }}>No setup fee. No surprise invoices. Cancel anytime.</p>
           </div>
-          <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 18, padding: 'clamp(24px, 6vw, 36px)', textAlign: 'center', boxShadow: '0 4px 20px rgba(15,23,42,0.06)' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 5, marginBottom: 6 }}>
-              <span style={{ fontSize: 'clamp(36px, 9vw, 52px)', fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px', lineHeight: 1 }}>${MONTHLY_PRICE}</span>
-              <span style={{ fontSize: 15, color: '#64748b', fontWeight: 500 }}>/month</span>
+          <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', boxShadow: '0 14px 40px rgba(15,23,42,0.14)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', padding: 'clamp(24px, 6vw, 34px) clamp(24px, 6vw, 36px) 30px', textAlign: 'center' }}>
+              <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', color: '#bfdbfe', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 20, marginBottom: 16 }}>
+                Pay only after you approve
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 5 }}>
+                <span style={{ fontSize: 'clamp(36px, 9vw, 52px)', fontWeight: 900, color: 'white', letterSpacing: '-1.5px', lineHeight: 1 }}>${MONTHLY_PRICE}</span>
+                <span style={{ fontSize: 15, color: '#bfdbfe', fontWeight: 500 }}>/month</span>
+              </div>
             </div>
-            <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 24 }}>Website, hosting, chatbot, and ongoing updates — all included</p>
-            <a
-              href="#apply"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '14px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 15.5, boxShadow: '0 8px 24px rgba(29,78,216,0.35)' }}
-            >
-              Apply Now →
-            </a>
-            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>You won't be charged until you've seen and approved your sample site.</p>
+
+            {/* Ticket-notch seam -- two circles matching the page background,
+                half-overlapping the card edges at the fold. */}
+            <div style={{ position: 'relative', height: 0 }}>
+              <div style={{ position: 'absolute', top: -10, left: -10, width: 20, height: 20, borderRadius: '50%', background: '#f8fafc' }} />
+              <div style={{ position: 'absolute', top: -10, right: -10, width: 20, height: 20, borderRadius: '50%', background: '#f8fafc' }} />
+            </div>
+            <div style={{ borderTop: '2px dashed #cbd5e1' }} />
+
+            <div style={{ background: 'white', padding: 'clamp(22px, 5vw, 30px) clamp(24px, 6vw, 36px)', textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px 18px', marginBottom: 22 }}>
+                {['Website + hosting', 'AI chatbot', 'Ongoing updates', 'Cancel anytime'].map(item => (
+                  <span key={item} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', fontWeight: 600 }}>
+                    <IconCheck size={13} /> {item}
+                  </span>
+                ))}
+              </div>
+              <a
+                href="#apply"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '14px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 15.5, boxShadow: '0 8px 24px rgba(29,78,216,0.35)' }}
+              >
+                Apply Now →
+              </a>
+              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>You won't be charged until you've seen and approved your sample site.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -342,21 +412,38 @@ export default function WebsiteSubscription() {
         </div>
       </div>
 
-      {/* Apply form */}
-      <div id="apply" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: '#f8fafc' }}>
-        <div style={{ maxWidth: 580, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 36 }}>
-            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>Apply for Your Website</h2>
-            <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.65 }}>Tell us a bit about your business and we'll build a live sample site for you to review — no payment required until you approve it.</p>
+      {/* Apply form -- dark closing section with a "what to expect" sidebar
+          next to the form instead of a lone centered card, so the risk-
+          reversal pitch is visible right where someone decides to commit. */}
+      <div id="apply" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: 12 }}>Apply for Your Website</h2>
+            <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.65, maxWidth: 480, margin: '0 auto' }}>Tell us a bit about your business and we'll build a live sample site for you to review — no payment required until you approve it.</p>
           </div>
           {sent ? (
-            <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 16, padding: '36px 28px', textAlign: 'center' }}>
+            <div style={{ maxWidth: 520, margin: '0 auto', background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 16, padding: '36px 28px', textAlign: 'center' }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}><IconSuccess /></div>
               <div style={{ fontWeight: 800, fontSize: 20, color: '#15803d', marginBottom: 8 }}>Application Sent!</div>
               <div style={{ fontSize: 15, color: '#166534' }}>We'll review your application and follow up with a live sample of your website — no payment required until you approve it.</div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(18px, 5vw, 40px)' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 28, alignItems: 'flex-start' }}>
+            <div style={{ flex: '1 1 280px', maxWidth: 340, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 16, padding: 'clamp(22px, 5vw, 28px)' }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: '#93c5fd', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 18 }}>What to expect</div>
+              {[
+                'No payment today — just fill out the form',
+                'We review it and build a live sample site',
+                'You review the sample before deciding anything',
+                'Only then do you pick a domain and subscribe',
+              ].map((line, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(96,165,250,0.2)', color: '#60a5fa', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
+                  <span style={{ fontSize: 13.5, color: '#cbd5e1', lineHeight: 1.55 }}>{line}</span>
+                </div>
+              ))}
+            </div>
+            <form onSubmit={handleSubmit} style={{ flex: '2 1 380px', minWidth: 0, background: 'white', borderRadius: 16, padding: 'clamp(18px, 5vw, 40px)', boxShadow: '0 14px 40px rgba(0,0,0,0.25)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full Name *</label>
@@ -429,6 +516,7 @@ export default function WebsiteSubscription() {
               </button>
               <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 14, marginBottom: 0 }}>We'll follow up within 48 hours with a live sample site — you won't be charged until you approve it.</p>
             </form>
+          </div>
           )}
         </div>
       </div>
