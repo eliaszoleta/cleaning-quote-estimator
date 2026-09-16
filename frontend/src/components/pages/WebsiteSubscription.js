@@ -204,7 +204,36 @@ export default function WebsiteSubscription() {
         @media (min-width: 768px) {
           .ws-step-desc { text-align: justify; }
         }
+        .ws-sample-callout { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        .ws-sample-callout:hover { transform: translateY(-2px); box-shadow: 0 18px 46px rgba(15,23,42,0.22); }
+        @media (prefers-reduced-motion: reduce) {
+          .ws-sample-callout { transition: none; }
+        }
       `}</style>
+
+      {/* Sample design callout -- links to a real, live demo site instead of
+          a screenshot, right after the hero where it gets seen. */}
+      <div style={{ padding: '0 20px', marginTop: -28, position: 'relative', zIndex: 2 }}>
+        <a
+          href="/website-example"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ws-sample-callout"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14,
+            maxWidth: 780, margin: '0 auto', background: 'white', borderRadius: 14,
+            padding: '18px 24px', textDecoration: 'none', boxShadow: '0 14px 40px rgba(15,23,42,0.16)', border: '1px solid #e2e8f0',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 2 }}>See what your website could actually look like</div>
+            <div style={{ fontSize: 13, color: '#64748b' }}>A real, live sample design — not just a mockup screenshot.</div>
+          </div>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: PRIMARY_GRADIENT, color: 'white', padding: '10px 18px', borderRadius: 9, fontWeight: 700, fontSize: 13.5, flexShrink: 0 }}>
+            View Sample Design <IconArrow size={14} color="white" />
+          </span>
+        </a>
+      </div>
 
       {/* Why this matters -- a before/after split instead of another icon
           card grid (used everywhere else on the site), so the contrast

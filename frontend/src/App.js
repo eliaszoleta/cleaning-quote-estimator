@@ -19,6 +19,7 @@ import BlogCategory from './components/blog/BlogCategory';
 import CompanyLanding from './components/pages/CompanyLanding';
 import PartnerWithUs from './components/pages/PartnerWithUs';
 import WebsiteSubscription from './components/pages/WebsiteSubscription';
+import WebsiteExample from './components/pages/WebsiteExample';
 import PartnerCityPricing from './components/pages/PartnerCityPricing';
 import PartnerDemoPage from './components/pages/PartnerDemoPage';
 import BuyCityPlacement from './components/pages/BuyCityPlacement';
@@ -59,6 +60,7 @@ const isAdminHomepageLeads = pathname === '/admin/leads';
 const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
 const isWebsiteSubscription = pathname === '/website-for-cleaning-companies';
+const isWebsiteExample = pathname === '/website-example';
 const isPartnerCityPricing = pathname === '/partner-city-pricing';
 const isPartnerDemo = pathname === '/partner-demo';
 const isBuyCityPlacementSuccess = pathname === '/buy-city-placement/success';
@@ -187,6 +189,15 @@ export default function App() {
         <main><PartnerWithUs /></main>
         <Footer />
       </div>
+    </HelmetProvider>
+  );
+
+  // No Header/Footer chrome here on purpose -- this page simulates a
+  // separate, standalone customer website, so cleanestimator.com's own
+  // nav/footer would break the illusion (it already has its own demo nav).
+  if (isWebsiteExample) return (
+    <HelmetProvider>
+      <WebsiteExample />
     </HelmetProvider>
   );
 
