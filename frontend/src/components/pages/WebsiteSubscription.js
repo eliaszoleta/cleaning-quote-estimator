@@ -8,6 +8,15 @@ const PRIMARY_GRADIENT = '#1d4ed8';
 const WEB3FORMS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
 const MONTHLY_PRICE = 197;
 
+// Same 9 services offered elsewhere on the site (ServiceSelect.js,
+// ServicesTab.js) -- kept as plain labels here since this form is just
+// collecting what to put on the site, not tied to the calculator's
+// configKey/pricing logic.
+const SERVICES_OFFERED = [
+  'House Cleaning', 'Apartment Cleaning', 'Commercial Cleaning', 'Carpet Cleaning',
+  'Air Duct Cleaning', 'Dryer Vent Cleaning', 'Tile & Grout Cleaning', 'Mold Remediation', 'Water Damage Restoration',
+];
+
 const IconCheck = ({ size = 18, color = '#16a34a', bg = '#dcfce7' }) => (
   <div style={{ width: size + 4, height: size + 4, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
     <svg width={size - 4} height={size - 4} viewBox="0 0 12 12" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="square" strokeLinejoin="miter">
@@ -89,9 +98,21 @@ export default function WebsiteSubscription() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', domain: '', currentWebsite: '', message: '' });
+  const [form, setForm] = useState({
+    name: '', business: '', email: '', phone: '', servicesOffered: [],
+    domain1: '', domain2: '', domain3: '', currentWebsite: '', message: '',
+  });
 
   const inputStyle = { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: 9, fontSize: 14, outline: 'none', boxSizing: 'border-box', color: '#0f172a', background: 'white' };
+
+  const toggleService = (label) => {
+    setForm(f => ({
+      ...f,
+      servicesOffered: f.servicesOffered.includes(label)
+        ? f.servicesOffered.filter(s => s !== label)
+        : [...f.servicesOffered, label],
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -109,7 +130,10 @@ export default function WebsiteSubscription() {
           business: form.business,
           email: form.email,
           phone: form.phone || 'Not provided',
-          preferred_domain: form.domain || 'Not provided',
+          services_offered: form.servicesOffered.length ? form.servicesOffered.join(', ') : 'Not specified',
+          domain_1st_choice: form.domain1 || 'Not provided',
+          domain_2nd_choice: form.domain2 || 'Not provided',
+          domain_3rd_choice: form.domain3 || 'Not provided',
           current_website: form.currentWebsite || 'None',
           message: form.message || 'No additional message',
         }),
@@ -337,20 +361,54 @@ export default function WebsiteSubscription() {
                   <input required type="email" style={inputStyle} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="you@yourbusiness.com" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone</label>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Business Phone Number</label>
                   <input type="tel" style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
                 </div>
+
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preferred Domain Name</label>
-                  <input style={inputStyle} value={form.domain} onChange={e => setForm(f => ({ ...f, domain: e.target.value }))} placeholder="e.g. sparklecleanco.com (or a couple ideas)" />
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Services You Offer</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {SERVICES_OFFERED.map(label => {
+                      const active = form.servicesOffered.includes(label);
+                      return (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={() => toggleService(label)}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            padding: '7px 14px 7px 12px', borderRadius: 20,
+                            background: active ? PRIMARY : 'white',
+                            border: active ? 'none' : '1.5px solid #e2e8f0',
+                            color: active ? 'white' : '#374151',
+                            fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                          }}
+                        >
+                          {active && <IconCheck size={12} color="white" bg="rgba(255,255,255,0.25)" />}
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
+
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preferred Domain Names</label>
+                  <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>Give us at least 3 ideas in case your first choice is taken — #1 is your priority.</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <input style={inputStyle} value={form.domain1} onChange={e => setForm(f => ({ ...f, domain1: e.target.value }))} placeholder="1st choice (priority) — e.g. sparklecleanco.com" />
+                    <input style={inputStyle} value={form.domain2} onChange={e => setForm(f => ({ ...f, domain2: e.target.value }))} placeholder="2nd choice" />
+                    <input style={inputStyle} value={form.domain3} onChange={e => setForm(f => ({ ...f, domain3: e.target.value }))} placeholder="3rd choice" />
+                  </div>
+                </div>
+
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Website (if any)</label>
                   <input style={inputStyle} value={form.currentWebsite} onChange={e => setForm(f => ({ ...f, currentWebsite: e.target.value }))} placeholder="https://... or Facebook page link" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tell us about your business</label>
-                  <textarea rows={3} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="Services you offer, what you'd want on your site, questions..." />
+                  <textarea rows={3} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="What you'd want on your site, service area, questions..." />
                 </div>
               </div>
               {error && (
