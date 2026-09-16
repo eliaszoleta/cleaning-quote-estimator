@@ -61,6 +61,11 @@ function Check({ children }) {
 // page doesn't already back up.
 const COMPARISON = [
   {
+    label: 'Before you pay',
+    them: 'You commit and pay upfront before seeing the finished site.',
+    us: 'We build a live sample website first — you only subscribe once you\'ve seen and approved it.',
+  },
+  {
     label: 'Upfront cost',
     them: 'Freelancers and agencies typically charge $2,000-$5,000+ before you see a single page.',
     us: '$0 upfront. One flat monthly rate covers the build, hosting, and everything after.',
@@ -173,7 +178,7 @@ export default function WebsiteSubscription() {
           <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 560, margin: '0 auto 32px', lineHeight: 1.5 }}>
             No website yet? We build it, host it, and hand you a chatbot that answers visitors and captures leads while you're out on a job — for one flat monthly rate, no big upfront cost.
           </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 14 }}>
             <a href="#apply" className="ws-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
               Apply Now <span className="ws-arrow"><IconArrow size={16} color="white" /></span>
             </a>
@@ -181,6 +186,9 @@ export default function WebsiteSubscription() {
               See Pricing
             </a>
           </div>
+          <p style={{ fontSize: 13, color: '#93c5fd', fontWeight: 600 }}>
+            We build a live sample of your site first — you don't pay until you've seen and approved it.
+          </p>
         </div>
       </div>
 
@@ -280,9 +288,9 @@ export default function WebsiteSubscription() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
             <StepCard number="1" title="Apply and tell us about your business" desc="Fill out the form below with a few details about your cleaning business and what you'd want on your site." />
-            <StepCard number="2" title="We build your site and set up your chatbot" desc="We design and build your website and configure your AI chatbot so it's ready to answer visitors and capture their info." />
-            <StepCard number="3" title="You pick your domain" desc="Already own one? We'll use it. Starting fresh? We'll help you pick and set up a domain name for your business." />
-            <StepCard number="4" title="Your site goes live" desc="Once everything's set up, your website and chatbot go live and start working for you around the clock." />
+            <StepCard number="2" title="We build a sample website for you to review" desc="No payment required for this step. We put together a live, working sample of your site so you can see exactly what you'd be getting." />
+            <StepCard number="3" title="Like it? Pick your domain and subscribe" desc="Already own a domain? We'll use it. Starting fresh? We'll help you pick one. Billing only starts once you're happy with the sample." />
+            <StepCard number="4" title="Your site and chatbot go fully live" desc="Once you're subscribed, your website goes live on your domain with the chatbot active and capturing leads around the clock." />
           </div>
         </div>
       </div>
@@ -306,6 +314,7 @@ export default function WebsiteSubscription() {
             >
               Apply Now →
             </a>
+            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>You won't be charged until you've seen and approved your sample site.</p>
           </div>
         </div>
       </div>
@@ -316,12 +325,13 @@ export default function WebsiteSubscription() {
           <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 36, textAlign: 'center' }}>Common Questions</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {[
+              { q: 'Do I have to pay before I see anything?', a: "No. After you apply, we build a live sample of your actual website first, so you can see exactly what you'd be getting. You only subscribe and start paying once you've reviewed it and you're happy with it." },
               { q: 'Do I own the website?', a: "Your site is built and hosted as part of your active subscription — similar to how a lot of small business tools work. As long as your subscription is active, it's live and it's yours to use and point customers to. We'll walk through the specifics with you when you apply." },
               { q: 'What happens if I cancel?', a: "Your website and chatbot come down when the subscription ends. There's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
               { q: 'How does the chatbot work?', a: "It's powered by GoHighLevel and sits on your website, ready to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours." },
               { q: 'Can I use a domain I already own?', a: "Yes. If you already have a domain, we'll use it. If not, we'll help you pick one and get it set up as part of onboarding." },
               { q: 'Is there a setup fee?', a: 'No. It\'s one flat monthly rate — no setup fee, no separate build cost.' },
-              { q: 'How long until my site is live?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your site and review your application." },
+              { q: 'How long until my sample site is ready?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your business and review your application. Your site goes fully live on your domain once you approve the sample and subscribe." },
             ].map((item, i) => (
               <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)' }}>
                 <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 8 }}>{item.q}</div>
@@ -337,13 +347,13 @@ export default function WebsiteSubscription() {
         <div style={{ maxWidth: 580, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
             <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>Apply for Your Website</h2>
-            <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.65 }}>Tell us a bit about your business and we'll follow up to confirm details and get you set up.</p>
+            <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.65 }}>Tell us a bit about your business and we'll build a live sample site for you to review — no payment required until you approve it.</p>
           </div>
           {sent ? (
             <div style={{ background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 16, padding: '36px 28px', textAlign: 'center' }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}><IconSuccess /></div>
               <div style={{ fontWeight: 800, fontSize: 20, color: '#15803d', marginBottom: 8 }}>Application Sent!</div>
-              <div style={{ fontSize: 15, color: '#166534' }}>We'll review your application and follow up to get your website and chatbot set up.</div>
+              <div style={{ fontSize: 15, color: '#166534' }}>We'll review your application and follow up with a live sample of your website — no payment required until you approve it.</div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(18px, 5vw, 40px)' }}>
@@ -417,7 +427,7 @@ export default function WebsiteSubscription() {
               <button type="submit" disabled={sending} style={{ width: '100%', background: sending ? '#93c5fd' : PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 10, padding: '14px 0', fontWeight: 800, fontSize: 16, cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'opacity 0.2s', boxShadow: sending ? 'none' : '0 8px 22px rgba(29,78,216,0.35)' }}>
                 {sending ? 'Sending...' : <> Send My Application <IconArrow size={18} color="white" /> </>}
               </button>
-              <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 14, marginBottom: 0 }}>We'll follow up within 48 hours to confirm details and get started.</p>
+              <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 14, marginBottom: 0 }}>We'll follow up within 48 hours with a live sample site — you won't be charged until you approve it.</p>
             </form>
           )}
         </div>
