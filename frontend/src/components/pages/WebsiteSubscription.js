@@ -105,6 +105,7 @@ export default function WebsiteSubscription() {
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '', business: '', email: '', phone: '', servicesOffered: [],
+    businessAddress: '', serviceAreas: '',
     domain1: '', domain2: '', domain3: '', currentWebsite: '', message: '',
   });
 
@@ -136,6 +137,8 @@ export default function WebsiteSubscription() {
           email: form.email,
           phone: form.phone || 'Not provided',
           services_offered: form.servicesOffered.length ? form.servicesOffered.join(', ') : 'Not specified',
+          business_address: form.businessAddress || 'Not provided',
+          service_areas: form.serviceAreas || 'Not provided',
           domain_1st_choice: form.domain1 || 'Not provided',
           domain_2nd_choice: form.domain2 || 'Not provided',
           domain_3rd_choice: form.domain3 || 'Not provided',
@@ -399,7 +402,7 @@ export default function WebsiteSubscription() {
             <div style={{ borderTop: '2px dashed #cbd5e1' }} />
 
             <div style={{ background: 'white', padding: 'clamp(22px, 5vw, 30px) clamp(24px, 6vw, 36px)', textAlign: 'center' }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px 18px', marginBottom: 22 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 22 }}>
                 {['Website + hosting', 'AI chatbot', 'Ongoing updates', 'Cancel anytime'].map(item => (
                   <span key={item} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', fontWeight: 600 }}>
                     <IconCheck size={13} /> {item}
@@ -519,6 +522,16 @@ export default function WebsiteSubscription() {
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cleaning Business Address</label>
+                  <input style={inputStyle} value={form.businessAddress} onChange={e => setForm(f => ({ ...f, businessAddress: e.target.value }))} placeholder="123 Main St, Austin, TX 78701" />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Service Areas</label>
+                  <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>Cities or areas you actually serve, so we can list them on your site.</p>
+                  <input style={inputStyle} value={form.serviceAreas} onChange={e => setForm(f => ({ ...f, serviceAreas: e.target.value }))} placeholder="e.g. Austin, Round Rock, Cedar Park" />
+                </div>
+
+                <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preferred Domain Names</label>
                   <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>Give us at least 3 ideas in case your first choice is taken — #1 is your priority.</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -533,8 +546,9 @@ export default function WebsiteSubscription() {
                   <input style={inputStyle} value={form.currentWebsite} onChange={e => setForm(f => ({ ...f, currentWebsite: e.target.value }))} placeholder="https://... or Facebook page link" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tell us about your business</label>
-                  <textarea rows={3} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="What you'd want on your site, service area, questions..." />
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tell Us About Your Business</label>
+                  <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>Your story, how you got started, who founded it — anything you'd want visitors to know about you.</p>
+                  <textarea rows={4} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="e.g. Founded in 2019 by... We started because... What makes us different is..." />
                 </div>
               </div>
               {error && (
