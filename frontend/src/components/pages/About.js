@@ -64,39 +64,38 @@ export default function About() {
         <link rel="canonical" href="https://www.cleanestimator.com/about" />
       </Helmet>
 
-      {/* Page Hero -- asymmetric two-column layout instead of the centered
-          headline-over-stats pattern used on every other hero band on the
-          site. Left: eyebrow/title/subtitle, left-aligned. Right: the three
-          stats as a distinct "fact sheet" card (frosted glass, vertical
-          list) rather than plain numbers -- gives this page its own
-          identity instead of reading as another copy of the same hero. */}
-      <div style={{ background: COLORS.heroGradient, padding: 'clamp(40px, 7vw, 72px) 20px clamp(80px, 11vw, 128px)', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -120, right: -80, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
-        <div style={{ maxWidth: 1080, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 48, alignItems: 'center', position: 'relative' }}>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
-              About Us
-            </div>
-            <h1 style={{ fontSize: 'clamp(30px, 5vw, 46px)', fontWeight: 800, color: 'white', lineHeight: 1.18, marginBottom: 20, letterSpacing: '-0.02em' }}>
-              About Clean Estimator
-            </h1>
-            <p style={{ fontSize: 17, color: '#94a3b8', lineHeight: 1.75, maxWidth: 480, margin: 0 }}>
-              We built Clean Estimator to solve a frustrating problem: no one knows what cleaning actually costs until they've already called 3 companies and waited for callbacks.
-            </p>
+      {/* Page Hero -- same centered, single-column layout as the Website +
+          Chatbot hero (eyebrow / h1 / subtitle, calm type scale), instead
+          of the asymmetric two-column version this had before. Stat row
+          keeps the same hairline-separated treatment underneath, sized down
+          to match. */}
+      <div style={{ background: COLORS.heroGradient, color: 'white', padding: 'clamp(40px, 9vw, 96px) 20px clamp(48px, 9vw, 96px)' }}>
+        <div style={{ maxWidth: 620, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 16 }}>
+            About Us
           </div>
+          <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
+            About Clean Estimator
+          </h1>
+          <p style={{ fontSize: 15, color: '#94a3b8', maxWidth: 540, margin: '0 auto', lineHeight: 1.55 }}>
+            We built Clean Estimator to solve a frustrating problem: no one knows what cleaning actually costs until they've already called 3 companies and waited for callbacks.
+          </p>
+        </div>
 
-          <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: RADIUS.xl, padding: '4px 28px', backdropFilter: 'blur(8px)' }}>
-            {STATS.map((s, i) => (
-              <div key={s.label} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 16, padding: '20px 0', borderBottom: i < STATS.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none' }}>
-                <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 600 }}>{s.label}</span>
-                <span style={{ fontSize: 28, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>{s.number}</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '36px auto 0', flexWrap: 'wrap', rowGap: 16 }}>
+          {STATS.map((s, i) => (
+            <div key={s.label} style={{ display: 'flex', alignItems: 'center' }}>
+              {i > 0 && <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.14)', margin: '0 28px' }} />}
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 21, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>{s.number}</div>
+                <div style={{ fontSize: 11, color: '#64748b', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: '-48px auto 0', padding: '0 20px clamp(36px, 7vw, 80px)', position: 'relative' }}>
+      <div style={{ maxWidth: 760, margin: '-28px auto 0', padding: '0 20px clamp(36px, 7vw, 80px)', position: 'relative' }}>
 
         {/* Our mission */}
         <section style={{ marginBottom: 24 }}>
