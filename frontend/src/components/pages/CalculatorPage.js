@@ -100,7 +100,7 @@ export default function CalculatorPage() {
       />
 
       <div className="page-hero-content">
-        <div style={showingResults ? undefined : { maxWidth: 720, margin: '-64px auto 0', position: 'relative', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={showingResults ? undefined : { maxWidth: 720, margin: '-64px auto 0', position: 'relative', background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <CleaningCalculator embedded siteLanding onShowResults={setShowingResults} />
         </div>
 
