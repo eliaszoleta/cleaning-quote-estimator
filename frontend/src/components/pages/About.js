@@ -62,12 +62,16 @@ export default function About() {
       </Helmet>
 
       {/* Page Hero -- same dark band / glow / left-aligned title+subtitle
-          layout as the blog page hero (BlogIndex.js), reusing the shared
-          PageHero.css classes directly instead of a bespoke centered/eyebrow
-          treatment, so About matches the blog hero exactly. */}
-      <div className="page-hero-band">
+          layout as the blog page hero (BlogIndex.js). Horizontal padding
+          moves off the band and onto the inner block using the exact same
+          maxWidth(760)+padding(20px)+margin:auto box as the body content
+          wrapper below, so the title/subtitle line up with the body text
+          instead of the wider 900px hero container. Vertical padding uses
+          clamp() with the same max as before, so desktop is unchanged but
+          the band gets noticeably shorter on mobile. */}
+      <div className="page-hero-band" style={{ padding: 'clamp(18px, 5vw, 40px) 0 clamp(36px, 9vw, 96px)' }}>
         <div className="page-hero-glow" aria-hidden="true" />
-        <div className="page-hero-inner" style={{ maxWidth: 900, textAlign: 'left' }}>
+        <div className="page-hero-inner" style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', textAlign: 'left' }}>
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
             About Clean Estimator
           </h1>
@@ -100,7 +104,7 @@ export default function About() {
           <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.primary, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>
             Our Mission
           </div>
-          <p style={{ fontSize: 'clamp(17px, 2.4vw, 21px)', color: COLORS.ink, lineHeight: 1.6, fontWeight: 500, margin: 0, maxWidth: 640 }}>
+          <p style={{ fontSize: 'clamp(15px, 4vw, 21px)', color: COLORS.ink, lineHeight: 1.6, fontWeight: 500, margin: 0, maxWidth: 640 }}>
             Make cleaning service pricing transparent, accessible, and instant. We want every homeowner and business owner to walk into a cleaning consultation already knowing what to expect — so they can negotiate confidently and avoid overpaying.
           </p>
         </section>
