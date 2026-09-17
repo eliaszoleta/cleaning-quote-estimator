@@ -1,14 +1,15 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Target, Calculator, Home, Building2, ShieldAlert, MessageCircle, Users, Sparkles, Code2, Handshake } from 'lucide-react';
+import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 
-const h2Style = { fontSize: 19, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' };
+const h2Style = { fontSize: 19, fontWeight: 800, color: COLORS.ink, letterSpacing: '-0.01em' };
 const pStyle = { fontSize: 14.5, color: '#334155', lineHeight: 1.65, margin: 0 };
-const cardStyle = { background: 'white', borderRadius: 10, padding: 'clamp(18px, 5vw, 32px)', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' };
+const cardStyle = { background: COLORS.surface, borderRadius: RADIUS.lg, padding: 'clamp(18px, 5vw, 32px)', border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm };
 
 function IconBadge({ Icon, color, bg }) {
   return (
-    <div style={{ width: 42, height: 42, borderRadius: 12, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <div style={{ width: 42, height: 42, borderRadius: RADIUS.sm, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
       <Icon size={21} strokeWidth={2.1} />
     </div>
   );
@@ -25,11 +26,11 @@ function SectionHeading({ Icon, color, bg, children }) {
 
 function ProductCard({ Icon, color, bg, title, children, href, linkLabel }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '22px 20px', background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '22px 20px', background: COLORS.surfaceMuted, borderRadius: RADIUS.md, border: `1px solid ${COLORS.border}` }}>
       <IconBadge Icon={Icon} color={color} bg={bg} />
-      <h3 style={{ fontSize: 15.5, fontWeight: 800, color: '#0f172a', margin: 0 }}>{title}</h3>
+      <h3 style={{ fontSize: 15.5, fontWeight: 800, color: COLORS.ink, margin: 0 }}>{title}</h3>
       <p style={{ ...pStyle, fontSize: 13.5, flex: 1 }}>{children}</p>
-      <a href={href} style={{ fontSize: 13, fontWeight: 700, color: '#2563eb', textDecoration: 'none' }}>{linkLabel} →</a>
+      <a href={href} style={{ fontSize: 13, fontWeight: 700, color: COLORS.primary, textDecoration: 'none' }}>{linkLabel} →</a>
     </div>
   );
 }
@@ -37,11 +38,11 @@ function ProductCard({ Icon, color, bg, title, children, href, linkLabel }) {
 function Step({ number, title, children }) {
   return (
     <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-      <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#1d4ed8', color: 'white', fontSize: 13.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <div style={{ width: 30, height: 30, borderRadius: '50%', background: COLORS.primaryHover, color: 'white', fontSize: 13.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         {number}
       </div>
       <div>
-        <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', margin: '0 0 4px' }}>{title}</h3>
+        <h3 style={{ fontSize: 15, fontWeight: 800, color: COLORS.ink, margin: '0 0 4px' }}>{title}</h3>
         <p style={{ ...pStyle, fontSize: 13.5 }}>{children}</p>
       </div>
     </div>
@@ -56,22 +57,21 @@ const STATS = [
 
 export default function About() {
   return (
-    <div style={{ background: '#f1f5f9', minHeight: '100vh' }}>
+    <div style={{ background: COLORS.surfaceMuted, minHeight: '100vh' }}>
       <Helmet>
         <title>About Clean Estimator | Free Cleaning Cost Estimator</title>
         <meta name="description" content="Clean Estimator provides free, accurate cleaning cost estimates for homeowners and businesses across all 50 U.S. states." />
         <link rel="canonical" href="https://www.cleanestimator.com/about" />
       </Helmet>
 
-      {/* Page Hero -- deliberately restrained: no gradient blob, no pill
-          button. A thin accent rule + small-caps eyebrow do the "this is a
-          distinct section" job a badge used to, with less visual noise;
-          the stat row drops the boxed/bordered grid for plain numbers
-          separated by a hairline, closer to how a stat line reads in
-          editorial design than a dashboard widget. */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(40px, 9vw, 96px) 20px clamp(36px, 7vw, 80px)', textAlign: 'center' }}>
-        <div style={{ maxWidth: 620, margin: '0 auto' }}>
-          <div style={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #3b82f6, #818cf8)', margin: '0 auto 24px' }} />
+      {/* Page Hero -- same full-bleed dark band + glow used across the rest
+          of the site (homepage, calculator, SEO pages), instead of the
+          flatter treatment this page had before. Small-caps eyebrow +
+          hairline-separated stat row kept as-is underneath -- still reads
+          calmer than a boxed dashboard-style stat grid. */}
+      <div style={{ background: COLORS.heroGradient, padding: 'clamp(40px, 9vw, 96px) 20px clamp(72px, 11vw, 128px)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -140, left: '50%', transform: 'translateX(-50%)', width: 560, height: 560, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
+        <div style={{ maxWidth: 620, margin: '0 auto', position: 'relative' }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
             About Us
           </div>
@@ -83,7 +83,7 @@ export default function About() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '52px auto 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '52px auto 0', position: 'relative' }}>
           {STATS.map((s, i) => (
             <div key={s.label} style={{ display: 'flex', alignItems: 'center' }}>
               {i > 0 && <div style={{ width: 1, height: 30, background: 'rgba(255,255,255,0.14)', margin: '0 32px' }} />}
@@ -96,7 +96,7 @@ export default function About() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(28px, 6vw, 48px) 20px clamp(36px, 7vw, 80px)' }}>
+      <div style={{ maxWidth: 760, margin: '-48px auto 0', padding: '0 20px clamp(36px, 7vw, 80px)', position: 'relative' }}>
 
         {/* Our mission */}
         <section style={{ marginBottom: 24 }}>
@@ -183,8 +183,8 @@ export default function About() {
 
         {/* Disclaimer note */}
         <section style={{ marginBottom: 32 }}>
-          <div style={{ background: '#eff6ff', borderRadius: 10, padding: '28px 32px', border: '1px solid #bfdbfe' }}>
-            <SectionHeading Icon={ShieldAlert} color="#1d4ed8" bg="rgba(255,255,255,0.6)">Disclaimer</SectionHeading>
+          <div style={{ background: COLORS.primaryMuted, borderRadius: RADIUS.lg, padding: '28px 32px', border: `1px solid ${COLORS.primaryMutedBorder}` }}>
+            <SectionHeading Icon={ShieldAlert} color={COLORS.primaryHover} bg="rgba(255,255,255,0.6)">Disclaimer</SectionHeading>
             <p style={pStyle}>
               Our estimates are starting points, not quotes. Actual cleaning service costs depend on the specific condition of the property, local market competition, the cleaning company's pricing, and many other factors. Always get multiple quotes from licensed, insured professionals before booking.
             </p>
@@ -192,18 +192,21 @@ export default function About() {
         </section>
 
         {/* Contact CTA */}
-        <section style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a8a)', borderRadius: 14, padding: '40px 32px', textAlign: 'center' }}>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-            <MessageCircle size={22} color="#93c5fd" strokeWidth={2.1} />
+        <section style={{ background: COLORS.heroGradient, borderRadius: RADIUS.xl, padding: '40px 32px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', bottom: -100, right: -60, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.25) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
+          <div style={{ position: 'relative' }}>
+            <div style={{ width: 44, height: 44, borderRadius: RADIUS.sm, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <MessageCircle size={22} color="#93c5fd" strokeWidth={2.1} />
+            </div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: 'white', marginBottom: 10, letterSpacing: '-0.01em' }}>Questions or Feedback?</h2>
+            <p style={{ color: '#cbd5e1', marginBottom: 24, fontSize: 15, lineHeight: 1.6 }}>We're a small team and we read every message.</p>
+            <a
+              href="/contact"
+              style={{ display: 'inline-flex', alignItems: 'center', padding: '12px 28px', background: 'white', color: COLORS.ink, borderRadius: RADIUS.sm, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}
+            >
+              Contact Us
+            </a>
           </div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: 'white', marginBottom: 10, letterSpacing: '-0.01em' }}>Questions or Feedback?</h2>
-          <p style={{ color: '#cbd5e1', marginBottom: 24, fontSize: 15, lineHeight: 1.6 }}>We're a small team and we read every message.</p>
-          <a
-            href="/contact"
-            style={{ display: 'inline-flex', alignItems: 'center', padding: '12px 28px', background: 'white', color: '#0f172a', borderRadius: 10, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}
-          >
-            Contact Us
-          </a>
         </section>
 
       </div>

@@ -170,7 +170,6 @@ export default function WebsiteSubscription() {
       {/* Hero */}
       <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: 'clamp(40px, 9vw, 96px) 20px clamp(48px, 9vw, 110px)' }}>
         <div style={{ maxWidth: 780, margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #3b82f6, #818cf8)', margin: '0 auto 22px' }} />
           <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
             Website + AI Chatbot
           </div>

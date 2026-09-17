@@ -129,7 +129,6 @@ export default function CompanyLanding() {
           <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(40px, 9vw, 96px) 20px clamp(48px, 9vw, 110px)' }}>
             <div className="ce-hero-grid" style={{ maxWidth: 1320, margin: '0 auto', display: 'grid', gap: 56, alignItems: 'center' }}>
               <div>
-                <div style={{ width: 44, height: 3, borderRadius: 2, background: 'linear-gradient(90deg, #3b82f6, #818cf8)', marginBottom: 22 }} />
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
                   For cleaning companies
                 </div>
