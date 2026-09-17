@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import StepWrapper from './StepWrapper';
+import { StepSection, StepChip, StepOptionCard, StepPillToggle } from './StepUI';
+import { COLORS } from '../../../styles/theme';
 
 const SQFT_OPTIONS = [
   { id: 'under_1000', label: 'Under 1,000 sq ft', sub: 'Small home / condo' },
@@ -63,142 +65,82 @@ export default function HomeStep({ value, onBack, onNext, primaryColor, companyC
       primaryColor={primaryColor}
     >
       {/* Home size */}
-      <Section label="Home size">
+      <StepSection label="Home size">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
           {SQFT_OPTIONS.map(o => (
-            <OptionCard key={o.id} selected={sqftTier === o.id} onClick={() => setSqftTier(o.id)} primaryColor={primaryColor}>
+            <StepOptionCard key={o.id} selected={sqftTier === o.id} onClick={() => setSqftTier(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 600, fontSize: 14 }}>{o.label}</div>
-              <div style={{ fontSize: 12, color: '#64748b' }}>{o.sub}</div>
-            </OptionCard>
+              <div style={{ fontSize: 12, color: COLORS.body }}>{o.sub}</div>
+            </StepOptionCard>
           ))}
         </div>
-      </Section>
+      </StepSection>
 
       {/* Bedrooms & bathrooms */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-        <Section label="Bedrooms">
+        <StepSection label="Bedrooms">
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {['1','2','3','4','5','6+'].map(n => (
-              <ChipBtn key={n} selected={bedrooms === n} onClick={() => setBedrooms(n)} primaryColor={primaryColor}>{n}</ChipBtn>
+              <StepChip key={n} selected={bedrooms === n} onClick={() => setBedrooms(n)} primaryColor={primaryColor}>{n}</StepChip>
             ))}
           </div>
-        </Section>
-        <Section label="Bathrooms">
+        </StepSection>
+        <StepSection label="Bathrooms">
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {['1','1.5','2','2.5','3','4+'].map(n => (
-              <ChipBtn key={n} selected={bathrooms === n} onClick={() => setBathrooms(n)} primaryColor={primaryColor}>{n}</ChipBtn>
+              <StepChip key={n} selected={bathrooms === n} onClick={() => setBathrooms(n)} primaryColor={primaryColor}>{n}</StepChip>
             ))}
           </div>
-        </Section>
+        </StepSection>
       </div>
 
       {/* Cleaning type */}
-      <Section label="Cleaning type">
+      <StepSection label="Cleaning type">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
           {CLEANING_TYPES.map(o => (
-            <OptionCard key={o.id} selected={cleaningType === o.id} onClick={() => setCleaningType(o.id)} primaryColor={primaryColor}>
+            <StepOptionCard key={o.id} selected={cleaningType === o.id} onClick={() => setCleaningType(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>{o.label}</div>
-              <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{o.desc}</div>
-            </OptionCard>
+              <div style={{ fontSize: 12, color: COLORS.body, marginTop: 4 }}>{o.desc}</div>
+            </StepOptionCard>
           ))}
         </div>
-      </Section>
+      </StepSection>
 
       {/* Frequency */}
-      <Section label="How often?">
+      <StepSection label="How often?">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {FREQUENCY.map(f => {
             const discountPct = Math.round((frequencyDiscounts[f.id] || 0) * 100);
             return (
-              <button
-                key={f.id}
-                onClick={() => setFrequency(f.id)}
-                style={{
-                  padding: '10px 18px', borderRadius: 8, border: `2px solid ${frequency === f.id ? primaryColor : '#e2e8f0'}`,
-                  background: frequency === f.id ? primaryColor : 'white',
-                  color: frequency === f.id ? 'white' : '#374151',
-                  cursor: 'pointer', fontWeight: 600, fontSize: 14,
-                }}
-              >
+              <StepChip key={f.id} selected={frequency === f.id} onClick={() => setFrequency(f.id)} primaryColor={primaryColor}>
                 {f.label}
                 {discountPct > 0 && <span style={{ fontSize: 11, marginLeft: 4, opacity: 0.85 }}>({discountPct}% off)</span>}
-              </button>
+              </StepChip>
             );
           })}
         </div>
-      </Section>
+      </StepSection>
 
       {/* Home condition */}
-      <Section label="Home condition">
+      <StepSection label="Home condition">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {[['good','Good'],['fair','Fair'],['poor','Neglected']].map(([id,label]) => (
-            <ChipBtn key={id} selected={condition === id} onClick={() => setCondition(id)} primaryColor={primaryColor}>{label}</ChipBtn>
+            <StepChip key={id} selected={condition === id} onClick={() => setCondition(id)} primaryColor={primaryColor}>{label}</StepChip>
           ))}
         </div>
-        <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>
+        <p style={{ fontSize: 12, color: COLORS.muted, marginTop: 6 }}>
           Neglected homes with heavy buildup may cost 25–50% more.
         </p>
-      </Section>
+      </StepSection>
 
       {/* Add-ons */}
-      <Section label="Add-ons (optional)">
+      <StepSection label="Add-ons (optional)">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {EXTRAS.map(ex => (
-            <button
-              key={ex.id}
-              onClick={() => toggleExtra(ex.id)}
-              style={{
-                padding: '8px 14px', borderRadius: 20, border: `2px solid ${extras.includes(ex.id) ? primaryColor : '#e2e8f0'}`,
-                background: extras.includes(ex.id) ? `${primaryColor}15` : 'white',
-                color: extras.includes(ex.id) ? primaryColor : '#374151',
-                cursor: 'pointer', fontWeight: 600, fontSize: 13,
-              }}
-            >
-              {ex.label}
-            </button>
+            <StepPillToggle key={ex.id} selected={extras.includes(ex.id)} onClick={() => toggleExtra(ex.id)} primaryColor={primaryColor}>{ex.label}</StepPillToggle>
           ))}
         </div>
-      </Section>
+      </StepSection>
     </StepWrapper>
-  );
-}
-
-function Section({ label, children }) {
-  return (
-    <div style={{ marginBottom: 24 }}>
-      <div style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 10 }}>{label}</div>
-      {children}
-    </div>
-  );
-}
-
-function OptionCard({ selected, onClick, primaryColor, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        padding: '12px 14px', borderRadius: 10, textAlign: 'left', cursor: 'pointer',
-        border: `2px solid ${selected ? primaryColor : '#e2e8f0'}`,
-        background: selected ? `${primaryColor}10` : 'white',
-        transition: 'all 0.15s', width: '100%',
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function ChipBtn({ selected, onClick, primaryColor, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        padding: '8px 16px', borderRadius: 8, border: `2px solid ${selected ? primaryColor : '#e2e8f0'}`,
-        background: selected ? primaryColor : 'white', color: selected ? 'white' : '#374151',
-        cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'all 0.15s',
-      }}
-    >
-      {children}
-    </button>
   );
 }

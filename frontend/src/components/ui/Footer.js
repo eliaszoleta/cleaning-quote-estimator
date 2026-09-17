@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
+import { COLORS, RADIUS } from '../../styles/theme';
 
 const cols = [
   {
@@ -84,9 +85,9 @@ const s = {
   brand: { display: 'flex', alignItems: 'center', gap: 10 },
   logoIcon: {
     width: 30, height: 30,
-    background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%)',
-    borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white',
-    boxShadow: '0 2px 8px rgba(30,64,175,0.4), inset 0 1px 0 rgba(255,255,255,0.18)',
+    background: COLORS.primary,
+    borderRadius: RADIUS.sm, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.4), inset 0 1px 0 rgba(255,255,255,0.18)',
   },
   copy: { fontSize: 13, color: '#64748b' },
   disclaimer: { maxWidth: 1200, margin: '0 auto', padding: '0 24px 40px', fontSize: 12, color: '#475569', lineHeight: 1.7 },

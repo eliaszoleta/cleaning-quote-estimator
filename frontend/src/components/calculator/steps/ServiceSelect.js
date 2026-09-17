@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets } from 'lucide-react';
+import { COLORS, RADIUS } from '../../../styles/theme';
 
 // "Most Requested" mirrors the verified tagline already shipped for this service in
 // data/services.js ("...the most requested service on Clean Estimator") — not a new claim.
@@ -37,10 +38,10 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
 
   return (
     <div>
-      <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: '#0f172a', marginBottom: 4, letterSpacing: '-0.3px' }}>
+      <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: COLORS.ink, marginBottom: 4, letterSpacing: '-0.3px' }}>
         {companyName ? `${companyName} — Get Your Quote` : 'What service do you need?'}
       </h2>
-      <p style={{ color: '#64748b', fontSize: 13, marginBottom: 18 }}>
+      <p style={{ color: COLORS.body, fontSize: 13, marginBottom: 18 }}>
         Tap a service to get your free, instant estimate.
       </p>
 
@@ -55,9 +56,9 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
             onClick={() => onSelect(id)}
             style={{
               position: 'relative',
-              background: 'white',
-              border: '1.5px solid #e2e8f0',
-              borderRadius: 12,
+              background: COLORS.surface,
+              border: `1.5px solid ${COLORS.border}`,
+              borderRadius: RADIUS.md,
               padding: isMobile ? '12px 10px' : '16px 14px',
               cursor: 'pointer',
               textAlign: 'left',
@@ -77,7 +78,7 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
               tile.style.color = 'white';
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.borderColor = '#e2e8f0';
+              e.currentTarget.style.borderColor = COLORS.border;
               e.currentTarget.style.boxShadow = '0 1px 2px rgba(15,23,42,0.03)';
               e.currentTarget.style.transform = 'none';
               const tile = e.currentTarget.querySelector('.svc-tile');
@@ -90,9 +91,9 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
             {popular && (
               <span style={{
                 position: 'absolute', top: -8, left: 14,
-                background: primaryColor || '#2563eb', color: 'white', fontSize: 9.5, fontWeight: 700,
+                background: primaryColor || COLORS.primary, color: 'white', fontSize: 9.5, fontWeight: 700,
                 letterSpacing: '0.03em', textTransform: 'uppercase',
-                padding: '2.5px 8px', borderRadius: 20, whiteSpace: 'nowrap',
+                padding: '2.5px 8px', borderRadius: RADIUS.pill, whiteSpace: 'nowrap',
                 boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
               }}>
                 Most Requested
@@ -101,7 +102,7 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
             <div
               className="svc-tile"
               style={{
-                width: 34, height: 34, borderRadius: 8,
+                width: 34, height: 34, borderRadius: RADIUS.sm,
                 background: bg, color: color,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 marginBottom: 8, transition: 'all 0.15s', flexShrink: 0,
@@ -109,8 +110,8 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
             >
               <Icon size={16} strokeWidth={1.8} />
             </div>
-            <div style={{ fontWeight: 600, fontSize: isMobile ? 13 : 14, color: '#0f172a', marginBottom: 2, lineHeight: 1.3 }}>{label}</div>
-            <div style={{ fontSize: 11, color: '#94a3b8', lineHeight: 1.4 }}>{desc}</div>
+            <div style={{ fontWeight: 600, fontSize: isMobile ? 13 : 14, color: COLORS.ink, marginBottom: 2, lineHeight: 1.3 }}>{label}</div>
+            <div style={{ fontSize: 11, color: COLORS.muted, lineHeight: 1.4 }}>{desc}</div>
           </button>
         ))}
       </div>

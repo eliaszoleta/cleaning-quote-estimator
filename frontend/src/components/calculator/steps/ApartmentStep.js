@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import StepWrapper from './StepWrapper';
+import { StepSection, StepChip, StepOptionCard, StepPillToggle } from './StepUI';
+import { COLORS } from '../../../styles/theme';
 
 const SIZES = [
   { id: 'studio', label: 'Studio', sub: '< 500 sq ft' },
@@ -47,69 +49,57 @@ export default function ApartmentStep({ value, onBack, onNext, primaryColor, com
 
   return (
     <StepWrapper title="Apartment details" subtitle="Get an accurate quote for your unit" onBack={onBack} onNext={() => onNext({ size, bathrooms, cleaningType, frequency, furnished, extras })} primaryColor={primaryColor}>
-      <Section label="Apartment size">
+      <StepSection label="Apartment size">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
           {SIZES.map(o => (
-            <Opt key={o.id} selected={size === o.id} onClick={() => setSize(o.id)} primaryColor={primaryColor}>
+            <StepOptionCard key={o.id} selected={size === o.id} onClick={() => setSize(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>{o.label}</div>
-              <div style={{ fontSize: 12, color: '#64748b' }}>{o.sub}</div>
-            </Opt>
+              <div style={{ fontSize: 12, color: COLORS.body }}>{o.sub}</div>
+            </StepOptionCard>
           ))}
         </div>
-      </Section>
+      </StepSection>
 
-      <Section label="Bathrooms">
+      <StepSection label="Bathrooms">
         <div style={{ display: 'flex', gap: 8 }}>
-          {['1','1.5','2','2.5','3+'].map(n => <Chip key={n} selected={bathrooms === n} onClick={() => setBathrooms(n)} primaryColor={primaryColor}>{n}</Chip>)}
+          {['1','1.5','2','2.5','3+'].map(n => <StepChip key={n} selected={bathrooms === n} onClick={() => setBathrooms(n)} primaryColor={primaryColor}>{n}</StepChip>)}
         </div>
-      </Section>
+      </StepSection>
 
-      <Section label="Cleaning type">
+      <StepSection label="Cleaning type">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {CLEANING_TYPES.map(t => <Chip key={t.id} selected={cleaningType === t.id} onClick={() => setCleaningType(t.id)} primaryColor={primaryColor}>{t.label}</Chip>)}
+          {CLEANING_TYPES.map(t => <StepChip key={t.id} selected={cleaningType === t.id} onClick={() => setCleaningType(t.id)} primaryColor={primaryColor}>{t.label}</StepChip>)}
         </div>
-      </Section>
+      </StepSection>
 
-      <Section label="Frequency">
+      <StepSection label="Frequency">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {FREQUENCY.map(f => {
             const discountPct = Math.round((frequencyDiscounts[f.id] || 0) * 100);
             return (
-              <button key={f.id} onClick={() => setFrequency(f.id)} style={{ padding: '10px 18px', borderRadius: 8, border: `2px solid ${frequency === f.id ? primaryColor : '#e2e8f0'}`, background: frequency === f.id ? primaryColor : 'white', color: frequency === f.id ? 'white' : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+              <StepChip key={f.id} selected={frequency === f.id} onClick={() => setFrequency(f.id)} primaryColor={primaryColor}>
                 {f.label}{discountPct > 0 && <span style={{ fontSize: 11, marginLeft: 4, opacity: 0.85 }}>({discountPct}% off)</span>}
-              </button>
+              </StepChip>
             );
           })}
         </div>
-      </Section>
+      </StepSection>
 
-      <Section label="Is the apartment furnished?">
+      <StepSection label="Is the apartment furnished?">
         <div style={{ display: 'flex', gap: 8 }}>
-          <Chip selected={furnished} onClick={() => setFurnished(true)} primaryColor={primaryColor}>Yes, furnished</Chip>
-          <Chip selected={!furnished} onClick={() => setFurnished(false)} primaryColor={primaryColor}>No, vacant</Chip>
+          <StepChip selected={furnished} onClick={() => setFurnished(true)} primaryColor={primaryColor}>Yes, furnished</StepChip>
+          <StepChip selected={!furnished} onClick={() => setFurnished(false)} primaryColor={primaryColor}>No, vacant</StepChip>
         </div>
-        <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>Vacant apartments typically cost 10–15% less.</p>
-      </Section>
+        <p style={{ fontSize: 12, color: COLORS.muted, marginTop: 6 }}>Vacant apartments typically cost 10–15% less.</p>
+      </StepSection>
 
-      <Section label="Add-ons">
+      <StepSection label="Add-ons">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {EXTRAS.map(ex => (
-            <button key={ex.id} onClick={() => toggleExtra(ex.id)} style={{ padding: '8px 14px', borderRadius: 20, border: `2px solid ${extras.includes(ex.id) ? primaryColor : '#e2e8f0'}`, background: extras.includes(ex.id) ? `${primaryColor}15` : 'white', color: extras.includes(ex.id) ? primaryColor : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
-              {ex.label}
-            </button>
+            <StepPillToggle key={ex.id} selected={extras.includes(ex.id)} onClick={() => toggleExtra(ex.id)} primaryColor={primaryColor}>{ex.label}</StepPillToggle>
           ))}
         </div>
-      </Section>
+      </StepSection>
     </StepWrapper>
   );
-}
-
-function Section({ label, children }) {
-  return <div style={{ marginBottom: 24 }}><div style={{ fontSize: 14, fontWeight: 700, color: '#374151', marginBottom: 10 }}>{label}</div>{children}</div>;
-}
-function Opt({ selected, onClick, primaryColor, children }) {
-  return <button onClick={onClick} style={{ padding: '12px 14px', borderRadius: 10, textAlign: 'left', cursor: 'pointer', border: `2px solid ${selected ? primaryColor : '#e2e8f0'}`, background: selected ? `${primaryColor}10` : 'white', width: '100%' }}>{children}</button>;
-}
-function Chip({ selected, onClick, primaryColor, children }) {
-  return <button onClick={onClick} style={{ padding: '8px 16px', borderRadius: 8, border: `2px solid ${selected ? primaryColor : '#e2e8f0'}`, background: selected ? primaryColor : 'white', color: selected ? 'white' : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>{children}</button>;
 }

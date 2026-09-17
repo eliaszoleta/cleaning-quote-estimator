@@ -5,10 +5,10 @@
 
 .calc-hero__badge {
   display: inline-block;
-  background: #dbeafe;
-  color: #1e40af;
+  background: #eff6ff;
+  color: #1d4ed8;
   padding: 5px 14px;
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 12px;

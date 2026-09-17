@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import { stateForZip } from '../../../data/zipStateRanges';
+import { COLORS, RADIUS } from '../../../styles/theme';
 
 const US_STATES = [
   ['AL','Alabama'],['AK','Alaska'],['AZ','Arizona'],['AR','Arkansas'],['CA','California'],
@@ -61,31 +62,31 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
 
   const inputStyle = {
     width: '100%', padding: '13px 14px', fontSize: 16,
-    border: '1.5px solid #e2e8f0', borderRadius: 10,
-    outline: 'none', marginTop: 6, letterSpacing: 2, background: 'white',
+    border: `1.5px solid ${COLORS.border}`, borderRadius: RADIUS.md,
+    outline: 'none', marginTop: 6, letterSpacing: 2, background: COLORS.surface,
   };
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 9, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <MapPin size={17} color="#2563eb" />
+        <div style={{ width: 36, height: 36, borderRadius: RADIUS.sm, background: COLORS.primaryMuted, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <MapPin size={17} color={COLORS.primary} />
         </div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', letterSpacing: '-0.2px' }}>Where is the property?</h2>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: COLORS.ink, letterSpacing: '-0.2px' }}>Where is the property?</h2>
       </div>
-      <p style={{ color: '#64748b', fontSize: 13.5, marginBottom: 22 }}>
+      <p style={{ color: COLORS.body, fontSize: 13.5, marginBottom: 22 }}>
         Prices vary significantly by location. We use this to give you an accurate local estimate.
       </p>
 
       {singleState ? (
         <div>
-          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>City</label>
+          <label style={{ fontSize: 13, fontWeight: 600, color: COLORS.ink }}>City</label>
           {citiesForState.length > 0 ? (
             <select
               value={city} onChange={e => setCity(e.target.value)}
               style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer' }}
               onFocus={e => { e.target.style.borderColor = primaryColor; }}
-              onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+              onBlur={e => { e.target.style.borderColor = COLORS.border; }}
               autoFocus
             >
               <option value="">Select your city…</option>
@@ -98,21 +99,21 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
               placeholder={`e.g. a city in ${scopedStates[0]?.[1] || serviceStates[0]}`}
               style={{ ...inputStyle, letterSpacing: 0 }}
               onFocus={e => { e.target.style.borderColor = primaryColor; }}
-              onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+              onBlur={e => { e.target.style.borderColor = COLORS.border; }}
               onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
               autoFocus
             />
           )}
-          <p style={{ color: '#94a3b8', fontSize: 12.5, marginTop: 5 }}>Serving {scopedStates[0]?.[1] || serviceStates[0]}</p>
+          <p style={{ color: COLORS.muted, fontSize: 12.5, marginTop: 5 }}>Serving {scopedStates[0]?.[1] || serviceStates[0]}</p>
         </div>
       ) : (
         <div>
-          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>State</label>
+          <label style={{ fontSize: 13, fontWeight: 600, color: COLORS.ink }}>State</label>
           <select
             value={state} onChange={e => selectState(e.target.value)}
             style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer' }}
             onFocus={e => { e.target.style.borderColor = primaryColor; }}
-            onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+            onBlur={e => { e.target.style.borderColor = COLORS.border; }}
           >
             <option value="">Select your state…</option>
             {(scoped ? scopedStates : US_STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
@@ -123,20 +124,20 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
               above), not a second, independent way to set location. */}
           {state && (
             <div style={{ marginTop: 14 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>
-                ZIP Code <span style={{ fontWeight: 400, color: '#94a3b8' }}>(optional)</span>
+              <label style={{ fontSize: 13, fontWeight: 600, color: COLORS.ink }}>
+                ZIP Code <span style={{ fontWeight: 400, color: COLORS.muted }}>(optional)</span>
               </label>
               <input
                 type="text" inputMode="numeric" maxLength={5} value={zip}
                 onChange={e => setZip(e.target.value.replace(/\D/g, '').slice(0, 5))}
                 placeholder="e.g. 90210"
-                style={{ ...inputStyle, borderColor: zipMismatch ? '#dc2626' : '#e2e8f0' }}
-                onFocus={e => { e.target.style.borderColor = zipMismatch ? '#dc2626' : primaryColor; }}
-                onBlur={e => { e.target.style.borderColor = zipMismatch ? '#dc2626' : '#e2e8f0'; }}
+                style={{ ...inputStyle, borderColor: zipMismatch ? COLORS.danger : COLORS.border }}
+                onFocus={e => { e.target.style.borderColor = zipMismatch ? COLORS.danger : primaryColor; }}
+                onBlur={e => { e.target.style.borderColor = zipMismatch ? COLORS.danger : COLORS.border; }}
                 onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
               />
               {zipMismatch && (
-                <p style={{ color: '#dc2626', fontSize: 12.5, marginTop: 5 }}>
+                <p style={{ color: COLORS.danger, fontSize: 12.5, marginTop: 5 }}>
                   That ZIP isn't in {US_STATES.find(([abbr]) => abbr === state)?.[1] || state}.
                 </p>
               )}
@@ -145,13 +146,13 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
 
           {scoped && (
             <div style={{ marginTop: 14 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>City</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: COLORS.ink }}>City</label>
               {citiesForState.length > 0 ? (
                 <select
                   value={city} onChange={e => setCity(e.target.value)}
                   style={{ ...inputStyle, letterSpacing: 0, cursor: 'pointer' }}
                   onFocus={e => { e.target.style.borderColor = primaryColor; }}
-                  onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+                  onBlur={e => { e.target.style.borderColor = COLORS.border; }}
                 >
                   <option value="">Select your city…</option>
                   {citiesForState.map(c => <option key={c} value={c}>{c}</option>)}
@@ -163,7 +164,7 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
                   placeholder="e.g. your city"
                   style={{ ...inputStyle, letterSpacing: 0 }}
                   onFocus={e => { e.target.style.borderColor = primaryColor; }}
-                  onBlur={e => { e.target.style.borderColor = '#e2e8f0'; }}
+                  onBlur={e => { e.target.style.borderColor = COLORS.border; }}
                   onKeyDown={e => { if (e.key === 'Enter' && canContinue) handleNext(); }}
                 />
               )}
@@ -172,16 +173,16 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 10, marginTop: 28, paddingTop: 20, borderTop: '1px solid #f1f5f9' }}>
+      <div style={{ display: 'flex', gap: 10, marginTop: 28, paddingTop: 20, borderTop: `1px solid ${COLORS.borderSubtle}` }}>
         <button
           onClick={onBack}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '13px 20px', border: '1.5px solid #e2e8f0', borderRadius: 10, background: 'white', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#64748b' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '13px 20px', border: `1.5px solid ${COLORS.border}`, borderRadius: RADIUS.md, background: COLORS.surface, cursor: 'pointer', fontSize: 14, fontWeight: 600, color: COLORS.body }}
         >
           <ArrowLeft size={15} /> Back
         </button>
         <button
           onClick={handleNext} disabled={!canContinue}
-          style={{ flex: 1, padding: '13px 20px', borderRadius: 10, border: 'none', cursor: canContinue ? 'pointer' : 'not-allowed', fontSize: 14, fontWeight: 700, color: 'white', background: canContinue ? primaryColor : '#cbd5e1', transition: 'all 0.15s' }}
+          style={{ flex: 1, padding: '13px 20px', borderRadius: RADIUS.md, border: 'none', cursor: canContinue ? 'pointer' : 'not-allowed', fontSize: 14, fontWeight: 700, color: 'white', background: canContinue ? primaryColor : '#cbd5e1', transition: 'all 0.15s' }}
         >
           Continue →
         </button>

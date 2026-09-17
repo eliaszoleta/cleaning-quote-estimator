@@ -7,6 +7,7 @@ import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import { trackMetaEvent } from '../../utils/metaPixel';
 import { trackNextdoorEvent } from '../../utils/nextdoorPixel';
 import { getFontStack, getGoogleFontHref } from '../../utils/fonts';
+import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 import ServiceSelect from './steps/ServiceSelect';
 import LocationStep from './steps/LocationStep';
 import HomeStep from './steps/HomeStep';
@@ -261,7 +262,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
       )}
 
       <div style={{
-        background: embedded ? 'white' : 'linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%)',
+        background: embedded ? 'white' : `linear-gradient(135deg, ${COLORS.primaryMuted} 0%, ${COLORS.surfaceMuted} 100%)`,
         padding: embedded ? '0' : '14px 16px 28px',
         fontFamily: fontFamily ? getFontStack(fontFamily) : undefined,
       }}>
@@ -278,26 +279,26 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         <div ref={cardRef} style={{
           maxWidth: 720,
           margin: '0 auto',
-          background: 'white',
-          borderRadius: embedded ? 0 : 16,
-          boxShadow: embedded ? 'none' : '0 8px 40px rgba(0,0,0,0.10)',
+          background: COLORS.surface,
+          borderRadius: embedded ? 0 : RADIUS.xl,
+          boxShadow: embedded ? 'none' : SHADOWS.lg,
           overflow: 'hidden',
-          border: embedded ? 'none' : '1px solid #e2e8f0',
+          border: embedded ? 'none' : `1px solid ${COLORS.border}`,
         }}>
           {/* Progress bar */}
           {currentStep !== 'service' && currentStep !== 'results' && (
-            <div style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '16px 24px' }}>
+            <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, padding: '16px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 {PROGRESS_LABELS.slice(0, effectiveSteps.length).map((label, i) => (
                   <span key={label} style={{
                     fontSize: 12, fontWeight: 600,
-                    color: i <= progressStep ? primaryColor : '#94a3b8',
+                    color: i <= progressStep ? primaryColor : COLORS.muted,
                   }}>
                     {label}
                   </span>
                 ))}
               </div>
-              <div style={{ height: 4, background: '#e2e8f0', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ height: 4, background: COLORS.border, borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%',
                   width: `${(progressStep / (effectiveSteps.length - 1)) * 100}%`,
@@ -311,7 +312,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
           {/* Error */}
           {error && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '11px 24px', color: '#dc2626', fontSize: 13.5 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: COLORS.dangerMuted, borderBottom: `1px solid ${COLORS.dangerBorder}`, padding: '11px 24px', color: COLORS.danger, fontSize: 13.5 }}>
               <AlertCircle size={15} /> {error}
             </div>
           )}
@@ -363,7 +364,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
               { Icon: ShieldOff, label: 'No email required', color: '#7c3aed' },
               { Icon: Zap,       label: 'Instant results',   color: '#ea580c' },
             ].map(({ Icon, label, color }) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#64748b', fontWeight: 500 }}>
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: COLORS.body, fontWeight: 500 }}>
                 <Icon size={14} color={color} /> {label}
               </div>
             ))}
