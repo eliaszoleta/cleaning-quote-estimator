@@ -126,8 +126,12 @@ export default function CompanyLanding() {
               badge (same language as the About page hero), and a two-column
               layout with a small static "product shot" of the widget so the
               page shows the thing it's selling instead of only describing it. */}
-          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(48px, 7vw, 80px) 20px' }}>
-            <div className="ce-hero-grid" style={{ maxWidth: 1320, margin: '0 auto', display: 'grid', gap: 56, alignItems: 'center' }}>
+          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(48px, 7vw, 80px) 0' }}>
+            {/* maxWidth 1200 + padding 24px, matching Header.js's own
+                container exactly, so the hero content's left edge lines
+                up with the logo instead of sitting further left under a
+                wider 1320px container. */}
+            <div className="ce-hero-grid" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'grid', gap: 56, alignItems: 'center' }}>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
                   For cleaning companies
