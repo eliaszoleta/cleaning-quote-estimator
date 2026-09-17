@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { MapPin, AlertTriangle, Zap, Phone, Mail, Share2, Printer, Check, ArrowLeft } from 'lucide-react';
+import { MapPin, AlertTriangle, Zap, Phone, Mail, Share2, Printer, Check, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import PartnerCard from '../partners/PartnerCard';
@@ -99,24 +99,27 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
           <div style={{ background: COLORS.surface, borderRadius: RADIUS.xl, overflow: 'hidden', boxShadow: embedded ? 'none' : SHADOWS.lg, border: embedded ? 'none' : `1px solid ${COLORS.border}`, marginBottom: 20 }}>
 
-            <div style={{ background: headerBg, padding: '28px 32px', color: 'white' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.8, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                {serviceTypeLabel(serviceType)} Estimate · {stateName}
-              </div>
-              <div style={{ fontSize: 'clamp(32px, 8vw, 48px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 8, letterSpacing: '-1px' }}>
-                {formatPrice(totalLow)} – {formatPrice(totalHigh)}
-              </div>
-              <div style={{ fontSize: 13.5, opacity: 0.85 }}>
-                {unit === 'per_month' ? 'per month' : 'per visit'}
-                {isHighState && ` · ${stateName} is a higher-cost market`}
-                {isLowState && ` · ${stateName} is a lower-cost market`}
-              </div>
-              {recurringMonthlyLow && unit !== 'per_month' && (
-                <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '10px 14px', display: 'inline-block' }}>
-                  <span style={{ fontWeight: 700, fontSize: 13.5 }}>Recurring: {formatPrice(recurringMonthlyLow)} – {formatPrice(recurringMonthlyHigh)}/visit</span>
-                  {recurringAnnualSavings && <span style={{ opacity: 0.9, fontSize: 13 }}> · Save ~{formatPrice(recurringAnnualSavings)}/year</span>}
+            <div style={{ background: headerBg, padding: 'clamp(28px, 6vw, 40px) 32px', color: 'white', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: -100, right: -60, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
+              <div style={{ position: 'relative' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, opacity: 0.85, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <CheckCircle2 size={14} /> {serviceTypeLabel(serviceType)} Estimate · {stateName}
                 </div>
-              )}
+                <div style={{ fontSize: 'clamp(34px, 8vw, 52px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 8, letterSpacing: '-1px' }}>
+                  {formatPrice(totalLow)} – {formatPrice(totalHigh)}
+                </div>
+                <div style={{ fontSize: 13.5, opacity: 0.85 }}>
+                  {unit === 'per_month' ? 'per month' : 'per visit'}
+                  {isHighState && ` · ${stateName} is a higher-cost market`}
+                  {isLowState && ` · ${stateName} is a lower-cost market`}
+                </div>
+                {recurringMonthlyLow && unit !== 'per_month' && (
+                  <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '10px 14px', display: 'inline-block' }}>
+                    <span style={{ fontWeight: 700, fontSize: 13.5 }}>Recurring: {formatPrice(recurringMonthlyLow)} – {formatPrice(recurringMonthlyHigh)}/visit</span>
+                    {recurringAnnualSavings && <span style={{ opacity: 0.9, fontSize: 13 }}> · Save ~{formatPrice(recurringAnnualSavings)}/year</span>}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div style={{ padding: '24px 28px' }}>
