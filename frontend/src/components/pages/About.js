@@ -15,13 +15,19 @@ function IconBadge({ Icon, color, bg }) {
   );
 }
 
+// Horizontal icon-left / content-right layout -- once the card stretches
+// full width (stacked instead of a 3-column grid), a vertical icon-on-top
+// layout leaves the text narrow and stranded on the left with empty space
+// on the right. This lets the title/paragraph use the full card width.
 function ProductCard({ Icon, color, bg, title, children, href, linkLabel }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '22px 20px', background: COLORS.surface, borderRadius: RADIUS.md, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm }}>
+    <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start', padding: '22px 24px', background: COLORS.surface, borderRadius: RADIUS.md, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm }}>
       <IconBadge Icon={Icon} color={color} bg={bg} />
-      <h3 style={{ fontSize: 15.5, fontWeight: 800, color: COLORS.ink, margin: 0 }}>{title}</h3>
-      <p style={{ ...pStyle, fontSize: 13.5, flex: 1 }}>{children}</p>
-      <a href={href} style={{ fontSize: 13, fontWeight: 700, color: COLORS.primary, textDecoration: 'none' }}>{linkLabel} →</a>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h3 style={{ fontSize: 15.5, fontWeight: 800, color: COLORS.ink, margin: '0 0 6px' }}>{title}</h3>
+        <p style={{ ...pStyle, fontSize: 13.5, marginBottom: 10 }}>{children}</p>
+        <a href={href} style={{ fontSize: 13, fontWeight: 700, color: COLORS.primary, textDecoration: 'none' }}>{linkLabel} →</a>
+      </div>
     </div>
   );
 }
@@ -120,7 +126,7 @@ export default function About() {
           <p style={{ ...pStyle, marginBottom: 24, maxWidth: 640 }}>
             Clean Estimator is three things working together: a free pricing tool for anyone comparing cleaning costs, a white-labeled version of that same tool cleaning companies embed on their own site, and a local partner program that turns those estimates into real leads.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <ProductCard Icon={Sparkles} color="#d97706" bg="#fffbeb" title="Free Cost Calculator" href="/cleaning-cost-calculator" linkLabel="Try it">
               Instant price ranges for house cleaning, carpet cleaning, commercial cleaning, and 6 other services — no signup, no phone calls.
             </ProductCard>
