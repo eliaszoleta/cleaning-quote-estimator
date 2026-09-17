@@ -21,7 +21,7 @@ const NAV = [
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
   { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
   { id: 'discount',      Icon: Percent,            label: 'Discount' },
-  { id: 'embed',         Icon: Code2,              label: 'Embed Widget' },
+  { id: 'embed',         Icon: Code2,              label: 'Estimator' },
   { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
 ];

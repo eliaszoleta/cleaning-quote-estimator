@@ -326,10 +326,10 @@ export default function HelpTab() {
       <div style={cardStyle}>
         <div style={sectionTitle}>
           <div style={iconBadge('#eff6ff')}><Code2 size={16} color="#2563eb" /></div>
-          Putting it on your website (Embed Widget tab)
+          Putting it on your website (Estimator tab)
         </div>
         <p style={pStyle}>
-          Copy the embed code from the Embed Widget tab into your site once — after that, every change you make here (markup, branding, enabled services) updates on your live site automatically, with nothing to re-paste.
+          Copy the embed code from the Estimator tab into your site once — after that, every change you make here (markup, branding, enabled services) updates on your live site automatically, with nothing to re-paste.
         </p>
       </div>
 
