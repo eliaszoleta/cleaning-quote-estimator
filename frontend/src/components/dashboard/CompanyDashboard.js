@@ -310,7 +310,7 @@ export default function CompanyDashboard({ user, onLogout }) {
         {/* Tab content */}
         <main style={{ flex: 1, padding: '28px 32px', overflowY: 'auto', maxWidth: 'calc(100vw - 216px)' }}>
           {error && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '11px 14px', marginBottom: 20, color: '#dc2626', fontSize: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 7, padding: '11px 14px', marginBottom: 20, color: '#dc2626', fontSize: 14 }}>
               <AlertCircle size={15} /> {error}
             </div>
           )}
@@ -338,10 +338,10 @@ export default function CompanyDashboard({ user, onLogout }) {
           onClick={() => setWelcomeDismissed(true)}
         >
           <div
-            style={{ background: 'white', borderRadius: 16, padding: '32px 30px', maxWidth: 420, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.35)', textAlign: 'center' }}
+            style={{ background: 'white', borderRadius: 7, padding: '32px 30px', maxWidth: 420, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.35)', textAlign: 'center' }}
             onClick={e => e.stopPropagation()}
           >
-            <div style={{ width: 52, height: 52, borderRadius: 14, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <div style={{ width: 52, height: 52, borderRadius: 7, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <HelpCircle size={26} color="#2563eb" />
             </div>
             <h3 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Welcome to Clean Estimator!</h3>
@@ -351,13 +351,13 @@ export default function CompanyDashboard({ user, onLogout }) {
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               <button
                 onClick={() => { setActiveTab('help'); setWelcomeDismissed(true); }}
-                style={{ background: '#2563eb', color: 'white', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, cursor: 'pointer', fontSize: 13.5 }}
+                style={{ background: '#2563eb', color: 'white', border: 'none', padding: '10px 20px', borderRadius: 7, fontWeight: 700, cursor: 'pointer', fontSize: 13.5 }}
               >
                 Go to Help &amp; Docs →
               </button>
               <button
                 onClick={() => setWelcomeDismissed(true)}
-                style={{ background: 'transparent', color: '#64748b', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: 13.5 }}
+                style={{ background: 'transparent', color: '#64748b', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 7, fontWeight: 600, cursor: 'pointer', fontSize: 13.5 }}
               >
                 Maybe later
               </button>

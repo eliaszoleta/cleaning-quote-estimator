@@ -46,12 +46,12 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
       </div>
 
       {/* Key card */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>Your API Key</div>
 
         {apiKey ? (
           <div>
-            <div style={{ background: '#0f172a', borderRadius: 8, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+            <div style={{ background: '#0f172a', borderRadius: 7, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 10 }}>
               <code style={{ color: '#7dd3fc', fontFamily: "'Menlo','Monaco',monospace", fontSize: 12.5, wordBreak: 'break-all', flex: 1 }}>
                 {revealed ? apiKey : maskedKey}
               </code>
@@ -59,14 +59,14 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
                 <button
                   onClick={() => setRevealed(r => !r)}
                   title={revealed ? 'Hide key' : 'Reveal key'}
-                  style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#1e293b', color: '#94a3b8', border: 'none', padding: '6px 11px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#1e293b', color: '#94a3b8', border: 'none', padding: '6px 11px', borderRadius: 7, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
                 >
                   {revealed ? <EyeOff size={13} /> : <Eye size={13} />}
                   {revealed ? 'Hide' : 'Reveal'}
                 </button>
                 <button
                   onClick={copyKey}
-                  style={{ display: 'flex', alignItems: 'center', gap: 5, background: copied ? '#16a34a' : '#2563eb', color: 'white', border: 'none', padding: '6px 11px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'background 0.15s' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, background: copied ? '#16a34a' : '#2563eb', color: 'white', border: 'none', padding: '6px 11px', borderRadius: 7, cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'background 0.15s' }}
                 >
                   {copied ? <><Check size={13} strokeLinecap="square" strokeLinejoin="miter" /> Copied</> : <><Copy size={13} /> Copy</>}
                 </button>
@@ -91,7 +91,7 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
                 if (ok) generateKey();
               }}
               disabled={generating || saving}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: generating || saving ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: 13, color: '#374151', opacity: generating || saving ? 0.6 : 1 }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', border: '1px solid #e2e8f0', borderRadius: 7, background: 'white', cursor: generating || saving ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: 13, color: '#374151', opacity: generating || saving ? 0.6 : 1 }}
             >
               <RotateCcw size={13} /> {generating ? 'Generating…' : 'Rotate Key'}
             </button>
@@ -100,7 +100,7 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
           <div>
             <p style={{ fontSize: 14, color: '#64748b', marginBottom: 16 }}>No API key generated yet.</p>
             <button onClick={generateKey} disabled={generating}
-              style={{ padding: '10px 22px', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
+              style={{ padding: '10px 22px', background: '#2563eb', color: 'white', border: 'none', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
               {generating ? 'Generating…' : 'Generate API Key →'}
             </button>
           </div>
@@ -108,7 +108,7 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
       </div>
 
       {/* Docs */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>API Reference</div>
 
         {[
@@ -118,7 +118,7 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
         ].map(({ label, color, code }) => (
           <div key={label} style={{ marginBottom: 18 }}>
             <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 7, color: '#374151' }}>{label}</div>
-            <div style={{ background: '#0f172a', borderRadius: 8, padding: '13px 16px', overflow: 'auto' }}>
+            <div style={{ background: '#0f172a', borderRadius: 7, padding: '13px 16px', overflow: 'auto' }}>
               <code style={{ color, fontFamily: "'Menlo','Monaco',monospace", fontSize: 12, whiteSpace: 'pre', display: 'block' }}>{code}</code>
             </div>
           </div>
@@ -126,8 +126,8 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
       </div>
 
       {/* Tip */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 12, padding: '14px 18px' }}>
-        <div style={{ width: 32, height: 32, borderRadius: 8, background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 7, padding: '14px 18px' }}>
+        <div style={{ width: 32, height: 32, borderRadius: 7, background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Lightbulb size={16} color="#16a34a" />
         </div>
         <div>

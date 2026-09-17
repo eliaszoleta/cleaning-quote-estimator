@@ -84,16 +84,16 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
       </div>
 
       {error && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '11px 14px', marginBottom: 18, color: '#dc2626', fontSize: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 7, padding: '11px 14px', marginBottom: 18, color: '#dc2626', fontSize: 14 }}>
           <AlertTriangle size={15} /> {error}
         </div>
       )}
 
       {/* Status card */}
-      <div style={{ borderRadius: 12, padding: '20px 22px', marginBottom: 18, background: sc.bg, border: `1px solid ${sc.border}`, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ borderRadius: 7, padding: '20px 22px', marginBottom: 18, background: sc.bg, border: `1px solid ${sc.border}`, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 14 }}>
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-            <div style={{ width: 42, height: 42, borderRadius: 10, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 7, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
               <sc.Icon size={22} color={sc.iconColor} strokeWidth={2} />
             </div>
             <div>
@@ -104,13 +104,13 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
           <div>
             {(!isActive || status === 'trialing') && (
               <button onClick={handleCheckout} disabled={loading === 'checkout'}
-                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'checkout' ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'checkout' ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: 7, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer' }}>
                 {loading === 'checkout' ? <><Loader2 size={14} className="spin" /> Redirecting…</> : status === 'requires_trial_setup' ? 'Get Started →' : status === 'trialing' ? 'Subscribe Now →' : 'Reactivate →'}
               </button>
             )}
             {(status === 'active' || status === 'active_canceling' || status === 'past_due') && (
               <button onClick={handlePortal} disabled={loading === 'portal'}
-                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'portal' ? '#94a3b8' : '#0f172a', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'portal' ? 'not-allowed' : 'pointer' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'portal' ? '#94a3b8' : '#0f172a', color: 'white', border: 'none', borderRadius: 7, fontWeight: 700, fontSize: 14, cursor: loading === 'portal' ? 'not-allowed' : 'pointer' }}>
                 {loading === 'portal' ? <><Loader2 size={14} className="spin" /> Loading…</> : 'Manage Billing →'}
               </button>
             )}
@@ -119,7 +119,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
       </div>
 
       {/* Features */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>What's included</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {FEATURES.map(({ Icon, text }) => (
@@ -134,7 +134,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
       </div>
 
       {/* Pricing */}
-      <div style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)', border: '1px solid #bfdbfe', borderRadius: 12, padding: '20px 22px' }}>
+      <div style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)', border: '1px solid #bfdbfe', borderRadius: 7, padding: '20px 22px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginBottom: 4 }}>
           <span style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>$159</span>
           <span style={{ fontSize: 14, color: '#64748b', fontWeight: 500 }}>/month</span>

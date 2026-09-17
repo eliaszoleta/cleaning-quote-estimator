@@ -60,11 +60,11 @@ export default function OverviewTab({ config, subStatus, user }) {
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 24 }}>
         {stats.map(({ label, value, Icon, color, bg }) => (
-          <div key={label} style={{ background: COLORS.surface, borderRadius: RADIUS.lg, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm, padding: '18px 20px', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+          <div key={label} style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm, padding: '18px 20px', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
             onMouseEnter={e => { e.currentTarget.style.boxShadow = SHADOWS.md; e.currentTarget.style.transform = 'translateY(-2px)'; }}
             onMouseLeave={e => { e.currentTarget.style.boxShadow = SHADOWS.sm; e.currentTarget.style.transform = 'none'; }}
           >
-            <div style={{ width: 38, height: 38, borderRadius: RADIUS.sm, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+            <div style={{ width: 38, height: 38, borderRadius: 7, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
               <Icon size={18} strokeWidth={2.1} />
             </div>
             <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.5px', lineHeight: 1, color: COLORS.ink, marginBottom: 8 }}>{value}</div>
@@ -74,7 +74,7 @@ export default function OverviewTab({ config, subStatus, user }) {
       </div>
 
       {/* Quick actions */}
-      <div style={{ background: COLORS.surface, borderRadius: RADIUS.lg, border: `1px solid ${COLORS.border}`, padding: '20px 22px', marginBottom: 20, boxShadow: SHADOWS.sm }}>
+      <div style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, padding: '20px 22px', marginBottom: 20, boxShadow: SHADOWS.sm }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, color: COLORS.ink }}>Quick Actions</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
           {quickActions.map(({ label, href, Icon }) => (
@@ -83,14 +83,14 @@ export default function OverviewTab({ config, subStatus, user }) {
               href={`/company${href}`}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                padding: '12px 14px', border: `1.5px solid ${COLORS.border}`, borderRadius: RADIUS.md,
+                padding: '12px 14px', border: `1.5px solid ${COLORS.border}`, borderRadius: 7,
                 textDecoration: 'none', color: COLORS.ink, fontWeight: 600, fontSize: 13.5,
                 background: COLORS.surface, transition: 'all 0.15s',
               }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = COLORS.primary; e.currentTarget.style.background = COLORS.primaryMuted; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = COLORS.border; e.currentTarget.style.background = COLORS.surface; }}
             >
-              <span style={{ width: 30, height: 30, borderRadius: RADIUS.sm, background: COLORS.primaryMuted, color: COLORS.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ width: 30, height: 30, borderRadius: 7, background: COLORS.primaryMuted, color: COLORS.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Icon size={15} strokeWidth={2.1} />
               </span>
               {label}
@@ -100,7 +100,7 @@ export default function OverviewTab({ config, subStatus, user }) {
       </div>
 
       {/* Recent leads */}
-      <div style={{ background: COLORS.surface, borderRadius: RADIUS.lg, border: `1px solid ${COLORS.border}`, overflow: 'hidden', boxShadow: SHADOWS.sm }}>
+      <div style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, overflow: 'hidden', boxShadow: SHADOWS.sm }}>
         <div style={{ padding: '16px 22px', borderBottom: `1px solid ${COLORS.borderSubtle}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, color: COLORS.ink }}>Recent Leads</h3>
           <a href="/company?tab=leads" style={{ fontSize: 13, color: COLORS.primary, fontWeight: 600, textDecoration: 'none' }}>View all →</a>
@@ -110,7 +110,7 @@ export default function OverviewTab({ config, subStatus, user }) {
           <div style={{ padding: 32, textAlign: 'center', color: COLORS.muted, fontSize: 14 }}>Loading leads…</div>
         ) : recentLeads.length === 0 ? (
           <div style={{ padding: '40px 32px', textAlign: 'center' }}>
-            <div style={{ width: 52, height: 52, borderRadius: RADIUS.md, background: COLORS.surfaceMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+            <div style={{ width: 52, height: 52, borderRadius: 7, background: COLORS.surfaceMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
               <Inbox size={24} color={COLORS.muted} />
             </div>
             <div style={{ fontWeight: 700, color: COLORS.ink, marginBottom: 6, fontSize: 15 }}>No leads yet</div>

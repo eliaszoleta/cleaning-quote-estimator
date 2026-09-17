@@ -86,7 +86,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
 
   const input = {
     width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0',
-    borderRadius: 8, fontSize: 14, color: '#0f172a', outline: 'none',
+    borderRadius: 7, fontSize: 14, color: '#0f172a', outline: 'none',
   };
 
   return (
@@ -119,13 +119,13 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
           <Card title="Colors">
             <Field label="Primary color">
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input type="color" value={form.primaryColor} onChange={e => set('primaryColor', e.target.value)} style={{ width: 48, height: 38, borderRadius: 6, border: '1px solid #e2e8f0', cursor: 'pointer', padding: 2 }} />
+                <input type="color" value={form.primaryColor} onChange={e => set('primaryColor', e.target.value)} style={{ width: 48, height: 38, borderRadius: 7, border: '1px solid #e2e8f0', cursor: 'pointer', padding: 2 }} />
                 <input style={{ ...input, width: 120 }} value={form.primaryColor} onChange={e => set('primaryColor', e.target.value)} placeholder="#2563eb" />
               </div>
             </Field>
             <Field label="Accent color">
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input type="color" value={form.accentColor} onChange={e => set('accentColor', e.target.value)} style={{ width: 48, height: 38, borderRadius: 6, border: '1px solid #e2e8f0', cursor: 'pointer', padding: 2 }} />
+                <input type="color" value={form.accentColor} onChange={e => set('accentColor', e.target.value)} style={{ width: 48, height: 38, borderRadius: 7, border: '1px solid #e2e8f0', cursor: 'pointer', padding: 2 }} />
                 <input style={{ ...input, width: 120 }} value={form.accentColor} onChange={e => set('accentColor', e.target.value)} placeholder="#16a34a" />
               </div>
             </Field>
@@ -183,7 +183,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
         {/* Preview column */}
         <div style={{ position: 'sticky', top: 96 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Live Preview</div>
-          <div style={{ border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', background: 'white', height: 600, overflowY: 'auto' }}>
+          <div style={{ border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', background: 'white', height: 600, overflowY: 'auto' }}>
             <CleaningCalculator companyConfig={previewConfig} embedded={true} />
           </div>
         </div>
@@ -200,7 +200,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
             display: 'flex', alignItems: 'center', gap: 7,
             padding: '11px 22px',
             background: saving ? '#334155' : '#2563eb',
-            color: 'white', border: 'none', borderRadius: 8,
+            color: 'white', border: 'none', borderRadius: 7,
             fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer',
             fontSize: 14, transition: 'background 0.15s',
           }}
@@ -222,7 +222,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
 
 function Card({ title, subtitle, children }) {
   return (
-    <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
+    <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden' }}>
       <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9' }}>
         <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{title}</div>
         {subtitle && <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>{subtitle}</div>}

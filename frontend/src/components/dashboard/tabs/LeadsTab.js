@@ -289,12 +289,12 @@ export default function LeadsTab({ user }) {
               </button>
             </div>
           </div>
-          <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 8, padding: 3, marginBottom: 10, width: 'fit-content' }}>
+          <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 7, padding: 3, marginBottom: 10, width: 'fit-content' }}>
             {[['active', `Active (${activeCount})`], ['trash', `Trash (${trashCount})`]].map(([v, label]) => (
               <button
                 key={v} onClick={() => switchView(v)}
                 style={{
-                  padding: '7px 14px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                  padding: '7px 14px', borderRadius: 7, border: 'none', cursor: 'pointer',
                   fontWeight: 700, fontSize: 12.5,
                   background: view === v ? 'white' : 'transparent',
                   color: view === v ? '#0f172a' : '#64748b',
@@ -329,7 +329,7 @@ export default function LeadsTab({ user }) {
             once at least one lead is actually checked, so the toolbar
             doesn't sit there half-active with nothing to do. */}
         {filtered.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 14px', marginBottom: 10, background: selectedIds.size > 0 ? '#eff6ff' : '#f8fafc', border: `1px solid ${selectedIds.size > 0 ? '#bfdbfe' : '#e2e8f0'}`, borderRadius: 8, transition: 'background 0.15s, border-color 0.15s' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 14px', marginBottom: 10, background: selectedIds.size > 0 ? '#eff6ff' : '#f8fafc', border: `1px solid ${selectedIds.size > 0 ? '#bfdbfe' : '#e2e8f0'}`, borderRadius: 7, transition: 'background 0.15s, border-color 0.15s' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, color: '#374151' }}>
               <input type="checkbox" checked={allFilteredSelected} onChange={toggleSelectAll} style={{ width: 15, height: 15, cursor: 'pointer' }} />
               {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
@@ -361,8 +361,8 @@ export default function LeadsTab({ user }) {
         {loading ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 14 }}>Loading…</div>
         ) : filtered.length === 0 ? (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'white', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-            <div style={{ width: 52, height: 52, borderRadius: 14, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'white', borderRadius: 7, border: '1px solid #e2e8f0' }}>
+            <div style={{ width: 52, height: 52, borderRadius: 7, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
               <Inbox size={24} color="#94a3b8" />
             </div>
             <div style={{ fontWeight: 700, fontSize: 15, color: '#374151', marginBottom: 5 }}>
@@ -377,7 +377,7 @@ export default function LeadsTab({ user }) {
             </p>
           </div>
         ) : (
-          <div style={{ flex: 1, overflowY: 'auto', background: 'white', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+          <div style={{ flex: 1, overflowY: 'auto', background: 'white', borderRadius: 7, border: '1px solid #e2e8f0' }}>
             {filtered.map((lead, i) => {
               const color = SERVICE_COLORS[lead.service_type] || '#64748b';
               const isSelected = selectedLead?.id === lead.id;
@@ -399,7 +399,7 @@ export default function LeadsTab({ user }) {
                     onChange={() => toggleSelect(lead.id)}
                     style={{ width: 15, height: 15, cursor: 'pointer', flexShrink: 0 }}
                   />
-                  <div style={{ width: 36, height: 36, borderRadius: 9, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15, fontWeight: 700, color }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 7, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15, fontWeight: 700, color }}>
                     {lead.name ? lead.name[0].toUpperCase() : '?'}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -409,7 +409,7 @@ export default function LeadsTab({ user }) {
                     </div>
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ background: `${color}18`, color, padding: '2px 8px', borderRadius: 6, fontSize: 11.5, fontWeight: 700, marginBottom: 3, display: 'inline-block' }}>
+                    <div style={{ background: `${color}18`, color, padding: '2px 8px', borderRadius: 7, fontSize: 11.5, fontWeight: 700, marginBottom: 3, display: 'inline-block' }}>
                       {serviceTypeLabel(lead.service_type)}
                     </div>
                     <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>
@@ -426,18 +426,18 @@ export default function LeadsTab({ user }) {
 
       {/* Lead detail panel */}
       {selectedLead && (
-        <div style={{ width: 340, background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 14, flexShrink: 0, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ width: 340, background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 14, flexShrink: 0, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <h3 style={{ fontWeight: 800, fontSize: 17, color: '#0f172a', marginBottom: 2 }}>{selectedLead.name || '(No name)'}</h3>
               <div style={{ fontSize: 12, color: '#94a3b8' }}>{formatDateTime(selectedLead.created_at)}</div>
             </div>
-            <button onClick={() => setSelectedLead(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 4, borderRadius: 6, display: 'flex', alignItems: 'center' }}>
+            <button onClick={() => setSelectedLead(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 4, borderRadius: 7, display: 'flex', alignItems: 'center' }}>
               <X size={18} />
             </button>
           </div>
 
-          <div style={{ background: '#f8fafc', borderRadius: 9, padding: '13px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+          <div style={{ background: '#f8fafc', borderRadius: 7, padding: '13px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
             {[
               ['Email',    selectedLead.email,  `mailto:${selectedLead.email}`],
               ['Phone',    selectedLead.phone,  `tel:${selectedLead.phone}`],
@@ -459,7 +459,7 @@ export default function LeadsTab({ user }) {
           {selectedLead.service_details && Object.keys(selectedLead.service_details).filter(k => k !== 'city').length > 0 && (
             <div>
               <div style={{ fontWeight: 700, fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Service Details</div>
-              <div style={{ background: '#f8fafc', borderRadius: 8, padding: '11px 13px' }}>
+              <div style={{ background: '#f8fafc', borderRadius: 7, padding: '11px 13px' }}>
                 {/* city is already shown above in Location -- skip it here so it's not listed twice */}
                 {Object.entries(selectedLead.service_details).filter(([k]) => k !== 'city').map(([k, v]) => (
                   <div key={k} style={{ fontSize: 12, color: '#374151', marginBottom: 4 }}>

@@ -136,7 +136,7 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
       {section === 'account' && (
       <div style={{ maxWidth: 600 }}>
       {/* Account info + password */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Account</div>
 
         <div style={{ marginBottom: 20 }}>
@@ -144,7 +144,7 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
           <input
             readOnly
             value={user?.email || ''}
-            style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13, background: '#f8fafc', color: '#64748b', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, background: '#f8fafc', color: '#64748b', boxSizing: 'border-box' }}
           />
         </div>
 
@@ -158,7 +158,7 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
               onChange={e => setPwNew(e.target.value)}
               placeholder="Min. 8 characters"
               required
-              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, boxSizing: 'border-box' }}
             />
           </div>
           <div style={{ marginBottom: 16 }}>
@@ -169,7 +169,7 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
               onChange={e => setPwConfirm(e.target.value)}
               placeholder="Repeat new password"
               required
-              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, boxSizing: 'border-box' }}
             />
           </div>
           {pwMsg && (
@@ -180,7 +180,7 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
           <button
             type="submit"
             disabled={pwLoading}
-            style={{ padding: '8px 18px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: pwLoading ? 'not-allowed' : 'pointer', opacity: pwLoading ? 0.7 : 1 }}
+            style={{ padding: '8px 18px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: pwLoading ? 'not-allowed' : 'pointer', opacity: pwLoading ? 0.7 : 1 }}
           >
             {pwLoading ? 'Updating…' : 'Update Password'}
           </button>
@@ -188,7 +188,7 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
       </div>
 
       {/* Danger Zone */}
-      <div style={{ background: 'white', border: '1px solid #fecaca', borderRadius: 12, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: 'white', border: '1px solid #fecaca', borderRadius: 7, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <AlertTriangle size={15} color="#dc2626" />
           <div style={{ fontSize: 11, fontWeight: 700, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Danger Zone</div>
@@ -212,7 +212,7 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
                 padding: '9px 20px',
                 background: cancelLoading ? '#f1f5f9' : '#16a34a',
                 color: cancelLoading ? '#94a3b8' : 'white',
-                border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 700,
                 cursor: cancelLoading ? 'not-allowed' : 'pointer',
                 transition: 'background 0.15s, color 0.15s',
               }}
@@ -234,7 +234,7 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
                 value={deleteConfirm}
                 onChange={e => setDeleteConfirm(e.target.value)}
                 placeholder="DELETE"
-                style={{ width: '100%', padding: '8px 12px', border: '1px solid #fecaca', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '8px 12px', border: '1px solid #fecaca', borderRadius: 7, fontSize: 13, boxSizing: 'border-box' }}
               />
             </div>
             {deleteError && (
@@ -249,7 +249,7 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
                 padding: '9px 20px',
                 background: deleteConfirm === 'DELETE' && !deleteLoading ? '#dc2626' : '#f1f5f9',
                 color: deleteConfirm === 'DELETE' && !deleteLoading ? 'white' : '#94a3b8',
-                border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 700,
                 cursor: deleteConfirm === 'DELETE' && !deleteLoading ? 'pointer' : 'not-allowed',
                 transition: 'background 0.15s, color 0.15s',
               }}

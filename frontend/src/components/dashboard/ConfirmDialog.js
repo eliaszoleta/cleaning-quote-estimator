@@ -21,7 +21,7 @@ export default function ConfirmDialog({
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{ background: 'white', borderRadius: 14, padding: '26px 24px', maxWidth: 420, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.28)' }}
+        style={{ background: 'white', borderRadius: 7, padding: '26px 24px', maxWidth: 420, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.28)' }}
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 22 }}>
           <div style={{ width: 40, height: 40, borderRadius: '50%', background: danger ? '#fef2f2' : '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -38,7 +38,7 @@ export default function ConfirmDialog({
           <button
             type="button"
             onClick={onCancel}
-            style={{ padding: '9px 18px', borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', color: '#374151', fontWeight: 600, fontSize: 13.5, cursor: 'pointer' }}
+            style={{ padding: '9px 18px', borderRadius: 7, border: '1px solid #e2e8f0', background: 'white', color: '#374151', fontWeight: 600, fontSize: 13.5, cursor: 'pointer' }}
           >
             {cancelLabel}
           </button>
@@ -46,7 +46,7 @@ export default function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             autoFocus
-            style={{ padding: '9px 18px', borderRadius: 8, border: 'none', background: danger ? '#dc2626' : '#2563eb', color: 'white', fontWeight: 700, fontSize: 13.5, cursor: 'pointer' }}
+            style={{ padding: '9px 18px', borderRadius: 7, border: 'none', background: danger ? '#dc2626' : '#2563eb', color: 'white', fontWeight: 700, fontSize: 13.5, cursor: 'pointer' }}
           >
             {confirmLabel}
           </button>

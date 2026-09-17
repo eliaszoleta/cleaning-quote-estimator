@@ -78,7 +78,7 @@ export default function EmbedTab({ config, user }) {
         <EmbedCard title="WordPress Shortcode" desc="Install the Clean Estimator WordPress plugin, then paste this shortcode." code={wordpressCode} onCopy={() => copy(wordpressCode, 'wp')} copied={copied === 'wp'} />
 
         {/* Installation Guide */}
-        <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.lg, padding: '20px 22px', boxShadow: SHADOWS.sm }}>
+        <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 7, padding: '20px 22px', boxShadow: SHADOWS.sm }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>Installation Guide</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 12 }}>
             {[
@@ -87,7 +87,7 @@ export default function EmbedTab({ config, user }) {
               { platform: 'WordPress',      steps: ['Open Gutenberg editor', 'Add a Custom HTML block', 'Paste the iFrame code'] },
               { platform: 'Weebly / Duda', steps: ['Add Embed Code element', 'Paste iFrame in the box', 'Publish your changes'] },
             ].map(({ platform, steps }) => (
-              <div key={platform} style={{ background: COLORS.surfaceMuted, borderRadius: RADIUS.sm, padding: '14px 16px' }}>
+              <div key={platform} style={{ background: COLORS.surfaceMuted, borderRadius: 7, padding: '14px 16px' }}>
                 <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10, color: COLORS.ink }}>{platform}</div>
                 <ol style={{ paddingLeft: 16, margin: 0 }}>
                   {steps.map(s => <li key={s} style={{ fontSize: 12.5, color: COLORS.body, marginBottom: 5 }}>{s}</li>)}
@@ -98,7 +98,7 @@ export default function EmbedTab({ config, user }) {
         </div>
 
         {/* Preview link */}
-        <div style={{ background: COLORS.primaryMuted, border: `1px solid ${COLORS.primaryMutedBorder}`, borderRadius: RADIUS.lg, padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14 }}>
+        <div style={{ background: COLORS.primaryMuted, border: `1px solid ${COLORS.primaryMutedBorder}`, borderRadius: 7, padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14 }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.primaryHover, marginBottom: 4 }}>Preview your widget</div>
             <p style={{ fontSize: 13, color: COLORS.primary, margin: 0 }}>See exactly how it looks before embedding on your site.</p>
@@ -107,7 +107,7 @@ export default function EmbedTab({ config, user }) {
             href={`/embed?company=${companyId}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: COLORS.primary, color: 'white', padding: '10px 18px', borderRadius: RADIUS.sm, textDecoration: 'none', fontWeight: 700, fontSize: 13, boxShadow: SHADOWS.primary }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: COLORS.primary, color: 'white', padding: '10px 18px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 13, boxShadow: SHADOWS.primary }}
           >
             Open Preview <ExternalLink size={13} />
           </a>
@@ -119,7 +119,7 @@ export default function EmbedTab({ config, user }) {
 
 function EmbedCard({ title, badge, desc, code, onCopy, copied }) {
   return (
-    <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.lg, overflow: 'hidden', boxShadow: SHADOWS.sm }}>
+    <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 7, overflow: 'hidden', boxShadow: SHADOWS.sm }}>
       <div style={{ padding: '14px 18px', borderBottom: `1px solid ${COLORS.borderSubtle}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -134,7 +134,7 @@ function EmbedCard({ title, badge, desc, code, onCopy, copied }) {
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '7px 14px',
             background: copied ? COLORS.success : COLORS.ink,
-            color: 'white', border: 'none', borderRadius: RADIUS.sm - 1,
+            color: 'white', border: 'none', borderRadius: 7,
             cursor: 'pointer', fontWeight: 600, fontSize: 12.5,
             flexShrink: 0, marginLeft: 14, transition: 'background 0.15s',
           }}

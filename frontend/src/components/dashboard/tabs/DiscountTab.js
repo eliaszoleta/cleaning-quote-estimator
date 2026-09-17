@@ -44,7 +44,7 @@ export default function DiscountTab({ config, update }) {
     });
   };
 
-  const inp = { padding: '8px 10px', border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.sm - 2, fontSize: 13, color: COLORS.ink, outline: 'none', background: COLORS.surface, width: 72 };
+  const inp = { padding: '8px 10px', border: `1px solid ${COLORS.border}`, borderRadius: 7, fontSize: 13, color: COLORS.ink, outline: 'none', background: COLORS.surface, width: 72 };
 
   return (
     <div>
@@ -61,9 +61,9 @@ export default function DiscountTab({ config, update }) {
       {SERVICES.map(({ id, label, Icon }) => {
         const d = getDiscounts(id);
         return (
-          <div key={id} style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.lg, overflow: 'hidden', marginBottom: 16, boxShadow: SHADOWS.sm }}>
+          <div key={id} style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 7, overflow: 'hidden', marginBottom: 16, boxShadow: SHADOWS.sm }}>
             <div style={{ padding: '14px 18px', borderBottom: `1px solid ${COLORS.borderSubtle}`, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 32, height: 32, borderRadius: RADIUS.sm, background: COLORS.primaryMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 7, background: COLORS.primaryMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Icon size={15} color={COLORS.primary} />
               </div>
               <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{label}</div>

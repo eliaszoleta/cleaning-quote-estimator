@@ -21,7 +21,7 @@ const DASHBOARD_STYLES = `
 `;
 
 const inputStyle = {
-  width: '100%', padding: '10px 13px', border: '1.5px solid #e2e8f0', borderRadius: 8,
+  width: '100%', padding: '10px 13px', border: '1.5px solid #e2e8f0', borderRadius: 7,
   fontSize: 14, outline: 'none', boxSizing: 'border-box', color: '#0f172a', background: 'white',
 };
 const labelStyle = { display: 'block', fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 5 };
@@ -141,10 +141,10 @@ export default function ClientDashboard({ user, onLogout }) {
   const Header = () => (
     <div style={headerStyle}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 16, fontWeight: 700 }}>✦</div>
+        <div style={{ width: 32, height: 32, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 16, fontWeight: 700 }}>✦</div>
         <span style={{ fontWeight: 800, fontSize: 16, color: '#0f172a' }}>Partner Portal</span>
       </div>
-      <button onClick={onLogout} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#374151' }}>
+      <button onClick={onLogout} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 7, padding: '8px 14px', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#374151' }}>
         <LogOut size={14} /> Log Out
       </button>
     </div>
@@ -188,10 +188,10 @@ export default function ClientDashboard({ user, onLogout }) {
       <Header />
       <div style={{ maxWidth: 780, margin: '0 auto', padding: '36px 24px 64px' }}>
 
-        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 28px', marginBottom: 24 }}>
+        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '24px 28px', marginBottom: 24 }}>
           {!editing ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              {partner.logo_url && <img src={partner.logo_url} alt={partner.business_name} style={{ height: 52, width: 52, objectFit: 'contain', borderRadius: 8, border: '1px solid #e2e8f0', flexShrink: 0 }} />}
+              {partner.logo_url && <img src={partner.logo_url} alt={partner.business_name} style={{ height: 52, width: 52, objectFit: 'contain', borderRadius: 7, border: '1px solid #e2e8f0', flexShrink: 0 }} />}
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontWeight: 800, fontSize: 19, color: '#0f172a' }}>{partner.business_name}</div>
                 {partner.address && (
@@ -216,12 +216,12 @@ export default function ClientDashboard({ user, onLogout }) {
                 )}
               </div>
               <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: partner.active ? '#16a34a' : '#94a3b8', background: partner.active ? '#f0fdf4' : '#f8fafc', border: `1px solid ${partner.active ? '#bbf7d0' : '#e2e8f0'}`, borderRadius: 6, padding: '4px 10px' }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: partner.active ? '#16a34a' : '#94a3b8', background: partner.active ? '#f0fdf4' : '#f8fafc', border: `1px solid ${partner.active ? '#bbf7d0' : '#e2e8f0'}`, borderRadius: 7, padding: '4px 10px' }}>
                   {partner.active ? 'Live' : 'Inactive'}
                 </span>
                 <button
                   onClick={startEdit}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 8, padding: '7px 13px', cursor: 'pointer', fontWeight: 600, fontSize: 12.5, color: '#374151' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 7, padding: '7px 13px', cursor: 'pointer', fontWeight: 600, fontSize: 12.5, color: '#374151' }}
                 >
                   <Pencil size={13} /> Edit
                 </button>
@@ -262,14 +262,14 @@ export default function ClientDashboard({ user, onLogout }) {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#2563eb', border: 'none', borderRadius: 8, padding: '9px 18px', cursor: saving ? 'default' : 'pointer', fontWeight: 700, fontSize: 13, color: 'white', opacity: saving ? 0.75 : 1 }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#2563eb', border: 'none', borderRadius: 7, padding: '9px 18px', cursor: saving ? 'default' : 'pointer', fontWeight: 700, fontSize: 13, color: 'white', opacity: saving ? 0.75 : 1 }}
                 >
                   {saving ? <><Loader2 size={14} className="cd-spin" /> Saving...</> : 'Save Changes'}
                 </button>
                 <button
                   onClick={() => setEditing(false)}
                   disabled={saving}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 8, padding: '9px 16px', cursor: saving ? 'default' : 'pointer', fontWeight: 600, fontSize: 13, color: '#374151' }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 7, padding: '9px 16px', cursor: saving ? 'default' : 'pointer', fontWeight: 600, fontSize: 13, color: '#374151' }}
                 >
                   <X size={14} /> Cancel
                 </button>
@@ -298,7 +298,7 @@ export default function ClientDashboard({ user, onLogout }) {
           <StatCard icon={TrendingUp} label="Click-Through Rate" value={`${ctr}%`} color="#7c3aed" bg="#f5f3ff" />
         </div>
 
-        <div className="cd-hover-lift" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '18px 24px', marginBottom: 24 }}>
+        <div className="cd-hover-lift" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 7, padding: '18px 24px', marginBottom: 24 }}>
           <button
             onClick={() => setHowOpen(o => !o)}
             className="cd-howto-toggle"
@@ -325,7 +325,7 @@ export default function ClientDashboard({ user, onLogout }) {
           )}
         </div>
 
-        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: '22px 28px' }}>
+        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '22px 28px' }}>
           <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 12 }}>Your Service Areas</div>
           {locations.length === 0 ? (
             <p style={{ fontSize: 13.5, color: '#94a3b8' }}>No cities on file yet.</p>
@@ -356,7 +356,7 @@ const PERIOD_OPTIONS = [
 
 function PeriodPicker({ period, setPeriod, ranges }) {
   return (
-    <div style={{ display: 'inline-flex', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 9, padding: 3, gap: 2 }}>
+    <div style={{ display: 'inline-flex', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 7, padding: 3, gap: 2 }}>
       {PERIOD_OPTIONS.map(opt => {
         const active = period === opt.key;
         const sublabel = opt.key === 'this_month' ? ranges.thisMonth.label : opt.key === 'last_month' ? ranges.lastMonth.label : null;
@@ -388,8 +388,8 @@ function PeriodPicker({ period, setPeriod, ranges }) {
 
 function StatCard({ icon: Icon, label, value, color, bg, trend }) {
   return (
-    <div className="cd-hover-lift" style={{ background: 'white', border: '1px solid #e2e8f0', borderTop: `2.5px solid ${color}`, borderRadius: 14, padding: '20px 22px' }}>
-      <div style={{ width: 34, height: 34, borderRadius: 9, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+    <div className="cd-hover-lift" style={{ background: 'white', border: '1px solid #e2e8f0', borderTop: `2.5px solid ${color}`, borderRadius: 7, padding: '20px 22px' }}>
+      <div style={{ width: 34, height: 34, borderRadius: 7, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
         <Icon size={17} strokeWidth={2} />
       </div>
       <div style={{ fontSize: 26, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>{value}</div>

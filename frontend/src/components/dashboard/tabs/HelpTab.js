@@ -4,9 +4,9 @@ import {
   Paintbrush, Code2, ChevronDown, Layers, Database, Percent,
 } from 'lucide-react';
 
-const cardStyle = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' };
+const cardStyle = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' };
 const sectionTitle = { display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 12 };
-const iconBadge = (bg) => ({ width: 30, height: 30, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 });
+const iconBadge = (bg) => ({ width: 30, height: 30, borderRadius: 7, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 });
 const pStyle = { fontSize: 13.5, color: '#374151', lineHeight: 1.7, margin: '0 0 10px' };
 
 const FAQ = [
@@ -62,7 +62,7 @@ const FAQ = [
 
 function MiniTable({ rows, highlight }) {
   return (
-    <div style={{ background: '#f8fafc', borderRadius: 8, padding: '4px 16px', marginBottom: 10 }}>
+    <div style={{ background: '#f8fafc', borderRadius: 7, padding: '4px 16px', marginBottom: 10 }}>
       {rows.map(([label, val], i) => (
         <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '9px 0', borderBottom: i < rows.length - 1 ? '1px solid #e2e8f0' : 'none', fontSize: 13 }}>
           <span style={{ color: '#64748b' }}>{label}</span>
@@ -167,7 +167,7 @@ export default function HelpTab() {
         <p style={pStyle}>
           House Cleaning, 1,500–2,000 sq ft, 3 bedrooms / 2 bathrooms, standard clean, good condition, one-time visit, visitor in Texas, your markup left at the default <code style={{ background: '#f1f5f9', padding: '1px 5px', borderRadius: 4, fontSize: 12.5 }}>1.0</code>:
         </p>
-        <div style={{ background: '#f8fafc', borderRadius: 8, padding: '4px 16px', marginBottom: 10 }}>
+        <div style={{ background: '#f8fafc', borderRadius: 7, padding: '4px 16px', marginBottom: 10 }}>
           {[
             ['Base price for that home size', '$158 – $198'],
             ['+ 3 bedrooms', '+$30'],

@@ -146,7 +146,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     });
   };
 
-  const inp = { padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: 13, color: '#0f172a', outline: 'none', background: 'white' };
+  const inp = { padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, color: '#0f172a', outline: 'none', background: 'white' };
 
   return (
     <div>
@@ -159,7 +159,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
       </div>
 
       {/* Service area */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
         <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14 }}>
             <MapPin size={15} color="#2563eb" /> Service Area
@@ -191,7 +191,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
             onChange={e => setStateSearch(e.target.value)}
           />
           {stateSearch.trim() && (
-            <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 8 }}>
+            <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 7 }}>
               {ALL_STATES.filter(s =>
                 !serviceStates.includes(s.code) &&
                 (s.name.toLowerCase().includes(stateSearch.trim().toLowerCase()) || s.code.toLowerCase() === stateSearch.trim().toLowerCase())
@@ -218,7 +218,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
           asking them what THEY cover is more accurate than any generic
           list would be anyway. */}
       {serviceStates.length > 0 && (
-        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
           <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>Cities/Towns You Serve <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: 12 }}>(optional)</span></div>
             <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
@@ -259,7 +259,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
                       type="button"
                       onClick={() => { addCity(code, search); setCitySearch(prev => ({ ...prev, [code]: '' })); }}
                       disabled={!search.trim()}
-                      style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: search.trim() ? '#16a34a' : '#e2e8f0', color: search.trim() ? 'white' : '#94a3b8', fontWeight: 700, fontSize: 13, cursor: search.trim() ? 'pointer' : 'not-allowed' }}
+                      style={{ padding: '8px 16px', borderRadius: 7, border: 'none', background: search.trim() ? '#16a34a' : '#e2e8f0', color: search.trim() ? 'white' : '#94a3b8', fontWeight: 700, fontSize: 13, cursor: search.trim() ? 'pointer' : 'not-allowed' }}
                     >
                       Add
                     </button>
@@ -272,7 +272,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
       )}
 
       {/* Services list */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
         <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: 14 }}>Available Services</div>
@@ -288,7 +288,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
                 key={id}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
-                  borderRadius: 8, marginBottom: 3,
+                  borderRadius: 7, marginBottom: 3,
                   background: s.enabled ? 'white' : '#f8fafc',
                   border: `1px solid ${s.enabled ? '#e2e8f0' : '#f1f5f9'}`,
                   flexWrap: 'wrap', transition: 'all 0.12s',
@@ -296,7 +296,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
               >
                 {/* Icon */}
                 <div style={{
-                  width: 34, height: 34, borderRadius: 8, flexShrink: 0,
+                  width: 34, height: 34, borderRadius: 7, flexShrink: 0,
                   background: s.enabled ? '#eff6ff' : '#f1f5f9',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
@@ -351,7 +351,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
       </div>
 
       {/* Lead capture */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
         <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
           <div style={{ fontWeight: 700, fontSize: 14 }}>Lead Capture</div>
           <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Collect contact info before showing the quote.</div>
@@ -376,7 +376,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
                 Custom questions <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: 12 }}>(optional)</span>
               </div>
               {customQuestions.map((q, idx) => (
-                <div key={q.id} style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: 13, marginBottom: 8, background: '#f8fafc' }}>
+                <div key={q.id} style={{ border: '1px solid #e2e8f0', borderRadius: 7, padding: 13, marginBottom: 8, background: '#f8fafc' }}>
                   <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
                     <input value={q.label} onChange={e => updateQuestion(idx, 'label', e.target.value)}
                       placeholder="Question label (e.g. 'How did you hear about us?')" style={{ ...inp, flex: 1, minWidth: 180 }} />
@@ -386,7 +386,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
                       <option value="select">Dropdown</option>
                     </select>
                     <button onClick={() => removeQuestion(idx)}
-                      style={{ padding: '6px 12px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+                      style={{ padding: '6px 12px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
                       Remove
                     </button>
                   </div>
@@ -397,7 +397,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
                 </div>
               ))}
               <button onClick={addQuestion}
-                style={{ padding: '8px 16px', border: '1.5px dashed #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#64748b' }}>
+                style={{ padding: '8px 16px', border: '1.5px dashed #e2e8f0', borderRadius: 7, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#64748b' }}>
                 + Add Question
               </button>
             </div>
