@@ -173,11 +173,11 @@ export default function WebsiteSubscription() {
           <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
             Website + AI Chatbot
           </div>
-          <h1 style={{ fontSize: 'clamp(28px,4.6vw,46px)', fontWeight: 800, lineHeight: 1.15, marginBottom: 18, letterSpacing: '-1px' }}>
+          <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
             A Professional Website, Built and Hosted for You —<br />
-            <span style={{ color: '#60a5fa' }}>With an AI Chatbot Capturing Leads 24/7</span>
+            <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>With an AI Chatbot Capturing Leads 24/7</span>
           </h1>
-          <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 560, margin: '0 auto 32px', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 15, color: '#94a3b8', maxWidth: 540, margin: '0 auto 28px', lineHeight: 1.55 }}>
             No website yet? We build it, host it, and hand you a chatbot that answers visitors and captures leads while you're out on a job — for one flat monthly rate, no big upfront cost.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 14 }}>
