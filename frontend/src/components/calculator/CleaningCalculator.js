@@ -262,23 +262,29 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
       )}
 
       <div style={{
-        background: embedded ? 'white' : `linear-gradient(135deg, ${COLORS.primaryMuted} 0%, ${COLORS.surfaceMuted} 100%)`,
-        padding: embedded ? '0' : '14px 16px 28px',
+        background: embedded ? 'white' : COLORS.surfaceMuted,
         fontFamily: fontFamily ? getFontStack(fontFamily) : undefined,
       }}>
-        {/* Hero (non-embedded only) */}
+        {/* Hero (non-embedded only) -- full-bleed dark band the calculator
+            card sinks into, instead of a plain badge/title on a light page
+            background. */}
         {!embedded && currentStep === 'service' && (
-          <div className="calc-hero">
-            <div className="calc-hero__badge">Free • Instant • No signup required</div>
-            <h1 className="calc-hero__title">Free Cleaning Cost Calculator — Get an Estimate</h1>
-            <p className="calc-hero__subtitle">Instant, ZIP-code accurate cleaning cost estimates for house cleaning, deep cleaning, move-out, carpet, air duct, mold remediation &amp; more.</p>
+          <div className="calc-hero-band">
+            <div className="calc-hero-glow" aria-hidden="true" />
+            <div className="calc-hero">
+              <div className="calc-hero__badge">Free • Instant • No signup required</div>
+              <h1 className="calc-hero__title">Free Cleaning Cost Calculator — Get an Estimate</h1>
+              <p className="calc-hero__subtitle">Instant, ZIP-code accurate cleaning cost estimates for house cleaning, deep cleaning, move-out, carpet, air duct, mold remediation &amp; more.</p>
+            </div>
           </div>
         )}
 
+        <div style={{ padding: embedded ? 0 : '0 16px 28px' }}>
         {/* Calculator card */}
         <div ref={cardRef} style={{
           maxWidth: 720,
-          margin: '0 auto',
+          margin: embedded ? '0 auto' : (currentStep === 'service' ? `${isMobile ? -44 : -72}px auto 0` : '14px auto 0'),
+          position: 'relative',
           background: COLORS.surface,
           borderRadius: embedded ? 0 : RADIUS.xl,
           boxShadow: embedded ? 'none' : SHADOWS.lg,
@@ -370,6 +376,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             ))}
           </div>
         )}
+        </div>
       </div>
     </>
   );
