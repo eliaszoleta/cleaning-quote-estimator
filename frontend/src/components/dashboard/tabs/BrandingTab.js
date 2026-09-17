@@ -91,9 +91,12 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Widget Branding</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Customize how your estimator looks on your website.</p>
+      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ width: 4, height: 34, borderRadius: 2, background: '#2563eb', flexShrink: 0 }} />
+        <div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2 }}>Widget Branding</h2>
+          <p style={{ color: '#64748b', fontSize: 14 }}>Customize how your estimator looks on your website.</p>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'start' }}>

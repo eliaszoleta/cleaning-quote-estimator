@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Home, Building2 } from 'lucide-react';
+import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
 const SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning',     Icon: Home      },
@@ -43,26 +44,29 @@ export default function DiscountTab({ config, update }) {
     });
   };
 
-  const inp = { padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: 13, color: '#0f172a', outline: 'none', background: 'white', width: 72 };
+  const inp = { padding: '8px 10px', border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.sm - 2, fontSize: 13, color: COLORS.ink, outline: 'none', background: COLORS.surface, width: 72 };
 
   return (
     <div>
-      <div style={{ marginBottom: 22 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Recurring Discounts</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>
-          Off by default — visitors are quoted the full price for recurring bookings unless you set a percentage below. Click <strong>Save Changes</strong> in the header when done.
-        </p>
+      <div style={{ marginBottom: 22, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ width: 4, height: 34, borderRadius: 2, background: COLORS.primary, flexShrink: 0 }} />
+        <div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, marginBottom: 2, letterSpacing: '-0.3px' }}>Recurring Discounts</h2>
+          <p style={{ color: COLORS.body, fontSize: 14 }}>
+            Off by default — visitors are quoted the full price for recurring bookings unless you set a percentage below. Click <strong>Save Changes</strong> in the header when done.
+          </p>
+        </div>
       </div>
 
       {SERVICES.map(({ id, label, Icon }) => {
         const d = getDiscounts(id);
         return (
-          <div key={id} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Icon size={15} color="#2563eb" />
+          <div key={id} style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.lg, overflow: 'hidden', marginBottom: 16, boxShadow: SHADOWS.sm }}>
+            <div style={{ padding: '14px 18px', borderBottom: `1px solid ${COLORS.borderSubtle}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 32, height: 32, borderRadius: RADIUS.sm, background: COLORS.primaryMuted, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon size={15} color={COLORS.primary} />
               </div>
-              <div style={{ fontWeight: 700, fontSize: 14 }}>{label}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{label}</div>
             </div>
             <div style={{ padding: '16px 18px', display: 'flex', gap: 24, flexWrap: 'wrap' }}>
               {FREQUENCIES.map(({ id: freq, label: freqLabel }) => (
@@ -75,8 +79,10 @@ export default function DiscountTab({ config, update }) {
                       onChange={e => setDiscount(id, freq, Math.max(0, Math.min(90, parseFloat(e.target.value) || 0)) / 100)}
                       placeholder="0"
                       style={inp}
+                      onFocus={e => { e.target.style.borderColor = COLORS.primary; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.12)'; }}
+                      onBlur={e => { e.target.style.borderColor = COLORS.border; e.target.style.boxShadow = 'none'; }}
                     />
-                    <span style={{ fontSize: 13, color: '#94a3b8' }}>%</span>
+                    <span style={{ fontSize: 13, color: COLORS.muted }}>%</span>
                   </div>
                 </div>
               ))}

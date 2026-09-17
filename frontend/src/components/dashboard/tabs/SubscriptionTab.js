@@ -75,9 +75,12 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
 
   return (
     <div style={{ maxWidth: 600 }}>
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Subscription</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Manage your Clean Estimator plan and billing.</p>
+      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ width: 4, height: 34, borderRadius: 2, background: '#2563eb', flexShrink: 0 }} />
+        <div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Subscription</h2>
+          <p style={{ color: '#64748b', fontSize: 14 }}>Manage your Clean Estimator plan and billing.</p>
+        </div>
       </div>
 
       {error && (

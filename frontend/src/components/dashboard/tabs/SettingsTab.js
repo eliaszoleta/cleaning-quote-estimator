@@ -3,6 +3,7 @@ import { AlertTriangle, User, CreditCard, KeyRound } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import SubscriptionTab from './SubscriptionTab';
 import APIKeysTab from './APIKeysTab';
+import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
@@ -100,14 +101,17 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
 
   return (
     <div>
-      <div style={{ marginBottom: 20 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Settings</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Manage your account settings.</p>
+      <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ width: 4, height: 34, borderRadius: 2, background: COLORS.primary, flexShrink: 0 }} />
+        <div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, marginBottom: 2, letterSpacing: '-0.3px' }}>Settings</h2>
+          <p style={{ color: COLORS.body, fontSize: 14 }}>Manage your account settings.</p>
+        </div>
       </div>
 
       {/* Section switcher -- Subscription and API Keys used to be their own
           top-level sidebar items; folded in here as sub-sections instead. */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 24, borderBottom: '1px solid #e2e8f0' }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 24, borderBottom: `1px solid ${COLORS.border}` }}>
         {SECTIONS.map(({ id, Icon, label }) => (
           <button
             key={id}
@@ -117,8 +121,8 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
               padding: '9px 4px', marginBottom: -1,
               background: 'none', border: 'none', cursor: 'pointer',
               fontSize: 13.5, fontWeight: 600,
-              color: section === id ? '#2563eb' : '#64748b',
-              borderBottom: `2px solid ${section === id ? '#2563eb' : 'transparent'}`,
+              color: section === id ? COLORS.primary : COLORS.body,
+              borderBottom: `2px solid ${section === id ? COLORS.primary : 'transparent'}`,
             }}
           >
             <Icon size={14} /> {label}

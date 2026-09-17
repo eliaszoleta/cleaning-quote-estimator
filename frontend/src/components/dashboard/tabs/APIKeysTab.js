@@ -37,9 +37,12 @@ export default function APIKeysTab({ config, saveConfig, saving }) {
 
   return (
     <div style={{ maxWidth: 640 }}>
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>API Access</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Use your API key to pull leads directly into your CRM.</p>
+      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ width: 4, height: 34, borderRadius: 2, background: '#2563eb', flexShrink: 0 }} />
+        <div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>API Access</h2>
+          <p style={{ color: '#64748b', fontSize: 14 }}>Use your API key to pull leads directly into your CRM.</p>
+        </div>
       </div>
 
       {/* Key card */}
