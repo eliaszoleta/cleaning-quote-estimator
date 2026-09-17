@@ -86,11 +86,11 @@ export default function About() {
         {/* Stats strip -- moved out of the hero band (blog's hero doesn't
             carry one) into a plain hairline-divided row at the top of the
             content area. */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, marginBottom: 48, paddingBottom: 28, borderBottom: `1px solid ${COLORS.border}` }}>
+        <div style={{ display: 'flex', flexWrap: 'nowrap', gap: 'clamp(14px, 5vw, 32px)', marginBottom: 48, paddingBottom: 28, borderBottom: `1px solid ${COLORS.border}` }}>
           {STATS.map(s => (
             <div key={s.label}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, letterSpacing: '-0.01em' }}>{s.number}</div>
-              <div style={{ fontSize: 11.5, color: COLORS.muted, marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
+              <div style={{ fontSize: 'clamp(17px, 4.5vw, 22px)', fontWeight: 800, color: COLORS.ink, letterSpacing: '-0.01em' }}>{s.number}</div>
+              <div style={{ fontSize: 'clamp(9.5px, 2.4vw, 11.5px)', color: COLORS.muted, marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{s.label}</div>
             </div>
           ))}
         </div>
