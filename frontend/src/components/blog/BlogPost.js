@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FileQuestion, Lightbulb, ArrowRight } from 'lucide-react';
 import { getPostBySlug, BLOG_POSTS } from '../../data/blogPosts';
+import '../pages/PageHero.css';
 
 // Simple markdown-to-HTML renderer (tables, headers, bold, lists, links)
 function renderMarkdown(md) {
@@ -151,30 +152,30 @@ export default function BlogPost({ slug }) {
       {/* 880 instead of the old 760 -- on a wide desktop monitor, a narrow
           column surrounded by huge margins reads like a cramped WordPress
           Gutenberg default width instead of a real article layout. */}
-      <div style={{ maxWidth: 880, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px' }}>
-        {/* Breadcrumb */}
-        <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 'clamp(8px, 4vw, 24px)' }}>
-          <a href="/" style={{ color: '#94a3b8' }}>Home</a> › <a href="/blog" style={{ color: '#94a3b8' }}>Blog</a> › <a href={`/blog/category/${post.category}`} style={{ color: '#94a3b8' }}>{post.categoryLabel}</a>
-        </div>
-
-        {/* Header + CTA + article body -- one bordered white card, matching
-            the same content-card style ServicePage.js uses (background
-            white, 14px radius, 1px #e2e8f0 border) instead of sitting
-            directly on the page's gray background. */}
-        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 36px) clamp(16px, 4.5vw, 36px)', marginBottom: 24 }}>
-          {/* Header */}
-          <div style={{ marginBottom: 'clamp(24px, 6vw, 40px)' }}>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-              <a href={`/blog/category/${post.category}`} style={{ color: '#1d4ed8', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>{post.categoryLabel}</a>
-              <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
-              <span style={{ color: '#94a3b8', fontSize: 13 }}>{post.readTime} read</span>
-              <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
-              <span style={{ color: '#94a3b8', fontSize: 13 }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-            </div>
-            <h1 style={{ fontSize: 'clamp(24px,4vw,40px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.2, marginBottom: 14, letterSpacing: '-0.01em' }}>{post.title}</h1>
-            <p style={{ fontSize: 'clamp(15px,3.6vw,18px)', color: '#64748b', lineHeight: 1.55 }}>{post.excerpt}</p>
+      <div className="page-hero-band" style={{ paddingBottom: 72 }}>
+        <div className="page-hero-glow" aria-hidden="true" />
+        <div className="page-hero-inner" style={{ maxWidth: 880, textAlign: 'left' }}>
+          <div className="page-hero-breadcrumb">
+            <a href="/">Home</a><span>›</span><a href="/blog">Blog</a><span>›</span>
+            <a href={`/blog/category/${post.category}`}>{post.categoryLabel}</a>
           </div>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+            <span style={{ color: '#93c5fd', fontSize: 13, fontWeight: 700 }}>{post.categoryLabel}</span>
+            <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>·</span>
+            <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>{post.readTime} read</span>
+            <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>·</span>
+            <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+          <h1 style={{ fontSize: 'clamp(24px,4vw,40px)', fontWeight: 900, color: 'white', lineHeight: 1.2, marginBottom: 14, letterSpacing: '-0.01em' }}>{post.title}</h1>
+          <p style={{ fontSize: 'clamp(15px,3.6vw,18px)', color: '#cbd5e1', lineHeight: 1.55, maxWidth: 720 }}>{post.excerpt}</p>
+        </div>
+      </div>
 
+      <div style={{ maxWidth: 880, margin: '0 auto', padding: '0 20px clamp(14px, 7vw, 60px)' }}>
+        {/* CTA + article body -- one bordered white card, matching the same
+            content-card style ServicePage.js uses, pulled up to sink into
+            the band above like the SEO template pages. */}
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 36px) clamp(16px, 4.5vw, 36px)', marginTop: -48, marginBottom: 24, boxShadow: '0 8px 30px rgba(15,23,42,0.08)', position: 'relative' }}>
           {/* CTA box */}
           <div style={{ background: 'linear-gradient(135deg,#eff6ff,#f5f8ff)', border: '1px solid #bfdbfe', borderRadius: 14, padding: 'clamp(14px, 4vw, 18px) clamp(14px, 4vw, 22px)', marginBottom: 'clamp(24px, 6vw, 36px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <span style={{ fontSize: 14, color: '#1d4ed8', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>

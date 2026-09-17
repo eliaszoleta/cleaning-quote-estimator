@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Home, SprayCan, Building2, ShieldAlert, ArrowRight, Search, X } from 'lucide-react';
 import { BLOG_POSTS, CATEGORIES } from '../../data/blogPosts';
+import '../pages/PageHero.css';
 
 const CATEGORY_ICONS = {
   'house-cleaning': { Icon: Home, color: '#1d4ed8', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)' },
@@ -113,12 +114,17 @@ export default function BlogIndex() {
           }
         })}</script>
       </Helmet>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px' }}>
-        <h1 style={{ fontSize: 'clamp(28px, 6.5vw, 40px)', fontWeight: 900, color: '#0f172a', marginBottom: 8, letterSpacing: '-0.01em' }}>Cleaning Cost Guides</h1>
-        <p style={{ fontSize: 'clamp(15px, 3.8vw, 18px)', color: '#64748b', lineHeight: 1.5, marginBottom: 'clamp(18px, 4vw, 28px)' }}>Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
+      <div className="page-hero-band" style={{ paddingBottom: 64 }}>
+        <div className="page-hero-glow" aria-hidden="true" />
+        <div className="page-hero-inner" style={{ maxWidth: 1100, textAlign: 'left' }}>
+          <h1 style={{ fontSize: 'clamp(28px, 6.5vw, 40px)', fontWeight: 900, color: 'white', marginBottom: 8, letterSpacing: '-0.01em' }}>Cleaning Cost Guides</h1>
+          <p style={{ fontSize: 'clamp(15px, 3.8vw, 18px)', color: '#cbd5e1', lineHeight: 1.5, maxWidth: 640 }}>Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
+        </div>
+      </div>
 
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px clamp(14px, 7vw, 60px)' }}>
         {/* Search */}
-        <div style={{ position: 'relative', marginBottom: 'clamp(20px, 4vw, 32px)' }}>
+        <div style={{ position: 'relative', marginTop: -32, marginBottom: 'clamp(20px, 4vw, 32px)' }}>
           <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
           <input
             type="text"
@@ -129,6 +135,7 @@ export default function BlogIndex() {
             style={{
               width: '100%', padding: '13px 40px', borderRadius: 12, border: '1.5px solid #e2e8f0',
               fontSize: 15, color: '#0f172a', background: 'white', boxSizing: 'border-box',
+              boxShadow: '0 8px 24px rgba(15,23,42,0.10)',
               outline: 'none', transition: 'border-color 0.15s, box-shadow 0.15s',
             }}
             onFocus={e => { e.target.style.borderColor = '#93c5fd'; e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.12)'; }}

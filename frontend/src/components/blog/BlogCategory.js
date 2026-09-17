@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Home, SprayCan, Building2, ShieldAlert, ArrowRight, ArrowLeft } from 'lucide-react';
 import { getPostsByCategory, CATEGORIES, BLOG_POSTS } from '../../data/blogPosts';
+import '../pages/PageHero.css';
 
 const CATEGORY_ICONS = {
   'house-cleaning': { Icon: Home, color: '#1d4ed8', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)' },
@@ -74,20 +75,25 @@ export default function BlogCategory({ category }) {
           "publisher": { "@type": "Organization", "name": "Clean Estimator", "url": "https://www.cleanestimator.com" }
         })}</script>
       </Helmet>
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px' }}>
-        <div style={{ marginBottom: 'clamp(10px, 3vw, 16px)' }}>
-          <a href="/blog" style={{ color: '#1d4ed8', fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}><ArrowLeft size={14} strokeWidth={2.5} /> All posts</a>
+      <div className="page-hero-band" style={{ paddingBottom: 56 }}>
+        <div className="page-hero-glow" aria-hidden="true" />
+        <div className="page-hero-inner" style={{ maxWidth: 1000, textAlign: 'left' }}>
+          <div style={{ marginBottom: 'clamp(10px, 3vw, 16px)' }}>
+            <a href="/blog" style={{ color: '#93c5fd', fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5, textDecoration: 'none' }}><ArrowLeft size={14} strokeWidth={2.5} /> All posts</a>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
+            {HeaderIcon && (
+              <span style={{ width: 48, height: 48, borderRadius: 14, background: meta.bg, color: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 8px rgba(15,23,42,0.2)' }}>
+                <HeaderIcon size={24} strokeWidth={2} />
+              </span>
+            )}
+            <h1 style={{ fontSize: 'clamp(26px, 6vw, 36px)', fontWeight: 900, color: 'white', letterSpacing: '-0.01em' }}>{title}</h1>
+          </div>
+          <p style={{ color: '#cbd5e1', fontSize: 16 }}>{posts.length} guide{posts.length !== 1 ? 's' : ''}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
-          {HeaderIcon && (
-            <span style={{ width: 48, height: 48, borderRadius: 14, background: meta.bg, color: meta.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 8px rgba(15,23,42,0.06)' }}>
-              <HeaderIcon size={24} strokeWidth={2} />
-            </span>
-          )}
-          <h1 style={{ fontSize: 'clamp(26px, 6vw, 36px)', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.01em' }}>{title}</h1>
-        </div>
-        <p style={{ color: '#64748b', fontSize: 16, marginBottom: 'clamp(20px, 5vw, 36px)' }}>{posts.length} guide{posts.length !== 1 ? 's' : ''}</p>
+      </div>
 
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '28px 20px clamp(14px, 7vw, 60px)' }}>
         {/* Other categories */}
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 'clamp(20px, 5vw, 36px)' }}>
           {CATEGORIES.filter(c => c.id !== category).map(c => (

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Database, MapPin, SlidersHorizontal, BookOpen, ShieldCheck, RefreshCw, Scale } from 'lucide-react';
+import './PageHero.css';
 
 const CROSS_CHECKS = [
   { service: 'House Cleaning (1,500–2,000 sq ft)', ours: '$158–$198', published: '$118–$238, avg ~$176', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-it-cost-hire-house-cleaner.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/hire-a-maid-service']] },
@@ -84,17 +85,20 @@ export default function MethodologyPage() {
         <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
       </Helmet>
 
-      <div style={{ maxWidth: 780, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px' }}>
-        <div style={{ display: 'flex', gap: 6, fontSize: 13, color: '#94a3b8', marginBottom: 'clamp(12px, 3vw, 20px)', flexWrap: 'wrap' }}>
-          <a href="/" style={{ color: '#64748b', textDecoration: 'none' }}>Home</a><span>&rsaquo;</span>
-          <span style={{ color: '#0f172a' }}>How We Calculate Prices</span>
+      <div className="page-hero-band" style={{ paddingBottom: 56 }}>
+        <div className="page-hero-glow" aria-hidden="true" />
+        <div className="page-hero-inner" style={{ maxWidth: 780, textAlign: 'left' }}>
+          <div className="page-hero-breadcrumb">
+            <a href="/">Home</a><span>&rsaquo;</span><span>How We Calculate Prices</span>
+          </div>
+          <h1 style={{ fontSize: 'clamp(28px, 6vw, 40px)', fontWeight: 900, color: 'white', marginBottom: 12, letterSpacing: '-0.01em' }}>How We Calculate Cleaning Prices</h1>
+          <p style={{ fontSize: 'clamp(15px, 3.8vw, 18px)', color: '#cbd5e1', lineHeight: 1.55, maxWidth: 640 }}>
+            Every estimate on Clean Estimator comes from a real methodology, not a guess. Here's exactly how the numbers behind the calculator — and every cost guide on this site — actually get built.
+          </p>
         </div>
+      </div>
 
-        <h1 style={{ fontSize: 'clamp(28px, 6vw, 40px)', fontWeight: 900, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.01em' }}>How We Calculate Cleaning Prices</h1>
-        <p style={{ fontSize: 'clamp(15px, 3.8vw, 18px)', color: '#64748b', marginBottom: 'clamp(24px, 6vw, 40px)', lineHeight: 1.55 }}>
-          Every estimate on Clean Estimator comes from a real methodology, not a guess. Here's exactly how the numbers behind the calculator — and every cost guide on this site — actually get built.
-        </p>
-
+      <div style={{ maxWidth: 780, margin: '0 auto', padding: 'clamp(24px, 6vw, 40px) 20px clamp(24px, 6vw, 40px)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {SECTIONS.map(({ Icon, title: t, body }) => (
             <div key={t} style={{ background: 'white', borderRadius: 16, padding: 'clamp(18px, 4.5vw, 26px) clamp(16px, 4.5vw, 28px)', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 4px 16px rgba(15,23,42,0.05)', display: 'flex', gap: 18 }}>
