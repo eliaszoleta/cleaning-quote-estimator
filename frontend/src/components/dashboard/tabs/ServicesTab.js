@@ -150,12 +150,9 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
 
   return (
     <div>
-      <div style={{ marginBottom: 22, display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={{ width: 4, height: 34, borderRadius: 2, background: '#2563eb', flexShrink: 0 }} />
-        <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Services & Pricing</h2>
-          <p style={{ color: '#64748b', fontSize: 14 }}>Service Area and toggling a service on/off save instantly. For markup and minimum price changes, click <strong>Save Changes</strong> in the header when done.</p>
-        </div>
+      <div style={{ marginBottom: 22 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Services & Pricing</h2>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Service Area and toggling a service on/off save instantly. For markup and minimum price changes, click <strong>Save Changes</strong> in the header when done.</p>
       </div>
 
       {/* Service area */}

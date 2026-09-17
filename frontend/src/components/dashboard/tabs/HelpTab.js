@@ -92,12 +92,9 @@ function FaqItem({ q, a }) {
 export default function HelpTab() {
   return (
     <div style={{ maxWidth: 680 }}>
-      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={{ width: 4, height: 34, borderRadius: 2, background: '#2563eb', flexShrink: 0 }} />
-        <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Help &amp; Documentation</h2>
-          <p style={{ color: '#64748b', fontSize: 14 }}>How the estimator works, and how to make it price things the way you want.</p>
-        </div>
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Help &amp; Documentation</h2>
+        <p style={{ color: '#64748b', fontSize: 14 }}>How the estimator works, and how to make it price things the way you want.</p>
       </div>
 
       <div style={cardStyle}>

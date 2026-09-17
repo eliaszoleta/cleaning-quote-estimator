@@ -48,14 +48,11 @@ export default function DiscountTab({ config, update }) {
 
   return (
     <div>
-      <div style={{ marginBottom: 22, display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={{ width: 4, height: 34, borderRadius: 2, background: COLORS.primary, flexShrink: 0 }} />
-        <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, marginBottom: 2, letterSpacing: '-0.3px' }}>Recurring Discounts</h2>
-          <p style={{ color: COLORS.body, fontSize: 14 }}>
-            Off by default — visitors are quoted the full price for recurring bookings unless you set a percentage below. Click <strong>Save Changes</strong> in the header when done.
-          </p>
-        </div>
+      <div style={{ marginBottom: 22 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, marginBottom: 2, letterSpacing: '-0.3px' }}>Recurring Discounts</h2>
+        <p style={{ color: COLORS.body, fontSize: 14 }}>
+          Off by default — visitors are quoted the full price for recurring bookings unless you set a percentage below. Click <strong>Save Changes</strong> in the header when done.
+        </p>
       </div>
 
       {SERVICES.map(({ id, label, Icon }) => {

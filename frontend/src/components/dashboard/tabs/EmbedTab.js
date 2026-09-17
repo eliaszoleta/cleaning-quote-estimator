@@ -64,12 +64,9 @@ export default function EmbedTab({ config, user }) {
 
   return (
     <div>
-      <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={{ width: 4, height: 34, borderRadius: 2, background: COLORS.primary, flexShrink: 0 }} />
-        <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, marginBottom: 2, letterSpacing: '-0.3px' }}>Embed Your Widget</h2>
-          <p style={{ color: COLORS.body, fontSize: 14 }}>Paste the code below anywhere on your website to embed your branded estimator.</p>
-        </div>
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, marginBottom: 2, letterSpacing: '-0.3px' }}>Embed Your Widget</h2>
+        <p style={{ color: COLORS.body, fontSize: 14 }}>Paste the code below anywhere on your website to embed your branded estimator.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
