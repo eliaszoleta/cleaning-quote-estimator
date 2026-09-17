@@ -154,7 +154,7 @@ export default function CompanyLanding() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <div style={{ width: '100%', maxWidth: 700 }}>
+                <div style={{ width: '100%', maxWidth: 560 }}>
                   <WidgetPreview />
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function CompanyLanding() {
           a live-status pulse on its "new lead" chip. Respects
           prefers-reduced-motion. */}
       <style>{`
-        .ce-hero-grid { grid-template-columns: minmax(300px, 1fr) minmax(520px, 700px); }
+        .ce-hero-grid { grid-template-columns: minmax(320px, 1fr) minmax(440px, 560px); }
         @media (max-width: 900px) { .ce-hero-grid { grid-template-columns: 1fr; } }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
