@@ -25,6 +25,7 @@ import PartnerDemoPage from './components/pages/PartnerDemoPage';
 import BuyCityPlacement from './components/pages/BuyCityPlacement';
 import PartnerCheckoutSuccess from './components/pages/PartnerCheckoutSuccess';
 import About from './components/pages/About';
+import Founder from './components/pages/Founder';
 import Contact from './components/pages/Contact';
 import PrivacyPolicy from './components/pages/PrivacyPolicy';
 import TermsOfService from './components/pages/TermsOfService';
@@ -51,6 +52,7 @@ const isEstimatorLanding = pathname === '/estimator';
 const isOldForCompanies = pathname === '/for-companies';
 const isBlog = pathname === '/blog' || pathname.startsWith('/blog/');
 const isAbout = pathname === '/about';
+const isFounder = pathname === '/founder';
 const isContact = pathname === '/contact';
 const isPrivacy = pathname === '/privacy-policy';
 const isTerms = pathname === '/terms-of-service';
@@ -256,6 +258,7 @@ export default function App() {
   if (isBlog) return <HelmetProvider><div className="app"><Header /><main><BlogRouter /></main><Footer /></div></HelmetProvider>;
 
   if (isAbout) return <HelmetProvider><div className="app"><Header /><main><About /></main><Footer /></div></HelmetProvider>;
+  if (isFounder) return <HelmetProvider><div className="app"><Header /><main><Founder /></main><Footer /></div></HelmetProvider>;
   if (isContact) return <HelmetProvider><div className="app"><Header /><main><Contact /></main><Footer /></div></HelmetProvider>;
   if (isPrivacy) return <HelmetProvider><div className="app"><Header /><main><PrivacyPolicy /></main><Footer /></div></HelmetProvider>;
   if (isTerms) return <HelmetProvider><div className="app"><Header /><main><TermsOfService /></main><Footer /></div></HelmetProvider>;

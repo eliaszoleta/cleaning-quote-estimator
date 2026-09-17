@@ -42,6 +42,7 @@ const cols = [
       { label: 'Cleaning Cost Estimator', href: '/cleaning-cost-estimator' },
       { label: 'How We Calculate Prices', href: '/how-we-calculate-prices' },
       { label: 'About Clean Estimator', href: '/about' },
+      { label: 'Meet the Founder', href: '/founder' },
       { label: 'Contact', href: '/contact' },
     ],
   },
