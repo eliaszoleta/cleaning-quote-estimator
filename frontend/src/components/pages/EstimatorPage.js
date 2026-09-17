@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ChevronDown, BarChart3, ListChecks, Lock, Repeat } from 'lucide-react';
 import CleaningCalculator from '../calculator/CleaningCalculator';
+import PageHero from './PageHero';
 import './PageHero.css';
 
 const WHY_POINTS = [
@@ -92,20 +93,14 @@ export default function EstimatorPage() {
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
 
-      <div className="page-hero-wrap">
-        <div className="page-hero-breadcrumb">
-          <a href="/" style={{ color: '#64748b', textDecoration: 'none' }}>Home</a><span>&rsaquo;</span>
-          <span style={{ color: '#0f172a' }}>Cleaning Cost Estimator</span>
-        </div>
+      <PageHero
+        breadcrumbLabel="Cleaning Cost Estimator"
+        title="Cleaning Cost Estimator"
+        subtitle="Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and 6 other services — enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation."
+      />
 
-        <div className="page-hero-block">
-          <h1 className="page-hero-title">Cleaning Cost Estimator</h1>
-          <p className="page-hero-subtitle">
-            Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and 6 other services — enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation.
-          </p>
-        </div>
-
-        <div style={showingResults ? undefined : { maxWidth: 720, margin: '0 auto', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+      <div className="page-hero-content">
+        <div style={showingResults ? undefined : { maxWidth: 720, margin: '-64px auto 0', position: 'relative', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <CleaningCalculator embedded siteLanding onShowResults={setShowingResults} />
         </div>
 

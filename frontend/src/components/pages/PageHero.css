@@ -1,65 +1,88 @@
-/* Shared hero block for the standalone calculator/estimator landing pages
-   (CalculatorPage, EstimatorPage, ServiceCalculatorPage) -- sized to match
-   the homepage's own hero (.calc-hero in CleaningCalculator.css) at every
-   breakpoint, not just mobile. The original inline styles here (h1 up to
-   42px, 17px/1.7 paragraph, 36px margin) were noticeably larger than the
-   homepage even on desktop, pushing the actual calculator down further
-   than it needs to for a page whose whole point is the calculator. */
+/* Shared hero for the standalone calculator/estimator landing pages
+   (CalculatorPage, EstimatorPage, ServiceCalculatorPage) -- same full-bleed
+   dark-band-the-card-sinks-into treatment as the homepage's own hero
+   (.calc-hero-band in CleaningCalculator.css), so these pages read as the
+   same product instead of a plainer, lighter cousin of the homepage. */
 
-.page-hero-wrap {
+.page-hero-band {
+  position: relative;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  overflow: hidden;
+  padding: 40px 24px 96px;
+}
+
+.page-hero-glow {
+  position: absolute;
+  top: -130px;
+  right: -90px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37,99,235,0.35) 0%, rgba(37,99,235,0) 70%);
+  pointer-events: none;
+}
+
+.page-hero-inner {
+  position: relative;
   max-width: 900px;
   margin: 0 auto;
-  padding: 40px 24px 64px;
 }
 
 .page-hero-breadcrumb {
   display: flex;
   gap: 6px;
   font-size: 13px;
-  color: #94a3b8;
+  color: rgba(255,255,255,0.55);
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
+.page-hero-breadcrumb a { color: rgba(255,255,255,0.55); }
+.page-hero-breadcrumb span:last-child { color: #ffffff; }
 
 .page-hero-block {
   text-align: center;
-  margin-bottom: 24px;
 }
 
 .page-hero-title {
-  font-size: clamp(18px, 3.5vw, 34px);
+  font-size: clamp(20px, 3.8vw, 36px);
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
   line-height: 1.2;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   letter-spacing: -0.02em;
 }
 
 .page-hero-subtitle {
   font-size: 15px;
-  color: #64748b;
+  color: #cbd5e1;
   max-width: 640px;
   margin: 0 auto;
-  line-height: 1.55;
+  line-height: 1.6;
+}
+
+/* Light section below the band -- calculator card, why-points, FAQ, etc. */
+.page-hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px 64px;
 }
 
 @media (max-width: 480px) {
-  .page-hero-wrap {
-    padding: 20px 16px 48px;
+  .page-hero-band {
+    padding: 24px 16px 64px;
   }
   .page-hero-breadcrumb {
     margin-bottom: 10px;
     font-size: 12px;
   }
-  .page-hero-block {
-    margin-bottom: 16px;
-  }
   .page-hero-title {
-    font-size: 17px;
     margin-bottom: 6px;
   }
   .page-hero-subtitle {
     font-size: 12.5px;
     line-height: 1.45;
+  }
+  .page-hero-content {
+    padding: 0 16px 48px;
   }
 }
