@@ -132,9 +132,9 @@ export default function CompanyLanding() {
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
                   For cleaning companies
                 </div>
-                <h1 style={{ fontSize: 'clamp(30px,4.6vw,48px)', fontWeight: 800, lineHeight: 1.12, marginBottom: 18, letterSpacing: '-1px', color: 'white' }}>
+                <h1 style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px', color: 'white' }}>
                   Give every homeowner an instant cleaning estimate<br />
-                  <span style={{ color: '#60a5fa' }}>on your website</span>
+                  <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>on your website</span>
                 </h1>
                 <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.65 }}>
                   Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7 — and emails you the second someone's ready to book.
