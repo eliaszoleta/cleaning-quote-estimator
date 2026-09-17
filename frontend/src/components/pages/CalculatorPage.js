@@ -97,6 +97,7 @@ export default function CalculatorPage() {
         breadcrumbLabel="Cleaning Cost Calculator"
         title="Cleaning Cost Calculator"
         subtitle="This free cleaning cost calculator gives you an instant, ZIP-code specific price for house cleaning, carpet cleaning, commercial cleaning, and 6 other services. Built as a standalone cleaning calculator you can bookmark and reuse — no signup, no phone calls, just enter your details and get a real cleaning estimator price range in under 60 seconds."
+        subtitleAlign="justify"
       />
 
       <div className="page-hero-content">

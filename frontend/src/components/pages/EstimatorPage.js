@@ -97,6 +97,7 @@ export default function EstimatorPage() {
         breadcrumbLabel="Cleaning Cost Estimator"
         title="Cleaning Cost Estimator"
         subtitle="Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and 6 other services — enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation."
+        subtitleAlign="justify"
       />
 
       <div className="page-hero-content">
