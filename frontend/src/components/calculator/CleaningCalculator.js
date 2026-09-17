@@ -7,7 +7,7 @@ import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import { trackMetaEvent } from '../../utils/metaPixel';
 import { trackNextdoorEvent } from '../../utils/nextdoorPixel';
 import { getFontStack, getGoogleFontHref } from '../../utils/fonts';
-import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
+import { COLORS, SHADOWS } from '../../styles/theme';
 import ServiceSelect from './steps/ServiceSelect';
 import LocationStep from './steps/LocationStep';
 import HomeStep from './steps/HomeStep';
@@ -286,7 +286,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           margin: embedded ? '0 auto' : (currentStep === 'service' ? `${isMobile ? -44 : -72}px auto 0` : '14px auto 0'),
           position: 'relative',
           background: COLORS.surface,
-          borderRadius: embedded ? 0 : RADIUS.xl,
+          borderRadius: embedded ? 0 : 10,
           boxShadow: embedded ? 'none' : SHADOWS.lg,
           overflow: 'hidden',
           border: embedded ? 'none' : `1px solid ${COLORS.border}`,
