@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ShieldAlert, MessageCircle, Sparkles, Code2, Handshake } from 'lucide-react';
 import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
+import './PageHero.css';
 
 const h2Style = { fontSize: 22, fontWeight: 800, color: COLORS.ink, letterSpacing: '-0.01em' };
 const pStyle = { fontSize: 14.5, color: '#334155', lineHeight: 1.65, margin: 0 };
@@ -53,45 +54,42 @@ const STATS = [
 
 export default function About() {
   return (
-    <div style={{ background: COLORS.surfaceMuted, minHeight: '100vh' }}>
+    <div style={{ minHeight: '100vh' }}>
       <Helmet>
         <title>About Clean Estimator | Free Cleaning Cost Estimator</title>
         <meta name="description" content="Clean Estimator provides free, accurate cleaning cost estimates for homeowners and businesses across all 50 U.S. states." />
         <link rel="canonical" href="https://www.cleanestimator.com/about" />
       </Helmet>
 
-      {/* Page Hero -- same centered, single-column layout as the Website +
-          Chatbot hero (eyebrow / h1 / subtitle, calm type scale), instead
-          of the asymmetric two-column version this had before. Stat row
-          keeps the same hairline-separated treatment underneath, sized down
-          to match. */}
-      <div style={{ background: COLORS.heroGradient, color: 'white', padding: 'clamp(40px, 9vw, 96px) 20px clamp(48px, 9vw, 96px)' }}>
-        <div style={{ maxWidth: 620, margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 16 }}>
-            About Us
-          </div>
-          <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
+      {/* Page Hero -- same dark band / glow / left-aligned title+subtitle
+          layout as the blog page hero (BlogIndex.js), reusing the shared
+          PageHero.css classes directly instead of a bespoke centered/eyebrow
+          treatment, so About matches the blog hero exactly. */}
+      <div className="page-hero-band">
+        <div className="page-hero-glow" aria-hidden="true" />
+        <div className="page-hero-inner" style={{ maxWidth: 900, textAlign: 'left' }}>
+          <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
             About Clean Estimator
           </h1>
-          <p style={{ fontSize: 15, color: '#94a3b8', maxWidth: 540, margin: '0 auto', lineHeight: 1.55 }}>
+          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640 }}>
             We built Clean Estimator to solve a frustrating problem: no one knows what cleaning actually costs until they've already called 3 companies and waited for callbacks.
           </p>
         </div>
+      </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '36px auto 0', flexWrap: 'wrap', rowGap: 16 }}>
-          {STATS.map((s, i) => (
-            <div key={s.label} style={{ display: 'flex', alignItems: 'center' }}>
-              {i > 0 && <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.14)', margin: '0 28px' }} />}
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 21, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>{s.number}</div>
-                <div style={{ fontSize: 11, color: '#64748b', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
-              </div>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: '28px 20px clamp(36px, 7vw, 80px)', position: 'relative' }}>
+
+        {/* Stats strip -- moved out of the hero band (blog's hero doesn't
+            carry one) into a plain hairline-divided row at the top of the
+            content area. */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, marginBottom: 48, paddingBottom: 28, borderBottom: `1px solid ${COLORS.border}` }}>
+          {STATS.map(s => (
+            <div key={s.label}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, letterSpacing: '-0.01em' }}>{s.number}</div>
+              <div style={{ fontSize: 11.5, color: COLORS.muted, marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
             </div>
           ))}
         </div>
-      </div>
-
-      <div style={{ maxWidth: 760, margin: '-28px auto 0', padding: '0 20px clamp(36px, 7vw, 80px)', position: 'relative' }}>
 
         {/* Our mission -- an opening statement rather than a card, so the
             page reads as an editorial piece first and a stack of feature
