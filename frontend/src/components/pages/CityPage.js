@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { ChevronDown, Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin } from 'lucide-react';
 import { getCityBySlug, getCitiesByState, getFeaturedCities, cityServicePrices } from '../../data/cityPricing';
 import { getAllFaqs } from '../../data/faqs';
+import './PageHero.css';
 
 const ICONS = {
   home_residential: Home,
@@ -135,18 +136,21 @@ export default function CityPage({ slug }) {
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
 
-      <div style={{ background: '#f8fafc', minHeight: '100vh', padding: 'clamp(20px, 5vw, 40px) 20px clamp(36px, 7vw, 64px)' }}>
-        <div style={{ maxWidth: 780, margin: '0 auto' }}>
-
-          <div style={{ display: 'flex', gap: 6, fontSize: 13, color: '#94a3b8', marginBottom: 24, flexWrap: 'wrap' }}>
-            <a href="/" style={{ color: '#64748b', textDecoration: 'none' }}>Home</a>
-            <span>›</span>
-            <a href={`/cleaning-cost/${city.stateSlugRef}`} style={{ color: '#64748b', textDecoration: 'none' }}>{city.stateName}</a>
-            <span>›</span>
-            <span style={{ color: '#0f172a' }}>{city.name}</span>
+      <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
+        <div className="page-hero-band" style={{ paddingBottom: 88 }}>
+          <div className="page-hero-glow" aria-hidden="true" />
+          <div className="page-hero-inner" style={{ maxWidth: 780, textAlign: 'left' }}>
+            <div className="page-hero-breadcrumb">
+              <a href="/">Home</a><span>›</span>
+              <a href={`/cleaning-cost/${city.stateSlugRef}`}>{city.stateName}</a><span>›</span>
+              <span>{city.name}</span>
+            </div>
           </div>
+        </div>
 
-          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 32px) clamp(16px, 4.5vw, 36px)', marginBottom: 24 }}>
+        <div style={{ maxWidth: 780, margin: '-64px auto 0', padding: '0 20px clamp(36px, 7vw, 64px)', position: 'relative' }}>
+
+          <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 32px) clamp(16px, 4.5vw, 36px)', marginBottom: 24, boxShadow: '0 8px 30px rgba(15,23,42,0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <MapPin size={18} color="#2563eb" />
               <span style={{ fontSize: 12, fontWeight: 700, color: '#2563eb', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{city.name}, {city.stateCode}</span>
