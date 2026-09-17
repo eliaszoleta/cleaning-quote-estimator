@@ -117,8 +117,8 @@ export default function BlogIndex() {
       <div className="page-hero-band" style={{ paddingBottom: 64 }}>
         <div className="page-hero-glow" aria-hidden="true" />
         <div className="page-hero-inner" style={{ maxWidth: 1100, textAlign: 'left' }}>
-          <h1 style={{ fontSize: 'clamp(28px, 6.5vw, 40px)', fontWeight: 900, color: 'white', marginBottom: 8, letterSpacing: '-0.01em' }}>Cleaning Cost Guides</h1>
-          <p style={{ fontSize: 'clamp(15px, 3.8vw, 18px)', color: '#cbd5e1', lineHeight: 1.5, maxWidth: 640 }}>Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
+          <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>Cleaning Cost Guides</h1>
+          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640 }}>Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
         </div>
       </div>
 

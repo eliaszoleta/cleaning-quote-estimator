@@ -87,9 +87,9 @@ export default function BlogCategory({ category }) {
                 <HeaderIcon size={24} strokeWidth={2} />
               </span>
             )}
-            <h1 style={{ fontSize: 'clamp(26px, 6vw, 36px)', fontWeight: 900, color: 'white', letterSpacing: '-0.01em' }}>{title}</h1>
+            <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, letterSpacing: '-0.01em' }}>{title}</h1>
           </div>
-          <p style={{ color: '#cbd5e1', fontSize: 16 }}>{posts.length} guide{posts.length !== 1 ? 's' : ''}</p>
+          <p style={{ color: '#94a3b8', fontSize: 15 }}>{posts.length} guide{posts.length !== 1 ? 's' : ''}</p>
         </div>
       </div>
 

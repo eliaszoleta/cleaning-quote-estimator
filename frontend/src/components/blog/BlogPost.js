@@ -166,8 +166,8 @@ export default function BlogPost({ slug }) {
             <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>·</span>
             <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
           </div>
-          <h1 style={{ fontSize: 'clamp(24px,4vw,40px)', fontWeight: 900, color: 'white', lineHeight: 1.2, marginBottom: 14, letterSpacing: '-0.01em' }}>{post.title}</h1>
-          <p style={{ fontSize: 'clamp(15px,3.6vw,18px)', color: '#cbd5e1', lineHeight: 1.55, maxWidth: 720 }}>{post.excerpt}</p>
+          <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 14, letterSpacing: '-0.01em' }}>{post.title}</h1>
+          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 720 }}>{post.excerpt}</p>
         </div>
       </div>
 
