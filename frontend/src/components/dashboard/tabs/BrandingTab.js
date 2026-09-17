@@ -180,7 +180,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
         {/* Preview column */}
         <div style={{ position: 'sticky', top: 96 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Live Preview</div>
-          <div style={{ border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', background: 'white', height: 600, overflowY: 'auto' }}>
+          <div style={{ border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', background: 'white' }}>
             <CleaningCalculator companyConfig={previewConfig} embedded={true} />
           </div>
         </div>
