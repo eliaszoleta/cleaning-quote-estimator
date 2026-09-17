@@ -67,6 +67,19 @@
   padding: 0 24px 64px;
 }
 
+/* Card-sink margin for CalculatorPage/EstimatorPage's calculator card --
+   desktop keeps the original -64px pull; mobile uses a smaller -40px pull
+   since the band's mobile bottom padding is only 64px, and -64px left
+   zero gap between the subtitle text and the card's top edge there. */
+.calc-card-sink {
+  margin: -64px auto 0;
+}
+@media (max-width: 480px) {
+  .calc-card-sink {
+    margin: -40px auto 0;
+  }
+}
+
 @media (max-width: 480px) {
   .page-hero-band {
     padding: 24px 16px 64px;
