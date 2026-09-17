@@ -289,7 +289,7 @@ export default function PartnerWithUs() {
           two-column layout, and a static "product shot" showing exactly
           what a visitor sees (their estimate, then the partner's listing
           recommended right below it) instead of only describing it. */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: '64px 24px 110px' }}>
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: 'clamp(72px, 10vw, 110px) 24px' }}>
         {/* minmax(min(380px, 100%), 1fr) instead of a bare minmax(380px, 1fr) --
             on phones narrower than ~428px, 380px + 48px of side padding no
             longer fits inside the viewport, and a plain fixed floor forces

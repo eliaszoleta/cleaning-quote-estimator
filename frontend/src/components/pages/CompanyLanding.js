@@ -126,7 +126,7 @@ export default function CompanyLanding() {
               badge (same language as the About page hero), and a two-column
               layout with a small static "product shot" of the widget so the
               page shows the thing it's selling instead of only describing it. */}
-          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(40px, 9vw, 96px) 20px clamp(48px, 9vw, 110px)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(72px, 10vw, 110px) 20px' }}>
             <div className="ce-hero-grid" style={{ maxWidth: 1320, margin: '0 auto', display: 'grid', gap: 56, alignItems: 'center' }}>
               <div>
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
