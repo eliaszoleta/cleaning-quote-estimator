@@ -59,8 +59,8 @@ export default function PartnerCheckoutSuccess() {
               You're officially a Clean Estimator partner. Your listing is live now &mdash; on the results card, the floating banner, and the estimate email in every city you bought.
             </p>
             <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '16px 18px', textAlign: 'left', marginBottom: 22 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: '#1e40af', marginBottom: 4 }}>Next: set up your dashboard</div>
-              <p style={{ fontSize: 13, color: '#1e40af', lineHeight: 1.6, margin: 0 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: '#1d4ed8', marginBottom: 4 }}>Next: set up your dashboard</div>
+              <p style={{ fontSize: 13, color: '#1d4ed8', lineHeight: 1.6, margin: 0 }}>
                 Head to <strong>cleanestimator.com/client</strong> and sign up with the personal email you checked out with to unlock your KPI dashboard &mdash; impressions, calls, and click-through-rate for every city.
               </p>
             </div>

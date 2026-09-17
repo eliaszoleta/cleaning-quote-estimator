@@ -4,7 +4,7 @@ import { Home, SprayCan, Building2, ShieldAlert, ArrowRight, Search, X } from 'l
 import { BLOG_POSTS, CATEGORIES } from '../../data/blogPosts';
 
 const CATEGORY_ICONS = {
-  'house-cleaning': { Icon: Home, color: '#1e40af', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)' },
+  'house-cleaning': { Icon: Home, color: '#1d4ed8', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)' },
   carpet: { Icon: SprayCan, color: '#7c3aed', bg: 'linear-gradient(135deg,#f5f3ff,#ede9fe)' },
   commercial: { Icon: Building2, color: '#0891b2', bg: 'linear-gradient(135deg,#ecfeff,#cffafe)' },
   restoration: { Icon: ShieldAlert, color: '#dc2626', bg: 'linear-gradient(135deg,#fef2f2,#fee2e2)' },
@@ -57,7 +57,7 @@ function PostCard({ post }) {
       </div>
       <h3 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 10, lineHeight: 1.4 }}>{post.title}</h3>
       <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.6, marginBottom: 16 }}>{post.excerpt}</p>
-      <span style={{ color: '#1e40af', fontWeight: 700, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}>Read more <ArrowRight size={14} strokeWidth={2.5} /></span>
+      <span style={{ color: '#1d4ed8', fontWeight: 700, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}>Read more <ArrowRight size={14} strokeWidth={2.5} /></span>
     </a>
   );
 }
@@ -181,7 +181,7 @@ export default function BlogIndex() {
             </div>
             <h2 style={{ fontSize: 'clamp(20px, 4.5vw, 26px)', fontWeight: 800, color: '#0f172a', marginBottom: 10, lineHeight: 1.3, letterSpacing: '-0.01em' }}>{featured.title}</h2>
             <p style={{ fontSize: 'clamp(14px, 3.6vw, 16px)', color: '#374151', lineHeight: 1.55, marginBottom: 16 }}>{featured.excerpt}</p>
-            <span style={{ color: '#1e40af', fontWeight: 700, fontSize: 15, display: 'inline-flex', alignItems: 'center', gap: 6 }}>Read the full guide <ArrowRight size={16} strokeWidth={2.5} /></span>
+            <span style={{ color: '#1d4ed8', fontWeight: 700, fontSize: 15, display: 'inline-flex', alignItems: 'center', gap: 6 }}>Read the full guide <ArrowRight size={16} strokeWidth={2.5} /></span>
           </a>
         )}
 

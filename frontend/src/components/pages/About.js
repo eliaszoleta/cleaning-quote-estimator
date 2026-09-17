@@ -184,7 +184,7 @@ export default function About() {
         {/* Disclaimer note */}
         <section style={{ marginBottom: 32 }}>
           <div style={{ background: '#eff6ff', borderRadius: 10, padding: '28px 32px', border: '1px solid #bfdbfe' }}>
-            <SectionHeading Icon={ShieldAlert} color="#1e40af" bg="rgba(255,255,255,0.6)">Disclaimer</SectionHeading>
+            <SectionHeading Icon={ShieldAlert} color="#1d4ed8" bg="rgba(255,255,255,0.6)">Disclaimer</SectionHeading>
             <p style={pStyle}>
               Our estimates are starting points, not quotes. Actual cleaning service costs depend on the specific condition of the property, local market competition, the cleaning company's pricing, and many other factors. Always get multiple quotes from licensed, insured professionals before booking.
             </p>

@@ -4,7 +4,7 @@ import { Home, SprayCan, Building2, ShieldAlert, ArrowRight, ArrowLeft } from 'l
 import { getPostsByCategory, CATEGORIES, BLOG_POSTS } from '../../data/blogPosts';
 
 const CATEGORY_ICONS = {
-  'house-cleaning': { Icon: Home, color: '#1e40af', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)' },
+  'house-cleaning': { Icon: Home, color: '#1d4ed8', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)' },
   carpet: { Icon: SprayCan, color: '#7c3aed', bg: 'linear-gradient(135deg,#f5f3ff,#ede9fe)' },
   commercial: { Icon: Building2, color: '#0891b2', bg: 'linear-gradient(135deg,#ecfeff,#cffafe)' },
   restoration: { Icon: ShieldAlert, color: '#dc2626', bg: 'linear-gradient(135deg,#fef2f2,#fee2e2)' },
@@ -76,7 +76,7 @@ export default function BlogCategory({ category }) {
       </Helmet>
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: 'clamp(14px, 7vw, 60px) 20px' }}>
         <div style={{ marginBottom: 'clamp(10px, 3vw, 16px)' }}>
-          <a href="/blog" style={{ color: '#1e40af', fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}><ArrowLeft size={14} strokeWidth={2.5} /> All posts</a>
+          <a href="/blog" style={{ color: '#1d4ed8', fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}><ArrowLeft size={14} strokeWidth={2.5} /> All posts</a>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
           {HeaderIcon && (
@@ -112,7 +112,7 @@ export default function BlogCategory({ category }) {
                     <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8, lineHeight: 1.35 }}>{post.title}</h2>
                     <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.6 }}>{post.excerpt}</p>
                   </div>
-                  <span style={{ color: '#1e40af', fontWeight: 700, fontSize: 15, flexShrink: 0, marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 5 }}>Read <ArrowRight size={15} strokeWidth={2.5} /></span>
+                  <span style={{ color: '#1d4ed8', fontWeight: 700, fontSize: 15, flexShrink: 0, marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 5 }}>Read <ArrowRight size={15} strokeWidth={2.5} /></span>
                 </div>
               </a>
             ))}

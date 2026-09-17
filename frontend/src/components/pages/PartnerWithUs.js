@@ -490,7 +490,7 @@ export default function PartnerWithUs() {
               <Check>Cancel anytime with 30 days notice</Check>
               <Check>Serve multiple cities under one account &mdash; each priced by that city's own tier</Check>
             </div>
-            <div style={{ background: 'white', borderRadius: 10, padding: '14px 18px', border: '1px solid #e2e8f0', fontSize: 13.5, color: '#1e40af', lineHeight: 1.6 }}>
+            <div style={{ background: 'white', borderRadius: 10, padding: '14px 18px', border: '1px solid #e2e8f0', fontSize: 13.5, color: '#1d4ed8', lineHeight: 1.6 }}>
               <strong>Example:</strong> A business covering a major metro like Dallas (${MAJOR_CITY_PRICE}/mo) plus a smaller city like Waco (${MINOR_CITY_PRICE}/mo) pays ${MAJOR_CITY_PRICE + MINOR_CITY_PRICE}/month total. Type your cities into the form below and we'll show you the exact tier and price for each.
             </div>
           </div>

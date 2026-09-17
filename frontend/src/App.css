@@ -2,10 +2,14 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --primary: #1e40af;
+  /* Matches styles/theme.js's COLORS/RADIUS/SHADOWS -- CSS vars for the
+     dashboard-shell classes below, JS constants for everywhere else, one
+     set of true values expressed in two forms. */
+  --primary: #2563eb;
   --primary-light: #2563eb;
   --primary-dark: #1e3a8a;
-  --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #2563eb 100%);
+  --primary-hover: #1d4ed8;
+  --primary-gradient: #2563eb;
   --primary-muted: #eff6ff;
   --primary-muted-2: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
   --accent: #16a34a;
@@ -17,12 +21,12 @@
   --border-subtle: #f1f5f9;
   --bg: #f1f5f9;
   --card: #ffffff;
-  --radius: 14px;
-  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.06);
   --shadow-sm: 0 1px 2px rgba(15,23,42,0.05), 0 2px 8px rgba(15,23,42,0.04);
   --shadow-md: 0 4px 16px rgba(15,23,42,0.08), 0 16px 40px rgba(15,23,42,0.10);
-  --shadow-primary: 0 4px 16px rgba(30,64,175,0.20), 0 2px 6px rgba(30,64,175,0.14);
+  --shadow-primary: 0 4px 16px rgba(37,99,235,0.20), 0 2px 6px rgba(37,99,235,0.14);
 }
 
 html { font-size: 16px; }
@@ -145,7 +149,7 @@ img { max-width: 100%; height: auto; }
   font-size: 14px; color: var(--text); background: white; width: 120px;
   outline: none; transition: border-color 0.15s;
 }
-.dash-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,64,175,0.10); }
+.dash-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
 .dash-input-text { width: 100%; max-width: 320px; }
 .dash-input-full { width: 100%; }
 
@@ -192,7 +196,7 @@ img { max-width: 100%; height: auto; }
   display: inline-flex; align-items: center; gap: 4px;
   padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 600;
 }
-.badge-blue   { background: #dbeafe; color: #1e40af; }
+.badge-blue   { background: #dbeafe; color: #1d4ed8; }
 .badge-green  { background: #dcfce7; color: #15803d; }
 .badge-amber  { background: #fef3c7; color: #92400e; }
 .badge-red    { background: #fee2e2; color: #991b1b; }

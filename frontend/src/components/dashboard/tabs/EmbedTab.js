@@ -96,7 +96,7 @@ export default function EmbedTab({ config, user }) {
         {/* Preview link */}
         <div style={{ background: 'linear-gradient(135deg, #eff6ff, #f8fafc)', border: '1px solid #bfdbfe', borderRadius: 12, padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14 }}>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: '#1e40af', marginBottom: 4 }}>Preview your widget</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: '#1d4ed8', marginBottom: 4 }}>Preview your widget</div>
             <p style={{ fontSize: 13, color: '#3b82f6', margin: 0 }}>See exactly how it looks before embedding on your site.</p>
           </div>
           <a

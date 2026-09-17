@@ -230,7 +230,7 @@ export default function Header() {
               </a>
             );
           })}
-          <a href="/partner-with-us" style={{ ...styles.navLink, display: 'block', padding: '10px 12px', color: '#1e40af', fontWeight: 700 }}>
+          <a href="/partner-with-us" style={{ ...styles.navLink, display: 'block', padding: '10px 12px', color: COLORS.primary, fontWeight: 700 }}>
             Become a Partner
           </a>
           <a href="/company" style={{ ...styles.cta, display: 'block', textAlign: 'center', marginLeft: 0, marginTop: 8 }}>

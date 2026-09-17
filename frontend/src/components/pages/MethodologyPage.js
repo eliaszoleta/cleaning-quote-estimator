@@ -98,7 +98,7 @@ export default function MethodologyPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {SECTIONS.map(({ Icon, title: t, body }) => (
             <div key={t} style={{ background: 'white', borderRadius: 16, padding: 'clamp(18px, 4.5vw, 26px) clamp(16px, 4.5vw, 28px)', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 4px 16px rgba(15,23,42,0.05)', display: 'flex', gap: 18 }}>
-              <span style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', color: '#1e40af', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Icon size={22} strokeWidth={2} />
               </span>
               <div style={{ flex: 1 }}>

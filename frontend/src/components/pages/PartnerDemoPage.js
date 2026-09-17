@@ -81,7 +81,7 @@ export default function PartnerDemoPage() {
           <strong style={{ color: '#0f172a' }}>1. The floating banner — look now.</strong> It should already be showing in the corner of your screen (top-right on desktop, bottom-right on mobile). That's what follows a visitor across every page in your city once you're live, not just this one.
         </div>
 
-        <div style={{ background: '#eff6ff', border: `1px solid #bfdbfe`, borderRadius: 14, padding: '16px 20px', marginBottom: 16, fontSize: 13.5, color: '#1e40af', lineHeight: 1.6 }}>
+        <div style={{ background: '#eff6ff', border: `1px solid #bfdbfe`, borderRadius: 14, padding: '16px 20px', marginBottom: 16, fontSize: 13.5, color: '#1d4ed8', lineHeight: 1.6 }}>
           <strong>2. The results-page card — try it below.</strong> This second placement only appears after a visitor completes an estimate, so run one through the calculator (any service works) to see it appear with your price.
         </div>
 

@@ -29,7 +29,7 @@ export default function OverviewTab({ config, subStatus, user }) {
     : 0;
 
   const stats = [
-    { label: 'Total Leads',    value: leads.length,                                              Icon: Users,       color: '#1e40af' },
+    { label: 'Total Leads',    value: leads.length,                                              Icon: Users,       color: '#1d4ed8' },
     { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a' },
     { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate) : '—',         Icon: DollarSign,  color: '#d97706' },
     { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—', Icon: Globe,       color: subStatus?.active ? '#16a34a' : '#dc2626' },

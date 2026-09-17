@@ -32,7 +32,7 @@ function renderMarkdown(md) {
   html = html.replace(/^([✅⚠️🚩❌✓])\s+(.+)$/gm, '<div style="display:flex;gap:8px;margin-bottom:8px"><span>$1</span><span>$2</span></div>');
 
   // Links
-  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#1e40af;font-weight:500">$1</a>');
+  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#1d4ed8;font-weight:500">$1</a>');
 
   // Unordered lists
   html = html.replace(/((?:^- .+\n?)+)/gm, (block) => {
@@ -60,11 +60,11 @@ export default function BlogPost({ slug }) {
 
   if (!post) return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
-      <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', color: '#1e40af', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+      <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
         <FileQuestion size={30} strokeWidth={1.75} />
       </div>
       <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>Post not found</h1>
-      <a href="/blog" style={{ color: '#1e40af', fontWeight: 600 }}>← Back to blog</a>
+      <a href="/blog" style={{ color: '#1d4ed8', fontWeight: 600 }}>← Back to blog</a>
     </div>
   );
 
@@ -165,7 +165,7 @@ export default function BlogPost({ slug }) {
           {/* Header */}
           <div style={{ marginBottom: 'clamp(24px, 6vw, 40px)' }}>
             <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-              <a href={`/blog/category/${post.category}`} style={{ color: '#1e40af', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>{post.categoryLabel}</a>
+              <a href={`/blog/category/${post.category}`} style={{ color: '#1d4ed8', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>{post.categoryLabel}</a>
               <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
               <span style={{ color: '#94a3b8', fontSize: 13 }}>{post.readTime} read</span>
               <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
@@ -177,7 +177,7 @@ export default function BlogPost({ slug }) {
 
           {/* CTA box */}
           <div style={{ background: 'linear-gradient(135deg,#eff6ff,#f5f8ff)', border: '1px solid #bfdbfe', borderRadius: 14, padding: 'clamp(14px, 4vw, 18px) clamp(14px, 4vw, 22px)', marginBottom: 'clamp(24px, 6vw, 36px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-            <span style={{ fontSize: 14, color: '#1e40af', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 14, color: '#1d4ed8', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
               <Lightbulb size={17} strokeWidth={2} /> Get a free local estimate for your project
             </span>
             <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '9px 20px', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: '0 2px 8px rgba(30,64,175,0.25)' }}>Use Free Calculator →</a>
@@ -206,7 +206,7 @@ export default function BlogPost({ slug }) {
                 >
                   <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>{p.categoryLabel}</div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>{p.title}</div>
-                  <div style={{ fontSize: 13, color: '#1e40af', fontWeight: 600, marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 4 }}>Read <ArrowRight size={13} strokeWidth={2.5} /></div>
+                  <div style={{ fontSize: 13, color: '#1d4ed8', fontWeight: 600, marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 4 }}>Read <ArrowRight size={13} strokeWidth={2.5} /></div>
                 </a>
               ))}
             </div>
