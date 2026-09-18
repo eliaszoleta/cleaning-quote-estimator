@@ -61,6 +61,7 @@ function HeroC({ site }) {
     <div style={{ background: c.bg, padding: 'clamp(36px, 8vw, 70px) 20px clamp(64px, 10vw, 100px)' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', gap: 48, alignItems: 'center' }}>
         <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: c.accent, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 16 }}>{site.city}, {site.state}</div>
           <h1 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(34px, 6vw, 56px)', fontWeight: 800, color: c.ink, lineHeight: 1.05, marginBottom: 22, letterSpacing: '-1px' }}>{site.tagline}</h1>
           <p style={{ fontSize: 16, color: c.textMuted, lineHeight: 1.65, maxWidth: 440 }}>
             {site.city}'s cleaning service for people who notice the details.

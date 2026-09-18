@@ -120,7 +120,7 @@ function NavC({ site, current }) {
             </a>
           ))}
         </div>
-        <PhoneCta site={site} iconColor={c.bg} style={{ background: c.ink, color: c.bg, padding: '10px 20px', borderRadius: 2, fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.04em' }} />
+        <PhoneCta site={site} iconColor={c.bg} style={{ background: c.ink, color: c.bg, padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.04em' }} />
         <button className="demo-nav-burger" onClick={() => setOpen(o => !o)} style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: c.ink }}>
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
