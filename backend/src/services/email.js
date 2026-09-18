@@ -1327,18 +1327,33 @@ function labeledRows(lines) {
   }).join('');
 }
 
-function buildWebsiteRequestDomainLines({ hasDomain, currentWebsite, domain1, domain2, domain3, facebookPage }) {
-  const lines = hasDomain
-    ? [`Already has a domain: ${currentWebsite || '(not provided)'}`]
-    : [
-        domain1 ? `1st choice: ${domain1}` : null,
-        domain2 ? `2nd choice: ${domain2}` : null,
-        domain3 ? `3rd choice: ${domain3}` : null,
-      ];
-  if (facebookPage && facebookPage !== 'None') lines.push(`Facebook: ${facebookPage}`);
-  return lines.filter(Boolean);
+function fmtOrDefault(v, fallback) {
+  return v && String(v).trim() ? v : fallback;
 }
 
+// Always returns every domain-related field (never omits one just because
+// it's blank) -- which of domain1/2/3 vs. currentWebsite applies depends on
+// hasDomain, same branching the form itself uses, not a case of hiding data.
+function buildWebsiteRequestDomainLines({ hasDomain, currentWebsite, domain1, domain2, domain3, facebookPage }) {
+  const lines = hasDomain
+    ? [
+        'Already has a domain: Yes',
+        `Current domain: ${fmtOrDefault(currentWebsite, 'Not provided')}`,
+      ]
+    : [
+        'Already has a domain: No',
+        `1st choice: ${fmtOrDefault(domain1, 'Not provided')}`,
+        `2nd choice: ${fmtOrDefault(domain2, 'Not provided')}`,
+        `3rd choice: ${fmtOrDefault(domain3, 'Not provided')}`,
+      ];
+  lines.push(`Facebook page: ${fmtOrDefault(facebookPage, 'None')}`);
+  return lines;
+}
+
+// Every field the form collects gets its own line here, with an explicit
+// "Not provided"/"None" placeholder when left blank -- so the notification
+// always shows the complete shape of what was submitted, and nothing an
+// applicant left blank is silently missing versus one they filled in.
 function buildWebsiteRequestText(args) {
   const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
   const domainLines = buildWebsiteRequestDomainLines(args);
@@ -1350,24 +1365,24 @@ function buildWebsiteRequestText(args) {
     '',
     'Contact info:',
     `  Email: ${email}`,
-    phone ? `  Phone: ${fmtPhone(phone)}` : null,
+    `  Phone: ${fmtOrDefault(phone && fmtPhone(phone), 'Not provided')}`,
     '',
     'Business details:',
-    servicesOffered ? `  Services offered: ${servicesOffered}` : null,
-    otherServices && otherServices !== 'None' ? `  Other services: ${otherServices}` : null,
-    businessAddress ? `  Address: ${businessAddress}` : null,
-    serviceAreas ? `  Service areas: ${serviceAreas}` : null,
-  ];
-
-  if (domainLines.length) lines.push('', 'Domain:', ...domainLines.map(l => `  ${l}`));
-  if (message) lines.push('', 'Message:', `  ${message}`);
-
-  lines.push(
+    `  Services offered: ${fmtOrDefault(servicesOffered, 'Not specified')}`,
+    `  Other services: ${fmtOrDefault(otherServices, 'None')}`,
+    `  Business address: ${fmtOrDefault(businessAddress, 'Not provided')}`,
+    `  Service areas: ${fmtOrDefault(serviceAreas, 'Not provided')}`,
+    '',
+    'Domain:',
+    ...domainLines.map(l => `  ${l}`),
+    '',
+    'Message:',
+    `  ${fmtOrDefault(message, 'No additional message')}`,
     '',
     'Reply to this email to reach them directly.',
     '',
-    'Clean Estimator - cleanestimator.com'
-  );
+    'Clean Estimator - cleanestimator.com',
+  ];
 
   return lines.join('\n');
 }
@@ -1376,12 +1391,15 @@ function buildWebsiteRequestHtml(args) {
   const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
   const domainLines = buildWebsiteRequestDomainLines(args);
 
-  const contactRows = labeledRows([`Email: ${email}`, phone ? `Phone: ${fmtPhone(phone)}` : null]);
+  const contactRows = labeledRows([
+    `Email: ${email}`,
+    `Phone: ${fmtOrDefault(phone && fmtPhone(phone), 'Not provided')}`,
+  ]);
   const businessRows = labeledRows([
-    servicesOffered ? `Services offered: ${servicesOffered}` : null,
-    otherServices && otherServices !== 'None' ? `Other services: ${otherServices}` : null,
-    businessAddress ? `Address: ${businessAddress}` : null,
-    serviceAreas ? `Service areas: ${serviceAreas}` : null,
+    `Services offered: ${fmtOrDefault(servicesOffered, 'Not specified')}`,
+    `Other services: ${fmtOrDefault(otherServices, 'None')}`,
+    `Business address: ${fmtOrDefault(businessAddress, 'Not provided')}`,
+    `Service areas: ${fmtOrDefault(serviceAreas, 'Not provided')}`,
   ]);
   const domainRows = labeledRows(domainLines);
 
@@ -1396,14 +1414,14 @@ function buildWebsiteRequestHtml(args) {
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
   <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${contactRows}</table>
 
-  ${businessRows ? `<p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Business details</p>
-  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${businessRows}</table>` : ''}
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Business details</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${businessRows}</table>
 
-  ${domainRows ? `<p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Domain</p>
-  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${domainRows}</table>` : ''}
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Domain</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${domainRows}</table>
 
-  ${message ? `<p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Message</p>
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;white-space:pre-wrap;">${message}</p>` : ''}
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Message</p>
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;white-space:pre-wrap;">${fmtOrDefault(message, 'No additional message')}</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
     Reply to this email to reach them directly.
