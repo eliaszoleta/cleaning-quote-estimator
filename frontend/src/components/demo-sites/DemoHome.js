@@ -207,7 +207,7 @@ function WhyUsBlock({ site, block, index }) {
     </div>
   );
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))', gap: 44, alignItems: 'center', marginBottom: 'clamp(40px, 7vw, 64px)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))', gap: 44, alignItems: 'center' }}>
       {imageFirst ? <>{image}{text}</> : <>{text}{image}</>}
     </div>
   );
@@ -218,7 +218,11 @@ function WhyUsSection({ site }) {
   return (
     <div style={{ padding: 'clamp(44px, 8vw, 80px) 20px', background: c.card }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-        {site.whyUs.map((block, i) => <WhyUsBlock key={block.headline} site={site} block={block} index={i} />)}
+        {site.whyUs.map((block, i) => (
+          <div key={block.headline} style={i > 0 ? { borderTop: `1px solid ${c.border}`, marginTop: 'clamp(40px, 7vw, 64px)', paddingTop: 'clamp(40px, 7vw, 64px)' } : undefined}>
+            <WhyUsBlock site={site} block={block} index={i} />
+          </div>
+        ))}
       </div>
     </div>
   );
