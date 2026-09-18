@@ -107,24 +107,32 @@ async function findPartner(city, state) {
   return { partner: data?.[0]?.partners || null, ok: true };
 }
 
-// Resolves the visitor's matched partner (or null). Always re-checks the
-// (cheap, same-origin) geolocation first, then reuses the cached partner
-// only if it was resolved for that exact city/state -- so the (comparatively
-// expensive) Supabase lookup is skipped on every same-location page load,
-// but a genuine location change (VPN switch, real travel) is picked up on
-// the very next load instead of persisting for the rest of the tab's
-// session. If geolocation itself fails, skip the cache entirely rather than
-// guessing -- better to show nothing for this load than serve a stale city.
-export async function getCachedPartnerMatch() {
+// Resolves the visitor's matched partner, along with whether the lookup
+// actually completed. Always re-checks the (cheap, same-origin) geolocation
+// first, then reuses the cached partner only if it was resolved for that
+// exact city/state -- so the (comparatively expensive) Supabase lookup is
+// skipped on every same-location page load, but a genuine location change
+// (VPN switch, real travel) is picked up on the very next load instead of
+// persisting for the rest of the tab's session. If geolocation itself
+// fails, skip the cache entirely rather than guessing -- better to report
+// "unknown" for this load than serve a stale city.
+//
+// `ok` distinguishes a confirmed "no partner in this city" from "the lookup
+// didn't complete" (network blip, ad blocker, rate limit) -- callers that
+// only care about "is there a partner" (getCachedPartnerMatch below) can
+// ignore it, but a caller that wants to act on the *absence* of a partner
+// (e.g. pitching the city as unclaimed) must not treat a failed lookup as
+// a confirmed vacancy.
+export async function getCachedPartnerMatchDetailed() {
   const loc = await getUserLocation();
-  if (!loc) return null;
+  if (!loc) return { partner: null, ok: false, loc: null };
 
   try {
     const cached = sessionStorage.getItem(CACHE_KEY);
     if (cached) {
       const parsed = JSON.parse(cached);
       if (parsed && parsed.city === loc.city && parsed.state === loc.state) {
-        return parsed.partner;
+        return { partner: parsed.partner, ok: true, loc };
       }
     }
   } catch { /* sessionStorage unavailable — fall through and fetch live */ }
@@ -142,6 +150,15 @@ export async function getCachedPartnerMatch() {
     } catch { /* ignore quota/private-mode errors */ }
   }
 
+  return { partner, ok, loc };
+}
+
+// Convenience wrapper for callers that only need "is there a partner" and
+// treat a failed lookup the same as "none found" (the existing sitewide
+// banner and the results-page card, where showing nothing on a failure is
+// the safe default either way).
+export async function getCachedPartnerMatch() {
+  const { partner } = await getCachedPartnerMatchDetailed();
   return partner;
 }
 
