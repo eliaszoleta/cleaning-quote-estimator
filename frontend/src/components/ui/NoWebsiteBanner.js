@@ -18,10 +18,10 @@ export default function NoWebsiteBanner() {
       >
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9, color: '#1e3a8a', fontSize: 14.5, fontWeight: 700 }}>
           <Globe size={17} color="#2563eb" strokeWidth={2.2} />
-          Don't have a website yet? We've got you — get your Done-For-You website built and hosted for you.
+          Don't have a cleaning website yet? We've got you — get your Done-For-You cleaning website built and hosted for you.
         </span>
         <span className="nwb-cta" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#2563eb', color: 'white', padding: '9px 18px', borderRadius: 8, fontWeight: 700, fontSize: 13.5, flexShrink: 0 }}>
-          Get My Done-For-You Website <ArrowRight size={14} />
+          Get My Done-For-You Cleaning Website <ArrowRight size={14} />
         </span>
       </a>
       <style>{`

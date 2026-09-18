@@ -64,7 +64,7 @@ const cols = [
       { label: 'Partner Pricing', href: '/partner-city-pricing' },
       { label: 'Apply Now', href: '/partner-with-us#apply' },
       { label: 'Partner Login', href: '/client' },
-      { label: 'Get a Website + Chatbot', href: '/website-for-cleaning-companies' },
+      { label: 'Get a Cleaning Website + Chatbot', href: '/website-for-cleaning-companies' },
     ],
   },
   {

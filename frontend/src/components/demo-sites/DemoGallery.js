@@ -7,8 +7,8 @@ export default function DemoGallery() {
   return (
     <>
       <Helmet>
-        <title>Sample Website Designs | Clean Estimator</title>
-        <meta name="description" content="Browse real, working sample websites Clean Estimator builds for cleaning companies -- ten distinct designs, each with its own look." />
+        <title>Sample Cleaning Website Designs | Clean Estimator</title>
+        <meta name="description" content="Browse real, working sample cleaning websites Clean Estimator builds for cleaning companies -- ten distinct designs, each with its own look." />
         <meta name="robots" content="noindex, follow" />
       </Helmet>
 
@@ -16,7 +16,7 @@ export default function DemoGallery() {
         <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>Sample Designs</div>
           <h1 style={{ fontSize: 'clamp(26px,4.5vw,40px)', fontWeight: 800, lineHeight: 1.25, marginBottom: 16, letterSpacing: '-0.5px' }}>
-            See What Your Website Could Actually Look Like
+            See What Your Cleaning Website Could Actually Look Like
           </h1>
           <p style={{ fontSize: 15.5, color: '#94a3b8', maxWidth: 600, margin: '0 auto 8px', lineHeight: 1.6 }}>
             {SITES.length} real, working sample sites for cleaning businesses — every one a different design, not one template reskinned ten times. Click any card to open the full site in a new tab.
@@ -67,7 +67,7 @@ export default function DemoGallery() {
           <h2 style={{ fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>Like What You See?</h2>
           <p style={{ fontSize: 14.5, color: '#64748b', marginBottom: 24, lineHeight: 1.6 }}>We'll build one just as custom for your business — free to preview, no payment until you approve it.</p>
           <a href="/website-for-cleaning-companies#apply" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#1d4ed8', color: 'white', padding: '14px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 15, boxShadow: '0 8px 22px rgba(29,78,216,0.3)' }}>
-            Request Website Sample →
+            Request Cleaning Website Sample →
           </a>
         </div>
       </div>
