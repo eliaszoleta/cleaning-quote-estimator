@@ -103,7 +103,7 @@ export default function WebsiteOfferBanner() {
         </div>
         {!isMobile && (
           <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>
-            We build a real sample site for a cleaning business — see it before you decide anything.
+            We build a live sample of your site first — you don't pay until you've seen and approved it.
           </div>
         )}
       </div>
