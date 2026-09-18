@@ -1,51 +1,75 @@
+/* Full-bleed dark hero band the calculator card sinks into -- this is the
+   one place on the site that gets the signature dark hero-gradient treatment
+   at full drama, since it's the first thing every homepage visitor sees. */
+.calc-hero-band {
+  position: relative;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  overflow: hidden;
+  padding: 64px 16px 108px;
+}
+
+.calc-hero-glow {
+  position: absolute;
+  top: -140px;
+  right: -100px;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37,99,235,0.35) 0%, rgba(37,99,235,0) 70%);
+  pointer-events: none;
+}
+
 .calc-hero {
+  position: relative;
   text-align: center;
-  margin-bottom: 24px;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .calc-hero__badge {
   display: inline-block;
-  background: #dbeafe;
-  color: #1e40af;
-  padding: 5px 14px;
-  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #bfdbfe;
+  padding: 6px 16px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 18px;
+  letter-spacing: 0.01em;
 }
 
 .calc-hero__title {
-  font-size: clamp(18px, 3.5vw, 34px);
+  font-size: clamp(26px, 4.6vw, 38px);
   font-weight: 800;
-  color: #0f172a;
-  line-height: 1.2;
-  margin-bottom: 8px;
+  color: #ffffff;
+  line-height: 1.15;
+  margin-bottom: 12px;
   letter-spacing: -0.02em;
 }
 
 .calc-hero__subtitle {
-  font-size: 15px;
-  color: #64748b;
-  max-width: 640px;
+  font-size: 16px;
+  color: #cbd5e1;
+  max-width: 620px;
   margin: 0 auto;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
-@media (max-width: 480px) {
-  .calc-hero {
-    margin-bottom: 16px;
+@media (max-width: 640px) {
+  .calc-hero-band {
+    padding: 44px 16px 84px;
   }
   .calc-hero__badge {
     font-size: 11px;
-    padding: 4px 11px;
-    margin-bottom: 8px;
+    padding: 5px 13px;
+    margin-bottom: 12px;
   }
   .calc-hero__title {
-    font-size: 17px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
   .calc-hero__subtitle {
-    font-size: 12.5px;
-    line-height: 1.45;
+    font-size: 13px;
+    line-height: 1.5;
   }
 }

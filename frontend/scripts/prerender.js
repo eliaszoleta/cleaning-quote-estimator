@@ -22,13 +22,67 @@ function loadBlogData() {
   return fn();
 }
 
+function loadServicesData() {
+  const raw = fs.readFileSync(path.join(SRC, 'data/services.js'), 'utf8');
+  const src = raw
+    .replace(/^export const /gm, 'const ')
+    .replace(/^export function /gm, 'function ')
+    .replace(/^export default /gm, 'const _default = ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(src + '\nreturn { getAllServices, getServiceBySlug, getRelatedServices, typicalCost };');
+  return fn();
+}
+
+function loadStatesData() {
+  const raw = fs.readFileSync(path.join(SRC, 'data/statePricing.js'), 'utf8');
+  const src = raw
+    .replace(/^export const /gm, 'const ')
+    .replace(/^export function /gm, 'function ')
+    .replace(/^export default /gm, 'const _default = ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(src + '\nreturn { getAllStates, getStateBySlug, getFeaturedStates, adjustForState };');
+  return fn();
+}
+
+// cityPricing.js imports getStateBySlug/adjustForState from statePricing.js and
+// getAllServices/typicalCost from services.js (real ES imports the webpack/React
+// build resolves natively) instead of duplicating that pricing data -- a second
+// copy of the same multiplier table is exactly the kind of two-sources-of-truth
+// mistake that already caused blog copy to contradict the calculator once on
+// this site. The raw-text eval trick every other loader here uses can't execute
+// import statements, so strip them and inject the already-loaded functions as
+// parameters instead of re-parsing them from source.
+function loadCityData(statesMod, servicesMod) {
+  const raw = fs.readFileSync(path.join(SRC, 'data/cityPricing.js'), 'utf8');
+  const src = raw
+    .replace(/^import[^\n]*\n/gm, '')
+    .replace(/^export const /gm, 'const ')
+    .replace(/^export function /gm, 'function ')
+    .replace(/^export default /gm, 'const _default = ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(
+    'getStateBySlug', 'adjustForState', 'getAllServices', 'typicalCost',
+    src + '\nreturn { getAllCities, getCityBySlug, getCitiesByState, getFeaturedCities, cityServicePrices };'
+  );
+  return fn(statesMod.getStateBySlug, statesMod.adjustForState, servicesMod.getAllServices, servicesMod.typicalCost);
+}
+
+function loadFaqsData() {
+  const raw = fs.readFileSync(path.join(SRC, 'data/faqs.js'), 'utf8');
+  const src = raw.replace(/^export function /gm, 'function ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(src + '\nreturn { getAllFaqs };');
+  return fn();
+}
+
 // ─── 2. Extract CSS/JS asset tags from the built index.html ─────────────────
 
 function getAssetTags() {
   const indexHtml = fs.readFileSync(path.join(BUILD, 'index.html'), 'utf8');
-  const cssLinks  = (indexHtml.match(/<link[^>]+\.css[^>]*>/g)  || []).join('\n  ');
-  const jsScripts = (indexHtml.match(/<script\b[^>]*\ssrc="[^"]*\.js[^"]*"[^>]*>\s*<\/script>/g) || []).join('\n  ');
-  return { cssLinks, jsScripts };
+  const cssLinks   = (indexHtml.match(/<link[^>]+\.css[^>]*>/g) || []).join('\n  ');
+  const fontLinks  = (indexHtml.match(/<link[^>]+fonts\.g(?:oogleapis|static)\.com[^>]*>/g) || []).join('\n  ');
+  const jsScripts  = (indexHtml.match(/<script\b[^>]*\ssrc="[^"]*\.js[^"]*"[^>]*>\s*<\/script>/g) || []).join('\n  ');
+  return { cssLinks: [fontLinks, cssLinks].filter(Boolean).join('\n  '), jsScripts };
 }
 
 // ─── 3. Helpers ──────────────────────────────────────────────────────────────
@@ -41,6 +95,12 @@ function esc(str) {
     .replace(/>/g, '&gt;');
 }
 
+// Crisp checkmark bullet icon (square caps/miter joins, not lucide's rounded
+// default) matching the React Check icon usage in ServicePage.js etc.
+function checkIconSvg() {
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+}
+
 // ─── 4. Static nav header (visible to Googlebot without JS) ─────────────────
 
 function staticHeader() {
@@ -48,10 +108,11 @@ function staticHeader() {
   <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px">
     <a href="/" style="font-size:18px;font-weight:800;color:#0f172a;text-decoration:none">Clean Estimator</a>
     <nav style="display:flex;gap:24px;align-items:center">
+      <a href="/cleaning-cost-calculator" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">Cost Calculator</a>
       <a href="/#how-it-works" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">How It Works</a>
       <a href="/blog" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">Blog</a>
       <a href="/#faq" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">FAQ</a>
-      <a href="/for-companies" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">For Companies</a>
+      <a href="/estimator" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">For Companies</a>
       <a href="/" style="background:${PRIMARY};color:white;padding:8px 18px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700">Get Estimate</a>
     </nav>
   </div>
@@ -154,6 +215,15 @@ function renderBlogPost(post, cat, assets) {
     ],
   });
 
+  // Mirrors BlogPost.js's optional FAQPage schema -- only posts that define
+  // `faqs` get this block. Prerendered here too since this script generates
+  // the static HTML independently rather than server-rendering BlogPost.js.
+  const faqSchemaStr = (post.faqs && post.faqs.length) ? JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: post.faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  }) : null;
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,7 +234,13 @@ function renderBlogPost(post, cat, assets) {
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}/blog/${post.slug}">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:site_name" content="Clean Estimator">
   <meta property="og:title" content="${esc(seoTitle)}">
   <meta property="og:description" content="${esc(post.excerpt)}">
@@ -181,10 +257,11 @@ function renderBlogPost(post, cat, assets) {
   <meta name="twitter:image" content="${DOMAIN}/og-image.svg">
   <script type="application/ld+json">${articleSchemaStr}</script>
   <script type="application/ld+json">${breadcrumbSchemaStr}</script>
+  ${faqSchemaStr ? `<script type="application/ld+json">${faqSchemaStr}</script>` : ''}
   ${assets.cssLinks}
 </head>
 <body>
-<div id="root">${staticHeader()}<div style="max-width:760px;margin:0 auto;padding:60px 24px;font-family:system-ui,-apple-system,sans-serif">
+<div id="root">${staticHeader()}<div style="max-width:760px;margin:0 auto;padding:60px 24px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
   <div style="font-size:13px;color:#94a3b8;margin-bottom:24px">
     <a href="/" style="color:#94a3b8">Home</a> ›
     <a href="/blog" style="color:#94a3b8">Blog</a> ›
@@ -263,7 +340,13 @@ function renderBlogIndex(posts, categories, assets) {
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}/blog">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:title" content="Cleaning Cost Guides &amp; Tips | Clean Estimator Blog">
   <meta property="og:description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses.">
   <meta property="og:type" content="website">
@@ -280,7 +363,7 @@ function renderBlogIndex(posts, categories, assets) {
 <body>
 <div id="root">
 ${staticHeader()}
-<div style="max-width:1100px;margin:0 auto;padding:60px 24px;font-family:system-ui,-apple-system,sans-serif">
+<div style="max-width:1100px;margin:0 auto;padding:60px 24px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
   <h1 style="font-size:40px;font-weight:900;color:#0f172a;margin-bottom:8px">Cleaning Cost Guides</h1>
   <p style="font-size:18px;color:#64748b;margin-bottom:40px">Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px">
@@ -342,7 +425,13 @@ function renderCategoryPage(cat, posts, assets) {
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}/blog/category/${cat.id}">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:title" content="${esc(seoTitle)}">
   <meta property="og:description" content="${esc(seoDesc)}">
   <meta property="og:url" content="${DOMAIN}/blog/category/${cat.id}">
@@ -359,7 +448,7 @@ function renderCategoryPage(cat, posts, assets) {
 <body>
 <div id="root">
 ${staticHeader()}
-<div style="background:#f8fafc;min-height:100vh;padding:48px 24px 64px;font-family:system-ui,-apple-system,sans-serif">
+<div style="background:#f8fafc;min-height:100vh;padding:48px 24px 64px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
   <div style="max-width:900px;margin:0 auto">
     <a href="/blog" style="font-size:13px;color:#64748b;text-decoration:none;display:inline-block;margin-bottom:28px">&#8592; All Guides</a>
     <h1 style="font-size:clamp(24px,4vw,34px);font-weight:800;color:#0f172a;margin-bottom:8px">${esc(cat.label)}</h1>
@@ -383,7 +472,7 @@ ${staticFooter()}
 
 function staticFooter() {
   return `<footer style="background:#0f172a;color:#94a3b8">
-  <div style="max-width:1200px;margin:0 auto;padding:64px 24px 40px;font-family:system-ui,-apple-system,sans-serif">
+  <div style="max-width:1200px;margin:0 auto;padding:64px 24px 40px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:40px;margin-bottom:48px">
       <div>
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Blog Categories</div>
@@ -395,13 +484,21 @@ function staticFooter() {
       </div>
       <div>
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Resources</div>
+        <a href="/cleaning-cost-calculator" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Cleaning Cost Calculator</a>
+        <a href="/cleaning-cost-estimator" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Cleaning Cost Estimator</a>
+        <a href="/how-we-calculate-prices" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">How We Calculate Prices</a>
         <a href="/about" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">About Clean Estimator</a>
         <a href="/contact" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Contact</a>
       </div>
       <div>
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">For Companies</div>
-        <a href="/for-companies" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Embed the Calculator</a>
+        <a href="/estimator" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Embed the Calculator</a>
         <a href="/company" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Company Login</a>
+      </div>
+      <div>
+        <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Local Partner Program</div>
+        <a href="/partner-with-us" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Become a Partner</a>
+        <a href="/client" style="display:block;color:#94a3b8;text-decoration:none;font-size:14px;margin-bottom:10px">Partner Login</a>
       </div>
       <div>
         <div style="color:white;font-weight:700;font-size:14px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Legal</div>
@@ -417,7 +514,7 @@ function staticFooter() {
       <div style="font-size:13px;color:#64748b">&copy; ${new Date().getFullYear()} Clean Estimator. All rights reserved.</div>
     </div>
   </div>
-  <div style="max-width:1200px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:#475569;line-height:1.7;font-family:system-ui,-apple-system,sans-serif">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px 40px;font-size:12px;color:#475569;line-height:1.7;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
     <strong style="color:#64748b">Disclaimer:</strong> All price estimates provided by Clean Estimator are for informational purposes only.
     Actual cleaning service costs vary based on local market conditions, specific service requirements, company pricing policies,
     and other factors. Always get multiple quotes from licensed, insured cleaning professionals in your area.
@@ -428,7 +525,7 @@ function staticFooter() {
 
 // ─── 8c. Standalone static page renderers (About / Contact / Legal / For-Companies) ─
 
-function renderStaticPage({ path: urlPath, seoTitle, seoDesc, bodyHtml, maxWidth = 760, assets }) {
+function renderStaticPage({ path: urlPath, seoTitle, seoDesc, bodyHtml, maxWidth = 760, assets, extraHead = '' }) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -439,7 +536,13 @@ function renderStaticPage({ path: urlPath, seoTitle, seoDesc, bodyHtml, maxWidth
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="${DOMAIN}${urlPath}">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:site_name" content="Clean Estimator">
   <meta property="og:title" content="${esc(seoTitle)}">
   <meta property="og:description" content="${esc(seoDesc)}">
@@ -450,10 +553,11 @@ function renderStaticPage({ path: urlPath, seoTitle, seoDesc, bodyHtml, maxWidth
   <meta name="twitter:title" content="${esc(seoTitle)}">
   <meta name="twitter:description" content="${esc(seoDesc)}">
   <meta name="twitter:image" content="${DOMAIN}/og-image.svg">
+  ${extraHead}
   ${assets.cssLinks}
 </head>
 <body>
-<div id="root">${staticHeader()}<div style="max-width:${maxWidth}px;margin:0 auto;padding:60px 24px;font-family:system-ui,-apple-system,sans-serif">
+<div id="root">${staticHeader()}<div style="max-width:${maxWidth}px;margin:0 auto;padding:60px 24px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
 ${bodyHtml}
 </div>${staticFooter()}</div>
   ${assets.jsScripts}
@@ -482,6 +586,216 @@ function renderAbout(assets) {
     <a href="/contact" style="background:${PRIMARY};color:white;padding:13px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px">Contact Us</a>
   </div>`;
   return renderStaticPage({ path: '/about', seoTitle, seoDesc, bodyHtml: body, assets });
+}
+
+function renderCalculatorPage(assets) {
+  const seoTitle = 'Cleaning Cost Calculator - Free Instant Estimate (2026)';
+  const seoDesc = 'Free cleaning cost calculator with ZIP-code accurate pricing. Instantly estimate house cleaning, carpet cleaning, commercial cleaning, mold remediation, and more. No signup required.';
+
+  const whyPoints = [
+    ['ZIP-Code Accurate', 'Every price this cleaning cost calculator returns is adjusted for your local labor rates and cost of living, not a flat national guess.'],
+    ['Instant Results', "Answer a few quick questions and get your estimate in under 60 seconds — no waiting for a callback from a cleaning company."],
+    ['9 Service Types Covered', 'From standard house cleaning to mold remediation and water damage restoration, this calculator covers the full range of cleaning and restoration services.'],
+    ['100% Free, No Signup', 'Use the cleaning cost calculator as many times as you want. No account, no credit card, and no obligation to book.'],
+  ];
+
+  const calcFaqs = [
+    { q: 'Is this cleaning cost calculator really free?', a: 'Yes. Our cleaning cost calculator is completely free to use, with no signup, no account, and no hidden fees. You can run as many estimates as you need.' },
+    { q: 'How accurate is the cleaning cost calculator?', a: 'The calculator uses real market pricing data with state-by-state cost-of-living adjustments, so your estimate reflects typical local pricing. Final prices from an actual cleaning company can vary based on the specific condition of your home and other in-person factors, so treat the result as a reliable starting range rather than a binding quote.' },
+    { q: 'What information do I need to use the cleaning cost calculator?', a: 'Just your ZIP code, the type of cleaning service you need, and a few basic details about your space (like square footage or number of rooms). No email or phone number is required to see your price range.' },
+    { q: 'Does the cleaning cost calculator work for businesses too?', a: 'Yes. In addition to house and apartment cleaning, the calculator includes commercial cleaning, carpet cleaning, air duct cleaning, dryer vent cleaning, tile & grout cleaning, mold remediation, and water damage restoration — for both residential and commercial properties.' },
+    { q: 'Can I embed this cleaning cost calculator on my own website?', a: 'Yes — cleaning companies can embed a white-labeled version of this calculator on their own site to capture leads with accurate, localized estimates. Visit our estimator page for details.' },
+  ];
+
+  const body = `  <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:14px;text-align:center">Cleaning Cost Calculator</h1>
+  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">This free cleaning cost calculator gives you an instant, ZIP-code specific price for house cleaning, carpet cleaning, commercial cleaning, and 6 other services. Built as a standalone cleaning calculator you can bookmark and reuse — no signup, no phone calls, just enter your details and get a real cleaning estimator price range in under 60 seconds.</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:32px;margin-bottom:40px;text-align:center">
+    <p style="font-size:14px;color:#94a3b8;margin:0">Loading your free cleaning cost calculator&hellip; please enable JavaScript to use the interactive calculator.</p>
+  </div>
+  <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:20px;text-align:center">Why Use This Cleaning Cost Calculator</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:40px">
+    ${whyPoints.map(([t, txt]) => `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:22px 24px">
+      <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px">${esc(t)}</h3>
+      <p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">${esc(txt)}</p>
+    </div>`).join('\n    ')}
+  </div>
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:32px 36px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:16px">Cleaning Cost Calculator FAQs</h2>
+    ${faqAccordionHtml(calcFaqs)}
+  </div>
+  <div style="margin-top:40px;text-align:center">
+    <p style="font-size:14px;color:#64748b">Want cost breakdowns by state or service instead? Browse our <a href="/blog" style="color:${PRIMARY};font-weight:600">cleaning cost guides</a>.</p>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'Cleaning Cost Calculator', item: `${DOMAIN}/cleaning-cost-calculator` },
+  ]);
+  const webAppSchema = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Cleaning Cost Calculator',
+    url: `${DOMAIN}/cleaning-cost-calculator`,
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    description: seoDesc,
+  });
+
+  return renderStaticPage({
+    path: '/cleaning-cost-calculator',
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 900,
+    assets,
+    extraHead: `<script type="application/ld+json">${webAppSchema}</script><script type="application/ld+json">${breadcrumb}</script><script type="application/ld+json">${faqSchema(calcFaqs)}</script>`,
+  });
+}
+
+function renderEstimatorPage(assets) {
+  const seoTitle = 'Cleaning Cost Estimator - Free Instant Estimate (2026)';
+  const seoDesc = 'Free cleaning cost estimator with ZIP-code accurate pricing. Instantly estimate house cleaning, carpet cleaning, commercial cleaning, mold remediation, and more. No signup required.';
+
+  const whyPoints = [
+    ['Real Market Pricing', 'This cleaning cost estimator pulls from actual state-by-state pricing data, not a generic industry average.'],
+    ['Covers Every Room & Service', 'Estimate house cleaning, apartment cleaning, commercial spaces, carpets, air ducts, dryer vents, tile & grout, mold remediation, and water damage restoration.'],
+    ['No Waiting on Quotes', 'Skip the back-and-forth with cleaning companies — get your price estimate the moment you finish answering a few questions.'],
+    ['Always Free', "There's no cost to use this estimator, no account required, and no limit on how many times you can run it."],
+  ];
+
+  const estimatorFaqs = [
+    { q: 'What is a cleaning cost estimator?', a: 'A cleaning cost estimator is a tool that calculates an expected price range for a cleaning service based on inputs like your location, home size, and service type — instead of requiring an in-person quote.' },
+    { q: 'How is a cleaning cost estimator different from a fixed price?', a: 'An estimator gives you a realistic price range based on typical market rates in your area. The exact price a cleaning company charges can vary slightly based on the specific condition of your space and their own pricing policies.' },
+    { q: 'Can I use this cleaning cost estimator for commercial properties?', a: 'Yes — select Commercial Cleaning as your service type and enter your square footage to get an estimate for offices, retail spaces, or warehouses.' },
+    { q: 'Is my information saved when I use the estimator?', a: "No. Your estimate is calculated instantly and isn't stored unless you choose to submit your contact information at the end." },
+    { q: 'How often should I re-check my cleaning cost estimate?', a: "Cleaning prices can shift with inflation and local labor rates, so it's worth re-running your estimate once or twice a year, especially before renewing a recurring cleaning contract." },
+  ];
+
+  const body = `  <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:14px;text-align:center">Cleaning Cost Estimator</h1>
+  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and 6 other services &mdash; enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation.</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:32px;margin-bottom:40px;text-align:center">
+    <p style="font-size:14px;color:#94a3b8;margin:0">Loading your free cleaning cost estimator&hellip; please enable JavaScript to use the interactive calculator.</p>
+  </div>
+  <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:20px;text-align:center">Why Use This Cleaning Cost Estimator</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:40px">
+    ${whyPoints.map(([t, txt]) => `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:22px 24px">
+      <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px">${esc(t)}</h3>
+      <p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">${esc(txt)}</p>
+    </div>`).join('\n    ')}
+  </div>
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:32px 36px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:16px">Cleaning Cost Estimator FAQs</h2>
+    ${faqAccordionHtml(estimatorFaqs)}
+  </div>
+  <div style="margin-top:40px;text-align:center">
+    <p style="font-size:14px;color:#64748b">Want cost breakdowns by state or service instead? Browse our <a href="/blog" style="color:${PRIMARY};font-weight:600">cleaning cost guides</a>.</p>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'Cleaning Cost Estimator', item: `${DOMAIN}/cleaning-cost-estimator` },
+  ]);
+  const webAppSchema = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Cleaning Cost Estimator',
+    url: `${DOMAIN}/cleaning-cost-estimator`,
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    description: seoDesc,
+  });
+
+  return renderStaticPage({
+    path: '/cleaning-cost-estimator',
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 900,
+    assets,
+    extraHead: `<script type="application/ld+json">${webAppSchema}</script><script type="application/ld+json">${breadcrumb}</script><script type="application/ld+json">${faqSchema(estimatorFaqs)}</script>`,
+  });
+}
+
+function renderMethodologyPage(assets) {
+  const seoTitle = 'How We Calculate Cleaning Prices | Clean Estimator';
+  const seoDesc = "See exactly how Clean Estimator builds its pricing: base rate research, state cost-of-living adjustments, city pricing methodology, and the external sources we cite. Full transparency on where our numbers come from.";
+
+  const sections = [
+    ['Our Base Pricing', "Every price tier in our calculator — for house cleaning, carpet cleaning, commercial cleaning, and every other service — starts from aggregated market research across residential and commercial cleaning providers nationwide: published rate surveys, provider pricing pages, and industry cost data. We don't invent a number and work backward; we build each tier from what providers are actually charging, then keep it current as the market shifts. Below, we show exactly how our numbers stack up against published guides from Angi, HomeAdvisor, and other industry sources."],
+    ['State Cost-of-Living Adjustments', "The same house cleaning job costs more in California than in Arkansas, and our numbers reflect that. Each state carries a multiplier — California sits around 1.40&times; the national baseline, Arkansas around 0.80&times; — built from regional labor cost and cost-of-living differences. That multiplier is applied directly to the national base price for whichever service you're pricing, not estimated separately per state."],
+    ['City and ZIP Code Pricing', "For city-level pages, we intentionally reuse the parent state's pricing data rather than inventing separate city-specific numbers. Reliable, verifiable cost data doesn't exist at neighborhood granularity for most markets — and we'd rather show you a number we can stand behind than a more precise-looking one we made up. If that changes for a given metro area, we'll update it."],
+    ['How Service Type Changes Your Price', "Deep cleans, move-in/move-out cleans, recurring-service discounts, and add-ons (inside oven, interior windows, and similar) are all priced as a percentage adjustment off the base tier, derived from how cleaning companies actually structure their own rate cards — for example, deep cleaning consistently runs 68-85% above a standard clean across the providers we've reviewed, so that's the range we show."],
+  ];
+
+  const crossChecks = [
+    ['House Cleaning (1,500–2,000 sq ft)', '$158–$198', '$118–$238, avg ~$176', [['Angi', 'https://www.angi.com/articles/how-much-does-it-cost-hire-house-cleaner.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/hire-a-maid-service']]],
+    ['Carpet Cleaning (per room)', '$44–$100', '$25–$125 per room', [['Angi', 'https://www.angi.com/articles/how-much-does-carpet-cleaning-cost.htm'], ['HomeGuide', 'https://homeguide.com/costs/carpet-cleaning-prices']]],
+    ['Office Cleaning (per sq ft, per visit)', '$0.088–$0.107', '$0.07–$0.20', [['Housecall Pro', 'https://www.housecallpro.com/resources/how-to-price-commercial-cleaning-jobs/']]],
+    ['Air Duct Cleaning (base system)', '$330–$420', '$268–$509, avg ~$379–$389', [['Angi', 'https://www.angi.com/articles/how-much-does-air-duct-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-ducts-and-vents']]],
+    ['Mold Remediation (10–100 sq ft)', '$1,950–$2,700', '~$1,000–$2,500 for 100 sq ft, avg $2,368', [['Angi', 'https://www.angi.com/articles/how-much-does-mold-remediation-service-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/environmental-safety/remove-mold-and-toxic-materials/']]],
+    ['Dryer Vent Cleaning', '$105–$253', '$104–$250+ depending on vent length', [['Angi', 'https://www.angi.com/articles/how-much-does-dryer-vent-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-dryer-vents/']]],
+  ];
+
+  const crossCheckTable = `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 14px">We don't just claim our numbers are researched — here's where they land next to current, publicly published cost guides from Angi, HomeAdvisor, HomeGuide, and Housecall Pro (checked August 2026). We're not claiming these sites as our original data source; this is an independent cross-check showing our ranges are in the same ballpark as what's publicly reported elsewhere.</p>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13.5px">
+      <thead><tr style="background:#f8fafc">
+        <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e2e8f0;font-weight:700;color:#374151">Service</th>
+        <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e2e8f0;font-weight:700;color:#374151">Our Estimate</th>
+        <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e2e8f0;font-weight:700;color:#374151">Published Range</th>
+        <th style="text-align:left;padding:8px 10px;border-bottom:2px solid #e2e8f0;font-weight:700;color:#374151">Source</th>
+      </tr></thead>
+      <tbody>
+        ${crossChecks.map(([service, ours, published, sources]) => `<tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:8px 10px;color:#0f172a">${esc(service)}</td>
+          <td style="padding:8px 10px;color:${PRIMARY};font-weight:700;white-space:nowrap">${ours}</td>
+          <td style="padding:8px 10px;color:#475569;white-space:nowrap">${esc(published)}</td>
+          <td style="padding:8px 10px;color:#475569">${sources.map(([name, href]) => `<a href="${href}" target="_blank" rel="noopener noreferrer" style="color:${PRIMARY};text-decoration:none;font-weight:600">${esc(name)}</a>`).join(', ')}</td>
+        </tr>`).join('\n        ')}
+      </tbody>
+    </table></div>`;
+
+  const citations = [
+    ['https://www.epa.gov', 'U.S. Environmental Protection Agency (EPA)', 'Air duct cleaning frequency guidance, and EPA-registered disinfectant lists (List N, List K) referenced in our medical and healthcare cleaning content.'],
+    ['https://www.usfa.fema.gov', 'U.S. Fire Administration', 'Dryer vent fire statistics cited in our dryer vent cleaning guides.'],
+    ['https://www.iicrc.org', 'IICRC (Institute of Inspection, Cleaning and Restoration Certification)', 'Recommended carpet cleaning frequency and industry certification standards referenced across our carpet and restoration content.'],
+    ['https://www.osha.gov', 'OSHA (Occupational Safety and Health Administration)', 'Bloodborne Pathogen Standard and workplace safety requirements referenced in our medical and healthcare facility cleaning content.'],
+  ];
+
+  const sectionCard = (title, inner) => `<div style="background:white;border-radius:16px;padding:26px 28px;border:1px solid #e2e8f0;margin-bottom:20px">
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:8px">${esc(title)}</h2>
+      ${inner}
+    </div>`;
+
+  const body = `  <h1 style="font-size:40px;font-weight:900;color:#0f172a;margin-bottom:12px">How We Calculate Cleaning Prices</h1>
+  <p style="font-size:18px;color:#64748b;margin-bottom:40px;line-height:1.7">Every estimate on Clean Estimator comes from a real methodology, not a guess. Here's exactly how the numbers behind the calculator — and every cost guide on this site — actually get built.</p>
+  ${sectionCard(sections[0][0], `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">${sections[0][1]}</p>`)}
+  ${sectionCard('How Our Numbers Compare to Published Industry Guides', crossCheckTable)}
+  ${sections.slice(1).map(([t, txt]) => sectionCard(t, `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">${txt}</p>`)).join('\n  ')}
+  ${sectionCard('External Sources We Reference', `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 10px">Where our content relies on safety guidance, industry standards, or regulatory requirements rather than our own pricing data, we cite the source directly:</p>
+    ${citations.map(([href, name, use]) => `<div style="font-size:14px;color:#475569;line-height:1.6;padding-left:14px;border-left:2px solid #e2e8f0;margin-bottom:10px"><a href="${href}" target="_blank" rel="noopener noreferrer" style="color:${PRIMARY};font-weight:700;text-decoration:none">${esc(name)}</a> &mdash; ${esc(use)}</div>`).join('\n    ')}`)}
+  ${sectionCard("What Our Estimates Are — and Aren't", `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">Every number on Clean Estimator is a starting point, not a quote. Actual pricing depends on the specific condition of a property, local competition, and each company's own pricing — factors that are only ever fully visible in person. Use our numbers to negotiate confidently and spot outliers, then always get multiple quotes from licensed, insured professionals before booking.</p>`)}
+  ${sectionCard('How Often We Update Pricing', `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0">We review and adjust our pricing models as national and regional market conditions change, rather than on a fixed calendar schedule. If you ever see a number that looks out of step with what you're being quoted locally, we want to know — <a href="/contact" style="color:${PRIMARY};font-weight:600">contact us</a> and we'll take a look.</p>`)}
+  <div style="margin-top:24px;background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:32px 36px;text-align:center">
+    <h2 style="font-size:22px;font-weight:800;color:white;margin-bottom:10px">See the Methodology in Action</h2>
+    <p style="color:#94a3b8;margin-bottom:20px;font-size:15px">Run a real, ZIP-code accurate estimate using the pricing engine described above.</p>
+    <a href="/cleaning-cost-calculator" style="background:${PRIMARY};color:white;padding:13px 30px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block">Try the Calculator &rarr;</a>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'How We Calculate Prices', item: `${DOMAIN}/how-we-calculate-prices` },
+  ]);
+
+  return renderStaticPage({
+    path: '/how-we-calculate-prices',
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    assets,
+    extraHead: `<script type="application/ld+json">${breadcrumb}</script>`,
+  });
 }
 
 function renderContact(assets) {
@@ -532,21 +846,394 @@ function renderLegalPage(kind, assets) {
   return renderStaticPage({ path: isPrivacy ? '/privacy-policy' : '/terms-of-service', seoTitle, seoDesc, bodyHtml: body, assets });
 }
 
+// ─── 8d. Service & state cost page renderers ─────────────────────────────────
+
+function fmt(n) {
+  return `$${Math.round(n).toLocaleString('en-US')}`;
+}
+
+function faqAccordionHtml(faqs) {
+  return faqs.map(f => `
+    <div style="background:#fafafa;border:1px solid #f1f5f9;border-radius:10px;overflow:hidden;margin-bottom:10px">
+      <div style="padding:14px 18px;font-weight:700;font-size:14.5px;color:#0f172a">${esc(f.q)}</div>
+      <div style="padding:0 18px 16px"><p style="font-size:13.5px;color:#475569;line-height:1.7;margin:0">${esc(f.a)}</p></div>
+    </div>`).join('');
+}
+
+function serviceSchema(service, cost) {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.name,
+    description: service.metaDescription,
+    provider: { '@type': 'Organization', name: 'Clean Estimator', url: DOMAIN },
+    areaServed: 'United States',
+    offers: { '@type': 'AggregateOffer', priceCurrency: 'USD', lowPrice: String(cost.low), highPrice: String(cost.high) },
+  });
+}
+
+function faqSchema(faqs) {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  });
+}
+
+function breadcrumbSchema(items) {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, item: it.item })),
+  });
+}
+
+function unitSuffix(service) {
+  if (service.unitType === 'per_sqft') return '/sq ft';
+  if (service.unitType === 'per_room') return '/room';
+  return '';
+}
+
+// Per-sq-ft tier rates are often well under $1 (e.g. commercial: $0.052–$0.185/sq ft) —
+// rounding those to whole dollars collapses them all to "$0". Show cents for rates.
+function fmtTier(n, service) {
+  return service.unitType === 'per_sqft' ? `$${n.toFixed(2)}` : fmt(n);
+}
+
+function renderServicePage(service, statesMod, assets) {
+  const ICON_EMOJI = { home_residential: '🏠', apartment: '🏢', commercial: '🏬', carpet: '🧶', air_duct: '💨', dryer_vent: '🔥', tile_grout: '▦', mold_remediation: '⚠️', water_damage: '💧' };
+
+  const headlineTier = service.tiers[service.typicalTierIndex] || service.tiers[0];
+  const cost = service.unitType === 'flat'
+    ? { low: headlineTier.low, high: headlineTier.high }
+    : { low: Math.round(headlineTier.low * (service.typicalQuantity || 1) * (service.typicalVisitsPerMonth || 1)), high: Math.round(headlineTier.high * (service.typicalQuantity || 1) * (service.typicalVisitsPerMonth || 1)) };
+
+  const tierRows = service.tiers.map((tier, i) => `
+    <tr style="background:${i % 2 === 0 ? 'white' : '#fafafa'}">
+      <td style="padding:10px 14px;color:#0f172a;font-weight:600;border-bottom:1px solid #f1f5f9">${esc(tier.label)}</td>
+      <td style="padding:10px 14px;color:${PRIMARY};font-weight:700;border-bottom:1px solid #f1f5f9;white-space:nowrap">${fmtTier(tier.low, service)}&ndash;${fmtTier(tier.high, service)}<span style="color:#94a3b8;font-weight:500;font-size:12px">${unitSuffix(service)}</span></td>
+      <td style="padding:10px 14px;color:#475569;border-bottom:1px solid #f1f5f9">${esc(tier.note)}</td>
+    </tr>`).join('');
+
+  const bulletsHtml = service.bullets.map(b => `<li style="display:flex;gap:8px;font-size:14.5px;color:#374151;line-height:1.7;margin-bottom:10px">${checkIconSvg()}${esc(b)}</li>`).join('');
+
+  const qty = service.unitType === 'flat' ? 1 : (service.typicalQuantity || 1) * (service.typicalVisitsPerMonth || 1);
+  const featured = statesMod.getFeaturedStates();
+  const stateRows = featured.map(state => {
+    const range = statesMod.adjustForState(headlineTier.low * qty, headlineTier.high * qty, state);
+    return `<a href="/cleaning-cost/${state.slug}" style="text-decoration:none"><div style="border:1px solid #f1f5f9;background:#fafafa;border-radius:8px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:13px;font-weight:600;color:#0f172a">${esc(state.name)}</span><span style="font-size:12.5px;font-weight:700;color:${PRIMARY};white-space:nowrap">${fmt(range.low)}&ndash;${fmt(range.high)}</span></div></a>`;
+  }).join('');
+
+  const related = (service.relatedSlugs || []).slice(0, 3);
+  const relatedHtml = related.map(slug => `<a href="/cleaning-services/${slug}" style="text-decoration:none"><div style="background:white;border-radius:10px;border:1px solid #e2e8f0;padding:16px 18px"><div style="font-size:14px;font-weight:700;color:#0f172a;margin-bottom:6px">${esc(slug)}</div><span style="font-size:12.5px;color:${PRIMARY};font-weight:600">See pricing &rarr;</span></div></a>`).join('');
+
+  const unitNote = service.unitType === 'flat' ? 'typical job cost' : service.unitType === 'per_room' ? `for a ${service.typicalQuantity}-room home` : service.id === 'commercial' ? `for a ${service.typicalQuantity.toLocaleString()} sq ft office, weekly` : `for ${service.typicalQuantity.toLocaleString()} sq ft`;
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:24px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">${esc(service.name)}</span>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <div style="width:44px;height:44px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:20px">${ICON_EMOJI[service.id] || '🏠'}</div>
+    <h1 style="font-size:clamp(24px,4vw,32px);font-weight:800;color:#0f172a;line-height:1.25;margin-bottom:10px">${esc(service.name)} Cost 2026</h1>
+    <p style="font-size:15.5px;color:#64748b;line-height:1.7;margin-bottom:20px">${esc(service.tagline)} <a href="/${service.slug}-calculator" style="color:${PRIMARY};font-weight:600">Try our dedicated ${esc(service.name)} Calculator &rarr;</a></p>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <span style="font-size:30px;font-weight:800;color:${PRIMARY}">${fmt(cost.low)} &ndash; ${fmt(cost.high)}</span>
+      <span style="font-size:13px;color:#94a3b8">${esc(unitNote)}</span>
+    </div>
+  </div>
+  ${service.disclaimer ? `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:13px 16px;margin-bottom:24px;display:flex;gap:10px">
+    <span style="flex-shrink:0;margin-top:1px">&#9888;&#65039;</span>
+    <div><div style="font-weight:700;color:#991b1b;margin-bottom:3px;font-size:13px">Important</div><p style="font-size:13px;color:#7f1d1d;line-height:1.6;margin:0">${esc(service.disclaimer)}</p></div>
+  </div>` : ''}
+  <div style="background:linear-gradient(135deg,${PRIMARY},#1d4ed8);border-radius:12px;padding:18px 24px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="color:white"><div style="font-weight:700;font-size:15px">Get a ZIP-code accurate ${esc(service.name.toLowerCase())} estimate</div><div style="font-size:13px;opacity:0.9">Free &middot; No signup &middot; 60 seconds</div></div>
+    <a href="/?service=${service.id}" style="background:white;color:${PRIMARY};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap">Calculate Now &rarr;</a>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:6px">Pricing by Tier</h2>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">National average pricing &mdash; ${esc(service.unit)}. <a href="/how-we-calculate-prices" style="color:${PRIMARY};font-weight:600">See how we calculate these prices &rarr;</a></p>
+    <div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Tier</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Price</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Notes</th></tr></thead>
+      <tbody>${tierRows}</tbody>
+    </table></div>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">What to Know</h2>
+    <ul style="list-style:none;padding:0;margin:0">${bulletsHtml}</ul>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">${esc(service.name)} Cost by State</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${stateRows}</div>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">FAQs</h2>
+    ${faqAccordionHtml(service.faqs)}
+  </div>
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:24px 28px;margin-bottom:32px;text-align:center">
+    <div style="font-weight:800;font-size:18px;color:#0f172a;margin-bottom:6px">Ready to get an accurate estimate?</div>
+    <p style="font-size:14px;color:#64748b;margin-bottom:16px">Use our free calculator for a ZIP-code accurate ${esc(service.name.toLowerCase())} estimate in under 60 seconds.</p>
+    <a href="/?service=${service.id}" style="background:${PRIMARY};color:white;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Get My Free Estimate &rarr;</a>
+  </div>
+  ${related.length ? `<div><div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Related Services</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">${relatedHtml}</div></div>` : ''}`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'Cleaning Services', item: `${DOMAIN}/#services` },
+    { name: service.name, item: `${DOMAIN}/cleaning-services/${service.slug}` },
+  ]);
+
+  return renderStaticPage({
+    path: `/cleaning-services/${service.slug}`,
+    seoTitle: service.seoTitle,
+    seoDesc: service.metaDescription,
+    bodyHtml: body,
+    maxWidth: 780,
+    assets,
+    extraHead: `<script type="application/ld+json">${serviceSchema(service, cost)}</script><script type="application/ld+json">${faqSchema(service.faqs)}</script><script type="application/ld+json">${breadcrumb}</script>`,
+  });
+}
+
+// Derives /{service.slug}-calculator (all service slugs already end in
+// "-cost", so this reads naturally as "[service] cost calculator") --
+// must match calculatorSlugFor() in ServiceCalculatorPage.js exactly, since
+// this is the static-HTML mirror of that React page.
+function calculatorSlugFor(service) {
+  return `${service.slug}-calculator`;
+}
+
+function renderServiceCalculatorPage(service, servicesMod, assets) {
+  const pageSlug = calculatorSlugFor(service);
+  const title = `${service.name} Cost Calculator - Free Instant Estimate (2026)`;
+  const description = `Free ${service.name.toLowerCase()} cost calculator with ZIP-code accurate pricing. ${service.tagline}`;
+  const related = servicesMod.getRelatedServices(service);
+
+  const bulletsHtml = service.bullets.map(b => `<div style="display:flex;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:10px">${checkIconSvg()}<span style="font-size:13.5px;color:#374151;line-height:1.6">${esc(b)}</span></div>`).join('');
+
+  const relatedHtml = related.length ? `<p style="font-size:13.5px;color:#94a3b8;margin-top:14px">Other calculators: ${related.map(r => `<a href="/${calculatorSlugFor(r)}" style="color:${PRIMARY};font-weight:600">${esc(r.name)}</a>`).join(' &middot; ')}</p>` : '';
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:20px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">${esc(service.name)} Cost Calculator</span>
+  </div>
+  <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:14px;text-align:center">${esc(service.name)} Cost Calculator</h1>
+  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">Get an instant, ZIP-code accurate ${esc(service.name.toLowerCase())} estimate &mdash; enter a few details and see a real price range in under 60 seconds. ${esc(service.tagline)}</p>
+  <div style="max-width:720px;margin:0 auto 40px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:32px;text-align:center">
+    <p style="font-size:14px;color:#94a3b8;margin:0">Loading your free ${esc(service.name.toLowerCase())} cost calculator&hellip; please enable JavaScript to use the interactive calculator.</p>
+  </div>
+  <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:20px;text-align:center">What Affects Your ${esc(service.name)} Price</h2>
+  <div style="max-width:720px;margin:0 auto 40px">${bulletsHtml}</div>
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:32px 36px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:16px">${esc(service.name)} Cost Calculator FAQs</h2>
+    ${faqAccordionHtml(service.faqs)}
+  </div>
+  <div style="margin-top:40px;text-align:center">
+    <p style="font-size:14px;color:#64748b;margin-bottom:14px">Want the full price breakdown by tier? See our <a href="/cleaning-services/${service.slug}" style="color:${PRIMARY};font-weight:600">complete ${esc(service.name.toLowerCase())} cost guide</a>.</p>
+    ${relatedHtml}
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: `${service.name} Cost Calculator`, item: `${DOMAIN}/${pageSlug}` },
+  ]);
+  const webAppSchema = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: `${service.name} Cost Calculator`,
+    url: `${DOMAIN}/${pageSlug}`,
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    description,
+  });
+
+  return renderStaticPage({
+    path: `/${pageSlug}`,
+    seoTitle: title,
+    seoDesc: description,
+    bodyHtml: body,
+    maxWidth: 900,
+    assets,
+    extraHead: `<script type="application/ld+json">${webAppSchema}</script><script type="application/ld+json">${breadcrumb}</script><script type="application/ld+json">${faqSchema(service.faqs)}</script>`,
+  });
+}
+
+function renderStatePage(state, servicesMod, statesMod, faqsMod, assets, citiesMod) {
+  const otherStates = statesMod.getAllStates().filter(s => s.slug !== state.slug);
+  const cities = citiesMod.getCitiesByState(state.slug);
+  const faqs = faqsMod.getAllFaqs().slice(0, 5);
+  const pctVsNational = Math.round((state.multiplier - 1) * 100);
+  const TIER_COPY = {
+    high: `Cleaning service costs in ${state.name} run above the national average, driven by higher labor rates and cost of living.`,
+    low: `Cleaning service costs in ${state.name} run below the national average, making it a comparatively affordable market for cleaning services.`,
+    average: `Cleaning service costs in ${state.name} are close to the national average.`,
+  };
+
+  const serviceRows = servicesMod.getAllServices().map((service, i) => {
+    const national = servicesMod.typicalCost(service);
+    const adjusted = statesMod.adjustForState(national.low, national.high, state);
+    return `<tr style="background:${i % 2 === 0 ? 'white' : '#fafafa'}">
+      <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9"><a href="/cleaning-services/${service.slug}" style="color:#0f172a;font-weight:600;text-decoration:none">${esc(service.name)}</a></td>
+      <td style="padding:10px 14px;color:${PRIMARY};font-weight:700;border-bottom:1px solid #f1f5f9;white-space:nowrap">${fmt(adjusted.low)}&ndash;${fmt(adjusted.high)}</td>
+    </tr>`;
+  }).join('');
+
+  const otherStatesHtml = otherStates.map(s => `<a href="/cleaning-cost/${s.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(s.name)}</a>`).join(' ');
+  const citiesInStateHtml = cities.map(c => `<a href="/cleaning-cost/city/${c.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(c.name)}</a>`).join(' ');
+
+  const seoTitle = `Cleaning Service Cost in ${state.name} (2026) | Average Prices & Estimates | Clean Estimator`;
+  const seoDesc = `See average cleaning service costs in ${state.name} for 2026: house cleaning, carpet, mold remediation, water damage, and more, adjusted for local labor rates. Get a free instant estimate.`;
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:24px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">Cleaning Cost in ${esc(state.name)}</span>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <div style="font-size:12px;font-weight:700;color:${PRIMARY};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">${esc(state.name)}</div>
+    <h1 style="font-size:clamp(24px,4vw,32px);font-weight:800;color:#0f172a;line-height:1.25;margin-bottom:10px">Cleaning Service Cost in ${esc(state.name)} (2026)</h1>
+    <p style="font-size:15.5px;color:#64748b;line-height:1.7;margin-bottom:20px">${esc(TIER_COPY[state.tier])}${pctVsNational !== 0 ? ` That's about ${Math.abs(pctVsNational)}% ${pctVsNational > 0 ? 'above' : 'below'} the national average.` : ''}</p>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <span style="font-size:30px;font-weight:800;color:${PRIMARY}">${fmt(state.low)} &ndash; ${fmt(state.high)}</span>
+      <span style="font-size:13px;color:#94a3b8">standard house cleaning, 2,000 sq ft home</span>
+    </div>
+  </div>
+  <div style="background:linear-gradient(135deg,${PRIMARY},#1d4ed8);border-radius:12px;padding:18px 24px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="color:white"><div style="font-weight:700;font-size:15px">Get a ZIP-code accurate estimate in ${esc(state.name)}</div><div style="font-size:13px;opacity:0.9">Free &middot; No signup &middot; 60 seconds</div></div>
+    <a href="/" style="background:white;color:${PRIMARY};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap">Calculate Now &rarr;</a>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:6px">Cost by Service in ${esc(state.name)}</h2>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">Estimated typical job cost, adjusted for ${esc(state.name)}'s labor rates. <a href="/how-we-calculate-prices" style="color:${PRIMARY};font-weight:600">See how we calculate these prices &rarr;</a></p>
+    <div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Service</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">${esc(state.name)} Estimate</th></tr></thead>
+      <tbody>${serviceRows}</tbody>
+    </table></div>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">FAQs</h2>
+    ${faqAccordionHtml(faqs)}
+  </div>
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:24px 28px;margin-bottom:32px;text-align:center">
+    <div style="font-weight:800;font-size:18px;color:#0f172a;margin-bottom:6px">Ready to get an accurate estimate?</div>
+    <p style="font-size:14px;color:#64748b;margin-bottom:16px">Use our free calculator for a ZIP-code accurate cleaning estimate in ${esc(state.name)} in under 60 seconds.</p>
+    <a href="/" style="background:${PRIMARY};color:white;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Get My Free Estimate &rarr;</a>
+  </div>
+  ${cities.length > 0 ? `<div style="margin-bottom:32px">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Cleaning Costs by City in ${esc(state.name)}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${citiesInStateHtml}</div>
+  </div>` : ''}
+  <div>
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Cleaning Costs in Other States</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${otherStatesHtml}</div>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: `Cleaning Cost in ${state.name}`, item: `${DOMAIN}/cleaning-cost/${state.slug}` },
+  ]);
+
+  return renderStaticPage({
+    path: `/cleaning-cost/${state.slug}`,
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 780,
+    assets,
+    extraHead: `<script type="application/ld+json">${faqSchema(faqs)}</script><script type="application/ld+json">${breadcrumb}</script>`,
+  });
+}
+
+function renderCityPage(city, servicesMod, citiesMod, faqsMod, assets) {
+  const otherCitiesInState = citiesMod.getCitiesByState(city.stateSlugRef).filter(c => c.slug !== city.slug);
+  const featuredCities = citiesMod.getFeaturedCities().filter(c => c.slug !== city.slug).slice(0, 8);
+  const faqs = faqsMod.getAllFaqs().slice(0, 5);
+  const pctVsNational = Math.round((city.multiplier - 1) * 100);
+  const TIER_COPY = {
+    high: `Cleaning service costs in ${city.name} run above the national average, in line with ${city.name}'s overall cost of living.`,
+    low: `Cleaning service costs in ${city.name} run below the national average, making it a comparatively affordable market for cleaning services.`,
+    average: `Cleaning service costs in ${city.name} are close to the national average.`,
+  };
+
+  const serviceRows = citiesMod.cityServicePrices(city).map(({ service, low, high }, i) => `<tr style="background:${i % 2 === 0 ? 'white' : '#fafafa'}">
+      <td style="padding:10px 14px;border-bottom:1px solid #f1f5f9"><a href="/cleaning-services/${service.slug}" style="color:#0f172a;font-weight:600;text-decoration:none">${esc(service.name)}</a></td>
+      <td style="padding:10px 14px;color:${PRIMARY};font-weight:700;border-bottom:1px solid #f1f5f9;white-space:nowrap">${fmt(low)}&ndash;${fmt(high)}</td>
+    </tr>`).join('');
+
+  const otherCitiesHtml = otherCitiesInState.map(c => `<a href="/cleaning-cost/city/${c.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(c.name)}</a>`).join(' ')
+    + ` <a href="/cleaning-cost/${city.stateSlugRef}" style="font-size:12.5px;color:${PRIMARY};font-weight:700;text-decoration:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:6px 12px">All of ${esc(city.stateName)} &rarr;</a>`;
+  const featuredCitiesHtml = featuredCities.map(c => `<a href="/cleaning-cost/city/${c.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(c.name)}, ${c.stateCode}</a>`).join(' ');
+
+  const seoTitle = `Cleaning Service Cost in ${city.name}, ${city.stateCode} (2026) | Clean Estimator`;
+  const seoDesc = `See average cleaning service costs in ${city.name}, ${city.stateName} for 2026: house cleaning, carpet, mold remediation, water damage, and more. Get a free instant estimate.`;
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:24px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <a href="/cleaning-cost/${city.stateSlugRef}" style="color:#64748b;text-decoration:none">${esc(city.stateName)}</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">${esc(city.name)}</span>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <div style="font-size:12px;font-weight:700;color:${PRIMARY};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">${esc(city.name)}, ${city.stateCode}</div>
+    <h1 style="font-size:clamp(24px,4vw,32px);font-weight:800;color:#0f172a;line-height:1.25;margin-bottom:10px">Cleaning Service Cost in ${esc(city.name)}, ${city.stateCode} (2026)</h1>
+    <p style="font-size:15.5px;color:#64748b;line-height:1.7;margin-bottom:20px">${esc(TIER_COPY[city.tier])}${pctVsNational !== 0 ? ` That's about ${Math.abs(pctVsNational)}% ${pctVsNational > 0 ? 'above' : 'below'} the national average, matching the broader ${esc(city.stateName)} market.` : ''}</p>
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <span style="font-size:30px;font-weight:800;color:${PRIMARY}">${fmt(city.low)} &ndash; ${fmt(city.high)}</span>
+      <span style="font-size:13px;color:#94a3b8">standard house cleaning, 2,000 sq ft home</span>
+    </div>
+  </div>
+  <div style="background:linear-gradient(135deg,${PRIMARY},#1d4ed8);border-radius:12px;padding:18px 24px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="color:white"><div style="font-weight:700;font-size:15px">Get a ZIP-code accurate estimate in ${esc(city.name)}</div><div style="font-size:13px;opacity:0.9">Free &middot; No signup &middot; 60 seconds</div></div>
+    <a href="/" style="background:white;color:${PRIMARY};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap">Calculate Now &rarr;</a>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:6px">Cost by Service in ${esc(city.name)}</h2>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:4px">Estimated typical job cost, adjusted for the ${esc(city.stateName)} market. <a href="/how-we-calculate-prices" style="color:${PRIMARY};font-weight:600">See how we calculate these prices &rarr;</a></p>
+    <div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">Service</th><th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;border-bottom:2px solid #e2e8f0">${esc(city.name)} Estimate</th></tr></thead>
+      <tbody>${serviceRows}</tbody>
+    </table></div>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">FAQs</h2>
+    ${faqAccordionHtml(faqs)}
+  </div>
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:24px 28px;margin-bottom:32px;text-align:center">
+    <div style="font-weight:800;font-size:18px;color:#0f172a;margin-bottom:6px">Ready to get an accurate estimate?</div>
+    <p style="font-size:14px;color:#64748b;margin-bottom:16px">Use our free calculator for a ZIP-code accurate cleaning estimate in ${esc(city.name)} in under 60 seconds.</p>
+    <a href="/" style="background:${PRIMARY};color:white;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Get My Free Estimate &rarr;</a>
+  </div>
+  ${otherCitiesInState.length ? `<div style="margin-bottom:32px">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">More Cities in ${esc(city.stateName)}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${otherCitiesHtml}</div>
+  </div>` : ''}
+  <div>
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Popular Cities</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${featuredCitiesHtml}</div>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: `Cleaning Cost in ${city.stateName}`, item: `${DOMAIN}/cleaning-cost/${city.stateSlugRef}` },
+    { name: `Cleaning Cost in ${city.name}`, item: `${DOMAIN}/cleaning-cost/city/${city.slug}` },
+  ]);
+
+  return renderStaticPage({
+    path: `/cleaning-cost/city/${city.slug}`,
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 780,
+    assets,
+    extraHead: `<script type="application/ld+json">${faqSchema(faqs)}</script><script type="application/ld+json">${breadcrumb}</script>`,
+  });
+}
+
 function renderForCompanies(assets) {
   const seoTitle = 'Embed a Cleaning Cost Calculator on Your Website | Clean Estimator for Companies';
   const seoDesc = 'Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 7-day free trial. $159/month.';
   const features = [
     ['White-label branding', 'Your logo, colors, and call-to-action text. Visitors never see the Clean Estimator name.'],
-    ['Lead capture built-in', 'Collect name, email, phone, and timeline from every visitor before they see the estimate.'],
+    ['Every lead is 100% yours', 'Name, email, phone, timeline, and the exact price they were quoted — stored permanently in your own dashboard. Never shared with other cleaners, never resold, never visible to anyone but you.'],
+    ['Instant lead alerts — zero setup', "The moment someone gets an estimate on your site, you get an email with their name, phone, and full price breakdown. No CRM, no Zapier, nothing to configure — it works the day you embed the widget."],
+    ['Every estimate email is branded as yours', "Visitors get a follow-up email carrying your logo, your phone number, and your call-to-action — not ours. Every completed estimate is another touchpoint with your business sitting in their inbox."],
     ['ZIP-code accurate pricing', 'State-specific pricing multipliers ensure your quotes reflect your local market.'],
     ['Per-service markup control', 'Adjust pricing up or down per service. Set your own minimum charges.'],
-    ['Easy one-line embed', 'Paste one line of HTML to add the calculator to any website, Wix, Squarespace, or WordPress.'],
-    ['API for CRM sync', 'Pull leads via REST API into HubSpot, Salesforce, or any CRM using Zapier or Make.'],
+    ['Easy to embed', 'Paste the embed code to add the calculator to any website, Wix, Squarespace, or WordPress.'],
+    ['API for CRM sync', 'Already have a CRM? Pull leads via REST API into HubSpot, Salesforce, or any tool using Zapier or Make — optional, on top of the email alerts you get by default.'],
   ];
   const steps = [
     ['1', 'Sign up', 'Create your account and start your 7-day free trial — credit card required.'],
     ['2', 'Customize your widget', 'Add your logo, set your brand colors, configure which services you offer, and write your CTA.'],
-    ['3', 'Embed on your site', "Copy one line of code and paste it anywhere on your website. That's it."],
+    ['3', 'Embed on your site', "Copy the embed code and paste it anywhere on your website. That's it."],
     ['4', 'Capture leads', 'Watch leads flow in. Manage them in your dashboard or sync to your CRM.'],
   ];
   const testimonials = [
@@ -554,12 +1241,12 @@ function renderForCompanies(assets) {
     ['James R.', 'Pro Restoration Group — Denver, CO', "The water damage and mold calculators are exactly what we needed. Customers come in already understanding the price range, so there's less sticker shock on-site."],
     ['Maria L.', 'Crystal Clean Commercial — Miami, FL', "Setup took about 20 minutes. The embed is seamless — my website visitors don't even realize it's a third-party tool."],
   ];
-  const planFeatures = ['Unlimited calculator sessions', 'White-label branding', 'Lead capture dashboard', 'API access', 'All 9 service calculators', 'CSV export', 'Priority support'];
+  const planFeatures = ['Unlimited calculator sessions', 'White-label branding', 'Every lead 100% yours, never shared', 'Instant email alerts on every lead', 'Branded follow-up emails to visitors', 'API access', 'All 9 service calculators', 'CSV export', 'Priority support'];
 
   const body = `<div style="background:linear-gradient(135deg,#0f172a,#1e293b);color:white;padding:64px 32px;border-radius:16px;text-align:center;margin-bottom:48px">
     <div style="display:inline-block;background:rgba(37,99,235,0.25);color:#93c5fd;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:22px;border:1px solid rgba(37,99,235,0.35)">For cleaning companies</div>
     <h1 style="font-size:clamp(28px,5vw,48px);font-weight:800;line-height:1.15;margin-bottom:18px">Add a Branded Cleaning Cost Calculator to Your Website</h1>
-    <p style="font-size:17px;color:#94a3b8;max-width:540px;margin:0 auto 32px;line-height:1.6">Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7.</p>
+    <p style="font-size:17px;color:#94a3b8;max-width:540px;margin:0 auto 32px;line-height:1.6">Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7 — and emails you the second someone's ready to book.</p>
     <a href="/company" style="background:${PRIMARY};color:white;padding:15px 30px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px">Start Free Trial &#8594;</a>
     <p style="color:#475569;font-size:13.5px;margin-top:14px">$159/mo after 7 days &middot; Cancel anytime</p>
   </div>
@@ -590,15 +1277,15 @@ function renderForCompanies(assets) {
     </div>`).join('\n    ')}
   </div>
 
-  <div id="pricing" style="background:linear-gradient(135deg,#f0f7ff,#f8fafc);border:1px solid #e2e8f0;border-radius:16px;padding:40px 32px;text-align:center;margin-bottom:48px">
-    <h2 style="font-size:22px;font-weight:700;color:#0f172a;margin-bottom:8px">Simple, transparent pricing</h2>
-    <p style="color:#64748b;font-size:13px;margin-bottom:20px">One plan. Everything included. No surprises.</p>
-    <div style="font-size:34px;font-weight:900;color:#0f172a">$159<span style="font-size:13px;color:#64748b;font-weight:600">/month</span></div>
-    <p style="color:#16a34a;font-weight:600;font-size:12px;margin-bottom:16px">$159/mo after 7 days &middot; Cancel anytime</p>
-    <ul style="list-style:none;padding:0;max-width:280px;margin:0 auto 20px;text-align:left">
-      ${planFeatures.map(f => `<li style="font-size:13px;color:#374151;margin-bottom:8px">&#10003; ${esc(f)}</li>`).join('\n      ')}
+  <div id="pricing" style="background:linear-gradient(135deg,#f0f7ff,#f8fafc);border:1.5px solid #1d4ed8;border-radius:16px;padding:40px 32px;text-align:center;margin-bottom:48px;max-width:420px;margin-left:auto;margin-right:auto">
+    <h2 style="font-size:32px;font-weight:700;color:#0f172a;margin-bottom:10px">Simple, transparent pricing</h2>
+    <p style="color:#64748b;font-size:16px;margin-bottom:28px">One plan. Everything included. No surprises.</p>
+    <div style="font-size:40px;font-weight:900;color:#0f172a">$159<span style="font-size:14px;color:#64748b;font-weight:600">/month</span></div>
+    <p style="color:#16a34a;font-weight:600;font-size:13px;margin-bottom:20px">$159/mo after your 30-day free trial &middot; No card required</p>
+    <ul style="list-style:none;padding:0;max-width:320px;margin:0 auto 22px;text-align:left">
+      ${planFeatures.map(f => `<li style="font-size:14px;color:#374151;margin-bottom:10px">&#10003; ${esc(f)}</li>`).join('\n      ')}
     </ul>
-    <a href="/company" style="display:inline-block;background:${PRIMARY};color:white;padding:11px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Start Free Trial &#8594;</a>
+    <a href="/company" style="display:inline-block;background:${PRIMARY};color:white;padding:13px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Start Free Trial &#8594;</a>
   </div>
 
   <div style="text-align:center">
@@ -607,7 +1294,7 @@ function renderForCompanies(assets) {
     <a href="/company" style="background:${PRIMARY};color:white;padding:14px 34px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px">Get Started Free &#8594;</a>
   </div>`;
 
-  return renderStaticPage({ path: '/for-companies', seoTitle, seoDesc, bodyHtml: body, maxWidth: 1100, assets });
+  return renderStaticPage({ path: '/estimator', seoTitle, seoDesc, bodyHtml: body, maxWidth: 1100, assets });
 }
 
 // ─── 9. Homepage injection ────────────────────────────────────────────────────
@@ -624,13 +1311,66 @@ function injectHomepage(posts, categories) {
     `<li style="margin-bottom:10px"><a href="/blog/${p.slug}" style="color:${PRIMARY};text-decoration:none;font-size:14px;font-weight:500;line-height:1.5">${esc(p.title)}</a></li>`
   ).join('\n      ');
 
+  // What the calculator actually asks for each service -- pulled directly
+  // from each step component's real form fields, mirroring the same data
+  // used in SEOContent.js's React "What Affects Your Price, by Service" grid.
+  const SERVICE_PRICE_FACTORS = [
+    ['House Cleaning', ['Home size — 7 tiers from under 1,000 sq ft to 4,000+ sq ft', 'Number of bedrooms and bathrooms', 'Cleaning type: standard, deep, move-in/move-out, or post-construction', 'Frequency: one-time, weekly, biweekly, or monthly', 'Home condition: good, fair, or neglected', 'Add-ons: inside oven/fridge/cabinets, laundry, interior windows, garage, patio, pet hair, finished basement']],
+    ['Apartment Cleaning', ['Unit size: studio up to 4+ bedrooms', 'Number of bathrooms', 'Cleaning type: standard, deep, or move-in/move-out', 'Frequency, and whether the unit is furnished or vacant (vacant runs 10–15% less)', 'Add-ons: inside oven/fridge/cabinets, laundry, interior windows, balcony/patio']],
+    ['Commercial Cleaning', ['Building type: office, retail, medical/dental, restaurant, warehouse, school, gym, or church', 'Square footage and number of restrooms', 'Cleaning frequency: daily, weekly, biweekly, or monthly', 'Service level: basic, standard, or premium', 'Optional day porter or after-hours service (+15%)']],
+    ['Carpet Cleaning', ['Room count or total square footage', 'Soil level: light, moderate, heavy, or pet stains/odors', 'Cleaning method: steam, dry cleaning, or encapsulation', 'Number of stairs', 'Add-ons: area rugs, Scotchgard protection, deodorizer, pet odor treatment']],
+    ['Air Duct Cleaning', ['Residential (vent count and HVAC system count) or commercial (square footage)', 'Add-ons: UV sanitizing, dryer vent bundle, coil cleaning, filter replacement', 'Suspected mold in the ductwork (+40–50%, requires inspection)']],
+    ['Dryer Vent Cleaning', ['Residential (vent length and routing) or commercial (number of dryers)', 'Vent length: short, medium, long, or very long', 'Routing: through wall, through roof, underground, or periscope/tight space', 'Suspected clog (+$50–$100), and bulk discounts for 10+ dryers']],
+    ['Tile & Grout Cleaning', ['Area size in square feet', 'Tile material: ceramic, porcelain, natural stone, travertine, or slate (natural stone costs 30–40% more)', 'Current condition, plus soap scum or hard water buildup', 'Services needed: deep clean, grout sealing, grout recoloring, caulk replacement']],
+    ['Mold Remediation', ['Affected area: under 10 sq ft up to 300+ sq ft', 'Locations affected: bathroom, basement, attic, crawl space, HVAC/ductwork, walls, kitchen, garage', 'Whether the moisture source has already been fixed', 'Residential or commercial property (+30–50%)', 'Optional air quality testing and post-remediation clearance testing']],
+    ['Water Damage Restoration', ['How long ago the damage occurred — urgency affects response', 'Cause: burst pipe, appliance leak, toilet overflow, roof leak, flooding, or sewage backup', 'Water category: clean, gray (+30%), or black water (+60–100%)', 'Affected square footage and which floors/areas are affected', 'Damage severity: wet carpets, soaked walls, or structural damage']],
+  ];
+  const serviceFactorCards = SERVICE_PRICE_FACTORS.map(([name, factors]) => `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px 20px">
+          <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">${esc(name)}</h3>
+          <ul style="margin:0;padding-left:18px;color:#475569;font-size:12.5px;line-height:1.7">
+            ${factors.map(f => `<li>${esc(f)}</li>`).join('\n            ')}
+          </ul>
+        </div>`).join('\n        ');
+
   const staticContent = `${staticHeader()}
-<div style="font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;min-height:80vh">
+<div style="font-family:'Poppins','Poppins Fallback',Arial,sans-serif;background:#f8fafc;min-height:80vh">
   <div style="max-width:1100px;margin:0 auto;padding:40px 24px 64px">
     <div style="text-align:center;padding:48px 24px 40px">
       <h1 style="font-size:clamp(28px,5vw,52px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:16px">Free Cleaning Cost Estimator 2026</h1>
       <p style="font-size:18px;color:#475569;max-width:560px;margin:0 auto 32px;line-height:1.6">Get instant, ZIP-code specific cleaning service prices for house cleaning, carpet cleaning, air duct cleaning, and more — 100% free.</p>
       <a href="/" style="background:${PRIMARY};color:white;padding:16px 36px;border-radius:10px;text-decoration:none;font-weight:700;font-size:17px;display:inline-block">Get My Free Estimate &#8594;</a>
+    </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px;text-align:center">
+      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:12px">Get a FREE Cleaning Cost Estimate Online</h2>
+      <p style="font-size:14.5px;color:#64748b;line-height:1.7;max-width:640px;margin:0 auto 12px">No phone calls, no waiting on a callback — just a real cleaning cost estimate online, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.</p>
+      <p style="font-size:14.5px;color:#64748b;line-height:1.7;max-width:640px;margin:0 auto 12px">It works the same way across all 9 services — house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, air duct cleaning, dryer vent cleaning, tile &amp; grout cleaning, mold remediation, and water damage restoration — each with its own scope questions, not a one-size-fits-all form.</p>
+      <p style="font-size:14.5px;color:#64748b;line-height:1.7;max-width:640px;margin:0 auto">It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.</p>
+    </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:14px;text-align:center">Average Cleaning Costs (2026)</h2>
+      <ul style="margin:0 0 32px;padding-left:20px;color:#374151;font-size:14.5px;line-height:1.9">
+        <li><strong>Standard House Cleaning:</strong> $90–$338 per visit depending on home size — $158–$198 is typical for the most common 1,500–2,000 sq ft home.</li>
+        <li><strong>Deep Cleaning:</strong> 68–85% more than a standard clean; move-in/move-out cleans run 88–105% more.</li>
+        <li><strong>Commercial Cleaning:</strong> $0.052–$0.185 per square foot per visit, depending on building type.</li>
+        <li><strong>Carpet Cleaning:</strong> $44–$100 per room, with a $90–$110 whole-home minimum.</li>
+        <li><strong>Mold Remediation:</strong> $750–$1,050 for a small spot under 10 sq ft, up to $8,500–$13,000+ for 300+ sq ft.</li>
+      </ul>
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">Key Pricing Factors</h2>
+      <p style="text-align:center;color:#64748b;font-size:13.5px;max-width:600px;margin:0 auto 14px;line-height:1.7">Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 9 services, not just house cleaning.</p>
+      <ul style="margin:0;padding-left:20px;color:#374151;font-size:14.5px;line-height:1.9">
+        <li><strong>Square Footage:</strong> Base price scales with home or space size — larger square footage means a higher price.</li>
+        <li><strong>Room Count:</strong> Extra bedrooms and bathrooms add roughly $15–$25 each on top of the base price.</li>
+        <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our 9 services asks its own scope questions. See the full breakdown by service below.</li>
+        <li><strong>Cleaning Frequency:</strong> Weekly service saves 20%, biweekly 15%, and monthly 10% off the one-time rate.</li>
+        <li><strong>Add-Ons:</strong> Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and similar extras are priced separately.</li>
+      </ul>
+    </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">What Affects Your Price, by Service</h2>
+      <p style="text-align:center;color:#64748b;font-size:13.5px;max-width:640px;margin:0 auto 20px;line-height:1.7">Every service on this cleaning cost estimator asks its own scope questions — not just square footage and ZIP code. Here's exactly what factors into each one.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+        ${serviceFactorCards}
+      </div>
     </div>
     <div id="how-it-works" style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
       <h2 style="font-size:24px;font-weight:800;color:#0f172a;margin-bottom:28px;text-align:center">How It Works</h2>
@@ -652,6 +1392,19 @@ function injectHomepage(posts, categories) {
         </div>
       </div>
     </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
+      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">How Our Cleaning Cost Calculator Estimates Your Price</h2>
+      <p style="font-size:14px;color:#64748b;text-align:center;max-width:560px;margin:0 auto 10px;line-height:1.6">Clean Estimator is a free cleaning cost calculator that builds every quote from six real variables — not a flat national guess. Here's exactly what goes into your number.</p>
+      <p style="text-align:center;font-size:13px;margin:0 auto 24px"><a href="/how-we-calculate-prices" style="color:${PRIMARY};font-weight:700;text-decoration:none">See our full pricing methodology and sources &rarr;</a></p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Home Size (Square Footage)</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Your base price scales with square footage — $90–$115 under 1,000 sq ft, up to $272–$338 over 3,000 sq ft.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Service Type</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Standard cleaning is the baseline. Deep cleaning costs 68–85% more, move-in/move-out costs 88–105% more.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Location (ZIP Code)</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">State and city cost-of-living adjust your price — CA and NY run 30–60% above the national average.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Cleaning Frequency</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Weekly service gets a 20% discount, biweekly 15%, and monthly 10% off the one-time rate.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Add-Ons</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">Inside oven, inside fridge, interior windows, and laundry are priced separately on top of the base clean.</p></div>
+        <div><h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:5px">Home Condition</h3><p style="font-size:13.5px;color:#475569;line-height:1.6;margin:0">A home not professionally cleaned in months typically costs 22–28% more for the first visit.</p></div>
+      </div>
+    </div>
     <div style="margin-bottom:40px">
       <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:20px">Cleaning Cost Guides</h2>
       <ul style="list-style:none;padding:0;margin:0;background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px">
@@ -659,27 +1412,51 @@ function injectHomepage(posts, categories) {
       </ul>
       <a href="/blog" style="display:inline-block;margin-top:14px;color:${PRIMARY};font-weight:700;font-size:14px;text-decoration:none">View all guides &#8594;</a>
     </div>
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
+      <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">Key Features for Businesses</h2>
+      <p style="text-align:center;color:#64748b;font-size:14px;max-width:600px;margin:0 auto 24px">Clean Estimator isn't just a consumer tool — cleaning companies work with us two ways.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px">
+          <h3 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px">Local Partner Program</h3>
+          <p style="font-size:13px;color:#475569;line-height:1.65;margin:0 0 12px">Exclusive, one-partner-per-city placement — your business is recommended directly to homeowners in your city actively searching for cleaning services. $350/month per city, only one partner per city.</p>
+          <a href="/partner-with-us" style="font-size:13px;color:${PRIMARY};font-weight:700;text-decoration:none">See partner program details &rarr;</a>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px">
+          <h3 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px">Website Integration</h3>
+          <p style="font-size:13px;color:#475569;line-height:1.65;margin:0 0 12px">Embed a branded, white-labeled cleaning cost calculator directly on your own website to capture leads. $159/month after a 7-day free trial.</p>
+          <a href="/estimator" style="font-size:13px;color:${PRIMARY};font-weight:700;text-decoration:none">See embeddable calculator details &rarr;</a>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px">
+          <h3 style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px">No Signup Needed for Consumers</h3>
+          <p style="font-size:13px;color:#475569;line-height:1.65;margin:0">Homeowners get instant, free estimates without creating an account — so every lead reaching a partner or embedded calculator is already warm.</p>
+        </div>
+      </div>
+    </div>
     <div id="faq" style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px">
       <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:24px">Frequently Asked Questions</h2>
       <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How much does house cleaning cost?</h3>
-        <p style="font-size:14px;color:#475569;line-height:1.6">House cleaning typically costs $100–$250 for a standard home, depending on size, location, and frequency. Our calculator gives you a precise estimate based on your ZIP code.</p>
+        <p style="font-size:14px;color:#475569;line-height:1.6">House cleaning runs $90–$338 per visit depending on home size — $158–$198 is typical for a 1,500–2,000 sq ft home. Our calculator gives you a precise estimate based on your ZIP code.</p>
       </div>
       <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">What affects carpet cleaning prices?</h3>
-        <p style="font-size:14px;color:#475569;line-height:1.6">Carpet cleaning costs $25–$75 per room on average. Factors include room size, carpet condition, stain treatment, and method (steam vs. dry cleaning).</p>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Carpet cleaning costs $44–$100 per room depending on condition, with a $90–$110 whole-home minimum. Factors include room count, soil level (light to pet stains), and method (steam vs. dry cleaning).</p>
       </div>
       <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How often should I have my air ducts cleaned?</h3>
-        <p style="font-size:14px;color:#475569;line-height:1.6">Most experts recommend air duct cleaning every 3–5 years. Costs range from $300–$500 for a typical home. More frequent cleaning may be needed with pets or allergies.</p>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Most experts recommend air duct cleaning every 3–5 years. A standard residential system costs $330–$420, plus $65–$85 per additional HVAC system. More frequent cleaning may be needed with pets or allergies.</p>
       </div>
       <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">How much does mold remediation cost?</h3>
-        <p style="font-size:14px;color:#475569;line-height:1.6">Mold remediation averages $500–$6,000 depending on the extent and location. Small areas under 10 sq ft may cost as little as $50–$200 with DIY treatment.</p>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Mold remediation costs $750–$1,050 for a small spot (under 10 sq ft) up to $8,500–$13,000+ for extensive contamination (300+ sq ft). It always requires an in-person inspection — final pricing depends on the extent of contamination and whether the moisture source has been fixed.</p>
       </div>
-      <div>
+      <div style="margin-bottom:20px">
         <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Is this calculator really free?</h3>
         <p style="font-size:14px;color:#475569;line-height:1.6">Yes, 100% free. No sign-up, no email required. We provide estimates based on real local market data so you can negotiate confidently with cleaning companies.</p>
+      </div>
+      <div>
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px">Can I get a cleaning cost estimate online instead of scheduling an in-home visit?</h3>
+        <p style="font-size:14px;color:#475569;line-height:1.6">Yes — that's exactly what Clean Estimator is built for. You get a full cleaning cost estimate online in under 60 seconds, based on real state-by-state pricing data, without a salesperson visiting your home or a phone call.</p>
       </div>
     </div>
   </div>
@@ -707,6 +1484,9 @@ function main() {
   }
 
   const { BLOG_POSTS, CATEGORIES } = loadBlogData();
+  const servicesMod = loadServicesData();
+  const statesMod = loadStatesData();
+  const faqsMod = loadFaqsData();
   const assets = getAssetTags();
   let count = 0;
 
@@ -734,10 +1514,38 @@ function main() {
   count++;
   writeFile('terms-of-service', renderLegalPage('terms', assets));
   count++;
-  writeFile('for-companies', renderForCompanies(assets));
+  writeFile('estimator', renderForCompanies(assets));
+  count++;
+  writeFile('cleaning-cost-calculator', renderCalculatorPage(assets));
+  count++;
+  writeFile('cleaning-cost-estimator', renderEstimatorPage(assets));
+  count++;
+  writeFile('how-we-calculate-prices', renderMethodologyPage(assets));
   count++;
 
-  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 5 static pages)');
+  const services = servicesMod.getAllServices();
+  for (const service of services) {
+    writeFile('cleaning-services/' + service.slug, renderServicePage(service, statesMod, assets));
+    count++;
+    writeFile(calculatorSlugFor(service), renderServiceCalculatorPage(service, servicesMod, assets));
+    count++;
+  }
+
+  const citiesMod = loadCityData(statesMod, servicesMod);
+
+  const states = statesMod.getAllStates();
+  for (const state of states) {
+    writeFile('cleaning-cost/' + state.slug, renderStatePage(state, servicesMod, statesMod, faqsMod, assets, citiesMod));
+    count++;
+  }
+
+  const cities = citiesMod.getAllCities();
+  for (const city of cities) {
+    writeFile('cleaning-cost/city/' + city.slug, renderCityPage(city, servicesMod, citiesMod, faqsMod, assets));
+    count++;
+  }
+
+  console.log('✓ prerender — ' + count + ' pages generated (' + BLOG_POSTS.length + ' posts, ' + CATEGORIES.length + ' categories, 8 static pages, ' + services.length + ' services, ' + states.length + ' states, ' + cities.length + ' cities)');
 }
 
 main();

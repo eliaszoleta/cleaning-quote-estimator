@@ -5,7 +5,11 @@ import CleaningCalculator from './components/calculator/CleaningCalculator';
 import ResultsScreen from './components/calculator/ResultsScreen';
 import CompanyDashboard from './components/dashboard/CompanyDashboard';
 import AuthPage from './components/dashboard/AuthPage';
+import ResetPasswordPage from './components/dashboard/ResetPasswordPage';
 import AdminPartners from './components/admin/AdminPartners';
+import AdminCompanies from './components/admin/AdminCompanies';
+import AdminHomepageLeads from './components/admin/AdminHomepageLeads';
+import ClientPortal from './components/client/ClientPortal';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import SEOContent from './components/ui/SEOContent';
@@ -14,11 +18,29 @@ import BlogPost from './components/blog/BlogPost';
 import BlogCategory from './components/blog/BlogCategory';
 import CompanyLanding from './components/pages/CompanyLanding';
 import PartnerWithUs from './components/pages/PartnerWithUs';
+import WebsiteSubscription from './components/pages/WebsiteSubscription';
+import DemoGallery from './components/demo-sites/DemoGallery';
+import DemoSitePage from './components/demo-sites/DemoSitePage';
+import PartnerCityPricing from './components/pages/PartnerCityPricing';
+import PartnerDemoPage from './components/pages/PartnerDemoPage';
+import BuyCityPlacement from './components/pages/BuyCityPlacement';
+import PartnerCheckoutSuccess from './components/pages/PartnerCheckoutSuccess';
 import About from './components/pages/About';
+import Founder from './components/pages/Founder';
 import Contact from './components/pages/Contact';
 import PrivacyPolicy from './components/pages/PrivacyPolicy';
 import TermsOfService from './components/pages/TermsOfService';
+import ServicePage from './components/pages/ServicePage';
+import StatePage from './components/pages/StatePage';
+import CityPage from './components/pages/CityPage';
+import CalculatorPage from './components/pages/CalculatorPage';
+import EstimatorPage from './components/pages/EstimatorPage';
+import MethodologyPage from './components/pages/MethodologyPage';
+import ServiceCalculatorPage, { calculatorSlugFor } from './components/pages/ServiceCalculatorPage';
+import { getAllServices } from './data/services';
 import EmbedWrapper from './components/EmbedWrapper';
+import { initMetaPixel } from './utils/metaPixel';
+import { initNextdoorPixel } from './utils/nextdoorPixel';
 import './App.css';
 
 const pathname = window.location.pathname.replace(/\/$/, '') || '/';
@@ -27,14 +49,33 @@ const searchParams = new URLSearchParams(window.location.search);
 const isEmbed = pathname.startsWith('/embed');
 const isResults = pathname === '/results';
 const isCompany = pathname === '/company' || pathname.startsWith('/company');
-const isForCompanies = pathname === '/for-companies';
+const isEstimatorLanding = pathname === '/estimator';
+const isOldForCompanies = pathname === '/for-companies';
 const isBlog = pathname === '/blog' || pathname.startsWith('/blog/');
 const isAbout = pathname === '/about';
+const isFounder = pathname === '/founder';
 const isContact = pathname === '/contact';
 const isPrivacy = pathname === '/privacy-policy';
 const isTerms = pathname === '/terms-of-service';
 const isAdminPartners = pathname === '/admin/partners';
+const isAdminCompanies = pathname === '/admin/companies';
+const isAdminHomepageLeads = pathname === '/admin/leads';
+const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
+const isWebsiteSubscription = pathname === '/website-for-cleaning-companies';
+const isDemoGallery = pathname === '/website-example';
+const demoSiteMatch = pathname.match(/^\/website-example\/([a-z0-9-]+)(?:\/(about|services|service-areas|contact))?$/);
+const isPartnerCityPricing = pathname === '/partner-city-pricing';
+const isPartnerDemo = pathname === '/partner-demo';
+const isBuyCityPlacementSuccess = pathname === '/buy-city-placement/success';
+const isBuyCityPlacement = pathname === '/buy-city-placement';
+const isServicePage = pathname.startsWith('/cleaning-services/');
+const isCityPage = pathname.startsWith('/cleaning-cost/city/');
+const isStatePage = pathname.startsWith('/cleaning-cost/') && !isCityPage;
+const isCalculatorPage = pathname === '/cleaning-cost-calculator';
+const isEstimatorPage = pathname === '/cleaning-cost-estimator';
+const isMethodologyPage = pathname === '/how-we-calculate-prices';
+const isServiceCalculatorPage = getAllServices().some(s => pathname === '/' + calculatorSlugFor(s));
 
 const embedCompanyId = isEmbed ? searchParams.get('company') : null;
 
@@ -84,6 +125,13 @@ function ResultsPage() {
 export default function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(isCompany);
+  // Clicking a password-reset email link logs the visitor in with a real
+  // (temporary) session -- Supabase fires PASSWORD_RECOVERY for exactly
+  // this case, distinct from a normal sign-in. Without tracking it
+  // separately, that session would satisfy the `!user` check below and drop
+  // the visitor straight into the full dashboard instead of making them set
+  // a new password first.
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
 
   useEffect(() => {
     if (!isCompany || !supabase) { setAuthLoading(false); return; }
@@ -94,11 +142,19 @@ export default function App() {
       setAuthLoading(false);
     }).catch(() => { clearTimeout(timeout); setAuthLoading(false); });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true);
       setUser(session?.user ?? null);
       setAuthLoading(false);
     });
     return () => subscription.unsubscribe();
+  }, []);
+
+  // Never on /embed -- that route renders inside an iframe on a third-party
+  // company's own site, and firing our pixels there would attribute their
+  // visitors to our ad accounts.
+  useEffect(() => {
+    if (!isEmbed) { initMetaPixel(); initNextdoorPixel(); }
   }, []);
 
   const handleLogout = async () => {
@@ -106,6 +162,13 @@ export default function App() {
     setUser(null);
     window.location.href = '/company';
   };
+
+  // The redirect lives server-side in vercel.json (permanent 301) -- this is
+  // just a client-side safety net for local dev / any edge cache gap.
+  if (isOldForCompanies) {
+    window.location.replace('/estimator' + window.location.search + window.location.hash);
+    return null;
+  }
 
   if (isEmbed) return (
     <HelmetProvider>
@@ -117,6 +180,12 @@ export default function App() {
 
   if (isAdminPartners) return <HelmetProvider><AdminPartners /></HelmetProvider>;
 
+  if (isAdminCompanies) return <HelmetProvider><AdminCompanies /></HelmetProvider>;
+
+  if (isAdminHomepageLeads) return <HelmetProvider><AdminHomepageLeads /></HelmetProvider>;
+
+  if (isClientPortal) return <HelmetProvider><ClientPortal /></HelmetProvider>;
+
   if (isPartnerWithUs) return (
     <HelmetProvider>
       <div className="app">
@@ -127,16 +196,102 @@ export default function App() {
     </HelmetProvider>
   );
 
-  if (isForCompanies) return <HelmetProvider><CompanyLanding /></HelmetProvider>;
+  // No Header/Footer chrome here on purpose -- these pages simulate
+  // separate, standalone customer websites, so cleanestimator.com's own
+  // nav/footer would break the illusion (each demo site has its own nav).
+  if (isDemoGallery) return (
+    <HelmetProvider>
+      <DemoGallery />
+    </HelmetProvider>
+  );
+
+  if (demoSiteMatch) return (
+    <HelmetProvider>
+      <DemoSitePage slug={demoSiteMatch[1]} page={demoSiteMatch[2]} />
+    </HelmetProvider>
+  );
+
+  if (isWebsiteSubscription) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><WebsiteSubscription /></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (isPartnerCityPricing) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><PartnerCityPricing /></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (isPartnerDemo) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><PartnerDemoPage /></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (isBuyCityPlacementSuccess) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><PartnerCheckoutSuccess /></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (isBuyCityPlacement) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><BuyCityPlacement /></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (isEstimatorLanding) return <HelmetProvider><CompanyLanding /></HelmetProvider>;
 
   if (isBlog) return <HelmetProvider><div className="app"><Header /><main><BlogRouter /></main><Footer /></div></HelmetProvider>;
 
   if (isAbout) return <HelmetProvider><div className="app"><Header /><main><About /></main><Footer /></div></HelmetProvider>;
+  if (isFounder) return <HelmetProvider><div className="app"><Header /><main><Founder /></main><Footer /></div></HelmetProvider>;
   if (isContact) return <HelmetProvider><div className="app"><Header /><main><Contact /></main><Footer /></div></HelmetProvider>;
   if (isPrivacy) return <HelmetProvider><div className="app"><Header /><main><PrivacyPolicy /></main><Footer /></div></HelmetProvider>;
   if (isTerms) return <HelmetProvider><div className="app"><Header /><main><TermsOfService /></main><Footer /></div></HelmetProvider>;
+  if (isServicePage) return <HelmetProvider><div className="app"><Header /><main><ServicePage slug={pathname.replace('/cleaning-services/', '')} /></main><Footer /></div></HelmetProvider>;
+  if (isCityPage) return <HelmetProvider><div className="app"><Header /><main><CityPage slug={pathname.replace('/cleaning-cost/city/', '')} /></main><Footer /></div></HelmetProvider>;
+  if (isStatePage) return <HelmetProvider><div className="app"><Header /><main><StatePage slug={pathname.replace('/cleaning-cost/', '')} /></main><Footer /></div></HelmetProvider>;
+  if (isCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><CalculatorPage /></main><Footer /></div></HelmetProvider>;
+  if (isEstimatorPage) return <HelmetProvider><div className="app"><Header /><main><EstimatorPage /></main><Footer /></div></HelmetProvider>;
+  if (isMethodologyPage) return <HelmetProvider><div className="app"><Header /><main><MethodologyPage /></main><Footer /></div></HelmetProvider>;
+  if (isServiceCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><ServiceCalculatorPage slug={pathname.slice(1)} /></main><Footer /></div></HelmetProvider>;
 
   if (isCompany) {
+    // No page-specific <title> existed here before -- every state fell back
+    // to index.html's generic site-wide title, leaving Google to guess a
+    // label for this page in search results (the same gap that made /client
+    // show up as a sitelink titled "Back"). noindex since a login gate has
+    // no content value to a searcher.
+    const companyHelmet = (
+      <Helmet>
+        <title>Company Login | Clean Estimator</title>
+        <meta name="description" content="Log in to your Clean Estimator company dashboard to manage your embedded calculator and leads." />
+        <meta name="robots" content="noindex, follow" />
+      </Helmet>
+    );
+
     if (authLoading) return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a' }}>
         <div style={{ color: 'white', fontSize: 16 }}>Loading...</div>
@@ -144,14 +299,16 @@ export default function App() {
     );
     if (!user && !supabase) return (
       <HelmetProvider>
+        {companyHelmet}
         <div className="app"><Header /><main style={{ padding: 40, textAlign: 'center' }}>
           <h2>Supabase not configured</h2>
           <p style={{ color: '#64748b', marginTop: 8 }}>Set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY to enable authentication.</p>
         </main><Footer /></div>
       </HelmetProvider>
     );
-    if (!user) return <HelmetProvider><AuthPage onAuth={setUser} /></HelmetProvider>;
-    return <HelmetProvider><CompanyDashboard user={user} onLogout={handleLogout} /></HelmetProvider>;
+    if (passwordRecovery) return <HelmetProvider>{companyHelmet}<ResetPasswordPage onDone={() => setPasswordRecovery(false)} /></HelmetProvider>;
+    if (!user) return <HelmetProvider>{companyHelmet}<AuthPage onAuth={setUser} /></HelmetProvider>;
+    return <HelmetProvider>{companyHelmet}<CompanyDashboard user={user} onLogout={handleLogout} /></HelmetProvider>;
   }
 
   return (

@@ -2,10 +2,11 @@ import React, { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 const WEB3FORMS_ACCESS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
+const PRIMARY_GRADIENT = '#1d4ed8';
 
-function Icon({ children, size = 20 }) {
+function Icon({ children, size = 20, linecap = 'round', linejoin = 'round' }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap={linecap} strokeLinejoin={linejoin} aria-hidden="true">
       {children}
     </svg>
   );
@@ -67,7 +68,7 @@ export default function Contact() {
   };
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', fontFamily: "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+    <div style={{ background: '#f8fafc', minHeight: '100vh', fontFamily: "'Poppins', 'Poppins Fallback', Arial, sans-serif" }}>
       <Helmet>
         <title>Contact Us | Clean Estimator</title>
         <meta name="description" content="Get in touch with the Clean Estimator team for support, partnerships, or general questions." />
@@ -86,7 +87,7 @@ export default function Contact() {
       {/* Hero */}
       <div style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%)',
-        padding: '60px 24px 92px',
+        padding: 'clamp(32px, 7vw, 60px) 20px 92px',
         textAlign: 'center',
         position: 'relative',
         overflow: 'hidden',
@@ -115,6 +116,13 @@ export default function Contact() {
             <SideCard icon={<ShieldIcon size={20} />} title="Pricing accuracy" body="Spot an estimate that looks off? Let us know and we'll take a look." color="#16a34a" bg="#dcfce7" />
             <SideCard icon={<SparklesIcon size={20} />} title="For cleaning companies" body="Want to embed our estimator on your site? Mention it in your message." color="#7c3aed" bg="#ede9fe" />
 
+            <div style={{ padding: '18px 20px', background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+              <p style={{ fontSize: 13, color: '#0f172a', fontWeight: 700, marginBottom: 6 }}>Prefer email?</p>
+              <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.65, margin: 0 }}>
+                Reach us directly at <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb', fontWeight: 600 }}>info@cleanestimator.com</a>.
+              </p>
+            </div>
+
             <div style={{ padding: '18px 20px', background: '#eff6ff', borderRadius: 14, border: '1px solid #bfdbfe' }}>
               <p style={{ fontSize: 13, color: '#1d4ed8', fontWeight: 700, marginBottom: 6 }}>Looking for quick answers?</p>
               <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.65, margin: 0 }}>
@@ -133,10 +141,10 @@ export default function Contact() {
             <div style={{ padding: '26px 30px 30px' }}>
               {status === 'success' ? (
                 <div style={{ textAlign: 'center', padding: '36px 0' }}>
-                  <div style={{ marginBottom: 14, color: '#16a34a', display: 'flex', justifyContent: 'center' }}><CheckCircleIcon size={44} /></div>
+                  <div style={{ marginBottom: 14, color: '#16a34a', display: 'flex', justifyContent: 'center' }}><CheckCircleIcon size={44} linecap="square" linejoin="miter" /></div>
                   <p style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Message sent!</p>
                   <p style={{ fontSize: 14, color: '#64748b', marginBottom: 22 }}>Thanks for reaching out — we typically respond within 1 business day.</p>
-                  <button onClick={() => setStatus('idle')} style={{ padding: '10px 22px', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14, fontFamily: 'inherit' }}>
+                  <button onClick={() => setStatus('idle')} style={{ padding: '10px 22px', background: PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14, fontFamily: 'inherit', boxShadow: '0 4px 14px rgba(29,78,216,0.3)' }}>
                     Send Another Message
                   </button>
                 </div>
@@ -183,7 +191,7 @@ export default function Contact() {
                     disabled={status === 'sending'}
                     style={{
                       padding: '13px 28px',
-                      background: '#2563eb',
+                      background: PRIMARY_GRADIENT,
                       color: 'white',
                       border: 'none',
                       borderRadius: 10,
@@ -192,12 +200,12 @@ export default function Contact() {
                       cursor: status === 'sending' ? 'not-allowed' : 'pointer',
                       opacity: status === 'sending' ? 0.7 : 1,
                       alignSelf: 'flex-start',
-                      transition: 'background 0.15s',
+                      transition: 'opacity 0.15s',
                       fontFamily: 'inherit',
-                      boxShadow: '0 4px 14px rgba(37,99,235,0.28)',
+                      boxShadow: '0 8px 22px rgba(29,78,216,0.35)',
                     }}
-                    onMouseEnter={e => { if (status !== 'sending') e.currentTarget.style.background = '#1d4ed8'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '#2563eb'; }}
+                    onMouseEnter={e => { if (status !== 'sending') e.currentTarget.style.opacity = '0.9'; }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = status === 'sending' ? '0.7' : '1'; }}
                   >
                     {status === 'sending' ? 'Sending…' : 'Send Message →'}
                   </button>

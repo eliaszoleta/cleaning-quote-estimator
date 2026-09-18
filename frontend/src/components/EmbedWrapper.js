@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Pause } from 'lucide-react';
 import CleaningCalculator from './calculator/CleaningCalculator';
 import { getCompanyPublic } from '../utils/api';
 
@@ -18,10 +19,17 @@ export default function EmbedWrapper({ companyId }) {
       .finally(() => setLoading(false));
   }, [companyId]);
 
-  // Keep parent iframe height synced
+  // Keep parent iframe height synced -- measured off document.body rather
+  // than document.documentElement, since a root html element's scrollHeight
+  // is clamped to be at least the layout viewport height (i.e. the iframe's
+  // OWN currently-applied height), so it can only ever report growth, never
+  // shrink back down once the parent has sized the iframe taller for a
+  // previous step. body has no such floor as long as nothing gives it an
+  // explicit height/min-height (it doesn't here), so its scrollHeight
+  // tracks the calculator's actual rendered content in both directions.
   useEffect(() => {
     const observer = new ResizeObserver(() => {
-      const h = document.documentElement.scrollHeight;
+      const h = document.body.scrollHeight;
       window.parent?.postMessage({ type: 'cleancalc-resize', height: h }, '*');
     });
     observer.observe(document.body);
@@ -34,9 +42,22 @@ export default function EmbedWrapper({ companyId }) {
 
   if (paused) return (
     <div style={{ padding: '40px 24px', textAlign: 'center', background: '#f8fafc', borderRadius: 12 }}>
-      <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
-      <div style={{ fontWeight: 700, fontSize: 16, color: '#374151', marginBottom: 8 }}>Widget Temporarily Unavailable</div>
-      <p style={{ color: '#64748b', fontSize: 14 }}>This cleaning cost calculator is temporarily unavailable. Please contact the company directly for a quote.</p>
+      <div style={{ width: 56, height: 56, background: '#f59e0b', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 4px 12px rgba(245,158,11,0.35)' }}>
+        <Pause size={24} color="white" strokeWidth={0} fill="white" />
+      </div>
+      <div style={{ fontWeight: 700, fontSize: 16, color: '#374151', marginBottom: 8 }}>Calculator Paused</div>
+      <p style={{ color: '#64748b', fontSize: 14, marginBottom: 16 }}>This cleaning cost calculator is currently paused due to an inactive subscription. If you're the site owner, log in to your dashboard to reactivate it.</p>
+      <a
+        href="https://cleanestimator.com/company"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#2563eb', color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: 13.5, padding: '10px 20px', borderRadius: 8 }}
+      >
+        Go to Dashboard →
+      </a>
+      <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14 }}>
+        Or email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a>
+      </p>
     </div>
   );
 

@@ -1,45 +1,154 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check } from 'lucide-react';
+import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles } from 'lucide-react';
+import { getAllFaqs } from '../../data/faqs';
+import { getAllServices, typicalCost } from '../../data/services';
+import { getFeaturedStates } from '../../data/statePricing';
 
-const FAQ = [
-  { q: 'How much does house cleaning cost in 2026?', a: 'The average house cleaning cost in 2026 is $120–$250 for a standard clean of a 1,500–2,500 sq ft home. Prices vary widely by state — California and New York average $160–$300, while Texas and Florida average $110–$200. Use our free cleaning cost calculator above to get a ZIP-code specific estimate in seconds.' },
-  { q: 'How do I calculate cleaning costs for my home?', a: 'To calculate cleaning costs, use our free cleaning cost estimator: select your service type, enter your ZIP code, and specify your home size and bedrooms. Our calculator uses real market data and state-by-state pricing to generate an accurate estimate in under 60 seconds. You can also estimate manually: multiply your home\'s square footage by $0.05–$0.15 for a standard clean, then adjust for your local cost of living.' },
-  { q: 'How much should I pay for house cleaning?', a: 'A fair price for house cleaning in 2026 is $120–$180 for a small home (under 1,500 sq ft), $150–$250 for a medium home (1,500–2,500 sq ft), and $200–$350+ for a large home (2,500+ sq ft). Deep cleans and first-time cleans cost 1.5–2× more than recurring visits. Always get at least 3 quotes before booking.' },
-  { q: 'How much does apartment cleaning cost?', a: 'Apartment cleaning typically costs $85–$150 for a studio or 1-bedroom, $110–$180 for a 2-bedroom, and $150–$250 for a 3-bedroom apartment. Move-in/move-out cleans cost significantly more ($150–$350+) due to the additional time required. Our cleaning cost calculator provides apartment-specific estimates by ZIP code.' },
-  { q: 'How much does carpet cleaning cost?', a: 'Professional carpet cleaning costs $100–$300 for a typical home. Most companies charge $25–$75 per room, with a minimum charge of $75–$100. Steam cleaning (hot water extraction) is the most common and effective method. Pet odor treatment adds $30–$80 per room.' },
-  { q: 'How much does air duct cleaning cost?', a: 'Air duct cleaning costs $300–$700 for a typical residential home. The price depends on the number of vents, HVAC systems, and any add-on services like sanitizing or mold treatment.' },
-  { q: 'How often should you clean air ducts?', a: 'The EPA recommends cleaning air ducts every 3–5 years, or sooner if you notice visible mold growth, pest infestation, excessive dust, or after major renovations that generate debris.' },
-  { q: 'How much does commercial cleaning cost per square foot?', a: 'Commercial cleaning typically costs $0.07–$0.20 per square foot per visit. A 2,000 sq ft office cleaned weekly would cost approximately $400–$1,200 per month depending on service level and location.' },
-  { q: 'How much does mold remediation cost?', a: 'Mold remediation costs $500–$6,000+ depending on the extent of contamination. Small bathroom mold patches cost $500–$1,500, while extensive basement or crawl space contamination can cost $3,000–$15,000+. Always get an in-person inspection first.' },
-  { q: 'Is dryer vent cleaning worth it?', a: 'Yes — absolutely. The U.S. Fire Administration reports that clogged dryer vents cause approximately 2,900 home fires annually. Professional dryer vent cleaning costs $100–$200 and should be done at least once per year.' },
-  { q: 'What factors affect cleaning service costs?', a: 'The main factors that affect cleaning costs are: (1) Home size — larger homes cost more, (2) Location — cities and high cost-of-living states charge more, (3) Frequency — weekly and biweekly clients get 10–20% discounts, (4) Service type — deep cleans and move-out cleans cost more than standard recurring cleans, (5) Condition — heavily cluttered or dirty homes may incur surcharges, and (6) Add-ons — oven, fridge, and window cleaning typically cost extra.' },
-  { q: 'Is it cheaper to hire a cleaning service or clean yourself?', a: 'Hiring a professional cleaning service costs $120–$250 per visit for a standard home, but saves 3–6 hours of your time. For many homeowners, the time savings and professional results justify the cost. Recurring service packages (weekly or biweekly) offer the best value at $80–$160 per visit with consistency discounts. DIY is cheaper upfront but requires purchasing supplies and the right techniques to achieve the same results.' },
-  { q: 'How do I get a free cleaning estimate?', a: 'Use the Clean Estimator cleaning cost calculator at the top of this page — it\'s completely free, requires no signup, and gives you an instant estimate based on your ZIP code, service type, and home size. For an official quote, contact 2–3 local cleaning companies and request an in-home or virtual walkthrough.' },
+const FAQ = getAllFaqs();
+
+const PRICE_FACTORS = [
+  { Icon: Ruler, term: 'Home Size (Square Footage)', detail: 'Your base price scales with square footage — $90–$115 for a home under 1,000 sq ft, up to $272–$338 for a home over 3,000 sq ft.' },
+  { Icon: ListChecks, term: 'Service Type', detail: 'Standard cleaning is the baseline. Deep cleaning costs 68–85% more, and move-in/move-out cleaning costs 88–105% more than a standard visit.' },
+  { Icon: MapPin, term: 'Location (ZIP Code)', detail: 'State and city cost-of-living adjust your price — California and New York run 30–60% above the national average; many Southern and Midwest states run below it.' },
+  { Icon: RefreshCw, term: 'Cleaning Frequency', detail: 'Recurring service is cheaper per visit: weekly gets a 20% discount, biweekly 15%, and monthly 10% off the one-time rate.' },
+  { Icon: PlusCircle, term: 'Add-Ons', detail: 'Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and laundry are priced separately on top of the base clean.' },
+  { Icon: Sparkles, term: 'Home Condition', detail: 'A home that hasn\'t been professionally cleaned in months typically costs 22–28% more for the first visit than one already in good condition.' },
 ];
 
-const STATES_DATA = [
-  { state: 'California', avg: '$165–$290', note: 'High cost of living drives premium pricing' },
-  { state: 'New York', avg: '$155–$280', note: 'NYC metro significantly higher than upstate' },
-  { state: 'Texas', avg: '$110–$195', note: 'Competitive market with many providers' },
-  { state: 'Florida', avg: '$115–$200', note: 'High demand due to tourism/vacation rentals' },
-  { state: 'Illinois', avg: '$120–$215', note: 'Chicago metro commands higher rates' },
-  { state: 'Washington', avg: '$140–$250', note: 'Seattle/Bellevue among highest in nation' },
-  { state: 'Colorado', avg: '$130–$230', note: 'Growing market, rates rising rapidly' },
-  { state: 'Arizona', avg: '$105–$185', note: 'Lower cost market, growing population' },
-];
+const ICONS = {
+  home_residential: Home,
+  apartment: Building2,
+  commercial: Building,
+  carpet: Layers,
+  air_duct: Wind,
+  dryer_vent: Flame,
+  tile_grout: Grid3x3,
+  mold_remediation: AlertTriangle,
+  water_damage: Droplets,
+};
+const COLORS = {
+  home_residential: { color: '#2563eb', bg: '#eff6ff' },
+  apartment: { color: '#4f46e5', bg: '#eef2ff' },
+  commercial: { color: '#7c3aed', bg: '#f5f3ff' },
+  carpet: { color: '#059669', bg: '#ecfdf5' },
+  air_duct: { color: '#0891b2', bg: '#ecfeff' },
+  dryer_vent: { color: '#ea580c', bg: '#fff7ed' },
+  tile_grout: { color: '#0d9488', bg: '#f0fdfa' },
+  mold_remediation: { color: '#d97706', bg: '#fffbeb' },
+  water_damage: { color: '#0284c7', bg: '#f0f9ff' },
+};
+const TIER_NOTE = {
+  high: 'Higher cost of living drives premium pricing',
+  low: 'Lower cost market, competitive pricing',
+  average: 'Close to the national average for cleaning service costs',
+};
 
-const SERVICES = [
-  { Icon: Home,          color: '#2563eb', bg: '#eff6ff', title: 'House Cleaning',           range: '$120 – $250',    detail: 'per visit, standard clean', href: '/?service=home_residential', facts: ['Prices based on sq footage & bedrooms', 'Deep clean costs 1.5–2× more', 'Recurring discounts up to 15%'] },
-  { Icon: Building2,     color: '#4f46e5', bg: '#eef2ff', title: 'Apartment Cleaning',       range: '$85 – $200',     detail: 'per visit',                href: '/?service=apartment',         facts: ['Studio to 4+ bedroom', 'Move-in/out cleans cost more', 'Vacant units 10–15% cheaper'] },
-  { Icon: Building,      color: '#7c3aed', bg: '#f5f3ff', title: 'Commercial Cleaning',      range: '$200 – $2,000+', detail: 'per month',                href: '/?service=commercial',        facts: ['Priced per sq ft per visit', 'Frequency heavily affects cost', 'Medical/restaurant rates higher'] },
-  { Icon: Layers,        color: '#059669', bg: '#ecfdf5', title: 'Carpet Cleaning',          range: '$100 – $300',    detail: 'whole home',               href: '/?service=carpet',            facts: ['$25–$75 per room', 'Steam cleaning most effective', 'Pet odor treatment extra'] },
-  { Icon: Wind,          color: '#0891b2', bg: '#ecfeff', title: 'Air Duct Cleaning',        range: '$300 – $700',    detail: 'per system',               href: '/?service=air_duct',          facts: ['Recommended every 3–5 years', 'More vents = higher cost', 'Mold treatment costs more'] },
-  { Icon: Flame,         color: '#ea580c', bg: '#fff7ed', title: 'Dryer Vent Cleaning',      range: '$100 – $200',    detail: 'per dryer',                href: '/?service=dryer_vent',        facts: ['Prevents fire hazard', 'Annual cleaning recommended', 'Clogs cost $50–$100 extra'] },
-  { Icon: Grid3x3,       color: '#0d9488', bg: '#f0fdfa', title: 'Tile & Grout Cleaning',   range: '$175 – $450',    detail: 'per project',              href: '/?service=tile_grout',        facts: ['Natural stone costs more', 'Sealing adds $1–$2/sq ft', 'Recoloring transforms appearance'] },
-  { Icon: AlertTriangle, color: '#d97706', bg: '#fffbeb', title: 'Mold Remediation',         range: '$500 – $6,000+', detail: 'requires inspection',      href: '/?service=mold_remediation',  facts: ['In-person inspection required', 'Fix moisture source first', 'Air testing adds $200–$500'] },
-  { Icon: Droplets,      color: '#0284c7', bg: '#f0f9ff', title: 'Water Damage Restoration', range: '$1,500 – $8,000+', detail: 'emergency service',      href: '/?service=water_damage',      facts: ['Act within 24–48 hours', 'Category 3 (sewage) costs most', "Homeowner's insurance may cover"] },
-];
+// Short, human labels for the price shown on each service card — kept
+// separate from the raw unit type so the wording matches how homeowners
+// actually think about each service (e.g. "requires inspection" for mold).
+const DETAIL_OVERRIDES = {
+  home_residential: 'per visit, standard clean',
+  apartment: 'per visit',
+  commercial: 'per month, 2,000 sq ft office (weekly)',
+  carpet: 'for a 5-room home',
+  air_duct: 'per system',
+  dryer_vent: 'per dryer',
+  tile_grout: 'for 300 sq ft',
+  mold_remediation: 'requires inspection',
+  water_damage: 'emergency service',
+};
+
+function formatPrice(n) {
+  return `$${Math.round(n).toLocaleString('en-US')}`;
+}
+
+const SERVICES = getAllServices().map(service => {
+  const cost = typicalCost(service);
+  return {
+    id: service.id,
+    Icon: ICONS[service.id] || Home,
+    ...COLORS[service.id],
+    title: service.name,
+    range: `${formatPrice(cost.low)} – ${formatPrice(cost.high)}`,
+    detail: DETAIL_OVERRIDES[service.id] || service.unit,
+    href: `/cleaning-services/${service.slug}`,
+    facts: service.bullets.slice(0, 3),
+  };
+});
+
+// What the calculator actually asks for each service — pulled directly from
+// each step component's real form fields (HomeStep.js, CarpetStep.js, etc.),
+// not a generic restatement, so this matches the live calculator exactly.
+const SERVICE_PRICE_FACTORS = {
+  home_residential: [
+    'Home size — 7 tiers from under 1,000 sq ft to 4,000+ sq ft',
+    'Number of bedrooms and bathrooms',
+    'Cleaning type: standard, deep, move-in/move-out, or post-construction',
+    'Frequency: one-time, weekly, biweekly, or monthly',
+    'Home condition: good, fair, or neglected',
+    'Add-ons: inside oven/fridge/cabinets, laundry, interior windows, garage, patio, pet hair, finished basement',
+  ],
+  apartment: [
+    'Unit size: studio up to 4+ bedrooms',
+    'Number of bathrooms',
+    'Cleaning type: standard, deep, or move-in/move-out',
+    'Frequency, and whether the unit is furnished or vacant (vacant runs 10–15% less)',
+    'Add-ons: inside oven/fridge/cabinets, laundry, interior windows, balcony/patio',
+  ],
+  commercial: [
+    'Building type: office, retail, medical/dental, restaurant, warehouse, school, gym, or church',
+    'Square footage and number of restrooms',
+    'Cleaning frequency: daily, weekly, biweekly, or monthly',
+    'Service level: basic, standard, or premium',
+    'Optional day porter or after-hours service (+15%)',
+  ],
+  carpet: [
+    'Room count or total square footage',
+    'Soil level: light, moderate, heavy, or pet stains/odors',
+    'Cleaning method: steam, dry cleaning, or encapsulation',
+    'Number of stairs',
+    'Add-ons: area rugs, Scotchgard protection, deodorizer, pet odor treatment',
+  ],
+  air_duct: [
+    'Residential (vent count and HVAC system count) or commercial (square footage)',
+    'Add-ons: UV sanitizing, dryer vent bundle, coil cleaning, filter replacement',
+    'Suspected mold in the ductwork (+40–50%, requires inspection)',
+  ],
+  dryer_vent: [
+    'Residential (vent length and routing) or commercial (number of dryers)',
+    'Vent length: short, medium, long, or very long',
+    'Routing: through wall, through roof, underground, or periscope/tight space',
+    'Suspected clog (+$50–$100), and bulk discounts for 10+ dryers',
+  ],
+  tile_grout: [
+    'Area size in square feet',
+    'Tile material: ceramic, porcelain, natural stone, travertine, or slate (natural stone costs 30–40% more)',
+    'Current condition, plus soap scum or hard water buildup',
+    'Services needed: deep clean, grout sealing, grout recoloring, caulk replacement',
+  ],
+  mold_remediation: [
+    'Affected area: under 10 sq ft up to 300+ sq ft',
+    'Locations affected: bathroom, basement, attic, crawl space, HVAC/ductwork, walls, kitchen, garage',
+    'Whether the moisture source has already been fixed',
+    'Residential or commercial property (+30–50%)',
+    'Optional air quality testing and post-remediation clearance testing',
+  ],
+  water_damage: [
+    'How long ago the damage occurred — urgency affects response',
+    'Cause: burst pipe, appliance leak, toilet overflow, roof leak, flooding, or sewage backup',
+    'Water category: clean, gray (+30%), or black water (+60–100%)',
+    'Affected square footage and which floors/areas are affected',
+    'Damage severity: wet carpets, soaked walls, or structural damage',
+  ],
+};
+
+const STATES_DATA = getFeaturedStates().map(s => ({
+  state: s.name,
+  avg: `${formatPrice(s.low)}–${formatPrice(s.high)}`,
+  note: TIER_NOTE[s.tier],
+  href: `/cleaning-cost/${s.slug}`,
+}));
 
 export default function SEOContent() {
   const faqSchema = {
@@ -57,7 +166,7 @@ export default function SEOContent() {
     '@type': 'WebApplication',
     name: 'Clean Estimator — Free Cleaning Cost Calculator',
     url: 'https://www.cleanestimator.com',
-    description: 'Free cleaning cost calculator and estimator for US homeowners and businesses. Instant, ZIP-code specific estimates for house cleaning, carpet, air duct, mold remediation, water damage, and more across all 50 states.',
+    description: 'Free cleaning cost calculator and estimator for US homeowners and businesses. Every price factors in home size, room count, service scope, and cleaning frequency, then adjusts for ZIP-code specific cost of living, for house cleaning, carpet, air duct, mold remediation, water damage, and more across all 50 states.',
     applicationCategory: 'UtilityApplication',
     operatingSystem: 'Web',
     browserRequirements: 'Requires JavaScript',
@@ -75,7 +184,10 @@ export default function SEOContent() {
     },
     featureList: [
       'Free cleaning cost estimates with no signup',
+      'Every service asks about size, scope, and frequency — not just ZIP code',
       'ZIP-code specific pricing across all 50 US states',
+      'Local Partner Program: exclusive, one-partner-per-city placement recommending a local cleaning company to homeowners, from $175/month per city ($350/month in major metros)',
+      'Website Integration: embeddable, white-labeled cleaning cost calculator for cleaning company websites, $159/month after a 30-day free trial, no credit card required',
       'House cleaning cost calculator',
       'Carpet cleaning cost estimator',
       'Air duct cleaning cost calculator',
@@ -102,12 +214,12 @@ export default function SEOContent() {
   return (
     <>
       <Helmet>
-        <title>Free Cleaning Cost Estimator 2026 | Clean Estimator</title>
-        <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $120–$250, carpet cleaning $100–$300, air duct $300–$700, commercial, mold remediation & more. No signup needed." />
-        <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, house cleaning cost calculator, how much does cleaning cost, cleaning estimate, carpet cleaning cost, air duct cleaning cost, commercial cleaning rates, mold remediation cost, cleaning price calculator, free cleaning estimate" />
+        <title>Free Cleaning Cost Calculator 2026 | Clean Estimator</title>
+        <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $90–$338, carpet cleaning $44–$100/room, air duct from $330, commercial, mold remediation & more. No signup needed." />
+        <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, house cleaning cost calculator, how much does cleaning cost, cleaning estimate, cleaning cost estimate online, carpet cleaning cost, air duct cleaning cost, commercial cleaning rates, mold remediation cost, cleaning price calculator, free cleaning estimate" />
         <link rel="canonical" href="https://www.cleanestimator.com/" />
         <meta property="og:site_name" content="Clean Estimator" />
-        <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+        <meta property="og:title" content="Free Cleaning Cost Calculator 2026 | Clean Estimator" />
         <meta property="og:description" content="Instant ZIP-code specific cleaning cost estimates. House cleaning, carpet, air duct, mold remediation and more. Free, no signup." />
         <meta property="og:url" content="https://www.cleanestimator.com/" />
         <meta property="og:type" content="website" />
@@ -117,7 +229,7 @@ export default function SEOContent() {
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@CleanEstimator" />
-        <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+        <meta name="twitter:title" content="Free Cleaning Cost Calculator 2026 | Clean Estimator" />
         <meta name="twitter:description" content="Free cleaning cost calculator — instant ZIP-code specific estimates for any cleaning service. No signup required." />
         <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
         <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
@@ -125,12 +237,91 @@ export default function SEOContent() {
         <script type="application/ld+json">{JSON.stringify(webAppSchema)}</script>
       </Helmet>
 
-      <div style={{ background: 'white', marginTop: 80 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 24px' }}>
+      <div style={{ background: 'white' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(32px, 7vw, 56px) 20px 0' }}>
+          {/* Pure vw-based floor (no nowrap) -- text width and viewport width
+              both scale with vw, so the fit holds across phone sizes without
+              risking an off-screen clip if the estimate is slightly off on
+              an unusually narrow device; it just wraps to 2 lines there
+              instead, same as before. */}
+          <h2 style={{ fontSize: 'clamp(14.5px, 4.4vw, 23px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px', textAlign: 'center' }}>
+            Get a FREE Cleaning Cost Estimate Online
+          </h2>
+          {/* text-align:justify only kicks in at the desktop breakpoint below --
+              on a narrow phone column, justify stretches short lines into
+              uneven "rivers" of whitespace since there isn't enough width per
+              line to distribute the extra space smoothly. */}
+          <style>{`
+            @media (min-width: 768px) {
+              .ce-seo-intro p { text-align: justify; }
+            }
+          `}</style>
+          <div className="ce-seo-intro">
+            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
+              No phone calls, no waiting on a callback — just a real cleaning cost estimate online from a dedicated <a href="/cleaning-cost-estimator" style={{ color: '#2563eb', fontWeight: 600 }}>cleaning cost estimator</a>, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.
+            </p>
+            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
+              It works the same way across all 9 services — house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, air duct cleaning, dryer vent cleaning, tile &amp; grout cleaning, mold remediation, and water damage restoration — each with its own scope questions, not a one-size-fits-all form.
+            </p>
+            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto' }}>
+              It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ maxWidth: 860, margin: 'clamp(28px, 6vw, 48px) auto 0', padding: '0 20px clamp(32px, 7vw, 56px)' }}>
+          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 16, textAlign: 'center' }}>Average Cleaning Costs (2026)</h2>
+          <ul style={{ margin: '0 0 40px', paddingLeft: 20, color: '#374151', fontSize: 15, lineHeight: 1.9 }}>
+            <li><strong>Standard House Cleaning:</strong> $90–$338 per visit depending on home size — $158–$198 is typical for the most common 1,500–2,000 sq ft home.</li>
+            <li><strong>Deep Cleaning:</strong> 68–85% more than a standard clean; move-in/move-out cleans run 88–105% more.</li>
+            <li><strong>Commercial Cleaning:</strong> $0.052–$0.185 per square foot per visit, depending on building type.</li>
+            <li><strong>Carpet Cleaning:</strong> $44–$100 per room, with a $90–$110 whole-home minimum.</li>
+            <li><strong>Mold Remediation:</strong> $750–$1,050 for a small spot under 10 sq ft, up to $8,500–$13,000+ for 300+ sq ft.</li>
+          </ul>
+
+          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>Key Pricing Factors</h2>
+          <p style={{ textAlign: 'center', color: '#64748b', fontSize: 14.5, maxWidth: 620, margin: '0 auto 18px', lineHeight: 1.7 }}>
+            Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 9 services, not just house cleaning.
+          </p>
+          <ul style={{ margin: '0 0 24px', paddingLeft: 20, color: '#374151', fontSize: 15, lineHeight: 1.9 }}>
+            <li><strong>Square Footage:</strong> Base price scales with home or space size — larger square footage means a higher price.</li>
+            <li><strong>Room Count:</strong> Extra bedrooms and bathrooms add roughly $15–$25 each on top of the base price.</li>
+            <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our 9 services asks its own scope questions. See the full breakdown by service below.</li>
+            <li><strong>Cleaning Frequency:</strong> Weekly service saves 20%, biweekly 15%, and monthly 10% off the one-time rate.</li>
+            <li><strong>Add-Ons:</strong> Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and similar extras are priced separately.</li>
+          </ul>
+          <p style={{ textAlign: 'center', fontSize: 13.5, color: '#94a3b8', marginBottom: 'clamp(28px, 6vw, 48px)' }}>
+            See the full breakdown on our <a href="/how-we-calculate-prices" style={{ color: '#2563eb', fontWeight: 600 }}>pricing methodology page</a>.
+          </p>
+
+          <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>What Affects Your Price, by Service</h2>
+          <p style={{ textAlign: 'center', color: '#64748b', fontSize: 14.5, maxWidth: 640, margin: '0 auto 24px', lineHeight: 1.7 }}>
+            Every service on this cleaning cost estimator asks its own scope questions — not just square footage and ZIP code. Here's exactly what factors into each one.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
+            {SERVICES.map(({ id, Icon, color, bg, title, href }) => (
+              <div key={id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '20px 22px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                  <span style={{ width: 30, height: 30, borderRadius: 9, background: bg, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Icon size={15} strokeWidth={2.1} />
+                  </span>
+                  <a href={href} style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', textDecoration: 'none' }}>{title}</a>
+                </div>
+                <ul style={{ margin: 0, paddingLeft: 18, color: '#475569', fontSize: 13, lineHeight: 1.7 }}>
+                  {(SERVICE_PRICE_FACTORS[id] || []).map((factor, i) => <li key={i}>{factor}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div id="services" style={{ background: 'white' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: 'clamp(40px, 8vw, 80px) 20px' }}>
 
           {/* Services grid */}
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.5px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 7vw, 52px)' }}>
+            <h2 style={{ fontSize: 'clamp(22px, 6vw, 32px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.5px' }}>
               Cleaning Cost Calculator — Every Service, Every State
             </h2>
             <p style={{ fontSize: 17, color: '#64748b', maxWidth: 580, margin: '0 auto' }}>
@@ -138,7 +329,7 @@ export default function SEOContent() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16, marginBottom: 80 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16, marginBottom: 'clamp(44px, 9vw, 80px)' }}>
             {SERVICES.map(({ Icon, color, bg, title, range, detail, href, facts }) => (
               <a
                 key={title} href={href}
@@ -158,7 +349,7 @@ export default function SEOContent() {
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {facts.map(f => (
                     <li key={f} style={{ fontSize: 13, color: '#475569', marginBottom: 5, display: 'flex', alignItems: 'flex-start', gap: 7 }}>
-                      <Check size={13} color="#16a34a" style={{ flexShrink: 0, marginTop: 1 }} />{f}
+                      <Check size={13} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" style={{ flexShrink: 0, marginTop: 1 }} />{f}
                     </li>
                   ))}
                 </ul>
@@ -167,22 +358,28 @@ export default function SEOContent() {
           </div>
 
           {/* State pricing table */}
-          <div style={{ marginBottom: 80 }}>
-            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
+          <div style={{ marginBottom: 'clamp(44px, 9vw, 80px)' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
               House Cleaning Cost by State — 2026 Averages
             </h2>
-            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, marginBottom: 32 }}>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, marginBottom: 'clamp(20px, 4.5vw, 32px)' }}>
               Average price for standard cleaning of a 2,000 sq ft home.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
               {STATES_DATA.map(s => (
-                <div key={s.state} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f8fafc', borderRadius: 10, padding: '13px 16px', border: '1px solid #f1f5f9' }}>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{s.state}</div>
-                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{s.note}</div>
+                <a key={s.state} href={s.href} style={{ textDecoration: 'none' }}>
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: '#f8fafc', borderRadius: 10, padding: '13px 16px', border: '1px solid #f1f5f9', transition: 'border-color 0.15s, background 0.15s' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#bfdbfe'; e.currentTarget.style.background = '#eff6ff'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#f1f5f9'; e.currentTarget.style.background = '#f8fafc'; }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontWeight: 700, fontSize: 14, color: '#0f172a' }}><MapPin size={12} color="#2563eb" />{s.state}</div>
+                      <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{s.note}</div>
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: '#2563eb', whiteSpace: 'nowrap', marginLeft: 12 }}>{s.avg}</div>
                   </div>
-                  <div style={{ fontWeight: 800, fontSize: 15, color: '#2563eb', whiteSpace: 'nowrap', marginLeft: 12 }}>{s.avg}</div>
-                </div>
+                </a>
               ))}
             </div>
             <p style={{ textAlign: 'center', fontSize: 12.5, color: '#94a3b8', marginTop: 14 }}>
@@ -190,9 +387,67 @@ export default function SEOContent() {
             </p>
           </div>
 
+          {/* How the cleaning estimator calculates price */}
+          <div style={{ marginBottom: 'clamp(44px, 9vw, 80px)' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
+              How Our Cleaning Cost Calculator Estimates your Price
+            </h2>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, maxWidth: 640, margin: '0 auto 12px' }}>
+              Clean Estimator is a free cleaning cost calculator that builds every quote from six real variables — not a flat national guess. Here's exactly what goes into your number.
+            </p>
+            <p style={{ textAlign: 'center', fontSize: 14, margin: '0 auto clamp(22px, 5vw, 36px)' }}>
+              <a href="/how-we-calculate-prices" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>See our full pricing methodology and sources &rarr;</a>
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, maxWidth: 980, margin: '0 auto' }}>
+              {PRICE_FACTORS.map(({ Icon, term, detail }) => (
+                <div key={term} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '20px 22px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                    <span style={{ width: 30, height: 30, borderRadius: 9, background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={15} strokeWidth={2.25} />
+                    </span>
+                    <strong style={{ fontSize: 15, color: '#0f172a' }}>{term}</strong>
+                  </div>
+                  <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: 0 }}>{detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Key features for businesses */}
+          <div style={{ marginBottom: 'clamp(44px, 9vw, 80px)' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 10, letterSpacing: '-0.3px' }}>
+              Key Features for Businesses
+            </h2>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 15, maxWidth: 620, margin: '0 auto clamp(20px, 4.5vw, 32px)' }}>
+              Clean Estimator isn't just a consumer tool — cleaning companies work with us two ways.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, maxWidth: 980, margin: '0 auto' }}>
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 26px' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Local Partner Program</h3>
+                <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: '0 0 14px' }}>
+                  Exclusive, one-partner-per-city placement — your business is recommended directly to homeowners in your city actively searching for cleaning services. From $175/month per city (major metros are $350/month), only one partner per city.
+                </p>
+                <a href="/partner-with-us" style={{ fontSize: 13.5, color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>See partner program details &rarr;</a>
+              </div>
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 26px' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Website Integration</h3>
+                <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: '0 0 14px' }}>
+                  Embed a branded, white-labeled cleaning cost calculator directly on your own website to capture leads. $159/month after a 30-day free trial, no credit card required.
+                </p>
+                <a href="/estimator" style={{ fontSize: 13.5, color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>See embeddable calculator details &rarr;</a>
+              </div>
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 26px' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>No Signup Needed for Consumers</h3>
+                <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: 0 }}>
+                  Homeowners get instant, free estimates without creating an account — so every lead reaching a partner or embedded calculator is already warm.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* FAQ */}
           <div>
-            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 36, letterSpacing: '-0.3px' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 5.2vw, 28px)', fontWeight: 700, color: '#0f172a', textAlign: 'center', marginBottom: 'clamp(22px, 5vw, 36px)', letterSpacing: '-0.3px' }}>
               Frequently Asked Questions
             </h2>
             <div style={{ maxWidth: 820, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12 }}>

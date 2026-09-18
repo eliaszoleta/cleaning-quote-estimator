@@ -1,10 +1,27 @@
 import React, { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, User, CreditCard, KeyRound } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
+import SubscriptionTab from './SubscriptionTab';
+import APIKeysTab from './APIKeysTab';
+import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
-export default function SettingsTab({ user, onLogout }) {
+const SECTIONS = [
+  { id: 'account',      Icon: User,       label: 'Account' },
+  { id: 'subscription', Icon: CreditCard, label: 'Subscription' },
+  { id: 'api',          Icon: KeyRound,   label: 'API Keys' },
+];
+
+export default function SettingsTab({ user, config, refetchConfig, saveConfig, saving, subStatus, onSubRefresh, section: sectionProp, onSectionChange }) {
+  // Falls back to its own state when no section/onSectionChange is passed
+  // (defensive -- every current call site controls this from
+  // CompanyDashboard so deep links like ?tab=settings&section=subscription
+  // land on the right pane, but this keeps the component usable standalone).
+  const [sectionState, setSectionState] = useState('account');
+  const section = sectionProp || sectionState;
+  const setSection = onSectionChange || setSectionState;
+
   const [pwNew, setPwNew] = useState('');
   const [pwConfirm, setPwConfirm] = useState('');
   const [pwLoading, setPwLoading] = useState(false);
@@ -12,6 +29,9 @@ export default function SettingsTab({ user, onLogout }) {
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [scheduledFor, setScheduledFor] = useState(config?.pendingDeletion?.scheduledFor || null);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelError, setCancelError] = useState('');
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -32,9 +52,13 @@ export default function SettingsTab({ user, onLogout }) {
     }
   };
 
+  // Schedules deletion 30 days out instead of deleting immediately -- the
+  // account stays fully logged-in and functional (minus the paused widget)
+  // for the whole grace period, so we deliberately do NOT sign out here.
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== 'DELETE') return;
     setDeleteLoading(true);
+    setDeleteError('');
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -44,23 +68,72 @@ export default function SettingsTab({ user, onLogout }) {
       });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Delete failed');
-      await supabase.auth.signOut();
-      if (onLogout) onLogout();
+      setScheduledFor(data.scheduledFor);
+      setDeleteConfirm('');
+      if (refetchConfig) refetchConfig();
     } catch (err) {
       setDeleteError(err.message || 'Failed to delete account. Please try again.');
+    } finally {
       setDeleteLoading(false);
     }
   };
 
+  const handleCancelDeletion = async () => {
+    setCancelLoading(true);
+    setCancelError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const res = await fetch(`${API_URL}/api/company/account/cancel-deletion`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Failed to cancel deletion');
+      setScheduledFor(null);
+      if (refetchConfig) refetchConfig();
+    } catch (err) {
+      setCancelError(err.message || 'Failed to cancel deletion. Please try again.');
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
   return (
-    <div style={{ maxWidth: 600 }}>
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Settings</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Manage your account settings.</p>
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, marginBottom: 2, letterSpacing: '-0.3px' }}>Settings</h2>
+        <p style={{ color: COLORS.body, fontSize: 14 }}>Manage your account settings.</p>
       </div>
 
+      {/* Section switcher -- Subscription and API Keys used to be their own
+          top-level sidebar items; folded in here as sub-sections instead. */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 24, borderBottom: `1px solid ${COLORS.border}` }}>
+        {SECTIONS.map(({ id, Icon, label }) => (
+          <button
+            key={id}
+            onClick={() => setSection(id)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '9px 4px', marginBottom: -1,
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontSize: 13.5, fontWeight: 600,
+              color: section === id ? COLORS.primary : COLORS.body,
+              borderBottom: `2px solid ${section === id ? COLORS.primary : 'transparent'}`,
+            }}
+          >
+            <Icon size={14} /> {label}
+          </button>
+        ))}
+      </div>
+
+      {section === 'subscription' && <SubscriptionTab subStatus={subStatus} onSubRefresh={onSubRefresh} />}
+      {section === 'api' && <APIKeysTab config={config} saveConfig={saveConfig} saving={saving} />}
+
+      {section === 'account' && (
+      <div style={{ maxWidth: 600 }}>
       {/* Account info + password */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>Account</div>
 
         <div style={{ marginBottom: 20 }}>
@@ -68,7 +141,7 @@ export default function SettingsTab({ user, onLogout }) {
           <input
             readOnly
             value={user?.email || ''}
-            style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13, background: '#f8fafc', color: '#64748b', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, background: '#f8fafc', color: '#64748b', boxSizing: 'border-box' }}
           />
         </div>
 
@@ -82,7 +155,7 @@ export default function SettingsTab({ user, onLogout }) {
               onChange={e => setPwNew(e.target.value)}
               placeholder="Min. 8 characters"
               required
-              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, boxSizing: 'border-box' }}
             />
           </div>
           <div style={{ marginBottom: 16 }}>
@@ -93,7 +166,7 @@ export default function SettingsTab({ user, onLogout }) {
               onChange={e => setPwConfirm(e.target.value)}
               placeholder="Repeat new password"
               required
-              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, boxSizing: 'border-box' }}
             />
           </div>
           {pwMsg && (
@@ -104,7 +177,7 @@ export default function SettingsTab({ user, onLogout }) {
           <button
             type="submit"
             disabled={pwLoading}
-            style={{ padding: '8px 18px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: pwLoading ? 'not-allowed' : 'pointer', opacity: pwLoading ? 0.7 : 1 }}
+            style={{ padding: '8px 18px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: pwLoading ? 'not-allowed' : 'pointer', opacity: pwLoading ? 0.7 : 1 }}
           >
             {pwLoading ? 'Updating…' : 'Update Password'}
           </button>
@@ -112,46 +185,79 @@ export default function SettingsTab({ user, onLogout }) {
       </div>
 
       {/* Danger Zone */}
-      <div style={{ background: 'white', border: '1px solid #fecaca', borderRadius: 12, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: 'white', border: '1px solid #fecaca', borderRadius: 7, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <AlertTriangle size={15} color="#dc2626" />
           <div style={{ fontSize: 11, fontWeight: 700, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Danger Zone</div>
         </div>
-        <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.6 }}>
-          Permanently deletes your account, all leads, settings, and branding. Your embedded widget will stop working immediately. <strong>This cannot be undone.</strong>
-        </p>
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
-            Type <strong>DELETE</strong> to confirm
-          </label>
-          <input
-            type="text"
-            value={deleteConfirm}
-            onChange={e => setDeleteConfirm(e.target.value)}
-            placeholder="DELETE"
-            style={{ width: '100%', padding: '8px 12px', border: '1px solid #fecaca', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
-          />
-        </div>
-        {deleteError && (
-          <div style={{ marginBottom: 12, fontSize: 13, padding: '8px 12px', borderRadius: 7, color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca' }}>
-            {deleteError}
-          </div>
+        {scheduledFor ? (
+          <>
+            <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.6 }}>
+              Your account is scheduled to be permanently deleted on{' '}
+              <strong>{new Date(scheduledFor).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</strong>.
+              Your embedded widget is paused until then. Changed your mind? You can cancel any time before that date and keep your account.
+            </p>
+            {cancelError && (
+              <div style={{ marginBottom: 12, fontSize: 13, padding: '8px 12px', borderRadius: 7, color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca' }}>
+                {cancelError}
+              </div>
+            )}
+            <button
+              onClick={handleCancelDeletion}
+              disabled={cancelLoading}
+              style={{
+                padding: '9px 20px',
+                background: cancelLoading ? '#f1f5f9' : '#16a34a',
+                color: cancelLoading ? '#94a3b8' : 'white',
+                border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 700,
+                cursor: cancelLoading ? 'not-allowed' : 'pointer',
+                transition: 'background 0.15s, color 0.15s',
+              }}
+            >
+              {cancelLoading ? 'Canceling…' : 'Cancel Deletion'}
+            </button>
+          </>
+        ) : (
+          <>
+            <p style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.6 }}>
+              Schedules your account for deletion in <strong>30 days</strong>. Your embedded widget pauses right away, but nothing is deleted immediately — you can log back in and cancel any time before then.
+            </p>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
+                Type <strong>DELETE</strong> to confirm
+              </label>
+              <input
+                type="text"
+                value={deleteConfirm}
+                onChange={e => setDeleteConfirm(e.target.value)}
+                placeholder="DELETE"
+                style={{ width: '100%', padding: '8px 12px', border: '1px solid #fecaca', borderRadius: 7, fontSize: 13, boxSizing: 'border-box' }}
+              />
+            </div>
+            {deleteError && (
+              <div style={{ marginBottom: 12, fontSize: 13, padding: '8px 12px', borderRadius: 7, color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca' }}>
+                {deleteError}
+              </div>
+            )}
+            <button
+              onClick={handleDeleteAccount}
+              disabled={deleteConfirm !== 'DELETE' || deleteLoading}
+              style={{
+                padding: '9px 20px',
+                background: deleteConfirm === 'DELETE' && !deleteLoading ? '#dc2626' : '#f1f5f9',
+                color: deleteConfirm === 'DELETE' && !deleteLoading ? 'white' : '#94a3b8',
+                border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 700,
+                cursor: deleteConfirm === 'DELETE' && !deleteLoading ? 'pointer' : 'not-allowed',
+                transition: 'background 0.15s, color 0.15s',
+              }}
+            >
+              {deleteLoading ? 'Scheduling…' : 'Delete My Account'}
+            </button>
+          </>
         )}
-        <button
-          onClick={handleDeleteAccount}
-          disabled={deleteConfirm !== 'DELETE' || deleteLoading}
-          style={{
-            padding: '9px 20px',
-            background: deleteConfirm === 'DELETE' && !deleteLoading ? '#dc2626' : '#f1f5f9',
-            color: deleteConfirm === 'DELETE' && !deleteLoading ? 'white' : '#94a3b8',
-            border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700,
-            cursor: deleteConfirm === 'DELETE' && !deleteLoading ? 'pointer' : 'not-allowed',
-            transition: 'background 0.15s, color 0.15s',
-          }}
-        >
-          {deleteLoading ? 'Deleting…' : 'Delete My Account'}
-        </button>
       </div>
+      </div>
+      )}
     </div>
   );
 }

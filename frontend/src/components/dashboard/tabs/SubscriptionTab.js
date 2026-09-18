@@ -4,14 +4,14 @@ import { postCheckout, postPortal } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 
 const FEATURES = [
-  { Icon: Globe,             text: 'Embeddable calculator widget on your website' },
+  { Icon: Globe,             text: 'Embeddable estimator widget on your website' },
   { Icon: Paintbrush,        text: 'Custom branding — colors, logo, CTA text' },
   { Icon: Users,             text: 'Lead capture & CRM dashboard' },
   { Icon: SlidersHorizontal, text: 'Per-service enable/disable and markup control' },
   { Icon: KeyRound,          text: 'API access for CRM integration' },
   { Icon: BarChart3,         text: 'Lead analytics and CSV export' },
   { Icon: Phone,             text: 'Priority support' },
-  { Icon: Infinity,          text: 'Unlimited calculator sessions per month' },
+  { Icon: Infinity,          text: 'Unlimited estimator sessions per month' },
 ];
 
 export default function SubscriptionTab({ subStatus, onSubRefresh }) {
@@ -63,9 +63,9 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   const sc = statusConfig[status] || { Icon: AlertTriangle, iconColor: '#94a3b8', bg: '#f8fafc', border: '#e2e8f0', title: 'No Active Plan' };
 
   const statusDetail = (() => {
-    if (status === 'requires_trial_setup') return 'Get 7 days free — credit card required, cancel anytime before your trial ends.';
-    if (status === 'trialing' && subStatus?.daysLeft > 0) return `${subStatus.daysLeft} days remaining in your trial.`;
-    if (status === 'trialing') return 'Your trial ends today.';
+    if (status === 'requires_trial_setup') return 'Get 30 days free — no credit card required.';
+    if (status === 'trialing' && subStatus?.daysLeft > 0) return `${subStatus.daysLeft} days remaining in your free trial — no credit card on file, subscribe anytime to keep your widget running after it ends.`;
+    if (status === 'trialing') return 'Your trial ends today. Subscribe now to keep your widget from pausing.';
     if (status === 'active' && subStatus?.currentPeriodEnd) return `Renews on ${new Date(subStatus.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`;
     if (status === 'active_canceling' && subStatus?.currentPeriodEnd) return `Active until ${new Date(subStatus.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Will not renew.`;
     if (status === 'past_due') return 'Your payment failed. Update your payment method to keep your widget active.';
@@ -76,21 +76,21 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   return (
     <div style={{ maxWidth: 600 }}>
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Subscription</h2>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Subscription</h2>
         <p style={{ color: '#64748b', fontSize: 14 }}>Manage your Clean Estimator plan and billing.</p>
       </div>
 
       {error && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '11px 14px', marginBottom: 18, color: '#dc2626', fontSize: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 7, padding: '11px 14px', marginBottom: 18, color: '#dc2626', fontSize: 14 }}>
           <AlertTriangle size={15} /> {error}
         </div>
       )}
 
       {/* Status card */}
-      <div style={{ borderRadius: 12, padding: '20px 22px', marginBottom: 18, background: sc.bg, border: `1px solid ${sc.border}`, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ borderRadius: 7, padding: '20px 22px', marginBottom: 18, background: sc.bg, border: `1px solid ${sc.border}`, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 14 }}>
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-            <div style={{ width: 42, height: 42, borderRadius: 10, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+            <div style={{ width: 42, height: 42, borderRadius: 7, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
               <sc.Icon size={22} color={sc.iconColor} strokeWidth={2} />
             </div>
             <div>
@@ -101,13 +101,13 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
           <div>
             {(!isActive || status === 'trialing') && (
               <button onClick={handleCheckout} disabled={loading === 'checkout'}
-                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'checkout' ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer' }}>
-                {loading === 'checkout' ? <><Loader2 size={14} className="spin" /> Redirecting…</> : status === 'requires_trial_setup' ? 'Start 7-Day Trial →' : status === 'trialing' ? 'Subscribe Now →' : 'Reactivate →'}
+                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'checkout' ? '#94a3b8' : '#2563eb', color: 'white', border: 'none', borderRadius: 7, fontWeight: 700, fontSize: 14, cursor: loading === 'checkout' ? 'not-allowed' : 'pointer' }}>
+                {loading === 'checkout' ? <><Loader2 size={14} className="spin" /> Redirecting…</> : status === 'requires_trial_setup' ? 'Get Started →' : status === 'trialing' ? 'Subscribe Now →' : 'Reactivate →'}
               </button>
             )}
             {(status === 'active' || status === 'active_canceling' || status === 'past_due') && (
               <button onClick={handlePortal} disabled={loading === 'portal'}
-                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'portal' ? '#94a3b8' : '#0f172a', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: loading === 'portal' ? 'not-allowed' : 'pointer' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'portal' ? '#94a3b8' : '#0f172a', color: 'white', border: 'none', borderRadius: 7, fontWeight: 700, fontSize: 14, cursor: loading === 'portal' ? 'not-allowed' : 'pointer' }}>
                 {loading === 'portal' ? <><Loader2 size={14} className="spin" /> Loading…</> : 'Manage Billing →'}
               </button>
             )}
@@ -116,7 +116,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
       </div>
 
       {/* Features */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>What's included</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {FEATURES.map(({ Icon, text }) => (
@@ -131,7 +131,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
       </div>
 
       {/* Pricing */}
-      <div style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)', border: '1px solid #bfdbfe', borderRadius: 12, padding: '20px 22px' }}>
+      <div style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)', border: '1px solid #bfdbfe', borderRadius: 7, padding: '20px 22px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginBottom: 4 }}>
           <span style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>$159</span>
           <span style={{ fontSize: 14, color: '#64748b', fontWeight: 500 }}>/month</span>

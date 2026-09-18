@@ -1,11 +1,10 @@
-const axios = require('axios');
+const { stateForZip } = require('../data/zipStateRanges');
 const {
   STATE_PRICING_MULTIPLIERS,
   HOME_SQFT_BASE_PRICES,
   BEDROOM_ADDON,
   BATHROOM_ADDON,
   CLEANING_TYPE_MULTIPLIERS,
-  FREQUENCY_DISCOUNTS,
   HOME_EXTRAS,
   CONDITION_MULTIPLIERS,
   APARTMENT_SIZE_PRICES,
@@ -35,9 +34,17 @@ const {
   TILE_SERVICE_ADDONS,
   TILE_MINIMUM,
   MOLD_PRICE_RANGES,
+  MOLD_TYPE_MULTIPLIERS,
+  MOLD_SOURCE_FIXED_MULTIPLIERS,
   MOLD_ADDONS,
   MOLD_COMMERCIAL_MULTIPLIER,
-  WATER_DAMAGE_RANGES,
+  WATER_EXTRACTION_DRYING_PER_SQFT,
+  WATER_EXTRACTION_DRYING_MINIMUM,
+  WATER_STRUCTURAL_DRYING_ADDON,
+  WATER_MOLD_PREVENTION_ADDON,
+  WATER_CONTENTS_PACKOUT_ADDON,
+  WATER_FULL_RESTORATION_PER_SQFT,
+  WATER_FULL_RESTORATION_MINIMUM,
   WATER_CATEGORY_MULTIPLIERS,
   STATE_NAMES,
 } = require('../config/defaults');
@@ -51,23 +58,17 @@ function addRange(a, b) {
 }
 function round2(n) { return Math.round(n * 100) / 100; }
 
-async function geocodeZip(zip) {
-  try {
-    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-      params: { postalcode: zip, country: 'US', format: 'json', limit: 1 },
-      headers: { 'User-Agent': 'CleanCalc/1.0 (cleaningcalculator.app)' },
-      timeout: 8000,
-    });
-    if (response.data && response.data.length > 0) {
-      const { display_name } = response.data[0];
-      const stateMatch = display_name.match(/,\s*([A-Z]{2}),\s*United States/);
-      const state = stateMatch ? stateMatch[1] : null;
-      return { state, display_name };
-    }
-  } catch (err) {
-    console.warn('Geocoding failed:', err.message);
+// Applies the minimum-charge floor and, if it actually raised the price,
+// records that as its own line item -- otherwise the itemized breakdown
+// could show line items adding up to far less than the total with no
+// explanation for the gap (e.g. a $95-121 job floored to a $500 minimum).
+function applyMinCharge(range, minCharge, adjustments) {
+  const flooredLow = Math.max(range.low, minCharge);
+  const flooredHigh = Math.max(range.high, minCharge);
+  if (flooredLow !== range.low || flooredHigh !== range.high) {
+    adjustments.push({ label: 'Brought up to minimum service charge', low: flooredLow - range.low, high: flooredHigh - range.high });
   }
-  return null;
+  return { low: flooredLow, high: flooredHigh };
 }
 
 function getStateMultiplier(state) {
@@ -99,9 +100,20 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
   let range = { low: base.low + bdAddon + baAddon, high: base.high + bdAddon + baAddon };
   range = applyMultiplier(range, stateMultiplier * markup);
 
-  const adjustments = [{ label: `Base price (${sqftTier.replace('_', '–')} sq ft)`, low: base.low, high: base.high }];
-  if (bdAddon > 0) adjustments.push({ label: `${bedrooms} bedrooms`, low: bdAddon, high: bdAddon });
-  if (baAddon > 0) adjustments.push({ label: `${bathrooms} bathrooms`, low: baAddon, high: baAddon });
+  // Show each line at its actual dollar contribution (state + markup already
+  // applied), not the raw table value -- a breakdown that lists $90-115 for
+  // the base price when the state-adjusted total is actually ~$95-121 looks
+  // like it doesn't add up to the total shown below it.
+  const baseAdj = applyMultiplier(base, stateMultiplier * markup);
+  const adjustments = [{ label: `Base price (${sqftTier.replace('_', '–')} sq ft)`, low: baseAdj.low, high: baseAdj.high }];
+  if (bdAddon > 0) {
+    const adj = applyMultiplier({ low: bdAddon, high: bdAddon }, stateMultiplier * markup);
+    adjustments.push({ label: `${bedrooms} bedrooms`, low: adj.low, high: adj.high });
+  }
+  if (baAddon > 0) {
+    const adj = applyMultiplier({ low: baAddon, high: baAddon }, stateMultiplier * markup);
+    adjustments.push({ label: `${bathrooms} bathrooms`, low: adj.low, high: adj.high });
+  }
 
   // Cleaning type multiplier
   const cleanMult = CLEANING_TYPE_MULTIPLIERS[cleaningType] || CLEANING_TYPE_MULTIPLIERS.standard;
@@ -130,11 +142,11 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
   }
 
   // Minimum
-  range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge);
+  range = applyMinCharge(range, minCharge, adjustments);
 
-  // Frequency discount
-  const discount = FREQUENCY_DISCOUNTS[frequency] || 0;
+  // Frequency discount -- off by default (0%) unless the company has set
+  // one for this frequency in the Discount tab (cfg.frequencyDiscounts).
+  const discount = cfg.frequencyDiscounts?.[frequency] || 0;
   let recurringLow = null, recurringHigh = null, annualSavings = null;
   if (frequency !== 'one_time' && discount > 0) {
     recurringLow = Math.round(range.low * (1 - discount));
@@ -187,11 +199,27 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
   }
   range = applyMultiplier(range, stateMultiplier * markup);
 
-  const adjustments = [{ label: `${size.toUpperCase()} apartment`, low: base.low, high: base.high }];
+  // Each line shows its actual dollar contribution (state + markup already
+  // applied) -- previously this only ever listed one flat, unadjusted base
+  // line, so the bathroom addon, the unfurnished discount, and the
+  // cleaning-type multiplier were all silently baked into the total with no
+  // corresponding line item to explain them.
+  const baseAdj = applyMultiplier(base, stateMultiplier * markup);
+  const adjustments = [{ label: `${size.toUpperCase()} apartment`, low: baseAdj.low, high: baseAdj.high }];
+  if (baAddon > 0) {
+    const adj = applyMultiplier({ low: baAddon, high: baAddon }, stateMultiplier * markup);
+    adjustments.push({ label: `${bathrooms} bathrooms`, low: adj.low, high: adj.high });
+  }
+  if (!furnished) {
+    const fullPrice = applyMultiplier({ low: base.low + baAddon, high: base.high + baAddon }, stateMultiplier * markup);
+    adjustments.push({ label: 'Unfurnished discount (-15%)', low: range.low - fullPrice.low, high: range.high - fullPrice.high });
+  }
 
   const cleanMult = CLEANING_TYPE_MULTIPLIERS[cleaningType] || CLEANING_TYPE_MULTIPLIERS.standard;
   if (cleaningType !== 'standard') {
+    const before = { ...range };
     range = { low: Math.round(range.low * cleanMult.low), high: Math.round(range.high * cleanMult.high) };
+    adjustments.push({ label: `${cleaningType.replace('_', ' ')} multiplier`, low: range.low - before.low, high: range.high - before.high });
   }
 
   for (const extra of extras) {
@@ -203,16 +231,16 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
     }
   }
 
-  range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge);
+  range = applyMinCharge(range, minCharge, adjustments);
 
-  const discount = FREQUENCY_DISCOUNTS[frequency] || 0;
+  const discount = cfg.frequencyDiscounts?.[frequency] || 0;
   let recurringLow = null, recurringHigh = null, annualSavings = null;
   if (frequency !== 'one_time' && discount > 0) {
     recurringLow = Math.round(range.low * (1 - discount));
     recurringHigh = Math.round(range.high * (1 - discount));
     const visitsPerYear = { weekly: 52, biweekly: 26, monthly: 12 }[frequency] || 12;
     annualSavings = Math.round(((range.low + range.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
+    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: -Math.round(range.low * discount), high: -Math.round(range.high * discount) });
   }
 
   return {
@@ -254,20 +282,39 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
   const levelMult = COMMERCIAL_SERVICE_LEVELS[serviceLevel] || COMMERCIAL_SERVICE_LEVELS.standard;
   const visitsPerMonth = COMMERCIAL_VISITS_PER_MONTH[frequency] || 4;
 
-  const afterHoursMult = afterHours ? 1.15 : 1.0;
+  // Computed without the after-hours multiplier first so the surcharge line
+  // below can show the true incremental amount -- multiplying the
+  // already-surcharged per-visit rate by 0.15 (the old approach) overstates
+  // the real +15% delta, since 15% of a value that's already ×1.15 is more
+  // than the actual difference between the with- and without-surcharge price.
+  const perVisitBaseLow = Math.round(sqft * sqftRate.low * levelMult.low * stateMultiplier * markup);
+  const perVisitBaseHigh = Math.round(sqft * sqftRate.high * levelMult.high * stateMultiplier * markup);
 
-  const perVisitLow = Math.round(sqft * sqftRate.low * levelMult.low * afterHoursMult * stateMultiplier * markup);
-  const perVisitHigh = Math.round(sqft * sqftRate.high * levelMult.high * afterHoursMult * stateMultiplier * markup);
+  const monthlyBaseLow = perVisitBaseLow * visitsPerMonth;
+  const monthlyBaseHigh = perVisitBaseHigh * visitsPerMonth;
 
-  const monthlyLow = Math.max(perVisitLow * visitsPerMonth, minCharge);
-  const monthlyHigh = Math.max(perVisitHigh * visitsPerMonth, minCharge);
-
+  // One line showing the actual monthly dollar amount this represents,
+  // instead of a per-visit rate paired with a separate "N visits/month"
+  // line that carried no dollar figure of its own -- the biggest number in
+  // a commercial quote was previously invisible in its own breakdown.
   const adjustments = [
-    { label: `${buildingType} @ ${sqft.toLocaleString()} sq ft`, low: perVisitLow, high: perVisitHigh },
-    { label: `${visitsPerMonth} visits/month`, low: 0, high: 0 },
+    { label: `${buildingType} @ ${sqft.toLocaleString()} sq ft (${visitsPerMonth}x/month @ $${perVisitBaseLow}–$${perVisitBaseHigh}/visit)`, low: monthlyBaseLow, high: monthlyBaseHigh },
   ];
 
-  if (afterHours) adjustments.push({ label: 'After-hours access (+15%)', low: Math.round(perVisitLow * 0.15), high: Math.round(perVisitHigh * 0.15) });
+  let afterHoursMonthlyLow = 0, afterHoursMonthlyHigh = 0;
+  if (afterHours) {
+    const perVisitAHLow = Math.round(perVisitBaseLow * 0.15);
+    const perVisitAHHigh = Math.round(perVisitBaseHigh * 0.15);
+    afterHoursMonthlyLow = perVisitAHLow * visitsPerMonth;
+    afterHoursMonthlyHigh = perVisitAHHigh * visitsPerMonth;
+    adjustments.push({ label: 'After-hours access (+15%)', low: afterHoursMonthlyLow, high: afterHoursMonthlyHigh });
+  }
+
+  const { low: monthlyLow, high: monthlyHigh } = applyMinCharge(
+    { low: monthlyBaseLow + afterHoursMonthlyLow, high: monthlyBaseHigh + afterHoursMonthlyHigh },
+    minCharge,
+    adjustments,
+  );
 
   let porterMonthlyLow = 0, porterMonthlyHigh = 0;
   if (dayPorter) {
@@ -277,14 +324,34 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'Day porter (monthly)', low: porterMonthlyLow, high: porterMonthlyHigh });
   }
 
-  const restroomSurcharge = restrooms > 2 ? (restrooms - 2) * 30 : 0;
-  if (restroomSurcharge > 0) adjustments.push({ label: `${restrooms} restrooms surcharge`, low: restroomSurcharge, high: restroomSurcharge });
+  // $30/restroom beyond a baseline that scales with the property's size --
+  // a flat "2 included" regardless of building size meant a 500 sq ft
+  // office and a 14,000 sq ft medical building were held to the same bar,
+  // so a large building with a perfectly normal restroom count for its
+  // size (plumbing code scales fixture counts with occupancy/sqft) got
+  // surcharged as if every restroom past 2 were unusual. The smallest tier
+  // matches the old flat constant so the common small-office default
+  // (~2,000 sq ft) is unaffected; larger tiers raise the included baseline
+  // to track what's actually typical for that size instead of guessing one
+  // number for every building.
+  const restroomBaseline =
+    sqft <= 3000 ? 2 :
+    sqft <= 8000 ? 3 :
+    sqft <= 15000 ? 4 :
+    sqft <= 25000 ? 5 : 6;
+  const extraRestrooms = restrooms > restroomBaseline ? restrooms - restroomBaseline : 0;
+  const restroomSurcharge = Math.round(extraRestrooms * 30 * stateMultiplier * markup);
+  // Spell out the baseline instead of just showing the raw restroom count --
+  // a label like "14 restrooms surcharge: $360" reads as if all 14 are
+  // being charged, when only the restrooms beyond what's typical for a
+  // property this size actually are.
+  if (restroomSurcharge > 0) adjustments.push({ label: `${extraRestrooms} extra restrooms (${restrooms} total, ${restroomBaseline} typical for ${sqft.toLocaleString()} sq ft) surcharge`, low: restroomSurcharge, high: restroomSurcharge });
 
   return {
     serviceType: 'commercial',
     totalLow: monthlyLow + porterMonthlyLow + restroomSurcharge,
     totalHigh: monthlyHigh + porterMonthlyHigh + restroomSurcharge,
-    basePrice: (perVisitLow + perVisitHigh) / 2,
+    basePrice: (perVisitBaseLow + perVisitBaseHigh) / 2,
     adjustments,
     unit: 'per_month',
     recurringMonthlyLow: monthlyLow + porterMonthlyLow,
@@ -354,8 +421,7 @@ function calculateCarpet(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: `${stairs} flight(s) of stairs`, low: stairAdj.low, high: stairAdj.high });
   }
 
-  range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge);
+  range = applyMinCharge(range, minCharge, adjustments);
 
   return {
     serviceType: 'carpet',
@@ -391,26 +457,42 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
   const markup = cfg.markup || 1.0;
   const minCharge = cfg.minimumCharge || 300;
 
+  // Each line below shows its actual, state/markup-adjusted dollar
+  // contribution -- previously the extra-vents and extra-systems addons
+  // were silently folded into the total with only a flat, unadjusted "Base
+  // duct cleaning" line ever shown, so a customer with more vents than the
+  // default tier had no way to see what that was costing them.
   let range;
+  const adjustments = [];
   if (propertyType === 'commercial') {
     range = {
       low: Math.round(sqft * AIR_DUCT_COMMERCIAL_PER_SQFT.low),
       high: Math.round(sqft * AIR_DUCT_COMMERCIAL_PER_SQFT.high),
     };
+    const adj = applyMultiplier(range, stateMultiplier * markup);
+    adjustments.push({ label: `Commercial duct cleaning (${sqft.toLocaleString()} sq ft)`, low: adj.low, high: adj.high });
   } else {
     range = { ...AIR_DUCT_BASE };
+    const baseAdj = applyMultiplier(AIR_DUCT_BASE, stateMultiplier * markup);
+    adjustments.push({ label: 'Base duct cleaning', low: baseAdj.low, high: baseAdj.high });
+
     const extraVents = { 'under_10': 0, '10_20': 5, '20_30': 15, '30_plus': 25 }[ventCount] || 0;
     if (extraVents > 0) {
-      range = addRange(range, { low: extraVents * AIR_DUCT_PER_VENT.low, high: extraVents * AIR_DUCT_PER_VENT.high });
+      const ventAddon = { low: extraVents * AIR_DUCT_PER_VENT.low, high: extraVents * AIR_DUCT_PER_VENT.high };
+      range = addRange(range, ventAddon);
+      const adj = applyMultiplier(ventAddon, stateMultiplier * markup);
+      adjustments.push({ label: `${extraVents} additional vents`, low: adj.low, high: adj.high });
     }
     if (systemCount > 1) {
       const extraSystems = systemCount - 1;
-      range = addRange(range, { low: extraSystems * AIR_DUCT_PER_SYSTEM.low, high: extraSystems * AIR_DUCT_PER_SYSTEM.high });
+      const sysAddon = { low: extraSystems * AIR_DUCT_PER_SYSTEM.low, high: extraSystems * AIR_DUCT_PER_SYSTEM.high };
+      range = addRange(range, sysAddon);
+      const adj = applyMultiplier(sysAddon, stateMultiplier * markup);
+      adjustments.push({ label: `${extraSystems} additional HVAC system(s)`, low: adj.low, high: adj.high });
     }
   }
 
   range = applyMultiplier(range, stateMultiplier * markup);
-  const adjustments = [{ label: 'Base duct cleaning', low: AIR_DUCT_BASE.low, high: AIR_DUCT_BASE.high }];
 
   for (const extra of extras) {
     if (AIR_DUCT_ADDONS[extra]) {
@@ -426,8 +508,7 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'Mold suspected surcharge (+43–47%)', low: moldSurcharge.low, high: moldSurcharge.high });
   }
 
-  range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge);
+  range = applyMinCharge(range, minCharge, adjustments);
 
   return {
     serviceType: 'air_duct',
@@ -463,34 +544,63 @@ function calculateDryerVent(details, stateMultiplier, companyConfig) {
   const markup = cfg.markup || 1.0;
   const minCharge = cfg.minimumCharge || 80;
 
+  // Each line shows its actual, state/markup-adjusted dollar contribution.
+  // Previously this always returned a flat "Base dryer vent cleaning:
+  // $105-138" line no matter what -- for the commercial branch that label
+  // and those numbers are simply wrong (commercial is priced per-dryer at a
+  // completely different rate), and for residential the length/type addons
+  // were silently priced in but never shown as their own line.
   let range;
+  let adjustments;
+  let basePriceDisplay;
   if (propertyType === 'commercial') {
-    range = applyMultiplier({ low: dryerCount * DRYER_VENT_COMMERCIAL_RATE.low, high: dryerCount * DRYER_VENT_COMMERCIAL_RATE.high }, stateMultiplier * markup);
+    const rateAdj = applyMultiplier(DRYER_VENT_COMMERCIAL_RATE, stateMultiplier * markup);
+    range = { low: dryerCount * rateAdj.low, high: dryerCount * rateAdj.high };
+    adjustments = [{ label: `${dryerCount} commercial dryer vent(s)`, low: range.low, high: range.high }];
+    basePriceDisplay = (DRYER_VENT_COMMERCIAL_RATE.low + DRYER_VENT_COMMERCIAL_RATE.high) / 2;
   } else {
+    const baseAdj = applyMultiplier(DRYER_VENT_BASE, stateMultiplier * markup);
+    adjustments = [{ label: 'Base dryer vent cleaning', low: baseAdj.low, high: baseAdj.high }];
     range = { ...DRYER_VENT_BASE };
+
     const lengthAddon = DRYER_VENT_LENGTH_ADDON[ventLength] || DRYER_VENT_LENGTH_ADDON.medium;
+    if (lengthAddon.low > 0 || lengthAddon.high > 0) {
+      range = addRange(range, lengthAddon);
+      const adj = applyMultiplier(lengthAddon, stateMultiplier * markup);
+      adjustments.push({ label: `Vent length: ${ventLength}`, low: adj.low, high: adj.high });
+    }
+
     const typeAddon = DRYER_VENT_TYPE_ADDON[ventType] || DRYER_VENT_TYPE_ADDON.standard;
-    range = addRange(addRange(range, lengthAddon), typeAddon);
-    if (clogSuspected) range = addRange(range, DRYER_VENT_CLOG_ADDON);
+    if (typeAddon.low > 0 || typeAddon.high > 0) {
+      range = addRange(range, typeAddon);
+      const adj = applyMultiplier(typeAddon, stateMultiplier * markup);
+      adjustments.push({ label: `Vent type: ${ventType.replace(/_/g, ' ')}`, low: adj.low, high: adj.high });
+    }
+
+    if (clogSuspected) {
+      range = addRange(range, DRYER_VENT_CLOG_ADDON);
+      const adj = applyMultiplier(DRYER_VENT_CLOG_ADDON, stateMultiplier * markup);
+      adjustments.push({ label: 'Clog removal', low: adj.low, high: adj.high });
+    }
+
     range = applyMultiplier(range, stateMultiplier * markup);
+    basePriceDisplay = (DRYER_VENT_BASE.low + DRYER_VENT_BASE.high) / 2;
   }
 
   if (multiUnit && dryerCount >= 10) {
+    const before = { ...range };
     range = applyMultiplier(range, 0.85);
+    adjustments.push({ label: 'Multi-unit bulk discount (-15%)', low: range.low - before.low, high: range.high - before.high });
   }
 
-  range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge);
+  range = applyMinCharge(range, minCharge, adjustments);
 
   return {
     serviceType: 'dryer_vent',
     totalLow: range.low,
     totalHigh: range.high,
-    basePrice: (DRYER_VENT_BASE.low + DRYER_VENT_BASE.high) / 2,
-    adjustments: [
-      { label: 'Base dryer vent cleaning', low: DRYER_VENT_BASE.low, high: DRYER_VENT_BASE.high },
-      ...(clogSuspected ? [{ label: 'Clog removal', low: DRYER_VENT_CLOG_ADDON.low, high: DRYER_VENT_CLOG_ADDON.high }] : []),
-    ],
+    basePrice: basePriceDisplay,
+    adjustments,
     unit: 'flat',
     recurringMonthlyLow: null,
     recurringMonthlyHigh: null,
@@ -547,13 +657,12 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'Grout recoloring', low: adj.low, high: adj.high });
   }
   if (services.includes('caulk_replacement') && caulkLinearFt > 0) {
-    const adj = { low: Math.round(caulkLinearFt * TILE_SERVICE_ADDONS.caulk_replacement.perLinFt.low), high: Math.round(caulkLinearFt * TILE_SERVICE_ADDONS.caulk_replacement.perLinFt.high) };
+    const adj = { low: Math.round(caulkLinearFt * TILE_SERVICE_ADDONS.caulk_replacement.perLinFt.low * stateMultiplier * markup), high: Math.round(caulkLinearFt * TILE_SERVICE_ADDONS.caulk_replacement.perLinFt.high * stateMultiplier * markup) };
     range = addRange(range, adj);
     adjustments.push({ label: `Caulk replacement (${caulkLinearFt} lin ft)`, low: adj.low, high: adj.high });
   }
 
-  range.low = Math.max(range.low, minCharge);
-  range.high = Math.max(range.high, minCharge);
+  range = applyMinCharge(range, minCharge, adjustments);
 
   return {
     serviceType: 'tile_grout',
@@ -588,9 +697,20 @@ function calculateMold(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.moldRemediation || {};
   const markup = cfg.markup || 1.0;
+  const minCharge = cfg.minimumCharge || 0;
 
-  let range = { ...(MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium) };
-  range = applyMultiplier(range, stateMultiplier * markup);
+  const baseTier = MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium;
+  const typeMult = MOLD_TYPE_MULTIPLIERS[moldType] || MOLD_TYPE_MULTIPLIERS.not_sure;
+  const sourceMult = MOLD_SOURCE_FIXED_MULTIPLIERS[sourceFixed] || MOLD_SOURCE_FIXED_MULTIPLIERS.not_sure;
+
+  // Known mold type and moisture-source status refine (narrow) the tier's base range
+  // instead of leaving every job at the full tier width.
+  const refinedBase = {
+    low: baseTier.low * typeMult.low * sourceMult.low,
+    high: baseTier.high * typeMult.high * sourceMult.high,
+  };
+
+  let range = applyMultiplier(refinedBase, stateMultiplier * markup);
 
   if (propertyType === 'commercial') {
     range = { low: Math.round(range.low * MOLD_COMMERCIAL_MULTIPLIER.low), high: Math.round(range.high * MOLD_COMMERCIAL_MULTIPLIER.high) };
@@ -614,13 +734,17 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'Post-remediation clearance test', low: adj.low, high: adj.high });
   }
 
+  if (minCharge > 0) {
+    range = applyMinCharge(range, minCharge, adjustments);
+  }
+
   const sourceWarning = sourceFixed === 'not_fixed' || sourceFixed === 'not_sure';
 
   return {
     serviceType: 'mold_remediation',
     totalLow: range.low,
     totalHigh: range.high,
-    basePrice: ((MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium).low + (MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium).high) / 2,
+    basePrice: (baseTier.low + baseTier.high) / 2,
     adjustments,
     unit: 'flat',
     recurringMonthlyLow: null,
@@ -629,6 +753,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     keyFactors: [
       { label: 'Affected area', impact: affectedSize },
       { label: 'Mold type', impact: moldType },
+      { label: 'Moisture source', impact: sourceFixed === 'yes' ? 'Fixed' : sourceFixed === 'not_fixed' ? 'Still leaking' : 'Unknown' },
       { label: 'Locations', impact: locations.join(', ') },
     ],
     disclaimer: `IMPORTANT: These are preliminary estimates only. Mold remediation pricing requires an in-person inspection by a licensed remediation contractor. Final costs depend on the extent of contamination, building materials, and local regulations.${sourceWarning ? ' The moisture source must be identified and fixed BEFORE remediation, or mold will return.' : ''}`,
@@ -650,46 +775,69 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.waterDamage || {};
   const markup = cfg.markup || 1.0;
+  const minCharge = cfg.minimumCharge || 0;
 
   const catMult = WATER_CATEGORY_MULTIPLIERS[waterCategory] || WATER_CATEGORY_MULTIPLIERS.clean;
 
-  // Base: extraction + drying — apply category multiplier asymmetrically (low/high)
+  // Extraction + drying scales with the actual affected sq ft (from the calculator's area
+  // slider) instead of quoting every job the same flat range, floored at a small-loss minimum.
+  const rawExtraction = {
+    low: Math.max(sqft * WATER_EXTRACTION_DRYING_PER_SQFT.low, WATER_EXTRACTION_DRYING_MINIMUM.low),
+    high: Math.max(sqft * WATER_EXTRACTION_DRYING_PER_SQFT.high, WATER_EXTRACTION_DRYING_MINIMUM.high),
+  };
+
   let range = {
-    low: Math.round(WATER_DAMAGE_RANGES.extraction_drying.low * catMult.low),
-    high: Math.round(WATER_DAMAGE_RANGES.extraction_drying.high * catMult.high),
+    low: Math.round(rawExtraction.low * catMult.low),
+    high: Math.round(rawExtraction.high * catMult.high),
   };
   range = applyMultiplier(range, stateMultiplier * markup);
 
-  const adjustments = [{ label: 'Water extraction + drying (3–5 days)', low: WATER_DAMAGE_RANGES.extraction_drying.low, high: WATER_DAMAGE_RANGES.extraction_drying.high }];
+  const adjustments = [{ label: 'Water extraction + drying (3–5 days)', low: range.low, high: range.high }];
 
   if (damageClass === 'wet_walls' || damageClass === 'structural') {
-    const adj = applyMultiplier({ ...WATER_DAMAGE_RANGES.structural_drying }, stateMultiplier * markup);
+    const adj = applyMultiplier({ ...WATER_STRUCTURAL_DRYING_ADDON }, stateMultiplier * markup);
     range = addRange(range, adj);
     adjustments.push({ label: 'Structural drying (walls opened)', low: adj.low, high: adj.high });
   }
 
-  // Mold prevention if >24h
+  // Mold prevention if >72h
   const moldRisk = ['days_3_7', 'week_plus'].includes(whenHappened);
   if (moldRisk) {
-    const adj = applyMultiplier({ ...WATER_DAMAGE_RANGES.mold_prevention }, stateMultiplier * markup);
+    const adj = applyMultiplier({ ...WATER_MOLD_PREVENTION_ADDON }, stateMultiplier * markup);
     range = addRange(range, adj);
     adjustments.push({ label: 'Mold prevention treatment (required)', low: adj.low, high: adj.high });
+  }
+
+  if (contentsDamaged) {
+    const adj = applyMultiplier({ ...WATER_CONTENTS_PACKOUT_ADDON }, stateMultiplier * markup);
+    range = addRange(range, adj);
+    adjustments.push({ label: 'Furniture / contents pack-out & cleaning', low: adj.low, high: adj.high });
+  }
+
+  if (minCharge > 0) {
+    range = applyMinCharge(range, minCharge, adjustments);
   }
 
   const urgencyMsg = whenHappened === 'today' || whenHappened === '24_48h'
     ? 'Act now — mold can begin growing within 24–48 hours of water damage.'
     : 'Mold growth is likely after this time period. Remediation may be required in addition to restoration.';
 
-  // For large areas, add full restoration estimate
+  // For large or multi-area losses, show a separate (not summed into the total above)
+  // full-restoration ballpark, scaled per sq ft rather than one flat $2k–$25k range.
   if (sqft > 1000 || areas.length > 1) {
-    adjustments.push({ label: 'Full restoration (drywall, flooring) — separate estimate', low: WATER_DAMAGE_RANGES.full_restoration.low, high: WATER_DAMAGE_RANGES.full_restoration.high });
+    const fullRestoration = {
+      low: Math.max(sqft * WATER_FULL_RESTORATION_PER_SQFT.low, WATER_FULL_RESTORATION_MINIMUM.low),
+      high: Math.max(sqft * WATER_FULL_RESTORATION_PER_SQFT.high, WATER_FULL_RESTORATION_MINIMUM.high),
+    };
+    const adj = applyMultiplier(fullRestoration, stateMultiplier * markup);
+    adjustments.push({ label: 'Full restoration (drywall, flooring) — separate estimate, not included above', low: adj.low, high: adj.high, separate: true });
   }
 
   return {
     serviceType: 'water_damage',
     totalLow: range.low,
     totalHigh: range.high,
-    basePrice: (WATER_DAMAGE_RANGES.extraction_drying.low + WATER_DAMAGE_RANGES.extraction_drying.high) / 2,
+    basePrice: Math.round((rawExtraction.low + rawExtraction.high) / 2),
     adjustments,
     unit: 'flat',
     recurringMonthlyLow: null,
@@ -697,6 +845,8 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
     recurringAnnualSavings: null,
     keyFactors: [
       { label: 'Water category', impact: waterCategory + ' water' },
+      { label: 'Cause', impact: cause.replace(/_/g, ' ') },
+      { label: 'Affected area', impact: `${sqft.toLocaleString()} sq ft` },
       { label: 'Time elapsed', impact: whenHappened },
       { label: 'Insurance', impact: hasInsurance ? 'May be covered' : 'Out of pocket' },
     ],
@@ -710,12 +860,16 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
 async function calculateCleaning(inputs, companyConfig = {}) {
   const { serviceType, zip, state: providedState, serviceDetails = {} } = inputs;
 
-  // Resolve state
-  let resolvedState = providedState || 'TX';
-  if (zip) {
-    const geo = await geocodeZip(zip);
-    if (geo && geo.state) resolvedState = geo.state;
-  }
+  // Resolve state -- an explicitly provided state is authoritative and
+  // never overridden by a ZIP lookup, even when a ZIP was also given (the
+  // location step now only ever collects ZIP as an optional field once a
+  // state is already selected, validated client-side against that same
+  // state -- see frontend/src/data/zipStateRanges.js). ZIP-based
+  // resolution only runs as a fallback when no state was provided at all
+  // (a caller bypassing the normal flow, e.g. a direct API integration);
+  // an unresolved ZIP then leaves the state genuinely unknown (null)
+  // rather than guessing a real, price-affecting state.
+  const resolvedState = providedState || (zip ? stateForZip(zip) : null);
 
   const stateMultiplier = getStateMultiplier(resolvedState);
   const stateName = STATE_NAMES[resolvedState] || resolvedState;
@@ -743,4 +897,4 @@ async function calculateCleaning(inputs, companyConfig = {}) {
   };
 }
 
-module.exports = { calculateCleaning, geocodeZip };
+module.exports = { calculateCleaning };

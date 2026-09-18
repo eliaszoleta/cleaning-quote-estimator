@@ -1,0 +1,183 @@
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Phone, X, MapPin } from 'lucide-react';
+import { getCachedPartnerMatch, logBannerEvent } from '../../utils/partnerLookup';
+
+const DISMISS_KEY = 'cleanestimator_partner_banner_dismissed';
+
+// Matches CleaningCalculator.js's card width (the widest centered content
+// column this banner shares a viewport with) -- used to work out whether
+// there's actually clear space to its right before docking the roomy
+// top-anchored card there, instead of a guessed viewport-width breakpoint.
+const CONTENT_MAX_WIDTH = 720;
+const DESKTOP_BANNER_WIDTH = 268;
+const DESKTOP_RIGHT_OFFSET = 16;
+const SAFE_GAP = 24;
+
+// True once the margin beside the centered content column is wide enough
+// for the full-size card to sit in without touching it. Below that width --
+// most laptops in the ~900-1280px range, where the 720px-wide column eats
+// most of the viewport -- we fall back to the small, bottom-corner "mobile"
+// treatment instead, which is a much smaller target to overlap and already
+// carries a dismiss button.
+export function computeIsCompact() {
+  const margin = (window.innerWidth - CONTENT_MAX_WIDTH) / 2;
+  return margin < DESKTOP_RIGHT_OFFSET + DESKTOP_BANNER_WIDTH + SAFE_GAP;
+}
+
+// The actual card, with no opinion on where its `partner` data comes from --
+// FloatingPartnerBanner below feeds it a real, geo-matched partner; the
+// /partner-demo page feeds it sample data directly so a prospect can see
+// this exact placement without needing to be in an active partner's city.
+// `fixed` (default true) is the only other seam: the real banner and the
+// live demo both pin it to the viewport, but the Get Leads page hero shows
+// this same card inside a small static mockup, where it needs to sit in
+// the corner of that mockup instead of the real browser window.
+export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, fixed = true }) {
+  return (
+    <div
+      role="complementary"
+      aria-label={`Recommended local cleaner: ${partner.business_name}`}
+      style={{
+        position: fixed ? 'fixed' : 'absolute',
+        top: fixed ? (isMobile ? 'auto' : 80) : 14,
+        bottom: fixed && isMobile ? 12 : 'auto',
+        right: fixed ? (isMobile ? 10 : DESKTOP_RIGHT_OFFSET) : 14,
+        zIndex: 90,
+        // Mobile: shrink to whatever the content actually needs (usually the
+        // "Call ..." button, since the address is allowed to wrap) instead
+        // of always claiming the full 218px, which left a visible strip of
+        // empty card on shorter business names/numbers.
+        width: isMobile ? 'fit-content' : DESKTOP_BANNER_WIDTH,
+        // 218px was clamping longer one-line addresses (e.g. "4232 Mangum rd
+        // Houston Texas 77092") into a wrap even though fit-content would
+        // otherwise size the card to fit it -- raised the cap so it has
+        // enough room, while still shrinking down for shorter listings.
+        maxWidth: isMobile ? 'min(260px, calc(100vw - 20px))' : 'calc(100vw - 20px)',
+        background: 'white',
+        border: isMobile ? '1px solid rgba(15,23,42,0.045)' : '1px solid rgba(15,23,42,0.07)',
+        borderRadius: isMobile ? 6 : 16,
+        overflow: 'hidden',
+        boxShadow: isMobile
+          ? '0 1px 3px rgba(15,23,42,0.04), 0 8px 18px rgba(37,99,235,0.10)'
+          : '0 2px 6px rgba(15,23,42,0.05), 0 18px 38px rgba(37,99,235,0.14)',
+        padding: isMobile ? '8px 8px' : '14px 16px',
+        animation: `partnerBannerIn 0.25s ease-out`,
+      }}
+    >
+      <style>{`@keyframes partnerBannerIn { from { opacity: 0; transform: translateY(${isMobile ? 8 : -8}px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+
+      {/* Thin brand-color accent instead of a full outline -- a nod to the
+          blue border this replaced, without boxing the whole card in it. */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: isMobile ? 2 : 3, background: 'linear-gradient(90deg, #2563eb, #7c3aed)' }} />
+
+      {/* No dismiss control on mobile -- the card is already small and
+          non-blocking there, so there's no close affordance to give. */}
+      {!isMobile && (
+        <button
+          onClick={onDismiss}
+          aria-label="Dismiss"
+          style={{ position: 'absolute', top: 10, right: 8, background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#94a3b8', display: 'flex' }}
+        >
+          <X size={14} />
+        </button>
+      )}
+
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 4 : 10 }}>
+        <div style={{ fontSize: 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
+          Local Cleaner Near You
+        </div>
+      </div>
+
+      {partner.logo_url && (
+        <img
+          src={partner.logo_url}
+          alt={partner.business_name}
+          style={{ maxWidth: '100%', maxHeight: isMobile ? 20 : 44, objectFit: 'contain', display: 'block', margin: isMobile ? '0 auto 4px' : '0 auto 10px' }}
+        />
+      )}
+
+      <div style={{ marginBottom: isMobile ? 5 : 12, textAlign: partner.logo_url ? 'center' : 'left' }}>
+        <div style={{ fontWeight: 800, fontSize: isMobile ? 11.5 : 14.5, color: '#0f172a', lineHeight: isMobile ? 1.15 : 1.25 }}>
+          {partner.business_name}
+        </div>
+        {partner.address && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: partner.logo_url ? 'center' : 'flex-start', gap: 4, fontSize: isMobile ? 10.5 : 12, color: '#64748b', marginTop: isMobile ? 1 : 2 }}>
+            {/* Pin icon dropped on mobile -- this card is only 218px wide there,
+                so the icon's width was pushing "4232 Mangum rd Houston Texas"
+                onto a second line instead of fitting on one. */}
+            {!isMobile && <MapPin size={11} color="#94a3b8" />} {partner.address}
+          </div>
+        )}
+      </div>
+
+      {partner.phone && (
+        <a
+          href={`tel:${partner.phone}`}
+          onClick={onCallClick}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#16a34a', color: 'white', padding: isMobile ? '6px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap' }}
+        >
+          <Phone size={isMobile ? 11 : 13} /> Call {partner.phone}
+        </a>
+      )}
+    </div>
+  );
+}
+
+// Sitewide floating card for the exclusive local partner in the visitor's
+// city (same match Supabase `partners` lookup ResultsScreen's inline
+// PartnerCard uses). Renders nothing until the match resolves client-side,
+// so it never appears in prerendered/static HTML or a crawler's first
+// paint -- no effect on indexed content or layout shift (position: fixed,
+// shown only after a short delay, and small enough to stay clear of
+// Google's intrusive-interstitial mobile-ranking guidance).
+export default function FloatingPartnerBanner() {
+  const [partner, setPartner] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(computeIsCompact);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(computeIsCompact());
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    try {
+      if (sessionStorage.getItem(DISMISS_KEY)) return;
+    } catch { /* ignore */ }
+
+    getCachedPartnerMatch().then(match => {
+      if (cancelled || !match) return;
+      setPartner(match);
+      setTimeout(() => {
+        if (cancelled) return;
+        setVisible(true);
+        logBannerEvent(match.id, 'impression');
+      }, 1500);
+    });
+
+    return () => { cancelled = true; };
+  }, []);
+
+  const dismiss = () => {
+    setVisible(false);
+    try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
+  };
+
+  if (!partner || !visible) return null;
+
+  // Portal to document.body -- Header's backdropFilter creates a new CSS
+  // containing block for any position:fixed descendant, which would anchor
+  // this to the header's own (small) box instead of the real viewport.
+  return createPortal(
+    <PartnerBannerCard
+      partner={partner}
+      isMobile={isMobile}
+      onDismiss={dismiss}
+      onCallClick={() => logBannerEvent(partner.id, 'call_click')}
+    />,
+    document.body
+  );
+}

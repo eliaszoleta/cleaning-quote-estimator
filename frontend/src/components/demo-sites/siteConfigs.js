@@ -1,0 +1,492 @@
+// Ten fictional demo cleaning businesses for the /website-example gallery.
+// Names, logos, "about" stories, and testimonials are all invented -- none
+// represent a real company. Addresses use real city/state/ZIP combinations
+// in a realistic street-address format (so the page doesn't read as an
+// obvious placeholder like "123 Fake St"), but the street-level address
+// itself is not a real, occupied business location.
+//
+// `layout` picks which of the three structurally different page templates
+// a site uses (see DemoSiteLayout.js / DemoHome.js etc.) -- grouped so
+// palette + layout + type pairing all vary together, not just color.
+
+// Generic, business-agnostic questions that build trust before a first-time
+// visitor hands over their address and a key -- lightly personalized with
+// the business name/city rather than written fresh per site.
+export function getFaqs(site) {
+  return [
+    { q: 'Do I need to be home during the cleaning?', a: `Not at all. Most ${site.city} clients provide a key, door code, or lockbox access -- we'll work out whatever's easiest for you.` },
+    { q: 'Are your cleaners insured and background-checked?', a: `Yes. Every ${site.businessName} cleaner is background-checked before they ever step into a client's home, and we're fully licensed and insured.` },
+    { q: 'Do you bring your own supplies and equipment?', a: 'Yes, we bring everything needed for a standard visit. Have products you\'d prefer we use instead? Just let us know.' },
+    { q: 'What if I\'m not happy with a cleaning?', a: 'Tell us within 24 hours and we\'ll come back and make it right at no extra charge -- no questions asked.' },
+    { q: 'How do I schedule or reschedule?', a: 'Request a quote online or give us a call. Most first appointments are available within a few days, and rescheduling only takes a text.' },
+  ];
+}
+
+const SITES = [
+  {
+    slug: 'evergreen-home-cleaning',
+    businessName: 'Evergreen Home Cleaning',
+    logoLabel: 'EH',
+    tagline: 'Thoughtful, detail-obsessed cleaning for Portland homes.',
+    layout: 'A',
+    fontHeading: "'Fraunces', Georgia, serif",
+    fontBody: "'Poppins', Arial, sans-serif",
+    colors: { primary: '#1b4332', primaryDark: '#123c28', accent: '#c9a227', ink: '#1c2b22', bg: '#faf6ee', bgAlt: '#f1ead9', card: '#ffffff', border: '#e2d9c3', textMuted: '#5f6b5f' },
+    phone: '(503) 555-0142',
+    email: 'hello@evergreenhomecleaning.com',
+    address: '4521 SE Hawthorne Blvd, Suite 2',
+    city: 'Portland', state: 'OR', zip: '97215',
+    founded: 2015,
+    aboutStory: [
+      "Evergreen Home Cleaning started in 2015 when sisters Mara and Colleen Whitfield got tired of choosing between a spotless home and products they didn't feel good about using around their kids. So they built a cleaning company around a simple idea: plant-based products, real attention to detail, and a team that treats your home like their own.",
+      "A decade later, we're still Portland-owned and operated, still using the same eco-friendly product line we started with, and still training every cleaner on the same room-by-room checklist Mara wrote by hand back in 2015. Small changes, done consistently, are what make a house feel truly clean.",
+    ],
+    services: [
+      { title: 'Standard Cleaning', desc: 'Kitchens, bathrooms, floors, and living spaces refreshed on a schedule that works for you.' },
+      { title: 'Deep Cleaning', desc: 'A thorough, top-to-bottom clean for baseboards, vents, and the spots everyday cleaning skips.' },
+      { title: 'Move-In / Move-Out', desc: 'A spotless handoff for renters, landlords, and homeowners closing a chapter.' },
+      { title: 'Recurring Service', desc: 'Weekly, bi-weekly, or monthly visits from the same trusted team.' },
+      { title: 'Eco-Friendly Add-On', desc: 'Fragrance-free, pet-safe products on request — same detail, gentler ingredients.' },
+    ],
+    serviceAreas: ['Portland', 'Beaverton', 'Lake Oswego', 'Milwaukie', 'Tigard', 'Gresham'],
+    testimonials: [
+      { name: 'Renee K.', text: 'They found things I didn\'t even know needed cleaning. My kitchen has never looked this good.' },
+      { name: 'Doug M.', text: 'Reliable, thorough, and the eco-friendly products actually work. Switched from three other services before landing here.' },
+    ],
+    aboutImageNote: 'Photo of two friendly cleaning professionals in matching evergreen-green polos, smiling, standing in front of a tidy branded service van.',
+    whyUs: [
+      {
+        headline: 'Cleaning You Can Feel Good About',
+        body: ["We built Evergreen around products that are genuinely safe for your family, not just labeled that way. No harsh fumes, no residue left behind for kids or pets to find."],
+        checklist: ['Plant-based, non-toxic products', 'Safe for kids and pets', 'Fragrance-free option on request', 'No harsh chemical residue'],
+        imageNote: 'Close-up photo of a hand spraying an eco-friendly cleaning product onto a kitchen counter, natural light, no harsh chemicals visible.',
+      },
+      {
+        headline: 'A Team You Can Actually Trust',
+        body: ["Every cleaner is background-checked and trained on the same room-by-room standard Mara wrote by hand in 2015. You'll usually see the same familiar faces, visit after visit."],
+        checklist: ['Background-checked cleaners', 'Trained on our own detail checklist', 'Same trusted team when possible', 'Fully licensed & insured'],
+        imageNote: 'Photo of a cleaning professional smiling while organizing a supply caddy in a bright, tidy entryway.',
+      },
+    ],
+  },
+  {
+    slug: 'harborline-cleaning',
+    businessName: 'Harborline Cleaning Co.',
+    logoLabel: 'HC',
+    tagline: 'Coastal-standard cleaning for Charleston homes and rentals.',
+    layout: 'B',
+    fontHeading: "'Manrope', Arial, sans-serif",
+    fontBody: "'Manrope', Arial, sans-serif",
+    colors: { primary: '#0b2545', primaryDark: '#081b34', accent: '#c9a44c', ink: '#0b2545', bg: '#f7f5f0', bgAlt: '#eef1f5', card: '#ffffff', border: '#dde3ea', textMuted: '#5a6472' },
+    phone: '(843) 555-0176',
+    email: 'book@harborlinecleaning.com',
+    address: '118 Meeting Street',
+    city: 'Charleston', state: 'SC', zip: '29401',
+    founded: 2012,
+    aboutStory: [
+      "Harborline Cleaning Co. has spent over a decade keeping historic Charleston homes and coastal rentals guest-ready. We started by cleaning a handful of downtown vacation rentals for a friend's property management company — word spread, and now we split our time between family homes and same-day turnovers for dozens of short-term rental hosts across the peninsula.",
+      "Charleston's humidity and historic homes come with their own challenges — original hardwood, older HVAC, salt air. Our team trains specifically on how to clean this city's homes the right way, not a generic checklist built for somewhere else.",
+    ],
+    services: [
+      { title: 'Standard Home Cleaning', desc: 'Regular upkeep for kitchens, bathrooms, and living spaces, on your schedule.' },
+      { title: 'Vacation Rental Turnover', desc: 'Same-day, guest-ready turnovers between bookings — inspected before every check-in.' },
+      { title: 'Deep Cleaning', desc: 'A full top-to-bottom reset for homes that need extra attention.' },
+      { title: 'Move-Out Cleaning', desc: 'Spotless handoffs that help renters get their deposit back.' },
+      { title: 'Commercial Cleaning', desc: 'Offices and small storefronts cleaned before or after business hours.' },
+    ],
+    serviceAreas: ['Charleston', 'Mount Pleasant', 'James Island', 'Folly Beach', 'Summerville'],
+    testimonials: [
+      { name: 'Patricia A.', text: 'Our Airbnb turnover team. Never late, never missed a booking gap, guests constantly compliment how clean the place is.' },
+      { name: 'Wade T.', text: 'They actually know how to handle old hardwood floors without wrecking them. Worth every penny.' },
+    ],
+    aboutImageNote: 'Photo of a small, well-dressed cleaning crew with a branded tote of supplies, standing outside a historic Charleston row house.',
+    whyUs: [
+      {
+        headline: "Built for Charleston's Homes",
+        body: ["Historic hardwood, older HVAC, salt air off the harbor — this city's homes get dirty differently, and take a gentler hand. We trained specifically for it, not a generic checklist built for somewhere else."],
+        checklist: ["Trained on historic hardwood & plaster", 'Humidity-aware cleaning methods', 'Careful with antiques & original finishes', 'Locally owned since 2012'],
+        imageNote: 'Photo of a cleaning professional carefully wiping down an original wood banister in a historic Charleston home entryway.',
+      },
+      {
+        headline: 'Guest-Ready, Every Time',
+        body: ['For our vacation rental hosts, a missed turnover means a bad review. We treat every changeover like the next guest is already at the door.'],
+        checklist: ['Same-day turnovers between bookings', 'Photo-verified inspection after every clean', 'Direct line for property managers', 'Flexible scheduling around bookings'],
+        imageNote: 'Bright photo of a neatly made bed and freshly arranged throw pillows in a coastal-style vacation rental bedroom, no people.',
+      },
+    ],
+  },
+  {
+    slug: 'ember-and-oak-cleaning',
+    businessName: 'Ember & Oak Cleaning',
+    logoLabel: 'E&O',
+    tagline: 'Modern cleaning, done with real craft.',
+    layout: 'C',
+    fontHeading: "'Playfair Display', Georgia, serif",
+    fontBody: "'Poppins', Arial, sans-serif",
+    colors: { primary: '#232323', primaryDark: '#141414', accent: '#c1502e', ink: '#201c1a', bg: '#f2e8dc', bgAlt: '#ece0d0', card: '#ffffff', border: '#e1d3bd', textMuted: '#6b5f52' },
+    phone: '(512) 555-0198',
+    email: 'hello@emberandoak.co',
+    address: '2200 Manor Rd',
+    city: 'Austin', state: 'TX', zip: '78722',
+    founded: 2018,
+    aboutStory: [
+      "Ember & Oak was built on a simple frustration: most cleaning companies treat your home like a checklist, not a space someone actually lives in. We started in 2018 with three cleaners and a shared belief that craft matters — the way you fold a towel, the way you line up a kitchen counter, the way a room feels when you walk back into it.",
+      "We're still small on purpose. Every cleaner on our team is trained in-house, not contracted out, and every home gets the same standard whether it's your first clean or your fiftieth.",
+    ],
+    services: [
+      { title: 'Standard Cleaning', desc: 'A consistent, detail-forward clean for kitchens, bathrooms, and living spaces.' },
+      { title: 'Deep Clean', desc: 'Baseboards, vents, inside appliances — the full reset.' },
+      { title: 'Move-In / Move-Out', desc: 'A spotless clean for your next chapter, or the one you\'re leaving behind.' },
+      { title: 'Recurring Maintenance', desc: 'Weekly, bi-weekly, or monthly — the same team, every time.' },
+      { title: 'Post-Construction Cleanup', desc: 'Dust, debris, and finish work cleaned up after renovation crews leave.' },
+    ],
+    serviceAreas: ['Austin', 'Round Rock', 'Cedar Park', 'Pflugerville', 'Kyle'],
+    testimonials: [
+      { name: 'Julia S.', text: 'They treat the house like it matters. Small details, every time — genuinely different from anyone else we\'ve used.' },
+      { name: 'Marcus D.', text: 'Post-renovation cleanup saved us weeks of dust. Worth booking before you even move back in.' },
+    ],
+    aboutImageNote: 'Close-up, editorial photo of cleaning hands wiping down a wood countertop with a linen cloth — warm tones, shallow depth of field.',
+    whyUs: [
+      {
+        headline: 'Craft, Not Just a Checklist',
+        body: ['Every cleaner on our team is trained in-house, not contracted out. That means the same standard, the same attention to detail, whether it\'s your first clean or your fiftieth.'],
+        checklist: ['In-house trained cleaners, not contractors', 'Consistent detail standard, every visit', 'Small team, close attention to your space', 'Fully insured for your peace of mind'],
+        imageNote: 'Editorial, warm-toned photo of a cleaner\'s hands carefully folding a linen towel on an open shelf.',
+      },
+      {
+        headline: 'A Calmer Home, Top to Bottom',
+        body: ['Post-renovation dust, built-up grime, or just a home that needs a real reset — we handle it with the same craft we bring to every standard visit.'],
+        checklist: ['Non-toxic product options available', 'Post-construction dust removal', 'Flexible scheduling', '100% satisfaction guarantee'],
+        imageNote: 'Moody, editorial photo of a minimalist Austin bedroom in soft afternoon light, freshly cleaned, no people.',
+      },
+    ],
+  },
+  {
+    slug: 'bloom-maid-service',
+    businessName: 'Bloom Maid Service',
+    logoLabel: 'BM',
+    tagline: 'A fresher home, every time.',
+    layout: 'A',
+    fontHeading: "'Fraunces', Georgia, serif",
+    fontBody: "'Poppins', Arial, sans-serif",
+    colors: { primary: '#5f6e3e', primaryDark: '#4d5a32', accent: '#e8b4b8', ink: '#3a3f2e', bg: '#f8f6ef', bgAlt: '#f1ece0', card: '#ffffff', border: '#e6ddc8', textMuted: '#6b7360' },
+    phone: '(615) 555-0134',
+    email: 'hello@bloommaidservice.com',
+    address: '1704 Charlotte Ave',
+    city: 'Nashville', state: 'TN', zip: '37203',
+    founded: 2019,
+    aboutStory: [
+      "Bloom Maid Service opened in 2019 with a simple goal: make coming home feel like a relief, not another item on your to-do list. Founder Ana Reyes started the company after years of cleaning homes for other companies and seeing how much better the job could be done with more care and better training.",
+      "Today Bloom serves families and Airbnb hosts across greater Nashville, with a small, consistent team so you see the same friendly faces every visit — not a rotating cast of strangers.",
+    ],
+    services: [
+      { title: 'Standard Cleaning', desc: 'A reliable refresh for kitchens, bathrooms, and everyday living spaces.' },
+      { title: 'Deep Cleaning', desc: 'The extra-mile clean for baseboards, blinds, and built-up grime.' },
+      { title: 'Move-In / Move-Out', desc: 'A truly spotless clean for your next place, or the one you\'re leaving.' },
+      { title: 'Recurring Visits', desc: 'Weekly, bi-weekly, or monthly, with the same trusted cleaner.' },
+      { title: 'Airbnb Turnover', desc: 'Fast, guest-ready turnovers between check-outs and check-ins.' },
+    ],
+    serviceAreas: ['Nashville', 'Franklin', 'Brentwood', 'Hendersonville', 'Murfreesboro'],
+    testimonials: [
+      { name: 'Katie B.', text: 'Same cleaner every time, always on schedule, always thorough. It genuinely makes my week better.' },
+      { name: 'Omar F.', text: 'Our Airbnb turnaround time dropped in half and the reviews mention how clean the place is constantly.' },
+    ],
+    aboutImageNote: 'Friendly photo of a small cleaning team holding supply caddies, smiling, in front of a house with a welcoming front porch.',
+    whyUs: [
+      {
+        headline: 'The Same Friendly Face, Every Visit',
+        body: ['No rotating cast of strangers. We assign the same cleaner to your home whenever we can, so you know exactly who\'s coming and they know exactly how you like things done.'],
+        checklist: ['Consistent cleaner assigned to your home', 'Background-checked & trained in-house', 'Flexible weekly, bi-weekly, or monthly plans', 'Real communication, not a call center'],
+        imageNote: 'Warm, friendly photo of a cleaning professional greeting a homeowner at the front door, genuine smile, natural light.',
+      },
+      {
+        headline: 'A Home That Feels Like a Fresh Start',
+        body: ['From weekly upkeep to a fast guest-ready Airbnb turnover, every visit gets the same close attention to the details that make a home feel truly cared for.'],
+        checklist: ['Deep-clean detail on every visit', 'Pet-friendly, family-safe products', 'Fast, guest-ready Airbnb turnovers', 'Satisfaction guaranteed'],
+        imageNote: 'Bright, cheerful photo of a freshly cleaned Nashville living room, soft natural light, no people.',
+      },
+    ],
+  },
+  {
+    slug: 'slate-and-co-cleaning',
+    businessName: 'Slate & Co. Cleaning',
+    logoLabel: 'S&C',
+    tagline: 'Precision cleaning for busy households.',
+    layout: 'B',
+    fontHeading: "'Manrope', Arial, sans-serif",
+    fontBody: "'Manrope', Arial, sans-serif",
+    colors: { primary: '#3c4650', primaryDark: '#2b323a', accent: '#ff6f61', ink: '#262b30', bg: '#f7f8f9', bgAlt: '#eef0f2', card: '#ffffff', border: '#dfe3e7', textMuted: '#5c6570' },
+    phone: '(720) 555-0163',
+    email: 'quotes@slateandco.com',
+    address: '3300 Walnut St',
+    city: 'Denver', state: 'CO', zip: '80205',
+    founded: 2020,
+    aboutStory: [
+      "Slate & Co. was founded in 2020 around one idea: cleaning should run like a well-managed service, not a favor from a friend of a friend. That means real scheduling, real communication, and a team trained to the same standard on every single visit.",
+      "We built our process around Denver's mix of condos, townhomes, and single-family houses — different layouts, different needs, same level of precision no matter the square footage.",
+    ],
+    services: [
+      { title: 'Standard Cleaning', desc: 'Consistent upkeep for kitchens, bathrooms, and living spaces.' },
+      { title: 'Deep Cleaning', desc: 'A complete reset — vents, baseboards, appliance interiors included.' },
+      { title: 'Move-Out Cleaning', desc: 'A spotless clean that helps get your deposit back.' },
+      { title: 'Recurring Service', desc: 'Weekly, bi-weekly, or monthly, scheduled around your life.' },
+      { title: 'Window & Carpet Add-Ons', desc: 'Interior windows and carpet spot-cleaning, added to any visit.' },
+    ],
+    serviceAreas: ['Denver', 'Aurora', 'Lakewood', 'Littleton', 'Arvada'],
+    testimonials: [
+      { name: 'Brianna L.', text: 'The most organized cleaning company I\'ve used — text reminders, on-time arrival, consistent quality.' },
+      { name: 'Tom R.', text: 'Booked a deep clean before selling our house. Buyers commented on how clean it was at the showing.' },
+    ],
+    aboutImageNote: 'Photo of a cleaning professional in a slate-gray uniform confidently pushing a modern cleaning cart down a hallway.',
+    whyUs: [
+      {
+        headline: 'Precision, Not Guesswork',
+        body: ['Every cleaner trains to the same standard, so the results don\'t depend on who shows up. You get a text before and after each visit, and pricing that\'s upfront from the start.'],
+        checklist: ['Standardized training for every cleaner', 'Text updates before & after each visit', 'On-time arrival, every time', 'Transparent, upfront pricing'],
+        imageNote: 'Clean, modern photo of a cleaning professional checking a phone/tablet checklist in a bright Denver kitchen.',
+      },
+      {
+        headline: 'Built for the Way Denver Lives',
+        body: ['Condo, townhome, or single-family house — we\'ve tailored our process to the mix of homes across the metro, not a one-size-fits-all routine.'],
+        checklist: ['Experience with condos, townhomes & houses', 'Window & carpet add-ons available', 'Flexible online scheduling', 'Fully licensed & insured'],
+        imageNote: 'Wide, modern photo of a freshly cleaned Denver condo interior with mountain-view windows, no people.',
+      },
+    ],
+  },
+  {
+    slug: 'coastal-sparkle-cleaners',
+    businessName: 'Coastal Sparkle Cleaners',
+    logoLabel: 'CS',
+    tagline: 'Bright, spotless homes by the coast.',
+    layout: 'C',
+    fontHeading: "'Playfair Display', Georgia, serif",
+    fontBody: "'Poppins', Arial, sans-serif",
+    colors: { primary: '#0f5257', primaryDark: '#0a3d41', accent: '#f2a65a', ink: '#123338', bg: '#f4f8f7', bgAlt: '#eaf2f1', card: '#ffffff', border: '#d9e6e4', textMuted: '#4e6265' },
+    phone: '(619) 555-0121',
+    email: 'hello@coastalsparkle.com',
+    address: '926 Garnet Ave',
+    city: 'San Diego', state: 'CA', zip: '92109',
+    founded: 2016,
+    aboutStory: [
+      "Coastal Sparkle Cleaners has been keeping San Diego homes and vacation rentals bright and beach-ready since 2016. Salt air, sand, and sun mean homes here get dirty differently than anywhere else — we built our process specifically around that.",
+      "What started as one founder cleaning a handful of Pacific Beach rentals has grown into a full team serving families, landlords, and short-term rental hosts across the county, without losing the personal touch that got us started.",
+    ],
+    services: [
+      { title: 'Standard Cleaning', desc: 'A reliable refresh for kitchens, bathrooms, and living areas.' },
+      { title: 'Deep Cleaning', desc: 'A thorough, top-to-bottom clean for homes that need extra care.' },
+      { title: 'Move-In / Move-Out', desc: 'Spotless turnovers for renters, landlords, and homeowners.' },
+      { title: 'Vacation Rental Cleaning', desc: 'Fast, guest-ready turnovers between every booking.' },
+      { title: 'Recurring Maintenance', desc: 'Weekly, bi-weekly, or monthly visits, on your schedule.' },
+    ],
+    serviceAreas: ['San Diego', 'Pacific Beach', 'La Jolla', 'Encinitas', 'Chula Vista'],
+    testimonials: [
+      { name: 'Yasmin P.', text: 'Our vacation rental cleaner for two years now. Always spotless, always on time between guests.' },
+      { name: 'Craig H.', text: 'They get the sand and salt residue out in a way other cleaners never did. Noticeable difference.' },
+    ],
+    aboutImageNote: 'Photo of a cheerful cleaning team in teal polos loading supplies into a branded van outside a beach-adjacent home.',
+    whyUs: [
+      {
+        headline: 'We Know Coastal Homes',
+        body: ['Salt air, sand, and sun mean homes here get dirty differently than anywhere else. We built our whole process around it, from the products we use to how we treat your floors.'],
+        checklist: ['Trained for sand, salt & humidity residue', 'Safe for beach-adjacent surfaces', 'Experienced with rental turnovers', 'Locally owned since 2016'],
+        imageNote: 'Bright photo of a cleaning professional wiping down a light wood floor near a sunlit sliding door, ocean-adjacent home, no faces.',
+      },
+      {
+        headline: 'A Brighter, Healthier Home',
+        body: ['A clean that actually feels different: no lingering residue, no harsh fumes, just a home that feels as bright as the coast outside.'],
+        checklist: ['Eco-conscious product options', 'Pet- and family-safe cleaning', 'Consistent quality every visit', '100% satisfaction guarantee'],
+        imageNote: 'Sunlit photo of a tidy coastal-style bedroom, white linens, ocean-adjacent light, no people.',
+      },
+    ],
+  },
+  {
+    slug: 'heritage-home-cleaners',
+    businessName: 'Heritage Home Cleaners',
+    logoLabel: 'HH',
+    tagline: 'Old-fashioned care for Savannah homes, done right.',
+    layout: 'A',
+    fontHeading: "'Fraunces', Georgia, serif",
+    fontBody: "'Poppins', Arial, sans-serif",
+    colors: { primary: '#3e2723', primaryDark: '#2c1b18', accent: '#c8974f', ink: '#2c1b18', bg: '#faf3e7', bgAlt: '#f2e6d0', card: '#ffffff', border: '#e6d3ab', textMuted: '#6d5c46' },
+    phone: '(912) 555-0187',
+    email: 'info@heritagehomecleaners.com',
+    address: '210 W Broughton St',
+    city: 'Savannah', state: 'GA', zip: '31401',
+    founded: 2009,
+    aboutStory: [
+      "Heritage Home Cleaners has been caring for Savannah's historic homes since 2009. Original plaster, antique hardwood, and homes older than most companies' entire client list require a gentler, more experienced hand — we built our whole training program around it.",
+      "Three generations of Savannah families trust us with the homes they grew up in. We treat that trust as the whole business, not a marketing line.",
+    ],
+    services: [
+      { title: 'Standard Cleaning', desc: 'Careful, consistent upkeep for kitchens, bathrooms, and living spaces.' },
+      { title: 'Deep Cleaning', desc: 'A full reset for homes that need extra attention, done gently.' },
+      { title: 'Historic Home Cleaning', desc: 'Specialized care for original woodwork, plaster, and antique finishes.' },
+      { title: 'Move-In / Move-Out', desc: 'A spotless handoff for Savannah\'s next chapter, or its last.' },
+      { title: 'Recurring Service', desc: 'Weekly, bi-weekly, or monthly, with the same trusted team.' },
+    ],
+    serviceAreas: ['Savannah', 'Pooler', 'Richmond Hill', 'Tybee Island', 'Garden City'],
+    testimonials: [
+      { name: 'Eleanor G.', text: 'They understand old houses. Our floors have never been damaged and they\'re always careful with antiques.' },
+      { name: 'Franklin B.', text: 'Fifteen years with this family business and they\'ve never once let us down.' },
+    ],
+    aboutImageNote: 'Photo of a veteran cleaning professional carefully dusting an ornate wood banister in a historic home entryway.',
+    whyUs: [
+      {
+        headline: 'Gentle Care for Historic Homes',
+        body: ['Original plaster, antique hardwood, homes older than most companies\' entire client list — we built our training around handling them the right way, not a one-size-fits-all routine.'],
+        checklist: ['Trained on antique wood & plaster care', 'Careful handling of heirlooms & antiques', 'Three generations of trusted service', 'Fully licensed & insured'],
+        imageNote: 'Warm photo of a cleaning professional gently dusting an antique wood dresser in a historic Savannah home, soft natural light.',
+      },
+      {
+        headline: 'Consistency You Can Count On',
+        body: ['Families who grew up in these homes trust us to keep coming back, visit after visit, with the same care and the same familiar team.'],
+        checklist: ['Same trusted team, every visit', 'Flexible recurring schedules', 'Background-checked cleaners', 'Satisfaction guaranteed'],
+        imageNote: 'Elegant photo of a freshly cleaned historic Savannah parlor room, original woodwork visible, soft light, no people.',
+      },
+    ],
+  },
+  {
+    slug: 'meridian-clean-co',
+    businessName: 'Meridian Clean Co.',
+    logoLabel: 'MC',
+    tagline: 'Modern cleaning for modern Seattle living.',
+    layout: 'B',
+    fontHeading: "'Manrope', Arial, sans-serif",
+    fontBody: "'Manrope', Arial, sans-serif",
+    colors: { primary: '#2c2a4a', primaryDark: '#201f38', accent: '#5fae6a', ink: '#201f38', bg: '#f6f6fa', bgAlt: '#ececf4', card: '#ffffff', border: '#dcdcea', textMuted: '#5b5a75' },
+    phone: '(206) 555-0159',
+    email: 'hello@meridianclean.co',
+    address: '1420 5th Ave',
+    city: 'Seattle', state: 'WA', zip: '98101',
+    founded: 2021,
+    aboutStory: [
+      "Meridian Clean Co. launched in 2021 to serve Seattle's fast-growing base of condos, townhomes, and remote-work households — people who need reliable, well-communicated cleaning that fits around a busy schedule, booked and managed without a single phone call if they'd rather not.",
+      "We're a newer company, but our team has a combined two decades of cleaning experience. Modern doesn't mean untested — it means we built the booking and communication experience our clients actually expect in 2025.",
+    ],
+    services: [
+      { title: 'Standard Cleaning', desc: 'A dependable refresh for kitchens, bathrooms, and living spaces.' },
+      { title: 'Deep Cleaning', desc: 'The full reset for homes that need more than a standard visit.' },
+      { title: 'Move-Out Cleaning', desc: 'A spotless clean for your next lease or closing date.' },
+      { title: 'Recurring Service', desc: 'Weekly, bi-weekly, or monthly, managed entirely online.' },
+      { title: 'Post-Renovation Cleanup', desc: 'Fine dust and debris cleared after your remodel wraps up.' },
+    ],
+    serviceAreas: ['Seattle', 'Bellevue', 'Redmond', 'Kirkland', 'Renton'],
+    testimonials: [
+      { name: 'Priya N.', text: 'Booked entirely through text, showed up exactly on time, did an excellent job. Couldn\'t be easier.' },
+      { name: 'Derek W.', text: 'Post-renovation cleanup was thorough — got dust out of places I didn\'t think to check.' },
+    ],
+    aboutImageNote: 'Photo of a cleaning professional reviewing a tablet checklist in a bright, modern apartment kitchen.',
+    whyUs: [
+      {
+        headline: 'Booking Made Simple',
+        body: ['No phone tag, no waiting on hold. Everything from your first quote to rescheduling next month\'s visit happens online or over text, on your time.'],
+        checklist: ['Text-based scheduling, no phone tag', 'Instant confirmation & reminders', 'Transparent, flat-rate pricing', 'Reschedule anytime online'],
+        imageNote: 'Modern photo of a hand holding a phone showing a simple booking confirmation screen, blurred bright apartment background.',
+      },
+      {
+        headline: 'A Team You Can Actually Trust',
+        body: ['Newer company, seasoned team — our cleaners bring two decades of combined experience, all background-checked and trained in-house.'],
+        checklist: ['Background-checked, in-house cleaners', 'Two decades of combined experience', 'Post-renovation dust removal available', 'Fully insured for your peace of mind'],
+        imageNote: 'Sleek photo of a cleaning professional wiping down a modern kitchen island in a Seattle condo, natural light, no face visible.',
+      },
+    ],
+  },
+  {
+    slug: 'noir-clean-collective',
+    businessName: 'Noir Clean Collective',
+    logoLabel: 'NC',
+    tagline: 'Refined cleaning for Chicago\'s finest homes.',
+    layout: 'C',
+    fontHeading: "'Playfair Display', Georgia, serif",
+    fontBody: "'Poppins', Arial, sans-serif",
+    colors: { primary: '#111111', primaryDark: '#000000', accent: '#0b6e4f', ink: '#111111', bg: '#f7f7f5', bgAlt: '#eeeeec', card: '#ffffff', border: '#dedede', textMuted: '#5c5c5c' },
+    phone: '(312) 555-0145',
+    email: 'concierge@noircleancollective.com',
+    address: '900 N Michigan Ave',
+    city: 'Chicago', state: 'IL', zip: '60611',
+    founded: 2017,
+    aboutStory: [
+      "Noir Clean Collective was founded in 2017 to bring a concierge standard of cleaning to Chicago's Gold Coast and Streeterville high-rises — white-glove attention, discreet scheduling, and a small, vetted team trusted with some of the city's most demanding homes.",
+      "We work by referral as often as by website inquiry. Every cleaner on our team is background-checked, trained in-house, and held to a standard most companies reserve for hotels, not homes.",
+    ],
+    services: [
+      { title: 'Signature Cleaning', desc: 'Our white-glove standard visit for kitchens, bathrooms, and living spaces.' },
+      { title: 'Deep Cleaning', desc: 'A meticulous, top-to-bottom reset for homes that deserve it.' },
+      { title: 'Move-In / Move-Out', desc: 'A flawless handoff for Chicago\'s next chapter.' },
+      { title: 'Recurring Concierge Service', desc: 'Weekly, bi-weekly, or monthly, with the same discreet team.' },
+      { title: 'Post-Event Cleanup', desc: 'Same-night or next-morning cleanup after hosting.' },
+    ],
+    serviceAreas: ['Chicago', 'Evanston', 'Oak Park', 'Naperville', 'Skokie'],
+    testimonials: [
+      { name: 'Alexandra V.', text: 'Discreet, punctual, impeccable. The only cleaning service I\'ve trusted with a home this size.' },
+      { name: 'Nathaniel P.', text: 'Post-event cleanup after we hosted twenty people — the place looked untouched by morning.' },
+    ],
+    aboutImageNote: 'Elegant, low-key photo of a gloved hand polishing a marble countertop, dramatic lighting, no faces visible.',
+    whyUs: [
+      {
+        headline: 'A Concierge Standard of Clean',
+        body: ['We work by referral as often as by inquiry. Every cleaner is vetted, background-checked, and held to a standard most companies reserve for hotels, not homes.'],
+        checklist: ['Vetted, background-checked team', 'Discreet, by-appointment scheduling', 'Consistent, white-glove attention to detail', 'Trusted by referral across Chicago'],
+        imageNote: 'Dramatic, low-key photo of a gloved hand smoothing a bed corner in an elegant high-rise bedroom, moody lighting.',
+      },
+      {
+        headline: 'Care for the Home You\'ve Built',
+        body: ['Fine finishes, real furnishings, a home that took real effort to build — we treat it that way, every single visit.'],
+        checklist: ['Experienced with fine finishes & furnishings', 'Small, dedicated team', 'Post-event same-night cleanup available', 'Fully insured'],
+        imageNote: 'High-contrast, editorial photo of a polished black marble countertop reflecting soft city light, no people.',
+      },
+    ],
+  },
+  {
+    slug: 'rustic-row-cleaning',
+    businessName: 'Rustic Row Cleaning',
+    logoLabel: 'RR',
+    tagline: 'Honest, hardworking cleaning for Boise homes.',
+    layout: 'A',
+    fontHeading: "'Fraunces', Georgia, serif",
+    fontBody: "'Poppins', Arial, sans-serif",
+    colors: { primary: '#6b6560', primaryDark: '#57524d', accent: '#b5502f', ink: '#3a3330', bg: '#faf7f2', bgAlt: '#f2ece3', card: '#ffffff', border: '#e5dccf', textMuted: '#6b6259' },
+    phone: '(208) 555-0113',
+    email: 'hello@rusticrowcleaning.com',
+    address: '815 W Bannock St',
+    city: 'Boise', state: 'ID', zip: '83702',
+    founded: 2014,
+    aboutStory: [
+      "Rustic Row Cleaning has been a Boise family business since 2014 — started by the Carrell family with one truck and a handful of regular clients, now a full team serving homes, farmhouses, and small properties across the Treasure Valley.",
+      "We grew up around this valley, and it shows in how we work: no-nonsense, on time, and genuinely proud of a job well done — whether that's a downtown condo or a barn that needs a real deep clean.",
+    ],
+    services: [
+      { title: 'Standard Cleaning', desc: 'Dependable upkeep for kitchens, bathrooms, and living spaces.' },
+      { title: 'Deep Cleaning', desc: 'A thorough, top-to-bottom clean for homes that need extra care.' },
+      { title: 'Move-In / Move-Out', desc: 'A spotless clean for your next place, or the one you\'re leaving.' },
+      { title: 'Recurring Service', desc: 'Weekly, bi-weekly, or monthly, with the same trusted crew.' },
+      { title: 'Farmhouse & Outbuilding Cleaning', desc: 'A regional specialty — barns, mudrooms, and larger properties.' },
+    ],
+    serviceAreas: ['Boise', 'Meridian', 'Nampa', 'Eagle', 'Star'],
+    testimonials: [
+      { name: 'Jenny H.', text: 'Same honest, hardworking crew for three years. They treat our place like it\'s theirs.' },
+      { name: 'Rick D.', text: 'Only company willing to take on our farmhouse and mudroom the right way. Highly recommend.' },
+    ],
+    aboutImageNote: 'Photo of a friendly family-run cleaning crew standing beside a pickup truck with cleaning supplies, Idaho foothills in the background.',
+    whyUs: [
+      {
+        headline: 'A Family Business, Still Family-Run',
+        body: ['One truck and a handful of regular clients in 2014 — now a full team, but still the same Carrell family running the show and standing behind the work.'],
+        checklist: ['Same Carrell family crew since 2014', 'Honest, upfront pricing, no surprises', 'Background-checked, trustworthy team', 'Fully licensed & insured'],
+        imageNote: 'Warm, candid photo of a family-run cleaning crew loading supplies into a pickup truck, Idaho foothills visible in the background.',
+      },
+      {
+        headline: 'Built for Treasure Valley Homes',
+        body: ['From a downtown condo to a farmhouse with a mudroom that needs real attention, we take on the properties other cleaners turn away.'],
+        checklist: ['Experience with farmhouses & larger properties', 'Flexible recurring schedules', 'Pet- and family-safe products', '100% satisfaction guarantee'],
+        imageNote: 'Warm, rustic photo of a freshly cleaned farmhouse mudroom with natural wood tones, soft daylight, no people.',
+      },
+    ],
+  },
+];
+
+export function getSite(slug) {
+  return SITES.find(s => s.slug === slug) || null;
+}
+
+export default SITES;

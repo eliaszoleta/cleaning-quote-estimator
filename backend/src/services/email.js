@@ -1,0 +1,1479 @@
+const axios = require('axios');
+const { stateNameFromCode } = require('../data/partnerCityTiers');
+
+// Lead capture (LeadCaptureStep.js) tells visitors "we'll email your
+// estimate" -- this is what actually makes that true. Sends via Resend
+// (a transactional email API) rather than raw SMTP or Hostinger's Email
+// API: SMTP got blocked by Railway's outbound network restrictions, and
+// Hostinger's customer-facing API token (hPanel > API) turned out to be
+// for their general hosting/VPS/domains API, not the separate Email API
+// -- there's no self-service token for that from a normal account. Resend
+// is purpose-built for this exact "app sends transactional email" case.
+//
+// Template is deliberately plain (no gradients, no colored button blocks,
+// no rounded "card" containers) -- that marketing-template look is exactly
+// what pushes transactional mail into Gmail's Promotions tab. Styled to
+// read like a receipt/confirmation instead.
+
+const RESEND_API_BASE = 'https://api.resend.com';
+
+const SERVICE_LABELS = {
+  home_residential: 'House Cleaning',
+  apartment: 'Apartment Cleaning',
+  commercial: 'Commercial Cleaning',
+  carpet: 'Carpet Cleaning',
+  air_duct: 'Air Duct Cleaning',
+  dryer_vent: 'Dryer Vent Cleaning',
+  tile_grout: 'Tile & Grout Cleaning',
+  mold_remediation: 'Mold Remediation',
+  water_damage: 'Water Damage Restoration',
+};
+
+function fmtMoney(n) {
+  return `$${Math.round(n).toLocaleString('en-US')}`;
+}
+
+// Normalizes any phone string to (XXX) XXX-XXXX for display in an email,
+// regardless of how it was stored -- older partner rows, admin-entered
+// numbers, or a lead who pasted digits some other way might not already
+// be in that format even though every phone <input> in the app now
+// formats as-you-type. Only reformats a clean 10-digit US number (or 11
+// with a leading 1); anything else (extension, international, garbled)
+// is left exactly as stored rather than risking corrupting it.
+function fmtPhone(value) {
+  if (!value) return value;
+  let digits = String(value).replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1);
+  if (digits.length !== 10) return value;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
+// Appended to lead-notification subject lines so each one is unique --
+// otherwise every lead for the same service type shares the exact same
+// subject text ("New House Cleaning lead on your estimator"), and Gmail
+// (and most other clients) groups emails with matching subjects into one
+// conversation thread, burying every lead but the first under "N more"
+// instead of each landing as its own visible email.
+function fmtSubjectTimestamp() {
+  return new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' });
+}
+
+function fmtAdjustment(adj) {
+  if (adj.low === 0 && adj.high === 0) return 'Included';
+  if (adj.low < 0 || adj.high < 0) return `−${fmtMoney(Math.abs(adj.low))} – −${fmtMoney(Math.abs(adj.high))}`;
+  return `${fmtMoney(adj.low)} – ${fmtMoney(adj.high)}`;
+}
+
+// Mirrors ResultsScreen's own "Price breakdown" table -- same rows,
+// same total, so the email matches what was actually shown on-screen
+// instead of just repeating the headline range.
+function buildBreakdownRows(adjustments) {
+  return adjustments
+    .filter(a => !a.separate)
+    .map(a => `
+      <tr>
+        <td style="padding:5px 0;color:#333333;font-size:14px;text-transform:capitalize;">${a.label}</td>
+        <td style="padding:5px 0;text-align:right;font-size:14px;color:#333333;white-space:nowrap;">${fmtAdjustment(a)}</td>
+      </tr>`)
+    .join('');
+}
+
+function buildKeyFactors(keyFactors) {
+  if (!keyFactors?.length) return '';
+  const line = keyFactors.map(f => `${f.label}: ${f.impact}`.replace(/_/g, ' ')).join(' · ');
+  return `<p style="font-size:13px;color:#666666;margin:12px 0 0;">${line}</p>`;
+}
+
+// Same match shown on-screen (PartnerCard.js) when the visitor's location
+// matches an active partner -- passed through from the frontend's own
+// match so the email never disagrees with what the results page showed.
+function buildPartnerSection(partner) {
+  if (!partner) return '';
+  const lines = [
+    partner.address || '',
+    partner.phone ? `Phone: ${fmtPhone(partner.phone)}` : '',
+    partner.website ? `Website: <a href="${partner.website}" style="color:#2563eb;">${partner.website.replace(/^https?:\/\//, '')}</a>` : '',
+  ].filter(Boolean).join('<br>');
+
+  return `
+    <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Recommended cleaner near you</p>
+    <p style="font-size:15px;color:#111111;font-weight:600;margin:0 0 4px;">${partner.business_name}</p>
+    <p style="font-size:14px;color:#333333;line-height:1.7;margin:0;">${lines}</p>`;
+}
+
+// Shown instead of the generic CTA when the estimate came from a
+// subscribed company's own embedded widget (as opposed to the main
+// cleanestimator.com site) -- they're paying to have their business in
+// front of these visitors, so their name/phone/email/logo should actually
+// show up. Just phone and email as plain contact lines now, no separate
+// "Schedule Free Estimate"-style link button -- the visitor already has
+// their estimate by the time they see this, so a second "get an estimate"
+// action read as redundant/confusing next to the Call/Email actions.
+function buildCompanySection({ companyName, logo, ctaEmail, ctaPhone }) {
+  const logoImg = logo ? `<img src="${logo}" alt="${companyName}" style="max-height:36px;margin:0 0 10px;display:block;">` : '';
+  // tel: link -- on mobile this taps straight into the dialer instead of
+  // requiring the visitor to copy/retype the number.
+  const infoLines = [
+    ctaPhone ? `Phone: <a href="tel:${ctaPhone}" style="color:#2563eb;">${fmtPhone(ctaPhone)}</a>` : '',
+    ctaEmail ? `Email: <a href="mailto:${ctaEmail}" style="color:#2563eb;">${ctaEmail}</a>` : '',
+  ].filter(Boolean).join('<br>');
+
+  return `
+    <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Contact</p>
+    ${logoImg}
+    <p style="font-size:15px;color:#111111;font-weight:600;margin:0 0 4px;">${companyName}</p>
+    ${infoLines ? `<p style="font-size:14px;color:#333333;line-height:1.7;margin:0;">${infoLines}</p>` : ''}`;
+}
+
+function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
+  return `
+    <p style="margin:24px 0 0;">
+      <a href="${ctaUrl}" style="color:#2563eb;font-size:14px;font-weight:600;">${ctaText} →</a>
+      ${ctaPhone ? `<br><span style="font-size:13px;color:#666666;">Or call ${ctaPhone}</span>` : ''}
+    </p>`;
+}
+
+// A plain-text alternative alongside the HTML body (multipart/alternative)
+// -- sending HTML-only is itself a signal Gmail's classifier associates
+// with bulk/marketing mail, on top of the styling itself.
+function buildText({ name, serviceType, result, companyConfig, partner }) {
+  const {
+    totalLow, totalHigh, stateName, unit,
+    adjustments = [], recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
+  } = result;
+
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const brandName = companyConfig?.companyName || 'Clean Estimator';
+  const firstName = (name || '').trim().split(' ')[0] || 'there';
+
+  const lines = [
+    `Hi ${firstName},`,
+    '',
+    `Here's your ${serviceLabel.toLowerCase()} estimate${stateName ? ` for ${stateName}` : ''}:`,
+    '',
+    `${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
+  ];
+
+  if (recurringMonthlyLow && unit !== 'per_month') {
+    lines.push(`Recurring: ${fmtMoney(recurringMonthlyLow)} - ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` (save ~${fmtMoney(recurringAnnualSavings)}/year)` : ''}`);
+  }
+
+  lines.push('', 'Price breakdown:');
+  adjustments.filter(a => !a.separate).forEach(a => {
+    lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
+  });
+  lines.push(`  Estimated total: ${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)}`);
+
+  if (partner) {
+    lines.push('', 'Recommended cleaner near you:', partner.business_name);
+    if (partner.address) lines.push(partner.address);
+    if (partner.phone) lines.push(`Phone: ${fmtPhone(partner.phone)}`);
+    if (partner.website) lines.push(`Website: ${partner.website}`);
+  } else if (companyConfig?.companyName) {
+    lines.push('', 'Contact:', companyConfig.companyName);
+    if (companyConfig.ctaPhone) lines.push(`Phone: ${fmtPhone(companyConfig.ctaPhone)}`);
+    if (companyConfig.ctaEmail) lines.push(`Email: ${companyConfig.ctaEmail}`);
+  } else {
+    lines.push('', 'Get an exact quote: https://www.cleanestimator.com');
+    if (companyConfig?.ctaPhone) lines.push(`Or call ${companyConfig.ctaPhone}`);
+  }
+
+  lines.push(
+    '',
+    "This is an estimate only — actual pricing may vary based on your home's condition and specific requirements.",
+    `${brandName} - cleanestimator.com`
+  );
+
+  return lines.join('\n');
+}
+
+function buildHtml({ name, serviceType, result, companyConfig, partner }) {
+  const {
+    totalLow, totalHigh, stateName, unit,
+    adjustments = [], keyFactors = [],
+    recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
+  } = result;
+
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const brandName = companyConfig?.companyName || 'Clean Estimator';
+  const firstName = (name || '').trim().split(' ')[0] || 'there';
+
+  const recurringLine = (recurringMonthlyLow && unit !== 'per_month')
+    ? `<p style="font-size:13px;color:#666666;margin:4px 0 0;">Recurring: ${fmtMoney(recurringMonthlyLow)} – ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` · Save ~${fmtMoney(recurringAnnualSavings)}/year` : ''}</p>`
+    : '';
+
+  const bottomHtml = partner
+    ? buildPartnerSection(partner)
+    : companyConfig?.companyName
+    ? buildCompanySection({
+        companyName: companyConfig.companyName,
+        logo: companyConfig.logo,
+        ctaEmail: companyConfig.ctaEmail,
+        ctaPhone: companyConfig.ctaPhone,
+      })
+    : buildGenericCta({
+        ctaUrl: 'https://www.cleanestimator.com',
+        ctaText: 'Get an exact quote',
+        ctaPhone: companyConfig?.ctaPhone || '',
+      });
+
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${firstName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${stateName ? ` for ${stateName}` : ''}:</p>
+
+  <p style="font-size:24px;font-weight:700;margin:10px 0 0;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span></p>
+  ${recurringLine}
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Price breakdown</p>
+  <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;">
+    ${buildBreakdownRows(adjustments)}
+    <tr>
+      <td style="padding:8px 0 0;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
+      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)}</td>
+    </tr>
+  </table>
+  ${buildKeyFactors(keyFactors)}
+
+  ${bottomHtml}
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    This is an estimate only — actual pricing may vary based on your home's condition and specific requirements.<br>
+    ${brandName} · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Fire-and-forget from the caller's perspective: never throws, returns
+// false (and logs why) instead so a missing config or a delivery failure
+// never breaks the /api/calculate response.
+async function sendEstimateEmail({ to, name, serviceType, result, companyConfig, partner, replyTo }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendEstimateEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+
+  const brandName = companyConfig?.companyName || 'Clean Estimator';
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `${brandName} <${fromAddress}>`,
+        to: [to],
+        // On a subscribed company's widget, replies should reach the
+        // company (their own inbox), not our sending address -- the From
+        // address itself has to stay ours (Resend can only send through a
+        // domain we've verified with SPF/DKIM; putting the company's own
+        // domain there would fail authentication and get flagged as
+        // spoofed), but reply_to lets "Reply" in the visitor's mail client
+        // route straight to the business anyway.
+        reply_to: replyTo || undefined,
+        subject: `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate is ready`,
+        html: buildHtml({ name, serviceType, result, companyConfig, partner }),
+        text: buildText({ name, serviceType, result, companyConfig, partner }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendEstimateEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+function fmtCityList(cities) {
+  // cities: array of "City, ST" strings
+  if (cities.length === 1) return cities[0];
+  if (cities.length === 2) return `${cities[0]} and ${cities[1]}`;
+  return `${cities.slice(0, -1).join(', ')}, and ${cities[cities.length - 1]}`;
+}
+
+function buildPartnerWelcomeText({ businessName, cities }) {
+  const cityList = fmtCityList(cities);
+  return [
+    `Congratulations, ${businessName}!`,
+    '',
+    `You're officially a Clean Estimator partner in ${cityList}. Your listing is live now -- on the results card, the floating banner, and the estimate email in every city you bought.`,
+    '',
+    'Next: set up your dashboard',
+    "Go to https://www.cleanestimator.com/client and sign up with this same email address to unlock your KPI dashboard -- impressions, calls, and click-through-rate for every city.",
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildPartnerWelcomeHtml({ businessName, cities }) {
+  const cityList = fmtCityList(cities);
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Congratulations, ${businessName}!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    You're officially a Clean Estimator partner in <strong>${cityList}</strong>. Your listing is live now — on the results card, the floating banner, and the estimate email in every city you bought.
+  </p>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Next: set up your dashboard</p>
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Go to <a href="https://www.cleanestimator.com/client" style="color:#2563eb;">cleanestimator.com/client</a> and sign up with this same email address to unlock your KPI dashboard — impressions, calls, and click-through-rate for every city.
+  </p>
+
+  <p style="margin:8px 0 0;">
+    <a href="https://www.cleanestimator.com/client" style="color:#2563eb;font-size:14px;font-weight:600;">Set up my dashboard →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent right after a self-serve "buy city placement" checkout provisions a
+// new active partner (backend/src/routes/partnerCheckout.js) -- the in-app
+// success page shows the same congrats + /client instructions, but a
+// buyer who closes that tab before it loads (or never sees it, e.g. the
+// webhook provisioned them after they'd already navigated away) would
+// otherwise have no way to find out their listing is live or how to get
+// dashboard access. Fire-and-forget, same as sendEstimateEmail.
+async function sendPartnerWelcomeEmail({ to, businessName, cities }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendPartnerWelcomeEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendPartnerWelcomeEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: `Welcome to the Clean Estimator Partner Program, ${businessName}!`,
+        html: buildPartnerWelcomeHtml({ businessName, cities }),
+        text: buildPartnerWelcomeText({ businessName, cities }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendPartnerWelcomeEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+const TIMELINE_LABELS = {
+  asap: 'ASAP',
+  week: 'This week',
+  month: 'This month',
+  planning: 'Just planning',
+};
+
+function buildLeadContactLines({ leadEmail, leadPhone, city, state, zip, timeline }) {
+  return [
+    leadEmail ? `Email: ${leadEmail}` : null,
+    leadPhone ? `Phone: ${fmtPhone(leadPhone)}` : null,
+    // city only ever comes from a company-scoped calculator's dropdown (see
+    // CleaningCalculator.js) -- shown here alongside state/ZIP instead of
+    // only buried in the generic Service Details dump further down the
+    // email. state is whatever the visitor picked on the Location step,
+    // shown as the full name for readability (same as sendEstimateEmail's
+    // opening line). zip is optional there (LocationStep.js only shows it
+    // once a state is picked, and validates it against that state) -- so
+    // it's just as often null as not; omitted here whenever it wasn't
+    // collected rather than showing a blank "ZIP:" line.
+    city ? `City: ${city}` : null,
+    state ? `State: ${stateNameFromCode(state)}` : null,
+    zip ? `ZIP: ${zip}` : null,
+    timeline ? `Timeline: ${TIMELINE_LABELS[timeline] || timeline}` : null,
+  ].filter(Boolean);
+}
+
+function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+  const name = leadName || 'A visitor';
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, state, zip, timeline });
+
+  const lines = [
+    'New lead in your area!',
+    '',
+    `${name} just got a ${serviceLabel.toLowerCase()} estimate on Clean Estimator: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}.`,
+    '',
+    'Contact info:',
+    ...contactLines.map(l => `  ${l}`),
+  ];
+
+  if (adjustments.length) {
+    lines.push('', 'Price breakdown:');
+    adjustments.filter(a => !a.separate).forEach(a => {
+      lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
+    });
+    lines.push(`  Estimated total: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}`);
+  }
+
+  if (keyFactors.length) {
+    lines.push('', `Key factors: ${keyFactors.map(f => `${f.label}: ${f.impact}`.replace(/_/g, ' ')).join(' · ')}`);
+  }
+
+  lines.push(...buildServiceDetailsText(serviceDetails));
+
+  lines.push(
+    '',
+    'Reply to this email to reach them directly, or use the contact info above.',
+    '',
+    "They opted in to be connected with a local cleaning professional -- that's you, as our exclusive partner in this area.",
+    '',
+    'Clean Estimator - cleanestimator.com'
+  );
+
+  return lines.join('\n');
+}
+
+function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+  const name = leadName || 'A visitor';
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, state, zip, timeline });
+
+  // No width:100% -- that stretches the value column to the far edge of
+  // the email, leaving a wide, disconnected gap between label and value.
+  // Left-aligned with a little breathing room instead, so the value sits
+  // right next to its label the way a normal label:value pair reads.
+  const contactRows = contactLines.map(l => {
+    const [label, ...rest] = l.split(': ');
+    const value = rest.join(': ');
+    return `
+    <tr>
+      <td style="padding:5px 0;color:#666666;font-size:13.5px;white-space:nowrap;">${label}</td>
+      <td style="padding:5px 0 5px 14px;text-align:left;font-size:13.5px;color:#111111;font-weight:600;">${value}</td>
+    </tr>`;
+  }).join('');
+
+  const breakdownHtml = adjustments.length ? `
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Price breakdown</p>
+  <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;">
+    ${buildBreakdownRows(adjustments)}
+    <tr>
+      <td style="padding:8px 0 0;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
+      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</td>
+    </tr>
+  </table>
+  ${buildKeyFactors(keyFactors)}` : '';
+
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead in your area!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on Clean Estimator: <strong>${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</strong>.
+  </p>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
+    ${contactRows}
+  </table>
+  ${breakdownHtml}
+  ${buildServiceDetailsHtml(serviceDetails)}
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Reply to this email to reach them directly, or use the contact info above.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    They opted in to be connected with a local cleaning professional — that's you, as our exclusive partner in this area.<br>
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent to the matched partner the moment a visitor in their (exclusive)
+// city opts in for their estimate email -- turns the partnership from
+// "shows up passively on the results page/banner/email" into an actual
+// warm lead landing in the partner's inbox, ready to call or reply to.
+// Fire-and-forget, same as the other partner emails; only called from
+// calculate.js when partnerInfo is present and has an email on file.
+// Includes the same full price breakdown/key factors/service details as
+// sendCompanyLeadEmail, not just the top-line range -- a partner deciding
+// whether to call back needs the same context a subscribed company gets.
+async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, state, zip, timeline, adjustments, keyFactors, serviceDetails }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendPartnerLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!partnerEmail) {
+    console.warn('sendPartnerLeadEmail skipped: no partner email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+  const args = { leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments, keyFactors, serviceDetails };
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [partnerEmail],
+        // Lets the partner just hit "reply" in their inbox to reach the
+        // lead directly, without ever needing to copy the contact info out.
+        reply_to: leadEmail || undefined,
+        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead in your area — ${fmtSubjectTimestamp()}`,
+        html: buildPartnerLeadHtml(args),
+        text: buildPartnerLeadText(args),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendPartnerLeadEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+// Same key-formatting LeadsTab.js's detail panel applies to
+// lead.service_details (insert a space before each capital, then
+// capitalize every word) -- so a company sees identical labels ("Sqft
+// Tier", "Cleaning Type") whether they're reading the email or the
+// dashboard. Values are left exactly as stored (e.g. "under_1000",
+// "one_time"), same as the dashboard.
+function formatDetailKey(key) {
+  return key
+    .replace(/([A-Z])/g, ' $1')
+    .trim()
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatDetailValue(v) {
+  return Array.isArray(v) ? v.join(', ') : String(v);
+}
+
+// city is excluded here -- it's already shown up in the Contact info
+// section (see buildLeadContactLines) alongside ZIP, so listing it again
+// in this generic dump would just duplicate it.
+function buildServiceDetailsText(serviceDetails) {
+  const entries = Object.entries(serviceDetails || {}).filter(([k, v]) => k !== 'city' && v !== null && v !== undefined && v !== '');
+  if (!entries.length) return [];
+  return ['', 'Service details:', ...entries.map(([k, v]) => `  ${formatDetailKey(k)}: ${formatDetailValue(v)}`)];
+}
+
+function buildServiceDetailsHtml(serviceDetails) {
+  const entries = Object.entries(serviceDetails || {}).filter(([k, v]) => k !== 'city' && v !== null && v !== undefined && v !== '');
+  if (!entries.length) return '';
+  const rows = entries.map(([k, v]) => `
+    <tr>
+      <td style="padding:5px 0;color:#666666;font-size:13.5px;white-space:nowrap;">${formatDetailKey(k)}</td>
+      <td style="padding:5px 0 5px 14px;text-align:left;font-size:13.5px;color:#111111;font-weight:600;">${formatDetailValue(v)}</td>
+    </tr>`).join('');
+  return `
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Service details</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
+    ${rows}
+  </table>`;
+}
+
+function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+  const name = leadName || 'A visitor';
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, state, zip, timeline });
+
+  const lines = [
+    `New lead on your ${companyName} estimator!`,
+    '',
+    `${name} just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}.`,
+    '',
+    'Contact info:',
+    ...contactLines.map(l => `  ${l}`),
+  ];
+
+  if (adjustments.length) {
+    lines.push('', 'Price breakdown:');
+    adjustments.filter(a => !a.separate).forEach(a => {
+      lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
+    });
+    lines.push(`  Estimated total: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}`);
+  }
+
+  if (keyFactors.length) {
+    lines.push('', `Key factors: ${keyFactors.map(f => `${f.label}: ${f.impact}`.replace(/_/g, ' ')).join(' · ')}`);
+  }
+
+  lines.push(...buildServiceDetailsText(serviceDetails));
+
+  lines.push(
+    '',
+    'Reply to this email to reach them directly, or use the contact info above.',
+    '',
+    'Clean Estimator - cleanestimator.com'
+  );
+
+  return lines.join('\n');
+}
+
+function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+  const name = leadName || 'A visitor';
+  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, state, zip, timeline });
+
+  const contactRows = contactLines.map(l => {
+    const [label, ...rest] = l.split(': ');
+    const value = rest.join(': ');
+    return `
+    <tr>
+      <td style="padding:5px 0;color:#666666;font-size:13.5px;white-space:nowrap;">${label}</td>
+      <td style="padding:5px 0 5px 14px;text-align:left;font-size:13.5px;color:#111111;font-weight:600;">${value}</td>
+    </tr>`;
+  }).join('');
+
+  const breakdownHtml = adjustments.length ? `
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Price breakdown</p>
+  <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;">
+    ${buildBreakdownRows(adjustments)}
+    <tr>
+      <td style="padding:8px 0 0;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
+      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</td>
+    </tr>
+  </table>
+  ${buildKeyFactors(keyFactors)}` : '';
+
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead on your ${companyName} estimator!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: <strong>${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</strong>.
+  </p>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
+    ${contactRows}
+  </table>
+  ${breakdownHtml}
+  ${buildServiceDetailsHtml(serviceDetails)}
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Reply to this email to reach them directly, or use the contact info above.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent to a company subscriber the moment a visitor completes an estimate
+// on THEIR embedded estimator widget (as opposed to sendEstimateEmail,
+// which goes to the visitor themselves). Reply-to is the lead's own email
+// so the company can just hit reply, same pattern as sendPartnerLeadEmail.
+// Fire-and-forget, called from calculate.js whenever companyId is present.
+async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, state, zip, timeline, adjustments, keyFactors, serviceDetails }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendCompanyLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendCompanyLeadEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments, keyFactors, serviceDetails };
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        reply_to: leadEmail || undefined,
+        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead on your estimator — ${fmtSubjectTimestamp()}`,
+        html: buildCompanyLeadHtml(args),
+        text: buildCompanyLeadText(args),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendCompanyLeadEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+// ─── Company welcome email ──────────────────────────────────────────────────
+
+// Keep this iframe/script string identical to the "Standard iFrame" snippet
+// EmbedTab.js generates (same id convention, same resize-listener script) --
+// this is the one place outside the dashboard that hands a company their
+// embed code, and it should never drift from what "Copy Code" gives them.
+function buildEmbedIframeCode(companyId) {
+  const iframeId = `cleancalc-iframe-${companyId}`;
+  return `<iframe
+  id="${iframeId}"
+  src="https://www.cleanestimator.com/embed?company=${companyId}"
+  width="100%"
+  height="700"
+  style="border:none;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.10);"
+  title="Cleaning Cost Estimator"
+  loading="lazy">
+</iframe>
+<script>
+  (function(){
+    var iframe=document.getElementById('${iframeId}');
+    window.addEventListener('message',function(e){
+      if(e.data&&e.data.type==='cleancalc-resize'&&e.source===iframe.contentWindow){
+        iframe.style.height=Math.max(e.data.height,300)+'px';
+      }
+    });
+  })();
+</script>`;
+}
+
+function buildCompanyWelcomeText({ companyId }) {
+  return [
+    'Welcome to Clean Estimator!',
+    '',
+    "Your account is live and your embedded estimator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:",
+    '',
+    buildEmbedIframeCode(companyId),
+    '',
+    "Paste that anywhere in your website's HTML — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The estimator will appear right there and resize itself to fit.",
+    '',
+    "Two things are already working, no setup needed: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.",
+    '',
+    'Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard:',
+    'https://www.cleanestimator.com/company?tab=branding',
+    '',
+    'New to Clean Estimator? Log in to your dashboard and open the Help & Docs tab — it walks through how the estimator works, how pricing is calculated (with the real data behind it), and answers to the most common questions:',
+    'https://www.cleanestimator.com/company?tab=help',
+    '',
+    "You can always get this same code later from the Embed Widget tab.",
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildCompanyWelcomeHtml({ companyId }) {
+  const code = buildEmbedIframeCode(companyId);
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Welcome to Clean Estimator!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your account is live and your embedded estimator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:
+  </p>
+
+  <pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-family:'Menlo','Monaco',monospace;font-size:11.5px;line-height:1.6;color:#334155;white-space:pre-wrap;word-break:break-all;margin:0 0 20px;">${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Paste that anywhere in your website's HTML — a <strong>Custom HTML / Embed block</strong> in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The estimator will appear right there and resize itself to fit.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Two things are already working, no setup needed: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=branding" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Set up my dashboard →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    New to Clean Estimator? Open the <a href="https://www.cleanestimator.com/company?tab=help" style="color:#2563eb;font-weight:700;">Help &amp; Docs</a> tab in your dashboard — it walks through how the estimator works, how pricing is calculated (with the real data behind it), and answers to the most common questions.
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    You can always get this same code later from the <strong>Embed Widget</strong> tab.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the moment a company's config row is first created (see
+// company.js's GET /:id handler) -- i.e. right after they confirm their
+// email and log in for the first time. Gets their embed code in front of
+// them immediately instead of relying on them to find the Embed Widget tab
+// themselves. Fire-and-forget, same pattern as the other company emails.
+// `subject` is overridable so the same content can be reused for a
+// one-off manual broadcast to existing accounts (see admin.js's
+// trial-email preview/send routes) with wording suited to "your trial is
+// already active" rather than "your account was just created".
+async function sendCompanyWelcomeEmail({ to, companyId, subject }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendCompanyWelcomeEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendCompanyWelcomeEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: subject || 'Your Clean Estimator account is ready — here\'s your embed code',
+        html: buildCompanyWelcomeHtml({ companyId }),
+        text: buildCompanyWelcomeText({ companyId }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendCompanyWelcomeEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+// ─── Trial reminder emails ─────────────────────────────────────────────────
+
+function buildTrialEndingSoonText({ companyName, daysLeft }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    `Your free Clean Estimator trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. After that, your embedded estimator will pause on your website until you subscribe.`,
+    '',
+    'Subscribe now to keep it running without interruption:',
+    'https://www.cleanestimator.com/company?tab=subscription',
+    '',
+    'No action needed if you plan to subscribe before then -- this is just a heads up.',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialEndingSoonHtml({ companyName, daysLeft }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your free Clean Estimator trial ends in <strong>${daysLeft} day${daysLeft === 1 ? '' : 's'}</strong>. After that, your embedded estimator will pause on your website until you subscribe.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Subscribe now →</a>
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    No action needed if you already plan to subscribe before then — this is just a heads up.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, 2 days before a company's 30-day free trial ends (see
+// checkTrialReminders in services/trialScheduler.js). Deduped via
+// config.subscription.trialEndingSoonEmailSentAt so it only ever goes out once.
+async function sendTrialEndingSoonEmail({ to, companyName, daysLeft }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialEndingSoonEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialEndingSoonEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: `Your Clean Estimator trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`,
+        html: buildTrialEndingSoonHtml({ companyName, daysLeft }),
+        text: buildTrialEndingSoonText({ companyName, daysLeft }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialEndingSoonEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+// ─── Trial check-in emails ──────────────────────────────────────────────────
+// Fill the gap between the day-0 welcome email and the day-28/30 reminders
+// above -- there was previously no contact at all for the ~27 days in
+// between. Sent once each via checkTrialReminders in trialScheduler.js
+// (day 7 / 14 / 21, deduped the same way as the reminder emails), so a
+// company that stops engaging mid-trial gets a nudge, a pointer to Help &
+// Docs, and an easy reply-to path before they forget the tool exists.
+
+function buildTrialCheckin1Text({ companyName }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    "You're about a week into your free trial — just checking in.",
+    '',
+    "If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the Embed Your Widget tab in your dashboard.",
+    '',
+    "If anything's confusing or not working the way you expected, just reply to this email or check the Help & Docs tab — happy to help.",
+    '',
+    'https://www.cleanestimator.com/company',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialCheckin1Html({ companyName }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    You're about a week into your free trial — just checking in.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the Embed Your Widget tab in your dashboard.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    If anything's confusing or not working the way you expected, just reply to this email or check the Help &amp; Docs tab — happy to help.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Go to my dashboard →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the first time a company's trial reaches 7 days elapsed (see
+// checkTrialReminders in services/trialScheduler.js). Deduped via
+// trialCheckin1EmailSentAt on config.subscription.
+async function sendTrialCheckin1Email({ to, companyName }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialCheckin1Email skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialCheckin1Email skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: "How's Clean Estimator working out so far?",
+        html: buildTrialCheckin1Html({ companyName }),
+        text: buildTrialCheckin1Text({ companyName }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialCheckin1Email failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+function buildTrialCheckin2Text({ companyName }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    "Two weeks into your trial. A couple of things worth a look if you haven't found them yet:",
+    '',
+    '- Branding tab -- set your logo, colors, and call-to-action so the cleaning cost estimator looks like it\'s actually yours',
+    '- Leads tab -- every completed estimate lands here automatically, with the visitor\'s full contact info and price',
+    '',
+    'Questions about either (or anything else)? Just reply -- a real person reads these.',
+    '',
+    'https://www.cleanestimator.com/company?tab=help',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialCheckin2Html({ companyName }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 16px;">
+    Two weeks into your trial. A couple of things worth a look if you haven't found them yet:
+  </p>
+
+  <ul style="font-size:14px;line-height:1.7;margin:0 0 20px;padding-left:20px;">
+    <li><strong>Branding tab</strong> — set your logo, colors, and call-to-action so the cleaning cost estimator looks like it's actually yours</li>
+    <li><strong>Leads tab</strong> — every completed estimate lands here automatically, with the visitor's full contact info and price</li>
+  </ul>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Questions about either (or anything else)? Just reply — a real person reads these.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=help" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Open Help &amp; Docs →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the first time a company's trial reaches 14 days elapsed.
+// Deduped via trialCheckin2EmailSentAt.
+async function sendTrialCheckin2Email({ to, companyName }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialCheckin2Email skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialCheckin2Email skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: 'Two weeks in — a couple of things worth checking out',
+        html: buildTrialCheckin2Html({ companyName }),
+        text: buildTrialCheckin2Text({ companyName }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialCheckin2Email failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+function buildTrialCheckin3Text({ companyName }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    "Your 30-day trial wraps up in about a week -- flagging it now so it doesn't catch you off guard.",
+    '',
+    "If it's been useful, no action needed -- we'll send the official heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends.",
+    '',
+    'https://www.cleanestimator.com/company',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialCheckin3Html({ companyName }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your 30-day trial wraps up in about a week — flagging it now so it doesn't catch you off guard.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    If it's been useful, no action needed — we'll send the official heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View my dashboard →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the first time a company's trial reaches 21 days elapsed.
+// Deduped via trialCheckin3EmailSentAt. Deliberately softer than the
+// day-28 "ending soon" email (no urgency framing) -- that one still does
+// the actual countdown.
+async function sendTrialCheckin3Email({ to, companyName }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialCheckin3Email skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialCheckin3Email skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: 'About a week left on your trial',
+        html: buildTrialCheckin3Html({ companyName }),
+        text: buildTrialCheckin3Text({ companyName }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialCheckin3Email failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+function buildTrialEndedText({ companyName }) {
+  return [
+    `Hi ${companyName},`,
+    '',
+    "Your 30-day free Clean Estimator trial has ended, and your embedded estimator is now paused on your website -- visitors will see a paused notice instead of the estimator until you subscribe.",
+    '',
+    'Subscribe now to turn it back on:',
+    'https://www.cleanestimator.com/company?tab=subscription',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildTrialEndedHtml({ companyName }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your 30-day free Clean Estimator trial has ended, and your embedded estimator is now <strong>paused</strong> on your website — visitors will see a paused notice instead of the estimator until you subscribe.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Subscribe to reactivate →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the day a company's 30-day free trial actually ends and their
+// widget gets paused (see checkTrialReminders). Deduped via
+// config.subscription.trialEndedEmailSentAt.
+async function sendTrialEndedEmail({ to, companyName }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendTrialEndedEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendTrialEndedEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: 'Your Clean Estimator widget has been paused',
+        html: buildTrialEndedHtml({ companyName }),
+        text: buildTrialEndedText({ companyName }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendTrialEndedEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+// ─── Account deletion (30-day grace period) ────────────────────────────────
+
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function buildAccountDeletionScheduledText({ companyName, scheduledFor }) {
+  const dateStr = formatDate(scheduledFor);
+  return [
+    `Hi ${companyName},`,
+    '',
+    `We've received your request to delete your Clean Estimator account. Your account, leads, and settings are scheduled to be permanently deleted on ${dateStr} (30 days from today).`,
+    '',
+    "Your embedded estimator has been paused in the meantime, but nothing has been deleted yet -- you can still log in any time before then to change your mind.",
+    '',
+    'Changed your mind? Log in and click "Cancel Deletion" in Settings:',
+    'https://www.cleanestimator.com/company?tab=settings',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildAccountDeletionScheduledHtml({ companyName, scheduledFor }) {
+  const dateStr = formatDate(scheduledFor);
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    We've received your request to delete your Clean Estimator account. Your account, leads, and settings are scheduled to be permanently deleted on <strong>${dateStr}</strong> (30 days from today).
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your embedded estimator has been paused in the meantime, but nothing has been deleted yet — you can still log in any time before then to change your mind.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=settings" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Log in to cancel deletion →</a>
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once, the moment a company requests account deletion (see company.js's
+// DELETE /account handler), which now schedules a 30-day grace-period
+// deletion instead of deleting immediately.
+async function sendAccountDeletionScheduledEmail({ to, companyName, scheduledFor }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendAccountDeletionScheduledEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendAccountDeletionScheduledEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: 'Your Clean Estimator account deletion is scheduled',
+        html: buildAccountDeletionScheduledHtml({ companyName, scheduledFor }),
+        text: buildAccountDeletionScheduledText({ companyName, scheduledFor }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendAccountDeletionScheduledEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+// ─── Website request notification ──────────────────────────────────────────
+// Internal-only notification the moment someone submits the "Get a
+// Done-For-You Website" application (WebsiteSubscription.js's form) --
+// goes to the business owner's own inbox, not the applicant (they get the
+// on-page confirmation instead). Recipient is env-configurable
+// (WEBSITE_REQUEST_NOTIFY_EMAIL) so it can be changed without a redeploy,
+// defaulting to the owner's personal inbox. reply_to is the applicant's own
+// email so replying in the inbox reaches them directly, same pattern as the
+// lead-notification emails above.
+
+function labeledRows(lines) {
+  return lines.filter(Boolean).map(l => {
+    const idx = l.indexOf(': ');
+    const label = idx === -1 ? l : l.slice(0, idx);
+    const value = idx === -1 ? '' : l.slice(idx + 2);
+    return `
+    <tr>
+      <td style="padding:5px 0;color:#666666;font-size:13.5px;white-space:nowrap;vertical-align:top;">${label}</td>
+      <td style="padding:5px 0 5px 14px;text-align:left;font-size:13.5px;color:#111111;font-weight:600;">${value}</td>
+    </tr>`;
+  }).join('');
+}
+
+function fmtOrDefault(v, fallback) {
+  return v && String(v).trim() ? v : fallback;
+}
+
+// Always returns every domain-related field (never omits one just because
+// it's blank) -- which of domain1/2/3 vs. currentWebsite applies depends on
+// hasDomain, same branching the form itself uses, not a case of hiding data.
+function buildWebsiteRequestDomainLines({ hasDomain, currentWebsite, domain1, domain2, domain3, facebookPage }) {
+  const lines = hasDomain
+    ? [
+        'Already has a domain: Yes',
+        `Current domain: ${fmtOrDefault(currentWebsite, 'Not provided')}`,
+      ]
+    : [
+        'Already has a domain: No',
+        `1st choice: ${fmtOrDefault(domain1, 'Not provided')}`,
+        `2nd choice: ${fmtOrDefault(domain2, 'Not provided')}`,
+        `3rd choice: ${fmtOrDefault(domain3, 'Not provided')}`,
+      ];
+  lines.push(`Facebook page: ${fmtOrDefault(facebookPage, 'None')}`);
+  return lines;
+}
+
+// Every field the form collects gets its own line here, with an explicit
+// "Not provided"/"None" placeholder when left blank -- so the notification
+// always shows the complete shape of what was submitted, and nothing an
+// applicant left blank is silently missing versus one they filled in.
+function buildWebsiteRequestText(args) {
+  const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
+  const domainLines = buildWebsiteRequestDomainLines(args);
+
+  const lines = [
+    'New website + chatbot application!',
+    '',
+    `${name} (${business}) just applied for a Done-For-You cleaning website.`,
+    '',
+    'Contact info:',
+    `  Email: ${email}`,
+    `  Phone: ${fmtOrDefault(phone && fmtPhone(phone), 'Not provided')}`,
+    '',
+    'Business details:',
+    `  Services offered: ${fmtOrDefault(servicesOffered, 'Not specified')}`,
+    `  Other services: ${fmtOrDefault(otherServices, 'None')}`,
+    `  Business address: ${fmtOrDefault(businessAddress, 'Not provided')}`,
+    `  Service areas: ${fmtOrDefault(serviceAreas, 'Not provided')}`,
+    '',
+    'Domain:',
+    ...domainLines.map(l => `  ${l}`),
+    '',
+    'Message:',
+    `  ${fmtOrDefault(message, 'No additional message')}`,
+    '',
+    'Reply to this email to reach them directly.',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ];
+
+  return lines.join('\n');
+}
+
+function buildWebsiteRequestHtml(args) {
+  const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
+  const domainLines = buildWebsiteRequestDomainLines(args);
+
+  const contactRows = labeledRows([
+    `Email: ${email}`,
+    `Phone: ${fmtOrDefault(phone && fmtPhone(phone), 'Not provided')}`,
+  ]);
+  const businessRows = labeledRows([
+    `Services offered: ${fmtOrDefault(servicesOffered, 'Not specified')}`,
+    `Other services: ${fmtOrDefault(otherServices, 'None')}`,
+    `Business address: ${fmtOrDefault(businessAddress, 'Not provided')}`,
+    `Service areas: ${fmtOrDefault(serviceAreas, 'Not provided')}`,
+  ]);
+  const domainRows = labeledRows(domainLines);
+
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New website + chatbot application!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    <strong>${name}</strong> (${business}) just applied for a Done-For-You cleaning website.
+  </p>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${contactRows}</table>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Business details</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${businessRows}</table>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Domain</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${domainRows}</table>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Message</p>
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;white-space:pre-wrap;">${fmtOrDefault(message, 'No additional message')}</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Reply to this email to reach them directly.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+async function sendWebsiteRequestNotificationEmail(args) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL, WEBSITE_REQUEST_NOTIFY_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendWebsiteRequestNotificationEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+  const notifyEmail = WEBSITE_REQUEST_NOTIFY_EMAIL || 'eliaszoleta87@gmail.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [notifyEmail],
+        reply_to: args.email || undefined,
+        subject: `New website application — ${args.business || args.name} — ${fmtSubjectTimestamp()}`,
+        html: buildWebsiteRequestHtml(args),
+        text: buildWebsiteRequestText(args),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendWebsiteRequestNotificationEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+module.exports = {
+  sendEstimateEmail,
+  sendPartnerWelcomeEmail,
+  sendPartnerLeadEmail,
+  sendCompanyLeadEmail,
+  sendCompanyWelcomeEmail,
+  sendTrialEndingSoonEmail,
+  sendTrialEndedEmail,
+  sendTrialCheckin1Email,
+  sendTrialCheckin2Email,
+  sendTrialCheckin3Email,
+  sendAccountDeletionScheduledEmail,
+  sendWebsiteRequestNotificationEmail,
+};

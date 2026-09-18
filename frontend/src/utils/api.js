@@ -8,7 +8,11 @@ async function apiFetch(path, options = {}) {
     headers: { 'Content-Type': 'application/json', ...(optHeaders || {}) },
   });
   const data = await res.json();
-  if (!res.ok || !data.success) throw new Error(data.error || `Request failed (${res.status})`);
+  if (!res.ok || !data.success) {
+    const err = new Error(data.error || `Request failed (${res.status})`);
+    err.responseData = data;
+    throw err;
+  }
   return data;
 }
 
@@ -36,12 +40,29 @@ export async function patchCompanyServices(token, companyId, services) {
   });
 }
 
+// BrandingTab.js -- separate from uploadPartnerLogo below since this one
+// requires the company's own auth token (partner logo upload is a public,
+// no-auth endpoint used pre-signup during checkout).
+export async function uploadCompanyLogo(token, companyId, { contentType, dataBase64 }) {
+  return apiFetch(`/api/company/${companyId}/upload-logo`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ contentType, dataBase64 }),
+  });
+}
+
 export async function getSubscriptionStatus(token) {
   return apiFetch('/api/subscription/status', { headers: { Authorization: `Bearer ${token}` } });
 }
 
 export async function postCheckout(token) {
   return apiFetch('/api/subscription/checkout', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+}
+
+// WebsiteSubscription.js's "Get a Done-For-You Website" application form --
+// triggers an internal notification email (see backend's email.js /
+// sendWebsiteRequestNotificationEmail) instead of relying on a third-party
+// form service whose destination inbox isn't controlled from this codebase.
+export async function postWebsiteRequest(payload) {
+  return apiFetch('/api/website-request', { method: 'POST', body: JSON.stringify(payload) });
 }
 
 export async function postPortal(token) {
@@ -54,12 +75,120 @@ export async function verifyCheckout(token, sessionId) {
   });
 }
 
-export async function getCompanyLeads(token) {
-  return apiFetch('/api/company-leads/company', { headers: { Authorization: `Bearer ${token}` } });
+export async function postPartnerCheckout(payload) {
+  return apiFetch('/api/partner-checkout/checkout', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+export async function getTakenCities() {
+  return apiFetch('/api/partner-checkout/taken-cities');
+}
+
+export async function uploadPartnerLogo({ contentType, dataBase64 }) {
+  return apiFetch('/api/partner-checkout/upload-logo', {
+    method: 'POST', body: JSON.stringify({ contentType, dataBase64 }),
+  });
+}
+
+export async function verifyPartnerCheckout(sessionId) {
+  return apiFetch('/api/partner-checkout/verify-checkout', { method: 'POST', body: JSON.stringify({ sessionId }) });
+}
+
+// ClientDashboard.js -- a logged-in partner editing their own listing's
+// business details. token is the partner's own Supabase Auth session
+// token (requireAuth on the backend resolves their own partner row from it,
+// same as the company dashboard's token-based routes).
+export async function updateClientPartner(token, payload) {
+  return apiFetch('/api/client/partner', {
+    method: 'PUT', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload),
+  });
+}
+
+// includeDeleted also fetches archived (Trash) leads alongside active ones,
+// so LeadsTab.js can split them into two views from one request instead of
+// fetching twice.
+export async function getCompanyLeads(token, includeDeleted = false) {
+  return apiFetch(`/api/company-leads/company${includeDeleted ? '?deleted=true' : ''}`, { headers: { Authorization: `Bearer ${token}` } });
 }
 
 export async function patchLead(token, leadId, updates) {
   return apiFetch(`/api/company-leads/company/${leadId}`, {
     method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(updates),
   });
+}
+
+// Permanent delete -- only ever called from the Trash view, on a lead
+// that's already been archived (soft-deleted) first.
+export async function deleteLeadForever(token, leadId) {
+  return apiFetch(`/api/company-leads/company/${leadId}`, {
+    method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+// adminKey is whatever the admin typed into AdminCompanies.js's login form,
+// forwarded as-is -- never a REACT_APP_* env var, since those are baked
+// into the public JS bundle at build time and this key guards an endpoint
+// backed by the Supabase service role key.
+export async function getAdminCompanies(adminKey) {
+  return apiFetch('/api/admin/companies', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function getTrialEmailPreview(adminKey) {
+  return apiFetch('/api/admin/companies/trial-email-preview', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function sendTrialEmails(adminKey, companyIds) {
+  return apiFetch('/api/admin/companies/send-trial-email', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true, companyIds }),
+  });
+}
+
+export async function sendTrialEmailPreview(adminKey, to) {
+  return apiFetch('/api/admin/companies/send-trial-email-preview', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ to }),
+  });
+}
+
+// AdminPartners.js -- same adminKey convention as above. Replaces writing
+// straight to Supabase from the browser with the anon key.
+export async function getAdminPartners(adminKey) {
+  return apiFetch('/api/admin/partners', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function createAdminPartner(adminKey, payload) {
+  return apiFetch('/api/admin/partners', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function updateAdminPartner(adminKey, id, payload) {
+  return apiFetch(`/api/admin/partners/${id}`, {
+    method: 'PUT', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function toggleAdminPartner(adminKey, id, active) {
+  return apiFetch(`/api/admin/partners/${id}/toggle`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ active }),
+  });
+}
+
+export async function deleteAdminPartner(adminKey, id) {
+  return apiFetch(`/api/admin/partners/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
+}
+
+// AdminHomepageLeads.js -- leads captured by the main public calculator
+// (no companyId, so company_id is null on the row), same adminKey convention
+// as the rest of the admin API.
+export async function getAdminHomepageLeads(adminKey, includeDeleted = false) {
+  return apiFetch(`/api/admin/homepage-leads${includeDeleted ? '?deleted=true' : ''}`, { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function patchAdminHomepageLead(adminKey, id, updates) {
+  return apiFetch(`/api/admin/homepage-leads/${id}`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(updates),
+  });
+}
+
+export async function deleteAdminHomepageLeadForever(adminKey, id) {
+  return apiFetch(`/api/admin/homepage-leads/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
 }

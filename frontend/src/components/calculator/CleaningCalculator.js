@@ -3,6 +3,11 @@ import { Helmet } from 'react-helmet-async';
 import './CleaningCalculator.css';
 import { AlertCircle, MapPin, BarChart3, ShieldOff, Zap } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
+import { getCachedPartnerMatch } from '../../utils/partnerLookup';
+import { trackMetaEvent } from '../../utils/metaPixel';
+import { trackNextdoorEvent } from '../../utils/nextdoorPixel';
+import { getFontStack, getGoogleFontHref } from '../../utils/fonts';
+import { COLORS, SHADOWS } from '../../styles/theme';
 import ServiceSelect from './steps/ServiceSelect';
 import LocationStep from './steps/LocationStep';
 import HomeStep from './steps/HomeStep';
@@ -29,6 +34,23 @@ const SERVICE_STEPS = {
   water_damage: ['service', 'location', 'water_damage', 'lead', 'results'],
 };
 
+// Maps a serviceType (snake_case, as used above and by /api/calculate) to
+// the camelCase key the dashboard's Services tab actually toggles in
+// companyConfig.services -- same mapping ServiceSelect.js uses to filter
+// its grid, needed here too so a ?service=... URL param can't reach a
+// service the company has disabled just because it skips that grid.
+const SERVICE_CONFIG_KEYS = {
+  home_residential: 'homeResidential',
+  apartment: 'apartment',
+  commercial: 'commercial',
+  carpet: 'carpet',
+  air_duct: 'airDuct',
+  dryer_vent: 'dryerVent',
+  tile_grout: 'tileGrout',
+  mold_remediation: 'moldRemediation',
+  water_damage: 'waterDamage',
+};
+
 const DETAIL_STEP_COMPONENT = {
   home: HomeStep,
   apartment: ApartmentStep,
@@ -43,11 +65,11 @@ const DETAIL_STEP_COMPONENT = {
 
 const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Send', 'Results'];
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null }) {
   const cardRef = useRef(null);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
-  const [serviceType, setServiceType] = useState(null);
-  const [stepIndex, setStepIndex] = useState(0);
+  const [serviceType, setServiceType] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? initialService : null);
+  const [stepIndex, setStepIndex] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? 1 : 0);
   const [location, setLocation] = useState({ zip: '', state: '' });
   const [serviceDetails, setServiceDetails] = useState({});
   const [leadInfo, setLeadInfo] = useState(null);
@@ -64,14 +86,19 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Pre-select service from URL param
+  // Pre-select service from URL param (skipped if initialService already set it)
+  // -- gated on the service actually being enabled, so a disabled service
+  // isn't just hidden from the picker grid while still reachable by
+  // appending ?service=... to the embed URL directly.
   useEffect(() => {
+    if (initialService) return;
     const param = new URLSearchParams(window.location.search).get('service');
-    if (param && SERVICE_STEPS[param]) {
+    const configKey = SERVICE_CONFIG_KEYS[param];
+    if (param && SERVICE_STEPS[param] && companyConfig?.services?.[configKey]?.enabled !== false) {
       setServiceType(param);
       setStepIndex(1);
     }
-  }, []);
+  }, [initialService, companyConfig]);
 
   // Scroll to card on step change, accounting for sticky navbar height
   useEffect(() => {
@@ -80,6 +107,31 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     const top = cardRef.current.getBoundingClientRect().top + window.scrollY - navbarHeight;
     window.scrollTo({ top, behavior: 'smooth' });
   }, [stepIndex]);
+
+  // Let a siteLanding page's own wrapper drop its fixed white/shadow card
+  // once results are showing, since ResultsScreen renders its own full page
+  // chrome (grey background, its own card, buttons outside it) that would
+  // otherwise get boxed in a second time by that wrapper.
+  useEffect(() => {
+    onShowResults?.(currentStep === 'results' && !!result);
+  }, [currentStep, result, onShowResults]);
+
+  // Lazy-loads the Google Font behind a company's chosen widget font (see
+  // BrandingTab.js) the moment it's actually needed, instead of every
+  // possible font being preloaded on every page load. No-op for web-safe
+  // choices (Arial, Georgia, etc.) and for the no-companyConfig public site.
+  const fontFamily = companyConfig?.fontFamily || null;
+  useEffect(() => {
+    const href = getGoogleFontHref(fontFamily);
+    if (!href) return;
+    const linkId = `cc-font-${fontFamily.replace(/\s+/g, '-')}`;
+    if (document.getElementById(linkId)) return;
+    const link = document.createElement('link');
+    link.id = linkId;
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  }, [fontFamily]);
 
   const goNext = () => setStepIndex(i => Math.min(i + 1, steps.length - 1));
   const goBack = () => setStepIndex(i => Math.max(i - 1, 0));
@@ -107,15 +159,34 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setError(null);
     setLoading(true);
     try {
+      // Same match ResultsScreen shows on-page (skipped when embedded, same
+      // as ResultsScreen's own guard) -- forwarded so the estimate email can
+      // include the same recommended-partner card, not a separate lookup.
+      const partnerMatch = embedded ? null : await getCachedPartnerMatch();
       const res = await postCalculate({
         serviceType,
         zip: location.zip || null,
         state: location.state || null,
-        serviceDetails,
+        // city only ever comes from a company-scoped LocationStep (see
+        // serviceStates) -- doesn't affect pricing (state is what the
+        // calculation engine actually uses), just stashed in
+        // serviceDetails' existing free-form JSONB column as lead
+        // context, no schema change needed.
+        serviceDetails: location.city ? { ...serviceDetails, city: location.city } : serviceDetails,
         companyId: companyConfig?.companyId || null,
         leadInfo: lead?.email ? lead : null,
+        partnerInfo: partnerMatch,
       });
       setResult(res.data);
+      // No-ops when a pixel isn't initialized (embed routes, ad blockers, no
+      // pixel ID configured) -- safe to call unconditionally rather than
+      // re-deriving the embed check each pixel already gated on.
+      trackMetaEvent('EstimateCompleted', { service_type: serviceType, value: res.data.totalLow, currency: 'USD' });
+      trackNextdoorEvent('ESTIMATE_COMPLETED', { service_type: serviceType, value: res.data.totalLow, currency: 'USD' });
+      if (lead?.email) {
+        trackMetaEvent('Lead', { service_type: serviceType });
+        trackNextdoorEvent('LEAD', { service_type: serviceType });
+      }
       goNext();
     } catch (err) {
       setError(err.message || 'Calculation failed. Please try again.');
@@ -147,16 +218,23 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   const progressStep = Math.min(stepIndex, 4);
 
-  // Results page
+  // Results page. On a siteLanding page (our own standalone calculator
+  // pages) the wizard steps stay flush/embedded inside the page's own card,
+  // but results should look exactly like the homepage's full results screen
+  // (its own grey background, its own card, Share/Print/disclaimer outside
+  // it) -- only a real third-party embed (EmbedWrapper) needs it flush too.
   if (currentStep === 'results' && result) {
     return (
-      <ResultsScreen
-        result={result}
-        serviceDetails={serviceDetails}
-        companyConfig={companyConfig}
-        embedded={embedded}
-        onReset={handleReset}
-      />
+      <div style={fontFamily ? { fontFamily: getFontStack(fontFamily) } : undefined}>
+        <ResultsScreen
+          result={result}
+          serviceDetails={serviceDetails}
+          companyConfig={companyConfig}
+          embedded={embedded && !siteLanding}
+          onReset={handleReset}
+          demoPartner={demoPartner}
+        />
+      </div>
     );
   }
 
@@ -166,61 +244,67 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     <>
       {!embedded && (
         <Helmet>
-          <title>Free Cleaning Cost Estimator 2026 | Clean Estimator</title>
+          <title>Free Cleaning Cost Calculator 2026 | Clean Estimator</title>
           <meta name="description" content="Free cleaning cost calculator for 2026. Instant ZIP-code specific estimates for house cleaning, carpet, air duct, mold remediation & more. No signup needed." />
           <link rel="canonical" href="https://www.cleanestimator.com/" />
           <meta property="og:site_name" content="Clean Estimator" />
-          <meta property="og:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+          <meta property="og:title" content="Free Cleaning Cost Calculator 2026 | Clean Estimator" />
           <meta property="og:type" content="website" />
           <meta property="og:url" content="https://www.cleanestimator.com/" />
           <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
           <meta property="og:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:site" content="@CleanEstimator" />
-          <meta name="twitter:title" content="Free Cleaning Cost Estimator 2026 | Clean Estimator" />
+          <meta name="twitter:title" content="Free Cleaning Cost Calculator 2026 | Clean Estimator" />
           <meta name="twitter:image" content="https://www.cleanestimator.com/og-image.png" />
           <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         </Helmet>
       )}
 
       <div style={{
-        background: embedded ? 'white' : 'linear-gradient(135deg, #f0f7ff 0%, #f8fafc 100%)',
-        minHeight: embedded ? 'auto' : '100vh',
-        padding: embedded ? '0' : '28px 16px',
+        background: embedded ? 'white' : COLORS.surfaceMuted,
+        fontFamily: fontFamily ? getFontStack(fontFamily) : undefined,
       }}>
-        {/* Hero (non-embedded only) */}
+        {/* Hero (non-embedded only) -- full-bleed dark band the calculator
+            card sinks into, instead of a plain badge/title on a light page
+            background. */}
         {!embedded && currentStep === 'service' && (
-          <div className="calc-hero">
-            <div className="calc-hero__badge">Free • Instant • No signup required</div>
-            <h1 className="calc-hero__title">Free Cleaning Cost Estimator &amp; Calculator</h1>
-            <p className="calc-hero__subtitle">Instant, ZIP-code accurate cleaning cost estimates for house cleaning, deep cleaning, move-out, carpet, air duct, mold remediation &amp; more.</p>
+          <div className="calc-hero-band">
+            <div className="calc-hero-glow" aria-hidden="true" />
+            <div className="calc-hero">
+              <div className="calc-hero__badge">Free • Instant • No signup required</div>
+              <h1 className="calc-hero__title">Free Cleaning Cost Calculator — Get an Estimate</h1>
+              <p className="calc-hero__subtitle">Instant, ZIP-code accurate cleaning cost estimates for house cleaning, deep cleaning, move-out, carpet, air duct, mold remediation &amp; more.</p>
+            </div>
           </div>
         )}
 
+        <div style={{ padding: embedded ? 0 : '0 16px 28px' }}>
         {/* Calculator card */}
         <div ref={cardRef} style={{
           maxWidth: 720,
-          margin: '0 auto',
-          background: 'white',
-          borderRadius: embedded ? 0 : 16,
-          boxShadow: embedded ? 'none' : '0 8px 40px rgba(0,0,0,0.10)',
+          margin: embedded ? '0 auto' : (currentStep === 'service' ? `${isMobile ? -44 : -72}px auto 0` : '14px auto 0'),
+          position: 'relative',
+          background: COLORS.surface,
+          borderRadius: embedded ? 0 : 10,
+          boxShadow: embedded ? 'none' : SHADOWS.lg,
           overflow: 'hidden',
-          border: embedded ? 'none' : '1px solid #e2e8f0',
+          border: embedded ? 'none' : `1px solid ${COLORS.border}`,
         }}>
           {/* Progress bar */}
           {currentStep !== 'service' && currentStep !== 'results' && (
-            <div style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '16px 24px' }}>
+            <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, padding: '16px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 {PROGRESS_LABELS.slice(0, effectiveSteps.length).map((label, i) => (
                   <span key={label} style={{
                     fontSize: 12, fontWeight: 600,
-                    color: i <= progressStep ? primaryColor : '#94a3b8',
+                    color: i <= progressStep ? primaryColor : COLORS.muted,
                   }}>
                     {label}
                   </span>
                 ))}
               </div>
-              <div style={{ height: 4, background: '#e2e8f0', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ height: 4, background: COLORS.border, borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%',
                   width: `${(progressStep / (effectiveSteps.length - 1)) * 100}%`,
@@ -234,7 +318,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
           {/* Error */}
           {error && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '11px 24px', color: '#dc2626', fontSize: 13.5 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: COLORS.dangerMuted, borderBottom: `1px solid ${COLORS.dangerBorder}`, padding: '11px 24px', color: COLORS.danger, fontSize: 13.5 }}>
               <AlertCircle size={15} /> {error}
             </div>
           )}
@@ -242,7 +326,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           {/* Steps */}
           <div style={{ padding: embedded ? '20px 16px' : isMobile ? '20px 16px' : '32px 40px' }}>
             {currentStep === 'service' && (
-              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} />
+              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} services={companyConfig?.services} />
             )}
             {currentStep === 'location' && (
               <LocationStep
@@ -250,6 +334,8 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 onBack={goBack}
                 onNext={handleLocationNext}
                 primaryColor={primaryColor}
+                serviceStates={companyConfig?.serviceStates || []}
+                serviceCities={companyConfig?.serviceCities || {}}
               />
             )}
             {DetailComponent && (
@@ -259,6 +345,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 onNext={handleDetailsNext}
                 primaryColor={primaryColor}
                 location={location}
+                companyConfig={companyConfig}
               />
             )}
             {currentStep === 'lead' && (
@@ -276,19 +363,20 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
         {/* Trust bar */}
         {!embedded && currentStep === 'service' && (
-          <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', gap: 28, flexWrap: 'wrap' }}>
+          <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', rowGap: 10, columnGap: 28, flexWrap: 'wrap' }}>
             {[
               { Icon: MapPin,    label: 'All 50 states',     color: '#059669' },
               { Icon: BarChart3, label: '9 service types',   color: '#2563eb' },
               { Icon: ShieldOff, label: 'No email required', color: '#7c3aed' },
               { Icon: Zap,       label: 'Instant results',   color: '#ea580c' },
             ].map(({ Icon, label, color }) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#64748b', fontWeight: 500 }}>
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: COLORS.body, fontWeight: 500 }}>
                 <Icon size={14} color={color} /> {label}
               </div>
             ))}
           </div>
         )}
+        </div>
       </div>
     </>
   );

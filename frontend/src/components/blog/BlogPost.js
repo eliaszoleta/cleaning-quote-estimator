@@ -1,6 +1,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { FileQuestion, Lightbulb, ArrowRight } from 'lucide-react';
 import { getPostBySlug, BLOG_POSTS } from '../../data/blogPosts';
+import '../pages/PageHero.css';
 
 // Simple markdown-to-HTML renderer (tables, headers, bold, lists, links)
 function renderMarkdown(md) {
@@ -14,12 +16,12 @@ function renderMarkdown(md) {
       const cells = row.split('|').filter(c => c.trim()).map(c => `<td style="padding:10px 14px;font-size:14px;border-bottom:1px solid #f1f5f9">${c.trim()}</td>`).join('');
       return `<tr>${cells}</tr>`;
     }).join('');
-    return `<div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden"><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    return `<div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden"><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
   });
 
   // Headers
-  html = html.replace(/^### (.+)$/gm, '<h3 style="font-size:20px;font-weight:700;color:#0f172a;margin:28px 0 12px">$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2 style="font-size:26px;font-weight:800;color:#0f172a;margin:40px 0 16px">$1</h2>');
+  html = html.replace(/^### (.+)$/gm, '<h3 style="font-size:clamp(17px,4.2vw,20px);font-weight:700;color:#0f172a;margin:clamp(20px,5vw,28px) 0 10px">$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2 style="font-size:clamp(21px,5vw,26px);font-weight:800;color:#0f172a;margin:clamp(28px,6vw,40px) 0 14px;letter-spacing:-0.01em">$1</h2>');
 
   // Horizontal rules
   html = html.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #e2e8f0;margin:32px 0">');
@@ -31,7 +33,7 @@ function renderMarkdown(md) {
   html = html.replace(/^([✅⚠️🚩❌✓])\s+(.+)$/gm, '<div style="display:flex;gap:8px;margin-bottom:8px"><span>$1</span><span>$2</span></div>');
 
   // Links
-  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#2563eb;font-weight:500">$1</a>');
+  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#1d4ed8;font-weight:500">$1</a>');
 
   // Unordered lists
   html = html.replace(/((?:^- .+\n?)+)/gm, (block) => {
@@ -48,7 +50,7 @@ function renderMarkdown(md) {
   // Paragraphs (double newlines)
   html = html.split(/\n\n+/).map(para => {
     if (para.startsWith('<h') || para.startsWith('<ul') || para.startsWith('<ol') || para.startsWith('<div') || para.startsWith('<table') || para.startsWith('<hr')) return para;
-    return `<p style="font-size:16px;line-height:1.8;color:#374151;margin:0 0 16px">${para.replace(/\n/g, '<br>')}</p>`;
+    return `<p style="font-size:clamp(14.5px,3.8vw,16px);line-height:1.65;color:#374151;margin:0 0 14px">${para.replace(/\n/g, '<br>')}</p>`;
   }).join('\n');
 
   return html;
@@ -59,9 +61,11 @@ export default function BlogPost({ slug }) {
 
   if (!post) return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>📄</div>
+      <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+        <FileQuestion size={30} strokeWidth={1.75} />
+      </div>
       <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>Post not found</h1>
-      <a href="/blog" style={{ color: '#2563eb', fontWeight: 600 }}>← Back to blog</a>
+      <a href="/blog" style={{ color: '#1d4ed8', fontWeight: 600 }}>← Back to blog</a>
     </div>
   );
 
@@ -108,6 +112,16 @@ export default function BlogPost({ slug }) {
     ],
   };
 
+  // Optional per-post FAQ schema -- only posts that define `faqs` get this
+  // block, so it's additive and doesn't affect posts without one. Directly
+  // targets AI Overviews / rich results, which pull heavily from FAQPage
+  // structured data for exactly this kind of Q&A content.
+  const faqSchema = post.faqs?.length ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: post.faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  } : null;
+
   return (
     <>
       <Helmet>
@@ -132,41 +146,53 @@ export default function BlogPost({ slug }) {
         <meta name="twitter:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator" />
         <script type="application/ld+json">{JSON.stringify(schema)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
+        {faqSchema && <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>}
       </Helmet>
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '60px 24px' }}>
-        {/* Breadcrumb */}
-        <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 24 }}>
-          <a href="/" style={{ color: '#94a3b8' }}>Home</a> › <a href="/blog" style={{ color: '#94a3b8' }}>Blog</a> › <a href={`/blog/category/${post.category}`} style={{ color: '#94a3b8' }}>{post.categoryLabel}</a>
-        </div>
-
-        {/* Header */}
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-            <a href={`/blog/category/${post.category}`} style={{ color: '#2563eb', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>{post.categoryLabel}</a>
-            <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
-            <span style={{ color: '#94a3b8', fontSize: 13 }}>{post.readTime} read</span>
-            <span style={{ color: '#cbd5e1', fontSize: 13 }}>·</span>
-            <span style={{ color: '#94a3b8', fontSize: 13 }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+      {/* 880 instead of the old 760 -- on a wide desktop monitor, a narrow
+          column surrounded by huge margins reads like a cramped WordPress
+          Gutenberg default width instead of a real article layout. */}
+      <div className="page-hero-band" style={{ paddingBottom: 72 }}>
+        <div className="page-hero-glow" aria-hidden="true" />
+        <div className="page-hero-inner" style={{ maxWidth: 880, textAlign: 'left' }}>
+          <div className="page-hero-breadcrumb">
+            <a href="/">Home</a><span>›</span><a href="/blog">Blog</a><span>›</span>
+            <a href={`/blog/category/${post.category}`}>{post.categoryLabel}</a>
           </div>
-          <h1 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 900, color: '#0f172a', lineHeight: 1.2, marginBottom: 16 }}>{post.title}</h1>
-          <p style={{ fontSize: 18, color: '#64748b', lineHeight: 1.6 }}>{post.excerpt}</p>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+            <span style={{ color: '#93c5fd', fontSize: 13, fontWeight: 700 }}>{post.categoryLabel}</span>
+            <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>·</span>
+            <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>{post.readTime} read</span>
+            <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>·</span>
+            <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+          <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 14, letterSpacing: '-0.01em' }}>{post.title}</h1>
+          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 720 }}>{post.excerpt}</p>
         </div>
+      </div>
 
-        {/* CTA box */}
-        <div style={{ background: '#f0f7ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '16px 20px', marginBottom: 36, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-          <span style={{ fontSize: 14, color: '#1e40af', fontWeight: 500 }}>💡 Get a free local estimate for your project</span>
-          <a href="/" style={{ background: '#2563eb', color: 'white', padding: '9px 20px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>Use Free Calculator →</a>
+      <div style={{ maxWidth: 880, margin: '0 auto', padding: '0 20px clamp(14px, 7vw, 60px)' }}>
+        {/* CTA + article body -- one bordered white card, matching the same
+            content-card style ServicePage.js uses, pulled up to sink into
+            the band above like the SEO template pages. */}
+        <div style={{ background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', padding: 'clamp(18px, 5vw, 36px) clamp(16px, 4.5vw, 36px)', marginTop: -48, marginBottom: 24, boxShadow: '0 8px 30px rgba(15,23,42,0.08)', position: 'relative' }}>
+          {/* CTA box */}
+          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#f5f8ff)', border: '1px solid #bfdbfe', borderRadius: 14, padding: 'clamp(14px, 4vw, 18px) clamp(14px, 4vw, 22px)', marginBottom: 'clamp(24px, 6vw, 36px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+            <span style={{ fontSize: 14, color: '#1d4ed8', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <Lightbulb size={17} strokeWidth={2} /> Get a free local estimate for your project
+            </span>
+            <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '9px 20px', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: '0 2px 8px rgba(30,64,175,0.25)' }}>Use Free Calculator →</a>
+          </div>
+
+          {/* Content */}
+          <div style={{ lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
         </div>
-
-        {/* Content */}
-        <div style={{ lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
 
         {/* Bottom CTA */}
-        <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)', borderRadius: 14, padding: '32px 36px', marginTop: 48, color: 'white', textAlign: 'center' }}>
+        <div style={{ background: 'linear-gradient(135deg, #0b1220, #1e293b)', borderRadius: 18, padding: 'clamp(24px, 6vw, 36px) clamp(20px, 5vw, 40px)', marginTop: 48, color: 'white', textAlign: 'center', boxShadow: '0 12px 32px rgba(15,23,42,0.24)' }}>
           <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Get a Free Local Estimate</h3>
           <p style={{ color: '#94a3b8', marginBottom: 20, fontSize: 15 }}>Our calculator gives ZIP-code specific prices across all 50 states. Free and instant.</p>
-          <a href="/" style={{ background: '#2563eb', color: 'white', padding: '14px 32px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 16 }}>Calculate My Cost →</a>
+          <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '14px 32px', borderRadius: 11, textDecoration: 'none', fontWeight: 700, fontSize: 16, boxShadow: '0 4px 16px rgba(37,99,235,0.3)' }}>Calculate My Cost →</a>
         </div>
 
         {/* Related posts */}
@@ -175,13 +201,13 @@ export default function BlogPost({ slug }) {
             <h3 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 20 }}>Related Guides</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
               {suggestions.map(p => (
-                <a key={p.slug} href={`/blog/${p.slug}`} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px', textDecoration: 'none', transition: 'all 0.15s' }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#2563eb'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; }}
+                <a key={p.slug} href={`/blog/${p.slug}`} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '20px', textDecoration: 'none', transition: 'all 0.2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#bfdbfe'; e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(30,64,175,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
                 >
                   <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>{p.categoryLabel}</div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>{p.title}</div>
-                  <div style={{ fontSize: 13, color: '#2563eb', fontWeight: 600, marginTop: 10 }}>Read →</div>
+                  <div style={{ fontSize: 13, color: '#1d4ed8', fontWeight: 600, marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 4 }}>Read <ArrowRight size={13} strokeWidth={2.5} /></div>
                 </a>
               ))}
             </div>

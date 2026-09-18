@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets } from 'lucide-react';
+import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X } from 'lucide-react';
+import { getAllStates } from '../../../data/statePricing';
+
+const ALL_STATES = getAllStates();
 
 const SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning',      Icon: Home          },
@@ -15,10 +18,18 @@ const SERVICES = [
 
 const DEFAULT_SVC = { enabled: true, markup: 1.0, minimumCharge: null };
 
-export default function ServicesTab({ config, update }) {
+export default function ServicesTab({ config, update, patchServices, autoSave }) {
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
   const [customQuestions, setCustomQuestions] = useState([]);
+  const [serviceStates, setServiceStates] = useState([]);
+  const [stateSearch, setStateSearch] = useState('');
+  // { [stateCode]: string[] } -- keyed by state so a company serving
+  // multiple states gets each state's own city list, instead of every
+  // state's cities showing up mixed together in one shared dropdown no
+  // matter which state a visitor picked.
+  const [serviceCities, setServiceCities] = useState({});
+  const [citySearch, setCitySearch] = useState({});
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -27,8 +38,61 @@ export default function ServicesTab({ config, update }) {
       setServices(config.services || {});
       setEnableLeadCapture(config.enableLeadCapture !== false);
       setCustomQuestions(config.customLeadQuestions || []);
+      setServiceStates(config.serviceStates || []);
+      setServiceCities(config.serviceCities || {});
     }
   }, [config]);
+
+  // Service Area (states + cities) saves immediately, same as the service
+  // on/off toggles below -- these are discrete add/remove actions, not
+  // continuous typing, so there's no "excessive autosave" concern, and
+  // leaving them staged behind Save Changes was exactly the "did my change
+  // actually take effect on the widget?" confusion the toggle autosave
+  // already fixed once.
+  const toggleState = (code) => {
+    const removing = serviceStates.includes(code);
+    setServiceStates(prev => {
+      const next = removing ? prev.filter(c => c !== code) : [...prev, code];
+      if (autoSave) autoSave({ serviceStates: next });
+      else if (update) update({ serviceStates: next });
+      return next;
+    });
+    // Drop that state's cities too when the state itself is removed --
+    // otherwise they sit around orphaned, unreachable from the UI but
+    // still saved.
+    if (removing) {
+      setServiceCities(prev => {
+        if (!(code in prev)) return prev;
+        const next = { ...prev };
+        delete next[code];
+        if (autoSave) autoSave({ serviceCities: next });
+        else if (update) update({ serviceCities: next });
+        return next;
+      });
+    }
+  };
+
+  const addCity = (stateCode, name) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setServiceCities(prev => {
+      const existing = prev[stateCode] || [];
+      if (existing.some(c => c.toLowerCase() === trimmed.toLowerCase())) return prev;
+      const next = { ...prev, [stateCode]: [...existing, trimmed] };
+      if (autoSave) autoSave({ serviceCities: next });
+      else if (update) update({ serviceCities: next });
+      return next;
+    });
+  };
+
+  const removeCity = (stateCode, name) => {
+    setServiceCities(prev => {
+      const next = { ...prev, [stateCode]: (prev[stateCode] || []).filter(c => c !== name) };
+      if (autoSave) autoSave({ serviceCities: next });
+      else if (update) update({ serviceCities: next });
+      return next;
+    });
+  };
 
   const getSvc = (id) => ({ ...DEFAULT_SVC, ...(services[id] || {}) });
 
@@ -38,6 +102,19 @@ export default function ServicesTab({ config, update }) {
       if (update) update({ services: next });
       return next;
     });
+  };
+
+  // Enable/disable saves immediately instead of waiting on the header's
+  // Save Changes button -- a company turning a service off expects it gone
+  // from their live widget right away, not just staged for the next manual
+  // save. Markup/minimumCharge edits still go through Save Changes as
+  // before (auto-saving those on every keystroke would be excessive).
+  const toggleService = (id) => {
+    const nextSvc = { ...getSvc(id), enabled: !getSvc(id).enabled };
+    const next = { ...services, [id]: nextSvc };
+    setServices(next);
+    if (update) update({ services: next });
+    if (patchServices) patchServices({ [id]: nextSvc });
   };
 
   const setLeadCapture = (val) => {
@@ -69,17 +146,130 @@ export default function ServicesTab({ config, update }) {
     });
   };
 
-  const inp = { padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: 13, color: '#0f172a', outline: 'none', background: 'white' };
+  const inp = { padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, color: '#0f172a', outline: 'none', background: 'white' };
 
   return (
     <div>
       <div style={{ marginBottom: 22 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 3, letterSpacing: '-0.3px' }}>Services & Pricing</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Toggle services and set pricing. Click <strong>Save Changes</strong> in the header when done.</p>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Services & Pricing</h2>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Service Area and toggling a service on/off save instantly. For markup and minimum price changes, click <strong>Save Changes</strong> in the header when done.</p>
       </div>
 
+      {/* Service area */}
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14 }}>
+            <MapPin size={15} color="#2563eb" /> Service Area
+          </div>
+          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
+            Which state(s) do you actually operate in? Leave empty to serve all 50 states with the standard state picker. Pick one state and your widget skips the state question entirely and just asks visitors for their city instead — pick a few and it shows only those states, not the full US list.
+          </div>
+        </div>
+        <div style={{ padding: '14px 18px' }}>
+          {serviceStates.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+              {serviceStates.map(code => {
+                const s = ALL_STATES.find(st => st.code === code);
+                return (
+                  <span key={code} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: 20, padding: '4px 6px 4px 12px', fontSize: 12.5, fontWeight: 600 }}>
+                    {s?.name || code}
+                    <button type="button" onClick={() => toggleState(code)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1d4ed8', display: 'flex', padding: 2 }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
+          <input
+            style={{ ...inp, width: '100%', boxSizing: 'border-box', marginBottom: 10 }}
+            placeholder="Search states to add..."
+            value={stateSearch}
+            onChange={e => setStateSearch(e.target.value)}
+          />
+          {stateSearch.trim() && (
+            <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 7 }}>
+              {ALL_STATES.filter(s =>
+                !serviceStates.includes(s.code) &&
+                (s.name.toLowerCase().includes(stateSearch.trim().toLowerCase()) || s.code.toLowerCase() === stateSearch.trim().toLowerCase())
+              ).slice(0, 8).map(s => (
+                <button
+                  key={s.code}
+                  type="button"
+                  onClick={() => { toggleState(s.code); setStateSearch(''); }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', background: 'none', border: 'none', borderBottom: '1px solid #f1f5f9', cursor: 'pointer', fontSize: 13 }}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Cities/towns you serve -- only relevant once at least one state is
+          set, since the city question only ever shows up once a state (or
+          the single fixed state) is known. Free-typed by the company, not
+          drawn from any external database: most cleaners serve a specific
+          metro area within a state, not literally every town in it, so
+          asking them what THEY cover is more accurate than any generic
+          list would be anyway. */}
+      {serviceStates.length > 0 && (
+        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{ fontWeight: 700, fontSize: 14 }}>Cities/Towns You Serve <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: 12 }}>(optional)</span></div>
+            <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
+              List the specific cities/towns you cover in each state and your widget shows visitors a dropdown of just those instead of a free-text box. Leave a state's list empty and visitors can type any city for it.
+            </div>
+          </div>
+          <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+            {serviceStates.map(code => {
+              const stateName = ALL_STATES.find(s => s.code === code)?.name || code;
+              const cities = serviceCities[code] || [];
+              const search = citySearch[code] || '';
+              return (
+                <div key={code}>
+                  <div style={{ fontWeight: 700, fontSize: 12.5, color: '#374151', marginBottom: 8 }}>{stateName}</div>
+                  {cities.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+                      {cities.map(city => (
+                        <span key={city} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0', borderRadius: 20, padding: '4px 6px 4px 12px', fontSize: 12.5, fontWeight: 600 }}>
+                          {city}
+                          <button type="button" onClick={() => removeCity(code, city)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#15803d', display: 'flex', padding: 2 }}>
+                            <X size={12} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      style={{ ...inp, flex: 1, boxSizing: 'border-box' }}
+                      placeholder={`Add a city in ${stateName} and press Enter…`}
+                      value={search}
+                      onChange={e => setCitySearch(prev => ({ ...prev, [code]: e.target.value }))}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') { e.preventDefault(); addCity(code, search); setCitySearch(prev => ({ ...prev, [code]: '' })); }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { addCity(code, search); setCitySearch(prev => ({ ...prev, [code]: '' })); }}
+                      disabled={!search.trim()}
+                      style={{ padding: '8px 16px', borderRadius: 7, border: 'none', background: search.trim() ? '#16a34a' : '#e2e8f0', color: search.trim() ? 'white' : '#94a3b8', fontWeight: 700, fontSize: 13, cursor: search.trim() ? 'pointer' : 'not-allowed' }}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Services list */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
         <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: 14 }}>Available Services</div>
@@ -95,7 +285,7 @@ export default function ServicesTab({ config, update }) {
                 key={id}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
-                  borderRadius: 8, marginBottom: 3,
+                  borderRadius: 7, marginBottom: 3,
                   background: s.enabled ? 'white' : '#f8fafc',
                   border: `1px solid ${s.enabled ? '#e2e8f0' : '#f1f5f9'}`,
                   flexWrap: 'wrap', transition: 'all 0.12s',
@@ -103,7 +293,7 @@ export default function ServicesTab({ config, update }) {
               >
                 {/* Icon */}
                 <div style={{
-                  width: 34, height: 34, borderRadius: 8, flexShrink: 0,
+                  width: 34, height: 34, borderRadius: 7, flexShrink: 0,
                   background: s.enabled ? '#eff6ff' : '#f1f5f9',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
@@ -136,7 +326,7 @@ export default function ServicesTab({ config, update }) {
                 {/* Toggle */}
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <label style={{ position: 'relative', display: 'inline-block', width: 42, height: 23, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={s.enabled} onChange={e => setSvc(id, 'enabled', e.target.checked)}
+                    <input type="checkbox" checked={s.enabled} onChange={() => toggleService(id)}
                       style={{ opacity: 0, width: 0, height: 0 }} />
                     <span style={{ position: 'absolute', inset: 0, borderRadius: 23, background: s.enabled ? '#2563eb' : '#cbd5e1', transition: 'background 0.2s' }}>
                       <span style={{ position: 'absolute', top: 2.5, left: s.enabled ? 21 : 2.5, width: 18, height: 18, borderRadius: '50%', background: 'white', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
@@ -158,7 +348,7 @@ export default function ServicesTab({ config, update }) {
       </div>
 
       {/* Lead capture */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
         <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
           <div style={{ fontWeight: 700, fontSize: 14 }}>Lead Capture</div>
           <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Collect contact info before showing the quote.</div>
@@ -183,7 +373,7 @@ export default function ServicesTab({ config, update }) {
                 Custom questions <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: 12 }}>(optional)</span>
               </div>
               {customQuestions.map((q, idx) => (
-                <div key={q.id} style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: 13, marginBottom: 8, background: '#f8fafc' }}>
+                <div key={q.id} style={{ border: '1px solid #e2e8f0', borderRadius: 7, padding: 13, marginBottom: 8, background: '#f8fafc' }}>
                   <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
                     <input value={q.label} onChange={e => updateQuestion(idx, 'label', e.target.value)}
                       placeholder="Question label (e.g. 'How did you hear about us?')" style={{ ...inp, flex: 1, minWidth: 180 }} />
@@ -193,7 +383,7 @@ export default function ServicesTab({ config, update }) {
                       <option value="select">Dropdown</option>
                     </select>
                     <button onClick={() => removeQuestion(idx)}
-                      style={{ padding: '6px 12px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+                      style={{ padding: '6px 12px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
                       Remove
                     </button>
                   </div>
@@ -204,7 +394,7 @@ export default function ServicesTab({ config, update }) {
                 </div>
               ))}
               <button onClick={addQuestion}
-                style={{ padding: '8px 16px', border: '1.5px dashed #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#64748b' }}>
+                style={{ padding: '8px 16px', border: '1.5px dashed #e2e8f0', borderRadius: 7, background: 'white', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: '#64748b' }}>
                 + Add Question
               </button>
             </div>

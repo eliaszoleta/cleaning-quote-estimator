@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { Sparkles } from 'lucide-react';
+import FloatingPartnerBanner from '../partners/FloatingPartnerBanner';
+import WebsiteOfferBanner from '../partners/WebsiteOfferBanner';
+import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 
 const styles = {
   header: {
-    background: 'white',
-    borderBottom: '1px solid #e2e8f0',
+    background: 'rgba(255,255,255,0.92)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    borderBottom: `1px solid ${COLORS.border}`,
     position: 'sticky',
     top: 0,
     zIndex: 100,
-    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+    boxShadow: SHADOWS.sm,
   },
   inner: {
     maxWidth: 1200,
@@ -25,74 +31,102 @@ const styles = {
     textDecoration: 'none',
     fontWeight: 800,
     fontSize: 20,
-    color: '#0f172a',
+    color: COLORS.ink,
     flexShrink: 0,
+    letterSpacing: '-0.01em',
   },
+  // A single solid color instead of a 3-stop gradient -- reads as more
+  // deliberate/premium than a rainbow-y gradient on a 34px icon, and one
+  // less gradient in a page that otherwise leans on them heavily.
   logoIcon: {
     width: 34,
     height: 34,
-    background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-    borderRadius: 8,
+    background: COLORS.primary,
+    borderRadius: RADIUS.sm,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     color: 'white',
-    fontSize: 18,
     flexShrink: 0,
+    boxShadow: '0 3px 10px rgba(37,99,235,0.28), inset 0 1px 0 rgba(255,255,255,0.16)',
   },
   nav: { display: 'flex', alignItems: 'center', gap: 4 },
   navLink: {
     padding: '8px 14px',
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     textDecoration: 'none',
     fontSize: 14,
     fontWeight: 500,
     color: '#475569',
     transition: 'all 0.15s',
   },
-  partnerLink: {
+  navLinkActive: {
     padding: '8px 14px',
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     textDecoration: 'none',
     fontSize: 14,
     fontWeight: 700,
-    color: '#2563eb',
+    color: COLORS.primaryHover,
+    background: COLORS.primaryMuted,
+    transition: 'all 0.15s',
+  },
+  partnerLink: {
+    padding: '8px 14px',
+    borderRadius: RADIUS.sm,
+    textDecoration: 'none',
+    fontSize: 14,
+    fontWeight: 700,
+    color: COLORS.primary,
     transition: 'all 0.15s',
   },
   cta: {
-    background: '#2563eb',
+    background: COLORS.primary,
     color: 'white',
     padding: '9px 18px',
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     textDecoration: 'none',
     fontSize: 14,
     fontWeight: 600,
     marginLeft: 8,
     transition: 'all 0.15s',
     whiteSpace: 'nowrap',
+    boxShadow: SHADOWS.primary,
   },
   ctaMobile: {
-    background: '#2563eb',
+    background: COLORS.primary,
     color: 'white',
     padding: '8px 14px',
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     textDecoration: 'none',
     fontSize: 13,
     fontWeight: 600,
     whiteSpace: 'nowrap',
     transition: 'all 0.15s',
+    boxShadow: '0 2px 8px rgba(37,99,235,0.22)',
   },
 };
 
 const navItems = [
-  { label: 'Calculator', href: '/' },
+  { label: 'Cost Calculator', href: '/cleaning-cost-calculator' },
+  { label: 'Services', href: '/#services' },
   { label: 'Blog', href: '/blog' },
-  { label: 'About', href: '/about' },
 ];
+
+function isNavItemActive(href, pathname, hash) {
+  const path = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
+  if (href === '/') return path === '/' && hash !== '#services';
+  if (href === '/#services') return path === '/' && hash === '#services';
+  if (href === '/blog') return path === '/blog' || path.startsWith('/blog/');
+  return path === href;
+}
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  const [location, setLocation] = useState(() => ({
+    pathname: window.location.pathname,
+    hash: window.location.hash,
+  }));
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth <= 768);
@@ -100,21 +134,33 @@ export default function Header() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  useEffect(() => {
+    const onLocationChange = () => setLocation({ pathname: window.location.pathname, hash: window.location.hash });
+    window.addEventListener('hashchange', onLocationChange);
+    window.addEventListener('popstate', onLocationChange);
+    return () => {
+      window.removeEventListener('hashchange', onLocationChange);
+      window.removeEventListener('popstate', onLocationChange);
+    };
+  }, []);
+
   return (
     <header style={styles.header}>
+      <FloatingPartnerBanner />
+      <WebsiteOfferBanner />
       <div style={styles.inner}>
         <a href="/" style={{ ...styles.logo, fontSize: isMobile ? 16 : 20 }} aria-label="Clean Estimator — Free Cleaning Cost Estimator">
-          <span style={styles.logoIcon} aria-hidden="true">✶</span>
+          <span style={styles.logoIcon} aria-hidden="true"><Sparkles size={17} strokeWidth={2.25} /></span>
           {!isMobile && 'Clean Estimator'}
         </a>
 
         {isMobile ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <a
-              href="/for-companies"
+              href="/estimator"
               style={styles.ctaMobile}
-              onMouseEnter={e => { e.currentTarget.style.background = '#1d4ed8'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#2563eb'; }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 14px rgba(30,64,175,0.32)'; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(30,64,175,0.22)'; }}
             >
               Get Estimator
             </a>
@@ -128,29 +174,33 @@ export default function Header() {
           </div>
         ) : (
           <nav style={styles.nav}>
-            {navItems.map(n => (
-              <a
-                key={n.href}
-                href={n.href}
-                style={styles.navLink}
-                onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f8fafc'; }}
-                onMouseLeave={e => { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; }}
-              >
-                {n.label}
-              </a>
-            ))}
+            {navItems.map(n => {
+              const active = isNavItemActive(n.href, location.pathname, location.hash);
+              return (
+                <a
+                  key={n.href}
+                  href={n.href}
+                  aria-current={active ? 'page' : undefined}
+                  style={active ? styles.navLinkActive : styles.navLink}
+                  onMouseEnter={e => { if (!active) { e.target.style.color = '#0f172a'; e.target.style.background = '#f1f5f9'; } }}
+                  onMouseLeave={e => { if (!active) { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; } }}
+                >
+                  {n.label}
+                </a>
+              );
+            })}
             <a
               href="/partner-with-us"
               style={styles.partnerLink}
               onMouseEnter={e => { e.target.style.background = '#eff6ff'; }}
               onMouseLeave={e => { e.target.style.background = 'transparent'; }}
             >
-              Partner With Us
+              Become a Partner
             </a>
             <a
-              href="/for-companies"
+              href="/estimator"
               style={styles.navLink}
-              onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f8fafc'; }}
+              onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f1f5f9'; }}
               onMouseLeave={e => { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; }}
             >
               Get Estimator
@@ -158,8 +208,8 @@ export default function Header() {
             <a
               href="/company"
               style={styles.cta}
-              onMouseEnter={e => { e.currentTarget.style.background = '#1d4ed8'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#2563eb'; }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(30,64,175,0.34)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 10px rgba(30,64,175,0.24)'; e.currentTarget.style.transform = 'none'; }}
             >
               Company Login →
             </a>
@@ -169,13 +219,21 @@ export default function Header() {
 
       {isMobile && menuOpen && (
         <div style={{ padding: '12px 24px 20px', borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: 4, background: 'white' }}>
-          {navItems.map(n => (
-            <a key={n.href} href={n.href} style={{ ...styles.navLink, display: 'block', padding: '10px 12px' }}>
-              {n.label}
-            </a>
-          ))}
-          <a href="/partner-with-us" style={{ ...styles.navLink, display: 'block', padding: '10px 12px', color: '#2563eb', fontWeight: 700 }}>
-            Partner With Us
+          {navItems.map(n => {
+            const active = isNavItemActive(n.href, location.pathname, location.hash);
+            return (
+              <a
+                key={n.href}
+                href={n.href}
+                aria-current={active ? 'page' : undefined}
+                style={{ ...(active ? styles.navLinkActive : styles.navLink), display: 'block', padding: '10px 12px' }}
+              >
+                {n.label}
+              </a>
+            );
+          })}
+          <a href="/partner-with-us" style={{ ...styles.navLink, display: 'block', padding: '10px 12px', color: COLORS.primary, fontWeight: 700 }}>
+            Become a Partner
           </a>
           <a href="/company" style={{ ...styles.cta, display: 'block', textAlign: 'center', marginLeft: 0, marginTop: 8 }}>
             Company Login →

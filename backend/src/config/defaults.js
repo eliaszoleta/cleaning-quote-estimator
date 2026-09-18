@@ -51,18 +51,32 @@ const STATE_MARKET_MATURITY = {
 // ─────────────────────────────────────────────────────────────────────────────
 const DEFAULT_COMPANY_CONFIG = {
   companyName: '',
+  // Owner-provided phone/website, collected once at signup and used to
+  // detect duplicate accounts (see companyConfig.js's findDuplicateCompany)
+  // -- distinct from ctaPhone/ctaEmail below, which are the contact info
+  // shown to visitors on the results page and are optional/edited any time.
+  phone: '',
+  website: '',
   logo: '',
   primaryColor: '#2563eb',
   accentColor: '#16a34a',
   fontFamily: 'Inter',
   ctaHeadline: 'Get Your Exact Quote Today',
   ctaSubtext: 'Our team is ready to provide a free, detailed estimate.',
-  ctaButtonText: 'Schedule Free Estimate',
   ctaPhone: '',
-  ctaButtonUrl: '',
+  ctaEmail: '',
+  // Where new-lead notifications get sent -- deliberately separate from the
+  // Supabase Auth signup email, since that's just a login credential, not
+  // necessarily an inbox anyone on the team actually checks for leads.
+  leadNotificationEmail: '',
   frameHeight: '700px',
   borderRadius: '12px',
   serviceStates: [],
+  // Map of state code -> city names, e.g. { TX: ['Austin','Houston'], OK: ['Tulsa'] }
+  // -- keyed by state so a company serving multiple states gets each
+  // state's own city list in the widget instead of one pool shared/mixed
+  // across every state they operate in.
+  serviceCities: {},
   customSteps: [],
   subscription: {
     status: 'trialing',
@@ -79,14 +93,17 @@ const DEFAULT_COMPANY_CONFIG = {
       basePricePerSqft: 0.10,
       minimumCharge: 100,
       markup: 1.0,
-      recurringDiscount: 0.15,
+      // Off by default (see DiscountTab.js) -- no recurring-frequency
+      // discount is applied on the estimate unless the company explicitly
+      // sets one for weekly/biweekly/monthly.
+      frequencyDiscounts: { weekly: 0, biweekly: 0, monthly: 0 },
     },
     apartment: {
       enabled: true,
       basePricePerSqft: 0.09,
       minimumCharge: 85,
       markup: 1.0,
-      recurringDiscount: 0.15,
+      frequencyDiscounts: { weekly: 0, biweekly: 0, monthly: 0 },
     },
     commercial: {
       enabled: true,
@@ -156,14 +173,6 @@ const CLEANING_TYPE_MULTIPLIERS = {
   deep:             { low: 1.68, high: 1.85 },
   move_in_out:      { low: 1.88, high: 2.05 },
   post_construction:{ low: 2.18, high: 2.35 },
-};
-
-// Frequency discounts
-const FREQUENCY_DISCOUNTS = {
-  one_time:  0,
-  weekly:    0.20,
-  biweekly:  0.15,
-  monthly:   0.10,
 };
 
 // Extra add-on costs (residential/apartment)
@@ -312,36 +321,67 @@ const TILE_MINIMUM = { low: 150, high: 200 };
 
 // Mold remediation price ranges by affected area
 // Source: EPA mold remediation guidelines, NORMI certified remediators
+// Ranges are tightened around each tier's typical job cost (~1.3-1.5x spread, matching
+// the other services below) — remaining uncertainty is resolved by the mold-type
+// and moisture-source multipliers instead of being baked into one wide tier range.
 const MOLD_PRICE_RANGES = {
-  small:     { low: 500,  high: 1500  },  // <10 sq ft
-  medium:    { low: 1500, high: 3500  },  // 10–100 sq ft
-  large:     { low: 3500, high: 7000  },  // 100–300 sq ft
-  extensive: { low: 7000, high: 25000 },  // 300+ sq ft
+  small:     { low: 750,  high: 1050  },  // <10 sq ft
+  medium:    { low: 1950, high: 2700  },  // 10–100 sq ft
+  large:     { low: 4300, high: 5800  },  // 100–300 sq ft
+  extensive: { low: 8500, high: 13000 },  // 300+ sq ft — widest tier since "300+" is open-ended
+};
+
+// Known mold type narrows (and shifts) the estimate instead of leaving the full tier
+// width — "not sure" keeps the tier's full uncertainty since containment/PPE needs are
+// unknown until inspection.
+const MOLD_TYPE_MULTIPLIERS = {
+  not_sure:   { low: 1.0,  high: 1.0  },
+  green_mold: { low: 0.85, high: 0.92 },  // common surface mold, cheapest to treat
+  white_mold: { low: 0.90, high: 0.97 },
+  black_mold: { low: 1.05, high: 1.18 },  // Stachybotrys — more containment/PPE/disposal
+};
+
+// Whether the moisture source is fixed affects re-treatment risk, not the base job size.
+const MOLD_SOURCE_FIXED_MULTIPLIERS = {
+  yes:        { low: 1.0, high: 1.0  },
+  not_fixed:  { low: 1.0, high: 1.15 },
+  not_sure:   { low: 1.0, high: 1.08 },
 };
 
 const MOLD_ADDONS = {
-  air_testing:         { low: 150, high: 350 },
-  clearance_test:      { low: 200, high: 400 },
-  hvac_cleaning:       { low: 300, high: 600 },
+  air_testing:         { low: 220, high: 290 },
+  clearance_test:      { low: 190, high: 250 },
+  hvac_cleaning:       { low: 340, high: 440 },
   drywall_replacement: { low: 3, high: 8 }, // per sq ft
 };
 
-const MOLD_COMMERCIAL_MULTIPLIER = { low: 2.0, high: 3.0 };
+// Matches the "+30–50%" shown in the calculator UI for commercial properties.
+const MOLD_COMMERCIAL_MULTIPLIER = { low: 1.3, high: 1.5 };
 
-// Water damage restoration price ranges
+// Water damage restoration pricing
 // Source: IICRC S500 standards, restoration industry data
-const WATER_DAMAGE_RANGES = {
-  extraction_only:     { low: 300,  high: 2500  },
-  extraction_drying:   { low: 1200, high: 4000  },
-  structural_drying:   { low: 500,  high: 2000  }, // additional
-  mold_prevention:     { low: 300,  high: 800   },
-  full_restoration:    { low: 2000, high: 25000 },
-};
+// Extraction + drying scales per affected sq ft (collected from the calculator's area
+// slider) instead of a single flat range, so the estimate reflects the actual job size.
+// Tightened to a ~1.3x per-sqft spread — matching the other services — since sq ft and
+// category already do the job of separating cheap jobs from expensive ones.
+const WATER_EXTRACTION_DRYING_PER_SQFT = { low: 2.90, high: 3.90 }; // 3–5 day extraction + drying
+const WATER_EXTRACTION_DRYING_MINIMUM = { low: 550, high: 750 };   // small-loss minimum charge
 
+const WATER_STRUCTURAL_DRYING_ADDON = { low: 700, high: 950 };   // walls opened for drying — additional
+const WATER_MOLD_PREVENTION_ADDON = { low: 350, high: 460 };     // required once 72h+ has passed
+const WATER_CONTENTS_PACKOUT_ADDON = { low: 280, high: 380 };    // furniture/contents pack-out & cleaning
+
+// Full drywall/flooring restoration is its own, separately-quoted project — priced per sq ft
+// so it scales with the job instead of quoting every large loss the same flat range.
+const WATER_FULL_RESTORATION_PER_SQFT = { low: 9, high: 15 };
+const WATER_FULL_RESTORATION_MINIMUM = { low: 2200, high: 3300 };
+
+// Matches the "+30%" (gray) / "+60–100%" (black) shown in the calculator UI, narrowed to
+// a tight band around each since category is already a strong, known signal.
 const WATER_CATEGORY_MULTIPLIERS = {
-  clean:  { low: 1.0, high: 1.0 },
-  gray:   { low: 1.3, high: 1.5 },
-  black:  { low: 2.0, high: 3.0 },
+  clean:  { low: 1.0,  high: 1.0  },
+  gray:   { low: 1.27, high: 1.33 },
+  black:  { low: 1.7,  high: 1.9  },
 };
 
 // State name lookup
@@ -382,7 +422,6 @@ module.exports = {
   BEDROOM_ADDON,
   BATHROOM_ADDON,
   CLEANING_TYPE_MULTIPLIERS,
-  FREQUENCY_DISCOUNTS,
   HOME_EXTRAS,
   CONDITION_MULTIPLIERS,
   APARTMENT_SIZE_PRICES,
@@ -412,8 +451,16 @@ module.exports = {
   TILE_SERVICE_ADDONS,
   TILE_MINIMUM,
   MOLD_PRICE_RANGES,
+  MOLD_TYPE_MULTIPLIERS,
+  MOLD_SOURCE_FIXED_MULTIPLIERS,
   MOLD_ADDONS,
   MOLD_COMMERCIAL_MULTIPLIER,
-  WATER_DAMAGE_RANGES,
+  WATER_EXTRACTION_DRYING_PER_SQFT,
+  WATER_EXTRACTION_DRYING_MINIMUM,
+  WATER_STRUCTURAL_DRYING_ADDON,
+  WATER_MOLD_PREVENTION_ADDON,
+  WATER_CONTENTS_PACKOUT_ADDON,
+  WATER_FULL_RESTORATION_PER_SQFT,
+  WATER_FULL_RESTORATION_MINIMUM,
   WATER_CATEGORY_MULTIPLIERS,
 };

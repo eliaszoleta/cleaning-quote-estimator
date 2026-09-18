@@ -1,0 +1,178 @@
+import { supabase } from '../lib/supabase';
+import { getAllStates } from '../data/statePricing';
+
+// Shared by ResultsScreen (inline partner card) and FloatingPartnerBanner
+// (sitewide corner banner) so both use the same match logic and, for the
+// banner, the same cached result -- avoids hitting Supabase again on every
+// page load in this multi-page (non-SPA-routed) site. Keyed by the detected
+// city/state (not just a flat "we have a match" flag) so a real location
+// change -- e.g. switching VPN servers -- invalidates it immediately on the
+// next load instead of only after sessionStorage itself is cleared (a new
+// tab). That distinction matters for partners themselves checking coverage
+// via VPN: without it, their own banner would keep showing everywhere they
+// reload, since the cache couldn't tell "still the same city" apart from
+// "just navigated to another page."
+const CACHE_KEY = 'cleanestimator_partner_match';
+
+// The admin form's state field is free text with no validation ("full name,
+// e.g. Nevada"), and ipapi.co returns full state names. A mismatch like "MN"
+// vs "Minnesota" -- an abbreviation typed into that field, a stray space,
+// different casing -- silently breaks matching entirely, with no error
+// shown anywhere, since the underlying query is an exact match. This maps
+// either form to both, so a visitor matches a partner regardless of which
+// form ended up stored.
+const STATE_CODE_TO_NAME = new Map(getAllStates().map(s => [s.code.toUpperCase(), s.name]));
+const STATE_NAME_TO_CODE = new Map(getAllStates().map(s => [s.name.toUpperCase(), s.code]));
+
+// Returns { name, code } for a state given either its full name or 2-letter
+// code (case/whitespace-insensitive) -- code is null if unrecognized.
+function resolveState(input) {
+  const trimmed = (input || '').trim();
+  const upper = trimmed.toUpperCase();
+  if (STATE_CODE_TO_NAME.has(upper)) return { name: STATE_CODE_TO_NAME.get(upper), code: upper };
+  if (STATE_NAME_TO_CODE.has(upper)) return { name: trimmed, code: STATE_NAME_TO_CODE.get(upper) };
+  return { name: trimmed, code: null };
+}
+
+// Exported so /admin/partners can normalize a typed state (e.g. "MN") to
+// its canonical full name ("Minnesota") at save time -- self-correcting
+// regardless of which form gets typed into that free-text field.
+export function normalizeStateName(input) {
+  return resolveState(input).name;
+}
+
+// Tries the first-party /api/geo endpoint first (a Vercel Function, see
+// api/geo.js) since it's a same-origin request that ad/tracker blockers
+// can't single out the way they do a third-party IP-lookup domain. Has to
+// be an actual Vercel Function, not routed through the Railway proxy --
+// confirmed Vercel's x-vercel-ip-* geolocation headers aren't present on
+// requests that only pass through a rewrite-to-external-URL. Falls back
+// to ipapi.co directly if unavailable (e.g. local dev).
+export async function getUserLocation() {
+  try {
+    const res = await fetch('/api/geo');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.city && data.state) return { city: data.city, state: data.state };
+    }
+  } catch { /* fall through to ipapi.co */ }
+
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    return { city: data.city, state: data.region };
+  } catch {
+    return null;
+  }
+}
+
+// A partner can serve multiple cities (one partner_locations row per city),
+// so the match is: any active partner with a service-area row matching the
+// visitor's city/state. partners!inner lets the .eq('partners.active', ...)
+// filter apply to the joined table (a plain left join would ignore it).
+// Returns { partner, ok } rather than just the partner -- `data` alone used
+// to be destructured with the query's `error` silently dropped, so a failed
+// request (network blip, ad blocker, rate limit) looked identical to a
+// confirmed "no partner in this city" and got cached exactly the same way
+// by getCachedPartnerMatch() below. `ok: false` lets that caller tell the
+// two apart and only cache a result it can actually trust.
+//
+// The joined partners(...) column list is deliberately explicit, not `*` --
+// this runs with the public anon key from every visitor's browser (the
+// banner and results-page card mount sitewide), so whatever's selected here
+// is sent to the client regardless of whether the UI renders it. `*` was
+// pulling personal_email (the partner's private /client login address --
+// explicitly "never shown publicly" per 007_split_partner_emails.sql) and
+// the Stripe customer/subscription/checkout-session ids from
+// 004_partner_checkout.sql into every page load. Only the fields the public
+// cards (PartnerBannerCard, PartnerCard) actually render belong here.
+async function findPartner(city, state) {
+  if (!supabase || !city || !state) return { partner: null, ok: true };
+
+  const { name, code } = resolveState(state);
+  const stateFilter = code ? `state.ilike.${name},state.ilike.${code}` : `state.ilike.${name}`;
+
+  const { data, error } = await supabase
+    .from('partner_locations')
+    .select('*, partners!inner(id, business_name, address, phone, business_email, website, logo_url)')
+    .eq('partners.active', true)
+    .ilike('city', city)
+    .or(stateFilter)
+    .limit(1);
+
+  if (error) {
+    console.warn('findPartner lookup failed:', error.message);
+    return { partner: null, ok: false };
+  }
+  return { partner: data?.[0]?.partners || null, ok: true };
+}
+
+// Resolves the visitor's matched partner, along with whether the lookup
+// actually completed. Always re-checks the (cheap, same-origin) geolocation
+// first, then reuses the cached partner only if it was resolved for that
+// exact city/state -- so the (comparatively expensive) Supabase lookup is
+// skipped on every same-location page load, but a genuine location change
+// (VPN switch, real travel) is picked up on the very next load instead of
+// persisting for the rest of the tab's session. If geolocation itself
+// fails, skip the cache entirely rather than guessing -- better to report
+// "unknown" for this load than serve a stale city.
+//
+// `ok` distinguishes a confirmed "no partner in this city" from "the lookup
+// didn't complete" (network blip, ad blocker, rate limit) -- callers that
+// only care about "is there a partner" (getCachedPartnerMatch below) can
+// ignore it, but a caller that wants to act on the *absence* of a partner
+// (e.g. pitching the city as unclaimed) must not treat a failed lookup as
+// a confirmed vacancy.
+export async function getCachedPartnerMatchDetailed() {
+  const loc = await getUserLocation();
+  if (!loc) return { partner: null, ok: false, loc: null };
+
+  try {
+    const cached = sessionStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && parsed.city === loc.city && parsed.state === loc.state) {
+        return { partner: parsed.partner, ok: true, loc };
+      }
+    }
+  } catch { /* sessionStorage unavailable — fall through and fetch live */ }
+
+  const { partner, ok } = await findPartner(loc.city, loc.state);
+
+  // Only cache a lookup that actually completed. Caching a failed one would
+  // make every later call in this tab -- the banner on the next page, then
+  // the lead-capture step, etc. -- silently reuse that failure (and so skip
+  // forwarding the lead to a partner who does exist) instead of getting a
+  // fresh chance to find the real match.
+  if (ok) {
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ city: loc.city, state: loc.state, partner }));
+    } catch { /* ignore quota/private-mode errors */ }
+  }
+
+  return { partner, ok, loc };
+}
+
+// Convenience wrapper for callers that only need "is there a partner" and
+// treat a failed lookup the same as "none found" (the existing sitewide
+// banner and the results-page card, where showing nothing on a failure is
+// the safe default either way).
+export async function getCachedPartnerMatch() {
+  const { partner } = await getCachedPartnerMatchDetailed();
+  return partner;
+}
+
+// KPI tracking for the floating partner banner: one row per time it's shown
+// (event_type 'impression') and per time the call button is tapped
+// ('call_click'), so impressions/calls/click-through-rate can be reported to
+// each paying partner. Fire-and-forget -- never blocks or breaks the UI if
+// it fails (e.g. offline, ad blocker on the Supabase request).
+export function logBannerEvent(partnerId, eventType) {
+  if (!supabase || !partnerId) return;
+  supabase.from('partner_banner_events').insert({
+    partner_id: partnerId,
+    event_type: eventType,
+    page_path: window.location.pathname,
+    is_mobile: window.innerWidth <= 768,
+  }).then(() => {}, () => {});
+}

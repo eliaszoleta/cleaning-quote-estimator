@@ -1,22 +1,30 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star } from 'lucide-react';
+import {
+  Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star,
+  BellRing, Send, Quote, ShieldCheck, Zap, ArrowRight,
+} from 'lucide-react';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
+import NoWebsiteBanner from '../ui/NoWebsiteBanner';
+
+const PRIMARY = '#1d4ed8';
 
 const FEATURES = [
   { Icon: Palette,       color: '#7c3aed', bg: '#f5f3ff', title: 'White-label branding',       desc: 'Your logo, colors, and call-to-action text. Visitors never see the Clean Estimator name.' },
-  { Icon: ClipboardList, color: '#2563eb', bg: '#eff6ff', title: 'Lead capture built-in',       desc: 'Collect name, email, phone, and timeline from every visitor before they see the estimate.' },
+  { Icon: ClipboardList, color: '#2563eb', bg: '#eff6ff', title: 'Every lead is 100% yours',    desc: 'Name, email, phone, timeline, and the exact price they were quoted — stored permanently in your own dashboard. Never shared with other cleaners, never resold, never visible to anyone but you.' },
+  { Icon: BellRing,      color: '#dc2626', bg: '#fef2f2', title: 'Instant lead alerts — zero setup', desc: "The moment someone gets an estimate on your site, you get an email with their name, phone, and full price breakdown. No CRM, no Zapier, nothing to configure — it works the day you embed the widget." },
+  { Icon: Send,          color: '#0d9488', bg: '#f0fdfa', title: 'Every estimate email is branded as yours', desc: "Visitors get a follow-up email carrying your logo, your phone number, and your call-to-action — not ours. Every completed estimate is another touchpoint with your business sitting in their inbox." },
   { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',   desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
   { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',  desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
-  { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Easy one-line embed',         desc: 'Paste one line of HTML to add the calculator to any website, Wix, Squarespace, or WordPress.' },
-  { Icon: Key,           color: '#d97706', bg: '#fffbeb', title: 'API for CRM sync',            desc: 'Pull leads via REST API into HubSpot, Salesforce, or any CRM using Zapier or Make.' },
+  { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Easy to embed',               desc: 'Paste the embed code to add the calculator to any website, Wix, Squarespace, or WordPress.' },
+  { Icon: Key,           color: '#d97706', bg: '#fffbeb', title: 'API for CRM sync',            desc: 'Already have a CRM? Pull leads via REST API into HubSpot, Salesforce, or any tool using Zapier or Make — optional, on top of the email alerts you get by default.' },
 ];
 
 const STEPS = [
-  { n: '1', title: 'Sign up',                  desc: 'Create your account and start your 7-day free trial — credit card required.' },
+  { n: '1', title: 'Sign up',                  desc: 'Create your account and start your 30-day free trial — no credit card required.' },
   { n: '2', title: 'Customize your widget',    desc: 'Add your logo, set your brand colors, configure which services you offer, and write your CTA.' },
-  { n: '3', title: 'Embed on your site',       desc: "Copy one line of code and paste it anywhere on your website. That's it." },
+  { n: '3', title: 'Embed on your site',       desc: "Copy the embed code and paste it anywhere on your website. That's it." },
   { n: '4', title: 'Capture leads',            desc: 'Watch leads flow in. Manage them in your dashboard or sync to your CRM.' },
 ];
 
@@ -29,72 +37,173 @@ const TESTIMONIALS = [
 const PLAN_FEATURES = [
   'Unlimited calculator sessions',
   'White-label branding',
-  'Lead capture dashboard',
+  'Every lead 100% yours, never shared',
+  'Instant email alerts on every lead',
+  'Branded follow-up emails to visitors',
   'API access',
   'All 9 service calculators',
   'CSV export',
   'Priority support',
 ];
 
+const TRUST_BADGES = [
+  { Icon: ShieldCheck, text: 'No credit card required for trial' },
+  { Icon: Zap,          text: 'Live on your site in 30 minutes' },
+  { Icon: Check,        text: 'Cancel anytime' },
+];
+
+const cardStyle = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, boxShadow: '0 1px 3px rgba(15,23,42,0.04)' };
+
+function FeatureIcon({ Icon, color, bg }) {
+  return (
+    <div className="ce-feature-icon" style={{ width: 42, height: 42, borderRadius: 11, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <Icon size={19} color={color} strokeWidth={1.9} />
+    </div>
+  );
+}
+
+// Nudges the icon 3px on hover -- applied inside any .ce-btn-* link so the
+// button feels responsive to the cursor instead of just changing color.
+function Arrow({ size }) {
+  return <span className="ce-arrow"><ArrowRight size={size} /></span>;
+}
+
+// Browser chrome around a static screenshot of the widget's front step --
+// a live embedded instance kept fighting the fixed-height frame (scroll or
+// clipping depending on how it was sized), so a plain image sidesteps that
+// entirely. Swap the image file to update what's shown.
+function WidgetPreview() {
+  return (
+    <div className="ce-float" style={{ position: 'relative' }}>
+      <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: '0 30px 70px -20px rgba(2,6,23,0.55), 0 8px 20px rgba(2,6,23,0.25)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '11px 16px', background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fca5a5' }} />
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fcd34d' }} />
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#86efac' }} />
+          <div style={{ marginLeft: 10, flex: 1, background: 'white', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 10px', fontSize: 11, color: '#94a3b8' }}>
+            yourcompany.com
+          </div>
+        </div>
+        <img
+          src="/images/marketing/estimator-hero.png"
+          alt="Clean Estimator widget — pick a service step"
+          style={{ display: 'block', width: '100%', height: 'auto' }}
+        />
+      </div>
+
+      {/* Floating lead-alert chip */}
+      <div style={{
+        position: 'absolute', left: -18, bottom: -22, display: 'flex', alignItems: 'center', gap: 10,
+        background: 'white', borderRadius: 12, padding: '11px 16px 11px 12px',
+        boxShadow: '0 14px 32px -8px rgba(2,6,23,0.35)', border: '1px solid #f1f5f9',
+      }}>
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <BellRing size={14} color="#dc2626" strokeWidth={2.2} />
+        </div>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>New lead: Sarah M.</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10.5, color: '#94a3b8' }}>
+            <span className="ce-pulse-dot" /> just now &middot; $249&ndash;$319 quoted
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CompanyLanding() {
   return (
     <>
       <Helmet>
         <title>Embed a Cleaning Cost Calculator on Your Website | Clean Estimator for Companies</title>
-        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 7-day free trial. $159/month." />
-        <link rel="canonical" href="https://www.cleanestimator.com/for-companies" />
+        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 30-day free trial, no credit card required. $159/month." />
+        <link rel="canonical" href="https://www.cleanestimator.com/estimator" />
       </Helmet>
       <div className="app">
         <Header />
         <main>
 
-          {/* Hero */}
-          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: 'white', padding: '100px 24px 120px', textAlign: 'center' }}>
-            <div style={{ maxWidth: 760, margin: '0 auto' }}>
-              <div style={{ display: 'inline-block', background: 'rgba(37,99,235,0.25)', color: '#93c5fd', padding: '5px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600, marginBottom: 22, border: '1px solid rgba(37,99,235,0.35)', letterSpacing: '0.02em' }}>
-                For cleaning companies
+          {/* Hero -- restrained accent line + eyebrow instead of a pill
+              badge (same language as the About page hero), and a two-column
+              layout with a small static "product shot" of the widget so the
+              page shows the thing it's selling instead of only describing it. */}
+          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(48px, 7vw, 80px) 0' }}>
+            {/* maxWidth 1200 + padding 24px, matching Header.js's own
+                container exactly, so the hero content's left edge lines
+                up with the logo instead of sitting further left under a
+                wider 1320px container. */}
+            <div className="ce-hero-grid" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'grid', gap: 56, alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
+                  For cleaning companies
+                </div>
+                <h1 style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px', color: 'white' }}>
+                  Give every homeowner an instant cleaning estimate<br />
+                  <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>on your website</span>
+                </h1>
+                <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.65 }}>
+                  Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7 — and emails you the second someone's ready to book.
+                </p>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <a href="/company" className="ce-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
+                    Start Free Trial <Arrow size={16} />
+                  </a>
+                  <a href="https://www.cleanestimator.com/#services" className="ce-btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,255,255,0.07)', color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 15.5, border: '1px solid rgba(255,255,255,0.15)' }}>
+                    See Demo
+                  </a>
+                </div>
               </div>
-              <h1 style={{ fontSize: 'clamp(30px,5vw,52px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 18, letterSpacing: '-1px' }}>
-                Add a Branded Cleaning<br />
-                <span style={{ color: '#60a5fa' }}>Cost Calculator to Your Website</span>
-              </h1>
-              <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 540, margin: '0 auto 32px', lineHeight: 1.6 }}>
-                Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7.
-              </p>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <a href="/company" style={{ background: '#2563eb', color: 'white', padding: '15px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 16 }}>Start Free Trial →</a>
-                <a href="/?service=home_residential" style={{ background: 'rgba(255,255,255,0.08)', color: 'white', padding: '15px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 16, border: '1px solid rgba(255,255,255,0.15)' }}>See Demo</a>
+
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <div style={{ width: '100%', maxWidth: 560 }}>
+                  <WidgetPreview />
+                </div>
               </div>
-              <p style={{ color: '#475569', fontSize: 13.5, marginTop: 14 }}>$159/mo after 7 days · Cancel anytime</p>
+            </div>
+          </div>
+
+          <NoWebsiteBanner />
+
+          {/* Trust strip */}
+          <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '22px 24px' }}>
+            <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '14px 40px' }}>
+              {TRUST_BADGES.map(({ Icon, text }) => (
+                <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#475569', fontSize: 13.5, fontWeight: 600 }}>
+                  <Icon size={15} color="#16a34a" strokeWidth={2.3} />
+                  {text}
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Features */}
-          <div style={{ padding: '80px 24px', maxWidth: 1100, margin: '0 auto' }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Everything you need</h2>
-            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 52 }}>No technical skills required. Set up in under 30 minutes.</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+          <div style={{ padding: 'clamp(40px, 9vw, 84px) 20px', maxWidth: 1120, margin: '0 auto' }}>
+            <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Everything you need</h2>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>No technical skills required. Set up in under 30 minutes.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
               {FEATURES.map(({ Icon, color, bg, title, desc }) => (
-                <div key={title} style={{ background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, padding: '26px 22px' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 11, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                    <Icon size={20} color={color} strokeWidth={1.8} />
-                  </div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>{title}</h3>
+                <div key={title} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
+                  <FeatureIcon Icon={Icon} color={color} bg={bg} />
+                  <h3 style={{ fontSize: 15.5, fontWeight: 700, color: '#0f172a', margin: '16px 0 8px' }}>{title}</h3>
                   <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: 0 }}>{desc}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* How it works */}
-          <div style={{ background: '#f8fafc', padding: '80px 24px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
-            <div style={{ maxWidth: 900, margin: '0 auto' }}>
-              <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 52, letterSpacing: '-0.4px' }}>Up and running in 30 minutes</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
+          {/* How it works -- same card language as the Features grid above
+              (tinted badge, left-aligned copy) instead of free-floating
+              circles on bare background, so this section reads as part of
+              the same designed page rather than a separate template block. */}
+          <div style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
+            <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+              <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Up and running in 30 minutes</h2>
+              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer required.</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18 }}>
                 {STEPS.map(s => (
-                  <div key={s.n} style={{ textAlign: 'center' }}>
-                    <div style={{ width: 48, height: 48, background: '#2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 20, margin: '0 auto 14px' }}>{s.n}</div>
-                    <h3 style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 8 }}>{s.title}</h3>
+                  <div key={s.n} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
+                    <div className="ce-step-badge" style={{ width: 34, height: 34, borderRadius: 9, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: PRIMARY, fontWeight: 800, fontSize: 14.5, marginBottom: 16 }}>{s.n}</div>
+                    <h3 style={{ fontWeight: 700, fontSize: 15.5, color: '#0f172a', marginBottom: 8 }}>{s.title}</h3>
                     <p style={{ fontSize: 13.5, color: '#64748b', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
                   </div>
                 ))}
@@ -103,17 +212,18 @@ export default function CompanyLanding() {
           </div>
 
           {/* Testimonials */}
-          <div style={{ padding: '80px 24px', maxWidth: 1100, margin: '0 auto' }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 44, letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
+          <div style={{ padding: 'clamp(40px, 9vw, 84px) 20px', maxWidth: 1120, margin: '0 auto' }}>
+            <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 'clamp(24px, 5vw, 44px)', letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
               {TESTIMONIALS.map(t => (
-                <div key={t.name} style={{ background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, padding: '26px 22px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-                  <div style={{ display: 'flex', gap: 2, marginBottom: 14 }}>
+                <div key={t.name} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
+                  <Quote size={20} color="#dbeafe" fill="#dbeafe" style={{ marginBottom: 10 }} />
+                  <div style={{ display: 'flex', gap: 2, marginBottom: 12 }}>
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} size={15} color="#f59e0b" fill="#f59e0b" />
+                      <Star key={i} size={14} color="#f59e0b" fill="#f59e0b" />
                     ))}
                   </div>
-                  <p style={{ fontSize: 14.5, color: '#374151', lineHeight: 1.7, marginBottom: 18 }}>"{t.text}"</p>
+                  <p style={{ fontSize: 14.5, color: '#374151', lineHeight: 1.7, marginBottom: 18 }}>{t.text}</p>
                   <div style={{ fontWeight: 700, fontSize: 13.5, color: '#0f172a' }}>{t.name}</div>
                   <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 2 }}>{t.company}</div>
                 </div>
@@ -121,45 +231,88 @@ export default function CompanyLanding() {
             </div>
           </div>
 
-          {/* Pricing */}
-          <div id="pricing" style={{ background: 'linear-gradient(135deg, #f0f7ff, #f8fafc)', padding: '56px 24px 42px', borderTop: '1px solid #e2e8f0' }}>
-            <div style={{ maxWidth: 350, margin: '0 auto', textAlign: 'center' }}>
-              <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 8, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
-              <p style={{ color: '#64748b', fontSize: 13, marginBottom: 24 }}>One plan. Everything included. No surprises.</p>
-              <div style={{ background: 'white', border: '2px solid #2563eb', borderRadius: 16, padding: '26px 24px', boxShadow: '0 6px 28px rgba(37,99,235,0.12)' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 3, marginBottom: 3 }}>
-                  <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$159</span>
-                  <span style={{ fontSize: 13, color: '#64748b' }}>/month</span>
-                </div>
-                <div style={{ color: '#16a34a', fontWeight: 600, fontSize: 12, marginBottom: 20 }}>$159/mo after 7 days · Cancel anytime</div>
-                <ul style={{ listStyle: 'none', padding: 0, marginBottom: 20, textAlign: 'left' }}>
-                  {PLAN_FEATURES.map(item => (
-                    <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: '#374151' }}>
-                      <span style={{ width: 16, height: 16, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Check size={9} color="#16a34a" strokeWidth={3} />
-                      </span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <a href="/company" style={{ display: 'block', background: '#2563eb', color: 'white', padding: '11px 0', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14, textAlign: 'center' }}>
-                  Start Free Trial →
-                </a>
-                <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 8, textAlign: 'center' }}>$159/mo after 7 days · Cancel anytime</p>
-              </div>
-            </div>
-          </div>
+          {/* Pricing + closing CTA, merged into one section -- these used to
+              be two separate full-bleed blocks each ending in its own big
+              blue button, which read as a hard-sell "buy now, then buy
+              again" pattern rather than a normal SaaS pricing section. One
+              section, one plan, one call to action. */}
+          <div id="pricing" style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0' }}>
+            <div style={{ maxWidth: 980, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 56, alignItems: 'center' }}>
 
-          {/* CTA */}
-          <div style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', padding: '80px 24px', textAlign: 'center' }}>
-            <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 14, letterSpacing: '-0.4px', color: '#0f172a' }}>Ready to capture more leads?</h2>
-            <p style={{ fontSize: 16, color: '#64748b', marginBottom: 30, maxWidth: 460, margin: '0 auto 30px' }}>Join cleaning companies already using Clean Estimator to turn website visitors into booked jobs.</p>
-            <a href="/company" style={{ background: '#2563eb', color: 'white', padding: '15px 38px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 17 }}>Get Started Free →</a>
+              <div>
+                <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, color: '#0f172a', marginBottom: 14, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
+                <p style={{ color: '#64748b', fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: 400 }}>
+                  One plan, everything included, no surprises. Built for independent cleaning companies who want more booked jobs from their own website.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {TRUST_BADGES.map(({ Icon, text }) => (
+                    <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#334155', fontSize: 14.5, fontWeight: 600 }}>
+                      <Icon size={16} color="#16a34a" strokeWidth={2.3} />
+                      {text}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="ce-card" style={{ ...cardStyle, borderRadius: 14, padding: 0, overflow: 'hidden' }}>
+                <div style={{ height: 3, background: 'linear-gradient(90deg, #3b82f6, #818cf8)' }} />
+                <div style={{ padding: '30px 28px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: 6 }}>
+                    <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$159</span>
+                    <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
+                  </div>
+                  <div style={{ color: '#64748b', fontSize: 13, marginBottom: 22 }}>After your 30-day free trial &middot; cancel anytime</div>
+                  <ul style={{ listStyle: 'none', padding: 0, marginBottom: 24, textAlign: 'left' }}>
+                    {PLAN_FEATURES.map(item => (
+                      <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10, fontSize: 14, color: '#374151' }}>
+                        <span style={{ width: 17, height: 17, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <Check size={10} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" />
+                        </span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <a href="/company" className="ce-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
+                    Start Free Trial <Arrow size={15} />
+                  </a>
+                </div>
+              </div>
+
+            </div>
           </div>
 
         </main>
         <Footer />
       </div>
+
+      {/* Small, tasteful motion only -- a hover lift on cards/badges, an
+          arrow nudge on buttons, a slow idle float on the hero mockup, and
+          a live-status pulse on its "new lead" chip. Respects
+          prefers-reduced-motion. */}
+      <style>{`
+        .ce-hero-grid { grid-template-columns: minmax(320px, 1fr) minmax(440px, 560px); }
+        @media (max-width: 900px) { .ce-hero-grid { grid-template-columns: 1fr; } }
+        .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+        .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
+        .ce-feature-icon { transition: transform 0.2s ease; }
+        .ce-card:hover .ce-feature-icon { transform: scale(1.08) rotate(-2deg); }
+        .ce-step-badge { transition: background 0.2s ease, color 0.2s ease; }
+        .ce-card:hover .ce-step-badge { background: ${PRIMARY}; color: white; }
+        .ce-btn-primary, .ce-btn-secondary { transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease; }
+        .ce-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(29,78,216,0.45); }
+        .ce-btn-secondary:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); }
+        .ce-arrow { display: inline-flex; transition: transform 0.15s ease; }
+        .ce-btn-primary:hover .ce-arrow, .ce-btn-secondary:hover .ce-arrow { transform: translateX(3px); }
+        @keyframes ce-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .ce-float { animation: ce-float 5s ease-in-out infinite; }
+        @keyframes ce-pulse-ring { 0% { transform: scale(0.9); opacity: 0.6; } 70%, 100% { transform: scale(2.1); opacity: 0; } }
+        .ce-pulse-dot { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+        .ce-pulse-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #22c55e; animation: ce-pulse-ring 1.8s ease-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+          .ce-float, .ce-pulse-dot::after { animation: none; }
+          .ce-card, .ce-btn-primary, .ce-btn-secondary, .ce-feature-icon, .ce-step-badge, .ce-arrow { transition: none; }
+        }
+      `}</style>
     </>
   );
 }
