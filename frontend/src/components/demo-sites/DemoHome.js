@@ -47,7 +47,7 @@ function HeroB({ site }) {
   const { openQuote } = useDemoSite();
   return (
     <>
-      <div style={{ background: c.primaryDark, padding: 'clamp(56px, 10vw, 100px) 20px', textAlign: 'center' }}>
+      <div style={{ background: c.primaryDark, padding: 'clamp(56px, 10vw, 100px) 20px clamp(110px, 15vw, 160px)', textAlign: 'center' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: c.accent, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 18 }}>{site.city}, {site.state}</div>
           <h1 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(28px, 5.5vw, 48px)', fontWeight: 800, color: 'white', lineHeight: 1.15, marginBottom: 18, letterSpacing: '-0.5px' }}>{site.tagline}</h1>
@@ -57,9 +57,12 @@ function HeroB({ site }) {
           <button onClick={openQuote} style={{ background: c.accent, color: c.primaryDark, padding: '16px 32px', borderRadius: 8, border: 'none', fontWeight: 800, fontSize: 15.5, cursor: 'pointer', fontFamily: site.fontBody }}>Get a Free Quote</button>
         </div>
       </div>
-      <div style={{ padding: '0 20px', marginTop: -1 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <ImagePlaceholder note={site.heroImageNote} height={280} radius={0} accent={c.primary} />
+      {/* Form card floats up over the seam between the dark hero band and
+          the page below -- the image slot's replacement for this layout,
+          distinct from A's side-by-side and C's offset placement. */}
+      <div style={{ padding: '0 20px', marginTop: 'clamp(-84px, -10vw, -60px)', position: 'relative', zIndex: 2 }}>
+        <div style={{ maxWidth: 440, margin: '0 auto' }}>
+          <HeroQuoteForm site={site} />
         </div>
       </div>
     </>
@@ -68,23 +71,17 @@ function HeroB({ site }) {
 
 function HeroC({ site }) {
   const c = site.colors;
-  const { openQuote } = useDemoSite();
   return (
     <div style={{ background: c.bg, padding: 'clamp(36px, 8vw, 70px) 20px clamp(64px, 10vw, 100px)' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
-        <div style={{ maxWidth: 640 }}>
-          <h1 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(34px, 7vw, 62px)', fontWeight: 800, color: c.ink, lineHeight: 1.05, marginBottom: 22, letterSpacing: '-1px' }}>{site.tagline}</h1>
+      <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', gap: 48, alignItems: 'start' }}>
+        <div>
+          <h1 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(34px, 6vw, 56px)', fontWeight: 800, color: c.ink, lineHeight: 1.05, marginBottom: 22, letterSpacing: '-1px' }}>{site.tagline}</h1>
           <p style={{ fontSize: 16, color: c.textMuted, lineHeight: 1.65, marginBottom: 26, maxWidth: 440 }}>
             {site.city}'s cleaning service for people who notice the details.
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 22, flexWrap: 'wrap' }}>
-            <button onClick={openQuote} style={{ background: c.ink, color: c.bg, padding: '15px 30px', borderRadius: 2, border: 'none', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: site.fontBody, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Request a Quote</button>
-            <a href={`tel:${site.phone.replace(/[^\d+]/g, '')}`} style={{ color: c.accent, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>or call {site.phone}</a>
-          </div>
+          <a href={`tel:${site.phone.replace(/[^\d+]/g, '')}`} style={{ color: c.accent, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>or call {site.phone}</a>
         </div>
-        <div style={{ marginTop: 40, maxWidth: 420, marginLeft: 'auto' }}>
-          <ImagePlaceholder note={site.heroImageNote} height={260} accent={c.primary} />
-        </div>
+        <HeroQuoteForm site={site} />
       </div>
     </div>
   );

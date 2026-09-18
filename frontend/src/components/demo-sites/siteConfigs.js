@@ -53,7 +53,6 @@ const SITES = [
       { name: 'Renee K.', text: 'They found things I didn\'t even know needed cleaning. My kitchen has never looked this good.' },
       { name: 'Doug M.', text: 'Reliable, thorough, and the eco-friendly products actually work. Switched from three other services before landing here.' },
     ],
-    heroImageNote: 'Wide, bright photo of a modern Pacific Northwest kitchen mid-clean — natural light, clean countertops, a spray bottle and folded microfiber cloth visible. No people.',
     aboutImageNote: 'Photo of two friendly cleaning professionals in matching evergreen-green polos, smiling, standing in front of a tidy branded service van.',
     whyUs: [
       {
@@ -100,7 +99,6 @@ const SITES = [
       { name: 'Patricia A.', text: 'Our Airbnb turnover team. Never late, never missed a booking gap, guests constantly compliment how clean the place is.' },
       { name: 'Wade T.', text: 'They actually know how to handle old hardwood floors without wrecking them. Worth every penny.' },
     ],
-    heroImageNote: 'Wide photo of a bright, elegant Charleston-style living room with tall windows, freshly cleaned — warm natural light, no people.',
     aboutImageNote: 'Photo of a small, well-dressed cleaning crew with a branded tote of supplies, standing outside a historic Charleston row house.',
     whyUs: [
       {
@@ -147,7 +145,6 @@ const SITES = [
       { name: 'Julia S.', text: 'They treat the house like it matters. Small details, every time — genuinely different from anyone else we\'ve used.' },
       { name: 'Marcus D.', text: 'Post-renovation cleanup saved us weeks of dust. Worth booking before you even move back in.' },
     ],
-    heroImageNote: 'Moody, editorial-style wide photo of a modern Austin living room in warm afternoon light — minimalist furniture, freshly cleaned, no people.',
     aboutImageNote: 'Close-up, editorial photo of cleaning hands wiping down a wood countertop with a linen cloth — warm tones, shallow depth of field.',
     whyUs: [
       {
@@ -194,7 +191,6 @@ const SITES = [
       { name: 'Katie B.', text: 'Same cleaner every time, always on schedule, always thorough. It genuinely makes my week better.' },
       { name: 'Omar F.', text: 'Our Airbnb turnaround time dropped in half and the reviews mention how clean the place is constantly.' },
     ],
-    heroImageNote: 'Bright, soft-toned photo of a tidy, sunlit bedroom with fresh linens being smoothed — warm and inviting, no visible faces.',
     aboutImageNote: 'Friendly photo of a small cleaning team holding supply caddies, smiling, in front of a house with a welcoming front porch.',
     whyUs: [
       {
@@ -241,7 +237,6 @@ const SITES = [
       { name: 'Brianna L.', text: 'The most organized cleaning company I\'ve used — text reminders, on-time arrival, consistent quality.' },
       { name: 'Tom R.', text: 'Booked a deep clean before selling our house. Buyers commented on how clean it was at the showing.' },
     ],
-    heroImageNote: 'Clean, modern wide photo of a minimalist Denver apartment living room with mountain-adjacent natural light, freshly cleaned, no people.',
     aboutImageNote: 'Photo of a cleaning professional in a slate-gray uniform confidently pushing a modern cleaning cart down a hallway.',
     whyUs: [
       {
@@ -288,7 +283,6 @@ const SITES = [
       { name: 'Yasmin P.', text: 'Our vacation rental cleaner for two years now. Always spotless, always on time between guests.' },
       { name: 'Craig H.', text: 'They get the sand and salt residue out in a way other cleaners never did. Noticeable difference.' },
     ],
-    heroImageNote: 'Bright, airy wide photo of a coastal-style home interior — light wood floors, white walls, ocean-adjacent natural light, freshly cleaned, no people.',
     aboutImageNote: 'Photo of a cheerful cleaning team in teal polos loading supplies into a branded van outside a beach-adjacent home.',
     whyUs: [
       {
@@ -335,7 +329,6 @@ const SITES = [
       { name: 'Eleanor G.', text: 'They understand old houses. Our floors have never been damaged and they\'re always careful with antiques.' },
       { name: 'Franklin B.', text: 'Fifteen years with this family business and they\'ve never once let us down.' },
     ],
-    heroImageNote: 'Warm, elegant wide photo of a historic Savannah-style home interior — original woodwork, soft natural light, freshly cleaned, no people.',
     aboutImageNote: 'Photo of a veteran cleaning professional carefully dusting an ornate wood banister in a historic home entryway.',
     whyUs: [
       {
@@ -382,7 +375,6 @@ const SITES = [
       { name: 'Priya N.', text: 'Booked entirely through text, showed up exactly on time, did an excellent job. Couldn\'t be easier.' },
       { name: 'Derek W.', text: 'Post-renovation cleanup was thorough — got dust out of places I didn\'t think to check.' },
     ],
-    heroImageNote: 'Sleek, wide photo of a modern Seattle high-rise condo living room, floor-to-ceiling windows, freshly cleaned, overcast natural light, no people.',
     aboutImageNote: 'Photo of a cleaning professional reviewing a tablet checklist in a bright, modern apartment kitchen.',
     whyUs: [
       {
@@ -429,7 +421,6 @@ const SITES = [
       { name: 'Alexandra V.', text: 'Discreet, punctual, impeccable. The only cleaning service I\'ve trusted with a home this size.' },
       { name: 'Nathaniel P.', text: 'Post-event cleanup after we hosted twenty people — the place looked untouched by morning.' },
     ],
-    heroImageNote: 'High-contrast, editorial wide photo of a sleek black-and-white Chicago high-rise living room at dusk, city lights visible, freshly cleaned, no people.',
     aboutImageNote: 'Elegant, low-key photo of a gloved hand polishing a marble countertop, dramatic lighting, no faces visible.',
     whyUs: [
       {
@@ -476,7 +467,6 @@ const SITES = [
       { name: 'Jenny H.', text: 'Same honest, hardworking crew for three years. They treat our place like it\'s theirs.' },
       { name: 'Rick D.', text: 'Only company willing to take on our farmhouse and mudroom the right way. Highly recommend.' },
     ],
-    heroImageNote: 'Warm, rustic-modern wide photo of a Boise farmhouse-style kitchen, freshly cleaned, natural wood tones, soft daylight, no people.',
     aboutImageNote: 'Photo of a friendly family-run cleaning crew standing beside a pickup truck with cleaning supplies, Idaho foothills in the background.',
     whyUs: [
       {
