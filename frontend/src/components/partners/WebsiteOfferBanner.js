@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Globe, X, ArrowRight } from 'lucide-react';
+import { Megaphone, X, ArrowRight } from 'lucide-react';
 import { getCachedPartnerMatchDetailed } from '../../utils/partnerLookup';
 import { computeIsCompact } from './FloatingPartnerBanner';
 
@@ -93,7 +93,7 @@ export default function WebsiteOfferBanner() {
 
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 4 : 10 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
-          <Globe size={isMobile ? 9 : 10} /> Attention Cleaners!
+          <Megaphone size={isMobile ? 9 : 10} /> Attention Cleaners!
         </div>
       </div>
 
