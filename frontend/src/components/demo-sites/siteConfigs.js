@@ -9,21 +9,6 @@
 // a site uses (see DemoSiteLayout.js / DemoHome.js etc.) -- grouped so
 // palette + layout + type pairing all vary together, not just color.
 
-export const TRUST_FEATURES = [
-  {
-    title: 'We never miss a call',
-    desc: "If we can't pick up, you get an instant text back so you're never left wondering — and we follow up personally within the hour.",
-  },
-  {
-    title: '5-star review requests, automatically',
-    desc: "After every job, we text you a quick link to leave a Google review — it takes 10 seconds and helps other neighbors find us.",
-  },
-  {
-    title: 'We follow up, every time',
-    desc: "Requested a quote and didn't hear back yet? We follow up automatically so a job never falls through the cracks.",
-  },
-];
-
 // Generic, business-agnostic questions that build trust before a first-time
 // visitor hands over their address and a key -- lightly personalized with
 // the business name/city rather than written fresh per site.

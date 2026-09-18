@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Sparkles, Home as HomeIcon, Truck, Repeat, Leaf, Star, PhoneCall, Send, ShieldCheck, BadgeCheck, ThumbsUp, ChevronDown } from 'lucide-react';
+import { Sparkles, Home as HomeIcon, Truck, Repeat, Leaf, Star, ShieldCheck, BadgeCheck, ThumbsUp, ChevronDown } from 'lucide-react';
 import { useDemoSite } from './DemoSiteContext';
-import { TRUST_FEATURES, getFaqs } from './siteConfigs';
+import { getFaqs } from './siteConfigs';
 import ImagePlaceholder from './ImagePlaceholder';
 import HeroQuoteForm from './HeroQuoteForm';
 
 const SERVICE_ICONS = [Sparkles, HomeIcon, Truck, Repeat, Leaf];
-const TRUST_ICONS = [PhoneCall, Star, Send];
 
 // Deterministic-but-varied illustrative stats, derived from each site's
 // founding year rather than hardcoded, so the ten sites don't all show the
@@ -136,27 +135,6 @@ export default function DemoHome() {
           </div>
           <div style={{ textAlign: 'center', marginTop: 32 }}>
             <a href={`/website-example/${site.slug}/services`} style={{ color: c.primary, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>See all services →</a>
-          </div>
-        </div>
-      </div>
-
-      {/* Trust features -- auto text-back, review requests, follow-up */}
-      <div style={{ padding: 'clamp(44px, 8vw, 80px) 20px', background: 'white' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          <h2 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 700, color: c.ink, textAlign: 'center', marginBottom: 40 }}>You'll Never Chase Us Down</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 24 }}>
-            {TRUST_FEATURES.map((f, i) => {
-              const Icon = TRUST_ICONS[i % TRUST_ICONS.length];
-              return (
-                <div key={f.title} style={{ textAlign: 'center', padding: '0 10px' }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: c.bgAlt, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                    <Icon size={20} color={c.primary} />
-                  </div>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: c.ink, marginBottom: 8 }}>{f.title}</div>
-                  <div style={{ fontSize: 13.5, color: c.textMuted, lineHeight: 1.6 }}>{f.desc}</div>
-                </div>
-              );
-            })}
           </div>
         </div>
       </div>
