@@ -44,28 +44,19 @@ function HeroA({ site }) {
 
 function HeroB({ site }) {
   const c = site.colors;
-  const { openQuote } = useDemoSite();
   return (
-    <>
-      <div style={{ background: c.primaryDark, padding: 'clamp(56px, 10vw, 100px) 20px clamp(110px, 15vw, 160px)', textAlign: 'center' }}>
-        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+    <div style={{ background: c.primaryDark, padding: 'clamp(48px, 9vw, 90px) 20px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', gap: 48, alignItems: 'center' }}>
+        <div>
           <div style={{ fontSize: 12, fontWeight: 700, color: c.accent, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 18 }}>{site.city}, {site.state}</div>
-          <h1 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(28px, 5.5vw, 48px)', fontWeight: 800, color: 'white', lineHeight: 1.15, marginBottom: 18, letterSpacing: '-0.5px' }}>{site.tagline}</h1>
-          <p style={{ fontSize: 16.5, color: 'rgba(255,255,255,0.75)', maxWidth: 540, margin: '0 auto 32px', lineHeight: 1.6 }}>
+          <h1 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(28px, 5vw, 44px)', fontWeight: 800, color: 'white', lineHeight: 1.15, marginBottom: 18, letterSpacing: '-0.5px' }}>{site.tagline}</h1>
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, maxWidth: 480 }}>
             Book in minutes, get a confirmation instantly, and know exactly who's showing up.
           </p>
-          <button onClick={openQuote} style={{ background: c.accent, color: c.primaryDark, padding: '16px 32px', borderRadius: 8, border: 'none', fontWeight: 800, fontSize: 15.5, cursor: 'pointer', fontFamily: site.fontBody }}>Get a Free Quote</button>
         </div>
+        <HeroQuoteForm site={site} />
       </div>
-      {/* Form card floats up over the seam between the dark hero band and
-          the page below -- the image slot's replacement for this layout,
-          distinct from A's side-by-side and C's offset placement. */}
-      <div style={{ padding: '0 20px', marginTop: 'clamp(-84px, -10vw, -60px)', position: 'relative', zIndex: 2 }}>
-        <div style={{ maxWidth: 440, margin: '0 auto' }}>
-          <HeroQuoteForm site={site} />
-        </div>
-      </div>
-    </>
+    </div>
   );
 }
 
