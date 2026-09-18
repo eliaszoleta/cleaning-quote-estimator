@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Home as HomeIcon, Truck, Repeat, Leaf, Star, ShieldCheck, BadgeCheck, ThumbsUp, ChevronDown } from 'lucide-react';
+import { Sparkles, Home as HomeIcon, Truck, Repeat, Leaf, Star, ShieldCheck, BadgeCheck, ThumbsUp, ChevronDown, Check } from 'lucide-react';
 import { useDemoSite } from './DemoSiteContext';
 import { getFaqs } from './siteConfigs';
 import ImagePlaceholder from './ImagePlaceholder';
@@ -139,6 +139,12 @@ export default function DemoHome() {
         </div>
       </div>
 
+      {/* Why us -- alternating image/text/checklist blocks, the kind of
+          expertise + legitimacy signal a service business needs before a
+          stranger hands over a house key. Copy is unique per business
+          (see siteConfigs.js's whyUs field), not one block reused 10 times. */}
+      <WhyUsSection site={site} />
+
       {/* Reviews / trust stat bar -- the kind of big, hard-to-fake social
           proof number a visitor looks for before trusting a home services
           business with their front door. */}
@@ -188,6 +194,50 @@ function DemoCtaButton({ site }) {
     <button onClick={openQuote} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: site.colors.accent, color: site.colors.primaryDark, padding: '14px 30px', borderRadius: 10, border: 'none', fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: site.fontBody }}>
       Get a Free Quote
     </button>
+  );
+}
+
+function WhyUsBlock({ site, block, index }) {
+  const c = site.colors;
+  const { openQuote } = useDemoSite();
+  const imageFirst = index % 2 === 0;
+  const image = <ImagePlaceholder note={block.imageNote} height={340} accent={c.primary} />;
+  const text = (
+    <div>
+      <h3 style={{ fontFamily: site.fontHeading, fontWeight: 700, fontSize: 'clamp(22px, 4vw, 28px)', color: c.ink, marginBottom: 14, letterSpacing: '-0.3px' }}>{block.headline}</h3>
+      {block.body.map((p, i) => (
+        <p key={i} style={{ fontSize: 14.5, color: c.textMuted, lineHeight: 1.7, marginBottom: 12 }}>{p}</p>
+      ))}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, margin: '18px 0 24px' }}>
+        {block.checklist.map(item => (
+          <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 20, height: 20, borderRadius: '50%', background: c.bgAlt, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Check size={12} color={c.primary} strokeWidth={3} />
+            </div>
+            <span style={{ fontSize: 14, color: c.ink, fontWeight: 500 }}>{item}</span>
+          </div>
+        ))}
+      </div>
+      <button onClick={openQuote} style={{ background: c.primary, color: 'white', padding: '13px 26px', borderRadius: 9, border: 'none', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: site.fontBody }}>
+        Get a Free Quote
+      </button>
+    </div>
+  );
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))', gap: 44, alignItems: 'center', marginBottom: 'clamp(40px, 7vw, 64px)' }}>
+      {imageFirst ? <>{image}{text}</> : <>{text}{image}</>}
+    </div>
+  );
+}
+
+function WhyUsSection({ site }) {
+  const c = site.colors;
+  return (
+    <div style={{ padding: 'clamp(44px, 8vw, 80px) 20px', background: c.card }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+        {site.whyUs.map((block, i) => <WhyUsBlock key={block.headline} site={site} block={block} index={i} />)}
+      </div>
+    </div>
   );
 }
 

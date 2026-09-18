@@ -55,6 +55,20 @@ const SITES = [
     ],
     heroImageNote: 'Wide, bright photo of a modern Pacific Northwest kitchen mid-clean — natural light, clean countertops, a spray bottle and folded microfiber cloth visible. No people.',
     aboutImageNote: 'Photo of two friendly cleaning professionals in matching evergreen-green polos, smiling, standing in front of a tidy branded service van.',
+    whyUs: [
+      {
+        headline: 'Cleaning You Can Feel Good About',
+        body: ["We built Evergreen around products that are genuinely safe for your family, not just labeled that way. No harsh fumes, no residue left behind for kids or pets to find."],
+        checklist: ['Plant-based, non-toxic products', 'Safe for kids and pets', 'Fragrance-free option on request', 'No harsh chemical residue'],
+        imageNote: 'Close-up photo of a hand spraying an eco-friendly cleaning product onto a kitchen counter, natural light, no harsh chemicals visible.',
+      },
+      {
+        headline: 'A Team You Can Actually Trust',
+        body: ["Every cleaner is background-checked and trained on the same room-by-room standard Mara wrote by hand in 2015. You'll usually see the same familiar faces, visit after visit."],
+        checklist: ['Background-checked cleaners', 'Trained on our own detail checklist', 'Same trusted team when possible', 'Fully licensed & insured'],
+        imageNote: 'Photo of a cleaning professional smiling while organizing a supply caddy in a bright, tidy entryway.',
+      },
+    ],
   },
   {
     slug: 'harborline-cleaning',
@@ -88,6 +102,20 @@ const SITES = [
     ],
     heroImageNote: 'Wide photo of a bright, elegant Charleston-style living room with tall windows, freshly cleaned — warm natural light, no people.',
     aboutImageNote: 'Photo of a small, well-dressed cleaning crew with a branded tote of supplies, standing outside a historic Charleston row house.',
+    whyUs: [
+      {
+        headline: "Built for Charleston's Homes",
+        body: ["Historic hardwood, older HVAC, salt air off the harbor — this city's homes get dirty differently, and take a gentler hand. We trained specifically for it, not a generic checklist built for somewhere else."],
+        checklist: ["Trained on historic hardwood & plaster", 'Humidity-aware cleaning methods', 'Careful with antiques & original finishes', 'Locally owned since 2012'],
+        imageNote: 'Photo of a cleaning professional carefully wiping down an original wood banister in a historic Charleston home entryway.',
+      },
+      {
+        headline: 'Guest-Ready, Every Time',
+        body: ['For our vacation rental hosts, a missed turnover means a bad review. We treat every changeover like the next guest is already at the door.'],
+        checklist: ['Same-day turnovers between bookings', 'Photo-verified inspection after every clean', 'Direct line for property managers', 'Flexible scheduling around bookings'],
+        imageNote: 'Bright photo of a neatly made bed and freshly arranged throw pillows in a coastal-style vacation rental bedroom, no people.',
+      },
+    ],
   },
   {
     slug: 'ember-and-oak-cleaning',
@@ -121,6 +149,20 @@ const SITES = [
     ],
     heroImageNote: 'Moody, editorial-style wide photo of a modern Austin living room in warm afternoon light — minimalist furniture, freshly cleaned, no people.',
     aboutImageNote: 'Close-up, editorial photo of cleaning hands wiping down a wood countertop with a linen cloth — warm tones, shallow depth of field.',
+    whyUs: [
+      {
+        headline: 'Craft, Not Just a Checklist',
+        body: ['Every cleaner on our team is trained in-house, not contracted out. That means the same standard, the same attention to detail, whether it\'s your first clean or your fiftieth.'],
+        checklist: ['In-house trained cleaners, not contractors', 'Consistent detail standard, every visit', 'Small team, close attention to your space', 'Fully insured for your peace of mind'],
+        imageNote: 'Editorial, warm-toned photo of a cleaner\'s hands carefully folding a linen towel on an open shelf.',
+      },
+      {
+        headline: 'A Calmer Home, Top to Bottom',
+        body: ['Post-renovation dust, built-up grime, or just a home that needs a real reset — we handle it with the same craft we bring to every standard visit.'],
+        checklist: ['Non-toxic product options available', 'Post-construction dust removal', 'Flexible scheduling', '100% satisfaction guarantee'],
+        imageNote: 'Moody, editorial photo of a minimalist Austin bedroom in soft afternoon light, freshly cleaned, no people.',
+      },
+    ],
   },
   {
     slug: 'bloom-maid-service',
@@ -154,6 +196,20 @@ const SITES = [
     ],
     heroImageNote: 'Bright, soft-toned photo of a tidy, sunlit bedroom with fresh linens being smoothed — warm and inviting, no visible faces.',
     aboutImageNote: 'Friendly photo of a small cleaning team holding supply caddies, smiling, in front of a house with a welcoming front porch.',
+    whyUs: [
+      {
+        headline: 'The Same Friendly Face, Every Visit',
+        body: ['No rotating cast of strangers. We assign the same cleaner to your home whenever we can, so you know exactly who\'s coming and they know exactly how you like things done.'],
+        checklist: ['Consistent cleaner assigned to your home', 'Background-checked & trained in-house', 'Flexible weekly, bi-weekly, or monthly plans', 'Real communication, not a call center'],
+        imageNote: 'Warm, friendly photo of a cleaning professional greeting a homeowner at the front door, genuine smile, natural light.',
+      },
+      {
+        headline: 'A Home That Feels Like a Fresh Start',
+        body: ['From weekly upkeep to a fast guest-ready Airbnb turnover, every visit gets the same close attention to the details that make a home feel truly cared for.'],
+        checklist: ['Deep-clean detail on every visit', 'Pet-friendly, family-safe products', 'Fast, guest-ready Airbnb turnovers', 'Satisfaction guaranteed'],
+        imageNote: 'Bright, cheerful photo of a freshly cleaned Nashville living room, soft natural light, no people.',
+      },
+    ],
   },
   {
     slug: 'slate-and-co-cleaning',
@@ -187,6 +243,20 @@ const SITES = [
     ],
     heroImageNote: 'Clean, modern wide photo of a minimalist Denver apartment living room with mountain-adjacent natural light, freshly cleaned, no people.',
     aboutImageNote: 'Photo of a cleaning professional in a slate-gray uniform confidently pushing a modern cleaning cart down a hallway.',
+    whyUs: [
+      {
+        headline: 'Precision, Not Guesswork',
+        body: ['Every cleaner trains to the same standard, so the results don\'t depend on who shows up. You get a text before and after each visit, and pricing that\'s upfront from the start.'],
+        checklist: ['Standardized training for every cleaner', 'Text updates before & after each visit', 'On-time arrival, every time', 'Transparent, upfront pricing'],
+        imageNote: 'Clean, modern photo of a cleaning professional checking a phone/tablet checklist in a bright Denver kitchen.',
+      },
+      {
+        headline: 'Built for the Way Denver Lives',
+        body: ['Condo, townhome, or single-family house — we\'ve tailored our process to the mix of homes across the metro, not a one-size-fits-all routine.'],
+        checklist: ['Experience with condos, townhomes & houses', 'Window & carpet add-ons available', 'Flexible online scheduling', 'Fully licensed & insured'],
+        imageNote: 'Wide, modern photo of a freshly cleaned Denver condo interior with mountain-view windows, no people.',
+      },
+    ],
   },
   {
     slug: 'coastal-sparkle-cleaners',
@@ -220,6 +290,20 @@ const SITES = [
     ],
     heroImageNote: 'Bright, airy wide photo of a coastal-style home interior — light wood floors, white walls, ocean-adjacent natural light, freshly cleaned, no people.',
     aboutImageNote: 'Photo of a cheerful cleaning team in teal polos loading supplies into a branded van outside a beach-adjacent home.',
+    whyUs: [
+      {
+        headline: 'We Know Coastal Homes',
+        body: ['Salt air, sand, and sun mean homes here get dirty differently than anywhere else. We built our whole process around it, from the products we use to how we treat your floors.'],
+        checklist: ['Trained for sand, salt & humidity residue', 'Safe for beach-adjacent surfaces', 'Experienced with rental turnovers', 'Locally owned since 2016'],
+        imageNote: 'Bright photo of a cleaning professional wiping down a light wood floor near a sunlit sliding door, ocean-adjacent home, no faces.',
+      },
+      {
+        headline: 'A Brighter, Healthier Home',
+        body: ['A clean that actually feels different: no lingering residue, no harsh fumes, just a home that feels as bright as the coast outside.'],
+        checklist: ['Eco-conscious product options', 'Pet- and family-safe cleaning', 'Consistent quality every visit', '100% satisfaction guarantee'],
+        imageNote: 'Sunlit photo of a tidy coastal-style bedroom, white linens, ocean-adjacent light, no people.',
+      },
+    ],
   },
   {
     slug: 'heritage-home-cleaners',
@@ -253,6 +337,20 @@ const SITES = [
     ],
     heroImageNote: 'Warm, elegant wide photo of a historic Savannah-style home interior — original woodwork, soft natural light, freshly cleaned, no people.',
     aboutImageNote: 'Photo of a veteran cleaning professional carefully dusting an ornate wood banister in a historic home entryway.',
+    whyUs: [
+      {
+        headline: 'Gentle Care for Historic Homes',
+        body: ['Original plaster, antique hardwood, homes older than most companies\' entire client list — we built our training around handling them the right way, not a one-size-fits-all routine.'],
+        checklist: ['Trained on antique wood & plaster care', 'Careful handling of heirlooms & antiques', 'Three generations of trusted service', 'Fully licensed & insured'],
+        imageNote: 'Warm photo of a cleaning professional gently dusting an antique wood dresser in a historic Savannah home, soft natural light.',
+      },
+      {
+        headline: 'Consistency You Can Count On',
+        body: ['Families who grew up in these homes trust us to keep coming back, visit after visit, with the same care and the same familiar team.'],
+        checklist: ['Same trusted team, every visit', 'Flexible recurring schedules', 'Background-checked cleaners', 'Satisfaction guaranteed'],
+        imageNote: 'Elegant photo of a freshly cleaned historic Savannah parlor room, original woodwork visible, soft light, no people.',
+      },
+    ],
   },
   {
     slug: 'meridian-clean-co',
@@ -286,6 +384,20 @@ const SITES = [
     ],
     heroImageNote: 'Sleek, wide photo of a modern Seattle high-rise condo living room, floor-to-ceiling windows, freshly cleaned, overcast natural light, no people.',
     aboutImageNote: 'Photo of a cleaning professional reviewing a tablet checklist in a bright, modern apartment kitchen.',
+    whyUs: [
+      {
+        headline: 'Booking Made Simple',
+        body: ['No phone tag, no waiting on hold. Everything from your first quote to rescheduling next month\'s visit happens online or over text, on your time.'],
+        checklist: ['Text-based scheduling, no phone tag', 'Instant confirmation & reminders', 'Transparent, flat-rate pricing', 'Reschedule anytime online'],
+        imageNote: 'Modern photo of a hand holding a phone showing a simple booking confirmation screen, blurred bright apartment background.',
+      },
+      {
+        headline: 'A Team You Can Actually Trust',
+        body: ['Newer company, seasoned team — our cleaners bring two decades of combined experience, all background-checked and trained in-house.'],
+        checklist: ['Background-checked, in-house cleaners', 'Two decades of combined experience', 'Post-renovation dust removal available', 'Fully insured for your peace of mind'],
+        imageNote: 'Sleek photo of a cleaning professional wiping down a modern kitchen island in a Seattle condo, natural light, no face visible.',
+      },
+    ],
   },
   {
     slug: 'noir-clean-collective',
@@ -319,6 +431,20 @@ const SITES = [
     ],
     heroImageNote: 'High-contrast, editorial wide photo of a sleek black-and-white Chicago high-rise living room at dusk, city lights visible, freshly cleaned, no people.',
     aboutImageNote: 'Elegant, low-key photo of a gloved hand polishing a marble countertop, dramatic lighting, no faces visible.',
+    whyUs: [
+      {
+        headline: 'A Concierge Standard of Clean',
+        body: ['We work by referral as often as by inquiry. Every cleaner is vetted, background-checked, and held to a standard most companies reserve for hotels, not homes.'],
+        checklist: ['Vetted, background-checked team', 'Discreet, by-appointment scheduling', 'Consistent, white-glove attention to detail', 'Trusted by referral across Chicago'],
+        imageNote: 'Dramatic, low-key photo of a gloved hand smoothing a bed corner in an elegant high-rise bedroom, moody lighting.',
+      },
+      {
+        headline: 'Care for the Home You\'ve Built',
+        body: ['Fine finishes, real furnishings, a home that took real effort to build — we treat it that way, every single visit.'],
+        checklist: ['Experienced with fine finishes & furnishings', 'Small, dedicated team', 'Post-event same-night cleanup available', 'Fully insured'],
+        imageNote: 'High-contrast, editorial photo of a polished black marble countertop reflecting soft city light, no people.',
+      },
+    ],
   },
   {
     slug: 'rustic-row-cleaning',
@@ -352,6 +478,20 @@ const SITES = [
     ],
     heroImageNote: 'Warm, rustic-modern wide photo of a Boise farmhouse-style kitchen, freshly cleaned, natural wood tones, soft daylight, no people.',
     aboutImageNote: 'Photo of a friendly family-run cleaning crew standing beside a pickup truck with cleaning supplies, Idaho foothills in the background.',
+    whyUs: [
+      {
+        headline: 'A Family Business, Still Family-Run',
+        body: ['One truck and a handful of regular clients in 2014 — now a full team, but still the same Carrell family running the show and standing behind the work.'],
+        checklist: ['Same Carrell family crew since 2014', 'Honest, upfront pricing, no surprises', 'Background-checked, trustworthy team', 'Fully licensed & insured'],
+        imageNote: 'Warm, candid photo of a family-run cleaning crew loading supplies into a pickup truck, Idaho foothills visible in the background.',
+      },
+      {
+        headline: 'Built for Treasure Valley Homes',
+        body: ['From a downtown condo to a farmhouse with a mudroom that needs real attention, we take on the properties other cleaners turn away.'],
+        checklist: ['Experience with farmhouses & larger properties', 'Flexible recurring schedules', 'Pet- and family-safe products', '100% satisfaction guarantee'],
+        imageNote: 'Warm, rustic photo of a freshly cleaned farmhouse mudroom with natural wood tones, soft daylight, no people.',
+      },
+    ],
   },
 ];
 
