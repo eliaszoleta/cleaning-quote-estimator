@@ -19,7 +19,6 @@ function reviewStatsFor(site) {
 
 function HeroA({ site }) {
   const c = site.colors;
-  const { openQuote } = useDemoSite();
   return (
     <div style={{ background: c.bg, padding: 'clamp(40px, 8vw, 76px) 20px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', gap: 48, alignItems: 'center' }}>
@@ -28,13 +27,9 @@ function HeroA({ site }) {
             <ShieldCheck size={13} /> Licensed &amp; Insured · Serving {site.city} since {site.founded}
           </div>
           <h1 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(28px, 5vw, 46px)', fontWeight: 700, color: c.ink, lineHeight: 1.15, marginBottom: 18, letterSpacing: '-0.5px' }}>{site.tagline}</h1>
-          <p style={{ fontSize: 16, color: c.textMuted, lineHeight: 1.65, marginBottom: 30, maxWidth: 460 }}>
+          <p style={{ fontSize: 16, color: c.textMuted, lineHeight: 1.65, maxWidth: 460 }}>
             Trusted, background-checked cleaners for {site.city} homes. Get a free, no-obligation quote in minutes.
           </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <button onClick={openQuote} style={{ background: c.primary, color: 'white', padding: '15px 28px', borderRadius: 10, border: 'none', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: site.fontBody }}>Get a Free Quote</button>
-            <a href={`/website-example/${site.slug}/services`} style={{ background: 'white', color: c.ink, padding: '15px 28px', borderRadius: 10, fontWeight: 700, fontSize: 15, border: `1.5px solid ${c.border}`, textDecoration: 'none' }}>Our Services</a>
-          </div>
         </div>
         <HeroQuoteForm site={site} />
       </div>
