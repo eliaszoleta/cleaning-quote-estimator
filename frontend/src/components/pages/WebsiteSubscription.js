@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Globe, Search, PhoneMissed } from 'lucide-react';
 import { formatPhoneInput } from '../../utils/formatPhone';
+import { postWebsiteRequest } from '../../utils/api';
 
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
-const WEB3FORMS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
 const MONTHLY_PRICE = 249;
 
 // What the same stack costs bought piecemeal -- backs up the $249 price
@@ -54,6 +54,46 @@ const IconSuccess = () => (
     <polyline points="7,12 10,15 17,9" />
   </svg>
 );
+
+// Pops up right after a successful application -- separate from the inline
+// "Application Sent!" card below the form so the 48-hour timeline is the
+// first thing seen, not something someone has to scroll back up to notice.
+function ThankYouModal({ open, onClose }) {
+  if (!open) return null;
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 500, padding: 20 }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: 'white', borderRadius: 18, padding: 'clamp(28px, 6vw, 40px)', maxWidth: 440, width: '100%', boxShadow: '0 24px 70px rgba(0,0,0,0.35)', textAlign: 'center', position: 'relative' }}
+      >
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          style={{ position: 'absolute', top: 14, right: 14, background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex', padding: 4 }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}><IconSuccess /></div>
+        <div style={{ fontWeight: 800, fontSize: 22, color: '#0f172a', marginBottom: 10 }}>Application Received!</div>
+        <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.65, marginBottom: 4 }}>
+          We're building your live cleaning website sample now — it'll be ready for you to review within <strong>48 hours</strong>.
+        </p>
+        <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.6, marginBottom: 22 }}>
+          No payment required until you've seen it and decide to keep it.
+        </p>
+        <button
+          onClick={onClose}
+          style={{ background: PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 10, padding: '12px 32px', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function Check({ children }) {
   return (
@@ -115,6 +155,7 @@ function StepCard({ number, title, desc }) {
 
 export default function WebsiteSubscription() {
   const [sent, setSent] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
@@ -139,38 +180,27 @@ export default function WebsiteSubscription() {
     setSending(true);
     setError('');
     try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_KEY,
-          subject: 'Website + Chatbot Subscription Inquiry - Clean Estimator',
-          from_name: form.name,
-          name: form.name,
-          business: form.business,
-          email: form.email,
-          phone: form.phone || 'Not provided',
-          services_offered: form.servicesOffered.length ? form.servicesOffered.join(', ') : 'Not specified',
-          other_services: form.otherServices || 'None',
-          business_address: form.businessAddress || 'Not provided',
-          service_areas: form.serviceAreas || 'Not provided',
-          already_has_domain: form.hasDomain ? 'Yes' : 'No',
-          domain_1st_choice: form.domain1 || 'Not provided',
-          domain_2nd_choice: form.domain2 || 'Not provided',
-          domain_3rd_choice: form.domain3 || 'Not provided',
-          current_website_domain: form.currentWebsite || 'None',
-          facebook_page: form.facebookPage || 'None',
-          message: form.message || 'No additional message',
-        }),
+      await postWebsiteRequest({
+        name: form.name,
+        business: form.business,
+        email: form.email,
+        phone: form.phone || '',
+        servicesOffered: form.servicesOffered.length ? form.servicesOffered.join(', ') : '',
+        otherServices: form.otherServices || '',
+        businessAddress: form.businessAddress || '',
+        serviceAreas: form.serviceAreas || '',
+        hasDomain: form.hasDomain,
+        domain1: form.domain1 || '',
+        domain2: form.domain2 || '',
+        domain3: form.domain3 || '',
+        currentWebsite: form.currentWebsite || '',
+        facebookPage: form.facebookPage || '',
+        message: form.message || '',
       });
-      const data = await res.json();
-      if (data.success) {
-        setSent(true);
-      } else {
-        setError('Something went wrong. Please try again or email us directly at info@cleanestimator.com');
-      }
+      setSent(true);
+      setShowThankYou(true);
     } catch {
-      setError('Network error. Please try again or email us directly at info@cleanestimator.com');
+      setError('Something went wrong. Please try again or email us directly at info@cleanestimator.com');
     } finally {
       setSending(false);
     }
@@ -497,7 +527,7 @@ export default function WebsiteSubscription() {
             <div style={{ maxWidth: 520, margin: '0 auto', background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 16, padding: '36px 28px', textAlign: 'center' }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}><IconSuccess /></div>
               <div style={{ fontWeight: 800, fontSize: 20, color: '#15803d', marginBottom: 8 }}>Application Sent!</div>
-              <div style={{ fontSize: 15, color: '#166534' }}>We'll review your application and follow up with a live sample of your cleaning website — no payment required until you approve it.</div>
+              <div style={{ fontSize: 15, color: '#166534' }}>We're building a live sample of your cleaning website now — it'll be ready for you to review within 48 hours. No payment required until you approve it.</div>
             </div>
           ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 28, alignItems: 'flex-start' }}>
@@ -614,6 +644,8 @@ export default function WebsiteSubscription() {
           )}
         </div>
       </div>
+
+      <ThankYouModal open={showThankYou} onClose={() => setShowThankYou(false)} />
     </>
   );
 }

@@ -57,6 +57,14 @@ export async function postCheckout(token) {
   return apiFetch('/api/subscription/checkout', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
 }
 
+// WebsiteSubscription.js's "Get a Done-For-You Website" application form --
+// triggers an internal notification email (see backend's email.js /
+// sendWebsiteRequestNotificationEmail) instead of relying on a third-party
+// form service whose destination inbox isn't controlled from this codebase.
+export async function postWebsiteRequest(payload) {
+  return apiFetch('/api/website-request', { method: 'POST', body: JSON.stringify(payload) });
+}
+
 export async function postPortal(token) {
   return apiFetch('/api/subscription/portal', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
 }

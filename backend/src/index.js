@@ -12,6 +12,7 @@ const leadsRouter = require('./routes/leads');
 const partnerCheckoutRouter = require('./routes/partnerCheckout');
 const adminRouter = require('./routes/admin');
 const clientRouter = require('./routes/client');
+const websiteRequestRouter = require('./routes/websiteRequest');
 const { requireAuth } = require('./middleware/auth');
 const { checkTrialReminders } = require('./services/trialScheduler');
 const { checkPendingDeletions } = require('./services/deletionScheduler');
@@ -101,6 +102,17 @@ app.use('/api/leads', rateLimit({
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }));
 
+// POST /api/website-request — public and unauthenticated (a prospect
+// filling out the "Get a Done-For-You Website" form), so it needs the same
+// spam throttle as the other public POST endpoints above.
+app.use('/api/website-request', rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
 // /api/auth/* isn't actually used by the dashboard (AuthPage.js calls
 // Supabase directly) but stays mounted and reachable regardless -- a thin
 // proxy to Supabase's own login/signup endpoints with no rate limit would
@@ -146,6 +158,13 @@ app.use('/api/leads', leadsRouter);
 // Public partner-checkout API — anonymous prospects on /buy-city-placement
 // aren't logged-in company users, so this can't sit behind requireAuth.
 app.use('/api/partner-checkout', partnerCheckoutRouter);
+
+// Public website-request API — same reasoning: an anonymous prospect
+// applying for the website offer isn't a logged-in company user either.
+// No wildcard publicCors like /api/calculate above -- this form is only
+// ever submitted from cleanestimator.com itself, not embedded on other
+// sites, so the default dashboard-origins CORS already covers it.
+app.use('/api/website-request', websiteRequestRouter);
 
 // ─── Auth-protected routes ────────────────────────────────────────────────────
 // requireAuth is applied per-route inside companyRouter, not blanket here --

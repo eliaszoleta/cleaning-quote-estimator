@@ -1304,6 +1304,147 @@ async function sendAccountDeletionScheduledEmail({ to, companyName, scheduledFor
   }
 }
 
+// ─── Website request notification ──────────────────────────────────────────
+// Internal-only notification the moment someone submits the "Get a
+// Done-For-You Website" application (WebsiteSubscription.js's form) --
+// goes to the business owner's own inbox, not the applicant (they get the
+// on-page confirmation instead). Recipient is env-configurable
+// (WEBSITE_REQUEST_NOTIFY_EMAIL) so it can be changed without a redeploy,
+// defaulting to the owner's personal inbox. reply_to is the applicant's own
+// email so replying in the inbox reaches them directly, same pattern as the
+// lead-notification emails above.
+
+function labeledRows(lines) {
+  return lines.filter(Boolean).map(l => {
+    const idx = l.indexOf(': ');
+    const label = idx === -1 ? l : l.slice(0, idx);
+    const value = idx === -1 ? '' : l.slice(idx + 2);
+    return `
+    <tr>
+      <td style="padding:5px 0;color:#666666;font-size:13.5px;white-space:nowrap;vertical-align:top;">${label}</td>
+      <td style="padding:5px 0 5px 14px;text-align:left;font-size:13.5px;color:#111111;font-weight:600;">${value}</td>
+    </tr>`;
+  }).join('');
+}
+
+function buildWebsiteRequestDomainLines({ hasDomain, currentWebsite, domain1, domain2, domain3, facebookPage }) {
+  const lines = hasDomain
+    ? [`Already has a domain: ${currentWebsite || '(not provided)'}`]
+    : [
+        domain1 ? `1st choice: ${domain1}` : null,
+        domain2 ? `2nd choice: ${domain2}` : null,
+        domain3 ? `3rd choice: ${domain3}` : null,
+      ];
+  if (facebookPage && facebookPage !== 'None') lines.push(`Facebook: ${facebookPage}`);
+  return lines.filter(Boolean);
+}
+
+function buildWebsiteRequestText(args) {
+  const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
+  const domainLines = buildWebsiteRequestDomainLines(args);
+
+  const lines = [
+    'New website + chatbot application!',
+    '',
+    `${name} (${business}) just applied for a Done-For-You cleaning website.`,
+    '',
+    'Contact info:',
+    `  Email: ${email}`,
+    phone ? `  Phone: ${fmtPhone(phone)}` : null,
+    '',
+    'Business details:',
+    servicesOffered ? `  Services offered: ${servicesOffered}` : null,
+    otherServices && otherServices !== 'None' ? `  Other services: ${otherServices}` : null,
+    businessAddress ? `  Address: ${businessAddress}` : null,
+    serviceAreas ? `  Service areas: ${serviceAreas}` : null,
+  ];
+
+  if (domainLines.length) lines.push('', 'Domain:', ...domainLines.map(l => `  ${l}`));
+  if (message) lines.push('', 'Message:', `  ${message}`);
+
+  lines.push(
+    '',
+    'Reply to this email to reach them directly.',
+    '',
+    'Clean Estimator - cleanestimator.com'
+  );
+
+  return lines.join('\n');
+}
+
+function buildWebsiteRequestHtml(args) {
+  const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
+  const domainLines = buildWebsiteRequestDomainLines(args);
+
+  const contactRows = labeledRows([`Email: ${email}`, phone ? `Phone: ${fmtPhone(phone)}` : null]);
+  const businessRows = labeledRows([
+    servicesOffered ? `Services offered: ${servicesOffered}` : null,
+    otherServices && otherServices !== 'None' ? `Other services: ${otherServices}` : null,
+    businessAddress ? `Address: ${businessAddress}` : null,
+    serviceAreas ? `Service areas: ${serviceAreas}` : null,
+  ]);
+  const domainRows = labeledRows(domainLines);
+
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New website + chatbot application!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    <strong>${name}</strong> (${business}) just applied for a Done-For-You cleaning website.
+  </p>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${contactRows}</table>
+
+  ${businessRows ? `<p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Business details</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${businessRows}</table>` : ''}
+
+  ${domainRows ? `<p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Domain</p>
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${domainRows}</table>` : ''}
+
+  ${message ? `<p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Message</p>
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;white-space:pre-wrap;">${message}</p>` : ''}
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Reply to this email to reach them directly.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+async function sendWebsiteRequestNotificationEmail(args) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL, WEBSITE_REQUEST_NOTIFY_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendWebsiteRequestNotificationEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+  const notifyEmail = WEBSITE_REQUEST_NOTIFY_EMAIL || 'eliaszoleta87@gmail.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [notifyEmail],
+        reply_to: args.email || undefined,
+        subject: `New website application — ${args.business || args.name} — ${fmtSubjectTimestamp()}`,
+        html: buildWebsiteRequestHtml(args),
+        text: buildWebsiteRequestText(args),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendWebsiteRequestNotificationEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
 module.exports = {
   sendEstimateEmail,
   sendPartnerWelcomeEmail,
@@ -1316,4 +1457,5 @@ module.exports = {
   sendTrialCheckin2Email,
   sendTrialCheckin3Email,
   sendAccountDeletionScheduledEmail,
+  sendWebsiteRequestNotificationEmail,
 };
