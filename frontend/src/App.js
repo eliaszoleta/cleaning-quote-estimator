@@ -19,7 +19,8 @@ import BlogCategory from './components/blog/BlogCategory';
 import CompanyLanding from './components/pages/CompanyLanding';
 import PartnerWithUs from './components/pages/PartnerWithUs';
 import WebsiteSubscription from './components/pages/WebsiteSubscription';
-import WebsiteExample from './components/pages/WebsiteExample';
+import DemoGallery from './components/demo-sites/DemoGallery';
+import DemoSitePage from './components/demo-sites/DemoSitePage';
 import PartnerCityPricing from './components/pages/PartnerCityPricing';
 import PartnerDemoPage from './components/pages/PartnerDemoPage';
 import BuyCityPlacement from './components/pages/BuyCityPlacement';
@@ -62,7 +63,8 @@ const isAdminHomepageLeads = pathname === '/admin/leads';
 const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
 const isWebsiteSubscription = pathname === '/website-for-cleaning-companies';
-const isWebsiteExample = pathname === '/website-example';
+const isDemoGallery = pathname === '/website-example';
+const demoSiteMatch = pathname.match(/^\/website-example\/([a-z0-9-]+)(?:\/(about|services|service-areas|contact))?$/);
 const isPartnerCityPricing = pathname === '/partner-city-pricing';
 const isPartnerDemo = pathname === '/partner-demo';
 const isBuyCityPlacementSuccess = pathname === '/buy-city-placement/success';
@@ -194,12 +196,18 @@ export default function App() {
     </HelmetProvider>
   );
 
-  // No Header/Footer chrome here on purpose -- this page simulates a
-  // separate, standalone customer website, so cleanestimator.com's own
-  // nav/footer would break the illusion (it already has its own demo nav).
-  if (isWebsiteExample) return (
+  // No Header/Footer chrome here on purpose -- these pages simulate
+  // separate, standalone customer websites, so cleanestimator.com's own
+  // nav/footer would break the illusion (each demo site has its own nav).
+  if (isDemoGallery) return (
     <HelmetProvider>
-      <WebsiteExample />
+      <DemoGallery />
+    </HelmetProvider>
+  );
+
+  if (demoSiteMatch) return (
+    <HelmetProvider>
+      <DemoSitePage slug={demoSiteMatch[1]} page={demoSiteMatch[2]} />
     </HelmetProvider>
   );
 
