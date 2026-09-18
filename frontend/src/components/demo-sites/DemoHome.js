@@ -64,13 +64,12 @@ function HeroC({ site }) {
   const c = site.colors;
   return (
     <div style={{ background: c.bg, padding: 'clamp(36px, 8vw, 70px) 20px clamp(64px, 10vw, 100px)' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', gap: 48, alignItems: 'start' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', gap: 48, alignItems: 'center' }}>
         <div>
           <h1 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(34px, 6vw, 56px)', fontWeight: 800, color: c.ink, lineHeight: 1.05, marginBottom: 22, letterSpacing: '-1px' }}>{site.tagline}</h1>
-          <p style={{ fontSize: 16, color: c.textMuted, lineHeight: 1.65, marginBottom: 26, maxWidth: 440 }}>
+          <p style={{ fontSize: 16, color: c.textMuted, lineHeight: 1.65, maxWidth: 440 }}>
             {site.city}'s cleaning service for people who notice the details.
           </p>
-          <a href={`tel:${site.phone.replace(/[^\d+]/g, '')}`} style={{ color: c.accent, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>or call {site.phone}</a>
         </div>
         <HeroQuoteForm site={site} />
       </div>
