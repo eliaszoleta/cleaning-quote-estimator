@@ -93,17 +93,17 @@ export default function WebsiteOfferBanner() {
 
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 4 : 10 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
-          <Globe size={isMobile ? 9 : 10} /> No Partner in {city} Yet
+          <Globe size={isMobile ? 9 : 10} /> Attention Cleaners!
         </div>
       </div>
 
       <div style={{ marginBottom: isMobile ? 5 : 12, textAlign: 'center' }}>
         <div style={{ fontWeight: 800, fontSize: isMobile ? 11.5 : 14.5, color: '#0f172a', lineHeight: isMobile ? 1.2 : 1.35 }}>
-          Want a free cleaning website?
+          Don't have a cleaning website yet?
         </div>
         {!isMobile && (
           <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>
-            We'll build a real sample site for a cleaning business in {city} — see it before you decide anything.
+            We build a real sample site for a cleaning business — see it before you decide anything.
           </div>
         )}
       </div>
