@@ -24,6 +24,19 @@ export const TRUST_FEATURES = [
   },
 ];
 
+// Generic, business-agnostic questions that build trust before a first-time
+// visitor hands over their address and a key -- lightly personalized with
+// the business name/city rather than written fresh per site.
+export function getFaqs(site) {
+  return [
+    { q: 'Do I need to be home during the cleaning?', a: `Not at all. Most ${site.city} clients provide a key, door code, or lockbox access -- we'll work out whatever's easiest for you.` },
+    { q: 'Are your cleaners insured and background-checked?', a: `Yes. Every ${site.businessName} cleaner is background-checked before they ever step into a client's home, and we're fully licensed and insured.` },
+    { q: 'Do you bring your own supplies and equipment?', a: 'Yes, we bring everything needed for a standard visit. Have products you\'d prefer we use instead? Just let us know.' },
+    { q: 'What if I\'m not happy with a cleaning?', a: 'Tell us within 24 hours and we\'ll come back and make it right at no extra charge -- no questions asked.' },
+    { q: 'How do I schedule or reschedule?', a: 'Request a quote online or give us a call. Most first appointments are available within a few days, and rescheduling only takes a text.' },
+  ];
+}
+
 const SITES = [
   {
     slug: 'evergreen-home-cleaning',

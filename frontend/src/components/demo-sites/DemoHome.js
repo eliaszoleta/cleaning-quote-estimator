@@ -1,11 +1,22 @@
-import React from 'react';
-import { Sparkles, Home as HomeIcon, Truck, Repeat, Leaf, Star, PhoneCall, Send, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sparkles, Home as HomeIcon, Truck, Repeat, Leaf, Star, PhoneCall, Send, ShieldCheck, BadgeCheck, ThumbsUp, ChevronDown } from 'lucide-react';
 import { useDemoSite } from './DemoSiteContext';
-import { TRUST_FEATURES } from './siteConfigs';
+import { TRUST_FEATURES, getFaqs } from './siteConfigs';
 import ImagePlaceholder from './ImagePlaceholder';
+import HeroQuoteForm from './HeroQuoteForm';
 
 const SERVICE_ICONS = [Sparkles, HomeIcon, Truck, Repeat, Leaf];
 const TRUST_ICONS = [PhoneCall, Star, Send];
+
+// Deterministic-but-varied illustrative stats, derived from each site's
+// founding year rather than hardcoded, so the ten sites don't all show the
+// identical "500+ reviews, 4.9 stars."
+function reviewStatsFor(site) {
+  const years = new Date().getFullYear() - site.founded;
+  const reviewCount = 80 + years * 45;
+  const rating = (4.7 + (site.founded % 3) * 0.1).toFixed(1);
+  return { reviewCount, rating };
+}
 
 function HeroA({ site }) {
   const c = site.colors;
@@ -26,7 +37,7 @@ function HeroA({ site }) {
             <a href={`/website-example/${site.slug}/services`} style={{ background: 'white', color: c.ink, padding: '15px 28px', borderRadius: 10, fontWeight: 700, fontSize: 15, border: `1.5px solid ${c.border}`, textDecoration: 'none' }}>Our Services</a>
           </div>
         </div>
-        <ImagePlaceholder note={site.heroImageNote} height={340} accent={c.primary} />
+        <HeroQuoteForm site={site} />
       </div>
     </div>
   );
@@ -150,6 +161,11 @@ export default function DemoHome() {
         </div>
       </div>
 
+      {/* Reviews / trust stat bar -- the kind of big, hard-to-fake social
+          proof number a visitor looks for before trusting a home services
+          business with their front door. */}
+      <ReviewStatBar site={site} />
+
       {/* Testimonials */}
       <div style={{ padding: 'clamp(44px, 8vw, 80px) 20px', background: c.bgAlt }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
@@ -160,7 +176,7 @@ export default function DemoHome() {
                 <div style={{ display: 'flex', gap: 3, marginBottom: 12 }}>
                   {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={14} color={c.accent} fill={c.accent} />)}
                 </div>
-                <p style={{ fontSize: 14.5, color: c.ink, lineHeight: 1.65, marginBottom: 14, fontStyle: 'italic' }}>"{t.text}"</p>
+                <p style={{ fontSize: 14.5, color: c.ink, lineHeight: 1.65, marginBottom: 14 }}>"{t.text}"</p>
                 <div style={{ fontWeight: 700, fontSize: 13, color: c.textMuted }}>— {t.name}</div>
               </div>
             ))}
@@ -168,6 +184,13 @@ export default function DemoHome() {
           <p style={{ textAlign: 'center', fontSize: 12, color: c.textMuted, marginTop: 20, fontStyle: 'italic' }}>Illustrative example only — a real site would feature your own customer reviews.</p>
         </div>
       </div>
+
+      {/* Before / after results -- concrete proof of work, not just claims */}
+      <BeforeAfter site={site} />
+
+      {/* FAQ -- answers the hesitations a first-time visitor has before
+          they'll hand over their address and a key. */}
+      <DemoFaq site={site} />
 
       {/* Closing CTA */}
       <div style={{ background: site.colors.primaryDark, padding: 'clamp(40px, 8vw, 70px) 20px', textAlign: 'center' }}>
@@ -187,5 +210,91 @@ function DemoCtaButton({ site }) {
     <button onClick={openQuote} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: site.colors.accent, color: site.colors.primaryDark, padding: '14px 30px', borderRadius: 10, border: 'none', fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: site.fontBody }}>
       Get a Free Quote
     </button>
+  );
+}
+
+function ReviewStatBar({ site }) {
+  const c = site.colors;
+  const { reviewCount, rating } = reviewStatsFor(site);
+  const badges = [
+    { Icon: ShieldCheck, text: 'Licensed & Insured' },
+    { Icon: BadgeCheck, text: 'Background-Checked Cleaners' },
+    { Icon: ThumbsUp, text: 'Satisfaction Guaranteed' },
+  ];
+  return (
+    <div style={{ background: c.card, padding: 'clamp(36px, 7vw, 60px) 20px', borderTop: `1px solid ${c.border}`, borderBottom: `1px solid ${c.border}` }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginBottom: 14 }}>
+          {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={22} color={c.accent} fill={c.accent} />)}
+        </div>
+        <h2 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(22px, 4.5vw, 32px)', fontWeight: 800, color: c.ink, marginBottom: 8 }}>
+          {reviewCount}+ Five-Star Reviews with a {rating} Average Rating
+        </h2>
+        <p style={{ fontSize: 14.5, color: c.textMuted, marginBottom: 28 }}>Real feedback from real {site.city}-area customers.</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '12px 32px' }}>
+          {badges.map(({ Icon, text }) => (
+            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: c.ink }}>
+              <Icon size={16} color={c.primary} /> {text}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BeforeAfter({ site }) {
+  const c = site.colors;
+  return (
+    <div style={{ padding: 'clamp(44px, 8vw, 80px) 20px', background: 'white' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <h2 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 700, color: c.ink, marginBottom: 10 }}>Our Results Speak for Themselves</h2>
+          <p style={{ fontSize: 14.5, color: c.textMuted, maxWidth: 520, margin: '0 auto' }}>A real before-and-after from a recent {site.city} job.</p>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 16 }}>
+          <div>
+            <ImagePlaceholder note={`BEFORE: a visibly dirty or stained area (carpet, floor, or countertop) in a home, unedited, natural lighting.`} height={240} accent={c.primary} />
+            <div style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 700, color: c.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 10 }}>Before</div>
+          </div>
+          <div>
+            <ImagePlaceholder note={`AFTER: the exact same area as the "before" photo, same framing and angle, now spotless.`} height={240} accent={c.primary} />
+            <div style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 700, color: c.primary, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 10 }}>After</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DemoFaq({ site }) {
+  const c = site.colors;
+  const [openIdx, setOpenIdx] = useState(0);
+  const faqs = getFaqs(site);
+  return (
+    <div style={{ padding: 'clamp(44px, 8vw, 80px) 20px', background: c.bgAlt }}>
+      <div style={{ maxWidth: 720, margin: '0 auto' }}>
+        <h2 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 700, color: c.ink, textAlign: 'center', marginBottom: 36 }}>Frequently Asked Questions</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {faqs.map((f, i) => {
+            const isOpen = openIdx === i;
+            return (
+              <div key={f.q} style={{ background: c.card, border: `1px solid ${c.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                <button
+                  onClick={() => setOpenIdx(isOpen ? -1 : i)}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, background: 'none', border: 'none', cursor: 'pointer', padding: '16px 20px', textAlign: 'left', fontFamily: site.fontBody }}
+                >
+                  <span style={{ fontWeight: 700, fontSize: 14.5, color: c.ink }}>{f.q}</span>
+                  <ChevronDown size={18} color={c.textMuted} style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+                </button>
+                {isOpen && (
+                  <div style={{ padding: '0 20px 18px', fontSize: 13.5, color: c.textMuted, lineHeight: 1.65 }}>{f.a}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }

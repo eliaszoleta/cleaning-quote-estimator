@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Phone, Mail, MapPin, Menu, X } from 'lucide-react';
 import DemoSiteContext from './DemoSiteContext';
 import QuotePopupModal from './QuotePopupModal';
+import DemoChatWidget from './DemoChatWidget';
 
 const PAGES = [
   { key: 'home', label: 'Home', path: '' },
@@ -29,7 +30,15 @@ function Logo({ site, dark }) {
 
 // Three structurally different nav treatments, matched to each site's
 // layout group -- not just a recolor of the same bar.
-function NavA({ site, current, onQuote }) {
+function PhoneCta({ site, style, iconColor }) {
+  return (
+    <a href={`tel:${site.phone.replace(/[^\d+]/g, '')}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none', fontFamily: site.fontBody, flexShrink: 0, ...style }}>
+      <Phone size={15} color={iconColor} /> {site.phone}
+    </a>
+  );
+}
+
+function NavA({ site, current }) {
   const c = site.colors;
   const [open, setOpen] = useState(false);
   return (
@@ -43,9 +52,7 @@ function NavA({ site, current, onQuote }) {
             </a>
           ))}
         </div>
-        <button onClick={onQuote} style={{ background: c.primary, color: 'white', border: 'none', padding: '10px 20px', borderRadius: 999, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', fontFamily: site.fontBody, flexShrink: 0 }}>
-          Get a Free Quote
-        </button>
+        <PhoneCta site={site} iconColor="white" style={{ background: c.primary, color: 'white', padding: '10px 20px', borderRadius: 999, fontWeight: 700, fontSize: 13.5 }} />
         <button className="demo-nav-burger" onClick={() => setOpen(o => !o)} style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: c.ink }}>
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -61,7 +68,7 @@ function NavA({ site, current, onQuote }) {
   );
 }
 
-function NavB({ site, current, onQuote }) {
+function NavB({ site, current }) {
   const c = site.colors;
   const [open, setOpen] = useState(false);
   return (
@@ -78,14 +85,7 @@ function NavB({ site, current, onQuote }) {
             </a>
           ))}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-          <a href={`tel:${site.phone.replace(/[^\d+]/g, '')}`} style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'white', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
-            <Phone size={14} color={c.accent} /> {site.phone}
-          </a>
-          <button onClick={onQuote} style={{ background: c.accent, color: c.primaryDark, border: 'none', padding: '10px 18px', borderRadius: 8, fontWeight: 800, fontSize: 13.5, cursor: 'pointer', fontFamily: site.fontBody }}>
-            Get a Quote
-          </button>
-        </div>
+        <PhoneCta site={site} iconColor={c.primaryDark} style={{ background: c.accent, color: c.primaryDark, padding: '10px 18px', borderRadius: 8, fontWeight: 800, fontSize: 13.5 }} />
         <button className="demo-nav-burger" onClick={() => setOpen(o => !o)} style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: 'white' }}>
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -101,7 +101,7 @@ function NavB({ site, current, onQuote }) {
   );
 }
 
-function NavC({ site, current, onQuote }) {
+function NavC({ site, current }) {
   const c = site.colors;
   const [open, setOpen] = useState(false);
   return (
@@ -120,9 +120,7 @@ function NavC({ site, current, onQuote }) {
             </a>
           ))}
         </div>
-        <button onClick={onQuote} style={{ background: 'none', color: c.ink, border: `1.5px solid ${c.ink}`, padding: '9px 18px', borderRadius: 2, fontWeight: 600, fontSize: 12.5, cursor: 'pointer', fontFamily: site.fontBody, textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0 }}>
-          Free Quote
-        </button>
+        <PhoneCta site={site} iconColor={c.ink} style={{ color: c.ink, border: `1.5px solid ${c.ink}`, padding: '9px 18px', borderRadius: 2, fontWeight: 600, fontSize: 12.5 }} />
         <button className="demo-nav-burger" onClick={() => setOpen(o => !o)} style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: c.ink }}>
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -192,12 +190,13 @@ export default function DemoSiteLayout({ site, current, children }) {
       </div>
 
       <div style={{ fontFamily: site.fontBody }}>
-        <Nav site={site} current={current} onQuote={() => setQuoteOpen(true)} />
+        <Nav site={site} current={current} />
         {children}
         <DemoFooter site={site} />
       </div>
 
       <QuotePopupModal open={quoteOpen} onClose={() => setQuoteOpen(false)} businessName={site.businessName} accent={site.colors.primary} font={site.fontBody} />
+      <DemoChatWidget site={site} />
 
       <style>{`
         @media (max-width: 760px) {
