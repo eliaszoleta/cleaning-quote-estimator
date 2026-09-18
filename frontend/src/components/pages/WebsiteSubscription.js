@@ -6,7 +6,16 @@ import { formatPhoneInput } from '../../utils/formatPhone';
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
 const WEB3FORMS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
-const MONTHLY_PRICE = 197;
+const MONTHLY_PRICE = 249;
+
+// What the same stack costs bought piecemeal -- backs up the $249 price
+// instead of just asserting it's a good deal.
+const VALUE_BREAKDOWN = [
+  { label: 'Website builder / hosting', cost: '$20-40/mo' },
+  { label: 'AI chatbot software', cost: '$150-300/mo' },
+  { label: 'Text-message lead notifications', cost: '$50-100/mo' },
+  { label: 'Lead capture forms & CRM', cost: '$100+/mo' },
+];
 
 // Same 9 services offered elsewhere on the site (ServiceSelect.js,
 // ServicesTab.js) -- kept as plain labels here since this form is just
@@ -83,7 +92,12 @@ const COMPARISON = [
   {
     label: 'Capturing leads',
     them: "Most sites are just a digital brochure — no way to catch a visitor who doesn't call.",
-    us: 'An AI chatbot (powered by GoHighLevel) engages visitors and captures their info the moment they land, day or night.',
+    us: 'An AI chatbot engages visitors and captures their info the moment they land, day or night.',
+  },
+  {
+    label: 'Replying to leads on the go',
+    them: "New lead notifications go to an inbox you check when you remember to.",
+    us: "A mobile app puts every quote-request and text conversation in your pocket — see it, reply to it, right from your phone.",
   },
 ];
 
@@ -104,9 +118,9 @@ export default function WebsiteSubscription() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
-    name: '', business: '', email: '', phone: '', servicesOffered: [],
+    name: '', business: '', email: '', phone: '', servicesOffered: [], otherServices: '',
     businessAddress: '', serviceAreas: '',
-    domain1: '', domain2: '', domain3: '', currentWebsite: '', message: '',
+    hasDomain: false, domain1: '', domain2: '', domain3: '', currentWebsite: '', facebookPage: '', message: '',
   });
 
   const inputStyle = { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: 9, fontSize: 14, outline: 'none', boxSizing: 'border-box', color: '#0f172a', background: 'white' };
@@ -137,12 +151,15 @@ export default function WebsiteSubscription() {
           email: form.email,
           phone: form.phone || 'Not provided',
           services_offered: form.servicesOffered.length ? form.servicesOffered.join(', ') : 'Not specified',
+          other_services: form.otherServices || 'None',
           business_address: form.businessAddress || 'Not provided',
           service_areas: form.serviceAreas || 'Not provided',
+          already_has_domain: form.hasDomain ? 'Yes' : 'No',
           domain_1st_choice: form.domain1 || 'Not provided',
           domain_2nd_choice: form.domain2 || 'Not provided',
           domain_3rd_choice: form.domain3 || 'Not provided',
-          current_website: form.currentWebsite || 'None',
+          current_website_domain: form.currentWebsite || 'None',
+          facebook_page: form.facebookPage || 'None',
           message: form.message || 'No additional message',
         }),
       });
@@ -163,7 +180,7 @@ export default function WebsiteSubscription() {
     <>
       <Helmet>
         <title>Website + AI Chatbot for Cleaning Companies | Clean Estimator</title>
-        <meta name="description" content={`Get a professional website with an AI chatbot built, hosted, and maintained for your cleaning business — $${MONTHLY_PRICE}/month flat, no upfront cost. Powered by GoHighLevel.`} />
+        <meta name="description" content={`Get a professional website with an AI chatbot built, hosted, and maintained for your cleaning business — $${MONTHLY_PRICE}/month flat, no upfront cost.`} />
         <link rel="canonical" href="https://www.cleanestimator.com/website-for-cleaning-companies" />
       </Helmet>
 
@@ -174,7 +191,7 @@ export default function WebsiteSubscription() {
             Website + AI Chatbot
           </div>
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
-            A Professional Website, Built and Hosted for You —<br />
+            A Professional Cleaning Website, Built and Hosted for You —<br />
             <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>With an AI Chatbot Capturing Leads 24/7</span>
           </h1>
           <p style={{ fontSize: 15, color: '#94a3b8', maxWidth: 540, margin: '0 auto 28px', lineHeight: 1.55 }}>
@@ -182,10 +199,7 @@ export default function WebsiteSubscription() {
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 14 }}>
             <a href="#apply" className="ws-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
-              Apply Now <span className="ws-arrow"><IconArrow size={16} color="white" /></span>
-            </a>
-            <a href="#pricing" className="ws-btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,255,255,0.07)', color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 15.5, border: '1px solid rgba(255,255,255,0.15)' }}>
-              See Pricing
+              Request Website Sample <span className="ws-arrow"><IconArrow size={16} color="white" /></span>
             </a>
           </div>
           <p style={{ fontSize: 13, color: '#93c5fd', fontWeight: 600 }}>
@@ -290,7 +304,9 @@ export default function WebsiteSubscription() {
             <Check>A domain name of your choice</Check>
             <Check>Fast, secure hosting, fully managed — nothing for you to set up</Check>
             <Check>Mobile-friendly design, since most of your visitors are on their phone</Check>
-            <Check>An AI chatbot, powered by GoHighLevel, that engages visitors and captures their contact info automatically</Check>
+            <Check>An AI chatbot that engages visitors and captures their contact info automatically</Check>
+            <Check>A built-in lead capture form so visitors can request a free estimate right from your site</Check>
+            <Check>A mobile app so you get a text the moment a new lead comes in from your quote form — and can reply right from your phone</Check>
             <Check>Ongoing updates and maintenance — no separate invoice every time something needs to change</Check>
             <Check>No long-term contract — cancel anytime</Check>
           </div>
@@ -401,8 +417,8 @@ export default function WebsiteSubscription() {
             <div style={{ borderTop: '2px dashed #cbd5e1' }} />
 
             <div style={{ background: 'white', padding: 'clamp(22px, 5vw, 30px) clamp(24px, 6vw, 36px)', textAlign: 'center' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 22 }}>
-                {['Website + hosting', 'AI chatbot', 'Ongoing updates', 'Cancel anytime'].map(item => (
+              <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, marginBottom: 22 }}>
+                {['Website + hosting', 'AI chatbot', 'Lead capture forms', 'Mobile app for texts', 'Ongoing updates', 'Cancel anytime'].map(item => (
                   <span key={item} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', fontWeight: 600 }}>
                     <IconCheck size={13} /> {item}
                   </span>
@@ -410,11 +426,36 @@ export default function WebsiteSubscription() {
               </div>
               <a
                 href="#apply"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '14px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 15.5, boxShadow: '0 8px 24px rgba(29,78,216,0.35)' }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '14px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 15.5, boxShadow: '0 8px 24px rgba(29,78,216,0.35)' }}
               >
-                Apply Now →
+                Request Website Sample →
               </a>
               <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>You won't be charged until you've seen and approved your sample site.</p>
+            </div>
+          </div>
+
+          {/* Value breakdown -- backs up $249 with what the same pieces cost
+              bought separately, instead of just asserting it's a good deal. */}
+          <div style={{ marginTop: 22, background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: 'clamp(18px, 4vw, 24px)' }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Why ${MONTHLY_PRICE}/month is a deal</div>
+            <p style={{ fontSize: 12.5, color: '#64748b', margin: '0 0 14px', lineHeight: 1.6 }}>
+              Piece this together yourself with separate tools and it adds up fast:
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+              {VALUE_BREAKDOWN.map(row => (
+                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151' }}>
+                  <span>{row.label}</span>
+                  <span style={{ color: '#94a3b8', fontWeight: 600 }}>{row.cost}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>Bought separately</span>
+              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#94a3b8', textDecoration: 'line-through' }}>$320-540+/mo</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 4 }}>
+              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#15803d' }}>With Clean Estimator, all included</span>
+              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#15803d' }}>${MONTHLY_PRICE}/mo</span>
             </div>
           </div>
         </div>
@@ -429,7 +470,7 @@ export default function WebsiteSubscription() {
               { q: 'Do I have to pay before I see anything?', a: "No. After you apply, we build a live sample of your actual website first, so you can see exactly what you'd be getting. You only subscribe and start paying once you've reviewed it and you're happy with it." },
               { q: 'Do I own the website?', a: "Your site is built and hosted as part of your active subscription — similar to how a lot of small business tools work. As long as your subscription is active, it's live and it's yours to use and point customers to. We'll walk through the specifics with you when you apply." },
               { q: 'What happens if I cancel?', a: "Your website and chatbot come down when the subscription ends. There's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
-              { q: 'How does the chatbot work?', a: "It's powered by GoHighLevel and sits on your website, ready to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours." },
+              { q: 'How does the chatbot work?', a: "It sits on your website, ready to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours. New leads land in your mobile app, so you can reply right away." },
               { q: 'Can I use a domain I already own?', a: "Yes. If you already have a domain, we'll use it. If not, we'll help you pick one and get it set up as part of onboarding." },
               { q: 'Is there a setup fee?', a: 'No. It\'s one flat monthly rate — no setup fee, no separate build cost.' },
               { q: 'How long until my sample site is ready?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your business and review your application. Your site goes fully live on your domain once you approve the sample and subscribe." },
@@ -449,7 +490,7 @@ export default function WebsiteSubscription() {
       <div id="apply" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: 12 }}>Apply for Your Website</h2>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: 12 }}>Request Website Sample</h2>
             <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.65, maxWidth: 480, margin: '0 auto' }}>Tell us a bit about your business and we'll build a live sample site for you to review — no payment required until you approve it.</p>
           </div>
           {sent ? (
@@ -489,13 +530,13 @@ export default function WebsiteSubscription() {
                   <input required type="email" style={inputStyle} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="you@yourbusiness.com" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Business Phone Number</label>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number</label>
                   <input type="tel" style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Services You Offer</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
                     {SERVICES_OFFERED.map(label => {
                       const active = form.servicesOffered.includes(label);
                       return (
@@ -518,6 +559,7 @@ export default function WebsiteSubscription() {
                       );
                     })}
                   </div>
+                  <input style={inputStyle} value={form.otherServices} onChange={e => setForm(f => ({ ...f, otherServices: e.target.value }))} placeholder="Offer something not listed? Add it here (e.g. Pressure Washing, Window Cleaning)" />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
@@ -532,17 +574,27 @@ export default function WebsiteSubscription() {
 
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preferred Domain Names</label>
-                  <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>Give us at least 3 ideas in case your first choice is taken — #1 is your priority.</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <input style={inputStyle} value={form.domain1} onChange={e => setForm(f => ({ ...f, domain1: e.target.value }))} placeholder="1st choice (priority) — e.g. sparklecleanco.com" />
-                    <input style={inputStyle} value={form.domain2} onChange={e => setForm(f => ({ ...f, domain2: e.target.value }))} placeholder="2nd choice" />
-                    <input style={inputStyle} value={form.domain3} onChange={e => setForm(f => ({ ...f, domain3: e.target.value }))} placeholder="3rd choice" />
-                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#374151', fontWeight: 600, marginBottom: 10, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={form.hasDomain} onChange={e => setForm(f => ({ ...f, hasDomain: e.target.checked }))} style={{ width: 16, height: 16 }} />
+                    I already have a domain
+                  </label>
+                  <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>{form.hasDomain ? 'Add it below under Current Website.' : 'Give us at least 3 ideas in case your first choice is taken — #1 is your priority.'}</p>
+                  {!form.hasDomain && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <input style={inputStyle} value={form.domain1} onChange={e => setForm(f => ({ ...f, domain1: e.target.value }))} placeholder="1st choice (priority) — e.g. sparklecleanco.com" />
+                      <input style={inputStyle} value={form.domain2} onChange={e => setForm(f => ({ ...f, domain2: e.target.value }))} placeholder="2nd choice" />
+                      <input style={inputStyle} value={form.domain3} onChange={e => setForm(f => ({ ...f, domain3: e.target.value }))} placeholder="3rd choice" />
+                    </div>
+                  )}
                 </div>
 
-                <div style={{ gridColumn: '1 / -1' }}>
+                <div>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Website (if any)</label>
-                  <input style={inputStyle} value={form.currentWebsite} onChange={e => setForm(f => ({ ...f, currentWebsite: e.target.value }))} placeholder="https://... or Facebook page link" />
+                  <input style={inputStyle} value={form.currentWebsite} onChange={e => setForm(f => ({ ...f, currentWebsite: e.target.value }))} placeholder="e.g. sparklecleanco.com" />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Facebook Page</label>
+                  <input style={inputStyle} value={form.facebookPage} onChange={e => setForm(f => ({ ...f, facebookPage: e.target.value }))} placeholder="https://facebook.com/..." />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tell Us About Your Business</label>
@@ -554,7 +606,7 @@ export default function WebsiteSubscription() {
                 <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, padding: '10px 14px', fontSize: 13.5, color: '#dc2626', marginBottom: 14 }}>{error}</div>
               )}
               <button type="submit" disabled={sending} style={{ width: '100%', background: sending ? '#93c5fd' : PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 10, padding: '14px 0', fontWeight: 800, fontSize: 16, cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'opacity 0.2s', boxShadow: sending ? 'none' : '0 8px 22px rgba(29,78,216,0.35)' }}>
-                {sending ? 'Sending...' : <> Send My Application <IconArrow size={18} color="white" /> </>}
+                {sending ? 'Sending...' : <> Request Website <IconArrow size={18} color="white" /> </>}
               </button>
               <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 14, marginBottom: 0 }}>We'll follow up within 48 hours with a live sample site — you won't be charged until you approve it.</p>
             </form>
