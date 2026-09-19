@@ -103,7 +103,7 @@ export default function WebsiteOfferBanner() {
         </div>
         {!isMobile && (
           <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>
-            We build, you review and decide if you want to keep it.
+            Request a FREE Build of your site. We build, you review and decide if you want to keep it.
           </div>
         )}
       </div>
@@ -112,7 +112,7 @@ export default function WebsiteOfferBanner() {
         href="/website-for-cleaning-companies#apply"
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#1d4ed8', color: 'white', padding: isMobile ? '6px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap' }}
       >
-        GET MY FREE BUILD <ArrowRight size={isMobile ? 11 : 13} />
+        Get My Free Website Build <ArrowRight size={isMobile ? 11 : 13} />
       </a>
     </div>,
     document.body
