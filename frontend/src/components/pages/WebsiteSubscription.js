@@ -79,7 +79,7 @@ function ThankYouModal({ open, onClose }) {
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}><IconSuccess /></div>
         <div style={{ fontWeight: 800, fontSize: 22, color: '#0f172a', marginBottom: 10 }}>Application Received!</div>
         <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.65, marginBottom: 4 }}>
-          We're building your live cleaning website sample now — it'll be ready for you to review within <strong>48 hours</strong>.
+          We're building your free cleaning website now — it'll be ready for you to review within <strong>48 hours</strong>.
         </p>
         <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.6, marginBottom: 22 }}>
           No payment required until you've seen it and decide to keep it.
@@ -112,7 +112,7 @@ const COMPARISON = [
   {
     label: 'Before you pay',
     them: 'You commit and pay upfront before seeing the finished site.',
-    us: 'We build a live sample cleaning website first — you only subscribe once you\'ve seen and approved it.',
+    us: 'We build your live cleaning website first — you only subscribe once you\'ve seen and approved it.',
   },
   {
     label: 'Upfront cost',
@@ -229,11 +229,11 @@ export default function WebsiteSubscription() {
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 14 }}>
             <a href="#apply" className="ws-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
-              Request Cleaning Website Sample <span className="ws-arrow"><IconArrow size={16} color="white" /></span>
+              Request a FREE Website Build <span className="ws-arrow"><IconArrow size={16} color="white" /></span>
             </a>
           </div>
           <p style={{ fontSize: 13, color: '#93c5fd', fontWeight: 600 }}>
-            We build a live sample of your site first — you don't pay until you've seen and approved it.
+            We build your site first — you don't pay until you've seen and approved it.
           </p>
         </div>
       </div>
@@ -273,10 +273,10 @@ export default function WebsiteSubscription() {
         >
           <div>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 2 }}>See what your cleaning website could actually look like</div>
-            <div style={{ fontSize: 13, color: '#64748b' }}>A real, live sample design — not just a mockup screenshot.</div>
+            <div style={{ fontSize: 13, color: '#64748b' }}>A real, live example design — not just a mockup screenshot.</div>
           </div>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: PRIMARY_GRADIENT, color: 'white', padding: '10px 18px', borderRadius: 9, fontWeight: 700, fontSize: 13.5, flexShrink: 0 }}>
-            View Sample Design <IconArrow size={14} color="white" />
+            View Example Design <IconArrow size={14} color="white" />
           </span>
         </a>
       </div>
@@ -389,7 +389,7 @@ export default function WebsiteSubscription() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                 <StepCard number="1" title="Apply and tell us about your business" desc="Fill out the form below with a few details about your cleaning business and what you'd want on your site." />
-                <StepCard number="2" title="We build a sample cleaning website for you to review" desc="A live, working sample of your site — built for you to look at, no payment involved." />
+                <StepCard number="2" title="We build your cleaning website for you to review" desc="A live, working build of your site — built for you to look at, no payment involved." />
               </div>
             </div>
             <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', borderRadius: 16, padding: 'clamp(20px, 5vw, 30px)', boxShadow: '0 10px 30px rgba(37,99,235,0.25)' }}>
@@ -458,9 +458,9 @@ export default function WebsiteSubscription() {
                 href="#apply"
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '14px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 15.5, boxShadow: '0 8px 24px rgba(29,78,216,0.35)' }}
               >
-                Request Cleaning Website Sample →
+                Request a FREE Website Build →
               </a>
-              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>You won't be charged until you've seen and approved your sample site.</p>
+              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>You won't be charged until you've seen and approved your build.</p>
             </div>
           </div>
 
@@ -497,13 +497,13 @@ export default function WebsiteSubscription() {
           <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 36, textAlign: 'center' }}>Common Questions</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {[
-              { q: 'Do I have to pay before I see anything?', a: "No. After you apply, we build a live sample of your actual cleaning website first, so you can see exactly what you'd be getting. You only subscribe and start paying once you've reviewed it and you're happy with it." },
+              { q: 'Do I have to pay before I see anything?', a: "No. After you apply, we build your actual cleaning website first, so you can see exactly what you'd be getting. You only subscribe and start paying once you've reviewed it and you're happy with it." },
               { q: 'Do I own the cleaning website?', a: "Your site is built and hosted as part of your active subscription — similar to how a lot of small business tools work. As long as your subscription is active, it's live and it's yours to use and point customers to. We'll walk through the specifics with you when you apply." },
               { q: 'What happens if I cancel?', a: "Your cleaning website and chatbot come down when the subscription ends. There's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
               { q: 'How does the chatbot work?', a: "It sits on your cleaning website, ready to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours. New leads land in your mobile app, so you can reply right away." },
               { q: 'Can I use a domain I already own?', a: "Yes. If you already have a domain, we'll use it. If not, we'll help you pick one and get it set up as part of onboarding." },
               { q: 'Is there a setup fee?', a: 'No. It\'s one flat monthly rate — no setup fee, no separate build cost.' },
-              { q: 'How long until my sample site is ready?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your business and review your application. Your site goes fully live on your domain once you approve the sample and subscribe." },
+              { q: 'How long until my website build is ready?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your business and review your application. Your site goes fully live on your domain once you approve the build and subscribe." },
             ].map((item, i) => (
               <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)' }}>
                 <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 8 }}>{item.q}</div>
@@ -520,14 +520,14 @@ export default function WebsiteSubscription() {
       <div id="apply" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: 12 }}>Request Cleaning Website Sample</h2>
-            <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.65, maxWidth: 480, margin: '0 auto' }}>Tell us a bit about your business and we'll build a live sample site for you to review — no payment required until you approve it.</p>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: 12 }}>Request a FREE Website Build</h2>
+            <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.65, maxWidth: 480, margin: '0 auto' }}>Tell us a bit about your business and we'll build your website for you to review — no payment required until you approve it.</p>
           </div>
           {sent ? (
             <div style={{ maxWidth: 520, margin: '0 auto', background: '#f0fdf4', border: '2px solid #86efac', borderRadius: 16, padding: '36px 28px', textAlign: 'center' }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}><IconSuccess /></div>
               <div style={{ fontWeight: 800, fontSize: 20, color: '#15803d', marginBottom: 8 }}>Application Sent!</div>
-              <div style={{ fontSize: 15, color: '#166534' }}>We're building a live sample of your cleaning website now — it'll be ready for you to review within 48 hours. No payment required until you approve it.</div>
+              <div style={{ fontSize: 15, color: '#166534' }}>We're building your cleaning website now — it'll be ready for you to review within 48 hours. No payment required until you approve it.</div>
             </div>
           ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 28, alignItems: 'flex-start' }}>
@@ -535,8 +535,8 @@ export default function WebsiteSubscription() {
               <div style={{ fontSize: 12, fontWeight: 800, color: '#93c5fd', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 18 }}>What to expect</div>
               {[
                 'No payment today — just fill out the form',
-                'We review it and build a live sample site',
-                'You review the sample before deciding anything',
+                'We review it and build your live website',
+                'You review the build before deciding anything',
                 'Only then do you pick a domain and subscribe',
               ].map((line, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
@@ -638,7 +638,7 @@ export default function WebsiteSubscription() {
               <button type="submit" disabled={sending} style={{ width: '100%', background: sending ? '#93c5fd' : PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 10, padding: '14px 0', fontWeight: 800, fontSize: 16, cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'opacity 0.2s', boxShadow: sending ? 'none' : '0 8px 22px rgba(29,78,216,0.35)' }}>
                 {sending ? 'Sending...' : <> Request Cleaning Website <IconArrow size={18} color="white" /> </>}
               </button>
-              <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 14, marginBottom: 0 }}>We'll follow up within 48 hours with a live sample site — you won't be charged until you approve it.</p>
+              <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 14, marginBottom: 0 }}>We'll follow up within 48 hours with your live website build — you won't be charged until you approve it.</p>
             </form>
           </div>
           )}

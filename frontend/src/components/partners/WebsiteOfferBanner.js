@@ -10,7 +10,7 @@ const DESKTOP_RIGHT_OFFSET = 16;
 
 // Mirror image of FloatingPartnerBanner's condition: that one shows the
 // active partner IN the visitor's city; this one shows only when the
-// lookup confirmed there ISN'T one yet -- pitching the free website sample
+// lookup confirmed there ISN'T one yet -- pitching the free website build
 // as the hook to recruit whoever becomes that city's exclusive partner.
 // Never both at once, since the two conditions are exact opposites of the
 // same lookup, and a failed lookup (network blip, ad blocker) shows
@@ -57,7 +57,7 @@ export default function WebsiteOfferBanner() {
   return createPortal(
     <div
       role="complementary"
-      aria-label="Get a free cleaning website sample"
+      aria-label="Get a free cleaning website build"
       style={{
         position: 'fixed',
         top: isMobile ? 'auto' : 80,
