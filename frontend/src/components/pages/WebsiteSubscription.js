@@ -132,12 +132,12 @@ const COMPARISON = [
   {
     label: 'Capturing leads',
     them: "Most sites are just a digital brochure — no way to catch a visitor who doesn't call.",
-    us: 'An AI chatbot engages visitors and captures their info the moment they land, day or night.',
+    us: 'A chat widget captures visitor info the moment they land — running on AI by default, or answered manually if you\'d rather reply yourself.',
   },
   {
     label: 'Replying to leads on the go',
     them: "New lead notifications go to an inbox you check when you remember to.",
-    us: "A mobile app puts every quote-request and text conversation in your pocket — see it, reply to it, right from your phone.",
+    us: "A mobile app puts every website chat, quote request, and call in your pocket — see it, reply to it, right from your phone.",
   },
 ];
 
@@ -209,8 +209,8 @@ export default function WebsiteSubscription() {
   return (
     <>
       <Helmet>
-        <title>Cleaning Website + AI Chatbot for Cleaning Companies | Clean Estimator</title>
-        <meta name="description" content={`Get a professional cleaning website with an AI chatbot built, hosted, and maintained for your cleaning business — $${MONTHLY_PRICE}/month flat, no upfront cost.`} />
+        <title>Cleaning Website + Lead App for Cleaning Companies | Clean Estimator</title>
+        <meta name="description" content={`Get a professional cleaning website built, hosted, and maintained for your cleaning business, with every lead landing in a mobile app you can reply to instantly — $${MONTHLY_PRICE}/month flat, no upfront cost.`} />
         <link rel="canonical" href="https://www.cleanestimator.com/website-for-cleaning-companies" />
       </Helmet>
 
@@ -218,14 +218,14 @@ export default function WebsiteSubscription() {
       <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: 'clamp(40px, 9vw, 96px) 20px clamp(48px, 9vw, 110px)' }}>
         <div style={{ maxWidth: 780, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
-            Cleaning Website + AI Chatbot
+            Cleaning Website + Lead App
           </div>
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
             A Professional Cleaning Website, Built and Hosted for You —<br />
-            <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>With an AI Chatbot Capturing Leads 24/7</span>
+            <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>With Every Lead Landing Right In Your Pocket</span>
           </h1>
           <p style={{ fontSize: 15, color: '#94a3b8', maxWidth: 540, margin: '0 auto 28px', lineHeight: 1.55 }}>
-            No cleaning website yet? We build it, host it, and hand you a chatbot that answers visitors and captures leads while you're out on a job — for one flat monthly rate, no big upfront cost.
+            No cleaning website yet? We build it, host it, and connect every quote request, text, and call to a mobile app you carry with you — for one flat monthly rate, no big upfront cost.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 14 }}>
             <a href="#apply" className="ws-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
@@ -308,7 +308,7 @@ export default function WebsiteSubscription() {
               <div style={{ fontSize: 12, fontWeight: 800, color: '#bfdbfe', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 20 }}>With your own cleaning website</div>
               {[
                 { Icon: Search, text: 'You show up like the established business you are' },
-                { Icon: PhoneMissed, text: "A chatbot catches leads while you're out on a job" },
+                { Icon: PhoneMissed, text: "Leads still reach you, even while you're out on a job" },
                 { Icon: Globe, text: 'Something that\'s permanently yours — not rented from an algorithm' },
               ].map(({ Icon, text }, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 16 }}>
@@ -334,9 +334,9 @@ export default function WebsiteSubscription() {
             <Check>A domain name of your choice</Check>
             <Check>Fast, secure hosting, fully managed — nothing for you to set up</Check>
             <Check>Mobile-friendly design, since most of your visitors are on their phone</Check>
-            <Check>An AI chatbot that engages visitors and captures their contact info automatically</Check>
+            <Check>A website chat widget that can auto-reply with AI or be switched to manual so you respond yourself</Check>
             <Check>A built-in lead capture form so visitors can request a free estimate right from your site</Check>
-            <Check>A mobile app so you get a text the moment a new lead comes in from your quote form — and can reply right from your phone</Check>
+            <Check>A mobile app where every website chat and quote form lead lands — reply by text or call right from your phone</Check>
             <Check>Ongoing updates and maintenance — no separate invoice every time something needs to change</Check>
             <Check>No long-term contract — cancel anytime</Check>
           </div>
@@ -407,8 +407,8 @@ export default function WebsiteSubscription() {
                 <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
                   <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', color: 'white', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>4</div>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 16, color: 'white', marginBottom: 4 }}>Your site and chatbot go fully live</div>
-                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Live on your domain, chatbot active, capturing leads around the clock.</div>
+                    <div style={{ fontWeight: 700, fontSize: 16, color: 'white', marginBottom: 4 }}>Your site goes fully live</div>
+                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Live on your domain, with quote requests, chats, and calls all routing straight to your mobile app.</div>
                   </div>
                 </div>
               </div>
@@ -448,7 +448,7 @@ export default function WebsiteSubscription() {
 
             <div style={{ background: 'white', padding: 'clamp(22px, 5vw, 30px) clamp(24px, 6vw, 36px)', textAlign: 'center' }}>
               <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, marginBottom: 22 }}>
-                {['Cleaning website + hosting', 'AI chatbot', 'Lead capture forms', 'Mobile app for texts', 'Ongoing updates', 'Cancel anytime'].map(item => (
+                {['Cleaning website + hosting', 'Lead capture forms', 'Website chat + mobile app', 'Ongoing updates', 'Cancel anytime'].map(item => (
                   <span key={item} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', fontWeight: 600 }}>
                     <IconCheck size={13} /> {item}
                   </span>
@@ -499,8 +499,8 @@ export default function WebsiteSubscription() {
             {[
               { q: 'Do I have to pay before I see anything?', a: "No. After you apply, we build your actual cleaning website first, so you can see exactly what you'd be getting. You only subscribe and start paying once you've reviewed it and you're happy with it." },
               { q: 'Do I own the cleaning website?', a: "Your site is built and hosted as part of your active subscription — similar to how a lot of small business tools work. As long as your subscription is active, it's live and it's yours to use and point customers to. We'll walk through the specifics with you when you apply." },
-              { q: 'What happens if I cancel?', a: "Your cleaning website and chatbot come down when the subscription ends. There's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
-              { q: 'How does the chatbot work?', a: "It sits on your cleaning website, ready to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours. New leads land in your mobile app, so you can reply right away." },
+              { q: 'What happens if I cancel?', a: "Your cleaning website and chat widget come down when the subscription ends. There's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
+              { q: 'How does the chat widget work?', a: "By default it uses AI to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours. You can also switch it to manual anytime and answer visitors yourself. Either way, every conversation lands in your mobile app, the same place you get texts and calls for quote form leads, so you can reply right from your phone." },
               { q: 'Can I use a domain I already own?', a: "Yes. If you already have a domain, we'll use it. If not, we'll help you pick one and get it set up as part of onboarding." },
               { q: 'Is there a setup fee?', a: 'No. It\'s one flat monthly rate — no setup fee, no separate build cost.' },
               { q: 'How long until my website build is ready?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your business and review your application. Your site goes fully live on your domain once you approve the build and subscribe." },
