@@ -8,6 +8,11 @@ const DISMISS_KEY = 'cleanestimator_website_offer_banner_dismissed';
 const DESKTOP_BANNER_WIDTH = 268;
 const DESKTOP_RIGHT_OFFSET = 16;
 
+// Pages that ARE the website-build offer (the sale page itself, and its demo)
+// -- showing a banner that pitches the same thing you're already looking at
+// is redundant, not a second chance to convert.
+const EXCLUDED_PATHS = ['/website-for-cleaning-companies', '/partner-demo'];
+
 // Mirror image of FloatingPartnerBanner's condition: that one shows the
 // active partner IN the visitor's city; this one shows only when the
 // lookup confirmed there ISN'T one yet -- pitching the free website build
@@ -28,6 +33,8 @@ export default function WebsiteOfferBanner() {
 
   useEffect(() => {
     let cancelled = false;
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    if (EXCLUDED_PATHS.includes(path)) return;
     try {
       if (sessionStorage.getItem(DISMISS_KEY)) return;
     } catch { /* ignore */ }
