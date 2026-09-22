@@ -162,6 +162,9 @@ export default function WebsiteSubscription() {
     name: '', business: '', email: '', phone: '', servicesOffered: [], otherServices: '',
     businessAddress: '', serviceAreas: '',
     hasDomain: false, domain1: '', domain2: '', domain3: '', currentWebsite: '', facebookPage: '', message: '',
+    // Honeypot: real visitors never see or fill this field; bots that
+    // auto-fill every input on the page usually do. Checked server-side.
+    website2: '',
   });
 
   const inputStyle = { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: 9, fontSize: 14, outline: 'none', boxSizing: 'border-box', color: '#0f172a', background: 'white' };
@@ -196,6 +199,7 @@ export default function WebsiteSubscription() {
         currentWebsite: form.currentWebsite || '',
         facebookPage: form.facebookPage || '',
         message: form.message || '',
+        website2: form.website2,
       });
       setSent(true);
       setShowThankYou(true);
@@ -546,6 +550,18 @@ export default function WebsiteSubscription() {
               ))}
             </div>
             <form onSubmit={handleSubmit} style={{ flex: '2 1 380px', minWidth: 0, background: 'white', borderRadius: 16, padding: 'clamp(18px, 5vw, 40px)', boxShadow: '0 14px 40px rgba(0,0,0,0.25)' }}>
+              {/* Honeypot -- off-screen, not display:none (some bots skip
+                  display:none fields), never seen or reached by a real user. */}
+              <input
+                type="text"
+                name="website2"
+                value={form.website2}
+                onChange={e => setForm(f => ({ ...f, website2: e.target.value }))}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: 'absolute', left: '-9999px', top: 'auto', width: 1, height: 1, overflow: 'hidden' }}
+              />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full Name *</label>

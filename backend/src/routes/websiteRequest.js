@@ -19,7 +19,14 @@ router.post('/', async (req, res) => {
     businessAddress, serviceAreas,
     hasDomain, domain1, domain2, domain3,
     currentWebsite, facebookPage, message,
+    website2, // honeypot -- real visitors never see or fill this field
   } = req.body || {};
+
+  // Bot filled the honeypot: pretend success so it doesn't learn to skip
+  // this field, but never send the notification email.
+  if (website2) {
+    return res.json({ success: true });
+  }
 
   if (!name || !business || !email) {
     return res.status(400).json({ success: false, error: 'Name, business, and email are required.' });
