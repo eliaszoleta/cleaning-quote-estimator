@@ -177,10 +177,14 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
           </Card>
         </div>
 
-        {/* Preview column */}
+        {/* Preview column -- capped to 720px (matching the calculator's
+            own internal max-width) so the bordered box hugs the actual
+            widget instead of stretching across the whole sticky column on
+            a wide monitor, leaving visible empty border/background on
+            both sides of a much-narrower-looking calculator. */}
         <div style={{ position: 'sticky', top: 96 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Live Preview</div>
-          <div style={{ border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', background: 'white' }}>
+          <div style={{ maxWidth: 720, border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', background: 'white' }}>
             <CleaningCalculator companyConfig={previewConfig} embedded={true} />
           </div>
         </div>
