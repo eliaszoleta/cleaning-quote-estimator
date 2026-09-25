@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, CalendarDays, DollarSign, Globe, Inbox, Paintbrush, Code2, CreditCard } from 'lucide-react';
+import { Users, CalendarDays, DollarSign, Globe, Inbox, Paintbrush, Code2, CreditCard, CalendarClock } from 'lucide-react';
 import { getCompanyLeads } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 import { formatPrice, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
@@ -36,11 +36,17 @@ export default function OverviewTab({ config, subStatus, user }) {
     { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—', Icon: Globe,       color: subStatus?.active ? '#16a34a' : '#dc2626', bg: subStatus?.active ? '#f0fdf4' : '#fef2f2' },
   ];
 
+  // TODO: swap in the real Calendly (or Google Calendar) booking link once
+  // it exists -- this is a placeholder so the CTA is ready to go the
+  // moment a real scheduling page is set up.
+  const WALKTHROUGH_URL = 'https://calendly.com/your-link/walkthrough';
+
   const quickActions = [
     { label: 'Customize Branding', href: '?tab=branding',      Icon: Paintbrush  },
     { label: 'Get Embed Code',     href: '?tab=embed',         Icon: Code2       },
     { label: 'View All Leads',     href: '?tab=leads',         Icon: Users       },
     { label: 'Manage Billing',     href: '?tab=settings&section=subscription',  Icon: CreditCard  },
+    { label: 'Schedule a Walkthrough', href: WALKTHROUGH_URL,  Icon: CalendarClock, external: true },
   ];
 
   return (
@@ -74,10 +80,11 @@ export default function OverviewTab({ config, subStatus, user }) {
       <div style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, padding: '20px 22px', marginBottom: 20, boxShadow: SHADOWS.sm }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 14, color: COLORS.ink }}>Quick Actions</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
-          {quickActions.map(({ label, href, Icon }) => (
+          {quickActions.map(({ label, href, Icon, external }) => (
             <a
               key={label}
-              href={`/company${href}`}
+              href={external ? href : `/company${href}`}
+              {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '12px 14px', border: `1.5px solid ${COLORS.border}`, borderRadius: 7,
