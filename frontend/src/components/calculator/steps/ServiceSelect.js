@@ -50,14 +50,21 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
         // 195px let a narrow row (like the dashboard's Branding preview, or
         // a widget embedded in a sidebar) fit 3 across whenever exactly 6-7
         // services were enabled -- an uneven "3 then 3" split instead of a
-        // clean 2-per-row grid. 260px keeps the columns from ever squeezing
-        // that tight; a genuinely wide full-page embed still gets 3-4.
-        // Only companies' embedded widget ever has a subset of services
-        // enabled in the first place -- the main cleanestimator.com
-        // calculator always shows all 9, so it keeps the original, more
-        // spacious 195px minimum instead of being narrowed for a problem
-        // it can't actually hit.
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : `repeat(auto-fill, minmax(${embedded ? 260 : 195}px, 1fr))`,
+        // clean 2-per-row grid. Only companies' embedded widget ever has a
+        // subset of services enabled in the first place -- the main
+        // cleanestimator.com calculator always shows all 9, so it keeps the
+        // original, unbounded 195px/1fr instead of being changed for a
+        // problem it can't actually hit.
+        //
+        // For the embedded case, the upper bound also has to be capped
+        // (300px, not 1fr) -- otherwise a card that lands alone in the
+        // second column stretches to fill all the leftover row width, so
+        // fewer services made each remaining card a wider rectangle instead
+        // of a more compact tile. Capped, cards keep a consistent size and
+        // any leftover row space is just left empty instead of inflating them.
+        gridTemplateColumns: isMobile
+          ? 'repeat(2, 1fr)'
+          : embedded ? 'repeat(auto-fill, minmax(260px, 300px))' : 'repeat(auto-fill, minmax(195px, 1fr))',
         gap: isMobile ? 8 : 10,
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (
