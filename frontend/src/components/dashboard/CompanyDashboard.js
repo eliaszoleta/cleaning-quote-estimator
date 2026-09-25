@@ -344,7 +344,7 @@ export default function CompanyDashboard({ user, onLogout }) {
             <div style={{ background: 'linear-gradient(90deg, #1e3a8a, #1d4ed8)', padding: '10px 44px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 16, position: 'relative' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white', fontSize: 13, fontWeight: 600, textAlign: 'center' }}>
                 <Globe size={15} style={{ flexShrink: 0 }} />
-                Don't have a website yet? We'll build you one for free — you decide if you want to keep it.
+                No website yet? We'll build you a free sample site — you decide if you want to keep it.
               </div>
               <a
                 href="/website-for-cleaning-companies"
@@ -352,7 +352,7 @@ export default function CompanyDashboard({ user, onLogout }) {
                 rel="noopener noreferrer"
                 style={{ background: 'white', color: '#1d4ed8', padding: '6px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 12.5, whiteSpace: 'nowrap', flexShrink: 0 }}
               >
-                Get My Free Website →
+                Build My Free Sample Site →
               </a>
               <button
                 onClick={dismissWebsiteOffer}

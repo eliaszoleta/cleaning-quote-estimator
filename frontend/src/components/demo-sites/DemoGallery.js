@@ -67,7 +67,7 @@ export default function DemoGallery() {
           <h2 style={{ fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>Like What You See?</h2>
           <p style={{ fontSize: 14.5, color: '#64748b', marginBottom: 24, lineHeight: 1.6 }}>We'll build one just as custom for your business — free to preview, no payment until you approve it.</p>
           <a href="/website-for-cleaning-companies#apply" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#1d4ed8', color: 'white', padding: '14px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 15, boxShadow: '0 8px 22px rgba(29,78,216,0.3)' }}>
-            Get My Free Website Build →
+            Build My Free Sample Site →
           </a>
         </div>
       </div>

@@ -124,11 +124,11 @@ export default function WebsiteOfferBanner() {
 
       <div style={{ marginBottom: isMobile ? 5 : 12, textAlign: 'center' }}>
         <div style={{ fontWeight: 800, fontSize: isMobile ? 11.5 : 14.5, color: '#0f172a', lineHeight: isMobile ? 1.2 : 1.35 }}>
-          Don't have a cleaning website yet?
+          No cleaning website yet?
         </div>
         {!isMobile && (
           <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>
-            We build it, free — you decide if you want to keep it.
+            We'll build you a free sample site — you decide if you want to keep it.
           </div>
         )}
       </div>
@@ -137,7 +137,7 @@ export default function WebsiteOfferBanner() {
         href="/website-for-cleaning-companies#apply"
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#1d4ed8', color: 'white', padding: isMobile ? '6px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap' }}
       >
-        Get My Free Website Build <ArrowRight size={isMobile ? 11 : 13} />
+        Build My Free Sample Site <ArrowRight size={isMobile ? 11 : 13} />
       </a>
     </div>,
     document.body
