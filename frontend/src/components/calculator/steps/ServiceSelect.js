@@ -67,6 +67,13 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
           ? 'repeat(2, 1fr)'
           : embedded ? 'repeat(auto-fill, minmax(260px, 300px))' : 'repeat(auto-fill, minmax(195px, 1fr))',
         gap: isMobile ? 8 : 10,
+        // The capped-width columns above leave leftover row space on any
+        // container wider than the cards actually need (a company's real
+        // site is usually narrow enough this never shows, but the
+        // dashboard's Branding preview panel is wide) -- centered so that
+        // space splits evenly instead of piling up on the right as if the
+        // cards were left-aligned in a box too big for them.
+        justifyContent: 'center',
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (
           <button
