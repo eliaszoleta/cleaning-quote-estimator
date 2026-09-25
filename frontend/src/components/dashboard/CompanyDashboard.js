@@ -27,7 +27,7 @@ const NAV = [
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
 ];
 
-const WALKTHROUGH_URL = 'https://calendly.com/eliaszoleta87/cleaningestimator';
+const WALKTHROUGH_URL = 'https://calendly.com/eliaszoleta87/cleaning-estimator';
 
 export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
