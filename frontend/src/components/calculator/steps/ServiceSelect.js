@@ -37,14 +37,19 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   // in the dashboard's Services tab).
   const visibleServices = SERVICES.filter(s => services?.[s.configKey]?.enabled !== false);
 
-  // Only the embedded desktop case can leave leftover row space (the
-  // capped-width grid centers itself within it, see below) -- everywhere
-  // else the grid already fills its full container, so the heading
-  // already lines up with it at the default full width. Capping this
-  // outer block too, and centering it the same way, keeps the heading
-  // sitting directly above the grid instead of starting further left
-  // than the (now centered) cards under it.
-  const contentMaxWidth = embedded && !isMobile ? 640 : undefined;
+  // Only the embedded desktop case can leave leftover row space -- and a
+  // fixed guess at that leftover (previously 640px, picked to comfortably
+  // fit 2 columns) was itself the bug: the grid never actually needs more
+  // than 2 columns in this width range (3 would need 800px+, more than
+  // this content block ever gets), but a company with just 1 enabled
+  // service only forms 1 column -- either way, a static number leaves the
+  // real gap between however wide the grid actually is and this guess,
+  // showing up as extra padding on whichever side the grid doesn't fill.
+  // Deriving it from the actual card count that will actually render
+  // removes that gap instead of guessing at it.
+  const gridCols = Math.min(Math.max(visibleServices.length, 1), 2);
+  const gridMaxWidth = gridCols * 300 + (gridCols - 1) * 10;
+  const contentMaxWidth = embedded && !isMobile ? gridMaxWidth : undefined;
 
   return (
     <div style={{ maxWidth: contentMaxWidth, margin: contentMaxWidth ? '0 auto' : undefined }}>
