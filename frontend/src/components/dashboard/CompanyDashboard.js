@@ -256,73 +256,77 @@ export default function CompanyDashboard({ user, onLogout }) {
         </div>
       </header>
 
-      {/* Nav -- horizontal tab bar sticky under the header, instead of a
-          left sidebar, so page content gets the full page width. */}
-      <nav className="dash-nav">
-        {NAV.map(({ id, Icon, label }) => (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={`dash-nav-item${activeTab === id ? ' active' : ''}`}
-          >
-            <Icon size={16} strokeWidth={activeTab === id ? 2.2 : 1.8} />
-            <span>{label}</span>
-            {id === 'leads' && config?.leadsCount > 0 && (
-              <span style={{
-                background: activeTab === 'leads' ? 'var(--primary-dark)' : '#e2e8f0',
-                color: activeTab === 'leads' ? 'white' : '#64748b',
-                borderRadius: 20, padding: '1px 7px', fontSize: 11, fontWeight: 700,
-              }}>
-                {config.leadsCount}
-              </span>
+      {/* Nav -- left sidebar, sticky under the header. */}
+      <div className="dash-main">
+        <nav className="dash-nav">
+          {NAV.map(({ id, Icon, label }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`dash-nav-item${activeTab === id ? ' active' : ''}`}
+            >
+              <Icon size={16} strokeWidth={activeTab === id ? 2.2 : 1.8} />
+              <span>{label}</span>
+              {id === 'leads' && config?.leadsCount > 0 && (
+                <span style={{
+                  marginLeft: 'auto',
+                  background: activeTab === 'leads' ? 'rgba(255,255,255,0.25)' : '#e2e8f0',
+                  color: activeTab === 'leads' ? 'white' : '#64748b',
+                  borderRadius: 20, padding: '1px 7px', fontSize: 11, fontWeight: 700,
+                }}>
+                  {config.leadsCount}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          {/* Pending account deletion banner */}
+          {deletionPending && (
+            <div style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#dc2626', fontWeight: 600, fontSize: 13 }}>
+                <AlertCircle size={15} />
+                Your account is scheduled for deletion on {new Date(deletionPending.scheduledFor).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Your widget is paused in the meantime.
+              </div>
+              <button onClick={() => { setActiveTab('settings'); setSettingsSection('account'); }} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+                Cancel Deletion →
+              </button>
+            </div>
+          )}
+
+          {/* Subscription expired banner */}
+          {!deletionPending && isPaused && (
+            <div style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#dc2626', fontWeight: 600, fontSize: 13 }}>
+                <AlertCircle size={15} />
+                Your widget is currently paused — {subStatus.status === 'requires_trial_setup' ? 'reload the page or reach out if this doesn\'t clear on its own' : subStatus.status === 'expired' ? 'your 30-day free trial has ended' : 'subscription issue'}.
+              </div>
+              <button onClick={() => { setActiveTab('settings'); setSettingsSection('subscription'); }} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+                {subStatus.status === 'requires_trial_setup' ? 'Get Started →' : 'Reactivate →'}
+              </button>
+            </div>
+          )}
+
+          {/* Tab content */}
+          <main className="dash-content">
+            {error && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 7, padding: '11px 14px', marginBottom: 20, color: '#dc2626', fontSize: 14 }}>
+                <AlertCircle size={15} /> {error}
+              </div>
             )}
-          </button>
-        ))}
-      </nav>
+            {Object.entries(TABS).map(([id, tab]) => (
+              <div key={id} style={{ display: id === activeTab ? 'block' : 'none' }}>
+                {tab}
+              </div>
+            ))}
 
-      {/* Pending account deletion banner */}
-      {deletionPending && (
-        <div style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#dc2626', fontWeight: 600, fontSize: 13 }}>
-            <AlertCircle size={15} />
-            Your account is scheduled for deletion on {new Date(deletionPending.scheduledFor).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. Your widget is paused in the meantime.
-          </div>
-          <button onClick={() => { setActiveTab('settings'); setSettingsSection('account'); }} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
-            Cancel Deletion →
-          </button>
+            <p style={{ fontSize: 12.5, color: '#94a3b8', textAlign: 'center', marginTop: 32 }}>
+              Need help? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a>
+            </p>
+          </main>
         </div>
-      )}
-
-      {/* Subscription expired banner */}
-      {!deletionPending && isPaused && (
-        <div style={{ background: '#fef2f2', borderBottom: '1px solid #fecaca', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#dc2626', fontWeight: 600, fontSize: 13 }}>
-            <AlertCircle size={15} />
-            Your widget is currently paused — {subStatus.status === 'requires_trial_setup' ? 'reload the page or reach out if this doesn\'t clear on its own' : subStatus.status === 'expired' ? 'your 30-day free trial has ended' : 'subscription issue'}.
-          </div>
-          <button onClick={() => { setActiveTab('settings'); setSettingsSection('subscription'); }} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
-            {subStatus.status === 'requires_trial_setup' ? 'Get Started →' : 'Reactivate →'}
-          </button>
-        </div>
-      )}
-
-      {/* Tab content */}
-      <main style={{ padding: '28px 32px', overflowY: 'auto' }}>
-        {error && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 7, padding: '11px 14px', marginBottom: 20, color: '#dc2626', fontSize: 14 }}>
-            <AlertCircle size={15} /> {error}
-          </div>
-        )}
-        {Object.entries(TABS).map(([id, tab]) => (
-          <div key={id} style={{ display: id === activeTab ? 'block' : 'none' }}>
-            {tab}
-          </div>
-        ))}
-
-        <p style={{ fontSize: 12.5, color: '#94a3b8', textAlign: 'center', marginTop: 32 }}>
-          Need help? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a>
-        </p>
-      </main>
+      </div>
 
       {/* First-time welcome pointer -- shown exactly once, on the very
           first login after signup (see the `created` comment on
