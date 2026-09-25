@@ -218,6 +218,7 @@ export default function CompanyDashboard({ user, onLogout }) {
             href={WALKTHROUGH_URL}
             target="_blank"
             rel="noopener noreferrer"
+            className="pulse-cta"
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '6px 12px', borderRadius: 20,
