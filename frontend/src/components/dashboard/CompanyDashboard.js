@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
   Users, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle, Percent,
-  Globe, X,
+  Globe, X, CalendarClock,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
@@ -26,6 +26,11 @@ const NAV = [
   { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
 ];
+
+// TODO: swap in the real Calendly (or Google Calendar) booking link once
+// it exists -- placeholder so the header CTA is ready to go the moment a
+// real scheduling page is set up.
+const WALKTHROUGH_URL = 'https://calendly.com/your-link/walkthrough';
 
 export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -209,6 +214,23 @@ export default function CompanyDashboard({ user, onLogout }) {
 
         {/* Right: badge, save, user */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <a
+            href={WALKTHROUGH_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '6px 12px', borderRadius: 20,
+              border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.06)',
+              color: 'white', textDecoration: 'none', fontSize: 12.5, fontWeight: 600,
+              transition: 'background 0.15s, border-color 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; }}
+          >
+            <CalendarClock size={13} /> Schedule a Walkthrough
+          </a>
+
           {subBadge && (
             <div style={{
               fontSize: 11.5, padding: '3px 10px', borderRadius: 20, fontWeight: 700,
