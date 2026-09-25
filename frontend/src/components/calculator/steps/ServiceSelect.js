@@ -37,8 +37,17 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
   // in the dashboard's Services tab).
   const visibleServices = SERVICES.filter(s => services?.[s.configKey]?.enabled !== false);
 
+  // Only the embedded desktop case can leave leftover row space (the
+  // capped-width grid centers itself within it, see below) -- everywhere
+  // else the grid already fills its full container, so the heading
+  // already lines up with it at the default full width. Capping this
+  // outer block too, and centering it the same way, keeps the heading
+  // sitting directly above the grid instead of starting further left
+  // than the (now centered) cards under it.
+  const contentMaxWidth = embedded && !isMobile ? 640 : undefined;
+
   return (
-    <div>
+    <div style={{ maxWidth: contentMaxWidth, margin: contentMaxWidth ? '0 auto' : undefined }}>
       <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: COLORS.ink, marginBottom: 4, letterSpacing: '-0.3px' }}>
         {companyName ? `${companyName} — Get Your Quote` : 'What service do you need?'}
       </h2>
@@ -67,13 +76,11 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
           ? 'repeat(2, 1fr)'
           : embedded ? 'repeat(auto-fill, minmax(260px, 300px))' : 'repeat(auto-fill, minmax(195px, 1fr))',
         gap: isMobile ? 8 : 10,
-        // The capped-width columns above leave leftover row space on any
-        // container wider than the cards actually need (a company's real
-        // site is usually narrow enough this never shows, but the
-        // dashboard's Branding preview panel is wide) -- centered so that
-        // space splits evenly instead of piling up on the right as if the
-        // cards were left-aligned in a box too big for them.
-        justifyContent: 'center',
+        // No justifyContent override here -- the outer contentMaxWidth
+        // block above already keeps this grid from sitting in a container
+        // much wider than it needs, so left-aligned (the grid default)
+        // lines its cards up with the heading's own left edge instead of
+        // centering the grid a second time and drifting the two apart.
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (
           <button
