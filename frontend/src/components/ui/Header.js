@@ -145,7 +145,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header style={styles.header}>
+    <header id="site-header" style={styles.header}>
       <FloatingPartnerBanner />
       <WebsiteOfferBanner />
       <div style={styles.inner}>

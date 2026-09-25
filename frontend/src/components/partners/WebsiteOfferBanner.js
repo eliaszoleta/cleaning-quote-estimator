@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Megaphone, X, ArrowRight } from 'lucide-react';
+import { X, ArrowRight } from 'lucide-react';
 import { getCachedPartnerMatchDetailed } from '../../utils/partnerLookup';
 import { computeIsCompact } from './FloatingPartnerBanner';
 
 const DISMISS_KEY = 'cleanestimator_website_offer_banner_dismissed';
 const DESKTOP_BANNER_WIDTH = 268;
 const DESKTOP_RIGHT_OFFSET = 16;
+const DESKTOP_TOP_FALLBACK = 80;
+const DESKTOP_TOP_GAP = 15;
 
 // Pages that ARE the website-build offer (the sale page itself, and its demo)
 // -- showing a banner that pitches the same thing you're already looking at
@@ -24,11 +26,27 @@ export default function WebsiteOfferBanner() {
   const [city, setCity] = useState(null);
   const [visible, setVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(computeIsCompact);
+  const [headerTop, setHeaderTop] = useState(DESKTOP_TOP_FALLBACK);
 
   useEffect(() => {
     const onResize = () => setIsMobile(computeIsCompact());
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // Anchored to the real header height (id="site-header", Header.js)
+  // instead of a hardcoded 80px -- that guess only matched the header's
+  // one known height; any page (or future header variant) with a taller
+  // header would put this banner right up against it, or overlapping it,
+  // instead of sitting a consistent gap below it.
+  useEffect(() => {
+    const header = document.getElementById('site-header');
+    if (!header) return;
+    const update = () => setHeaderTop(header.getBoundingClientRect().height + DESKTOP_TOP_GAP);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(header);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -67,7 +85,7 @@ export default function WebsiteOfferBanner() {
       aria-label="Get a free cleaning website build"
       style={{
         position: 'fixed',
-        top: isMobile ? 'auto' : 80,
+        top: isMobile ? 'auto' : headerTop,
         bottom: isMobile ? 12 : 'auto',
         right: isMobile ? 10 : DESKTOP_RIGHT_OFFSET,
         zIndex: 90,
@@ -99,8 +117,8 @@ export default function WebsiteOfferBanner() {
       )}
 
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 4 : 10 }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
-          <Megaphone size={isMobile ? 9 : 10} /> Attention Cleaners!
+        <div style={{ display: 'inline-flex', alignItems: 'center', fontSize: 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
+          For Cleaning Companies
         </div>
       </div>
 
@@ -110,7 +128,7 @@ export default function WebsiteOfferBanner() {
         </div>
         {!isMobile && (
           <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>
-            Request a FREE Build of your site. We build, you review and decide if you want to keep it.
+            We build it, free — you decide if you want to keep it.
           </div>
         )}
       </div>
