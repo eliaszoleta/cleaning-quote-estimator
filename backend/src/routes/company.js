@@ -165,7 +165,11 @@ router.post('/:id/upload-logo', requireAuth, async (req, res) => {
     const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(path);
     res.json({ success: true, data: { url: data.publicUrl } });
   } catch (err) {
-    console.error('Company logo upload error:', err.message);
+    // Logged in full (not just err.message) since Supabase Storage errors
+    // -- e.g. "Bucket not found" when 010_company_logo_storage.sql hasn't
+    // actually been run against this project yet -- carry the useful part
+    // in fields .message alone drops.
+    console.error('Company logo upload error:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
     res.status(500).json({ success: false, error: 'Failed to upload logo. You can paste an image URL instead.' });
   }
 });
