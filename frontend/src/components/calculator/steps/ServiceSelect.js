@@ -21,7 +21,7 @@ const SERVICES = [
   { id: 'water_damage',     configKey: 'waterDamage',     Icon: Droplets,       label: 'Water Damage Restoration', desc: 'Emergency extraction & drying',      color: '#0284c7', bg: '#f0f9ff' },
 ];
 
-export default function ServiceSelect({ onSelect, primaryColor, companyName, services }) {
+export default function ServiceSelect({ onSelect, primaryColor, companyName, services, embedded }) {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
 
   useEffect(() => {
@@ -52,7 +52,12 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
         // services were enabled -- an uneven "3 then 3" split instead of a
         // clean 2-per-row grid. 260px keeps the columns from ever squeezing
         // that tight; a genuinely wide full-page embed still gets 3-4.
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(260px, 1fr))',
+        // Only companies' embedded widget ever has a subset of services
+        // enabled in the first place -- the main cleanestimator.com
+        // calculator always shows all 9, so it keeps the original, more
+        // spacious 195px minimum instead of being narrowed for a problem
+        // it can't actually hit.
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : `repeat(auto-fill, minmax(${embedded ? 260 : 195}px, 1fr))`,
         gap: isMobile ? 8 : 10,
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (
