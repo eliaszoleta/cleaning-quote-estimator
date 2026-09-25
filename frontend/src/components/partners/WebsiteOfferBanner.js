@@ -128,7 +128,7 @@ export default function WebsiteOfferBanner() {
         </div>
         {!isMobile && (
           <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>
-            We'll build you a free sample site — you decide if you want to keep it.
+            We'll build you a free sample — you decide if you want to keep it.
           </div>
         )}
       </div>
