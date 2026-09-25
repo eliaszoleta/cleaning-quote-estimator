@@ -27,10 +27,7 @@ const NAV = [
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
 ];
 
-// TODO: swap in the real Calendly (or Google Calendar) booking link once
-// it exists -- placeholder so the header CTA is ready to go the moment a
-// real scheduling page is set up.
-const WALKTHROUGH_URL = 'https://calendly.com/your-link/walkthrough';
+const WALKTHROUGH_URL = 'https://calendly.com/eliaszoleta87/cleaningestimator';
 
 export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
