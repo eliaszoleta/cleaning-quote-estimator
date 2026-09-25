@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
   Users, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle, Percent,
+  Globe, X,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
@@ -35,6 +36,17 @@ export default function CompanyDashboard({ user, onLogout }) {
   const [subStatus, setSubStatus] = useState(null);
   const [localConfig, setLocalConfig] = useState(null);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
+  // Persisted (not sessionStorage) -- unlike the public site's floating
+  // WebsiteOfferBanner, this is a repeat-use dashboard, so "dismiss" here
+  // means "stop showing me this," not just "not this tab session."
+  const [websiteOfferDismissed, setWebsiteOfferDismissed] = useState(() => {
+    try { return localStorage.getItem('ce_dash_website_offer_dismissed') === '1'; }
+    catch { return false; }
+  });
+  const dismissWebsiteOffer = () => {
+    setWebsiteOfferDismissed(true);
+    try { localStorage.setItem('ce_dash_website_offer_dismissed', '1'); } catch { /* ignore */ }
+  };
   const { config, loading, saving, saved, error, saveConfig, patchServices, refetch, justCreated } = useCompanyConfig(user.id);
 
   const localConfigReady = useRef(false);
@@ -304,6 +316,35 @@ export default function CompanyDashboard({ user, onLogout }) {
               </div>
               <button onClick={() => { setActiveTab('settings'); setSettingsSection('subscription'); }} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                 {subStatus.status === 'requires_trial_setup' ? 'Get Started →' : 'Reactivate →'}
+              </button>
+            </div>
+          )}
+
+          {/* Free website build cross-sell -- separate offer from the
+              estimator widget itself (see WebsiteSubscription.js /
+              /website-for-cleaning-companies), pitched here since a
+              company already paying for the estimator is exactly who's
+              likely to not have a real site yet. */}
+          {!websiteOfferDismissed && (
+            <div style={{ background: 'linear-gradient(90deg, #1e3a8a, #1d4ed8)', padding: '10px 44px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 16, position: 'relative' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white', fontSize: 13, fontWeight: 600, textAlign: 'center' }}>
+                <Globe size={15} style={{ flexShrink: 0 }} />
+                Don't have a website yet? We'll build you one for free — you decide if you want to keep it.
+              </div>
+              <a
+                href="/website-for-cleaning-companies"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ background: 'white', color: '#1d4ed8', padding: '6px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 12.5, whiteSpace: 'nowrap', flexShrink: 0 }}
+              >
+                Get My Free Website →
+              </a>
+              <button
+                onClick={dismissWebsiteOffer}
+                aria-label="Dismiss"
+                style={{ position: 'absolute', right: 18, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', padding: 4, display: 'flex' }}
+              >
+                <X size={14} />
               </button>
             </div>
           )}
