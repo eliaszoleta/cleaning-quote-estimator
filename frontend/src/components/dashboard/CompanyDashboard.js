@@ -36,17 +36,12 @@ export default function CompanyDashboard({ user, onLogout }) {
   const [subStatus, setSubStatus] = useState(null);
   const [localConfig, setLocalConfig] = useState(null);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
-  // Persisted (not sessionStorage) -- unlike the public site's floating
-  // WebsiteOfferBanner, this is a repeat-use dashboard, so "dismiss" here
-  // means "stop showing me this," not just "not this tab session."
-  const [websiteOfferDismissed, setWebsiteOfferDismissed] = useState(() => {
-    try { return localStorage.getItem('ce_dash_website_offer_dismissed') === '1'; }
-    catch { return false; }
-  });
-  const dismissWebsiteOffer = () => {
-    setWebsiteOfferDismissed(true);
-    try { localStorage.setItem('ce_dash_website_offer_dismissed', '1'); } catch { /* ignore */ }
-  };
+  // Not persisted -- meant to always show again on a fresh login (App.js
+  // unmounts this whole component on logout and mounts a new one on the
+  // next login, which resets this back to false), so dismissing it just
+  // clears it for the rest of the current session, not permanently.
+  const [websiteOfferDismissed, setWebsiteOfferDismissed] = useState(false);
+  const dismissWebsiteOffer = () => setWebsiteOfferDismissed(true);
   const { config, loading, saving, saved, error, saveConfig, patchServices, refetch, justCreated } = useCompanyConfig(user.id);
 
   const localConfigReady = useRef(false);
