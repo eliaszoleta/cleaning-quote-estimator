@@ -47,7 +47,12 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
 
       <div className="cc-svc-grid" style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(195px, 1fr))',
+        // 195px let a narrow row (like the dashboard's Branding preview, or
+        // a widget embedded in a sidebar) fit 3 across whenever exactly 6-7
+        // services were enabled -- an uneven "3 then 3" split instead of a
+        // clean 2-per-row grid. 260px keeps the columns from ever squeezing
+        // that tight; a genuinely wide full-page embed still gets 3-4.
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(260px, 1fr))',
         gap: isMobile ? 8 : 10,
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (

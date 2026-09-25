@@ -118,7 +118,14 @@ img { max-width: 100%; height: auto; }
 }
 .dash-nav-item.active svg { color: white; }
 
-.dash-content { flex: 1; padding: 28px 32px; overflow-y: auto; }
+/* No overflow-y here on purpose -- this box's height always just grows to
+   fit its content (nothing above bounds it to the viewport), so it never
+   actually gets its own scrollbar; the window is the real scroller. But
+   simply having overflow-y:auto set still makes this the containing
+   scroll box for any position:sticky descendant (like BrandingTab's live
+   preview column), which broke sticky since this box's own scrollTop
+   never moves. */
+.dash-content { flex: 1; padding: 28px 32px; }
 
 /* ─── Settings Cards ──────────────────────────────────────────────────────── */
 .settings-grid { display: flex; flex-direction: column; gap: 20px; max-width: 760px; }
