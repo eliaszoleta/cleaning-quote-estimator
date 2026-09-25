@@ -524,12 +524,18 @@ export default function LeadsTab({ user }) {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => archiveLead(selectedLead.id)}
-                style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
-              >
-                <Trash2 size={13} /> Move to Trash
-              </button>
+              <div style={{ display: 'flex' }}>
+                <button
+                  onClick={() => archiveLead(selectedLead.id)}
+                  title="Move to Trash"
+                  aria-label="Move to Trash"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 8, background: 'transparent', color: '#94a3b8', border: 'none', borderRadius: 7, cursor: 'pointer' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#dc2626'; e.currentTarget.style.background = '#fef2f2'; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.background = 'transparent'; }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             )}
           </div>
         </div>
