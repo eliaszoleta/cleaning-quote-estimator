@@ -339,7 +339,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           {/* Steps */}
           <div style={{ padding: embedded ? '20px 16px' : isMobile ? '20px 16px' : '32px 40px' }}>
             {currentStep === 'service' && (
-              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} />
+              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} />
             )}
             {currentStep === 'location' && (
               <LocationStep

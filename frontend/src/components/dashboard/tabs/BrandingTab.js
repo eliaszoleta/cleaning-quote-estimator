@@ -70,7 +70,11 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
     companyName: form.companyName,
     primaryColor: form.primaryColor,
     accentColor: form.accentColor,
-    ctaHeadline: form.ctaHeadline || 'Get Your Instant Estimate',
+    // No hardcoded fallback here -- an empty field should preview exactly
+    // like production does for an untouched account (ServiceSelect.js and
+    // LeadCaptureStep.js each already fall back to their own default
+    // headline when this is empty), not a third, preview-only default.
+    ctaHeadline: form.ctaHeadline,
     ctaSubtext: form.ctaSubtext,
     ctaPhone: form.ctaPhone,
     ctaEmail: form.ctaEmail,

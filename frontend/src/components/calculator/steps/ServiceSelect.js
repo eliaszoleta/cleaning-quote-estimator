@@ -29,7 +29,7 @@ const SERVICES = [
 // desktop browser, so a narrow preview panel never actually counted as
 // mobile, and looked different from how the same widget renders on a real
 // site.
-export default function ServiceSelect({ onSelect, primaryColor, companyName, services, embedded, isMobile }) {
+export default function ServiceSelect({ onSelect, primaryColor, companyName, ctaHeadline, services, embedded, isMobile }) {
 
   // No companyConfig (main cleanestimator.com site) or a service with no
   // explicit entry both default to shown -- only an explicit enabled:false
@@ -49,7 +49,13 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, ser
   return (
     <div style={{ maxWidth: contentMaxWidth, margin: contentMaxWidth ? '0 auto' : undefined }}>
       <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: COLORS.ink, marginBottom: 4, letterSpacing: '-0.3px' }}>
-        {companyName ? `${companyName} — Get Your Quote` : 'What service do you need?'}
+        {/* The Branding tab's "Headline" field (ctaHeadline) previously
+            only reached LeadCaptureStep, a screen further into the flow
+            the live preview never advances to -- so typing a custom
+            headline there visibly did nothing. Respecting it here too,
+            since this is the first (and in a static preview, the only)
+            screen a company actually sees it apply to. */}
+        {ctaHeadline || (companyName ? `${companyName} — Get Your Quote` : 'What service do you need?')}
       </h2>
       <p style={{ color: COLORS.body, fontSize: 13, marginBottom: 18 }}>
         Tap a service to get your free, instant estimate.
