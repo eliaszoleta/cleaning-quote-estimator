@@ -86,6 +86,12 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
     // callback both tabs write through, so this reflects toggles
     // immediately, not just after Save Changes.
     services: config?.services,
+    // Same gap, same fix -- the Services tab's "Service Areas" picker
+    // (serviceStates/serviceCities) restricts which states LocationStep
+    // shows, but the preview never passed either through, so it kept
+    // showing all 50 states no matter what was actually selected there.
+    serviceStates: config?.serviceStates,
+    serviceCities: config?.serviceCities,
   };
 
   const input = {
