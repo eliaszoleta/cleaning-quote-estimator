@@ -85,7 +85,7 @@ function WidgetPreview() {
           </div>
         </div>
         <img
-          src="/images/marketing/estimator-hero.png"
+          src="/images/marketing/service-form.png"
           alt="Clean Estimator widget — pick a service step"
           style={{ display: 'block', width: '100%', height: 'auto' }}
         />
