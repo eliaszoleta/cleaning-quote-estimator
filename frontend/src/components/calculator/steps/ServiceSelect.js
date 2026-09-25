@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets } from 'lucide-react';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
@@ -21,14 +21,15 @@ const SERVICES = [
   { id: 'water_damage',     configKey: 'waterDamage',     Icon: Droplets,       label: 'Water Damage Restoration', desc: 'Emergency extraction & drying',      color: '#0284c7', bg: '#f0f9ff' },
 ];
 
-export default function ServiceSelect({ onSelect, primaryColor, companyName, services, embedded }) {
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
-
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 640);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
+// isMobile comes from CleaningCalculator's own ResizeObserver on the card
+// element (not window.innerWidth) -- this step used to measure the window
+// itself, which is correct inside a real <iframe> embed (the iframe has
+// its own window) but not for CleaningCalculator rendered directly, like
+// the dashboard's Branding tab preview -- there "window" is the whole
+// desktop browser, so a narrow preview panel never actually counted as
+// mobile, and looked different from how the same widget renders on a real
+// site.
+export default function ServiceSelect({ onSelect, primaryColor, companyName, services, embedded, isMobile }) {
 
   // No companyConfig (main cleanestimator.com site) or a service with no
   // explicit entry both default to shown -- only an explicit enabled:false

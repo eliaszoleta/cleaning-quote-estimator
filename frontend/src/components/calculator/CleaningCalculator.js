@@ -67,7 +67,14 @@ const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Send', 'Results'];
 
 export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null }) {
   const cardRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
+  // Measures the card's own rendered width, not window.innerWidth -- this
+  // renders both in a real <iframe width="100%"> embed (where window IS
+  // the iframe's own narrow viewport, so innerWidth happened to work) and
+  // directly in the dashboard's Branding tab preview (no iframe -- window
+  // is the whole desktop browser, so innerWidth stayed "desktop" no matter
+  // how narrow the actual preview panel was, giving it a different,
+  // uncapped-looking layout than the same widget gets on a real site).
+  const [isMobile, setIsMobile] = useState(false);
   const [serviceType, setServiceType] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? initialService : null);
   const [stepIndex, setStepIndex] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? 1 : 0);
   const [location, setLocation] = useState({ zip: '', state: '' });
@@ -81,9 +88,15 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   const currentStep = steps[stepIndex];
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 640);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const el = cardRef.current;
+    if (!el) return;
+    const check = (width) => setIsMobile(width <= 640);
+    check(el.getBoundingClientRect().width);
+    const observer = new ResizeObserver(entries => {
+      check(entries[0].contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   // Pre-select service from URL param (skipped if initialService already set it)
@@ -326,7 +339,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           {/* Steps */}
           <div style={{ padding: embedded ? '20px 16px' : isMobile ? '20px 16px' : '32px 40px' }}>
             {currentStep === 'service' && (
-              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} services={companyConfig?.services} embedded={embedded} />
+              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} />
             )}
             {currentStep === 'location' && (
               <LocationStep
