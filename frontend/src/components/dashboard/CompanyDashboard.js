@@ -17,9 +17,9 @@ import SettingsTab from './tabs/SettingsTab';
 import HelpTab from './tabs/HelpTab';
 
 const NAV = [
-  { id: 'overview',      Icon: LayoutDashboard,   label: 'Overview' },
-  { id: 'leads',         Icon: Users,              label: 'Leads' },
+  { id: 'overview',      Icon: LayoutDashboard,   label: 'Dashboard' },
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
+  { id: 'leads',         Icon: Users,              label: 'Leads' },
   { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
   { id: 'discount',      Icon: Percent,            label: 'Discount' },
   { id: 'embed',         Icon: Code2,              label: 'Estimator' },
