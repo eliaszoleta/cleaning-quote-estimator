@@ -12,7 +12,7 @@ import NoWebsiteBanner from '../ui/NoWebsiteBanner';
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
 const WEB3FORMS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
-const DEMO_CALL_URL = 'https://calendly.com/eliaszoleta87/cleaning-estimator';
+const DEMO_CALL_URL = 'https://calendly.com/eliaszoleta87/partnership-clean-estimator';
 
 // Same sample data /partner-demo uses -- a generic "SC" mark inlined as a
 // data URI so the hero mockup doesn't depend on an external image file.
