@@ -1,47 +1,73 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
-import CleaningCalculator from './components/calculator/CleaningCalculator';
-import ResultsScreen from './components/calculator/ResultsScreen';
-import CompanyDashboard from './components/dashboard/CompanyDashboard';
-import AuthPage from './components/dashboard/AuthPage';
-import ResetPasswordPage from './components/dashboard/ResetPasswordPage';
-import AdminPartners from './components/admin/AdminPartners';
-import AdminCompanies from './components/admin/AdminCompanies';
-import AdminHomepageLeads from './components/admin/AdminHomepageLeads';
-import ClientPortal from './components/client/ClientPortal';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
-import SEOContent from './components/ui/SEOContent';
-import BlogIndex from './components/blog/BlogIndex';
-import BlogPost from './components/blog/BlogPost';
-import BlogCategory from './components/blog/BlogCategory';
-import CompanyLanding from './components/pages/CompanyLanding';
-import PartnerWithUs from './components/pages/PartnerWithUs';
-import WebsiteSubscription from './components/pages/WebsiteSubscription';
-import DemoGallery from './components/demo-sites/DemoGallery';
-import DemoSitePage from './components/demo-sites/DemoSitePage';
-import PartnerCityPricing from './components/pages/PartnerCityPricing';
-import PartnerDemoPage from './components/pages/PartnerDemoPage';
-import BuyCityPlacement from './components/pages/BuyCityPlacement';
-import PartnerCheckoutSuccess from './components/pages/PartnerCheckoutSuccess';
-import About from './components/pages/About';
-import Founder from './components/pages/Founder';
-import Contact from './components/pages/Contact';
-import PrivacyPolicy from './components/pages/PrivacyPolicy';
-import TermsOfService from './components/pages/TermsOfService';
-import ServicePage from './components/pages/ServicePage';
-import StatePage from './components/pages/StatePage';
-import CityPage from './components/pages/CityPage';
-import CalculatorPage from './components/pages/CalculatorPage';
-import EstimatorPage from './components/pages/EstimatorPage';
-import MethodologyPage from './components/pages/MethodologyPage';
 import ServiceCalculatorPage, { calculatorSlugFor } from './components/pages/ServiceCalculatorPage';
 import { getAllServices } from './data/services';
-import EmbedWrapper from './components/EmbedWrapper';
 import { initMetaPixel } from './utils/metaPixel';
 import { initNextdoorPixel } from './utils/nextdoorPixel';
 import './App.css';
+
+// Route-specific screens are code-split so a visitor to any one page (most
+// often the homepage) only downloads that page's JS instead of the entire
+// site -- dashboard, admin panels, blog engine, demo-site gallery, and every
+// other page's code bundled together. Before this, all of it shipped in one
+// ~380KB gzipped main.js that had to finish downloading and executing before
+// the prerendered static HTML (see scripts/prerender.js) got replaced by the
+// real app, which is exactly the "plain page, then a beat later the real
+// site" flash visitors were seeing -- the swap couldn't happen any faster
+// than that whole bundle could load. Header/Footer and ServiceCalculatorPage
+// stay eager: the first two render on nearly every route anyway, and
+// ServiceCalculatorPage's calculatorSlugFor export has to run synchronously
+// above, before first render, which a lazy() wrapper can't provide.
+const CleaningCalculator = lazy(() => import('./components/calculator/CleaningCalculator'));
+const ResultsScreen = lazy(() => import('./components/calculator/ResultsScreen'));
+const CompanyDashboard = lazy(() => import('./components/dashboard/CompanyDashboard'));
+const AuthPage = lazy(() => import('./components/dashboard/AuthPage'));
+const ResetPasswordPage = lazy(() => import('./components/dashboard/ResetPasswordPage'));
+const AdminPartners = lazy(() => import('./components/admin/AdminPartners'));
+const AdminCompanies = lazy(() => import('./components/admin/AdminCompanies'));
+const AdminHomepageLeads = lazy(() => import('./components/admin/AdminHomepageLeads'));
+const ClientPortal = lazy(() => import('./components/client/ClientPortal'));
+const SEOContent = lazy(() => import('./components/ui/SEOContent'));
+const BlogIndex = lazy(() => import('./components/blog/BlogIndex'));
+const BlogPost = lazy(() => import('./components/blog/BlogPost'));
+const BlogCategory = lazy(() => import('./components/blog/BlogCategory'));
+const CompanyLanding = lazy(() => import('./components/pages/CompanyLanding'));
+const PartnerWithUs = lazy(() => import('./components/pages/PartnerWithUs'));
+const WebsiteSubscription = lazy(() => import('./components/pages/WebsiteSubscription'));
+const DemoGallery = lazy(() => import('./components/demo-sites/DemoGallery'));
+const DemoSitePage = lazy(() => import('./components/demo-sites/DemoSitePage'));
+const PartnerCityPricing = lazy(() => import('./components/pages/PartnerCityPricing'));
+const PartnerDemoPage = lazy(() => import('./components/pages/PartnerDemoPage'));
+const BuyCityPlacement = lazy(() => import('./components/pages/BuyCityPlacement'));
+const PartnerCheckoutSuccess = lazy(() => import('./components/pages/PartnerCheckoutSuccess'));
+const About = lazy(() => import('./components/pages/About'));
+const Founder = lazy(() => import('./components/pages/Founder'));
+const Contact = lazy(() => import('./components/pages/Contact'));
+const PrivacyPolicy = lazy(() => import('./components/pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./components/pages/TermsOfService'));
+const ServicePage = lazy(() => import('./components/pages/ServicePage'));
+const StatePage = lazy(() => import('./components/pages/StatePage'));
+const CityPage = lazy(() => import('./components/pages/CityPage'));
+const CalculatorPage = lazy(() => import('./components/pages/CalculatorPage'));
+const EstimatorPage = lazy(() => import('./components/pages/EstimatorPage'));
+const MethodologyPage = lazy(() => import('./components/pages/MethodologyPage'));
+const EmbedWrapper = lazy(() => import('./components/EmbedWrapper'));
+
+// Shown only for the brief window (usually one animation frame or two)
+// between a lazy chunk being requested and it arriving -- every route that
+// uses this already has real content on screen already (the prerendered
+// static HTML, or the previous page before a client-side nav), so this never
+// needs to look like a real loading state.
+function PageFallback() {
+  return (
+    <div style={{ minHeight: '40vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 14 }}>
+      Loading&hellip;
+    </div>
+  );
+}
 
 const pathname = window.location.pathname.replace(/\/$/, '') || '/';
 const searchParams = new URLSearchParams(window.location.search);
@@ -109,13 +135,15 @@ function ResultsPage() {
     <div className="app">
       <Header />
       <main>
-        <ResultsScreen
-          result={data.r}
-          serviceDetails={data.d}
-          companyConfig={null}
-          embedded={false}
-          onReset={() => { window.location.href = '/'; }}
-        />
+        <Suspense fallback={<PageFallback />}>
+          <ResultsScreen
+            result={data.r}
+            serviceDetails={data.d}
+            companyConfig={null}
+            embedded={false}
+            onReset={() => { window.location.href = '/'; }}
+          />
+        </Suspense>
       </main>
       <Footer />
     </div>
@@ -172,25 +200,27 @@ export default function App() {
 
   if (isEmbed) return (
     <HelmetProvider>
-      <EmbedWrapper companyId={embedCompanyId} />
+      <Suspense fallback={<PageFallback />}>
+        <EmbedWrapper companyId={embedCompanyId} />
+      </Suspense>
     </HelmetProvider>
   );
 
   if (isResults) return <HelmetProvider><ResultsPage /></HelmetProvider>;
 
-  if (isAdminPartners) return <HelmetProvider><AdminPartners /></HelmetProvider>;
+  if (isAdminPartners) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminPartners /></Suspense></HelmetProvider>;
 
-  if (isAdminCompanies) return <HelmetProvider><AdminCompanies /></HelmetProvider>;
+  if (isAdminCompanies) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminCompanies /></Suspense></HelmetProvider>;
 
-  if (isAdminHomepageLeads) return <HelmetProvider><AdminHomepageLeads /></HelmetProvider>;
+  if (isAdminHomepageLeads) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminHomepageLeads /></Suspense></HelmetProvider>;
 
-  if (isClientPortal) return <HelmetProvider><ClientPortal /></HelmetProvider>;
+  if (isClientPortal) return <HelmetProvider><Suspense fallback={<PageFallback />}><ClientPortal /></Suspense></HelmetProvider>;
 
   if (isPartnerWithUs) return (
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><PartnerWithUs /></main>
+        <main><Suspense fallback={<PageFallback />}><PartnerWithUs /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -201,13 +231,17 @@ export default function App() {
   // nav/footer would break the illusion (each demo site has its own nav).
   if (isDemoGallery) return (
     <HelmetProvider>
-      <DemoGallery />
+      <Suspense fallback={<PageFallback />}>
+        <DemoGallery />
+      </Suspense>
     </HelmetProvider>
   );
 
   if (demoSiteMatch) return (
     <HelmetProvider>
-      <DemoSitePage slug={demoSiteMatch[1]} page={demoSiteMatch[2]} />
+      <Suspense fallback={<PageFallback />}>
+        <DemoSitePage slug={demoSiteMatch[1]} page={demoSiteMatch[2]} />
+      </Suspense>
     </HelmetProvider>
   );
 
@@ -215,7 +249,7 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><WebsiteSubscription /></main>
+        <main><Suspense fallback={<PageFallback />}><WebsiteSubscription /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -225,7 +259,7 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><PartnerCityPricing /></main>
+        <main><Suspense fallback={<PageFallback />}><PartnerCityPricing /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -235,7 +269,7 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><PartnerDemoPage /></main>
+        <main><Suspense fallback={<PageFallback />}><PartnerDemoPage /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -245,7 +279,7 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><PartnerCheckoutSuccess /></main>
+        <main><Suspense fallback={<PageFallback />}><PartnerCheckoutSuccess /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -255,27 +289,27 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><BuyCityPlacement /></main>
+        <main><Suspense fallback={<PageFallback />}><BuyCityPlacement /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
   );
 
-  if (isEstimatorLanding) return <HelmetProvider><CompanyLanding /></HelmetProvider>;
+  if (isEstimatorLanding) return <HelmetProvider><Suspense fallback={<PageFallback />}><CompanyLanding /></Suspense></HelmetProvider>;
 
-  if (isBlog) return <HelmetProvider><div className="app"><Header /><main><BlogRouter /></main><Footer /></div></HelmetProvider>;
+  if (isBlog) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><BlogRouter /></Suspense></main><Footer /></div></HelmetProvider>;
 
-  if (isAbout) return <HelmetProvider><div className="app"><Header /><main><About /></main><Footer /></div></HelmetProvider>;
-  if (isFounder) return <HelmetProvider><div className="app"><Header /><main><Founder /></main><Footer /></div></HelmetProvider>;
-  if (isContact) return <HelmetProvider><div className="app"><Header /><main><Contact /></main><Footer /></div></HelmetProvider>;
-  if (isPrivacy) return <HelmetProvider><div className="app"><Header /><main><PrivacyPolicy /></main><Footer /></div></HelmetProvider>;
-  if (isTerms) return <HelmetProvider><div className="app"><Header /><main><TermsOfService /></main><Footer /></div></HelmetProvider>;
-  if (isServicePage) return <HelmetProvider><div className="app"><Header /><main><ServicePage slug={pathname.replace('/cleaning-services/', '')} /></main><Footer /></div></HelmetProvider>;
-  if (isCityPage) return <HelmetProvider><div className="app"><Header /><main><CityPage slug={pathname.replace('/cleaning-cost/city/', '')} /></main><Footer /></div></HelmetProvider>;
-  if (isStatePage) return <HelmetProvider><div className="app"><Header /><main><StatePage slug={pathname.replace('/cleaning-cost/', '')} /></main><Footer /></div></HelmetProvider>;
-  if (isCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><CalculatorPage /></main><Footer /></div></HelmetProvider>;
-  if (isEstimatorPage) return <HelmetProvider><div className="app"><Header /><main><EstimatorPage /></main><Footer /></div></HelmetProvider>;
-  if (isMethodologyPage) return <HelmetProvider><div className="app"><Header /><main><MethodologyPage /></main><Footer /></div></HelmetProvider>;
+  if (isAbout) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><About /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isFounder) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><Founder /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isContact) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><Contact /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isPrivacy) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><PrivacyPolicy /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isTerms) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><TermsOfService /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isServicePage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><ServicePage slug={pathname.replace('/cleaning-services/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isCityPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><CityPage slug={pathname.replace('/cleaning-cost/city/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isStatePage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><StatePage slug={pathname.replace('/cleaning-cost/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><CalculatorPage /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isEstimatorPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><EstimatorPage /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isMethodologyPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><MethodologyPage /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isServiceCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><ServiceCalculatorPage slug={pathname.slice(1)} /></main><Footer /></div></HelmetProvider>;
 
   if (isCompany) {
@@ -306,9 +340,9 @@ export default function App() {
         </main><Footer /></div>
       </HelmetProvider>
     );
-    if (passwordRecovery) return <HelmetProvider>{companyHelmet}<ResetPasswordPage onDone={() => setPasswordRecovery(false)} /></HelmetProvider>;
-    if (!user) return <HelmetProvider>{companyHelmet}<AuthPage onAuth={setUser} /></HelmetProvider>;
-    return <HelmetProvider>{companyHelmet}<CompanyDashboard user={user} onLogout={handleLogout} /></HelmetProvider>;
+    if (passwordRecovery) return <HelmetProvider>{companyHelmet}<Suspense fallback={<PageFallback />}><ResetPasswordPage onDone={() => setPasswordRecovery(false)} /></Suspense></HelmetProvider>;
+    if (!user) return <HelmetProvider>{companyHelmet}<Suspense fallback={<PageFallback />}><AuthPage onAuth={setUser} /></Suspense></HelmetProvider>;
+    return <HelmetProvider>{companyHelmet}<Suspense fallback={<PageFallback />}><CompanyDashboard user={user} onLogout={handleLogout} /></Suspense></HelmetProvider>;
   }
 
   return (
@@ -330,8 +364,10 @@ export default function App() {
       <div className="app">
         <Header />
         <main>
-          <CleaningCalculator />
-          <SEOContent />
+          <Suspense fallback={<PageFallback />}>
+            <CleaningCalculator />
+            <SEOContent />
+          </Suspense>
         </main>
         <Footer />
       </div>
