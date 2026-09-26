@@ -12,6 +12,7 @@ import NoWebsiteBanner from '../ui/NoWebsiteBanner';
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
 const WEB3FORMS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
+const DEMO_CALL_URL = 'https://calendly.com/eliaszoleta87/cleaning-estimator';
 
 // Same sample data /partner-demo uses -- a generic "SC" mark inlined as a
 // data URI so the hero mockup doesn't depend on an external image file.
@@ -321,6 +322,14 @@ export default function PartnerWithUs() {
                 See Live Demo
               </a>
             </div>
+            <a
+              href={DEMO_CALL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, color: '#93c5fd', textDecoration: 'none', fontWeight: 600, fontSize: 14 }}
+            >
+              Or book a free demo call <IconArrow size={14} />
+            </a>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center' }}>
