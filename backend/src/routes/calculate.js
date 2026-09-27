@@ -5,6 +5,7 @@ const { STATE_PRICING_MULTIPLIERS, STATE_AVERAGE_HOME_CLEANING_COST, STATE_NAMES
 const { getCompanyConfig } = require('../services/companyConfig');
 const { saveLead } = require('./leads');
 const { sendEstimateEmail, sendPartnerLeadEmail, sendCompanyLeadEmail } = require('../services/email');
+const { resolveCityForZip } = require('../services/zipCity');
 
 const VALID_SERVICE_TYPES = [
   'home_residential', 'apartment', 'commercial', 'carpet',
@@ -146,6 +147,13 @@ router.post('/', async (req, res) => {
               console.warn(`Partner lead email skipped: partner ${partnerIdForLead} not found, inactive, or missing business_email`);
               return;
             }
+            // Resolved here (not before res.json above) so a slow/failed ZIP
+            // lookup can never delay the visitor's own response -- this only
+            // affects the partner's email, sent well after the response
+            // already went out. Prefers an explicit serviceDetails.city (a
+            // scoped-widget visitor who was actually asked) over the ZIP
+            // guess, same priority as the admin homepage-leads panel.
+            const leadCity = serviceDetails?.city || await resolveCityForZip(zip);
             const sent = await sendPartnerLeadEmail({
               partnerEmail,
               leadName: leadInfo.name,
@@ -154,6 +162,7 @@ router.post('/', async (req, res) => {
               serviceType,
               priceLow: result.totalLow,
               priceHigh: result.totalHigh,
+              city: leadCity,
               state: result.state,
               zip: zip || null,
               timeline: leadInfo.timeline || null,
@@ -186,22 +195,30 @@ router.post('/', async (req, res) => {
       // leadNotificationEmail above -- same reasoning).
       if (companyId) {
         if (leadNotificationEmail) {
-          sendCompanyLeadEmail({
-            to: leadNotificationEmail,
-            companyName: companyConfig.companyName || 'Clean Estimator',
-            leadName: leadInfo.name,
-            leadEmail: leadInfo.email,
-            leadPhone: leadInfo.phone,
-            serviceType,
-            priceLow: result.totalLow,
-            priceHigh: result.totalHigh,
-            state: result.state,
-            zip: zip || null,
-            timeline: leadInfo.timeline || null,
-            adjustments: result.adjustments,
-            keyFactors: result.keyFactors,
-            serviceDetails: serviceDetails || {},
-          }).catch(err => console.error('Company lead email failed:', err.message));
+          // Same fire-and-forget/non-blocking city resolution as the
+          // partner email above -- wrapped in an async IIFE since this
+          // call site (unlike the partner one) isn't already inside an
+          // async function to await within.
+          (async () => {
+            const leadCity = serviceDetails?.city || await resolveCityForZip(zip);
+            await sendCompanyLeadEmail({
+              to: leadNotificationEmail,
+              companyName: companyConfig.companyName || 'Clean Estimator',
+              leadName: leadInfo.name,
+              leadEmail: leadInfo.email,
+              leadPhone: leadInfo.phone,
+              serviceType,
+              priceLow: result.totalLow,
+              priceHigh: result.totalHigh,
+              city: leadCity,
+              state: result.state,
+              zip: zip || null,
+              timeline: leadInfo.timeline || null,
+              adjustments: result.adjustments,
+              keyFactors: result.keyFactors,
+              serviceDetails: serviceDetails || {},
+            });
+          })().catch(err => console.error('Company lead email failed:', err.message));
         } else {
           console.warn(`Company lead email skipped: no leadNotificationEmail configured for company ${companyId}`);
         }

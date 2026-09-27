@@ -397,10 +397,10 @@ function buildLeadContactLines({ leadEmail, leadPhone, city, state, zip, timelin
   ].filter(Boolean);
 }
 
-function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, state, zip, timeline });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
 
   const lines = [
     'New lead in your area!',
@@ -437,10 +437,10 @@ function buildPartnerLeadText({ leadName, serviceType, priceLow, priceHigh, lead
   return lines.join('\n');
 }
 
-function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, state, zip, timeline });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
 
   // No width:100% -- that stretches the value column to the far edge of
   // the email, leaving a wide, disconnected gap between label and value.
@@ -502,7 +502,7 @@ function buildPartnerLeadHtml({ leadName, serviceType, priceLow, priceHigh, lead
 // Includes the same full price breakdown/key factors/service details as
 // sendCompanyLeadEmail, not just the top-line range -- a partner deciding
 // whether to call back needs the same context a subscribed company gets.
-async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, state, zip, timeline, adjustments, keyFactors, serviceDetails }) {
+async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, city, state, zip, timeline, adjustments, keyFactors, serviceDetails }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendPartnerLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -514,7 +514,7 @@ async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPho
   }
 
   const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-  const args = { leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments, keyFactors, serviceDetails };
+  const args = { leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments, keyFactors, serviceDetails };
 
   try {
     await axios.post(
@@ -579,10 +579,10 @@ function buildServiceDetailsHtml(serviceDetails) {
   </table>`;
 }
 
-function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, state, zip, timeline });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
 
   const lines = [
     `New lead on your ${companyName} estimator!`,
@@ -617,10 +617,10 @@ function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, pr
   return lines.join('\n');
 }
 
-function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
   const name = leadName || 'A visitor';
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
-  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: serviceDetails?.city, state, zip, timeline });
+  const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
 
   const contactRows = contactLines.map(l => {
     const [label, ...rest] = l.split(': ');
@@ -673,7 +673,7 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
 // which goes to the visitor themselves). Reply-to is the lead's own email
 // so the company can just hit reply, same pattern as sendPartnerLeadEmail.
 // Fire-and-forget, called from calculate.js whenever companyId is present.
-async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, state, zip, timeline, adjustments, keyFactors, serviceDetails }) {
+async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, city, state, zip, timeline, adjustments, keyFactors, serviceDetails }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendCompanyLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -685,7 +685,7 @@ async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, lead
   }
 
   const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, state, zip, timeline, adjustments, keyFactors, serviceDetails };
+  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments, keyFactors, serviceDetails };
 
   try {
     await axios.post(
