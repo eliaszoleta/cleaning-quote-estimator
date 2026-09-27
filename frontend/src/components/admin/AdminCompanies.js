@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye, Trash2 } from 'lucide-react';
+import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye, Trash2, Phone, Globe } from 'lucide-react';
 import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails, sendTrialEmailPreview, deleteAdminCompanyForever } from '../../utils/api';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 
@@ -345,6 +345,24 @@ export default function AdminCompanies() {
                     <StatusBadge sub={c.subscription} />
                   </div>
                   <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 3 }}>{c.email || '(no email on file)'}</div>
+                  {(c.phone || c.website) && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 3 }}>
+                      {c.phone && (
+                        <a href={`tel:${c.phone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12.5, color: '#64748b', textDecoration: 'none' }}>
+                          <Phone size={11} /> {c.phone}
+                        </a>
+                      )}
+                      {c.website && (
+                        <a
+                          href={/^https?:\/\//i.test(c.website) ? c.website : `https://${c.website}`}
+                          target="_blank" rel="noopener noreferrer"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12.5, color: '#64748b', textDecoration: 'none' }}
+                        >
+                          <Globe size={11} /> {c.website.replace(/^https?:\/\//i, '').replace(/\/$/, '')}
+                        </a>
+                      )}
+                    </div>
+                  )}
                   {c.serviceStates?.length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 6 }}>
                       {c.serviceStates.map(st => (

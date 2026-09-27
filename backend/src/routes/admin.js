@@ -99,6 +99,8 @@ router.get('/companies', async (req, res) => {
         companyId: row.companyId,
         companyName: config.companyName || '(unnamed)',
         email: row.email,
+        phone: config.phone || null,
+        website: config.website || null,
         signedUpAt: row.signedUpAt,
         lastConfigUpdate: row.updatedAt,
         subscription: sub,
