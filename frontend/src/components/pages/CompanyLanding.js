@@ -116,7 +116,7 @@ export default function CompanyLanding() {
     <>
       <Helmet>
         <title>Embed a Cleaning Cost Calculator on Your Website | Clean Estimator for Companies</title>
-        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 30-day free trial, no credit card required. $159/month." />
+        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 30-day free trial, no credit card required. $59/month." />
         <link rel="canonical" href="https://www.cleanestimator.com/estimator" />
       </Helmet>
       <div className="app">
@@ -288,7 +288,7 @@ export default function CompanyLanding() {
                 <div style={{ height: 3, background: 'linear-gradient(90deg, #3b82f6, #818cf8)' }} />
                 <div style={{ padding: '30px 28px' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: 6 }}>
-                    <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$159</span>
+                    <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$59</span>
                     <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
                   </div>
                   <div style={{ color: '#64748b', fontSize: 13, marginBottom: 22 }}>After your 30-day free trial &middot; cancel anytime</div>
