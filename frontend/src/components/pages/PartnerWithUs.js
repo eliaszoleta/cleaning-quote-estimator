@@ -309,7 +309,7 @@ export default function PartnerWithUs() {
             </span>
             <h1 style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
               Get recommended to thousands of homeowners<br />
-              <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>ready to hire a cleaner</span>
+              <span style={{ color: '#60a5fa' }}>ready to hire a cleaner</span>
             </h1>
             <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 14, lineHeight: 1.5 }}>
               Clean Estimator gets <span style={{ color: 'white', fontWeight: 400 }}>25&ndash;30K organic visits a month</span> from homeowners actively pricing out a cleaning job, not casual browsers.
