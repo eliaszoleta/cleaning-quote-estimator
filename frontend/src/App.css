@@ -34,7 +34,7 @@ html { font-size: 16px; }
 input, select, textarea, button { font-family: inherit; }
 
 body {
-  font-family: 'Poppins', 'Poppins Fallback', Arial, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', Arial, sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: 1.6;
