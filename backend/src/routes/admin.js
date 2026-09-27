@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { sendCompanyWelcomeEmail } = require('../services/email');
@@ -282,6 +283,34 @@ router.post('/companies/send-trial-email-preview', async (req, res) => {
 // everything else in this file.
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// The homepage's own calculator never asks for a city -- LocationStep.js
+// only asks that question when a company has scoped its embedded widget to
+// specific states/cities (see `scoped` there), which the unscoped main
+// calculator on cleanestimator.com never is. So a homepage lead only ever
+// has zip + state on file, which is what showed up in the admin panel as a
+// bare ZIP with no city. Resolved here at read time via a free public
+// ZIP->city lookup instead, cached in memory per server process (a handful
+// of API calls the first time a given ZIP shows up, then free after that)
+// rather than bundling/maintaining a full ~41k-row US ZIP database, and
+// without writing the resolved value back to the row (a GET shouldn't have
+// side effects, and re-resolving on each server restart is cheap enough at
+// this volume).
+const zipCityCache = new Map(); // zip -> city string, or null if lookup failed/had no match (cached either way so a bad ZIP isn't retried every request)
+
+async function resolveCityForZip(zip) {
+  if (!zip || !/^\d{5}$/.test(zip)) return null;
+  if (zipCityCache.has(zip)) return zipCityCache.get(zip);
+  try {
+    const { data } = await axios.get(`https://api.zippopotam.us/us/${zip}`, { timeout: 4000 });
+    const city = data?.places?.[0]?.['place name'] || null;
+    zipCityCache.set(zip, city);
+    return city;
+  } catch (err) {
+    zipCityCache.set(zip, null);
+    return null;
+  }
+}
+
 // GET /api/admin/homepage-leads
 router.get('/homepage-leads', async (req, res) => {
   const sb = getSupabase();
@@ -295,7 +324,21 @@ router.get('/homepage-leads', async (req, res) => {
     if (!includeDeleted) query = query.is('deleted_at', null);
     const { data, error } = await query;
     if (error) throw error;
-    res.json({ success: true, count: data.length, data: data || [] });
+
+    // Resolve each unique ZIP once (not once per lead -- many leads share
+    // a ZIP), then attach the result as a top-level `city` field. Prefers
+    // an explicit service_details.city when one exists (a scoped-widget
+    // lead that really was asked, vs. a homepage lead being backfilled),
+    // so this never overrides real visitor input with a guess.
+    const rows = data || [];
+    const uniqueZips = [...new Set(rows.map(r => r.zip).filter(Boolean))];
+    await Promise.all(uniqueZips.map(resolveCityForZip));
+    const enriched = rows.map(row => ({
+      ...row,
+      city: row.service_details?.city || zipCityCache.get(row.zip) || null,
+    }));
+
+    res.json({ success: true, count: enriched.length, data: enriched });
   } catch (err) {
     console.error('Admin homepage-leads list error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to load leads' });

@@ -41,6 +41,7 @@ export default function AdminHomepageLeads() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [stateFilter, setStateFilter] = useState('all');
+  const [cityFilter, setCityFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [selectedLead, setSelectedLead] = useState(null);
@@ -102,17 +103,27 @@ export default function AdminHomepageLeads() {
   const filtered = baseLeads.filter(l => {
     if (filter !== 'all' && l.service_type !== filter) return false;
     if (stateFilter !== 'all' && l.state !== stateFilter) return false;
+    if (cityFilter !== 'all' && l.city !== cityFilter) return false;
     if (search) {
       const q = search.toLowerCase();
-      return (l.name || '').toLowerCase().includes(q) || (l.email || '').toLowerCase().includes(q) || (l.zip || '').includes(q);
+      return (l.name || '').toLowerCase().includes(q) || (l.email || '').toLowerCase().includes(q) || (l.zip || '').includes(q) || (l.city || '').toLowerCase().includes(q);
     }
     return true;
   });
 
   const serviceTypes = [...new Set(baseLeads.map(l => l.service_type))];
   const states = [...new Set(baseLeads.map(l => l.state).filter(Boolean))].sort();
+  // Scoped to the selected state (like LocationStep.js's own citiesForState)
+  // -- three leads from three different Texas cities only add three city
+  // options while "TX" is selected, not every city across every state mixed
+  // into one list.
+  const cities = [...new Set(
+    baseLeads.filter(l => stateFilter === 'all' || l.state === stateFilter).map(l => l.city).filter(Boolean)
+  )].sort();
 
-  const switchView = (v) => { setView(v); setFilter('all'); setStateFilter('all'); setDateFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
+  const selectStateFilter = (v) => { setStateFilter(v); setCityFilter('all'); };
+
+  const switchView = (v) => { setView(v); setFilter('all'); setStateFilter('all'); setCityFilter('all'); setDateFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
 
   const toggleSelect = (id) => {
     setSelectedIds(prev => {
@@ -255,7 +266,7 @@ export default function AdminHomepageLeads() {
     const headers = ['Name', 'Email', 'Phone', 'Service', 'City', 'State', 'ZIP', 'Estimate Low', 'Estimate High', 'Timeline', 'Date', 'Notes'];
     const rows = rowsSource.map(l => [
       l.name || '', l.email || '', l.phone || '', serviceTypeLabel(l.service_type),
-      l.service_details?.city || '', l.state || '', l.zip || '',
+      l.city || '', l.state || '', l.zip || '',
       l.estimated_price_low || '', l.estimated_price_high || '',
       l.timeline || '', new Date(l.created_at).toLocaleDateString(), l.notes || '',
     ]);
@@ -289,7 +300,7 @@ export default function AdminHomepageLeads() {
         (l.phone || '').replace(/\D/g, ''),
         (fn || '').toLowerCase(),
         lnParts.join(' ').toLowerCase(),
-        (l.service_details?.city || '').toLowerCase().replace(/\s+/g, ''),
+        (l.city || '').toLowerCase().replace(/\s+/g, ''),
         (l.state || '').toLowerCase(),
         (l.zip || '').trim(),
         'us',
@@ -375,7 +386,7 @@ export default function AdminHomepageLeads() {
                 <input
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  placeholder="Search by name, email, ZIP…"
+                  placeholder="Search by name, email, city, ZIP…"
                   style={{ flex: 1, minWidth: 200, padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, outline: 'none', color: '#0f172a' }}
                 />
                 <select
@@ -388,12 +399,22 @@ export default function AdminHomepageLeads() {
                 </select>
                 <select
                   value={stateFilter}
-                  onChange={e => setStateFilter(e.target.value)}
+                  onChange={e => selectStateFilter(e.target.value)}
                   style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
                 >
                   <option value="all">All states</option>
                   {states.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
+                {cities.length > 0 && (
+                  <select
+                    value={cityFilter}
+                    onChange={e => setCityFilter(e.target.value)}
+                    style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
+                  >
+                    <option value="all">All cities</option>
+                    {cities.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                )}
                 <select
                   value={dateFilter}
                   onChange={e => setDateFilter(e.target.value)}
@@ -444,10 +465,10 @@ export default function AdminHomepageLeads() {
                   <Inbox size={24} color="#94a3b8" />
                 </div>
                 <div style={{ fontWeight: 700, fontSize: 15, color: '#374151', marginBottom: 5 }}>
-                  {search || filter !== 'all' || stateFilter !== 'all' || dateFilter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
+                  {search || filter !== 'all' || stateFilter !== 'all' || cityFilter !== 'all' || dateFilter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
                 </div>
                 <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', maxWidth: 300, margin: 0 }}>
-                  {search || filter !== 'all' || stateFilter !== 'all' || dateFilter !== 'all'
+                  {search || filter !== 'all' || stateFilter !== 'all' || cityFilter !== 'all' || dateFilter !== 'all'
                     ? 'Try changing your search or filter.'
                     : view === 'trash'
                       ? 'Leads you archive show up here, and can be restored.'
@@ -520,7 +541,7 @@ export default function AdminHomepageLeads() {
                   ['Email',    selectedLead.email,  `mailto:${selectedLead.email}`],
                   ['Phone',    selectedLead.phone,  `tel:${selectedLead.phone}`],
                   ['Service',  serviceTypeLabel(selectedLead.service_type), null],
-                  ['Location', [selectedLead.service_details?.city, selectedLead.zip, selectedLead.state].filter(Boolean).join(' · '), null],
+                  ['Location', [selectedLead.city, selectedLead.state, selectedLead.zip].filter(Boolean).join(' · '), null],
                   ['Estimate', selectedLead.estimated_price_low ? `${formatPrice(selectedLead.estimated_price_low)} – ${formatPrice(selectedLead.estimated_price_high)}` : '—', null],
                   ['Timeline', selectedLead.timeline || '—', null],
                 ].filter(([, val]) => val && val !== '—' && val !== '').map(([label, val, href]) => (
