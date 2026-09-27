@@ -3,6 +3,7 @@ const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { sendCompanyWelcomeEmail } = require('../services/email');
+const { getCompanyConfig } = require('../services/companyConfig');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SERVICE_KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -120,6 +121,55 @@ router.get('/companies', async (req, res) => {
   } catch (err) {
     console.error('Admin companies list error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to load companies' });
+  }
+});
+
+// DELETE /api/admin/companies/:id — permanently delete a company account
+// right now: cancels any active Stripe subscription, deletes every lead
+// they've captured, their config row, and their Supabase auth user. Unlike
+// the self-service DELETE /api/company/account (which only schedules a
+// 30-day grace period -- see deletionScheduler.js for what actually runs
+// once that elapses), this is immediate and irreversible, for the admin
+// panel's own "permanently delete this account" action. Requires
+// { confirm: true } in the body, same deliberate-second-step pattern as
+// send-trial-email below, since a GET/bookmark/retry must never trigger this.
+router.delete('/companies/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+  if (req.body?.confirm !== true) {
+    return res.status(400).json({ success: false, error: 'Refusing to delete without { confirm: true } in the request body.' });
+  }
+
+  const { id } = req.params;
+
+  try {
+    // Cancel any active Stripe subscription first -- otherwise deleting the
+    // account leaves someone still being billed with no dashboard left to
+    // cancel it from.
+    const config = await getCompanyConfig(id);
+    const subId = config?.subscription?.stripeSubscriptionId;
+    if (subId && process.env.STRIPE_SECRET_KEY) {
+      try {
+        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.cancel(subId);
+      } catch (err) {
+        console.warn(`Admin delete company ${id}: Stripe cancel warning:`, err.message);
+      }
+    }
+
+    const { error: leadsErr } = await sb.from('leads').delete().eq('company_id', id);
+    if (leadsErr) throw leadsErr;
+
+    const { error: cfgErr } = await sb.from('cleaning_company_configs').delete().eq('company_id', id);
+    if (cfgErr) throw cfgErr;
+
+    const { error: userErr } = await sb.auth.admin.deleteUser(id);
+    if (userErr) throw userErr;
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(`Admin delete company ${id} error:`, err.message);
+    res.status(500).json({ success: false, error: err.message || 'Failed to delete company' });
   }
 });
 

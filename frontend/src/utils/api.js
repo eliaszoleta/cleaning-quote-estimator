@@ -136,6 +136,15 @@ export async function getTrialEmailPreview(adminKey) {
   return apiFetch('/api/admin/companies/trial-email-preview', { headers: { 'x-admin-key': adminKey } });
 }
 
+// Permanent, immediate delete -- cancels their Stripe subscription, deletes
+// their leads/config/login. Unlike a company's own self-service DELETE
+// /api/company/account (a 30-day grace period), there's no undo here.
+export async function deleteAdminCompanyForever(adminKey, companyId) {
+  return apiFetch(`/api/admin/companies/${companyId}`, {
+    method: 'DELETE', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true }),
+  });
+}
+
 export async function sendTrialEmails(adminKey, companyIds) {
   return apiFetch('/api/admin/companies/send-trial-email', {
     method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true, companyIds }),

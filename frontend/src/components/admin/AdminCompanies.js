@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye } from 'lucide-react';
-import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails, sendTrialEmailPreview } from '../../utils/api';
+import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye, Trash2 } from 'lucide-react';
+import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails, sendTrialEmailPreview, deleteAdminCompanyForever } from '../../utils/api';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 
 const STORAGE_KEY = 'admin_companies_key';
@@ -53,6 +53,8 @@ export default function AdminCompanies() {
   const [previewSending, setPreviewSending] = useState(false);
   const [previewSendResult, setPreviewSendResult] = useState(null);
   const [previewSendError, setPreviewSendError] = useState(null);
+
+  const [deletingId, setDeletingId] = useState(null);
 
   const load = useCallback(async (key) => {
     setLoading(true);
@@ -155,6 +157,32 @@ export default function AdminCompanies() {
       setPreviewSendError(err.message);
     } finally {
       setPreviewSending(false);
+    }
+  };
+
+  // Permanent, immediate delete -- cancels their Stripe subscription and
+  // wipes their leads, config, and login. No grace period like the
+  // company's own self-service account deletion, so the confirm dialog
+  // spells out exactly what's about to happen rather than a generic "are
+  // you sure?".
+  const handleDeleteCompany = async (c) => {
+    const ok = await confirm({
+      title: `Permanently delete ${c.companyName}?`,
+      message: `This cancels their Stripe subscription, deletes all ${c.leadCount} lead${c.leadCount === 1 ? '' : 's'} they've captured, their account settings, and their login. There is no undo.`,
+      confirmLabel: 'Delete Forever',
+      danger: true,
+    });
+    if (!ok) return;
+    setDeletingId(c.companyId);
+    setError(null);
+    try {
+      await deleteAdminCompanyForever(adminKey, c.companyId);
+      setCompanies(prev => prev.filter(x => x.companyId !== c.companyId));
+      setSummary(prev => ({ ...prev, count: Math.max(0, prev.count - 1) }));
+    } catch (err) {
+      setError(err.message || 'Failed to delete company');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -339,6 +367,20 @@ export default function AdminCompanies() {
                     <div style={{ color: '#94a3b8', fontSize: 11 }}>signed up</div>
                   </div>
                 </div>
+                <button
+                  onClick={() => handleDeleteCompany(c)}
+                  disabled={deletingId === c.companyId}
+                  title="Permanently delete this account"
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 34, height: 34, flexShrink: 0, borderRadius: 8,
+                    border: '1px solid #fecaca', background: 'white', color: '#dc2626',
+                    cursor: deletingId === c.companyId ? 'not-allowed' : 'pointer',
+                    opacity: deletingId === c.companyId ? 0.5 : 1,
+                  }}
+                >
+                  {deletingId === c.companyId ? <RefreshCw size={14} className="spin" /> : <Trash2 size={14} />}
+                </button>
               </div>
             ))}
           </div>
@@ -346,7 +388,7 @@ export default function AdminCompanies() {
 
         <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12, color: '#94a3b8' }}>
           <Users size={12} style={{ verticalAlign: -1, marginRight: 4 }} />
-          Read-only view. To pause, cancel, or delete a subscriber's account, use Stripe or Supabase directly for now.
+          To pause or change a subscriber's billing without deleting their account, use Stripe directly for now.
         </div>
       </div>
 
