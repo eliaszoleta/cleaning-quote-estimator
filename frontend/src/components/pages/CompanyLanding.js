@@ -218,7 +218,7 @@ export default function CompanyLanding() {
                 {STEPS.map((s, i) => (
                   <React.Fragment key={s.n}>
                     <div className="ce-card" style={{ ...cardStyle, padding: '26px 22px', position: 'relative', overflow: 'hidden' }}>
-                      <div style={{ position: 'absolute', top: 0, left: 0, height: 3, width: `${((i + 1) / STEPS.length) * 100}%`, background: PRIMARY }} />
+                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: PRIMARY }} />
                       <div style={{ position: 'relative', width: 42, height: 42, marginBottom: 16 }}>
                         <div className="ce-feature-icon" style={{ width: 42, height: 42, borderRadius: 11, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <s.Icon size={19} color={s.color} strokeWidth={1.9} />
