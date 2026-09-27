@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star,
-  BellRing, Send, Quote, ShieldCheck, Zap, ArrowRight,
+  BellRing, Send, Quote, ShieldCheck, Zap, ArrowRight, Rocket, Sparkles,
 } from 'lucide-react';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
@@ -22,10 +22,10 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { n: '1', title: 'Sign up',                  desc: 'Create your account and start your 30-day free trial — no credit card required.' },
-  { n: '2', title: 'Customize your widget',    desc: 'Add your logo, set your brand colors, configure which services you offer, and write your CTA.' },
-  { n: '3', title: 'Embed on your site',       desc: "Copy the embed code and paste it anywhere on your website. That's it." },
-  { n: '4', title: 'Capture leads',            desc: 'Watch leads flow in. Manage them in your dashboard or sync to your CRM.' },
+  { n: '1', Icon: Rocket,       color: '#1d4ed8', bg: '#eff6ff', title: 'Sign up',               desc: 'Create your account and start your 30-day free trial — no credit card required.' },
+  { n: '2', Icon: Palette,      color: '#7c3aed', bg: '#f5f3ff', title: 'Customize your widget', desc: 'Add your logo, set your brand colors, configure which services you offer, and write your CTA.' },
+  { n: '3', Icon: Code2,        color: '#0891b2', bg: '#ecfeff', title: 'Embed on your site',    desc: "Copy the embed code and paste it anywhere on your website. That's it." },
+  { n: '4', Icon: BellRing,     color: '#dc2626', bg: '#fef2f2', title: 'Capture leads',         desc: 'Watch leads flow in. Manage them in your dashboard or sync to your CRM.' },
 ];
 
 const TESTIMONIALS = [
@@ -191,21 +191,44 @@ export default function CompanyLanding() {
             </div>
           </div>
 
-          {/* How it works -- same card language as the Features grid above
-              (tinted badge, left-aligned copy) instead of free-floating
-              circles on bare background, so this section reads as part of
-              the same designed page rather than a separate template block. */}
-          <div style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
-            <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+          {/* How it works -- an icon+number "stepper" badge per card (icon
+              says what the step is, the small numbered dot says where it
+              falls in the sequence) with a connecting arrow between cards
+              on wide screens, instead of a bare numbered square. Reuses the
+              Features grid's own icon/color pairings (Palette, Code2,
+              BellRing) so the same icon means the same thing in both
+              places on this page. */}
+          <div style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', position: 'relative', overflow: 'hidden' }}>
+            <div aria-hidden="true" style={{ position: 'absolute', top: -80, right: '8%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.08), transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ maxWidth: 1120, margin: '0 auto', position: 'relative' }}>
+              <div style={{ textAlign: 'center', marginBottom: 14 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: PRIMARY, padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', border: '1px solid #dbeafe' }}>
+                  <Sparkles size={12} />
+                  Simple onboarding
+                </span>
+              </div>
               <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Up and running in 30 minutes</h2>
               <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer required.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18 }}>
-                {STEPS.map(s => (
-                  <div key={s.n} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
-                    <div className="ce-step-badge" style={{ width: 34, height: 34, borderRadius: 9, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: PRIMARY, fontWeight: 800, fontSize: 14.5, marginBottom: 16 }}>{s.n}</div>
-                    <h3 style={{ fontWeight: 700, fontSize: 15.5, color: '#0f172a', marginBottom: 8 }}>{s.title}</h3>
-                    <p style={{ fontSize: 13.5, color: '#64748b', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
-                  </div>
+              <div className="ce-steps-grid">
+                {STEPS.map((s, i) => (
+                  <React.Fragment key={s.n}>
+                    <div className="ce-card" style={{ ...cardStyle, padding: '26px 22px', position: 'relative', overflow: 'hidden' }}>
+                      <div style={{ position: 'absolute', top: 0, left: 0, height: 3, width: `${((i + 1) / STEPS.length) * 100}%`, background: PRIMARY }} />
+                      <div style={{ position: 'relative', width: 42, height: 42, marginBottom: 16 }}>
+                        <div className="ce-feature-icon" style={{ width: 42, height: 42, borderRadius: 11, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <s.Icon size={19} color={s.color} strokeWidth={1.9} />
+                        </div>
+                        <div className="ce-step-badge" style={{ position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: '50%', background: PRIMARY, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 11, border: '2px solid white', boxShadow: '0 1px 3px rgba(15,23,42,0.15)' }}>{s.n}</div>
+                      </div>
+                      <h3 style={{ fontWeight: 700, fontSize: 15.5, color: '#0f172a', marginBottom: 8 }}>{s.title}</h3>
+                      <p style={{ fontSize: 13.5, color: '#64748b', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
+                    </div>
+                    {i < STEPS.length - 1 && (
+                      <div className="ce-step-arrow" aria-hidden="true">
+                        <ArrowRight size={18} />
+                      </div>
+                    )}
+                  </React.Fragment>
                 ))}
               </div>
             </div>
@@ -292,6 +315,12 @@ export default function CompanyLanding() {
       <style>{`
         .ce-hero-grid { grid-template-columns: minmax(320px, 1fr) minmax(440px, 560px); }
         @media (max-width: 900px) { .ce-hero-grid { grid-template-columns: 1fr; } }
+        .ce-steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; align-items: stretch; }
+        .ce-step-arrow { display: none; }
+        @media (min-width: 900px) {
+          .ce-steps-grid { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; }
+          .ce-step-arrow { display: flex; align-items: center; justify-content: center; color: #cbd5e1; }
+        }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
         .ce-feature-icon { transition: transform 0.2s ease; }
