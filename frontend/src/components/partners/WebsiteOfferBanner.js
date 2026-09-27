@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ArrowRight } from 'lucide-react';
+import { X, ArrowRight, Globe } from 'lucide-react';
 import { getCachedPartnerMatchDetailed } from '../../utils/partnerLookup';
 import { computeIsCompact } from './FloatingPartnerBanner';
 
@@ -91,18 +91,29 @@ export default function WebsiteOfferBanner() {
         zIndex: 90,
         width: isMobile ? 'fit-content' : DESKTOP_BANNER_WIDTH,
         maxWidth: isMobile ? 'min(260px, calc(100vw - 20px))' : 'calc(100vw - 20px)',
-        background: 'white',
-        border: isMobile ? '1px solid rgba(15,23,42,0.045)' : '1px solid rgba(15,23,42,0.07)',
-        borderRadius: isMobile ? 6 : 16,
+        background: 'linear-gradient(165deg, #ffffff 0%, #f8faff 55%, #eff6ff 100%)',
+        border: isMobile ? '1px solid rgba(15,23,42,0.045)' : '1px solid rgba(37,99,235,0.12)',
+        borderRadius: isMobile ? 8 : 16,
         overflow: 'hidden',
         boxShadow: isMobile
           ? '0 1px 3px rgba(15,23,42,0.04), 0 8px 18px rgba(29,78,216,0.12)'
-          : '0 2px 6px rgba(15,23,42,0.05), 0 18px 38px rgba(29,78,216,0.16)',
-        padding: isMobile ? '8px 8px' : '14px 16px',
+          : '0 2px 6px rgba(15,23,42,0.05), 0 18px 38px rgba(29,78,216,0.18)',
+        padding: isMobile ? '8px 8px' : '16px 16px 14px',
         animation: 'websiteOfferBannerIn 0.25s ease-out',
       }}
     >
-      <style>{`@keyframes websiteOfferBannerIn { from { opacity: 0; transform: translateY(${isMobile ? 8 : -8}px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+      <style>{`
+        @keyframes websiteOfferBannerIn { from { opacity: 0; transform: translateY(${isMobile ? 8 : -8}px); } to { opacity: 1; transform: translateY(0); } }
+        .wob-cta { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        .wob-cta:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(29,78,216,0.4); }
+        .wob-arrow { display: inline-flex; transition: transform 0.15s ease; }
+        .wob-cta:hover .wob-arrow { transform: translateX(3px); }
+        @media (prefers-reduced-motion: reduce) { .wob-cta, .wob-arrow { transition: none; } }
+      `}</style>
+
+      {/* Soft glow in the corner instead of a flat white card -- matches
+          the eyebrow-pill + glow treatment used on the /estimator page. */}
+      <div aria-hidden="true" style={{ position: 'absolute', top: -34, right: -34, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.16), transparent 70%)', pointerEvents: 'none' }} />
 
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: isMobile ? 2 : 3, background: 'linear-gradient(90deg, #2563eb, #1d4ed8)' }} />
 
@@ -116,13 +127,14 @@ export default function WebsiteOfferBanner() {
         </button>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 4 : 10 }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', fontSize: 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px', borderRadius: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 4 : 10, position: 'relative' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 9.5, fontWeight: 700, color: '#2563eb', background: '#eff6ff', textTransform: 'uppercase', letterSpacing: '0.05em', padding: isMobile ? '2px 7px' : '4px 10px 4px 8px', borderRadius: 20, border: '1px solid #dbeafe' }}>
+          <Globe size={isMobile ? 9 : 11} />
           For Cleaning Companies
         </div>
       </div>
 
-      <div style={{ marginBottom: isMobile ? 5 : 12, textAlign: 'center' }}>
+      <div style={{ marginBottom: isMobile ? 5 : 12, textAlign: 'center', position: 'relative' }}>
         <div style={{ fontWeight: 800, fontSize: isMobile ? 11.5 : 14.5, color: '#0f172a', lineHeight: isMobile ? 1.2 : 1.35 }}>
           No cleaning website yet?
         </div>
@@ -134,10 +146,11 @@ export default function WebsiteOfferBanner() {
       </div>
 
       <a
+        className="wob-cta"
         href="/website-for-cleaning-companies#apply"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#1d4ed8', color: 'white', padding: isMobile ? '6px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap' }}
+        style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: 'white', padding: isMobile ? '6px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(29,78,216,0.28)' }}
       >
-        Build My Free Sample Site <ArrowRight size={isMobile ? 11 : 13} />
+        Build My Free Sample Site <span className="wob-arrow"><ArrowRight size={isMobile ? 11 : 13} /></span>
       </a>
     </div>,
     document.body
