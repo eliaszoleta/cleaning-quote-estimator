@@ -116,10 +116,17 @@ export default function AdminHomepageLeads() {
   // Scoped to the selected state (like LocationStep.js's own citiesForState)
   // -- three leads from three different Texas cities only add three city
   // options while "TX" is selected, not every city across every state mixed
-  // into one list.
-  const cities = [...new Set(
-    baseLeads.filter(l => stateFilter === 'all' || l.state === stateFilter).map(l => l.city).filter(Boolean)
-  )].sort();
+  // into one list. Each option's count is how many of those leads came from
+  // that city, so it updates as new leads come in same as everything else
+  // here -- never a stored/cached number.
+  const cityCounts = baseLeads
+    .filter(l => stateFilter === 'all' || l.state === stateFilter)
+    .reduce((acc, l) => {
+      if (!l.city) return acc;
+      acc[l.city] = (acc[l.city] || 0) + 1;
+      return acc;
+    }, {});
+  const cities = Object.keys(cityCounts).sort((a, b) => cityCounts[b] - cityCounts[a]);
 
   const selectStateFilter = (v) => { setStateFilter(v); setCityFilter('all'); };
 
@@ -412,7 +419,7 @@ export default function AdminHomepageLeads() {
                     style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
                   >
                     <option value="all">All cities</option>
-                    {cities.map(c => <option key={c} value={c}>{c}</option>)}
+                    {cities.map(c => <option key={c} value={c}>{c} ({cityCounts[c]})</option>)}
                   </select>
                 )}
                 <select
