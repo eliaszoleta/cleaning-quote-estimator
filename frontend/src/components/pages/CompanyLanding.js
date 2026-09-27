@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import {
   Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star,
   BellRing, Send, Quote, ShieldCheck, Zap, ArrowRight, Rocket, Sparkles, Tag,
+  Building2,
 } from 'lucide-react';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
@@ -123,20 +124,24 @@ export default function CompanyLanding() {
         <Header />
         <main>
 
-          {/* Hero -- restrained accent line + eyebrow instead of a pill
-              badge (same language as the About page hero), and a two-column
+          {/* Hero -- a pill eyebrow badge (matching the "Simple onboarding"
+              / "Pricing" pills further down this same page) and a couple of
+              soft glow blobs instead of a flat gradient, plus a two-column
               layout with a small static "product shot" of the widget so the
               page shows the thing it's selling instead of only describing it. */}
-          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(48px, 7vw, 80px) 0' }}>
+          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: 'clamp(48px, 7vw, 80px) 0', position: 'relative', overflow: 'hidden' }}>
+            <div aria-hidden="true" style={{ position: 'absolute', top: -100, right: '6%', width: 340, height: 340, borderRadius: '50%', background: 'radial-gradient(circle, rgba(96,165,250,0.18), transparent 70%)', pointerEvents: 'none' }} />
+            <div aria-hidden="true" style={{ position: 'absolute', bottom: -120, left: '2%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.16), transparent 70%)', pointerEvents: 'none' }} />
             {/* maxWidth 1200 + padding 24px, matching Header.js's own
                 container exactly, so the hero content's left edge lines
                 up with the logo instead of sitting further left under a
                 wider 1320px container. */}
-            <div className="ce-hero-grid" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'grid', gap: 56, alignItems: 'center' }}>
+            <div className="ce-hero-grid" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', display: 'grid', gap: 56, alignItems: 'center', position: 'relative' }}>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(96,165,250,0.12)', color: '#93c5fd', padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', border: '1px solid rgba(96,165,250,0.3)', marginBottom: 18 }}>
+                  <Building2 size={12} />
                   For cleaning companies
-                </div>
+                </span>
                 <h1 style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px', color: 'white' }}>
                   Give every homeowner an instant cleaning estimate<br />
                   <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>on your website</span>
