@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { AlertTriangle, User, CreditCard, KeyRound } from 'lucide-react';
+import { AlertTriangle, User, KeyRound } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
-import SubscriptionTab from './SubscriptionTab';
 import APIKeysTab from './APIKeysTab';
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
@@ -9,14 +8,13 @@ const API_URL = process.env.REACT_APP_API_URL || '';
 
 const SECTIONS = [
   { id: 'account',      Icon: User,       label: 'Account' },
-  { id: 'subscription', Icon: CreditCard, label: 'Subscription' },
   { id: 'api',          Icon: KeyRound,   label: 'API Keys' },
 ];
 
-export default function SettingsTab({ user, config, refetchConfig, saveConfig, saving, subStatus, onSubRefresh, section: sectionProp, onSectionChange }) {
+export default function SettingsTab({ user, config, refetchConfig, saveConfig, saving, section: sectionProp, onSectionChange }) {
   // Falls back to its own state when no section/onSectionChange is passed
   // (defensive -- every current call site controls this from
-  // CompanyDashboard so deep links like ?tab=settings&section=subscription
+  // CompanyDashboard so deep links like ?tab=settings&section=api
   // land on the right pane, but this keeps the component usable standalone).
   const [sectionState, setSectionState] = useState('account');
   const section = sectionProp || sectionState;
@@ -106,8 +104,8 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
         <p style={{ color: COLORS.body, fontSize: 14 }}>Manage your account settings.</p>
       </div>
 
-      {/* Section switcher -- Subscription and API Keys used to be their own
-          top-level sidebar items; folded in here as sub-sections instead. */}
+      {/* Section switcher -- API Keys used to be its own top-level sidebar
+          item; folded in here as a sub-section instead. */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 24, borderBottom: `1px solid ${COLORS.border}` }}>
         {SECTIONS.map(({ id, Icon, label }) => (
           <button
@@ -127,7 +125,6 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
         ))}
       </div>
 
-      {section === 'subscription' && <SubscriptionTab subStatus={subStatus} onSubRefresh={onSubRefresh} />}
       {section === 'api' && <APIKeysTab config={config} saveConfig={saveConfig} saving={saving} />}
 
       {section === 'account' && (
