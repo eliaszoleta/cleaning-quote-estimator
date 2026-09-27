@@ -283,9 +283,9 @@ export default function AuthPage({ onAuth }) {
 
           {mode === 'signup' && (
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Website</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Website or Facebook page</label>
               <input type="text" required value={website} onChange={e => setWebsite(e.target.value)}
-                placeholder="www.yourcompany.com" style={inputStyle}
+                placeholder="www.yourcompany.com or facebook.com/yourpage" style={inputStyle}
                 onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
                 onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
             </div>
