@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star,
-  BellRing, Send, Quote, ShieldCheck, Zap, ArrowRight, Rocket, Sparkles,
+  BellRing, Send, Quote, ShieldCheck, Zap, ArrowRight, Rocket, Sparkles, Tag,
 } from 'lucide-react';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
@@ -259,19 +259,26 @@ export default function CompanyLanding() {
               blue button, which read as a hard-sell "buy now, then buy
               again" pattern rather than a normal SaaS pricing section. One
               section, one plan, one call to action. */}
-          <div id="pricing" style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0' }}>
-            <div style={{ maxWidth: 980, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 56, alignItems: 'center' }}>
+          <div id="pricing" style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0', position: 'relative', overflow: 'hidden' }}>
+            <div aria-hidden="true" style={{ position: 'absolute', top: -60, left: '4%', width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.07), transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ maxWidth: 980, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 56, alignItems: 'center', position: 'relative' }}>
 
               <div>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: PRIMARY, padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', border: '1px solid #dbeafe', marginBottom: 16 }}>
+                  <Tag size={12} />
+                  Pricing
+                </span>
                 <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, color: '#0f172a', marginBottom: 14, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
                 <p style={{ color: '#64748b', fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: 400 }}>
                   One plan, everything included, no surprises. Built for independent cleaning companies who want more booked jobs from their own website.
                 </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, maxWidth: 420 }}>
                   {TRUST_BADGES.map(({ Icon, text }) => (
-                    <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#334155', fontSize: 14.5, fontWeight: 600 }}>
-                      <Icon size={16} color="#16a34a" strokeWidth={2.3} />
-                      {text}
+                    <div key={text} className="ce-card" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'white', border: '1px solid #e2e8f0', borderRadius: 11, padding: '12px 14px' }}>
+                      <div style={{ width: 30, height: 30, borderRadius: 9, background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <Icon size={15} color="#16a34a" strokeWidth={2.3} />
+                      </div>
+                      <span style={{ color: '#334155', fontSize: 13.5, fontWeight: 600, lineHeight: 1.3 }}>{text}</span>
                     </div>
                   ))}
                 </div>
