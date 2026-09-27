@@ -223,7 +223,7 @@ export default function AuthPage({ onAuth }) {
   // ── Main auth card ─────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ background: 'white', borderRadius: 22, padding: 'clamp(28px, 6vw, 48px) clamp(20px, 5vw, 44px)', maxWidth: 440, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}>
+      <div style={{ background: 'white', borderRadius: 22, padding: 'clamp(28px, 6vw, 48px) clamp(20px, 5vw, 56px)', maxWidth: 520, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}>
 
         {/* Logo -- flexWrap left at its nowrap default and every child pinned
             with whiteSpace:nowrap so this stays one line on a narrow phone
