@@ -1,7 +1,16 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowUpRight, MapPin } from 'lucide-react';
+import { ArrowUpRight, MapPin, BadgeCheck } from 'lucide-react';
 import SITES from './siteConfigs';
+import EXTERNAL_SITES from './externalSites';
+
+// Real, live client builds first, then the fictional example designs --
+// both rendered as the same card, both opened at our own
+// /website-example/:slug (never the raw external URL directly), so the
+// browser's address bar never leaves cleanestimator.com even for the real
+// ones (see DemoSitePage.js, which iframes the live site for an
+// EXTERNAL_SITES slug instead of rendering one of our own templates).
+const ALL_SITES = [...EXTERNAL_SITES, ...SITES];
 
 export default function DemoGallery() {
   return (
@@ -19,15 +28,15 @@ export default function DemoGallery() {
             See What Your Cleaning Website Could Actually Look Like
           </h1>
           <p style={{ fontSize: 15.5, color: '#94a3b8', maxWidth: 600, margin: '0 auto 8px', lineHeight: 1.6 }}>
-            {SITES.length} real, working example sites for cleaning businesses — every one a different design, not one template reskinned ten times. Click any card to open the full site in a new tab.
+            {ALL_SITES.length} real, working example sites for cleaning businesses — every one a different design, not one template reskinned. Click any card to open the full site in a new tab.
           </p>
-          <p style={{ fontSize: 13, color: '#60a5fa', fontWeight: 600 }}>All businesses shown are fictional examples, not actual customers.</p>
+          <p style={{ fontSize: 13, color: '#60a5fa', fontWeight: 600 }}>Some designs are real, live client builds — others are fictional examples built to show range.</p>
         </div>
       </div>
 
       <div style={{ padding: 'clamp(36px, 7vw, 64px) 20px', background: '#f8fafc' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 20 }}>
-          {SITES.map(site => (
+          {ALL_SITES.map(site => (
             <a
               key={site.slug}
               href={`/website-example/${site.slug}`}
@@ -43,14 +52,21 @@ export default function DemoGallery() {
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: site.colors.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, color: site.colors.primaryDark, fontFamily: site.fontHeading }}>
                   {site.logoLabel}
                 </div>
+                {site.externalUrl && (
+                  <span style={{ position: 'absolute', top: 12, left: 68, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.9)', color: '#0f172a', fontSize: 10.5, fontWeight: 700, padding: '3px 8px', borderRadius: 20 }}>
+                    <BadgeCheck size={11} color="#16a34a" /> Live client site
+                  </span>
+                )}
                 <ArrowUpRight size={18} color="rgba(255,255,255,0.85)" style={{ position: 'absolute', top: 14, right: 16 }} />
               </div>
               <div style={{ padding: '18px 20px 20px' }}>
                 <div style={{ fontFamily: site.fontHeading, fontWeight: 700, fontSize: 17, color: '#0f172a', marginBottom: 4 }}>{site.businessName}</div>
                 <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12, lineHeight: 1.5 }}>{site.tagline}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#94a3b8', fontWeight: 600 }}>
-                  <MapPin size={12} /> {site.city}, {site.state}
-                </div>
+                {site.city && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#94a3b8', fontWeight: 600 }}>
+                    <MapPin size={12} /> {site.city}, {site.state}
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: 5, marginTop: 14 }}>
                   {[site.colors.primary, site.colors.accent, site.colors.bg].map((clr, i) => (
                     <span key={i} style={{ width: 16, height: 16, borderRadius: '50%', background: clr, border: '1px solid rgba(0,0,0,0.08)' }} />
