@@ -25,7 +25,7 @@ const VALUE_BREAKDOWN = [
 // down), so this describes what happens after that approval, not the
 // sample build itself.
 const PRICING_TIMELINE = [
-  { label: 'Today', amount: `$${SETUP_FEE}`, desc: 'One-time, once you approve your build' },
+  { label: 'On Approval', amount: `$${SETUP_FEE}`, desc: 'One-time setup fee, charged the day you approve your build' },
   { label: `Months 1-${FREE_MONTHS}`, amount: 'Free', desc: 'Full site, chat & lead app -- zero charge' },
   { label: `Month ${FREE_MONTHS + 1}+`, amount: `$${MONTHLY_PRICE}/mo`, desc: 'Flat rate from here on, cancel anytime' },
 ];
