@@ -568,7 +568,8 @@ export default function WebsiteSubscription() {
                 'No payment today — just fill out the form',
                 'We review it and build your live website',
                 'You review the build before deciding anything',
-                'Only then do you pick a domain and subscribe',
+                `Like it? Approve it for just $${SETUP_FEE}`,
+                `Then get ${FREE_MONTHS} months free, $${MONTHLY_PRICE}/mo after that`,
               ].map((line, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
                   <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(96,165,250,0.2)', color: '#60a5fa', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
