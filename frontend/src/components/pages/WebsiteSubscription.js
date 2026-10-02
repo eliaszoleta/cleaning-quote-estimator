@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Globe, Search, PhoneMissed } from 'lucide-react';
+import { Globe, Search, PhoneMissed, Sparkles } from 'lucide-react';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { postWebsiteRequest } from '../../utils/api';
 
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
 const MONTHLY_PRICE = 249;
+const SETUP_FEE = 5;
+const FREE_MONTHS = 2;
 
 // What the same stack costs bought piecemeal -- backs up the $249 price
 // instead of just asserting it's a good deal.
@@ -15,6 +17,17 @@ const VALUE_BREAKDOWN = [
   { label: 'AI chatbot software', cost: '$150-300/mo' },
   { label: 'Text-message lead notifications', cost: '$50-100/mo' },
   { label: 'Lead capture forms & CRM', cost: '$100+/mo' },
+];
+
+// Shown as a 3-step money timeline on the pricing card instead of a bare
+// "$249/month" -- the offer only kicks in once a prospect has already seen
+// and approved their free sample build (see the apply-form copy further
+// down), so this describes what happens after that approval, not the
+// sample build itself.
+const PRICING_TIMELINE = [
+  { label: 'Today', amount: `$${SETUP_FEE}`, desc: 'One-time, once you approve your build' },
+  { label: `Months 1-${FREE_MONTHS}`, amount: 'Free', desc: 'Full site, chat & lead app -- zero charge' },
+  { label: `Month ${FREE_MONTHS + 1}+`, amount: `$${MONTHLY_PRICE}/mo`, desc: 'Flat rate from here on, cancel anytime' },
 ];
 
 // Same 9 services offered elsewhere on the site (ServiceSelect.js,
@@ -214,7 +227,7 @@ export default function WebsiteSubscription() {
     <>
       <Helmet>
         <title>Cleaning Website + Lead App for Cleaning Companies | Clean Estimator</title>
-        <meta name="description" content={`Get a professional cleaning website built, hosted, and maintained for your cleaning business, with every lead landing in a mobile app you can reply to instantly — $${MONTHLY_PRICE}/month flat, no upfront cost.`} />
+        <meta name="description" content={`Get a professional cleaning website built free to preview. Approve it for just $${SETUP_FEE}, get ${FREE_MONTHS} months free, then $${MONTHLY_PRICE}/month — with every lead landing in a mobile app you can reply to instantly.`} />
         <link rel="canonical" href="https://www.cleanestimator.com/website-for-cleaning-companies" />
       </Helmet>
 
@@ -428,17 +441,27 @@ export default function WebsiteSubscription() {
       <div id="pricing" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: '#f8fafc' }}>
         <div style={{ maxWidth: 440, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>Simple, Flat Pricing</h2>
-            <p style={{ fontSize: 15, color: '#64748b' }}>No setup fee. No surprise invoices. Cancel anytime.</p>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>Simple Pricing, Zero Risk</h2>
+            <p style={{ fontSize: 15, color: '#64748b' }}>Just ${SETUP_FEE} to start. {FREE_MONTHS} months free. ${MONTHLY_PRICE}/mo after that.</p>
           </div>
           <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', boxShadow: '0 14px 40px rgba(15,23,42,0.14)' }}>
-            <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', padding: 'clamp(24px, 6vw, 34px) clamp(24px, 6vw, 36px) 30px', textAlign: 'center' }}>
-              <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', color: '#bfdbfe', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 20, marginBottom: 16 }}>
-                Pay only after you approve
+            <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', padding: 'clamp(22px, 6vw, 30px) clamp(24px, 6vw, 36px) 26px' }}>
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.15)', color: '#bfdbfe', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 20 }}>
+                  <Sparkles size={12} /> {FREE_MONTHS} Months Free To Start
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 5 }}>
-                <span style={{ fontSize: 'clamp(36px, 9vw, 52px)', fontWeight: 900, color: 'white', letterSpacing: '-1.5px', lineHeight: 1 }}>${MONTHLY_PRICE}</span>
-                <span style={{ fontSize: 15, color: '#bfdbfe', fontWeight: 500 }}>/month</span>
+              <div>
+                {PRICING_TIMELINE.map((step, i) => (
+                  <div key={step.label} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '11px 0', borderTop: i > 0 ? '1px solid rgba(255,255,255,0.15)' : 'none' }}>
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', color: 'white', fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: 'white' }}>{step.label}</div>
+                      <div style={{ fontSize: 11.5, color: '#bfdbfe' }}>{step.desc}</div>
+                    </div>
+                    <div style={{ fontSize: 17, fontWeight: 900, color: 'white', whiteSpace: 'nowrap' }}>{step.amount}</div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -464,7 +487,7 @@ export default function WebsiteSubscription() {
               >
                 Build My Free Sample Site →
               </a>
-              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>You won't be charged until you've seen and approved your build.</p>
+              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>Free to see. Nothing to pay until you approve it.</p>
             </div>
           </div>
 
@@ -482,6 +505,10 @@ export default function WebsiteSubscription() {
                   <span style={{ color: '#94a3b8', fontWeight: 600 }}>{row.cost}</span>
                 </div>
               ))}
+            </div>
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: '#15803d' }}>Your {FREE_MONTHS} free months are worth</span>
+              <span style={{ fontSize: 14.5, fontWeight: 800, color: '#15803d', whiteSpace: 'nowrap' }}>${MONTHLY_PRICE * FREE_MONTHS}</span>
             </div>
             <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <span style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>Bought separately</span>
@@ -506,7 +533,7 @@ export default function WebsiteSubscription() {
               { q: 'What happens if I cancel?', a: "Your cleaning website and chat widget come down when the subscription ends. There's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
               { q: 'How does the chat widget work?', a: "By default it uses AI to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours. You can also switch it to manual anytime and answer visitors yourself. Either way, every conversation lands in your mobile app, the same place you get texts and calls for quote form leads, so you can reply right from your phone." },
               { q: 'Can I use a domain I already own?', a: "Yes. If you already have a domain, we'll use it. If not, we'll help you pick one and get it set up as part of onboarding." },
-              { q: 'Is there a setup fee?', a: 'No. It\'s one flat monthly rate — no setup fee, no separate build cost.' },
+              { q: 'Is there a setup fee?', a: `Just a $${SETUP_FEE} one-time setup fee once you approve your build — that's it. Your first ${FREE_MONTHS} months are completely free, and you're only billed $${MONTHLY_PRICE}/month starting month ${FREE_MONTHS + 1}.` },
               { q: 'How long until my website build is ready?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your business and review your application. Your site goes fully live on your domain once you approve the build and subscribe." },
             ].map((item, i) => (
               <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)' }}>
