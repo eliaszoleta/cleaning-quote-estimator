@@ -142,11 +142,11 @@ export default function WebsiteOfferBanner() {
 
       <div style={{ marginBottom: isMobile ? 5 : 12, textAlign: 'center', position: 'relative' }}>
         <div style={{ fontWeight: 800, fontSize: isMobile ? 11.5 : 14.5, color: '#0f172a', lineHeight: isMobile ? 1.2 : 1.35 }}>
-          No cleaning website yet?
+          Still Don't Have a Website?
         </div>
         {!isMobile && (
           <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.5 }}>
-            We'll build you a free sample — you decide if you want to keep it.
+            Let us build one for you — completely free.<br />Take a look, see if you like it, and decide from there.
           </div>
         )}
       </div>
