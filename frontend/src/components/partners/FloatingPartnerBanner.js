@@ -41,7 +41,10 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
       style={{
         position: fixed ? 'fixed' : 'absolute',
         top: fixed ? (isMobile ? 'auto' : 80) : 14,
-        bottom: fixed && isMobile ? 12 : 'auto',
+        // See WebsiteOfferBanner.js for why this isn't a plain 12px --
+        // iOS Safari's bottom toolbar/home-indicator draws over a fixed
+        // bottom element instead of pushing it up without this.
+        bottom: fixed && isMobile ? 'calc(12px + env(safe-area-inset-bottom, 0px))' : 'auto',
         right: fixed ? (isMobile ? 10 : DESKTOP_RIGHT_OFFSET) : 14,
         zIndex: 90,
         // Mobile: shrink to whatever the content actually needs (usually the

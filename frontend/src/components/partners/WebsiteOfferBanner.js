@@ -86,7 +86,13 @@ export default function WebsiteOfferBanner() {
       style={{
         position: 'fixed',
         top: isMobile ? 'auto' : headerTop,
-        bottom: isMobile ? 12 : 'auto',
+        // iOS Safari's bottom toolbar (and the home-indicator gesture bar
+        // on notched phones) draws on top of a plain `bottom: 12px` fixed
+        // element instead of pushing it up -- env(safe-area-inset-bottom)
+        // reports that toolbar's live height (0 on desktop, shrinking as
+        // the toolbar auto-hides on scroll) and requires viewport-fit=cover
+        // in index.html's viewport meta tag to report anything but 0.
+        bottom: isMobile ? 'calc(12px + env(safe-area-inset-bottom, 0px))' : 'auto',
         right: isMobile ? 10 : DESKTOP_RIGHT_OFFSET,
         zIndex: 90,
         width: isMobile ? 'fit-content' : DESKTOP_BANNER_WIDTH,
