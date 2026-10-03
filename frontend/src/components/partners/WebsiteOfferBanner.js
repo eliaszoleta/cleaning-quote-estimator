@@ -16,14 +16,17 @@ const DESKTOP_TOP_GAP = 15;
 const EXCLUDED_PATHS = ['/website-for-cleaning-companies', '/partner-demo'];
 
 // Mirror image of FloatingPartnerBanner's condition: that one shows the
-// active partner IN the visitor's city; this one shows only when the
-// lookup confirmed there ISN'T one yet -- pitching the free website build
-// as the hook to recruit whoever becomes that city's exclusive partner.
-// Never both at once, since the two conditions are exact opposites of the
-// same lookup, and a failed lookup (network blip, ad blocker) shows
-// neither rather than guessing.
+// active partner IN the visitor's city; this one shows whenever the lookup
+// did NOT confirm an active partner there -- a confirmed empty city, OR
+// the lookup itself failing to resolve a location at all (common on
+// mobile, where carrier networks/ad blockers/iCloud Private Relay often
+// block the third-party geolocation fallback -- see partnerLookup.js).
+// Unlike FloatingPartnerBanner, showing this generic offer with no
+// confirmed city carries no risk of pitching wrong info, just an
+// occasional redundant one to a visitor whose city does have a partner,
+// so "unknown" is treated as "safe to show" rather than "show nothing."
 export default function WebsiteOfferBanner() {
-  const [city, setCity] = useState(null);
+  const [eligible, setEligible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(computeIsCompact);
   const [headerTop, setHeaderTop] = useState(DESKTOP_TOP_FALLBACK);
@@ -57,9 +60,12 @@ export default function WebsiteOfferBanner() {
       if (sessionStorage.getItem(DISMISS_KEY)) return;
     } catch { /* ignore */ }
 
-    getCachedPartnerMatchDetailed().then(({ partner, ok, loc }) => {
-      if (cancelled || !ok || partner || !loc) return;
-      setCity(loc.city);
+    getCachedPartnerMatchDetailed().then(({ partner, ok }) => {
+      // Only a *confirmed* partner match suppresses this banner -- a
+      // failed/unresolved lookup (ok: false, or ok: true with no loc) falls
+      // through to showing it, same as a confirmed empty city.
+      if (cancelled || (ok && partner)) return;
+      setEligible(true);
       setTimeout(() => {
         if (cancelled) return;
         setVisible(true);
@@ -74,7 +80,7 @@ export default function WebsiteOfferBanner() {
     try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
   };
 
-  if (!city || !visible) return null;
+  if (!eligible || !visible) return null;
 
   // Portal to document.body for the same reason as FloatingPartnerBanner --
   // Header's backdropFilter would otherwise anchor position:fixed to its
