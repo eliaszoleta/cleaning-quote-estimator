@@ -210,12 +210,18 @@ async function markSetupPaid(sb, request) {
 // requires 3D Secure, Stripe returns requires_action with a client_secret
 // the frontend can complete inline via stripe.confirmCardPayment, instead
 // of the harder failure an off-session charge would get for the same case.
+// payment_method_types is explicit ('card' only) rather than left to the
+// account's automatic_payment_methods default -- without this, Stripe can
+// select a redirect-based method (depending on what's enabled in the
+// Dashboard) and then refuses to confirm server-side without a return_url,
+// which a confirm:true call made right here has no use for.
 async function chargeSetupFee(stripe, request, paymentMethodId) {
   return stripe.paymentIntents.create({
     amount: SETUP_FEE_CENTS,
     currency: 'usd',
     customer: request.stripe_customer_id,
     payment_method: paymentMethodId,
+    payment_method_types: ['card'],
     confirm: true,
     receipt_email: request.email,
     description: `Website setup fee — first 2 months free, then $${MONTHLY_PRICE_CENTS / 100}/month starting month 3. Cancel anytime.`,
