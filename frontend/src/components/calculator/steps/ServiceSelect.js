@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets } from 'lucide-react';
 import { COLORS, RADIUS } from '../../../styles/theme';
+
+const TILE_MIN = 260;
+const TILE_MAX = 300;
+const GRID_GAP = 10;
 
 // "Most Requested" mirrors the verified tagline already shipped for this service in
 // data/services.js ("...the most requested service on Clean Estimator") — not a new claim.
@@ -30,6 +34,27 @@ const SERVICES = [
 // mobile, and looked different from how the same widget renders on a real
 // site.
 export default function ServiceSelect({ onSelect, primaryColor, companyName, ctaHeadline, services, embedded, isMobile }) {
+  const wrapRef = useRef(null);
+  // Real measured width of this step's own content area, used below to pick
+  // an explicit column count for the embedded-desktop grid instead of
+  // relying on the CSS 'auto-fit'/'auto-fill' keyword -- when a track's max
+  // bound is a fixed length (not 1fr), the browser uses THAT max (300px),
+  // not the min (260px), to decide how many tracks fit, which rounds down
+  // to fewer, more sparsely-packed columns than the container can actually
+  // hold and leaves the remainder as unusable blank space. Picking the
+  // count ourselves off the min width instead, then letting minmax(260,300)
+  // size each resulting track, uses the real available width.
+  const [gridWidth, setGridWidth] = useState(0);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || !embedded || isMobile) return;
+    const check = (width) => setGridWidth(width);
+    check(el.getBoundingClientRect().width);
+    const observer = new ResizeObserver(entries => check(entries[0].contentRect.width));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [embedded, isMobile]);
 
   // No companyConfig (main cleanestimator.com site) or a service with no
   // explicit entry both default to shown -- only an explicit enabled:false
@@ -37,22 +62,15 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   // in the dashboard's Services tab).
   const visibleServices = SERVICES.filter(s => services?.[s.configKey]?.enabled !== false);
 
-  // Only the embedded desktop case can leave leftover row space -- and a
-  // fixed guess at that leftover (previously 640px, picked to comfortably
-  // fit 2 columns) was itself the bug: the grid never actually needs more
-  // than 2 columns in this width range (3 would need 800px+, more than
-  // this content block ever gets), but a company with just 1 enabled
-  // service only forms 1 column -- either way, a static number leaves the
-  // real gap between however wide the grid actually is and this guess,
-  // showing up as extra padding on whichever side the grid doesn't fill.
-  // Deriving it from the actual card count that will actually render
-  // removes that gap instead of guessing at it.
-  const gridCols = Math.min(Math.max(visibleServices.length, 1), 2);
-  const gridMaxWidth = gridCols * 300 + (gridCols - 1) * 10;
-  const contentMaxWidth = embedded && !isMobile ? gridMaxWidth : undefined;
+  // Capped at visibleServices.length too -- an explicit repeat() count (unlike
+  // auto-fit) doesn't collapse empty trailing tracks on its own, so asking
+  // for more columns than there are cards to fill them would just move the
+  // same blank-space problem into the row instead of removing it.
+  const widthCols = gridWidth > 0 ? Math.max(1, Math.floor((gridWidth + GRID_GAP) / (TILE_MIN + GRID_GAP))) : null;
+  const gridCols = widthCols ? Math.min(widthCols, Math.max(visibleServices.length, 1)) : null;
 
   return (
-    <div style={{ maxWidth: contentMaxWidth, margin: contentMaxWidth ? '0 auto' : undefined }}>
+    <div ref={wrapRef}>
       <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: COLORS.ink, marginBottom: 4, letterSpacing: '-0.3px' }}>
         {/* The Branding tab's "Headline" field (ctaHeadline) previously
             only reached LeadCaptureStep, a screen further into the flow
@@ -77,21 +95,20 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
         // original, unbounded 195px/1fr instead of being changed for a
         // problem it can't actually hit.
         //
-        // For the embedded case, the upper bound also has to be capped
-        // (300px, not 1fr) -- otherwise a card that lands alone in the
-        // second column stretches to fill all the leftover row width, so
-        // fewer services made each remaining card a wider rectangle instead
-        // of a more compact tile. Capped, cards keep a consistent size and
-        // any leftover row space is just left empty instead of inflating them.
+        // For the embedded case, gridCols (computed above from the real
+        // measured width) picks the column count explicitly rather than via
+        // the 'auto-fit' keyword, and each resulting track still sizes
+        // itself within minmax(260px, 300px) -- so a card never grows into
+        // an oversized rectangle when it's alone in its row, but a row that
+        // genuinely has the width and the cards to fill it does, instead of
+        // leaving that width as blank gutter space. Before gridCols is
+        // measured (a brief instant on first mount), 'auto-fit' is a
+        // reasonable placeholder since it can only ever be too conservative
+        // for that one frame, never wrong in a visible way.
         gridTemplateColumns: isMobile
           ? 'repeat(2, 1fr)'
-          : embedded ? 'repeat(auto-fill, minmax(260px, 300px))' : 'repeat(auto-fill, minmax(195px, 1fr))',
+          : embedded ? `repeat(${gridCols || 'auto-fit'}, minmax(${TILE_MIN}px, ${TILE_MAX}px))` : 'repeat(auto-fill, minmax(195px, 1fr))',
         gap: isMobile ? 8 : 10,
-        // No justifyContent override here -- the outer contentMaxWidth
-        // block above already keeps this grid from sitting in a container
-        // much wider than it needs, so left-aligned (the grid default)
-        // lines its cards up with the heading's own left edge instead of
-        // centering the grid a second time and drifting the two apart.
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (
           <button

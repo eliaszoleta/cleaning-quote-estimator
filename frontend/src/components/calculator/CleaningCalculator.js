@@ -303,9 +303,19 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         )}
 
         <div style={{ padding: embedded ? 0 : '0 16px 28px' }}>
-        {/* Calculator card */}
+        {/* Calculator card. maxWidth only applies when NOT embedded (the
+            main site/dashboard, where nothing else constrains how wide this
+            could stretch on a big monitor) -- when embedded, the iframe's
+            own width IS the host site's deliberate choice (that's what a
+            real <iframe width="100%"> embed means), so capping it here too
+            fought that choice: a host giving the widget more than 720px of
+            room (a full-width content section, not the narrower sidebar-ish
+            embeds this cap was sized for) got a floating 720px form
+            centered in all that extra space instead of using it, which read
+            as one big card with oversized gutters since both are plain
+            white with nothing to visually tell them apart. */}
         <div ref={cardRef} style={{
-          maxWidth: 720,
+          maxWidth: embedded ? undefined : 720,
           margin: embedded ? '0 auto' : (currentStep === 'service' ? `${isMobile ? -44 : -72}px auto 0` : '14px auto 0'),
           position: 'relative',
           background: COLORS.surface,
