@@ -123,6 +123,7 @@ export default function Footer() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <a href="mailto:info@cleanestimator.com" style={{ ...s.copy, color: '#94a3b8', textDecoration: 'none' }}>info@cleanestimator.com</a>
+            <div style={s.copy}>255 S Glendora Ave, Glendora, CA 91740</div>
             <div style={s.copy}>© {new Date().getFullYear()} Clean Estimator. All rights reserved.</div>
           </div>
         </div>
