@@ -5,58 +5,35 @@ import {
   getWebsiteRequestByToken,
   postWebsiteRequestCheckout,
   postWebsiteRequestVerifySetup,
-  postWebsiteRequestConfirmPayment,
 } from '../../utils/api';
 
 const PRIMARY_GRADIENT = '#1d4ed8';
 const SETUP_FEE = 5;
 const FREE_MONTHS = 2;
 const MONTHLY_PRICE = 249;
-const STRIPE_PUBLISHABLE_KEY = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
-
-let stripeJsPromise = null;
-// Loads Stripe.js lazily -- only the rare case where a bank requires 3D
-// Secure on the $5 charge needs it at all, so it's never fetched on the
-// common path where verify-setup finishes the whole approval in one go.
-function loadStripeJs() {
-  if (window.Stripe) return Promise.resolve(window.Stripe(STRIPE_PUBLISHABLE_KEY));
-  if (!stripeJsPromise) {
-    stripeJsPromise = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://js.stripe.com/v3/';
-      script.onload = () => resolve(window.Stripe(STRIPE_PUBLISHABLE_KEY));
-      script.onerror = () => reject(new Error('Failed to load Stripe.js'));
-      document.head.appendChild(script);
-    });
-  }
-  return stripeJsPromise;
-}
 
 // The "Get a Website" approval + payment page -- /website-approval/:token,
 // linked from the sample-ready email (see services/email.js's
 // buildWebsiteSampleReadyHtml) and AdminWebsiteRequests.js's copyable link.
 // No login of its own: the random token in the URL is the auth (see
 // routes/websiteRequest.js's by-token routes). Walks a prospect through
-// reviewing their free sample, then ONE Stripe Checkout redirect that only
-// collects a card (see routes/websiteRequest.js's mode='setup' session) --
-// the backend charges the $5 setup fee right after that, with no second
-// card-entry step. The only time this page needs anything further from the
-// customer is the rare case where their bank requires a 3D Secure challenge
-// on that charge, shown inline via Stripe.js rather than another redirect.
-// The $249/mo trial subscription itself isn't created here at all -- an
-// admin sets it up by hand in Stripe once the fee is paid (see
-// routes/admin.js), so 'approved' is a real, if temporary, end state from
-// this page's point of view, not something a button on this page advances.
+// reviewing their free sample, then ONE Stripe Checkout redirect that
+// charges the $5 setup fee directly on Stripe's own hosted page (including
+// any 3D Secure challenge, handled entirely by Stripe before it ever
+// redirects back here -- no custom confirmation step needed). The $249/mo
+// trial subscription itself isn't created here at all -- an admin sets it
+// up by hand in Stripe once the fee is paid (see routes/admin.js), so
+// 'approved' is a real, if temporary, end state from this page's point of
+// view, not something a button on this page advances.
 export default function WebsiteApproval({ token }) {
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState(null);
-  // 'idle' | 'verifying_setup' | 'completing_3ds' -- drives the full-page
-  // processing state while a return-from-Stripe redirect resolves
-  // server-side (or a 3D Secure challenge completes) before this page can
-  // show the real status.
+  // 'idle' | 'verifying_setup' -- drives the full-page processing state
+  // while a return-from-Stripe redirect resolves server-side before this
+  // page can show the real status.
   const [resolving, setResolving] = useState('idle');
 
   const load = useCallback(async () => {
@@ -86,26 +63,9 @@ export default function WebsiteApproval({ token }) {
 
     setResolving('verifying_setup');
     postWebsiteRequestVerifySetup(token, sessionId)
-      .then(async res => {
+      .then(res => {
         cleanUrl();
         const data = res.data || {};
-
-        if (data.requiresAction && data.clientSecret) {
-          // The bank wants extra verification on the $5 charge -- handled
-          // inline via Stripe.js instead of another redirect/checkout page.
-          setResolving('completing_3ds');
-          const stripe = await loadStripeJs();
-          const result = await stripe.confirmCardPayment(data.clientSecret);
-          if (result.error) {
-            setResolving('idle');
-            setError(result.error.message || 'Your card could not be verified. Please try again.');
-            return;
-          }
-          await postWebsiteRequestConfirmPayment(token, result.paymentIntent.id);
-          setResolving('idle');
-          load();
-          return;
-        }
 
         if (data.declined) {
           setResolving('idle');
@@ -145,7 +105,7 @@ export default function WebsiteApproval({ token }) {
         <div style={{ textAlign: 'center', color: '#64748b' }}>
           <Loader2 size={28} className="wa-spin" style={{ marginBottom: 12 }} />
           <div style={{ fontSize: 14.5, fontWeight: 600 }}>
-            {resolving === 'verifying_setup' ? 'Confirming your payment…' : resolving === 'completing_3ds' ? 'Verifying your card…' : 'Loading…'}
+            {resolving === 'verifying_setup' ? 'Confirming your payment…' : 'Loading…'}
           </div>
           <style>{`.wa-spin { animation: wa-spin 0.9s linear infinite; } @keyframes wa-spin { to { transform: rotate(360deg); } }`}</style>
         </div>

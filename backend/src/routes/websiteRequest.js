@@ -162,41 +162,17 @@ async function markSetupPaid(sb, request) {
   return data;
 }
 
-// Charges the $5 setup fee on the card that was just saved via a
-// mode='setup' Checkout Session (see /checkout below). Confirmed on-session
-// (no off_session flag) since the customer is still actively present, right
-// after finishing that session, a few seconds ago at most -- if their bank
-// requires 3D Secure, Stripe returns requires_action with a client_secret
-// the frontend can complete inline via stripe.confirmCardPayment, instead
-// of the harder failure an off-session charge would get for the same case.
-// payment_method_types is explicit ('card' only) rather than left to the
-// account's automatic_payment_methods default -- without this, Stripe can
-// select a redirect-based method (depending on what's enabled in the
-// Dashboard) and then refuses to confirm server-side without a return_url,
-// which a confirm:true call made right here has no use for.
-async function chargeSetupFee(stripe, request, paymentMethodId) {
-  return stripe.paymentIntents.create({
-    amount: SETUP_FEE_CENTS,
-    currency: 'usd',
-    customer: request.stripe_customer_id,
-    payment_method: paymentMethodId,
-    payment_method_types: ['card'],
-    confirm: true,
-    receipt_email: request.email,
-    description: `Website setup fee — first 2 months free, then $${MONTHLY_PRICE_CENTS / 100}/month starting month 3. Cancel anytime.`,
-    metadata: { type: 'website_request_setup', requestId: request.id },
-  });
-}
-
 // POST /api/website-request/by-token/:token/checkout — public, token-gated.
-// Creates a mode='setup' Checkout Session that only collects and saves a
-// card -- charges nothing itself. verify-setup below does the actual $5
-// charge once this redirects back. There's deliberately no subscription
-// creation anywhere in this flow: an admin creates each client's $249/mo
-// trial subscription by hand in the Stripe Dashboard once they've paid
-// (see PATCH /api/admin/website-requests/:id's stripe_subscription_id
-// handling), so this route has nothing left to do once the fee is already
-// paid -- that's a terminal state from the customer's side.
+// Creates a mode='payment' Checkout Session that charges the $5 setup fee
+// directly on Stripe's own hosted page (shows the line item/price like any
+// normal checkout, and handles any 3D Secure challenge inline before ever
+// redirecting back here -- no custom confirmation step needed on our side).
+// payment_intent_data.setup_future_usage also saves the card to the
+// customer, since an admin still needs it to create each client's $249/mo
+// trial subscription by hand in the Stripe Dashboard once they've paid (see
+// PATCH /api/admin/website-requests/:id's stripe_subscription_id handling)
+// -- this route has nothing left to do once the fee is already paid, which
+// is a terminal state from the customer's side.
 // Never trusts a client-supplied amount -- the price is built from the
 // server-side constant above.
 router.post('/by-token/:token/checkout', async (req, res) => {
@@ -218,9 +194,26 @@ router.post('/by-token/:token/checkout', async (req, res) => {
     const customerId = await getOrCreateCustomer(stripe, sb, request);
 
     const session = await stripe.checkout.sessions.create({
-      mode: 'setup',
+      mode: 'payment',
       payment_method_types: ['card'],
       customer: customerId,
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          unit_amount: SETUP_FEE_CENTS,
+          product_data: {
+            name: 'Clean Estimator — Cleaning Website Setup Fee',
+            description: `First 2 months free, then $${MONTHLY_PRICE_CENTS / 100}/month starting month 3. Cancel anytime.`,
+          },
+        },
+        quantity: 1,
+      }],
+      payment_intent_data: {
+        receipt_email: request.email,
+        description: `Website setup fee — first 2 months free, then $${MONTHLY_PRICE_CENTS / 100}/month starting month 3. Cancel anytime.`,
+        setup_future_usage: 'off_session',
+        metadata: { type: 'website_request_setup', requestId: request.id },
+      },
       success_url: `${FRONTEND_URL}/website-approval/${req.params.token}?step=setup&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/website-approval/${req.params.token}`,
       metadata: { type: 'website_request_setup', requestId: request.id },
@@ -235,10 +228,13 @@ router.post('/by-token/:token/checkout', async (req, res) => {
 });
 
 // POST /api/website-request/by-token/:token/verify-setup — called by
-// WebsiteApproval.js right after Stripe redirects back from the mode='setup'
-// Checkout Session. Attaches the saved card and charges the $5 setup fee
-// on it -- that's the full job here; see routes/admin.js for how an admin
-// links each client's $249/mo trial subscription afterward.
+// WebsiteApproval.js right after Stripe redirects back from the Checkout
+// Session above. The $5 charge (and any 3D Secure challenge) is already
+// fully resolved by Stripe's own hosted page by the time this ever runs --
+// this just confirms the session actually paid before marking the request
+// approved, and points the customer's default payment method at the card
+// that was just saved, ready for an admin to use when creating the $249/mo
+// subscription later.
 router.post('/by-token/:token/verify-setup', async (req, res) => {
   const { sessionId } = req.body || {};
   if (!sessionId) return res.status(400).json({ success: false, error: 'sessionId is required' });
@@ -258,42 +254,19 @@ router.post('/by-token/:token/verify-setup', async (req, res) => {
     }
 
     const stripe = getStripe();
-    const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['setup_intent'] });
+    const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['payment_intent'] });
     if (session.metadata?.requestId !== request.id) {
       return res.status(403).json({ success: false, error: 'Session does not belong to this request' });
     }
-    if (session.status !== 'complete' || !session.setup_intent?.payment_method) {
+    if (session.payment_status !== 'paid') {
       return res.json({ success: true, data: { ready: false } });
     }
 
-    const paymentMethodId = session.setup_intent.payment_method;
-    await stripe.paymentMethods.attach(paymentMethodId, { customer: request.stripe_customer_id }).catch(err => {
-      // Already attached (a retried call racing itself) -- anything else
-      // is a real failure.
-      if (!/already been attached/.test(err.message || '')) throw err;
-    });
-    await stripe.customers.update(request.stripe_customer_id, {
-      invoice_settings: { default_payment_method: paymentMethodId },
-    });
-
-    let paymentIntent;
-    try {
-      paymentIntent = await chargeSetupFee(stripe, request, paymentMethodId);
-    } catch (err) {
-      if (err.type === 'StripeCardError') {
-        return res.json({ success: true, data: { declined: true, error: err.message } });
-      }
-      throw err;
-    }
-
-    if (paymentIntent.status === 'requires_action') {
-      // Needs 3D Secure -- the frontend completes this inline via
-      // stripe.confirmCardPayment(clientSecret), then calls
-      // /confirm-payment below to finish.
-      return res.json({ success: true, data: { requiresAction: true, clientSecret: paymentIntent.client_secret } });
-    }
-    if (paymentIntent.status !== 'succeeded') {
-      return res.json({ success: true, data: { declined: true, error: 'Your card was declined. Please try again.' } });
+    const paymentMethodId = session.payment_intent?.payment_method;
+    if (paymentMethodId) {
+      await stripe.customers.update(request.stripe_customer_id, {
+        invoice_settings: { default_payment_method: paymentMethodId },
+      });
     }
 
     await markSetupPaid(sb, request);
@@ -304,56 +277,16 @@ router.post('/by-token/:token/verify-setup', async (req, res) => {
   }
 });
 
-// POST /api/website-request/by-token/:token/confirm-payment — only reached
-// when verify-setup above returned requiresAction and the frontend
-// completed Stripe's 3D Secure challenge via stripe.confirmCardPayment.
-// Re-checks the PaymentIntent server-side (never trusts the client's own
-// claim that it succeeded) before running the same markSetupPaid
-// verify-setup would have run directly if no extra verification had been
-// needed.
-router.post('/by-token/:token/confirm-payment', async (req, res) => {
-  const { paymentIntentId } = req.body || {};
-  if (!paymentIntentId) return res.status(400).json({ success: false, error: 'paymentIntentId is required' });
-
-  const sb = getSupabase();
-  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
-
-  try {
-    const { data: request, error } = await sb.from('website_requests').select('*').eq('approval_token', req.params.token).maybeSingle();
-    if (error) throw error;
-    if (!request) return res.status(404).json({ success: false, error: 'Not found' });
-
-    if (request.setup_fee_paid_at) {
-      return res.json({ success: true, data: { approved: true } });
-    }
-
-    const stripe = getStripe();
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-    if (paymentIntent.metadata?.requestId !== request.id) {
-      return res.status(403).json({ success: false, error: 'Payment does not belong to this request' });
-    }
-    if (paymentIntent.status !== 'succeeded') {
-      return res.json({ success: true, data: { declined: true, error: 'Your card was declined. Please try again.' } });
-    }
-
-    await markSetupPaid(sb, request);
-    res.json({ success: true, data: { approved: true } });
-  } catch (err) {
-    console.error('website-request confirm-payment error:', err.message);
-    res.status(500).json({ success: false, error: 'Failed to confirm payment' });
-  }
-});
-
 // ─── Webhook handler (backup path) ─────────────────────────────────────────
-// The verify-setup/confirm-payment routes above are the primary path --
-// called synchronously right after Stripe redirects the browser back (or
-// right after a 3D Secure challenge resolves). This only covers the rare
-// case where Stripe's charge succeeded but that response never reached the
-// browser (tab closed, network drop) -- it marks the $5 fee paid so the
-// resume path in /checkout can pick the rest up later, but deliberately
-// does NOT try to create the subscription itself: that needs a request
-// object this webhook doesn't have reliably, so a webhook-only recovery is
-// logged loudly for a human to double-check instead of guessed at silently.
+// verify-setup above is the primary path -- called synchronously right
+// after Stripe redirects the browser back from its hosted Checkout page.
+// This only covers the rare case where Stripe's charge succeeded but that
+// response never reached the browser (tab closed, network drop): it marks
+// the $5 fee paid directly (there's no further step on this end for the
+// customer to resume into), but deliberately does NOT try to create the
+// subscription itself -- that's a manual Stripe Dashboard step for an admin
+// to do anyway, so a webhook-only recovery here is logged loudly for a
+// human to double-check instead of guessed at silently.
 async function handleWebsiteRequestEvent(event) {
   if (event.type !== 'payment_intent.succeeded') return;
   const paymentIntent = event.data.object;
