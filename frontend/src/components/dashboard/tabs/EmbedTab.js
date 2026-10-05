@@ -26,8 +26,12 @@ export default function EmbedTab({ config, user }) {
   (function(){
     var iframe=document.getElementById('${iframeId}');
     window.addEventListener('message',function(e){
-      if(e.data&&e.data.type==='cleancalc-resize'&&e.source===iframe.contentWindow){
+      if(!e.data||e.source!==iframe.contentWindow)return;
+      if(e.data.type==='cleancalc-resize'){
         iframe.style.height=Math.max(e.data.height,300)+'px';
+      } else if(e.data.type==='cleancalc-scroll-to-top'){
+        var top=iframe.getBoundingClientRect().top+window.pageYOffset-70;
+        window.scrollTo({top:top,behavior:'smooth'});
       }
     });
   })();
@@ -43,8 +47,12 @@ export default function EmbedTab({ config, user }) {
     el.title='Cleaning Cost Estimator';el.loading='lazy';
     document.getElementById('cleancalc-widget').appendChild(el);
     window.addEventListener('message',function(e){
-      if(e.data&&e.data.type==='cleancalc-resize'&&e.source===el.contentWindow){
+      if(!e.data||e.source!==el.contentWindow)return;
+      if(e.data.type==='cleancalc-resize'){
         el.style.height=Math.max(e.data.height,300)+'px';
+      } else if(e.data.type==='cleancalc-scroll-to-top'){
+        var top=el.getBoundingClientRect().top+window.pageYOffset-70;
+        window.scrollTo({top:top,behavior:'smooth'});
       }
     });
   })();

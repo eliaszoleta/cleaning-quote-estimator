@@ -113,13 +113,23 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     }
   }, [initialService, companyConfig]);
 
-  // Scroll to card on step change, accounting for sticky navbar height
+  // Scroll to card on step change, accounting for sticky navbar height.
+  // When embedded, window here is the IFRAME's own window -- scrolling it
+  // does nothing a visitor can see, since the page that actually scrolls is
+  // the host site's parent window, which this iframe can't call
+  // window.scrollTo on directly (different origin). Posting a message
+  // instead, for the embed snippet's own listener (see EmbedTab.js) to act
+  // on against the real page.
   useEffect(() => {
     if (stepIndex === 0 || !cardRef.current) return;
+    if (embedded) {
+      window.parent?.postMessage({ type: 'cleancalc-scroll-to-top' }, '*');
+      return;
+    }
     const navbarHeight = 70;
     const top = cardRef.current.getBoundingClientRect().top + window.scrollY - navbarHeight;
     window.scrollTo({ top, behavior: 'smooth' });
-  }, [stepIndex]);
+  }, [stepIndex, embedded]);
 
   // Let a siteLanding page's own wrapper drop its fixed white/shadow card
   // once results are showing, since ResultsScreen renders its own full page
