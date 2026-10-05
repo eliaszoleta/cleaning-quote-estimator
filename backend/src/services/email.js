@@ -1463,33 +1463,33 @@ async function sendWebsiteRequestNotificationEmail(args) {
   }
 }
 
-function buildWebsiteRequestReceivedText({ name }) {
+function buildWebsiteRequestReceivedText({ name, business }) {
   return [
     `Hi ${name},`,
     '',
-    "Thanks for applying for a cleaning website! We're building your custom sample now and will email you a link to review as soon as it's ready — usually within a few days.",
+    `Got your request for a website for ${business}. We're building your sample now and will send a link to review it in a few days.`,
     '',
-    'No action needed from you right now.',
+    'No action needed from you right now -- just reply to this email anytime if you have a question.',
     '',
-    'Clean Estimator - cleanestimator.com',
+    'Clean Estimator',
   ].join('\n');
 }
 
-function buildWebsiteRequestReceivedHtml({ name }) {
+function buildWebsiteRequestReceivedHtml({ name, business }) {
   return `
 <div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:14px;margin:0 0 20px;">Hi ${name},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Thanks for applying for a cleaning website! We're building your custom sample now and will email you a link to review as soon as it's ready — usually within a few days.
+    Got your request for a website for ${business}. We're building your sample now and will send a link to review it in a few days.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    No action needed from you right now.
+    No action needed from you right now -- just reply to this email anytime if you have a question.
   </p>
 
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  <p style="font-size:13px;color:#555555;line-height:1.6;margin:28px 0 0;">
+    Clean Estimator
   </p>
 </div>`;
 }
@@ -1521,7 +1521,7 @@ async function sendWebsiteRequestReceivedEmail({ to, name, business }) {
       {
         from: `Clean Estimator <${fromAddress}>`,
         to: [to],
-        subject: `We got your request, ${business}!`,
+        subject: `We got your request, ${business}`,
         html: buildWebsiteRequestReceivedHtml({ name, business }),
         text: buildWebsiteRequestReceivedText({ name, business }),
       },
