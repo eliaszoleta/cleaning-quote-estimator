@@ -1463,6 +1463,77 @@ async function sendWebsiteRequestNotificationEmail(args) {
   }
 }
 
+function buildWebsiteRequestReceivedText({ name }) {
+  return [
+    `Hi ${name},`,
+    '',
+    "Thanks for applying for a cleaning website! We're building your custom sample now and will email you a link to review as soon as it's ready — usually within a few days.",
+    '',
+    'No action needed from you right now.',
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildWebsiteRequestReceivedHtml({ name }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${name},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Thanks for applying for a cleaning website! We're building your custom sample now and will email you a link to review as soon as it's ready — usually within a few days.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    No action needed from you right now.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent to the applicant right after they submit the public "Get a Website"
+// form (POST /api/website-request below) -- previously that form only
+// triggered the internal notification above, leaving the applicant with no
+// confirmation their submission even went through until (if) a sample got
+// marked ready, which can be days later. Deliberately NOT sent from the
+// admin's own manual-add path (see POST /api/admin/website-requests) --
+// a client an admin enters by hand wasn't necessarily told "a sample is
+// coming in a few days," so that promise shouldn't go out on their behalf.
+async function sendWebsiteRequestReceivedEmail({ to, name, business }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendWebsiteRequestReceivedEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendWebsiteRequestReceivedEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: `We got your request, ${business}!`,
+        html: buildWebsiteRequestReceivedHtml({ name, business }),
+        text: buildWebsiteRequestReceivedText({ name, business }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendWebsiteRequestReceivedEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
 // ─── Website-request approval flow emails ──────────────────────────────────
 // Sent to the prospect themselves (not the internal notification above,
 // which goes to WEBSITE_REQUEST_NOTIFY_EMAIL) as their sample moves through
@@ -1639,6 +1710,7 @@ module.exports = {
   sendTrialCheckin3Email,
   sendAccountDeletionScheduledEmail,
   sendWebsiteRequestNotificationEmail,
+  sendWebsiteRequestReceivedEmail,
   sendWebsiteSampleReadyEmail,
   sendWebsiteSubscriptionConfirmedEmail,
 };

@@ -208,6 +208,16 @@ export async function getAdminWebsiteRequests(adminKey) {
   return apiFetch('/api/admin/website-requests', { headers: { 'x-admin-key': adminKey } });
 }
 
+// Manual add (e.g. a client who reached out outside the public apply form)
+// -- deliberately skips both the internal "new application" notification
+// and the applicant's own "we got your request" confirmation email, since
+// neither fits an admin entering someone directly.
+export async function createAdminWebsiteRequest(adminKey, payload) {
+  return apiFetch('/api/admin/website-requests', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
 export async function patchAdminWebsiteRequest(adminKey, id, updates) {
   return apiFetch(`/api/admin/website-requests/${id}`, {
     method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(updates),

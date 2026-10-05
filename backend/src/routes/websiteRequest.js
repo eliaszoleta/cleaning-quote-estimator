@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
-const { sendWebsiteRequestNotificationEmail, sendWebsiteSubscriptionConfirmedEmail } = require('../services/email');
+const { sendWebsiteRequestNotificationEmail, sendWebsiteRequestReceivedEmail, sendWebsiteSubscriptionConfirmedEmail } = require('../services/email');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 const SETUP_FEE_CENTS = 500; // $5
@@ -25,9 +25,14 @@ function getSupabase() {
 // form (WebsiteSubscription.js). Public, unauthenticated (same as
 // /api/calculate) since it's submitted by a prospect, not a logged-in
 // company. Persists a row (status: 'submitted') so AdminWebsiteRequests.js
-// has something to review and mark sample-ready, in addition to the existing
-// internal notification email -- previously the email *was* the only record,
-// with no way to track a request through to approval/billing.
+// has something to review and mark sample-ready, in addition to the
+// internal notification email and a "we got your request" confirmation
+// sent to the applicant themselves -- previously the internal email *was*
+// the only record, with no way to track a request through to
+// approval/billing, and no confirmation ever reached the applicant at all.
+// This is the ONLY place sendWebsiteRequestReceivedEmail is called from --
+// see POST /api/admin/website-requests for the admin's own manual-add path,
+// which deliberately skips both this and the internal notification.
 router.post('/', async (req, res) => {
   const {
     name, business, email, phone,
@@ -39,7 +44,7 @@ router.post('/', async (req, res) => {
   } = req.body || {};
 
   // Bot filled the honeypot: pretend success so it doesn't learn to skip
-  // this field, but never send the notification email or save a row.
+  // this field, but never send any email or save a row.
   if (website2) {
     return res.json({ success: true });
   }
@@ -48,6 +53,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ success: false, error: 'Name, business, and email are required.' });
   }
 
+  let saved = false;
   const sb = getSupabase();
   if (sb) {
     try {
@@ -67,11 +73,19 @@ router.post('/', async (req, res) => {
         message: message || null,
       });
       if (error) console.error('website_requests insert failed:', error.message);
+      else saved = true;
     } catch (err) {
       console.error('website_requests insert error:', err.message);
     }
   } else {
     console.warn('Website request not saved: Supabase not configured');
+  }
+
+  // Only confirm receipt to the applicant once there's actually a row for
+  // an admin to act on -- otherwise "no action needed, we're building your
+  // sample" would be a promise nothing can follow through on.
+  if (saved) {
+    sendWebsiteRequestReceivedEmail({ to: email, name, business }).catch(err => console.error('sendWebsiteRequestReceivedEmail failed:', err.message));
   }
 
   try {

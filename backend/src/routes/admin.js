@@ -540,6 +540,42 @@ router.get('/website-requests', async (req, res) => {
   }
 });
 
+// POST /api/admin/website-requests — lets an admin add a client directly
+// (e.g. one who reached out outside the public apply form) instead of only
+// ever reviewing requests that came in through it. Deliberately sends
+// neither the internal "new application" notification (the admin already
+// knows -- they're the one entering it) nor the applicant's own "we got
+// your request" confirmation (see sendWebsiteRequestReceivedEmail in
+// routes/websiteRequest.js, which is only ever called from the public
+// POST /api/website-request) -- that email promises a sample is coming
+// "within a few days," which isn't a promise this route should make on an
+// admin's behalf. The row lands as a normal 'submitted' request otherwise,
+// so it moves through sample_ready / approved / active exactly like one
+// from the public form from here on.
+router.post('/website-requests', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { name, business, email, phone, business_address: businessAddress } = req.body || {};
+  if (!name || !business || !email) {
+    return res.status(400).json({ success: false, error: 'Name, business, and email are required.' });
+  }
+
+  try {
+    const { data, error } = await sb.from('website_requests').insert({
+      name, business, email,
+      phone: phone || null,
+      business_address: businessAddress || null,
+    }).select().single();
+    if (error) throw error;
+
+    res.json({ success: true, data: { ...data, approvalUrl: `${FRONTEND_URL}/website-approval/${data.approval_token}` } });
+  } catch (err) {
+    console.error('Admin create website-request error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to create website request' });
+  }
+});
+
 // PATCH /api/admin/website-requests/:id — sets sample_url / status /
 // admin_notes / stripe_subscription_id. Moving status to 'sample_ready'
 // (either explicitly, or implicitly by attaching a sample_url to a request

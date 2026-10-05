@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { RefreshCw, Inbox, Mail, Phone, X, Copy, Check, ExternalLink, Ban, Trash2 } from 'lucide-react';
-import { getAdminWebsiteRequests, patchAdminWebsiteRequest, cancelAdminWebsiteSubscription, deleteAdminWebsiteRequestForever } from '../../utils/api';
+import { RefreshCw, Inbox, Mail, Phone, X, Copy, Check, ExternalLink, Ban, Trash2, Plus } from 'lucide-react';
+import { getAdminWebsiteRequests, createAdminWebsiteRequest, patchAdminWebsiteRequest, cancelAdminWebsiteSubscription, deleteAdminWebsiteRequestForever } from '../../utils/api';
 import { formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 
@@ -14,6 +14,8 @@ const STATUS_META = {
   declined: { label: 'Declined', color: '#dc2626' },
   canceled: { label: 'Canceled', color: '#94a3b8' },
 };
+
+const EMPTY_ADD_FORM = { name: '', business: '', email: '', phone: '', business_address: '' };
 
 // Site-owner queue for "Get a Website" applications (WebsiteSubscription.js's
 // apply form) -- previously email-only (see routes/websiteRequest.js), now a
@@ -43,6 +45,10 @@ export default function AdminWebsiteRequests() {
   const [linkingSub, setLinkingSub] = useState(false);
   const [linkError, setLinkError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addForm, setAddForm] = useState(EMPTY_ADD_FORM);
+  const [adding, setAdding] = useState(false);
+  const [addError, setAddError] = useState(null);
   const notesTimer = useRef(null);
   const { confirm, dialog: confirmDialog } = useConfirm();
 
@@ -151,6 +157,36 @@ export default function AdminWebsiteRequests() {
       console.error('Failed to save sample URL:', err.message);
     } finally {
       setSavingSample(false);
+    }
+  };
+
+  // Manually adds a client (e.g. one who reached out outside the public
+  // apply form) -- deliberately sends no email of any kind (see
+  // createAdminWebsiteRequest/POST /api/admin/website-requests): neither the
+  // internal "new application" notification nor the applicant's own "we got
+  // your request, a sample is coming in a few days" confirmation, since an
+  // admin entering someone by hand wasn't necessarily told that.
+  const submitAddForm = async (e) => {
+    e.preventDefault();
+    if (!addForm.name.trim() || !addForm.business.trim() || !addForm.email.trim()) return;
+    setAdding(true);
+    setAddError(null);
+    try {
+      const res = await createAdminWebsiteRequest(adminKey, {
+        name: addForm.name.trim(),
+        business: addForm.business.trim(),
+        email: addForm.email.trim(),
+        phone: addForm.phone.trim() || undefined,
+        business_address: addForm.business_address.trim() || undefined,
+      });
+      setRequests(prev => [res.data, ...prev]);
+      setSelected(res.data);
+      setShowAddForm(false);
+      setAddForm(EMPTY_ADD_FORM);
+    } catch (err) {
+      setAddError(err.message || 'Failed to add client');
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -272,7 +308,58 @@ export default function AdminWebsiteRequests() {
             <div style={{ fontWeight: 800, fontSize: 24, color: '#0f172a' }}>Website Requests</div>
             <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>"Get a Website" applications from /website-for-cleaning-companies.</div>
           </div>
+          <button
+            onClick={() => { setAddForm(EMPTY_ADD_FORM); setAddError(null); setShowAddForm(true); }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#2563eb', color: 'white', border: 'none', borderRadius: 9, padding: '11px 20px', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+          >
+            <Plus size={15} /> Add Client
+          </button>
         </div>
+
+        {showAddForm && (
+          <div style={{ background: 'white', border: '1.5px solid #2563eb', borderRadius: 14, padding: '22px 26px', marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a' }}>Add Client Manually</div>
+                <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>For a client who reached out directly, not through the apply form -- no emails are sent for this.</div>
+              </div>
+              <button onClick={() => setShowAddForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}><X size={18} /></button>
+            </div>
+            <form onSubmit={submitAddForm}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Contact Name *</label>
+                  <input required style={inputStyle} value={addForm.name} onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Business Name *</label>
+                  <input required style={inputStyle} value={addForm.business} onChange={e => setAddForm(f => ({ ...f, business: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Email *</label>
+                  <input required type="email" style={inputStyle} value={addForm.email} onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Phone</label>
+                  <input type="tel" style={inputStyle} value={addForm.phone} onChange={e => setAddForm(f => ({ ...f, phone: e.target.value }))} />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b', display: 'block', marginBottom: 5 }}>Business Address</label>
+                  <input style={inputStyle} value={addForm.business_address} onChange={e => setAddForm(f => ({ ...f, business_address: e.target.value }))} />
+                </div>
+              </div>
+              {addError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: 13, marginBottom: 14 }}>{addError}</div>}
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button type="submit" disabled={adding} style={{ background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 700, fontSize: 13.5, cursor: adding ? 'default' : 'pointer', opacity: adding ? 0.7 : 1 }}>
+                  {adding ? 'Adding…' : 'Add Client'}
+                </button>
+                <button type="button" onClick={() => setShowAddForm(false)} style={{ background: 'white', color: '#374151', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 20px', fontWeight: 600, fontSize: 13.5, cursor: 'pointer' }}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 20, height: 'calc(100vh - 180px)' }}>
           {/* Request list */}
