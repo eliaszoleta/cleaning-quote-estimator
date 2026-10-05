@@ -1659,12 +1659,12 @@ function buildWebsiteSubscriptionConfirmedHtml({ name, business, trialDays, mont
 </div>`;
 }
 
-// Sent once the $5 setup fee actually clears (see markSetupPaid in
-// routes/websiteRequest.js) -- that's the one fully-automated moment in
-// this flow, so it's also the moment the client is told what to expect
-// (2 months free, billed starting month 3). The $249/mo subscription
-// itself gets linked later by hand in the admin panel, deliberately
-// silently -- see PATCH /api/admin/website-requests/:id.
+// Sent once an admin links the client's $249/mo subscription in the admin
+// panel (see PATCH /api/admin/website-requests/:id), not when the $5 fee
+// itself clears -- Stripe already sends its own receipt for that charge
+// automatically, so a second email at that same moment would be redundant,
+// and the "2 months free, billed starting month 3" it describes isn't
+// actually true yet until that subscription really exists.
 async function sendWebsiteSubscriptionConfirmedEmail({ to, name, business, trialDays, monthlyPrice }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
