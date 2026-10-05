@@ -136,7 +136,7 @@ export default function WebsiteApproval({ token }) {
   return (
     <>
       <Helmet>
-        <title>Review Your Website Sample | Clean Estimator</title>
+        <title>Review Your Website | Clean Estimator</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <div style={shellStyle}>
@@ -148,9 +148,9 @@ export default function WebsiteApproval({ token }) {
           {request.status === 'submitted' && (
             <>
               <Clock size={40} color="#d97706" style={{ marginBottom: 14 }} />
-              <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Your sample is being built</h1>
+              <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Your website is being built</h1>
               <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                Hang tight, {request.name.split(' ')[0]} — we're building your free sample for {request.business}, and we'll email you the moment it's ready to review.
+                Hang tight, {request.name.split(' ')[0]} — we're building your free website for {request.business}, and we'll email you the moment it's ready to review.
               </p>
             </>
           )}
@@ -168,12 +168,12 @@ export default function WebsiteApproval({ token }) {
           {(request.status === 'sample_ready' || request.status === 'approved') && (
             <>
               <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 8, letterSpacing: '-0.3px' }}>
-                {request.setupFeePaidAt ? 'Almost there!' : `Your sample is ready, ${request.name.split(' ')[0]}`}
+                {request.setupFeePaidAt ? 'Almost there!' : `Your website is ready, ${request.name.split(' ')[0]}`}
               </h1>
               <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, marginBottom: 22 }}>
                 {request.setupFeePaidAt
                   ? "You've paid the setup fee — just one more step to start your free trial."
-                  : `Take a look at the free sample we built for ${request.business}`}
+                  : `Take a look at the free website we built for ${request.business}`}
               </p>
 
               {!request.setupFeePaidAt && request.sampleUrl && (
@@ -183,7 +183,7 @@ export default function WebsiteApproval({ token }) {
                   rel="noopener noreferrer"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#f1f5f9', color: '#0f172a', padding: '12px 22px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 14.5, marginBottom: 24 }}
                 >
-                  View Your Sample Site <ExternalLink size={15} />
+                  View Your Website <ExternalLink size={15} />
                 </a>
               )}
 

@@ -1472,7 +1472,7 @@ function buildWebsiteSampleReadyText({ name, business, sampleUrl, approvalUrl })
   return [
     `Hi ${name},`,
     '',
-    `Your free sample cleaning website for ${business} is ready to review.`,
+    `Your free cleaning website for ${business} is ready to review.`,
     '',
     `Take a look: ${sampleUrl}`,
     '',
@@ -1492,11 +1492,11 @@ function buildWebsiteSampleReadyHtml({ name, business, sampleUrl, approvalUrl })
   <p style="font-size:14px;margin:0 0 20px;">Hi ${name},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your free sample cleaning website for <strong>${business}</strong> is ready to review.
+    Your free cleaning website for <strong>${business}</strong> is ready to review.
   </p>
 
   <p style="margin:0 0 20px;">
-    <a href="${sampleUrl}" style="display:inline-block;background-color:#0f172a;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View your sample site →</a>
+    <a href="${sampleUrl}" style="display:inline-block;background-color:#0f172a;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View your website →</a>
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
@@ -1538,7 +1538,7 @@ async function sendWebsiteSampleReadyEmail({ to, name, business, sampleUrl, appr
       {
         from: `Clean Estimator <${fromAddress}>`,
         to: [to],
-        subject: `Your free website sample for ${business} is ready`,
+        subject: `Your free website for ${business} is ready`,
         html: buildWebsiteSampleReadyHtml({ name, business, sampleUrl, approvalUrl }),
         text: buildWebsiteSampleReadyText({ name, business, sampleUrl, approvalUrl }),
       },
