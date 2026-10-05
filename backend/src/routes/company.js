@@ -200,6 +200,16 @@ router.patch('/:id/services', requireAuth, async (req, res) => {
   }
 });
 
+// Elias's own demo/testing account (blueboyacc05@gmail.com) -- this route
+// has no req.user (it's the public, unauthenticated widget endpoint), so
+// there's no email to check the way computeSubscriptionStatus does
+// elsewhere; the company id from the URL is the one piece of identity
+// already on hand here with no extra Supabase lookup needed. Used to
+// always test against the real, live embedded widget while working on
+// this app, so it should never show the "Calculator Paused" state the way
+// a real subscriber's expired/deleted account would.
+const ALWAYS_ACTIVE_COMPANY_ID = '4ecae3b0-dfef-4c02-9498-02fc4994d45b';
+
 // GET /api/company/:id/public — branding only, no auth (for widget)
 router.get('/:id/public', async (req, res) => {
   try {
@@ -207,8 +217,9 @@ router.get('/:id/public', async (req, res) => {
     const sub = computeSubscriptionStatus(config);
     // Deletion was requested -- pause the widget for the whole grace period
     // even if the subscription itself is still active, since the owner
-    // asked for the account to go away.
-    const deletionPending = !!config.pendingDeletion;
+    // asked for the account to go away. Never true for the demo account
+    // above, same reasoning as the paused override below.
+    const deletionPending = !!config.pendingDeletion && req.params.id !== ALWAYS_ACTIVE_COMPANY_ID;
     const {
       companyName, logo, primaryColor, accentColor, fontFamily,
       ctaHeadline, ctaHeadlineEnabled, ctaSubtext, ctaPhone, ctaEmail,
@@ -225,7 +236,7 @@ router.get('/:id/public', async (req, res) => {
         companyName, logo, primaryColor, accentColor, fontFamily,
         ctaHeadline, ctaHeadlineEnabled, ctaSubtext, ctaPhone, ctaEmail,
         serviceStates, serviceCities: normalizeServiceCities(config), frameHeight, borderRadius, services,
-        paused: !sub.active || deletionPending,
+        paused: req.params.id === ALWAYS_ACTIVE_COMPANY_ID ? false : (!sub.active || deletionPending),
         trialDaysLeft: sub.daysLeft,
       },
     });
