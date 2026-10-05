@@ -62,7 +62,7 @@ const SERVICES = [
 // desktop browser, so a narrow preview panel never actually counted as
 // mobile, and looked different from how the same widget renders on a real
 // site.
-export default function ServiceSelect({ onSelect, primaryColor, companyName, ctaHeadline, services, embedded, isMobile }) {
+export default function ServiceSelect({ onSelect, primaryColor, companyName, ctaHeadline, ctaHeadlineEnabled, services, embedded, isMobile }) {
   const wrapRef = useRef(null);
   // Real measured width of this step's own content area, used below to pick
   // an explicit column count for the embedded-desktop grid instead of
@@ -114,15 +114,18 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   return (
     <div ref={wrapRef}>
       <div style={{ maxWidth: contentMaxWidth, margin: contentMaxWidth ? '0 auto' : undefined }}>
-      <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: COLORS.ink, marginBottom: 4, letterSpacing: '-0.3px' }}>
-        {/* The Branding tab's "Headline" field (ctaHeadline) previously
-            only reached LeadCaptureStep, a screen further into the flow
-            the live preview never advances to -- so typing a custom
-            headline there visibly did nothing. Respecting it here too,
-            since this is the first (and in a static preview, the only)
-            screen a company actually sees it apply to. */}
-        {ctaHeadline || (companyName ? `${companyName} — Get Your Quote` : 'What service do you need?')}
-      </h2>
+      {/* The Branding tab's "Headline" field (ctaHeadline), and its
+          show/hide toggle (ctaHeadlineEnabled, default shown), previously
+          only reached LeadCaptureStep, a screen further into the flow the
+          live preview never advances to -- so typing a custom headline (or
+          toggling it off) there visibly did nothing. Respecting both here
+          too, since this is the first (and in a static preview, the only)
+          screen a company actually sees them apply to. */}
+      {ctaHeadlineEnabled !== false && (
+        <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: COLORS.ink, marginBottom: 4, letterSpacing: '-0.3px' }}>
+          {ctaHeadline || (companyName ? `${companyName} — Get Your Quote` : 'What service do you need?')}
+        </h2>
+      )}
       <p style={{ color: COLORS.body, fontSize: 13, marginBottom: 18 }}>
         Tap a service to get your free, instant estimate.
       </p>
