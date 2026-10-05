@@ -6,6 +6,35 @@ const TILE_MIN = 260;
 const TILE_MAX = 300;
 const GRID_GAP = 10;
 
+// Picks a column count (1..maxCols) that lays the n cards out closest to a
+// square block, rather than always maximizing columns just because the
+// width allows it -- e.g. 4 cards in a width that fits 3 columns looks
+// better as a clean 2x2 square than as a lopsided 3-then-1 row with an
+// orphan card dangling alone underneath. Scored by, in order: how close
+// columns-vs-rows are to each other (the "squareness"), how few empty
+// cells the resulting grid leaves in its last row, and finally the
+// highest column count among any remaining ties (so it still prefers
+// using more of the available width when squareness is a wash either way).
+function pickSquareColumns(n, maxCols) {
+  let best = 1;
+  let bestScore = Infinity;
+  for (let c = 1; c <= maxCols; c++) {
+    const rows = Math.ceil(n / c);
+    const squareness = Math.abs(c - rows);
+    const emptyCells = c * rows - n;
+    // squareness and emptyCells (both single digits for up to 9 services)
+    // dominate c in this weighting, so the comparison is effectively
+    // squareness first, emptyCells second, and highest c last as the
+    // tiebreak when both of those are equal.
+    const score = squareness * 100 + emptyCells * 10 - c;
+    if (score < bestScore) {
+      bestScore = score;
+      best = c;
+    }
+  }
+  return best;
+}
+
 // "Most Requested" mirrors the verified tagline already shipped for this service in
 // data/services.js ("...the most requested service on Clean Estimator") — not a new claim.
 // configKey maps this step's serviceType (snake_case, what /api/calculate
@@ -62,12 +91,14 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   // in the dashboard's Services tab).
   const visibleServices = SERVICES.filter(s => services?.[s.configKey]?.enabled !== false);
 
-  // Capped at visibleServices.length too -- an explicit repeat() count (unlike
-  // auto-fit) doesn't collapse empty trailing tracks on its own, so asking
-  // for more columns than there are cards to fill them would just move the
-  // same blank-space problem into the row instead of removing it.
+  // widthCols is how many columns the measured width can fit at all; the
+  // actual column count used is whichever of 1..widthCols lays out this
+  // many cards closest to a square block (see pickSquareColumns) -- maxing
+  // out columns just because the width allows it left an orphan card alone
+  // in a half-empty last row whenever the enabled count didn't divide
+  // evenly into the max, instead of a tidier, more compact square.
   const widthCols = gridWidth > 0 ? Math.max(1, Math.floor((gridWidth + GRID_GAP) / (TILE_MIN + GRID_GAP))) : null;
-  const gridCols = widthCols ? Math.min(widthCols, Math.max(visibleServices.length, 1)) : null;
+  const gridCols = widthCols ? pickSquareColumns(Math.max(visibleServices.length, 1), widthCols) : null;
 
   return (
     <div ref={wrapRef}>
@@ -95,20 +126,28 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
         // original, unbounded 195px/1fr instead of being changed for a
         // problem it can't actually hit.
         //
-        // For the embedded case, gridCols (computed above from the real
-        // measured width) picks the column count explicitly rather than via
-        // the 'auto-fit' keyword, and each resulting track still sizes
-        // itself within minmax(260px, 300px) -- so a card never grows into
-        // an oversized rectangle when it's alone in its row, but a row that
-        // genuinely has the width and the cards to fill it does, instead of
-        // leaving that width as blank gutter space. Before gridCols is
-        // measured (a brief instant on first mount), 'auto-fit' is a
-        // reasonable placeholder since it can only ever be too conservative
-        // for that one frame, never wrong in a visible way.
+        // For the embedded case, gridCols (computed above via
+        // pickSquareColumns off the real measured width) picks the column
+        // count explicitly rather than via the 'auto-fit' keyword -- partly
+        // because 'auto-fit' sizes its repeat count off minmax's fixed max
+        // bound (300px) rather than its min, under-filling wide containers,
+        // and partly because always maximizing columns whenever the width
+        // allowed it left an orphan card alone in a half-empty last row
+        // instead of a tidier, more square-looking block. Each resulting
+        // track still sizes itself within minmax(260px, 300px), so a card
+        // never grows into an oversized rectangle either way. Before
+        // gridCols is measured (a brief instant on first mount), 'auto-fit'
+        // is a reasonable placeholder since it can only ever be too
+        // conservative for that one frame, never wrong in a visible way.
         gridTemplateColumns: isMobile
           ? 'repeat(2, 1fr)'
           : embedded ? `repeat(${gridCols || 'auto-fit'}, minmax(${TILE_MIN}px, ${TILE_MAX}px))` : 'repeat(auto-fill, minmax(195px, 1fr))',
         gap: isMobile ? 8 : 10,
+        // pickSquareColumns usually leaves little to no unused width, but
+        // centering (rather than the grid default left-align) means
+        // whatever's left over on a width minmax's own 300px cap can't
+        // quite absorb splits evenly instead of all piling up on one side.
+        justifyContent: !isMobile && embedded ? 'center' : undefined,
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (
           <button

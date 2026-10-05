@@ -206,9 +206,18 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
             against the column's left edge with all the leftover width
             piling up as empty space on the right. Capping AND centering
             this inner wrapper (label + box together) instead keeps both
-            of them centered as a unit, on any monitor width. */}
+            of them centered as a unit, on any monitor width.
+            960px (not the old 720px, which matched a hardcoded cap the
+            embedded widget itself used to have everywhere) approximates a
+            real, fairly generous embed -- a company pasting the iframe into
+            a wide content section on their own site, not the narrower
+            720px-ish width this preview used to imply, was rendering
+            noticeably differently (and more usefully, more columns) than
+            what this panel showed. Still just an approximation: the real
+            widget always matches whatever width a given site's own page
+            actually provides, which this can't know in advance. */}
         <div style={{ position: 'sticky', top: 96 }}>
-          <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <div style={{ maxWidth: 960, margin: '0 auto' }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Live Preview</div>
             <div style={{ border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', background: 'white' }}>
               <CleaningCalculator companyConfig={previewConfig} embedded={true} />
