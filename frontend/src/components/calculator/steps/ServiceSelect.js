@@ -99,9 +99,21 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   // evenly into the max, instead of a tidier, more compact square.
   const widthCols = gridWidth > 0 ? Math.max(1, Math.floor((gridWidth + GRID_GAP) / (TILE_MIN + GRID_GAP))) : null;
   const gridCols = widthCols ? pickSquareColumns(Math.max(visibleServices.length, 1), widthCols) : null;
+  // The actual rendered width of a gridCols-column grid once its tracks
+  // settle at their max (300px) -- capped at gridWidth itself in case
+  // pickSquareColumns picked a count whose tracks need to shrink toward
+  // their min to fit, so this never asks for more width than genuinely
+  // exists. Centering the heading+subtext+grid together at this width
+  // (rather than centering the grid alone) keeps the heading's left edge
+  // lined up with the grid's, instead of the heading staying flush left
+  // while the grid centers independently and drifts out of alignment with it.
+  const contentMaxWidth = gridCols && gridWidth > 0
+    ? Math.min(gridCols * TILE_MAX + (gridCols - 1) * GRID_GAP, gridWidth)
+    : undefined;
 
   return (
     <div ref={wrapRef}>
+      <div style={{ maxWidth: contentMaxWidth, margin: contentMaxWidth ? '0 auto' : undefined }}>
       <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: COLORS.ink, marginBottom: 4, letterSpacing: '-0.3px' }}>
         {/* The Branding tab's "Headline" field (ctaHeadline) previously
             only reached LeadCaptureStep, a screen further into the flow
@@ -143,11 +155,6 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
           ? 'repeat(2, 1fr)'
           : embedded ? `repeat(${gridCols || 'auto-fit'}, minmax(${TILE_MIN}px, ${TILE_MAX}px))` : 'repeat(auto-fill, minmax(195px, 1fr))',
         gap: isMobile ? 8 : 10,
-        // pickSquareColumns usually leaves little to no unused width, but
-        // centering (rather than the grid default left-align) means
-        // whatever's left over on a width minmax's own 300px cap can't
-        // quite absorb splits evenly instead of all piling up on one side.
-        justifyContent: !isMobile && embedded ? 'center' : undefined,
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (
           <button
@@ -213,6 +220,7 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
             <div style={{ fontSize: 11, color: COLORS.muted, lineHeight: 1.4 }}>{desc}</div>
           </button>
         ))}
+      </div>
       </div>
 
       <style>{`
