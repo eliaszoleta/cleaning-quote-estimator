@@ -14,6 +14,17 @@ const { stateNameFromCode } = require('../data/partnerCityTiers');
 // no rounded "card" containers) -- that marketing-template look is exactly
 // what pushes transactional mail into Gmail's Promotions tab. Styled to
 // read like a receipt/confirmation instead.
+//
+// Confirmed in practice: sendWebsiteRequestReceivedEmail started landing in
+// Promotions, and moved to Primary after (a) giving it a personalized
+// action/reference point instead of being purely "no action needed" with
+// nothing but a generic homepage link, and (b) toning down the copy --
+// dropping exclamation points and phrasing like "Thanks for applying...!"
+// that reads as a marketing auto-responder. No setting here can force
+// Primary placement (that's Gmail's own sender-reputation + content ML,
+// outside this codebase's control), but matching every other template's
+// plain, specific, low-enthusiasm style is the best lever available when
+// writing a new one.
 
 const RESEND_API_BASE = 'https://api.resend.com';
 
