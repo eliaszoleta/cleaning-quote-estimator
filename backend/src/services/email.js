@@ -1538,7 +1538,7 @@ async function sendWebsiteSampleReadyEmail({ to, name, business, sampleUrl, appr
       {
         from: `Clean Estimator <${fromAddress}>`,
         to: [to],
-        subject: `Your free website for ${business} is ready`,
+        subject: `Your website for ${business} is ready`,
         html: buildWebsiteSampleReadyHtml({ name, business, sampleUrl, approvalUrl }),
         text: buildWebsiteSampleReadyText({ name, business, sampleUrl, approvalUrl }),
       },
