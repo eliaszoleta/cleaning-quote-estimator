@@ -29,6 +29,7 @@ const ResetPasswordPage = lazy(() => import('./components/dashboard/ResetPasswor
 const AdminPartners = lazy(() => import('./components/admin/AdminPartners'));
 const AdminCompanies = lazy(() => import('./components/admin/AdminCompanies'));
 const AdminHomepageLeads = lazy(() => import('./components/admin/AdminHomepageLeads'));
+const AdminWebsiteRequests = lazy(() => import('./components/admin/AdminWebsiteRequests'));
 const ClientPortal = lazy(() => import('./components/client/ClientPortal'));
 const SEOContent = lazy(() => import('./components/ui/SEOContent'));
 const BlogIndex = lazy(() => import('./components/blog/BlogIndex'));
@@ -37,6 +38,7 @@ const BlogCategory = lazy(() => import('./components/blog/BlogCategory'));
 const CompanyLanding = lazy(() => import('./components/pages/CompanyLanding'));
 const PartnerWithUs = lazy(() => import('./components/pages/PartnerWithUs'));
 const WebsiteSubscription = lazy(() => import('./components/pages/WebsiteSubscription'));
+const WebsiteApproval = lazy(() => import('./components/pages/WebsiteApproval'));
 const DemoGallery = lazy(() => import('./components/demo-sites/DemoGallery'));
 const DemoSitePage = lazy(() => import('./components/demo-sites/DemoSitePage'));
 const PartnerCityPricing = lazy(() => import('./components/pages/PartnerCityPricing'));
@@ -86,9 +88,11 @@ const isTerms = pathname === '/terms-of-service';
 const isAdminPartners = pathname === '/admin/partners';
 const isAdminCompanies = pathname === '/admin/companies';
 const isAdminHomepageLeads = pathname === '/admin/leads';
+const isAdminWebsiteRequests = pathname === '/admin/website-requests';
 const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
 const isWebsiteSubscription = pathname === '/website-for-cleaning-companies';
+const websiteApprovalMatch = pathname.match(/^\/website-approval\/([a-f0-9]+)$/);
 const isDemoGallery = pathname === '/website-example';
 const demoSiteMatch = pathname.match(/^\/website-example\/([a-z0-9-]+)(?:\/(about|services|service-areas|contact))?$/);
 const isPartnerCityPricing = pathname === '/partner-city-pricing';
@@ -214,6 +218,8 @@ export default function App() {
 
   if (isAdminHomepageLeads) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminHomepageLeads /></Suspense></HelmetProvider>;
 
+  if (isAdminWebsiteRequests) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminWebsiteRequests /></Suspense></HelmetProvider>;
+
   if (isClientPortal) return <HelmetProvider><Suspense fallback={<PageFallback />}><ClientPortal /></Suspense></HelmetProvider>;
 
   if (isPartnerWithUs) return (
@@ -250,6 +256,16 @@ export default function App() {
       <div className="app">
         <Header />
         <main><Suspense fallback={<PageFallback />}><WebsiteSubscription /></Suspense></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (websiteApprovalMatch) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><Suspense fallback={<PageFallback />}><WebsiteApproval token={websiteApprovalMatch[1]} /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>

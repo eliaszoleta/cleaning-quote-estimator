@@ -1463,6 +1463,166 @@ async function sendWebsiteRequestNotificationEmail(args) {
   }
 }
 
+// ─── Website-request approval flow emails ──────────────────────────────────
+// Sent to the prospect themselves (not the internal notification above,
+// which goes to WEBSITE_REQUEST_NOTIFY_EMAIL) as their sample moves through
+// routes/websiteRequest.js and routes/admin.js's approval flow.
+
+function buildWebsiteSampleReadyText({ name, business, sampleUrl, approvalUrl }) {
+  return [
+    `Hi ${name},`,
+    '',
+    `Your free sample cleaning website for ${business} is ready to review.`,
+    '',
+    `Take a look: ${sampleUrl}`,
+    '',
+    "Like what you see? Approve it to get started — just $5 one-time to lock in your build, then your first 2 months are completely free. After that it's a flat $249/month, cancel anytime.",
+    '',
+    `Review & approve: ${approvalUrl}`,
+    '',
+    "No obligation — if it's not for you, just ignore this and nothing happens.",
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildWebsiteSampleReadyHtml({ name, business, sampleUrl, approvalUrl }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${name},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your free sample cleaning website for <strong>${business}</strong> is ready to review.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="${sampleUrl}" style="display:inline-block;background-color:#0f172a;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View your sample site →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Like what you see? Approve it to get started — just $5 one-time to lock in your build, then your first 2 months are completely free. After that it's a flat $249/month, cancel anytime.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="${approvalUrl}" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Review &amp; approve →</a>
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    No obligation — if it's not for you, just ignore this and nothing happens.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent by PATCH /api/admin/website-requests/:id when an admin attaches a
+// sample link and the request moves to 'sample_ready'.
+async function sendWebsiteSampleReadyEmail({ to, name, business, sampleUrl, approvalUrl }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendWebsiteSampleReadyEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendWebsiteSampleReadyEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: `Your free website sample for ${business} is ready`,
+        html: buildWebsiteSampleReadyHtml({ name, business, sampleUrl, approvalUrl }),
+        text: buildWebsiteSampleReadyText({ name, business, sampleUrl, approvalUrl }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendWebsiteSampleReadyEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
+function buildWebsiteSubscriptionConfirmedText({ name, business, trialDays, monthlyPrice }) {
+  return [
+    `Hi ${name},`,
+    '',
+    `You're all set! Your cleaning website for ${business} is approved and your subscription is active.`,
+    '',
+    `Your first ${trialDays} days are completely free. After that, you'll be billed ${fmtMoney(monthlyPrice)}/month flat — cancel anytime.`,
+    '',
+    "We'll be in touch shortly to finish setting up your live site and domain.",
+    '',
+    'Clean Estimator - cleanestimator.com',
+  ].join('\n');
+}
+
+function buildWebsiteSubscriptionConfirmedHtml({ name, business, trialDays, monthlyPrice }) {
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi ${name},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    You're all set! Your cleaning website for <strong>${business}</strong> is approved and your subscription is active.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your first ${trialDays} days are completely free. After that, you'll be billed ${fmtMoney(monthlyPrice)}/month flat — cancel anytime.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    We'll be in touch shortly to finish setting up your live site and domain.
+  </p>
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
+  </p>
+</div>`;
+}
+
+// Sent once a request's subscription Checkout Session completes (see
+// activateSubscription in routes/websiteRequest.js, called from both the
+// verify-subscription route and its webhook backup).
+async function sendWebsiteSubscriptionConfirmedEmail({ to, name, business, trialDays, monthlyPrice }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendWebsiteSubscriptionConfirmedEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!to) {
+    console.warn('sendWebsiteSubscriptionConfirmedEmail skipped: no recipient email');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [to],
+        subject: `You're all set, ${business}! Your cleaning website is confirmed`,
+        html: buildWebsiteSubscriptionConfirmedHtml({ name, business, trialDays, monthlyPrice }),
+        text: buildWebsiteSubscriptionConfirmedText({ name, business, trialDays, monthlyPrice }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendWebsiteSubscriptionConfirmedEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
 module.exports = {
   sendEstimateEmail,
   sendPartnerWelcomeEmail,
@@ -1476,4 +1636,6 @@ module.exports = {
   sendTrialCheckin3Email,
   sendAccountDeletionScheduledEmail,
   sendWebsiteRequestNotificationEmail,
+  sendWebsiteSampleReadyEmail,
+  sendWebsiteSubscriptionConfirmedEmail,
 };

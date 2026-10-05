@@ -135,6 +135,10 @@ app.post('/api/partner-checkout/webhook',
   express.raw({ type: 'application/json' }),
   partnerCheckoutRouter.webhookHandler
 );
+app.post('/api/website-request/webhook',
+  express.raw({ type: 'application/json' }),
+  websiteRequestRouter.webhookHandler
+);
 
 // Logo uploads carry a base64-encoded image, well over the 10kb default
 // below — register a larger-limit parser for just this path first (the

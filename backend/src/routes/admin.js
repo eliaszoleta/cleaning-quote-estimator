@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { sendCompanyWelcomeEmail } = require('../services/email');
+const { sendCompanyWelcomeEmail, sendWebsiteSampleReadyEmail } = require('../services/email');
 const { getCompanyConfig } = require('../services/companyConfig');
 const { resolveCityForZip } = require('../services/zipCity');
 
@@ -510,6 +510,88 @@ router.delete('/partners/:id', async (req, res) => {
   } catch (err) {
     console.error('Admin delete partner error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to delete partner' });
+  }
+});
+
+// ─── Website requests ("Get a Website" applications) ──────────────────────
+// Previously email-only (see routes/websiteRequest.js's original comment:
+// "the email *is* the record") -- now persisted so there's a real queue to
+// review, mark sample-ready, and track through the $5-setup/2-months-free/
+// $249-month-3 approval flow at /website-approval/:token.
+
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+// GET /api/admin/website-requests
+router.get('/website-requests', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  try {
+    const { data, error } = await sb.from('website_requests').select('*').order('created_at', { ascending: false }).limit(500);
+    if (error) throw error;
+    const rows = (data || []).map(row => ({
+      ...row,
+      approvalUrl: `${FRONTEND_URL}/website-approval/${row.approval_token}`,
+    }));
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error('Admin website-requests list error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to load website requests' });
+  }
+});
+
+// PATCH /api/admin/website-requests/:id — sets sample_url / status /
+// admin_notes. Moving status to 'sample_ready' (either explicitly, or
+// implicitly by attaching a sample_url to a request that's still
+// 'submitted') emails the prospect their approval link -- same
+// fire-and-forget philosophy as every other notification email in this
+// codebase, so a Resend hiccup doesn't fail the admin's save.
+router.patch('/website-requests/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { id } = req.params;
+  const { sample_url, status, admin_notes } = req.body || {};
+  const allowedStatuses = ['submitted', 'sample_ready', 'approved', 'active', 'declined'];
+  if (status !== undefined && !allowedStatuses.includes(status)) {
+    return res.status(400).json({ success: false, error: 'Invalid status' });
+  }
+
+  try {
+    const { data: existing, error: fetchErr } = await sb.from('website_requests').select('*').eq('id', id).maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (!existing) return res.status(404).json({ success: false, error: 'Not found' });
+
+    const updates = { updated_at: new Date().toISOString() };
+    if (sample_url !== undefined) updates.sample_url = sample_url;
+    if (admin_notes !== undefined) updates.admin_notes = admin_notes;
+    if (status !== undefined) {
+      updates.status = status;
+    } else if (existing.status === 'submitted' && (sample_url || existing.sample_url)) {
+      // Attaching a sample link to a fresh request implicitly marks it ready
+      // -- an admin pasting a URL and clicking Save shouldn't also require a
+      // separate status dropdown change to actually notify the prospect.
+      updates.status = 'sample_ready';
+    }
+
+    const { data: updated, error: updateErr } = await sb.from('website_requests').update(updates).eq('id', id).select().single();
+    if (updateErr) throw updateErr;
+
+    const justBecameSampleReady = existing.status !== 'sample_ready' && updated.status === 'sample_ready';
+    if (justBecameSampleReady && updated.sample_url) {
+      sendWebsiteSampleReadyEmail({
+        to: updated.email,
+        name: updated.name,
+        business: updated.business,
+        sampleUrl: updated.sample_url,
+        approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}`,
+      }).catch(err => console.error('sendWebsiteSampleReadyEmail failed:', err.message));
+    }
+
+    res.json({ success: true, data: { ...updated, approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}` } });
+  } catch (err) {
+    console.error('Admin update website-request error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to update website request' });
   }
 });
 

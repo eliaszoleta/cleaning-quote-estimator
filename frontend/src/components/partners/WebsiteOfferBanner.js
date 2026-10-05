@@ -14,6 +14,10 @@ const DESKTOP_TOP_GAP = 15;
 // -- showing a banner that pitches the same thing you're already looking at
 // is redundant, not a second chance to convert.
 const EXCLUDED_PATHS = ['/website-for-cleaning-companies', '/partner-demo'];
+// /website-approval/:token is where someone who already applied is
+// reviewing their sample or paying -- pitching the same offer they're mid-
+// way through completing would be confusing, not a second chance to convert.
+const EXCLUDED_PREFIXES = ['/website-approval/'];
 
 // Mirror image of FloatingPartnerBanner's condition: that one shows the
 // active partner IN the visitor's city; this one shows only when the
@@ -52,7 +56,7 @@ export default function WebsiteOfferBanner() {
   useEffect(() => {
     let cancelled = false;
     const path = window.location.pathname.replace(/\/$/, '') || '/';
-    if (EXCLUDED_PATHS.includes(path)) return;
+    if (EXCLUDED_PATHS.includes(path) || EXCLUDED_PREFIXES.some(p => path.startsWith(p))) return;
     try {
       if (sessionStorage.getItem(DISMISS_KEY)) return;
     } catch { /* ignore */ }

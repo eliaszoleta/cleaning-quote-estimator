@@ -201,3 +201,38 @@ export async function patchAdminHomepageLead(adminKey, id, updates) {
 export async function deleteAdminHomepageLeadForever(adminKey, id) {
   return apiFetch(`/api/admin/homepage-leads/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
 }
+
+// AdminWebsiteRequests.js -- "Get a Website" applications, same adminKey
+// convention as the rest of the admin API.
+export async function getAdminWebsiteRequests(adminKey) {
+  return apiFetch('/api/admin/website-requests', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function patchAdminWebsiteRequest(adminKey, id, updates) {
+  return apiFetch(`/api/admin/website-requests/${id}`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(updates),
+  });
+}
+
+// WebsiteApproval.js -- public, token-gated (no adminKey/login; the random
+// token in the URL is the auth). Backs the prospect-facing approve-and-pay
+// flow for a "Get a Website" application.
+export async function getWebsiteRequestByToken(token) {
+  return apiFetch(`/api/website-request/by-token/${token}`);
+}
+
+export async function postWebsiteRequestCheckout(token) {
+  return apiFetch(`/api/website-request/by-token/${token}/checkout`, { method: 'POST' });
+}
+
+export async function postWebsiteRequestVerifySetup(token, sessionId) {
+  return apiFetch(`/api/website-request/by-token/${token}/verify-setup`, {
+    method: 'POST', body: JSON.stringify({ sessionId }),
+  });
+}
+
+export async function postWebsiteRequestVerifySubscription(token, sessionId) {
+  return apiFetch(`/api/website-request/by-token/${token}/verify-subscription`, {
+    method: 'POST', body: JSON.stringify({ sessionId }),
+  });
+}
