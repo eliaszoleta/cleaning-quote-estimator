@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, ExternalLink, Clock, XCircle, Loader2 } from 'lucide-react';
+import { CheckCircle2, ExternalLink, Clock, XCircle, Loader2, Lock } from 'lucide-react';
 import {
   getWebsiteRequestByToken,
   postWebsiteRequestCheckout,
@@ -208,7 +208,12 @@ export default function WebsiteApproval({ token }) {
               >
                 {starting ? 'Loading…' : request.setupFeePaidAt ? 'Continue to Start My Free Trial →' : `Approve & Pay $${SETUP_FEE} →`}
               </button>
-              <p style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 12, marginBottom: 0 }}>Secure checkout powered by Stripe.</p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 12 }}>
+                <Lock size={11} color="#16a34a" />
+                <span style={{ fontSize: 11.5, color: '#94a3b8' }}>
+                  Secure checkout powered by <strong style={{ color: '#635bff', fontWeight: 700 }}>Stripe</strong>
+                </span>
+              </div>
             </>
           )}
 
