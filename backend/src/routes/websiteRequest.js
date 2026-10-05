@@ -162,6 +162,13 @@ async function createSubscriptionForRequest(stripe, sb, request) {
       },
     }],
     trial_period_days: TRIAL_DAYS,
+    // Same reasoning as chargeSetupFee's payment_method_types -- without
+    // this, Stripe falls back to the account's automatic payment methods,
+    // which can include redirect-based ones that need a return_url this
+    // flow has no use for (there's no charge to redirect for; the trial
+    // defers it). Pinning to card matches the one payment method this
+    // customer actually has saved.
+    payment_settings: { payment_method_types: ['card'] },
     metadata: { type: 'website_request_subscription', requestId: request.id },
   });
 
