@@ -22,7 +22,7 @@ router.get('/status', async (req, res) => {
       sendCompanyWelcomeEmail({ to: req.user.email, companyId: req.user.id })
         .catch(err => console.error('Company welcome email failed:', err.message));
     }
-    res.json({ success: true, data: computeSubscriptionStatus(config) });
+    res.json({ success: true, data: computeSubscriptionStatus(config, req.user.email) });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to get subscription status' });
   }
@@ -100,7 +100,7 @@ router.post('/verify-checkout', async (req, res) => {
     const config = (await getCompanyConfig(companyId)) || {};
 
     if (session.payment_status !== 'paid' && session.status !== 'complete') {
-      return res.json({ success: true, data: computeSubscriptionStatus(config) });
+      return res.json({ success: true, data: computeSubscriptionStatus(config, req.user.email) });
     }
 
     const sub = session.subscription;
@@ -116,7 +116,7 @@ router.post('/verify-checkout', async (req, res) => {
         : null,
     };
     await saveCompanyConfig(companyId, config);
-    res.json({ success: true, data: computeSubscriptionStatus(config) });
+    res.json({ success: true, data: computeSubscriptionStatus(config, req.user.email) });
   } catch (err) {
     console.error('verify-checkout error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to verify checkout session' });

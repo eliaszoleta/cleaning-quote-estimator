@@ -1,6 +1,20 @@
 const TRIAL_DAYS = 30; // Legacy: for existing accounts that started a free trial without CC
 
-function computeSubscriptionStatus(config) {
+// Elias's own demo/testing account -- used to check real dashboard/widget
+// behavior while working on this app, so it should never show trial-expired
+// or paused states on its own account like a real subscriber's would.
+// Checked by email (passed in by each call site from req.user.email, or
+// from the admin company list's own already-looked-up email) rather than
+// company id, since that's the one piece of identity already on hand
+// everywhere computeSubscriptionStatus is called from an authenticated
+// route, with no extra Supabase lookup needed.
+const ALWAYS_ACTIVE_EMAIL = 'blueboyacc05@gmail.com';
+
+function computeSubscriptionStatus(config, email) {
+  if (email && email.toLowerCase() === ALWAYS_ACTIVE_EMAIL) {
+    return { active: true, status: 'active', cancelAtPeriodEnd: false, daysLeft: null, currentPeriodEnd: null, stripeCustomerId: null, stripeSubscriptionId: null };
+  }
+
   const sub = config.subscription || {};
   const trialStart = sub.trialStartedAt ? new Date(sub.trialStartedAt) : null;
 

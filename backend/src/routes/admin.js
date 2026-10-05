@@ -92,7 +92,7 @@ router.get('/companies', async (req, res) => {
 
     const companies = rows.map(row => {
       const { config } = row;
-      const sub = computeSubscriptionStatus(config);
+      const sub = computeSubscriptionStatus(config, row.email);
       const services = config.services || {};
       const enabledCount = Object.values(services).filter(s => s?.enabled !== false).length;
       return {
