@@ -62,6 +62,7 @@ const DEFAULT_COMPANY_CONFIG = {
   accentColor: '#16a34a',
   fontFamily: 'Inter',
   ctaHeadline: 'Get Your Exact Quote Today',
+  ctaHeadlineEnabled: true,
   ctaSubtext: 'Our team is ready to provide a free, detailed estimate.',
   ctaPhone: '',
   ctaEmail: '',

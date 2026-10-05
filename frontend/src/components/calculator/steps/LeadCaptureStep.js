@@ -12,6 +12,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
   const [touched, setTouched] = useState({});
 
   const ctaHeadline = companyConfig?.ctaHeadline || 'Get your instant estimate';
+  const ctaHeadlineEnabled = companyConfig?.ctaHeadlineEnabled !== false;
   const ctaSubtext = companyConfig?.ctaSubtext || "We'll email your results and, if there's a match in your area, recommend a local cleaning professional.";
 
   const nameValid = name.trim().length > 0;
@@ -38,7 +39,9 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
 
   return (
     <div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 5, letterSpacing: '-0.2px' }}>{ctaHeadline}</h2>
+      {ctaHeadlineEnabled && (
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 5, letterSpacing: '-0.2px' }}>{ctaHeadline}</h2>
+      )}
       <p style={{ color: '#64748b', fontSize: 13.5, marginBottom: 22 }}>{ctaSubtext}</p>
 
       <form onSubmit={handleSubmit}>

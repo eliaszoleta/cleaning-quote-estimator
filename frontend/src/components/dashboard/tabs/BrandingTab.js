@@ -18,7 +18,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
 
   const [form, setForm] = useState({
     companyName: '', logo: '', primaryColor: '#2563eb', accentColor: '#16a34a',
-    ctaHeadline: '', ctaSubtext: '', ctaPhone: '', ctaEmail: '',
+    ctaHeadline: '', ctaHeadlineEnabled: true, ctaSubtext: '', ctaPhone: '', ctaEmail: '',
     leadNotificationEmail: '',
     fontFamily: 'Inter', frameHeight: '700', borderRadius: '12',
   });
@@ -33,6 +33,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
         primaryColor: config.primaryColor || '#2563eb',
         accentColor: config.accentColor || '#16a34a',
         ctaHeadline: config.ctaHeadline || '',
+        ctaHeadlineEnabled: config.ctaHeadlineEnabled !== false,
         ctaSubtext: config.ctaSubtext || '',
         ctaPhone: config.ctaPhone || '',
         ctaEmail: config.ctaEmail || '',
@@ -54,6 +55,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
         primaryColor: next.primaryColor,
         accentColor: next.accentColor,
         ctaHeadline: next.ctaHeadline,
+        ctaHeadlineEnabled: next.ctaHeadlineEnabled,
         ctaSubtext: next.ctaSubtext,
         ctaPhone: next.ctaPhone,
         ctaEmail: next.ctaEmail,
@@ -75,6 +77,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
     // LeadCaptureStep.js each already fall back to their own default
     // headline when this is empty), not a third, preview-only default.
     ctaHeadline: form.ctaHeadline,
+    ctaHeadlineEnabled: form.ctaHeadlineEnabled,
     ctaSubtext: form.ctaSubtext,
     ctaPhone: form.ctaPhone,
     ctaEmail: form.ctaEmail,
@@ -160,9 +163,19 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
               split into two clearly-scoped cards so that mistake isn't the
               default path anymore. */}
           <Card title="Lead Capture Form" subtitle="Shown before the visitor sees their estimate">
-            <Field label="Headline">
-              <input style={input} value={form.ctaHeadline} onChange={e => set('ctaHeadline', e.target.value)} placeholder="Get your instant estimate" />
-            </Field>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>Headline</label>
+                <label style={{ position: 'relative', display: 'inline-block', width: 36, height: 20, cursor: 'pointer', flexShrink: 0 }}>
+                  <input type="checkbox" checked={form.ctaHeadlineEnabled} onChange={e => set('ctaHeadlineEnabled', e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
+                  <span style={{ position: 'absolute', inset: 0, borderRadius: 20, background: form.ctaHeadlineEnabled ? '#2563eb' : '#cbd5e1', transition: 'background 0.2s' }}>
+                    <span style={{ position: 'absolute', top: 2, left: form.ctaHeadlineEnabled ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: 'white', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
+                  </span>
+                </label>
+              </div>
+              <input style={{ ...input, opacity: form.ctaHeadlineEnabled ? 1 : 0.5 }} disabled={!form.ctaHeadlineEnabled} value={form.ctaHeadline} onChange={e => set('ctaHeadline', e.target.value)} placeholder="Get your instant estimate" />
+              {!form.ctaHeadlineEnabled && <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 6 }}>Hidden on the form -- only the subtext below will show.</div>}
+            </div>
             <Field label="Subtext">
               <input style={input} value={form.ctaSubtext} onChange={e => set('ctaSubtext', e.target.value)} placeholder="We'll email your results and connect you with one of our team members" />
             </Field>

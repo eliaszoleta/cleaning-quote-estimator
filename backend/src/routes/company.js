@@ -211,7 +211,7 @@ router.get('/:id/public', async (req, res) => {
     const deletionPending = !!config.pendingDeletion;
     const {
       companyName, logo, primaryColor, accentColor, fontFamily,
-      ctaHeadline, ctaSubtext, ctaPhone, ctaEmail,
+      ctaHeadline, ctaHeadlineEnabled, ctaSubtext, ctaPhone, ctaEmail,
       serviceStates, frameHeight, borderRadius, services,
     } = config;
     // Same no-store as the authed GET /:id -- a subscriber who just changed
@@ -223,7 +223,7 @@ router.get('/:id/public', async (req, res) => {
       success: true,
       data: {
         companyName, logo, primaryColor, accentColor, fontFamily,
-        ctaHeadline, ctaSubtext, ctaPhone, ctaEmail,
+        ctaHeadline, ctaHeadlineEnabled, ctaSubtext, ctaPhone, ctaEmail,
         serviceStates, serviceCities: normalizeServiceCities(config), frameHeight, borderRadius, services,
         paused: !sub.active || deletionPending,
         trialDaysLeft: sub.daysLeft,
