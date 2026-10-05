@@ -220,6 +220,14 @@ export async function cancelAdminWebsiteSubscription(adminKey, id) {
   });
 }
 
+// Permanent, immediate delete -- cancels their Stripe subscription (if any)
+// and removes the request row. No undo, same as deleteAdminCompanyForever.
+export async function deleteAdminWebsiteRequestForever(adminKey, id) {
+  return apiFetch(`/api/admin/website-requests/${id}`, {
+    method: 'DELETE', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true }),
+  });
+}
+
 // WebsiteApproval.js -- public, token-gated (no adminKey/login; the random
 // token in the URL is the auth). Backs the prospect-facing approve-and-pay
 // flow for a "Get a Website" application.

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { RefreshCw, Inbox, Mail, Phone, X, Copy, Check, ExternalLink, Ban } from 'lucide-react';
-import { getAdminWebsiteRequests, patchAdminWebsiteRequest, cancelAdminWebsiteSubscription } from '../../utils/api';
+import { RefreshCw, Inbox, Mail, Phone, X, Copy, Check, ExternalLink, Ban, Trash2 } from 'lucide-react';
+import { getAdminWebsiteRequests, patchAdminWebsiteRequest, cancelAdminWebsiteSubscription, deleteAdminWebsiteRequestForever } from '../../utils/api';
 import { formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 
@@ -38,6 +38,7 @@ export default function AdminWebsiteRequests() {
   const [noteStatus, setNoteStatus] = useState('');
   const [savingSample, setSavingSample] = useState(false);
   const [cancelingSub, setCancelingSub] = useState(false);
+  const [deletingReq, setDeletingReq] = useState(false);
   const [subscriptionIdInput, setSubscriptionIdInput] = useState('');
   const [linkingSub, setLinkingSub] = useState(false);
   const [linkError, setLinkError] = useState('');
@@ -208,6 +209,33 @@ export default function AdminWebsiteRequests() {
       console.error('Failed to cancel subscription:', err.message);
     } finally {
       setCancelingSub(false);
+    }
+  };
+
+  // Permanently removes the request -- cancels any still-active Stripe
+  // subscription server-side first (see DELETE /api/admin/website-requests/:id)
+  // so nothing keeps billing with no record left to trace it back to.
+  const deleteRequest = async () => {
+    if (!selected) return;
+    const hasActiveSub = selected.status === 'active' && selected.stripe_subscription_id;
+    const ok = await confirm({
+      title: `Permanently delete ${selected.business}?`,
+      message: hasActiveSub
+        ? "This cancels their Stripe subscription and deletes this request completely -- there's no undo."
+        : "This deletes this request completely -- there's no undo.",
+      confirmLabel: 'Delete Forever',
+      danger: true,
+    });
+    if (!ok) return;
+    setDeletingReq(true);
+    try {
+      await deleteAdminWebsiteRequestForever(adminKey, selected.id);
+      setRequests(prev => prev.filter(r => r.id !== selected.id));
+      setSelected(null);
+    } catch (err) {
+      console.error('Failed to delete website request:', err.message);
+    } finally {
+      setDeletingReq(false);
     }
   };
 
@@ -502,6 +530,13 @@ export default function AdminWebsiteRequests() {
                     <X size={13} /> Decline
                   </button>
                 )}
+                <button
+                  onClick={deleteRequest}
+                  disabled={deletingReq}
+                  style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: deletingReq ? 'default' : 'pointer', fontWeight: 600, fontSize: 13, opacity: deletingReq ? 0.6 : 1 }}
+                >
+                  <Trash2 size={13} /> {deletingReq ? 'Deleting…' : 'Delete Forever'}
+                </button>
               </div>
             </div>
           )}

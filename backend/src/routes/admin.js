@@ -688,4 +688,48 @@ router.post('/website-requests/:id/cancel-subscription', async (req, res) => {
   }
 });
 
+// DELETE /api/admin/website-requests/:id — permanently deletes a website
+// request. Cancels any still-active Stripe subscription first (same reason
+// as DELETE /companies/:id above -- otherwise someone keeps getting billed
+// with no record left anywhere to trace it back to or cancel it from).
+// Requires { confirm: true }, same deliberate-second-step pattern as every
+// other destructive action in this file, since a GET/bookmark/retry must
+// never trigger this. Immediate and irreversible -- there's no grace
+// period or undo, unlike a client's own self-service account deletion.
+router.delete('/website-requests/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+  if (req.body?.confirm !== true) {
+    return res.status(400).json({ success: false, error: 'Refusing to delete without { confirm: true } in the request body.' });
+  }
+
+  const { id } = req.params;
+
+  try {
+    const { data: request, error: fetchErr } = await sb.from('website_requests').select('*').eq('id', id).maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (!request) return res.status(404).json({ success: false, error: 'Not found' });
+
+    if (request.stripe_subscription_id && request.status !== 'canceled' && process.env.STRIPE_SECRET_KEY) {
+      try {
+        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.cancel(request.stripe_subscription_id);
+      } catch (err) {
+        // Already canceled on Stripe's own side is fine; anything else is a
+        // real failure, but still shouldn't block deleting the local record
+        // -- log it loudly instead so it can be double-checked by hand.
+        if (err.code !== 'resource_missing') console.warn(`Admin delete website-request ${id}: Stripe cancel warning:`, err.message);
+      }
+    }
+
+    const { error: deleteErr } = await sb.from('website_requests').delete().eq('id', id);
+    if (deleteErr) throw deleteErr;
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(`Admin delete website-request ${id} error:`, err.message);
+    res.status(500).json({ success: false, error: 'Failed to delete website request' });
+  }
+});
+
 module.exports = router;
