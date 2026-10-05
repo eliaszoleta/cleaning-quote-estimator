@@ -1588,9 +1588,12 @@ function buildWebsiteSubscriptionConfirmedHtml({ name, business, trialDays, mont
 </div>`;
 }
 
-// Sent once a request's subscription Checkout Session completes (see
-// activateSubscription in routes/websiteRequest.js, called from both the
-// verify-subscription route and its webhook backup).
+// Sent once the $5 setup fee actually clears (see markSetupPaid in
+// routes/websiteRequest.js) -- that's the one fully-automated moment in
+// this flow, so it's also the moment the client is told what to expect
+// (2 months free, billed starting month 3). The $249/mo subscription
+// itself gets linked later by hand in the admin panel, deliberately
+// silently -- see PATCH /api/admin/website-requests/:id.
 async function sendWebsiteSubscriptionConfirmedEmail({ to, name, business, trialDays, monthlyPrice }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {

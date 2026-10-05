@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
-const { sendWebsiteRequestNotificationEmail } = require('../services/email');
+const { sendWebsiteRequestNotificationEmail, sendWebsiteSubscriptionConfirmedEmail } = require('../services/email');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 const SETUP_FEE_CENTS = 500; // $5
-const MONTHLY_PRICE_CENTS = 24900; // $249 -- quoted in the $5 receipt's description only; the actual $249/mo trial subscription is created manually by an admin in Stripe (see routes/admin.js)
+const MONTHLY_PRICE_CENTS = 24900; // $249 -- quoted in the $5 receipt's description and the confirmation email below; the actual $249/mo trial subscription itself is created manually by an admin in Stripe (see routes/admin.js)
+const TRIAL_DAYS = 60; // matches the "2 months free" language used everywhere else -- quoted in the confirmation email only, the real trial length is whatever the admin sets by hand when creating the subscription in Stripe
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -135,7 +136,11 @@ async function getOrCreateCustomer(stripe, sb, request) {
 
 // Marks the $5 setup fee paid (idempotent -- a retried call, or the webhook
 // racing this one, both just re-set the same fields) and returns the
-// request row.
+// request row. Every caller below only reaches this after already checking
+// request.setup_fee_paid_at was still unset, so a call that gets here really
+// is the first time -- that's what fires the confirmation email, right when
+// the fee actually clears, instead of waiting on an admin to later link the
+// $249/mo subscription by hand (which can happen days afterward).
 async function markSetupPaid(sb, request) {
   if (request.setup_fee_paid_at) return request;
   const { data, error } = await sb
@@ -145,6 +150,15 @@ async function markSetupPaid(sb, request) {
     .select()
     .single();
   if (error) throw error;
+
+  sendWebsiteSubscriptionConfirmedEmail({
+    to: data.email,
+    name: data.name,
+    business: data.business,
+    trialDays: TRIAL_DAYS,
+    monthlyPrice: MONTHLY_PRICE_CENTS / 100,
+  }).catch(err => console.error('sendWebsiteSubscriptionConfirmedEmail failed:', err.message));
+
   return data;
 }
 

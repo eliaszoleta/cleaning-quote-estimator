@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { sendCompanyWelcomeEmail, sendWebsiteSampleReadyEmail, sendWebsiteSubscriptionConfirmedEmail } = require('../services/email');
+const { sendCompanyWelcomeEmail, sendWebsiteSampleReadyEmail } = require('../services/email');
 const { getCompanyConfig } = require('../services/companyConfig');
 const { resolveCityForZip } = require('../services/zipCity');
 
@@ -520,13 +520,6 @@ router.delete('/partners/:id', async (req, res) => {
 // $249-month-3 approval flow at /website-approval/:token.
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
-// Presentation-only values for the activation confirmation email below --
-// the real trial length/price live in Stripe itself (the admin sets both
-// when manually creating each client's subscription; see the PATCH route's
-// stripe_subscription_id handling), these just need to match what's quoted
-// on the pricing page and the $5 receipt (routes/websiteRequest.js).
-const WEBSITE_TRIAL_DAYS = 60;
-const WEBSITE_MONTHLY_PRICE = 249;
 
 // GET /api/admin/website-requests
 router.get('/website-requests', async (req, res) => {
@@ -561,7 +554,11 @@ router.get('/website-requests', async (req, res) => {
 // future billing on its own from the moment that subscription exists, no
 // code involved). Verified against Stripe itself before trusting it, since
 // a pasted id is exactly the kind of thing a typo or copy-paste mistake
-// happens to.
+// happens to. Deliberately silent (no email) -- the client already got the
+// full "2 months free, billed starting month 3" confirmation the moment
+// their $5 fee cleared (see markSetupPaid in routes/websiteRequest.js);
+// this step is just internal bookkeeping to attach the subscription Stripe
+// is already running on its own.
 router.patch('/website-requests/:id', async (req, res) => {
   const sb = getSupabase();
   if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
@@ -627,17 +624,6 @@ router.patch('/website-requests/:id', async (req, res) => {
         sampleUrl: updated.sample_url,
         approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}`,
       }).catch(err => console.error('sendWebsiteSampleReadyEmail failed:', err.message));
-    }
-
-    const justBecameActive = existing.status !== 'active' && updated.status === 'active' && updated.stripe_subscription_id;
-    if (justBecameActive) {
-      sendWebsiteSubscriptionConfirmedEmail({
-        to: updated.email,
-        name: updated.name,
-        business: updated.business,
-        trialDays: WEBSITE_TRIAL_DAYS,
-        monthlyPrice: WEBSITE_MONTHLY_PRICE,
-      }).catch(err => console.error('sendWebsiteSubscriptionConfirmedEmail failed:', err.message));
     }
 
     res.json({ success: true, data: { ...updated, approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}` } });
