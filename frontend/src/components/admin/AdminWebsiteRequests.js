@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { RefreshCw, Inbox, Mail, Phone, X, Copy, Check, ExternalLink } from 'lucide-react';
-import { getAdminWebsiteRequests, patchAdminWebsiteRequest } from '../../utils/api';
+import { RefreshCw, Inbox, Mail, Phone, X, Copy, Check, ExternalLink, Ban } from 'lucide-react';
+import { getAdminWebsiteRequests, patchAdminWebsiteRequest, cancelAdminWebsiteSubscription } from '../../utils/api';
 import { formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 
@@ -12,6 +12,7 @@ const STATUS_META = {
   approved: { label: 'Approved', color: '#2563eb' },
   active: { label: 'Active', color: '#16a34a' },
   declined: { label: 'Declined', color: '#dc2626' },
+  canceled: { label: 'Canceled', color: '#94a3b8' },
 };
 
 // Site-owner queue for "Get a Website" applications (WebsiteSubscription.js's
@@ -36,6 +37,7 @@ export default function AdminWebsiteRequests() {
   const [notes, setNotes] = useState('');
   const [noteStatus, setNoteStatus] = useState('');
   const [savingSample, setSavingSample] = useState(false);
+  const [cancelingSub, setCancelingSub] = useState(false);
   const [copied, setCopied] = useState(false);
   const notesTimer = useRef(null);
   const { confirm, dialog: confirmDialog } = useConfirm();
@@ -160,6 +162,26 @@ export default function AdminWebsiteRequests() {
       applyUpdate(selected.id, res.data);
     } catch (err) {
       console.error('Failed to decline request:', err.message);
+    }
+  };
+
+  const cancelSubscription = async () => {
+    if (!selected) return;
+    const ok = await confirm({
+      title: `Cancel ${selected.business}'s subscription?`,
+      message: "This cancels it in Stripe immediately -- they'll lose access to their site right away, and this can't be undone from here.",
+      confirmLabel: 'Cancel Subscription',
+      danger: true,
+    });
+    if (!ok) return;
+    setCancelingSub(true);
+    try {
+      const res = await cancelAdminWebsiteSubscription(adminKey, selected.id);
+      applyUpdate(selected.id, res.data);
+    } catch (err) {
+      console.error('Failed to cancel subscription:', err.message);
+    } finally {
+      setCancelingSub(false);
     }
   };
 
@@ -331,13 +353,17 @@ export default function AdminWebsiteRequests() {
               )}
 
               {/* Billing status -- read-only summary of where this request
-                  is in the $5-setup / 2-months-free / $249-month-3 flow. */}
+                  is in the $5-setup / 2-months-free / $249-month-3 flow.
+                  Switches to the canceled styling once canceled_at is set,
+                  rather than just appending a canceled line to an otherwise
+                  still-green "active" box. */}
               {(selected.setup_fee_paid_at || selected.subscription_started_at) && (
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Billing</div>
-                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '11px 13px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {selected.setup_fee_paid_at && <div style={{ fontSize: 12.5, color: '#15803d', fontWeight: 600 }}>$5 setup fee paid {formatDateTime(selected.setup_fee_paid_at)}</div>}
-                    {selected.subscription_started_at && <div style={{ fontSize: 12.5, color: '#15803d', fontWeight: 600 }}>Subscription active since {formatDateTime(selected.subscription_started_at)} (2 months free, then $249/mo)</div>}
+                  <div style={{ background: selected.canceled_at ? '#f8fafc' : '#f0fdf4', border: `1px solid ${selected.canceled_at ? '#e2e8f0' : '#bbf7d0'}`, borderRadius: 8, padding: '11px 13px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {selected.setup_fee_paid_at && <div style={{ fontSize: 12.5, color: selected.canceled_at ? '#64748b' : '#15803d', fontWeight: 600 }}>$5 setup fee paid {formatDateTime(selected.setup_fee_paid_at)}</div>}
+                    {selected.subscription_started_at && <div style={{ fontSize: 12.5, color: selected.canceled_at ? '#64748b' : '#15803d', fontWeight: 600 }}>Subscription {selected.canceled_at ? 'started' : 'active since'} {formatDateTime(selected.subscription_started_at)} (2 months free, then $249/mo)</div>}
+                    {selected.canceled_at && <div style={{ fontSize: 12.5, color: '#dc2626', fontWeight: 600 }}>Canceled {formatDateTime(selected.canceled_at)}</div>}
                   </div>
                 </div>
               )}
@@ -404,7 +430,16 @@ export default function AdminWebsiteRequests() {
                     )}
                   </div>
                 )}
-                {selected.status !== 'declined' && selected.status !== 'active' && (
+                {selected.status === 'active' && (
+                  <button
+                    onClick={cancelSubscription}
+                    disabled={cancelingSub}
+                    style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: cancelingSub ? 'default' : 'pointer', fontWeight: 600, fontSize: 13, opacity: cancelingSub ? 0.6 : 1 }}
+                  >
+                    <Ban size={13} /> {cancelingSub ? 'Canceling…' : 'Cancel Subscription'}
+                  </button>
+                )}
+                {selected.status !== 'declined' && selected.status !== 'active' && selected.status !== 'canceled' && (
                   <button
                     onClick={declineRequest}
                     style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}

@@ -214,6 +214,12 @@ export async function patchAdminWebsiteRequest(adminKey, id, updates) {
   });
 }
 
+export async function cancelAdminWebsiteSubscription(adminKey, id) {
+  return apiFetch(`/api/admin/website-requests/${id}/cancel-subscription`, {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true }),
+  });
+}
+
 // WebsiteApproval.js -- public, token-gated (no adminKey/login; the random
 // token in the URL is the auth). Backs the prospect-facing approve-and-pay
 // flow for a "Get a Website" application.

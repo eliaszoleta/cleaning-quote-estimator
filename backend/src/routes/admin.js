@@ -552,7 +552,7 @@ router.patch('/website-requests/:id', async (req, res) => {
 
   const { id } = req.params;
   const { sample_url, status, admin_notes } = req.body || {};
-  const allowedStatuses = ['submitted', 'sample_ready', 'approved', 'active', 'declined'];
+  const allowedStatuses = ['submitted', 'sample_ready', 'approved', 'active', 'declined', 'canceled'];
   if (status !== undefined && !allowedStatuses.includes(status)) {
     return res.status(400).json({ success: false, error: 'Invalid status' });
   }
@@ -592,6 +592,61 @@ router.patch('/website-requests/:id', async (req, res) => {
   } catch (err) {
     console.error('Admin update website-request error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to update website request' });
+  }
+});
+
+// POST /api/admin/website-requests/:id/cancel-subscription — cancels the
+// client's Stripe subscription immediately (not at period end -- by the
+// time anyone's asking to cancel they're either still in the free trial
+// with nothing paid for this period, or past it and "cancel anytime" on
+// the pricing page doesn't promise a prorated runout) and marks the
+// request 'canceled'. Requires { confirm: true }, same deliberate-
+// second-step pattern as DELETE /companies/:id above, since a GET/
+// bookmark/retry must never trigger this.
+router.post('/website-requests/:id/cancel-subscription', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+  if (req.body?.confirm !== true) {
+    return res.status(400).json({ success: false, error: 'Refusing to cancel without { confirm: true } in the request body.' });
+  }
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return res.status(503).json({ success: false, error: 'Stripe is not configured' });
+  }
+
+  const { id } = req.params;
+
+  try {
+    const { data: request, error: fetchErr } = await sb.from('website_requests').select('*').eq('id', id).maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (!request) return res.status(404).json({ success: false, error: 'Not found' });
+    if (request.status === 'canceled') return res.status(400).json({ success: false, error: 'Already canceled.' });
+    if (!request.stripe_subscription_id) {
+      return res.status(400).json({ success: false, error: 'This request has no active subscription to cancel.' });
+    }
+
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    try {
+      await stripe.subscriptions.cancel(request.stripe_subscription_id);
+    } catch (err) {
+      // Already canceled on Stripe's own side (e.g. a previous attempt's
+      // Stripe call succeeded but the DB update below it failed) -- treat
+      // as success rather than blocking the admin from marking it canceled
+      // here too.
+      if (err.code !== 'resource_missing') throw err;
+    }
+
+    const { data: updated, error: updateErr } = await sb
+      .from('website_requests')
+      .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    if (updateErr) throw updateErr;
+
+    res.json({ success: true, data: { ...updated, approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}` } });
+  } catch (err) {
+    console.error('Admin cancel website-request subscription error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to cancel subscription' });
   }
 });
 
