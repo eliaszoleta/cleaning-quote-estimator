@@ -5,32 +5,55 @@ import {
   getWebsiteRequestByToken,
   postWebsiteRequestCheckout,
   postWebsiteRequestVerifySetup,
-  postWebsiteRequestVerifySubscription,
+  postWebsiteRequestConfirmPayment,
 } from '../../utils/api';
 
 const PRIMARY_GRADIENT = '#1d4ed8';
 const SETUP_FEE = 5;
 const FREE_MONTHS = 2;
 const MONTHLY_PRICE = 249;
+const STRIPE_PUBLISHABLE_KEY = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
+
+let stripeJsPromise = null;
+// Loads Stripe.js lazily -- only the rare case where a bank requires 3D
+// Secure on the $5 charge needs it at all, so it's never fetched on the
+// common path where verify-setup finishes the whole approval in one go.
+function loadStripeJs() {
+  if (window.Stripe) return Promise.resolve(window.Stripe(STRIPE_PUBLISHABLE_KEY));
+  if (!stripeJsPromise) {
+    stripeJsPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v3/';
+      script.onload = () => resolve(window.Stripe(STRIPE_PUBLISHABLE_KEY));
+      script.onerror = () => reject(new Error('Failed to load Stripe.js'));
+      document.head.appendChild(script);
+    });
+  }
+  return stripeJsPromise;
+}
 
 // The "Get a Website" approval + payment page -- /website-approval/:token,
 // linked from the sample-ready email (see services/email.js's
 // buildWebsiteSampleReadyHtml) and AdminWebsiteRequests.js's copyable link.
 // No login of its own: the random token in the URL is the auth (see
 // routes/websiteRequest.js's by-token routes). Walks a prospect through
-// reviewing their free sample, then a two-step Stripe Checkout redirect --
-// a $5 one-time setup fee first, then a $249/mo subscription with a 60-day
-// trial -- landing back on this same page between and after each step via
-// the ?step= query param.
+// reviewing their free sample, then ONE Stripe Checkout redirect that only
+// collects a card (see routes/websiteRequest.js's mode='setup' session) --
+// the backend charges the $5 setup fee and creates the trial subscription
+// itself right after that, with no second card-entry step. The only time
+// this page needs anything further from the customer is the rare case
+// where their bank requires a 3D Secure challenge on that $5 charge, shown
+// inline via Stripe.js rather than another redirect.
 export default function WebsiteApproval({ token }) {
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState(null);
-  // 'idle' | 'verifying_setup' | 'verifying_subscription' -- drives the
-  // full-page processing state while a return-from-Stripe redirect resolves
-  // server-side before this page can show the real status.
+  // 'idle' | 'verifying_setup' | 'completing_3ds' -- drives the full-page
+  // processing state while a return-from-Stripe redirect resolves
+  // server-side (or a 3D Secure challenge completes) before this page can
+  // show the real status.
   const [resolving, setResolving] = useState('idle');
 
   const load = useCallback(async () => {
@@ -46,49 +69,55 @@ export default function WebsiteApproval({ token }) {
 
   useEffect(() => { load(); }, [load]);
 
-  // Resolves the two Stripe redirect hops. Runs once per page load (the
-  // session_id in the URL is single-use on Stripe's side anyway), then
-  // scrubs the query string so a refresh doesn't attempt to re-verify an
-  // already-consumed session.
+  // Resolves the redirect back from Stripe's card-collection step. Runs
+  // once per page load (the session_id is single-use on Stripe's side
+  // anyway), then scrubs the query string so a refresh doesn't attempt to
+  // re-verify an already-consumed session.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const step = params.get('step');
     const sessionId = params.get('session_id');
-    if (!step || !sessionId) return;
+    if (step !== 'setup' || !sessionId) return;
 
     const cleanUrl = () => window.history.replaceState({}, '', window.location.pathname);
 
-    if (step === 'setup') {
-      setResolving('verifying_setup');
-      postWebsiteRequestVerifySetup(token, sessionId)
-        .then(res => {
-          cleanUrl();
-          if (res.url) {
-            window.location.href = res.url;
+    setResolving('verifying_setup');
+    postWebsiteRequestVerifySetup(token, sessionId)
+      .then(async res => {
+        cleanUrl();
+        const data = res.data || {};
+
+        if (data.requiresAction && data.clientSecret) {
+          // The bank wants extra verification on the $5 charge -- handled
+          // inline via Stripe.js instead of another redirect/checkout page.
+          setResolving('completing_3ds');
+          const stripe = await loadStripeJs();
+          const result = await stripe.confirmCardPayment(data.clientSecret);
+          if (result.error) {
+            setResolving('idle');
+            setError(result.error.message || 'Your card could not be verified. Please try again.');
             return;
           }
+          await postWebsiteRequestConfirmPayment(token, result.paymentIntent.id);
           setResolving('idle');
           load();
-        })
-        .catch(err => {
-          cleanUrl();
+          return;
+        }
+
+        if (data.declined) {
           setResolving('idle');
-          setError(err.message || 'Failed to verify your payment. Please try again.');
-        });
-    } else if (step === 'subscribed') {
-      setResolving('verifying_subscription');
-      postWebsiteRequestVerifySubscription(token, sessionId)
-        .then(() => {
-          cleanUrl();
-          setResolving('idle');
-          load();
-        })
-        .catch(err => {
-          cleanUrl();
-          setResolving('idle');
-          setError(err.message || 'Failed to confirm your subscription. Please try again.');
-        });
-    }
+          setError(data.error || 'Your card was declined. Please try again.');
+          return;
+        }
+
+        setResolving('idle');
+        load();
+      })
+      .catch(err => {
+        cleanUrl();
+        setResolving('idle');
+        setError(err.message || 'Failed to verify your payment. Please try again.');
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
@@ -97,7 +126,14 @@ export default function WebsiteApproval({ token }) {
     setError(null);
     try {
       const res = await postWebsiteRequestCheckout(token);
-      window.location.href = res.url;
+      if (res.url) {
+        window.location.href = res.url;
+        return;
+      }
+      // Resume path: the $5 fee was already paid earlier, so this finished
+      // the subscription immediately with no redirect at all.
+      setStarting(false);
+      load();
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
       setStarting(false);
@@ -113,7 +149,7 @@ export default function WebsiteApproval({ token }) {
         <div style={{ textAlign: 'center', color: '#64748b' }}>
           <Loader2 size={28} className="wa-spin" style={{ marginBottom: 12 }} />
           <div style={{ fontSize: 14.5, fontWeight: 600 }}>
-            {resolving === 'verifying_setup' ? 'Confirming your payment…' : resolving === 'verifying_subscription' ? 'Setting up your subscription…' : 'Loading…'}
+            {resolving === 'verifying_setup' ? 'Confirming your payment…' : resolving === 'completing_3ds' ? 'Verifying your card…' : 'Loading…'}
           </div>
           <style>{`.wa-spin { animation: wa-spin 0.9s linear infinite; } @keyframes wa-spin { to { transform: rotate(360deg); } }`}</style>
         </div>
@@ -161,6 +197,16 @@ export default function WebsiteApproval({ token }) {
               <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>This request is closed</h1>
               <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, margin: 0 }}>
                 Changed your mind, or think this is a mistake? Just reply to any email from us and we'll help.
+              </p>
+            </>
+          )}
+
+          {request.status === 'canceled' && (
+            <>
+              <XCircle size={40} color="#94a3b8" style={{ marginBottom: 14 }} />
+              <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Subscription canceled</h1>
+              <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, margin: 0 }}>
+                Your subscription for {request.business} has been canceled. Want to start it back up? Just reply to any email from us.
               </p>
             </>
           )}

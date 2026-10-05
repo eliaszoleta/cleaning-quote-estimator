@@ -237,8 +237,11 @@ export async function postWebsiteRequestVerifySetup(token, sessionId) {
   });
 }
 
-export async function postWebsiteRequestVerifySubscription(token, sessionId) {
-  return apiFetch(`/api/website-request/by-token/${token}/verify-subscription`, {
-    method: 'POST', body: JSON.stringify({ sessionId }),
+// Only called when verify-setup above comes back with requiresAction (the
+// customer's bank required a 3D Secure challenge on the $5 charge) and the
+// frontend has just completed that challenge via stripe.confirmCardPayment.
+export async function postWebsiteRequestConfirmPayment(token, paymentIntentId) {
+  return apiFetch(`/api/website-request/by-token/${token}/confirm-payment`, {
+    method: 'POST', body: JSON.stringify({ paymentIntentId }),
   });
 }
