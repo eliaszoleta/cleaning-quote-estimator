@@ -156,7 +156,7 @@ export default function WebsiteOfferBanner() {
         href="/website-for-cleaning-companies#apply"
         style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: 'white', padding: isMobile ? '6px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(29,78,216,0.28)' }}
       >
-        Build My Free Sample Site <span className="wob-arrow"><ArrowRight size={isMobile ? 11 : 13} /></span>
+        Build My Free Sample <span className="wob-arrow"><ArrowRight size={isMobile ? 11 : 13} /></span>
       </a>
     </div>,
     document.body
