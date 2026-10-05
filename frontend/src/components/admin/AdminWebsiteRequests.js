@@ -38,6 +38,9 @@ export default function AdminWebsiteRequests() {
   const [noteStatus, setNoteStatus] = useState('');
   const [savingSample, setSavingSample] = useState(false);
   const [cancelingSub, setCancelingSub] = useState(false);
+  const [subscriptionIdInput, setSubscriptionIdInput] = useState('');
+  const [linkingSub, setLinkingSub] = useState(false);
+  const [linkError, setLinkError] = useState('');
   const [copied, setCopied] = useState(false);
   const notesTimer = useRef(null);
   const { confirm, dialog: confirmDialog } = useConfirm();
@@ -63,6 +66,8 @@ export default function AdminWebsiteRequests() {
       setNotes(selected.admin_notes || '');
       setSampleUrlInput(selected.sample_url || '');
       setNoteStatus('');
+      setSubscriptionIdInput('');
+      setLinkError('');
     }
   }, [selected?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -162,6 +167,27 @@ export default function AdminWebsiteRequests() {
       applyUpdate(selected.id, res.data);
     } catch (err) {
       console.error('Failed to decline request:', err.message);
+    }
+  };
+
+  // Links the $249/mo trial subscription an admin created by hand in the
+  // Stripe Dashboard (see WEBSITE_TRIAL_DAYS/WEBSITE_MONTHLY_PRICE in
+  // routes/admin.js) -- the backend verifies the id actually exists in
+  // Stripe and belongs to this request's customer before trusting it, so a
+  // typo or pasted-the-wrong-id mistake surfaces here instead of silently
+  // linking the wrong client.
+  const linkSubscription = async () => {
+    if (!selected || !subscriptionIdInput.trim()) return;
+    setLinkingSub(true);
+    setLinkError('');
+    try {
+      const res = await patchAdminWebsiteRequest(adminKey, selected.id, { stripe_subscription_id: subscriptionIdInput.trim() });
+      applyUpdate(selected.id, res.data);
+      setSubscriptionIdInput('');
+    } catch (err) {
+      setLinkError(err.message || 'Failed to link subscription');
+    } finally {
+      setLinkingSub(false);
     }
   };
 
@@ -365,6 +391,35 @@ export default function AdminWebsiteRequests() {
                     {selected.subscription_started_at && <div style={{ fontSize: 12.5, color: selected.canceled_at ? '#64748b' : '#15803d', fontWeight: 600 }}>Subscription {selected.canceled_at ? 'started' : 'active since'} {formatDateTime(selected.subscription_started_at)} (2 months free, then $249/mo)</div>}
                     {selected.canceled_at && <div style={{ fontSize: 12.5, color: '#dc2626', fontWeight: 600 }}>Canceled {formatDateTime(selected.canceled_at)}</div>}
                   </div>
+                </div>
+              )}
+
+              {/* Shown once the $5 fee is paid but no subscription is linked
+                  yet -- the $249/mo trial itself is created by hand in the
+                  Stripe Dashboard (60-day trial, their saved card), then
+                  pasted in here to activate the client and notify them. */}
+              {selected.status === 'approved' && (
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Link Subscription</div>
+                  <p style={{ fontSize: 11.5, color: '#64748b', margin: '0 0 8px', lineHeight: 1.5 }}>
+                    Create their $249/mo subscription in Stripe (60-day trial, using their saved card), then paste the subscription ID here to activate and notify them.
+                  </p>
+                  <div style={{ display: 'flex', gap: 7 }}>
+                    <input
+                      value={subscriptionIdInput}
+                      onChange={e => setSubscriptionIdInput(e.target.value)}
+                      placeholder="sub_..."
+                      style={{ flex: 1, padding: '9px 11px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, outline: 'none', color: '#0f172a' }}
+                    />
+                    <button
+                      onClick={linkSubscription}
+                      disabled={linkingSub || !subscriptionIdInput.trim()}
+                      style={{ padding: '9px 14px', background: '#16a34a', color: 'white', border: 'none', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 12.5, opacity: (linkingSub || !subscriptionIdInput.trim()) ? 0.5 : 1, whiteSpace: 'nowrap' }}
+                    >
+                      {linkingSub ? 'Linking…' : 'Link & Activate'}
+                    </button>
+                  </div>
+                  {linkError && <p style={{ fontSize: 11.5, color: '#dc2626', margin: '6px 0 0' }}>{linkError}</p>}
                 </div>
               )}
 

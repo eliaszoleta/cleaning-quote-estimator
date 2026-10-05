@@ -1,15 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
-const {
-  sendWebsiteRequestNotificationEmail,
-  sendWebsiteSubscriptionConfirmedEmail,
-} = require('../services/email');
+const { sendWebsiteRequestNotificationEmail } = require('../services/email');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 const SETUP_FEE_CENTS = 500; // $5
-const MONTHLY_PRICE_CENTS = 24900; // $249
-const TRIAL_DAYS = 60; // ~2 months free before the first $249 charge
+const MONTHLY_PRICE_CENTS = 24900; // $249 -- quoted in the $5 receipt's description only; the actual $249/mo trial subscription is created manually by an admin in Stripe (see routes/admin.js)
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -137,64 +133,6 @@ async function getOrCreateCustomer(stripe, sb, request) {
   return customer.id;
 }
 
-// Creates the $249/mo subscription directly via the Subscriptions API --
-// not a second Checkout Session, since there's no second card entry in this
-// flow. Reuses the payment method already saved and set as the customer's
-// default payment method during the $5 setup-fee charge (see
-// chargeSetupFee/verify-setup below), so Stripe already knows what to bill
-// once the trial ends. trial_period_days defers that first real invoice
-// ~2 months out -- same day-based approximation as before (Checkout-era
-// comment applies equally to the Subscriptions API: no exact "2 calendar
-// months" option without computing and passing a trial_end timestamp
-// instead). Idempotent -- a retried call after the subscription already
-// exists just returns the request row unchanged.
-async function createSubscriptionForRequest(stripe, sb, request) {
-  if (request.stripe_subscription_id) return request;
-
-  const subscription = await stripe.subscriptions.create({
-    customer: request.stripe_customer_id,
-    items: [{
-      price_data: {
-        currency: 'usd',
-        product_data: { name: 'Clean Estimator — Cleaning Website Subscription' },
-        unit_amount: MONTHLY_PRICE_CENTS,
-        recurring: { interval: 'month' },
-      },
-    }],
-    trial_period_days: TRIAL_DAYS,
-    // Same reasoning as chargeSetupFee's payment_method_types -- without
-    // this, Stripe falls back to the account's automatic payment methods,
-    // which can include redirect-based ones that need a return_url this
-    // flow has no use for (there's no charge to redirect for; the trial
-    // defers it). Pinning to card matches the one payment method this
-    // customer actually has saved.
-    payment_settings: { payment_method_types: ['card'] },
-    metadata: { type: 'website_request_subscription', requestId: request.id },
-  });
-
-  const { data, error } = await sb
-    .from('website_requests')
-    .update({
-      status: 'active',
-      stripe_subscription_id: subscription.id,
-      subscription_started_at: new Date().toISOString(),
-    })
-    .eq('id', request.id)
-    .select()
-    .single();
-  if (error) throw error;
-
-  sendWebsiteSubscriptionConfirmedEmail({
-    to: data.email,
-    name: data.name,
-    business: data.business,
-    trialDays: TRIAL_DAYS,
-    monthlyPrice: MONTHLY_PRICE_CENTS / 100,
-  }).catch(err => console.error('sendWebsiteSubscriptionConfirmedEmail failed:', err.message));
-
-  return data;
-}
-
 // Marks the $5 setup fee paid (idempotent -- a retried call, or the webhook
 // racing this one, both just re-set the same fields) and returns the
 // request row.
@@ -237,18 +175,16 @@ async function chargeSetupFee(stripe, request, paymentMethodId) {
 }
 
 // POST /api/website-request/by-token/:token/checkout — public, token-gated.
-// Starts (or resumes) the approval payment flow:
-//   - sample_ready, nothing paid yet -> creates a mode='setup' Checkout
-//     Session that only collects and saves a card -- charges nothing.
-//     verify-setup below does the actual $5 charge once this redirects
-//     back, and the subscription right after that succeeds, so the whole
-//     approval only ever asks for a card once.
-//   - setup fee already paid but no subscription yet (e.g. the browser
-//     closed before that finished) -> the payment method is already saved
-//     as the customer's default, so this resumes straight into creating
-//     the subscription with no further card entry or redirect at all.
-// Never trusts a client-supplied amount -- both prices are built from the
-// server-side constants above.
+// Creates a mode='setup' Checkout Session that only collects and saves a
+// card -- charges nothing itself. verify-setup below does the actual $5
+// charge once this redirects back. There's deliberately no subscription
+// creation anywhere in this flow: an admin creates each client's $249/mo
+// trial subscription by hand in the Stripe Dashboard once they've paid
+// (see PATCH /api/admin/website-requests/:id's stripe_subscription_id
+// handling), so this route has nothing left to do once the fee is already
+// paid -- that's a terminal state from the customer's side.
+// Never trusts a client-supplied amount -- the price is built from the
+// server-side constant above.
 router.post('/by-token/:token/checkout', async (req, res) => {
   const sb = getSupabase();
   if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
@@ -262,14 +198,10 @@ router.post('/by-token/:token/checkout', async (req, res) => {
       return res.status(400).json({ success: false, error: 'This request is closed.' });
     }
     if (request.status === 'submitted') return res.status(400).json({ success: false, error: 'Your sample isn\'t ready to review yet.' });
+    if (request.setup_fee_paid_at) return res.status(400).json({ success: false, error: 'Your setup fee is already paid.' });
 
     const stripe = getStripe();
     const customerId = await getOrCreateCustomer(stripe, sb, request);
-
-    if (request.setup_fee_paid_at && !request.stripe_subscription_id) {
-      await createSubscriptionForRequest(stripe, sb, { ...request, stripe_customer_id: customerId });
-      return res.json({ success: true, data: { active: true } });
-    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'setup',
@@ -290,9 +222,9 @@ router.post('/by-token/:token/checkout', async (req, res) => {
 
 // POST /api/website-request/by-token/:token/verify-setup — called by
 // WebsiteApproval.js right after Stripe redirects back from the mode='setup'
-// Checkout Session. Attaches the saved card, charges the $5 setup fee on
-// it, and -- unless the bank requires extra verification -- creates the
-// subscription immediately after, all in this one request.
+// Checkout Session. Attaches the saved card and charges the $5 setup fee
+// on it -- that's the full job here; see routes/admin.js for how an admin
+// links each client's $249/mo trial subscription afterward.
 router.post('/by-token/:token/verify-setup', async (req, res) => {
   const { sessionId } = req.body || {};
   if (!sessionId) return res.status(400).json({ success: false, error: 'sessionId is required' });
@@ -307,8 +239,8 @@ router.post('/by-token/:token/verify-setup', async (req, res) => {
 
     // Already fully done -- a retried/duplicate call after the first one
     // already finished the whole flow.
-    if (request.stripe_subscription_id) {
-      return res.json({ success: true, data: { active: true } });
+    if (request.setup_fee_paid_at) {
+      return res.json({ success: true, data: { approved: true } });
     }
 
     const stripe = getStripe();
@@ -318,13 +250,6 @@ router.post('/by-token/:token/verify-setup', async (req, res) => {
     }
     if (session.status !== 'complete' || !session.setup_intent?.payment_method) {
       return res.json({ success: true, data: { ready: false } });
-    }
-
-    // Setup fee already charged (e.g. this exact success URL got reloaded)
-    // -- skip straight to the subscription instead of charging $5 twice.
-    if (request.setup_fee_paid_at) {
-      await createSubscriptionForRequest(stripe, sb, request);
-      return res.json({ success: true, data: { active: true } });
     }
 
     const paymentMethodId = session.setup_intent.payment_method;
@@ -357,9 +282,8 @@ router.post('/by-token/:token/verify-setup', async (req, res) => {
       return res.json({ success: true, data: { declined: true, error: 'Your card was declined. Please try again.' } });
     }
 
-    const paid = await markSetupPaid(sb, request);
-    await createSubscriptionForRequest(stripe, sb, paid);
-    res.json({ success: true, data: { active: true } });
+    await markSetupPaid(sb, request);
+    res.json({ success: true, data: { approved: true } });
   } catch (err) {
     console.error('website-request verify-setup error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to verify payment' });
@@ -370,9 +294,9 @@ router.post('/by-token/:token/verify-setup', async (req, res) => {
 // when verify-setup above returned requiresAction and the frontend
 // completed Stripe's 3D Secure challenge via stripe.confirmCardPayment.
 // Re-checks the PaymentIntent server-side (never trusts the client's own
-// claim that it succeeded) before running the same markSetupPaid +
-// createSubscriptionForRequest sequence verify-setup would have run
-// directly if no extra verification had been needed.
+// claim that it succeeded) before running the same markSetupPaid
+// verify-setup would have run directly if no extra verification had been
+// needed.
 router.post('/by-token/:token/confirm-payment', async (req, res) => {
   const { paymentIntentId } = req.body || {};
   if (!paymentIntentId) return res.status(400).json({ success: false, error: 'paymentIntentId is required' });
@@ -385,8 +309,8 @@ router.post('/by-token/:token/confirm-payment', async (req, res) => {
     if (error) throw error;
     if (!request) return res.status(404).json({ success: false, error: 'Not found' });
 
-    if (request.stripe_subscription_id) {
-      return res.json({ success: true, data: { active: true } });
+    if (request.setup_fee_paid_at) {
+      return res.json({ success: true, data: { approved: true } });
     }
 
     const stripe = getStripe();
@@ -398,9 +322,8 @@ router.post('/by-token/:token/confirm-payment', async (req, res) => {
       return res.json({ success: true, data: { declined: true, error: 'Your card was declined. Please try again.' } });
     }
 
-    const paid = await markSetupPaid(sb, request);
-    await createSubscriptionForRequest(stripe, sb, paid);
-    res.json({ success: true, data: { active: true } });
+    await markSetupPaid(sb, request);
+    res.json({ success: true, data: { approved: true } });
   } catch (err) {
     console.error('website-request confirm-payment error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to confirm payment' });

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { sendCompanyWelcomeEmail, sendWebsiteSampleReadyEmail } = require('../services/email');
+const { sendCompanyWelcomeEmail, sendWebsiteSampleReadyEmail, sendWebsiteSubscriptionConfirmedEmail } = require('../services/email');
 const { getCompanyConfig } = require('../services/companyConfig');
 const { resolveCityForZip } = require('../services/zipCity');
 
@@ -520,6 +520,13 @@ router.delete('/partners/:id', async (req, res) => {
 // $249-month-3 approval flow at /website-approval/:token.
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+// Presentation-only values for the activation confirmation email below --
+// the real trial length/price live in Stripe itself (the admin sets both
+// when manually creating each client's subscription; see the PATCH route's
+// stripe_subscription_id handling), these just need to match what's quoted
+// on the pricing page and the $5 receipt (routes/websiteRequest.js).
+const WEBSITE_TRIAL_DAYS = 60;
+const WEBSITE_MONTHLY_PRICE = 249;
 
 // GET /api/admin/website-requests
 router.get('/website-requests', async (req, res) => {
@@ -541,17 +548,26 @@ router.get('/website-requests', async (req, res) => {
 });
 
 // PATCH /api/admin/website-requests/:id — sets sample_url / status /
-// admin_notes. Moving status to 'sample_ready' (either explicitly, or
-// implicitly by attaching a sample_url to a request that's still
-// 'submitted') emails the prospect their approval link -- same
+// admin_notes / stripe_subscription_id. Moving status to 'sample_ready'
+// (either explicitly, or implicitly by attaching a sample_url to a request
+// that's still 'submitted') emails the prospect their approval link -- same
 // fire-and-forget philosophy as every other notification email in this
 // codebase, so a Resend hiccup doesn't fail the admin's save.
+//
+// stripe_subscription_id is how an admin links a client's $249/mo trial
+// subscription once they've created it by hand in the Stripe Dashboard
+// (see routes/websiteRequest.js -- the automated checkout only ever
+// collects the $5 setup fee, on purpose; Stripe runs the trial and all
+// future billing on its own from the moment that subscription exists, no
+// code involved). Verified against Stripe itself before trusting it, since
+// a pasted id is exactly the kind of thing a typo or copy-paste mistake
+// happens to.
 router.patch('/website-requests/:id', async (req, res) => {
   const sb = getSupabase();
   if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
 
   const { id } = req.params;
-  const { sample_url, status, admin_notes } = req.body || {};
+  const { sample_url, status, admin_notes, stripe_subscription_id } = req.body || {};
   const allowedStatuses = ['submitted', 'sample_ready', 'approved', 'active', 'declined', 'canceled'];
   if (status !== undefined && !allowedStatuses.includes(status)) {
     return res.status(400).json({ success: false, error: 'Invalid status' });
@@ -565,12 +581,37 @@ router.patch('/website-requests/:id', async (req, res) => {
     const updates = { updated_at: new Date().toISOString() };
     if (sample_url !== undefined) updates.sample_url = sample_url;
     if (admin_notes !== undefined) updates.admin_notes = admin_notes;
+
+    let subscriptionLinked = false;
+    if (stripe_subscription_id && !existing.stripe_subscription_id) {
+      if (!process.env.STRIPE_SECRET_KEY) {
+        return res.status(503).json({ success: false, error: 'Stripe is not configured' });
+      }
+      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      let subscription;
+      try {
+        subscription = await stripe.subscriptions.retrieve(stripe_subscription_id.trim());
+      } catch (err) {
+        return res.status(400).json({ success: false, error: 'That subscription ID could not be found in Stripe.' });
+      }
+      if (existing.stripe_customer_id && subscription.customer !== existing.stripe_customer_id) {
+        return res.status(400).json({ success: false, error: "That subscription belongs to a different customer than this request's — double-check the ID." });
+      }
+      updates.stripe_subscription_id = subscription.id;
+      updates.subscription_started_at = new Date().toISOString();
+      subscriptionLinked = true;
+    }
+
+    // Explicit status always wins; otherwise linking a subscription implies
+    // 'active', and (failing that) attaching a sample link to a fresh
+    // request implicitly marks it 'sample_ready' -- an admin pasting a URL
+    // and clicking Save shouldn't also require a separate status dropdown
+    // change to actually notify the prospect.
     if (status !== undefined) {
       updates.status = status;
+    } else if (subscriptionLinked) {
+      updates.status = 'active';
     } else if (existing.status === 'submitted' && (sample_url || existing.sample_url)) {
-      // Attaching a sample link to a fresh request implicitly marks it ready
-      // -- an admin pasting a URL and clicking Save shouldn't also require a
-      // separate status dropdown change to actually notify the prospect.
       updates.status = 'sample_ready';
     }
 
@@ -586,6 +627,17 @@ router.patch('/website-requests/:id', async (req, res) => {
         sampleUrl: updated.sample_url,
         approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}`,
       }).catch(err => console.error('sendWebsiteSampleReadyEmail failed:', err.message));
+    }
+
+    const justBecameActive = existing.status !== 'active' && updated.status === 'active' && updated.stripe_subscription_id;
+    if (justBecameActive) {
+      sendWebsiteSubscriptionConfirmedEmail({
+        to: updated.email,
+        name: updated.name,
+        business: updated.business,
+        trialDays: WEBSITE_TRIAL_DAYS,
+        monthlyPrice: WEBSITE_MONTHLY_PRICE,
+      }).catch(err => console.error('sendWebsiteSubscriptionConfirmedEmail failed:', err.message));
     }
 
     res.json({ success: true, data: { ...updated, approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}` } });

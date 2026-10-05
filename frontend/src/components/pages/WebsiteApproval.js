@@ -39,11 +39,14 @@ function loadStripeJs() {
 // routes/websiteRequest.js's by-token routes). Walks a prospect through
 // reviewing their free sample, then ONE Stripe Checkout redirect that only
 // collects a card (see routes/websiteRequest.js's mode='setup' session) --
-// the backend charges the $5 setup fee and creates the trial subscription
-// itself right after that, with no second card-entry step. The only time
-// this page needs anything further from the customer is the rare case
-// where their bank requires a 3D Secure challenge on that $5 charge, shown
-// inline via Stripe.js rather than another redirect.
+// the backend charges the $5 setup fee right after that, with no second
+// card-entry step. The only time this page needs anything further from the
+// customer is the rare case where their bank requires a 3D Secure challenge
+// on that charge, shown inline via Stripe.js rather than another redirect.
+// The $249/mo trial subscription itself isn't created here at all -- an
+// admin sets it up by hand in Stripe once the fee is paid (see
+// routes/admin.js), so 'approved' is a real, if temporary, end state from
+// this page's point of view, not something a button on this page advances.
 export default function WebsiteApproval({ token }) {
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -126,14 +129,7 @@ export default function WebsiteApproval({ token }) {
     setError(null);
     try {
       const res = await postWebsiteRequestCheckout(token);
-      if (res.url) {
-        window.location.href = res.url;
-        return;
-      }
-      // Resume path: the $5 fee was already paid earlier, so this finished
-      // the subscription immediately with no redirect at all.
-      setStarting(false);
-      load();
+      window.location.href = res.url;
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
       setStarting(false);
@@ -211,18 +207,16 @@ export default function WebsiteApproval({ token }) {
             </>
           )}
 
-          {(request.status === 'sample_ready' || request.status === 'approved') && (
+          {request.status === 'sample_ready' && (
             <>
               <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 8, letterSpacing: '-0.3px' }}>
-                {request.setupFeePaidAt ? 'Almost there!' : `Your website is ready, ${request.name.split(' ')[0]}`}
+                Your website is ready, {request.name.split(' ')[0]}
               </h1>
               <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, marginBottom: 22 }}>
-                {request.setupFeePaidAt
-                  ? "You've paid the setup fee — just one more step to start your free trial."
-                  : `Take a look at the free website we built for ${request.business}`}
+                Take a look at the free website we built for {request.business}
               </p>
 
-              {!request.setupFeePaidAt && request.sampleUrl && (
+              {request.sampleUrl && (
                 <a
                   href={request.sampleUrl}
                   target="_blank"
@@ -252,7 +246,7 @@ export default function WebsiteApproval({ token }) {
                 disabled={starting}
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '14px 0', borderRadius: 10, border: 'none', cursor: starting ? 'default' : 'pointer', fontWeight: 800, fontSize: 15.5, opacity: starting ? 0.7 : 1 }}
               >
-                {starting ? 'Loading…' : request.setupFeePaidAt ? 'Continue to Start My Free Trial →' : `Approve & Pay $${SETUP_FEE} →`}
+                {starting ? 'Loading…' : `Approve & Pay $${SETUP_FEE} →`}
               </button>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 12 }}>
                 <Lock size={11} color="#16a34a" />
@@ -260,6 +254,16 @@ export default function WebsiteApproval({ token }) {
                   Secure checkout powered by <strong style={{ color: '#635bff', fontWeight: 700 }}>Stripe</strong>
                 </span>
               </div>
+            </>
+          )}
+
+          {request.status === 'approved' && (
+            <>
+              <CheckCircle2 size={40} color="#16a34a" style={{ marginBottom: 14 }} />
+              <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>You're approved!</h1>
+              <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, margin: 0 }}>
+                Your $5 setup fee for {request.business} is paid. We'll have your {FREE_MONTHS} months free trial up and running shortly — you won't be charged again until month 3 (${MONTHLY_PRICE}/mo), and we'll email you once it's live.
+              </p>
             </>
           )}
 
