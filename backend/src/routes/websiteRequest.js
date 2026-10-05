@@ -214,6 +214,18 @@ router.post('/by-token/:token/checkout', async (req, res) => {
         },
         quantity: 1,
       }],
+      // receipt_email forces Stripe to send its receipt for this specific
+      // charge regardless of the account-wide "successful payments" email
+      // toggle. description lands directly on that receipt (confirmed via
+      // Stripe's own receipts docs -- payment_intent.description is what
+      // renders there, separate from the Checkout-page-only product_data
+      // description above) -- spelling out the free trial and when the
+      // real billing starts so there's no "what's this $5 for" confusion
+      // and no surprise when $249 lands in month 3.
+      payment_intent_data: {
+        receipt_email: request.email,
+        description: `Website setup fee — first 2 months free, then $${MONTHLY_PRICE_CENTS / 100}/month starting month 3. Cancel anytime.`,
+      },
       success_url: `${FRONTEND_URL}/website-approval/${req.params.token}?step=setup&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/website-approval/${req.params.token}`,
       metadata: { type: 'website_request_setup', requestId: request.id },
