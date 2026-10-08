@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { BarChart3, ListChecks, Lock, Repeat } from 'lucide-react';
+import { ChevronDown, BarChart3, ListChecks, Lock, Repeat } from 'lucide-react';
 import CleaningCalculator from '../calculator/CleaningCalculator';
 import PageHero from './PageHero';
 import './PageHero.css';
-import { SectionBand, FaqAccordion, GuaranteeBadge } from './SalesPageKit';
 
 const WHY_POINTS = [
   { Icon: BarChart3, title: 'Real Market Pricing', body: 'This cleaning cost estimator pulls from actual state-by-state pricing data, not a generic industry average.' },
@@ -20,6 +19,34 @@ const ESTIMATOR_FAQS = [
   { q: 'Is my information saved when I use the estimator?', a: "No. Your estimate is calculated instantly and isn't stored unless you choose to submit your contact information at the end." },
   { q: 'How often should I re-check my cleaning cost estimate?', a: "Cleaning prices can shift with inflation and local labor rates, so it's worth re-running your estimate once or twice a year, especially before renewing a recurring cleaning contract." },
 ];
+
+function FaqAccordion({ faqs }) {
+  const [openIndex, setOpenIndex] = useState(0);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {faqs.map((faq, i) => {
+        const open = openIndex === i;
+        return (
+          <div key={i} style={{ background: '#fafafa', border: '1px solid #f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
+            <button
+              onClick={() => setOpenIndex(open ? -1 : i)}
+              style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+              aria-expanded={open}
+            >
+              <span style={{ fontWeight: 700, fontSize: 14.5, color: '#0f172a' }}>{faq.q}</span>
+              <ChevronDown size={16} color="#94a3b8" style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+            </button>
+            {open && (
+              <div style={{ padding: '0 18px 16px' }}>
+                <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.7, margin: 0 }}>{faq.a}</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function EstimatorPage() {
   // Once results are showing, ResultsScreen renders its own full page chrome
@@ -93,13 +120,6 @@ export default function EstimatorPage() {
           </div>
         </div>
 
-        <div style={{ marginTop: 48 }}>
-          <GuaranteeBadge
-            title="Always Free — No Catch"
-            points={['No signup required', 'No limit on uses', 'Your info is never stored unless you choose to submit it']}
-          />
-        </div>
-
         <div style={{ marginTop: 48, background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(18px, 5vw, 32px) clamp(16px, 4.5vw, 36px)' }}>
           <h2 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 16 }}>Cleaning Cost Estimator FAQs</h2>
           <FaqAccordion faqs={ESTIMATOR_FAQS} />
@@ -109,13 +129,6 @@ export default function EstimatorPage() {
           <p style={{ fontSize: 14, color: '#64748b', marginBottom: 14 }}>Want cost breakdowns by state or service instead? Browse our <a href="/blog" style={{ color: '#2563eb', fontWeight: 600 }}>cleaning cost guides</a>.</p>
         </div>
       </div>
-
-      <SectionBand
-        eyebrow="Next Step"
-        title="Already have your estimate? See who's recommended in your city."
-        subtitle="If a local partner serves your area, they'll show up right alongside your results."
-        variant="accent"
-      />
     </>
   );
 }
