@@ -8,6 +8,7 @@ import CityTierBrowser, { STATES_WITH_CITIES } from '../partners/CityTierBrowser
 import PartnerGallery from '../partners/PartnerGallery';
 import { PartnerBannerCard } from '../partners/FloatingPartnerBanner';
 import NoWebsiteBanner from '../ui/NoWebsiteBanner';
+import { SectionBand, FaqAccordion, GuaranteeBadge, StickyMobileCTA } from './SalesPageKit';
 
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
@@ -417,6 +418,8 @@ export default function PartnerWithUs() {
         </div>
       </div>
 
+      <SectionBand eyebrow="The Comparison" title="See how this stacks up against paid ads" />
+
       {/* Why not ads */}
       <div style={{ padding: 'clamp(48px, 8vw, 80px) 24px', background: 'white' }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
@@ -522,6 +525,13 @@ export default function PartnerWithUs() {
           </div>
 
           <CityTierBrowser />
+
+          <div style={{ marginTop: 32 }}>
+            <GuaranteeBadge
+              title="No Setup Fees, Cancel Anytime"
+              points={['No setup fees', 'No commissions, no lead fees', 'Cancel anytime with 30 days notice']}
+            />
+          </div>
         </div>
       </div>
 
@@ -541,12 +551,12 @@ export default function PartnerWithUs() {
         </div>
       </div>
 
+      <SectionBand eyebrow="Before You Ask" title="Common questions, answered honestly" />
+
       {/* FAQ */}
       <div style={{ padding: 'clamp(48px, 8vw, 80px) 24px', background: '#f8fafc' }}>
         <div style={{ maxWidth: 680, margin: '0 auto' }}>
-          <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px', marginBottom: 36, textAlign: 'center' }}>Common Questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {[
+          <FaqAccordion faqs={[
               { q: 'Is there really only one partner per city?', a: 'Yes. We give one cleaning business exclusive placement per city. Once a city is taken, we waitlist new applicants. Apply early to lock in your market.' },
               { q: 'How exactly does my business appear?', a: 'Three ways. After a user completes an estimate, a branded card with your business name, address, logo, phone number, and website link appears on their results page as a recommended local cleaner. A small floating banner with the same info follows visitors in your city across the whole site — home page, blog posts, cost guides — not just the results page. And if that visitor opts in to have their estimate emailed to them, the same recommendation card is included right in that email too. All three look like trusted recommendations, not banner ads.' },
               { q: 'Can I cover more than one city?', a: `Yes. There's no limit — add as many cities as you want to serve, each priced by that city's own tier ($${MAJOR_CITY_PRICE}/month for major metros, $${MINOR_CITY_PRICE}/month for smaller cities), all under one account and one dashboard.` },
@@ -555,13 +565,7 @@ export default function PartnerWithUs() {
               { q: 'What if traffic in my city is low?', a: "We can share an estimate of current monthly sessions for your city before you commit. You're still getting targeted, high-intent visitors for less than the cost of one Google Ads day." },
               { q: 'Can I cancel?', a: "Yes. Give us 30 days notice and we'll remove your listing at the end of the billing cycle. No long-term contracts." },
               { q: "Don't have a website yet?", a: 'We also build and host websites with an AI chatbot included, for cleaning businesses that need one — see cleanestimator.com/website-for-cleaning-companies for details.' },
-            ].map((item, i) => (
-              <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)' }}>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 8 }}>{item.q}</div>
-                <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{item.a}</div>
-              </div>
-            ))}
-          </div>
+          ]} />
         </div>
       </div>
 
@@ -702,6 +706,7 @@ export default function PartnerWithUs() {
           )}
         </div>
       </div>
+      {!sent && <StickyMobileCTA label="Get My City" href="#apply" />}
     </>
   );
 }

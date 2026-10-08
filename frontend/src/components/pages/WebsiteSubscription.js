@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Globe, Search, PhoneMissed, Sparkles } from 'lucide-react';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { postWebsiteRequest } from '../../utils/api';
+import { SectionBand, FaqAccordion, GuaranteeBadge, StickyMobileCTA } from './SalesPageKit';
 
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
@@ -340,6 +341,8 @@ export default function WebsiteSubscription() {
         </div>
       </div>
 
+      <SectionBand eyebrow="What You Get" title="Everything included, one flat rate" />
+
       {/* What's included */}
       <div style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'white' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
@@ -519,15 +522,22 @@ export default function WebsiteSubscription() {
               <span style={{ fontSize: 13.5, fontWeight: 800, color: '#15803d' }}>${MONTHLY_PRICE}/mo</span>
             </div>
           </div>
+
+          <div style={{ marginTop: 28 }}>
+            <GuaranteeBadge
+              title="Free to See, Nothing to Pay Until You Approve"
+              points={['$0 upfront', `$${SETUP_FEE} only after you approve the build`, 'Cancel anytime, no contract']}
+            />
+          </div>
         </div>
       </div>
 
+      <SectionBand eyebrow="Before You Ask" title="Common questions, answered honestly" />
+
       {/* FAQ */}
-      <div style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'white' }}>
+      <div style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: '#f8fafc' }}>
         <div style={{ maxWidth: 680, margin: '0 auto' }}>
-          <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 36, textAlign: 'center' }}>Common Questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {[
+          <FaqAccordion faqs={[
               { q: 'Do I have to pay before I see anything?', a: "No. After you apply, we build your actual cleaning website first, so you can see exactly what you'd be getting. You only subscribe and start paying once you've reviewed it and you're happy with it." },
               { q: 'Do I own the cleaning website?', a: "Your site is built and hosted as part of your active subscription — similar to how a lot of small business tools work. As long as your subscription is active, it's live and it's yours to use and point customers to. We'll walk through the specifics with you when you apply." },
               { q: 'What happens if I cancel?', a: "Your cleaning website and chat widget come down when the subscription ends. There's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
@@ -535,13 +545,7 @@ export default function WebsiteSubscription() {
               { q: 'Can I use a domain I already own?', a: "Yes. If you already have a domain, we'll use it. If not, we'll help you pick one and get it set up as part of onboarding." },
               { q: 'Is there a setup fee?', a: `Just a $${SETUP_FEE} one-time setup fee once you approve your build — that's it. Your first ${FREE_MONTHS} months are completely free, and you're only billed $${MONTHLY_PRICE}/month starting month ${FREE_MONTHS + 1}.` },
               { q: 'How long until my website build is ready?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your business and review your application. Your site goes fully live on your domain once you approve the build and subscribe." },
-            ].map((item, i) => (
-              <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)' }}>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 8 }}>{item.q}</div>
-                <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{item.a}</div>
-              </div>
-            ))}
-          </div>
+          ]} />
         </div>
       </div>
 
@@ -690,6 +694,7 @@ export default function WebsiteSubscription() {
       </div>
 
       <ThankYouModal open={showThankYou} onClose={() => setShowThankYou(false)} />
+      {!sent && <StickyMobileCTA label="Build My Free Sample Site" href="#apply" />}
     </>
   );
 }
