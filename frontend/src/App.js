@@ -94,7 +94,7 @@ const isPartnerWithUs = pathname === '/partner-with-us';
 const isWebsiteSubscription = pathname === '/website-for-cleaning-companies';
 const websiteApprovalMatch = pathname.match(/^\/website-approval\/([a-f0-9]+)$/);
 const isDemoGallery = pathname === '/website-example';
-const demoSiteMatch = pathname.match(/^\/website-example\/([a-z0-9-]+)(?:\/(about|services|service-areas|contact))?$/);
+const demoSiteMatch = pathname.match(/^\/website-example\/([a-z0-9-]+)(?:\/(about|services|service-areas|contact)(?:\/([a-z0-9-]+))?)?$/);
 const isPartnerCityPricing = pathname === '/partner-city-pricing';
 const isPartnerDemo = pathname === '/partner-demo';
 const isBuyCityPlacementSuccess = pathname === '/buy-city-placement/success';
@@ -246,7 +246,7 @@ export default function App() {
   if (demoSiteMatch) return (
     <HelmetProvider>
       <Suspense fallback={<PageFallback />}>
-        <DemoSitePage slug={demoSiteMatch[1]} page={demoSiteMatch[2]} />
+        <DemoSitePage slug={demoSiteMatch[1]} page={demoSiteMatch[2]} subSlug={demoSiteMatch[3]} />
       </Suspense>
     </HelmetProvider>
   );

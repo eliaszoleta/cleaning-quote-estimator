@@ -6,6 +6,8 @@ import DemoHome from './DemoHome';
 import DemoAbout from './DemoAbout';
 import DemoServices from './DemoServices';
 import DemoServiceAreas from './DemoServiceAreas';
+import DemoServicePage from './DemoServicePage';
+import DemoAreaPage from './DemoAreaPage';
 import DemoContact from './DemoContact';
 
 const PAGE_COMPONENTS = {
@@ -14,6 +16,18 @@ const PAGE_COMPONENTS = {
   services: DemoServices,
   'service-areas': DemoServiceAreas,
   contact: DemoContact,
+};
+
+// Pages with a dedicated per-slug sub-route (/services/:slug,
+// /service-areas/:slug) -- each one gets its own unique meta/H1/FAQs/schema
+// instead of only appearing as a card on the combined listing page.
+const SUB_PAGE_COMPONENTS = {
+  services: DemoServicePage,
+  'service-areas': DemoAreaPage,
+};
+const SUB_PAGE_PROP = {
+  services: 'serviceSlug',
+  'service-areas': 'areaSlug',
 };
 
 // Real, live client site -- iframed full-bleed so the browser's address bar
@@ -35,12 +49,27 @@ function ExternalSitePage({ site }) {
 // Resolves /website-example/:slug(/:page) to the right template. Not found
 // (bad slug or page) sends visitors back to the gallery rather than a blank
 // screen -- a mistyped or stale link is the only realistic way to land here.
-export default function DemoSitePage({ slug, page }) {
+export default function DemoSitePage({ slug, page, subSlug }) {
   const externalSite = getExternalSite(slug);
   if (externalSite) return <ExternalSitePage site={externalSite} />;
 
   const site = getSite(slug);
   const pageKey = page || 'home';
+
+  if (subSlug && SUB_PAGE_COMPONENTS[pageKey]) {
+    if (!site) {
+      if (typeof window !== 'undefined') window.location.replace('/website-example');
+      return null;
+    }
+    const SubPage = SUB_PAGE_COMPONENTS[pageKey];
+    const propName = SUB_PAGE_PROP[pageKey];
+    return (
+      <DemoSiteLayout site={site} current={pageKey}>
+        <SubPage {...{ [propName]: subSlug }} />
+      </DemoSiteLayout>
+    );
+  }
+
   const Page = PAGE_COMPONENTS[pageKey];
 
   if (!site || !Page) {

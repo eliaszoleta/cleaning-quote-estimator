@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Sparkles, Home as HomeIcon, Truck, Repeat, Leaf, Star, ShieldCheck, BadgeCheck, ThumbsUp, ChevronDown, Check } from 'lucide-react';
 import { useDemoSite } from './DemoSiteContext';
 import { getFaqs } from './siteConfigs';
+import { serviceSlugFor } from './demoSeoContent';
 import ImagePlaceholder from './ImagePlaceholder';
 import HeroQuoteForm from './HeroQuoteForm';
+import DemoWorkGallery from './DemoWorkGallery';
 
 const SERVICE_ICONS = [Sparkles, HomeIcon, Truck, Repeat, Leaf];
 
@@ -106,13 +108,13 @@ export default function DemoHome() {
             {site.services.map((s, i) => {
               const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
               return (
-                <div key={s.title} style={{ background: c.card, borderRadius: 14, padding: 24, border: `1px solid ${c.border}` }}>
+                <a key={s.title} href={`/website-example/${site.slug}/services/${serviceSlugFor(s)}`} style={{ background: c.card, borderRadius: 14, padding: 24, border: `1px solid ${c.border}`, textDecoration: 'none', display: 'block' }}>
                   <div style={{ width: 40, height: 40, borderRadius: 10, background: c.bgAlt, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
                     <Icon size={18} color={c.primary} />
                   </div>
                   <div style={{ fontFamily: site.fontHeading, fontWeight: 700, fontSize: 15.5, color: c.ink, marginBottom: 6 }}>{s.title}</div>
                   <div style={{ fontSize: 13.5, color: c.textMuted, lineHeight: 1.6 }}>{s.desc}</div>
-                </div>
+                </a>
               );
             })}
           </div>
@@ -121,6 +123,10 @@ export default function DemoHome() {
           </div>
         </div>
       </div>
+
+      {/* Slide gallery -- real photos, auto-advancing, matching the "work in
+          action" gallery pattern the live client sites use. */}
+      <DemoWorkGallery />
 
       {/* Why us -- alternating image/text/checklist blocks, the kind of
           expertise + legitimacy signal a service business needs before a
@@ -184,7 +190,7 @@ function WhyUsBlock({ site, block, index }) {
   const c = site.colors;
   const { openQuote } = useDemoSite();
   const imageFirst = index % 2 === 0;
-  const image = <ImagePlaceholder note={block.imageNote} height={340} accent={c.primary} />;
+  const image = <ImagePlaceholder src={block.image} alt={block.imageNote} note={block.imageNote} height={340} accent={c.primary} />;
   const text = (
     <div>
       <h3 style={{ fontFamily: site.fontHeading, fontWeight: 700, fontSize: 'clamp(22px, 4vw, 28px)', color: c.ink, marginBottom: 14, letterSpacing: '-0.3px' }}>{block.headline}</h3>

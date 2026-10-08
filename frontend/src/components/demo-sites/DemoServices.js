@@ -1,10 +1,11 @@
 import React from 'react';
 import { Sparkles, Home as HomeIcon, Truck, Repeat, Leaf } from 'lucide-react';
 import { useDemoSite } from './DemoSiteContext';
+import { serviceSlugFor } from './demoSeoContent';
 
 const ICONS = [Sparkles, HomeIcon, Truck, Repeat, Leaf];
 
-function ServicesA({ site, onQuote }) {
+function ServicesA({ site }) {
   const c = site.colors;
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 20 }}>
@@ -17,7 +18,7 @@ function ServicesA({ site, onQuote }) {
             </div>
             <div style={{ fontFamily: site.fontHeading, fontWeight: 700, fontSize: 17, color: c.ink, marginBottom: 8 }}>{s.title}</div>
             <div style={{ fontSize: 14, color: c.textMuted, lineHeight: 1.65, marginBottom: 16 }}>{s.desc}</div>
-            <button onClick={onQuote} style={{ background: 'none', border: 'none', color: c.primary, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', padding: 0, fontFamily: site.fontBody }}>Request this service →</button>
+            <a href={`/website-example/${site.slug}/services/${serviceSlugFor(s)}`} style={{ color: c.primary, fontWeight: 700, fontSize: 13.5, textDecoration: 'none', fontFamily: site.fontBody }}>Learn more →</a>
           </div>
         );
       })}
@@ -25,25 +26,25 @@ function ServicesA({ site, onQuote }) {
   );
 }
 
-function ServicesB({ site, onQuote }) {
+function ServicesB({ site }) {
   const c = site.colors;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       {site.services.map((s, i) => (
-        <div key={s.title} style={{ display: 'flex', gap: 24, alignItems: 'flex-start', padding: '26px 0', borderBottom: i < site.services.length - 1 ? `1px solid ${c.border}` : 'none' }}>
+        <a key={s.title} href={`/website-example/${site.slug}/services/${serviceSlugFor(s)}`} style={{ display: 'flex', gap: 24, alignItems: 'flex-start', padding: '26px 0', borderBottom: i < site.services.length - 1 ? `1px solid ${c.border}` : 'none', textDecoration: 'none' }}>
           <div style={{ fontFamily: site.fontHeading, fontSize: 32, fontWeight: 800, color: c.accent, minWidth: 52 }}>{String(i + 1).padStart(2, '0')}</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 800, fontSize: 17, color: c.ink, marginBottom: 6 }}>{s.title}</div>
             <div style={{ fontSize: 14, color: c.textMuted, lineHeight: 1.65 }}>{s.desc}</div>
           </div>
-          <button onClick={onQuote} style={{ background: c.primary, color: 'white', border: 'none', padding: '9px 16px', borderRadius: 8, fontWeight: 700, fontSize: 12.5, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: site.fontBody }}>Get Quote</button>
-        </div>
+          <span style={{ background: c.primary, color: 'white', border: 'none', padding: '9px 16px', borderRadius: 8, fontWeight: 700, fontSize: 12.5, whiteSpace: 'nowrap', fontFamily: site.fontBody }}>Learn More</span>
+        </a>
       ))}
     </div>
   );
 }
 
-function ServicesC({ site, onQuote }) {
+function ServicesC({ site }) {
   const c = site.colors;
   return (
     <div>
@@ -57,7 +58,7 @@ function ServicesC({ site, onQuote }) {
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: site.fontHeading, fontWeight: 700, fontSize: 22, color: c.ink, marginBottom: 8 }}>{s.title}</div>
             <div style={{ fontSize: 14.5, color: c.textMuted, lineHeight: 1.7, marginBottom: 14, maxWidth: 460, marginLeft: i % 2 === 0 ? 0 : 'auto' }}>{s.desc}</div>
-            <button onClick={onQuote} style={{ background: 'none', border: `1.5px solid ${c.ink}`, color: c.ink, padding: '9px 18px', borderRadius: 2, fontWeight: 600, fontSize: 12, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: site.fontBody }}>Request Quote</button>
+            <a href={`/website-example/${site.slug}/services/${serviceSlugFor(s)}`} style={{ background: 'none', border: `1.5px solid ${c.ink}`, color: c.ink, padding: '9px 18px', borderRadius: 2, fontWeight: 600, fontSize: 12, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: site.fontBody, display: 'inline-block' }}>Learn More</a>
           </div>
         </div>
       ))}
