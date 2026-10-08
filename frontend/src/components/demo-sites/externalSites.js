@@ -26,6 +26,21 @@ const EXTERNAL_SITES = [
     colors: { primary: '#2d5b70', primaryDark: '#1e3f4f', accent: '#e0a940', bg: '#f7fbfc' },
     externalUrl: 'https://suds-and-smile.vercel.app/',
   },
+  {
+    // Placeholder metadata -- outbound access to this domain is blocked in
+    // this sandbox, so the real business name, tagline, city, and palette
+    // haven't been verified against the live site. The iframe itself still
+    // points at the real URL and works now; see chat for what to confirm.
+    slug: 'the-cleaning-sister',
+    businessName: 'The Cleaning Sister',
+    tagline: 'Professional home cleaning you can trust.',
+    city: '',
+    state: '',
+    logoLabel: 'CS',
+    fontHeading: "'Poppins', Arial, sans-serif",
+    colors: { primary: '#b5638c', primaryDark: '#7d4160', accent: '#e8a9c0', bg: '#fdf6f9' },
+    externalUrl: 'https://the-cleaning-sister.vercel.app/',
+  },
 ];
 
 export function getExternalSite(slug) {
