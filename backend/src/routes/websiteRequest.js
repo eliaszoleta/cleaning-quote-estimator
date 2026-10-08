@@ -48,8 +48,11 @@ router.post('/', async (req, res) => {
     return res.json({ success: true });
   }
 
-  if (!name || !business || !email) {
-    return res.status(400).json({ success: false, error: 'Name, business, and email are required.' });
+  if (!name || !business || !email || !phone || !businessAddress || !serviceAreas) {
+    return res.status(400).json({ success: false, error: 'Name, business, email, phone, business address, and service areas are required.' });
+  }
+  if (!currentWebsite && !facebookPage) {
+    return res.status(400).json({ success: false, error: 'Please provide your current website or Facebook page/profile.' });
   }
 
   let saved = false;

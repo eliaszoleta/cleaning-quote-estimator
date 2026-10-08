@@ -193,8 +193,16 @@ export default function WebsiteSubscription() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSending(true);
     setError('');
+    // Current website and Facebook page/profile aren't individually marked
+    // required (HTML5 required can't express "at least one of these two"),
+    // so this cross-field check is the only thing enforcing it -- either one
+    // satisfies the requirement, both is fine too, neither is not.
+    if (!form.currentWebsite.trim() && !form.facebookPage.trim()) {
+      setError('Please provide your current website or Facebook page/profile -- at least one is required.');
+      return;
+    }
+    setSending(true);
     try {
       await postWebsiteRequest({
         name: form.name,
@@ -604,8 +612,8 @@ export default function WebsiteSubscription() {
                   <input required type="email" style={inputStyle} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="you@yourbusiness.com" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number</label>
-                  <input type="tel" style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number *</label>
+                  <input required type="tel" style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
@@ -637,13 +645,13 @@ export default function WebsiteSubscription() {
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cleaning Business Address</label>
-                  <input style={inputStyle} value={form.businessAddress} onChange={e => setForm(f => ({ ...f, businessAddress: e.target.value }))} placeholder="123 Main St, Austin, TX 78701" />
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cleaning Business Address *</label>
+                  <input required style={inputStyle} value={form.businessAddress} onChange={e => setForm(f => ({ ...f, businessAddress: e.target.value }))} placeholder="123 Main St, Austin, TX 78701" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Service Areas</label>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Service Areas *</label>
                   <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>Cities or areas you actually serve, so we can list them on your site.</p>
-                  <input style={inputStyle} value={form.serviceAreas} onChange={e => setForm(f => ({ ...f, serviceAreas: e.target.value }))} placeholder="e.g. Austin, Round Rock, Cedar Park" />
+                  <input required style={inputStyle} value={form.serviceAreas} onChange={e => setForm(f => ({ ...f, serviceAreas: e.target.value }))} placeholder="e.g. Austin, Round Rock, Cedar Park" />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
@@ -662,13 +670,16 @@ export default function WebsiteSubscription() {
                   )}
                 </div>
 
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 2px' }}>At least one of the two below is required -- if you have a website, your Facebook page/profile is optional, and vice versa.</p>
+                </div>
                 <div>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Cleaning Website (if any)</label>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Cleaning Website</label>
                   <input style={inputStyle} value={form.currentWebsite} onChange={e => setForm(f => ({ ...f, currentWebsite: e.target.value }))} placeholder="e.g. sparklecleanco.com" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Facebook Page</label>
-                  <input style={inputStyle} value={form.facebookPage} onChange={e => setForm(f => ({ ...f, facebookPage: e.target.value }))} placeholder="https://facebook.com/..." />
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Facebook Page/Profile</label>
+                  <input style={inputStyle} value={form.facebookPage} onChange={e => setForm(f => ({ ...f, facebookPage: e.target.value }))} placeholder="https://facebook.com/yourpage or your profile URL" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tell Us About Your Business</label>
