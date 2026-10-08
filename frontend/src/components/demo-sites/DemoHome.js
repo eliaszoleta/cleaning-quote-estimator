@@ -158,9 +158,6 @@ export default function DemoHome() {
         </div>
       </div>
 
-      {/* Before / after results -- concrete proof of work, not just claims */}
-      <BeforeAfter site={site} />
-
       {/* FAQ -- answers the hesitations a first-time visitor has before
           they'll hand over their address and a key. */}
       <DemoFaq site={site} />
@@ -264,29 +261,6 @@ function ReviewStatBar({ site }) {
   );
 }
 
-function BeforeAfter({ site }) {
-  const c = site.colors;
-  return (
-    <div style={{ padding: 'clamp(44px, 8vw, 80px) 20px', background: 'white' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <h2 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 700, color: c.ink, marginBottom: 10 }}>Our Results Speak for Themselves</h2>
-          <p style={{ fontSize: 14.5, color: c.textMuted, maxWidth: 520, margin: '0 auto' }}>A real before-and-after from a recent {site.city} job.</p>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 16 }}>
-          <div>
-            <ImagePlaceholder note={`BEFORE: a visibly dirty or stained area (carpet, floor, or countertop) in a home, unedited, natural lighting.`} height={240} accent={c.primary} />
-            <div style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 700, color: c.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 10 }}>Before</div>
-          </div>
-          <div>
-            <ImagePlaceholder note={`AFTER: the exact same area as the "before" photo, same framing and angle, now spotless.`} height={240} accent={c.primary} />
-            <div style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 700, color: c.primary, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 10 }}>After</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function DemoFaq({ site }) {
   const c = site.colors;
