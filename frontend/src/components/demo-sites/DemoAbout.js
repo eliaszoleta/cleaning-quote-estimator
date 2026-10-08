@@ -19,13 +19,13 @@ export default function DemoAbout() {
 
       <div style={{ padding: 'clamp(40px, 8vw, 72px) 20px', background: 'white' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))', gap: 48, alignItems: 'center' }}>
-          {imageFirst && <ImagePlaceholder note={site.aboutImageNote} height={340} accent={c.primary} />}
+          {imageFirst && <ImagePlaceholder src={site.aboutImage} alt={site.aboutImageNote} note={site.aboutImageNote} height={340} accent={c.primary} />}
           <div>
             {site.aboutStory.map((p, i) => (
               <p key={i} style={{ fontSize: 15.5, color: c.ink, lineHeight: 1.75, marginBottom: 18 }}>{p}</p>
             ))}
           </div>
-          {!imageFirst && <ImagePlaceholder note={site.aboutImageNote} height={340} accent={c.primary} />}
+          {!imageFirst && <ImagePlaceholder src={site.aboutImage} alt={site.aboutImageNote} note={site.aboutImageNote} height={340} accent={c.primary} />}
         </div>
       </div>
 

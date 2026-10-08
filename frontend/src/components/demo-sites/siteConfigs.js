@@ -53,7 +53,8 @@ const SITES = [
       { name: 'Renee K.', text: 'They found things I didn\'t even know needed cleaning. My kitchen has never looked this good.' },
       { name: 'Doug M.', text: 'Reliable, thorough, and the eco-friendly products actually work. Switched from three other services before landing here.' },
     ],
-    aboutImageNote: 'Photo of two friendly cleaning professionals in matching evergreen-green polos, smiling, standing in front of a tidy branded service van.',
+    aboutImage: '/images/demo-stock/open-concept-kitchen-living.jpg',
+    aboutImageNote: 'Warm, open-concept kitchen and living area with wood floors and natural light, freshly cleaned, no people.',
     whyUs: [
       {
         headline: 'Cleaning You Can Feel Good About',
@@ -99,7 +100,8 @@ const SITES = [
       { name: 'Patricia A.', text: 'Our Airbnb turnover team. Never late, never missed a booking gap, guests constantly compliment how clean the place is.' },
       { name: 'Wade T.', text: 'They actually know how to handle old hardwood floors without wrecking them. Worth every penny.' },
     ],
-    aboutImageNote: 'Photo of a small, well-dressed cleaning crew with a branded tote of supplies, standing outside a historic Charleston row house.',
+    aboutImage: '/images/demo-stock/coastal-living-room-ocean-view.jpg',
+    aboutImageNote: 'Bright, modern coastal living room with ocean and mountain views through floor-to-ceiling windows, freshly cleaned, no people.',
     whyUs: [
       {
         headline: "Built for Charleston's Homes",
@@ -145,7 +147,8 @@ const SITES = [
       { name: 'Julia S.', text: 'They treat the house like it matters. Small details, every time — genuinely different from anyone else we\'ve used.' },
       { name: 'Marcus D.', text: 'Post-renovation cleanup saved us weeks of dust. Worth booking before you even move back in.' },
     ],
-    aboutImageNote: 'Close-up, editorial photo of cleaning hands wiping down a wood countertop with a linen cloth — warm tones, shallow depth of field.',
+    aboutImage: '/images/demo-stock/modern-office-conference-room.jpg',
+    aboutImageNote: 'Editorial, modern office space with herringbone wood floors and industrial finishes, freshly cleaned, no people.',
     whyUs: [
       {
         headline: 'Craft, Not Just a Checklist',
@@ -191,7 +194,8 @@ const SITES = [
       { name: 'Katie B.', text: 'Same cleaner every time, always on schedule, always thorough. It genuinely makes my week better.' },
       { name: 'Omar F.', text: 'Our Airbnb turnaround time dropped in half and the reviews mention how clean the place is constantly.' },
     ],
-    aboutImageNote: 'Friendly photo of a small cleaning team holding supply caddies, smiling, in front of a house with a welcoming front porch.',
+    aboutImage: '/images/demo-stock/cozy-bedroom-bookshelf.jpg',
+    aboutImageNote: 'Cozy, tidy bedroom with a bookshelf and desk, warm natural light, freshly cleaned, no people.',
     whyUs: [
       {
         headline: 'The Same Friendly Face, Every Visit',
@@ -237,7 +241,8 @@ const SITES = [
       { name: 'Brianna L.', text: 'The most organized cleaning company I\'ve used — text reminders, on-time arrival, consistent quality.' },
       { name: 'Tom R.', text: 'Booked a deep clean before selling our house. Buyers commented on how clean it was at the showing.' },
     ],
-    aboutImageNote: 'Photo of a cleaning professional in a slate-gray uniform confidently pushing a modern cleaning cart down a hallway.',
+    aboutImage: '/images/demo-stock/modern-bathroom-laundry.jpg',
+    aboutImageNote: 'Sleek, modern white bathroom with built-in laundry area, freshly cleaned, no people.',
     whyUs: [
       {
         headline: 'Precision, Not Guesswork',
@@ -283,7 +288,8 @@ const SITES = [
       { name: 'Yasmin P.', text: 'Our vacation rental cleaner for two years now. Always spotless, always on time between guests.' },
       { name: 'Craig H.', text: 'They get the sand and salt residue out in a way other cleaners never did. Noticeable difference.' },
     ],
-    aboutImageNote: 'Photo of a cheerful cleaning team in teal polos loading supplies into a branded van outside a beach-adjacent home.',
+    aboutImage: '/images/demo-stock/coastal-primary-bedroom.jpg',
+    aboutImageNote: 'Bright, airy coastal primary bedroom with white linens and an ocean view, freshly cleaned, no people.',
     whyUs: [
       {
         headline: 'We Know Coastal Homes',
@@ -329,7 +335,8 @@ const SITES = [
       { name: 'Eleanor G.', text: 'They understand old houses. Our floors have never been damaged and they\'re always careful with antiques.' },
       { name: 'Franklin B.', text: 'Fifteen years with this family business and they\'ve never once let us down.' },
     ],
-    aboutImageNote: 'Photo of a veteran cleaning professional carefully dusting an ornate wood banister in a historic home entryway.',
+    aboutImage: '/images/demo-stock/cream-kitchen-cabinets.jpg',
+    aboutImageNote: 'Traditional cream-cabinet kitchen with warm wood countertops, freshly cleaned, no people.',
     whyUs: [
       {
         headline: 'Gentle Care for Historic Homes',
@@ -375,7 +382,8 @@ const SITES = [
       { name: 'Priya N.', text: 'Booked entirely through text, showed up exactly on time, did an excellent job. Couldn\'t be easier.' },
       { name: 'Derek W.', text: 'Post-renovation cleanup was thorough — got dust out of places I didn\'t think to check.' },
     ],
-    aboutImageNote: 'Photo of a cleaning professional reviewing a tablet checklist in a bright, modern apartment kitchen.',
+    aboutImage: '/images/demo-stock/spa-bathroom-soaking-tub.jpg',
+    aboutImageNote: 'Bright, modern spa-style bathroom with a soaking tub and marble finishes, freshly cleaned, no people.',
     whyUs: [
       {
         headline: 'Booking Made Simple',
@@ -421,7 +429,8 @@ const SITES = [
       { name: 'Alexandra V.', text: 'Discreet, punctual, impeccable. The only cleaning service I\'ve trusted with a home this size.' },
       { name: 'Nathaniel P.', text: 'Post-event cleanup after we hosted twenty people — the place looked untouched by morning.' },
     ],
-    aboutImageNote: 'Elegant, low-key photo of a gloved hand polishing a marble countertop, dramatic lighting, no faces visible.',
+    aboutImage: '/images/demo-stock/folding-fresh-laundry.jpg',
+    aboutImageNote: 'Elegant, editorial close-up of hands neatly folding fresh linens, soft natural light, no faces visible.',
     whyUs: [
       {
         headline: 'A Concierge Standard of Clean',
@@ -467,7 +476,8 @@ const SITES = [
       { name: 'Jenny H.', text: 'Same honest, hardworking crew for three years. They treat our place like it\'s theirs.' },
       { name: 'Rick D.', text: 'Only company willing to take on our farmhouse and mudroom the right way. Highly recommend.' },
     ],
-    aboutImageNote: 'Photo of a friendly family-run cleaning crew standing beside a pickup truck with cleaning supplies, Idaho foothills in the background.',
+    aboutImage: '/images/demo-stock/carpet-cleaning-equipment.jpg',
+    aboutImageNote: 'Close-up photo of professional carpet-cleaning equipment at work on a carpeted floor, no people.',
     whyUs: [
       {
         headline: 'A Family Business, Still Family-Run',
