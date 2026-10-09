@@ -140,7 +140,7 @@ const COMPARISON = [
   {
     label: 'Updates after launch',
     them: 'Want a change later? That\'s usually a new invoice.',
-    us: 'Ongoing updates and maintenance are included in your monthly rate — no extra invoices.',
+    us: 'Priority support included — update text, info, or photos, or add pages, with no extra invoices.',
   },
   {
     label: 'Capturing leads',
@@ -362,7 +362,7 @@ export default function WebsiteSubscription() {
             <Check>A website chat widget that can auto-reply with AI or be switched to manual so you respond yourself</Check>
             <Check>A built-in lead capture form so visitors can request a free estimate right from your site</Check>
             <Check>A mobile app where every website chat and quote form lead lands — reply by text or call right from your phone</Check>
-            <Check>Ongoing updates and maintenance — no separate invoice every time something needs to change</Check>
+            <Check>Priority support for ongoing changes — update text, info, or photos, or add pages, included in your plan</Check>
             <Check>No long-term contract — cancel anytime</Check>
           </div>
         </div>
@@ -483,7 +483,7 @@ export default function WebsiteSubscription() {
 
             <div style={{ background: 'white', padding: 'clamp(22px, 5vw, 30px) clamp(24px, 6vw, 36px)', textAlign: 'center' }}>
               <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, marginBottom: 22 }}>
-                {['Cleaning website + hosting', 'Lead capture forms', 'Website chat + mobile app', 'Ongoing updates', 'Cancel anytime'].map(item => (
+                {['Cleaning website + hosting', 'Lead capture forms', 'Website chat + mobile app', 'Priority support & updates', 'Cancel anytime'].map(item => (
                   <span key={item} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', fontWeight: 600 }}>
                     <IconCheck size={13} /> {item}
                   </span>
@@ -538,6 +538,7 @@ export default function WebsiteSubscription() {
             {[
               { q: 'Do I have to pay before I see anything?', a: "No. After you apply, we build your actual cleaning website first, so you can see exactly what you'd be getting. You only subscribe and start paying once you've reviewed it and you're happy with it." },
               { q: 'Do I own the cleaning website?', a: "Your site is built and hosted as part of your active subscription — similar to how a lot of small business tools work. As long as your subscription is active, it's live and it's yours to use and point customers to. We'll walk through the specifics with you when you apply." },
+              { q: 'Can I make changes to my website after it\'s live?', a: "Yes. Update your text, business info, or photos, or ask us to add a new page or section — it's included in your plan, with priority support so changes don't sit in a queue for weeks. Just send us what you'd like changed and we'll take care of it." },
               { q: 'What happens if I cancel?', a: "Your cleaning website and chat widget come down when the subscription ends. There's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
               { q: 'How does the chat widget work?', a: "By default it uses AI to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours. You can also switch it to manual anytime and answer visitors yourself. Either way, every conversation lands in your mobile app, the same place you get texts and calls for quote form leads, so you can reply right from your phone." },
               { q: 'Can I use a domain I already own?', a: "Yes. If you already have a domain, we'll use it. If not, we'll help you pick one and get it set up as part of onboarding." },
