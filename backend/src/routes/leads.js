@@ -40,7 +40,7 @@ function saveLeadsFile(leads) {
 }
 
 // ─── saveLead (called from calculate route) ───────────────────────────────────
-async function saveLead({ companyId, name, email, phone, serviceType, zip, state, estimatedPriceLow, estimatedPriceHigh, timeline, preferredContact, serviceDetails, customAnswers }) {
+async function saveLead({ companyId, name, email, phone, serviceType, zip, state, estimatedPriceLow, estimatedPriceHigh, timeline, preferredContact, userType, serviceDetails, customAnswers }) {
   const lead = {
     id: uuidv4(),
     company_id: companyId || null,
@@ -54,6 +54,7 @@ async function saveLead({ companyId, name, email, phone, serviceType, zip, state
     estimated_price_high: estimatedPriceHigh || null,
     timeline: timeline || null,
     preferred_contact: preferredContact || null,
+    user_type: userType === 'homeowner' || userType === 'business' ? userType : null,
     service_details: serviceDetails || {},
     custom_answers: customAnswers || {},
     notes: null,

@@ -103,6 +103,7 @@ router.post('/', async (req, res) => {
           estimatedPriceHigh: result.totalHigh,
           timeline: leadInfo.timeline || null,
           preferredContact: leadInfo.preferredContact || null,
+          userType: leadInfo.userType || null,
           serviceDetails: serviceDetails || {},
           customAnswers: leadInfo.customAnswers || {},
         });

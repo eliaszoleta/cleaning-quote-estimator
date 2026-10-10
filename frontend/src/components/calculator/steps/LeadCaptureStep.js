@@ -8,6 +8,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
   const [phone, setPhone] = useState('');
   const [timeline, setTimeline] = useState('');
   const [preferredContact, setPreferredContact] = useState('email');
+  const [userType, setUserType] = useState('');
   const [customAnswers, setCustomAnswers] = useState({});
   const [touched, setTouched] = useState({});
 
@@ -27,7 +28,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
     e?.preventDefault();
     setTouched({ name: true, email: true, phone: true });
     if (!canSubmit) return;
-    onNext({ name: name.trim(), email: email.trim(), phone: phone.trim(), timeline, preferredContact, customAnswers });
+    onNext({ name: name.trim(), email: email.trim(), phone: phone.trim(), timeline, preferredContact, userType, customAnswers });
   };
 
   const inputStyle = {
@@ -89,6 +90,25 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
                     border: `1.5px solid ${timeline === id ? primaryColor : '#e2e8f0'}`,
                     background: timeline === id ? primaryColor : 'white',
                     color: timeline === id ? 'white' : '#374151',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>I am a…</label>
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+              {[['homeowner', 'Homeowner'], ['business', 'Cleaning business / cleaner']].map(([id, label]) => (
+                <button
+                  key={id} type="button" onClick={() => setUserType(userType === id ? '' : id)}
+                  style={{
+                    padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
+                    border: `1.5px solid ${userType === id ? primaryColor : '#e2e8f0'}`,
+                    background: userType === id ? primaryColor : 'white',
+                    color: userType === id ? 'white' : '#374151',
                   }}
                 >
                   {label}
