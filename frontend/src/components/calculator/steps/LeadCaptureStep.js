@@ -19,14 +19,15 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
   const nameValid = name.trim().length > 0;
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const phoneValid = phone.replace(/\D/g, '').length === 10;
-  const canSubmit = !loading && nameValid && emailValid && phoneValid;
+  const userTypeValid = userType === 'homeowner' || userType === 'business';
+  const canSubmit = !loading && nameValid && emailValid && phoneValid && userTypeValid;
 
   const touch = (field) => setTouched(prev => ({ ...prev, [field]: true }));
   const showError = (field, valid) => touched[field] && !valid;
 
   const handleSubmit = (e) => {
     e?.preventDefault();
-    setTouched({ name: true, email: true, phone: true });
+    setTouched({ name: true, email: true, phone: true, userType: true });
     if (!canSubmit) return;
     onNext({ name: name.trim(), email: email.trim(), phone: phone.trim(), timeline, preferredContact, userType, customAnswers });
   };
@@ -103,10 +104,10 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
             <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
               {[['homeowner', 'Homeowner'], ['business', 'Cleaning business / cleaner']].map(([id, label]) => (
                 <button
-                  key={id} type="button" onClick={() => setUserType(userType === id ? '' : id)}
+                  key={id} type="button" onClick={() => { setUserType(id); touch('userType'); }}
                   style={{
                     padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
-                    border: `1.5px solid ${userType === id ? primaryColor : '#e2e8f0'}`,
+                    border: `1.5px solid ${userType === id ? primaryColor : showError('userType', userTypeValid) ? '#dc2626' : '#e2e8f0'}`,
                     background: userType === id ? primaryColor : 'white',
                     color: userType === id ? 'white' : '#374151',
                   }}
@@ -115,6 +116,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
                 </button>
               ))}
             </div>
+            {showError('userType', userTypeValid) && <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please select one.</p>}
           </div>
 
           {customQuestions.map((q, i) => (
