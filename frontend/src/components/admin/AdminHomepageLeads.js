@@ -14,11 +14,18 @@ const SERVICE_COLORS = {
 
 // 'this_month' / 'last_month' compare against the viewer's local calendar
 // month, not a rolling 30-day window -- matches how "this month" reads to
-// a person glancing at a calendar.
+// a person glancing at a calendar. 'this_week' is the one rolling window
+// here (last 7 days), since "calendar week" has no single obvious start
+// day and a rolling window is what "leads this week" usually means day to
+// day.
 function matchesDateFilter(createdAt, dateFilter) {
   if (dateFilter === 'all') return true;
   const d = new Date(createdAt);
   const now = new Date();
+  if (dateFilter === 'this_week') {
+    const ms = now.getTime() - d.getTime();
+    return ms >= 0 && ms <= 7 * 24 * 60 * 60 * 1000;
+  }
   const monthsAgo = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
   return dateFilter === 'this_month' ? monthsAgo === 0 : monthsAgo === 1;
 }
@@ -355,7 +362,7 @@ export default function AdminHomepageLeads() {
                 </div>
               </div>
               <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 8, padding: 3, marginBottom: 10, width: 'fit-content' }}>
-                {[['active', 'Active'], ['trash', `Trash (${trashCount})`]].map(([v, label]) => (
+                {[['active', `Active (${activeCount})`], ['trash', `Trash (${trashCount})`]].map(([v, label]) => (
                   <button
                     key={v} onClick={() => switchView(v)}
                     style={{
@@ -400,6 +407,7 @@ export default function AdminHomepageLeads() {
                   style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
                 >
                   <option value="all">All time</option>
+                  <option value="this_week">This week</option>
                   <option value="this_month">This month</option>
                   <option value="last_month">Last month</option>
                 </select>
