@@ -5,12 +5,7 @@ import {
   previewAdminEmailAudience, sendAdminIndividualEmail,
   getAdminEmailCampaigns, getAdminEmailCampaign, createAdminEmailCampaign, cancelAdminEmailCampaign,
 } from '../../utils/api';
-
-const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13.5, outline: 'none', boxSizing: 'border-box', color: '#0f172a', fontFamily: 'inherit' };
-const labelStyle = { fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: 6 };
-const btnStyle = { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 16px', border: '1px solid #e2e8f0', borderRadius: 8, background: 'white', cursor: 'pointer', fontSize: 13, fontWeight: 700, color: '#374151' };
-const primaryBtnStyle = { ...btnStyle, background: '#2563eb', borderColor: '#2563eb', color: 'white' };
-const cardStyle = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: 20 };
+import { theme, cardStyle, inputStyle, labelStyle, secondaryBtnStyle, primaryBtnStyle, dangerBtnStyle, pill, PageHeader } from './adminTheme';
 
 const SUB_TABS = [
   { slug: 'templates', label: 'Templates' },
@@ -38,31 +33,34 @@ export default function AdminEmailMarketing({ adminKey }) {
   useEffect(() => { if (adminKey) loadTemplates(); }, [adminKey, loadTemplates]);
 
   return (
-    <div style={{ padding: '28px 16px', maxWidth: 1100, margin: '0 auto' }}>
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontWeight: 800, fontSize: 22, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 9 }}><Mail size={20} color="#2563eb" /> Email Marketing</div>
-        <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Templates (including every automated lifecycle email), individual sends, and scheduled bulk campaigns.</div>
-      </div>
+    <div style={{ minHeight: '100vh', background: theme.contentBg, padding: '30px 32px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <PageHeader
+          icon={Mail}
+          title="Email Marketing"
+          subtitle="Templates (including every automated lifecycle email), individual sends, and scheduled bulk campaigns."
+        />
 
-      <div style={{ display: 'flex', gap: 4, background: '#f1f5f9', borderRadius: 9, padding: 3, width: 'fit-content', marginBottom: 22 }}>
-        {SUB_TABS.map(t => (
-          <button key={t.slug} onClick={() => setSub(t.slug)} style={{
-            padding: '8px 16px', borderRadius: 7, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13,
-            background: sub === t.slug ? 'white' : 'transparent', color: sub === t.slug ? '#0f172a' : '#64748b',
-            boxShadow: sub === t.slug ? '0 1px 4px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s',
-          }}>{t.label}</button>
-        ))}
-      </div>
+        <div style={{ display: 'flex', gap: 4, background: 'rgba(15,23,42,0.05)', borderRadius: 10, padding: 3, width: 'fit-content', marginBottom: 22 }}>
+          {SUB_TABS.map(t => (
+            <button key={t.slug} onClick={() => setSub(t.slug)} style={{
+              padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13,
+              background: sub === t.slug ? theme.cardBg : 'transparent', color: sub === t.slug ? theme.textPrimary : theme.textMuted,
+              boxShadow: sub === t.slug ? theme.shadowSm : 'none', transition: 'all 0.15s',
+            }}>{t.label}</button>
+          ))}
+        </div>
 
-      {sub === 'templates' && (
-        <TemplatesPanel adminKey={adminKey} templates={templates} loading={templatesLoading} reload={loadTemplates} />
-      )}
-      {sub === 'compose' && (
-        <ComposePanel adminKey={adminKey} templates={templates} />
-      )}
-      {sub === 'campaigns' && (
-        <CampaignsPanel adminKey={adminKey} templates={templates} />
-      )}
+        {sub === 'templates' && (
+          <TemplatesPanel adminKey={adminKey} templates={templates} loading={templatesLoading} reload={loadTemplates} />
+        )}
+        {sub === 'compose' && (
+          <ComposePanel adminKey={adminKey} templates={templates} />
+        )}
+        {sub === 'campaigns' && (
+          <CampaignsPanel adminKey={adminKey} templates={templates} />
+        )}
+      </div>
     </div>
   );
 }
@@ -152,18 +150,18 @@ function TemplatesPanel({ adminKey, templates, loading, reload }) {
   return (
     <div style={{ display: 'flex', gap: 20 }}>
       <div style={{ width: 280, flexShrink: 0 }}>
-        <button onClick={startNew} style={{ ...primaryBtnStyle, width: '100%', justifyContent: 'center', marginBottom: 14 }}>
+        <button onClick={startNew} style={{ ...primaryBtnStyle, width: '100%', marginBottom: 14 }}>
           <Plus size={14} /> New marketing template
         </button>
         {loading ? (
-          <div style={{ color: '#94a3b8', fontSize: 13, padding: 12 }}>Loading…</div>
+          <div style={{ color: theme.textMuted, fontSize: 13, padding: 12 }}>Loading…</div>
         ) : (
           <>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '4px 0 8px' }}>Marketing ({marketing.length})</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', margin: '4px 0 8px' }}>Marketing ({marketing.length})</div>
             {marketing.map(t => (
               <TemplateRow key={t.id} t={t} active={t.id === selectedId} onClick={() => setSelectedId(t.id)} />
             ))}
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '16px 0 8px' }}>Lifecycle (automated) ({lifecycle.length})</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', margin: '16px 0 8px' }}>Lifecycle (automated) ({lifecycle.length})</div>
             {lifecycle.map(t => (
               <TemplateRow key={t.id} t={t} active={t.id === selectedId} onClick={() => setSelectedId(t.id)} />
             ))}
@@ -172,22 +170,22 @@ function TemplatesPanel({ adminKey, templates, loading, reload }) {
       </div>
 
       {(selected || creating) && (
-        <div style={{ ...cardStyle, flex: 1, minWidth: 0 }}>
+        <div style={{ ...cardStyle, flex: 1, minWidth: 0, padding: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 16, color: '#0f172a' }}>{creating ? 'New template' : selected.name}</div>
-              {!creating && selected.key && <div style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 2 }}>key: {selected.key} — triggered automatically by the app, editable but not deletable</div>}
+              <div style={{ fontWeight: 800, fontSize: 16, color: theme.textPrimary }}>{creating ? 'New template' : selected.name}</div>
+              {!creating && selected.key && <div style={{ fontSize: 11.5, color: theme.textMuted, marginTop: 2 }}>key: {selected.key} — triggered automatically by the app, editable but not deletable</div>}
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setShowPreview(p => !p)} style={btnStyle}><Eye size={13} /> {showPreview ? 'Edit' : 'Preview'}</button>
-              {!creating && !selected.key && <button onClick={remove} style={{ ...btnStyle, color: '#dc2626', borderColor: '#fecaca' }}><Trash2 size={13} /></button>}
+              <button onClick={() => setShowPreview(p => !p)} style={secondaryBtnStyle}><Eye size={13} /> {showPreview ? 'Edit' : 'Preview'}</button>
+              {!creating && !selected.key && <button onClick={remove} style={dangerBtnStyle}><Trash2 size={13} /></button>}
             </div>
           </div>
 
           {showPreview ? (
             <div>
-              <div style={{ fontSize: 12.5, color: '#64748b', marginBottom: 8 }}>Subject: <strong style={{ color: '#0f172a' }}>{draft.subject}</strong></div>
-              <iframe title="Template preview" srcDoc={previewHtml} style={{ width: '100%', height: 480, border: '1px solid #e2e8f0', borderRadius: 8 }} />
+              <div style={{ fontSize: 12.5, color: theme.textSecondary, marginBottom: 8 }}>Subject: <strong style={{ color: theme.textPrimary }}>{draft.subject}</strong></div>
+              <iframe title="Template preview" srcDoc={previewHtml} style={{ width: '100%', height: 480, border: `1px solid ${theme.border}`, borderRadius: theme.radiusMd }} />
             </div>
           ) : (
             <>
@@ -214,14 +212,14 @@ function TemplatesPanel({ adminKey, templates, loading, reload }) {
                     <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 7 }}>
                       <input style={{ ...inputStyle, flex: 1 }} placeholder="name" value={v.name} onChange={e => updateVarRow(i, 'name', e.target.value)} />
                       <input style={{ ...inputStyle, flex: 2 }} placeholder="example value (used in preview)" value={v.example} onChange={e => updateVarRow(i, 'example', e.target.value)} />
-                      <button onClick={() => removeVarRow(i)} style={{ ...btnStyle, padding: '9px 10px' }}><X size={13} /></button>
+                      <button onClick={() => removeVarRow(i)} style={{ ...secondaryBtnStyle, padding: '9px 10px' }}><X size={13} /></button>
                     </div>
                   ))}
-                  <button onClick={addVarRow} style={btnStyle}><Plus size={13} /> Add variable</button>
+                  <button onClick={addVarRow} style={secondaryBtnStyle}><Plus size={13} /> Add variable</button>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 12, borderTop: '1px solid #f1f5f9' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 12, borderTop: `1px solid ${theme.borderSoft}` }}>
                 <button onClick={save} disabled={saving || !draft.name || !draft.subject || !draft.html_body} style={{ ...primaryBtnStyle, opacity: saving ? 0.7 : 1 }}>
                   {saving ? 'Saving…' : creating ? 'Create template' : 'Save changes'}
                 </button>
@@ -238,11 +236,11 @@ function TemplatesPanel({ adminKey, templates, loading, reload }) {
 function TemplateRow({ t, active, onClick }) {
   return (
     <div onClick={onClick} style={{
-      padding: '9px 12px', borderRadius: 8, cursor: 'pointer', marginBottom: 4,
-      background: active ? '#eff6ff' : 'transparent', border: `1px solid ${active ? '#bfdbfe' : 'transparent'}`,
+      padding: '9px 12px', borderRadius: theme.radiusSm, cursor: 'pointer', marginBottom: 4,
+      background: active ? '#eef2ff' : 'transparent', border: `1px solid ${active ? 'rgba(79,70,229,0.25)' : 'transparent'}`,
     }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>{t.name}</div>
-      <div style={{ fontSize: 11.5, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.subject}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: theme.textPrimary }}>{t.name}</div>
+      <div style={{ fontSize: 11.5, color: theme.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.subject}</div>
     </div>
   );
 }
@@ -327,7 +325,7 @@ function ComposePanel({ adminKey, templates }) {
 
   return (
     <div style={{ display: 'flex', gap: 20 }}>
-      <div style={{ ...cardStyle, flex: 1, maxWidth: 640 }}>
+      <div style={{ ...cardStyle, flex: 1, maxWidth: 640, padding: 22 }}>
         <div style={{ marginBottom: 16 }}>
           <label style={labelStyle}>Template</label>
           <select style={{ ...inputStyle, cursor: 'pointer' }} value={templateId} onChange={e => setTemplateId(e.target.value)}>
@@ -336,18 +334,18 @@ function ComposePanel({ adminKey, templates }) {
           </select>
         </div>
 
-        <div style={{ display: 'flex', gap: 4, background: '#f1f5f9', borderRadius: 9, padding: 3, width: 'fit-content', marginBottom: 18 }}>
+        <div style={{ display: 'flex', gap: 4, background: 'rgba(15,23,42,0.05)', borderRadius: 9, padding: 3, width: 'fit-content', marginBottom: 18 }}>
           {[['individual', 'Individual'], ['bulk', 'Bulk / Scheduled']].map(([v, label]) => (
             <button key={v} onClick={() => setMode(v)} style={{
               padding: '7px 14px', borderRadius: 7, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 12.5,
-              background: mode === v ? 'white' : 'transparent', color: mode === v ? '#0f172a' : '#64748b',
-              boxShadow: mode === v ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+              background: mode === v ? theme.cardBg : 'transparent', color: mode === v ? theme.textPrimary : theme.textMuted,
+              boxShadow: mode === v ? theme.shadowSm : 'none',
             }}>{label}</button>
           ))}
         </div>
 
         {!template ? (
-          <p style={{ fontSize: 13, color: '#94a3b8' }}>Pick a template above to continue.</p>
+          <p style={{ fontSize: 13, color: theme.textMuted }}>Pick a template above to continue.</p>
         ) : mode === 'individual' ? (
           <div>
             <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
@@ -384,8 +382,8 @@ function ComposePanel({ adminKey, templates }) {
           <div>
             <label style={labelStyle}>Audience</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: '#374151' }}>
-                <input type="checkbox" checked={sources.leads} onChange={e => setSources(s => ({ ...s, leads: e.target.checked }))} /> Leads
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: theme.textSecondary }}>
+                <input type="checkbox" checked={sources.leads} onChange={e => setSources(s => ({ ...s, leads: e.target.checked }))} style={{ accentColor: theme.accentSolid }} /> Leads
               </label>
               {sources.leads && (
                 <div style={{ display: 'flex', gap: 10, marginLeft: 24 }}>
@@ -402,35 +400,35 @@ function ComposePanel({ adminKey, templates }) {
                 </div>
               )}
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: '#374151' }}>
-                <input type="checkbox" checked={sources.companies} onChange={e => setSources(s => ({ ...s, companies: e.target.checked }))} /> Companies (subscribers)
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: theme.textSecondary }}>
+                <input type="checkbox" checked={sources.companies} onChange={e => setSources(s => ({ ...s, companies: e.target.checked }))} style={{ accentColor: theme.accentSolid }} /> Companies (subscribers)
               </label>
               {sources.companies && (
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64748b', marginLeft: 24 }}>
-                  <input type="checkbox" checked={companyActiveOnly} onChange={e => setCompanyActiveOnly(e.target.checked)} /> Active subscribers only
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: theme.textMuted, marginLeft: 24 }}>
+                  <input type="checkbox" checked={companyActiveOnly} onChange={e => setCompanyActiveOnly(e.target.checked)} style={{ accentColor: theme.accentSolid }} /> Active subscribers only
                 </label>
               )}
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: '#374151' }}>
-                <input type="checkbox" checked={sources.partners} onChange={e => setSources(s => ({ ...s, partners: e.target.checked }))} /> Partners
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: theme.textSecondary }}>
+                <input type="checkbox" checked={sources.partners} onChange={e => setSources(s => ({ ...s, partners: e.target.checked }))} style={{ accentColor: theme.accentSolid }} /> Partners
               </label>
               {sources.partners && (
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64748b', marginLeft: 24 }}>
-                  <input type="checkbox" checked={partnersActiveOnly} onChange={e => setPartnersActiveOnly(e.target.checked)} /> Active partners only
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: theme.textMuted, marginLeft: 24 }}>
+                  <input type="checkbox" checked={partnersActiveOnly} onChange={e => setPartnersActiveOnly(e.target.checked)} style={{ accentColor: theme.accentSolid }} /> Active partners only
                 </label>
               )}
             </div>
 
-            <button onClick={runPreview} disabled={previewing} style={{ ...btnStyle, marginBottom: 14 }}>
+            <button onClick={runPreview} disabled={previewing} style={{ ...secondaryBtnStyle, marginBottom: 14 }}>
               <RefreshCw size={13} /> {previewing ? 'Checking…' : 'Preview audience'}
             </button>
             {preview && (
               preview.error
                 ? <div style={{ fontSize: 13, color: '#dc2626', marginBottom: 14 }}>{preview.error}</div>
                 : (
-                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', marginBottom: 14, fontSize: 13 }}>
+                  <div style={{ background: theme.contentBg, border: `1px solid ${theme.borderSoft}`, borderRadius: theme.radiusMd, padding: '10px 14px', marginBottom: 14, fontSize: 13 }}>
                     <strong>{preview.count}</strong> recipient{preview.count === 1 ? '' : 's'}
-                    {preview.sample.length > 0 && <div style={{ color: '#64748b', marginTop: 4 }}>e.g. {preview.sample.slice(0, 5).map(s => s.email).join(', ')}{preview.count > 5 ? '…' : ''}</div>}
+                    {preview.sample.length > 0 && <div style={{ color: theme.textMuted, marginTop: 4 }}>e.g. {preview.sample.slice(0, 5).map(s => s.email).join(', ')}{preview.count > 5 ? '…' : ''}</div>}
                   </div>
                 )
             )}
@@ -468,9 +466,9 @@ function KpiRow({ kpis }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
       {KPI_LABELS.map(([key, label]) => (
-        <div key={key} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 7, padding: '5px 10px', fontSize: 12 }}>
-          <span style={{ color: '#94a3b8', fontWeight: 600 }}>{label}</span>{' '}
-          <strong style={{ color: '#0f172a' }}>{kpis?.[key] ?? 0}</strong>
+        <div key={key} style={{ background: theme.contentBg, border: `1px solid ${theme.borderSoft}`, borderRadius: theme.radiusSm, padding: '5px 10px', fontSize: 12 }}>
+          <span style={{ color: theme.textMuted, fontWeight: 600 }}>{label}</span>{' '}
+          <strong style={{ color: theme.textPrimary }}>{kpis?.[key] ?? 0}</strong>
         </div>
       ))}
     </div>
@@ -478,7 +476,7 @@ function KpiRow({ kpis }) {
 }
 
 const STATUS_COLORS = {
-  draft: '#94a3b8', scheduled: '#2563eb', sending: '#d97706', completed: '#16a34a', canceled: '#dc2626',
+  draft: '#94a3b8', scheduled: theme.accentSolid, sending: '#d97706', completed: '#16a34a', canceled: '#dc2626',
 };
 
 function CampaignsPanel({ adminKey }) {
@@ -522,29 +520,29 @@ function CampaignsPanel({ adminKey }) {
 
   if (detail) {
     return (
-      <div style={cardStyle}>
-        <button onClick={() => setDetail(null)} style={{ ...btnStyle, marginBottom: 16 }}><ArrowLeft size={13} /> Back to campaigns</button>
+      <div style={{ ...cardStyle, padding: 22 }}>
+        <button onClick={() => setDetail(null)} style={{ ...secondaryBtnStyle, marginBottom: 16 }}><ArrowLeft size={13} /> Back to campaigns</button>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
           <div>
-            <div style={{ fontWeight: 800, fontSize: 17, color: '#0f172a' }}>{detail.campaign.name}</div>
+            <div style={{ fontWeight: 800, fontSize: 17, color: theme.textPrimary }}>{detail.campaign.name}</div>
             <div style={{ fontSize: 12.5, color: STATUS_COLORS[detail.campaign.status], fontWeight: 700, marginTop: 3, textTransform: 'uppercase' }}>{detail.campaign.status}</div>
           </div>
           {detail.campaign.status === 'scheduled' && (
-            <button onClick={() => cancel(detail.campaign.id)} style={{ ...btnStyle, color: '#dc2626', borderColor: '#fecaca' }}><Ban size={13} /> Cancel</button>
+            <button onClick={() => cancel(detail.campaign.id)} style={dangerBtnStyle}><Ban size={13} /> Cancel</button>
           )}
         </div>
         <div style={{ marginBottom: 20 }}><KpiRow kpis={detail.kpis} /></div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Recipients ({detail.sends.length})</div>
-        <div style={{ border: '1px solid #e2e8f0', borderRadius: 8, maxHeight: 420, overflowY: 'auto' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Recipients ({detail.sends.length})</div>
+        <div style={{ border: `1px solid ${theme.borderSoft}`, borderRadius: theme.radiusMd, maxHeight: 420, overflowY: 'auto' }}>
           {detail.sends.map((s, i) => (
-            <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', borderBottom: i < detail.sends.length - 1 ? '1px solid #f8fafc' : 'none', fontSize: 13 }}>
+            <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', borderBottom: i < detail.sends.length - 1 ? `1px solid ${theme.borderSoft}` : 'none', fontSize: 13 }}>
               <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.recipient_email}</span>
-              <span style={{ fontSize: 11, color: '#94a3b8', textTransform: 'capitalize' }}>{s.recipient_type || ''}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 5, background: '#f1f5f9', color: '#374151', textTransform: 'uppercase' }}>{s.status}</span>
+              <span style={{ fontSize: 11, color: theme.textMuted, textTransform: 'capitalize' }}>{s.recipient_type || ''}</span>
+              <span style={pill(theme.textSecondary, theme.contentBg)}>{s.status}</span>
               {s.opened_at && <span style={{ fontSize: 11, color: '#16a34a', fontWeight: 600 }}>Opened</span>}
             </div>
           ))}
-          {detail.sends.length === 0 && !detailLoading && <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>No sends yet.</div>}
+          {detail.sends.length === 0 && !detailLoading && <div style={{ padding: 20, textAlign: 'center', color: theme.textMuted, fontSize: 13 }}>No sends yet.</div>}
         </div>
       </div>
     );
@@ -552,19 +550,19 @@ function CampaignsPanel({ adminKey }) {
 
   return (
     <div>
-      <button onClick={load} style={{ ...btnStyle, marginBottom: 14 }}><RefreshCw size={13} /> Refresh</button>
+      <button onClick={load} style={{ ...secondaryBtnStyle, marginBottom: 14 }}><RefreshCw size={13} /> Refresh</button>
       {loading ? (
-        <div style={{ color: '#94a3b8', fontSize: 14, padding: 20 }}>Loading…</div>
+        <div style={{ color: theme.textMuted, fontSize: 14, padding: 20 }}>Loading…</div>
       ) : campaigns.length === 0 ? (
-        <div style={{ ...cardStyle, textAlign: 'center', color: '#94a3b8', fontSize: 13.5 }}>No campaigns yet — create one from the Compose / Send tab.</div>
+        <div style={{ ...cardStyle, padding: 30, textAlign: 'center', color: theme.textMuted, fontSize: 13.5 }}>No campaigns yet — create one from the Compose / Send tab.</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {campaigns.map(c => (
             <div key={c.id} onClick={() => openDetail(c.id)} style={{ ...cardStyle, cursor: 'pointer', padding: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 14.5, color: '#0f172a' }}>{c.name}</div>
-                  <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{c.templateName} · {new Date(c.scheduled_at || c.created_at).toLocaleString()}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14.5, color: theme.textPrimary }}>{c.name}</div>
+                  <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>{c.templateName} · {new Date(c.scheduled_at || c.created_at).toLocaleString()}</div>
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 700, color: STATUS_COLORS[c.status], textTransform: 'uppercase' }}>{c.status}</span>
               </div>

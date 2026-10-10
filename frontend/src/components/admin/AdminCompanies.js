@@ -2,21 +2,22 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye, Trash2, Phone, Globe } from 'lucide-react';
 import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails, sendTrialEmailPreview, deleteAdminCompanyForever } from '../../utils/api';
 import { useConfirm } from '../dashboard/ConfirmDialog';
+import { theme, cardStyle, inputStyle, secondaryBtnStyle, primaryBtnStyle, dangerBtnStyle, pill, avatarGradient, StatTile, PageHeader } from './adminTheme';
 
 const STATUS_STYLE = {
-  active:            { label: 'Active',        color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
-  active_canceling:  { label: 'Canceling',      color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
-  trialing:          { label: 'Trialing',       color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
-  past_due:          { label: 'Past due',       color: '#dc2626', bg: '#fef2f2', border: '#fecaca' },
-  canceled:          { label: 'Canceled',       color: '#64748b', bg: '#f8fafc', border: '#e2e8f0' },
-  expired:           { label: 'Trial expired',  color: '#dc2626', bg: '#fef2f2', border: '#fecaca' },
-  requires_trial_setup: { label: 'Not started', color: '#94a3b8', bg: '#f8fafc', border: '#e2e8f0' },
+  active:            { label: 'Active',        color: '#16a34a', bg: '#f0fdf4' },
+  active_canceling:  { label: 'Canceling',      color: '#d97706', bg: '#fffbeb' },
+  trialing:          { label: 'Trialing',       color: theme.accentSolid, bg: '#eef2ff' },
+  past_due:          { label: 'Past due',       color: '#dc2626', bg: '#fef2f2' },
+  canceled:          { label: 'Canceled',       color: '#64748b', bg: '#f1f5f9' },
+  expired:           { label: 'Trial expired',  color: '#dc2626', bg: '#fef2f2' },
+  requires_trial_setup: { label: 'Not started', color: '#94a3b8', bg: '#f1f5f9' },
 };
 
 function StatusBadge({ sub }) {
   const s = STATUS_STYLE[sub?.status] || STATUS_STYLE.requires_trial_setup;
   return (
-    <span style={{ fontSize: 11, fontWeight: 700, color: s.color, background: s.bg, border: `1px solid ${s.border}`, borderRadius: 6, padding: '3px 9px', whiteSpace: 'nowrap' }}>
+    <span style={pill(s.color, s.bg)}>
       {s.label}{sub?.status === 'trialing' && sub.daysLeft != null ? ` · ${sub.daysLeft}d left` : ''}
     </span>
   );
@@ -171,55 +172,50 @@ export default function AdminCompanies({ adminKey }) {
     return true;
   });
 
-  const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' };
+  const selectStyle = { ...inputStyle, width: 'auto', cursor: 'pointer', color: theme.textSecondary };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '32px 16px' }}>
-      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: 24, color: '#0f172a' }}>Company Accounts</div>
-            <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Every business subscribed to the embeddable estimator.</div>
-          </div>
-          <button onClick={() => load(adminKey)} disabled={loading} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 9, padding: '9px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
-            <RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh
-          </button>
-        </div>
+    <div style={{ minHeight: '100vh', background: theme.contentBg, padding: '30px 32px' }}>
+      <div style={{ maxWidth: 1040, margin: '0 auto' }}>
+        <PageHeader
+          icon={Building2}
+          title="Company Accounts"
+          subtitle="Every business subscribed to the embeddable estimator."
+          actions={
+            <button onClick={() => load(adminKey)} disabled={loading} style={secondaryBtnStyle}>
+              <RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh
+            </button>
+          }
+        />
 
-        {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '12px 16px', color: '#dc2626', fontSize: 13, marginBottom: 20 }}>{error}</div>}
+        {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: theme.radiusMd, padding: '12px 16px', color: '#dc2626', fontSize: 13, marginBottom: 20 }}>{error}</div>}
 
         {/* Summary stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
-          {[
-            { label: 'Total companies', value: summary.count, Icon: Building2, color: '#2563eb' },
-            { label: 'Active subscriptions', value: summary.activeCount, Icon: TrendingUp, color: '#16a34a' },
-            { label: 'Total leads captured', value: summary.totalLeads, Icon: Inbox, color: '#d97706' },
-          ].map(({ label, value, Icon, color }) => (
-            <div key={label} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 8 }}>
-                <Icon size={14} color={color} /> {label}
-              </div>
-              <div style={{ fontSize: 26, fontWeight: 800, color: '#0f172a' }}>{loading ? '—' : value}</div>
-            </div>
-          ))}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+          <StatTile icon={Building2} label="Total companies" value={loading ? '—' : summary.count} color="#4f46e5" tint="#eef2ff" />
+          <StatTile icon={TrendingUp} label="Active subscriptions" value={loading ? '—' : summary.activeCount} color="#16a34a" tint="#f0fdf4" />
+          <StatTile icon={Inbox} label="Total leads captured" value={loading ? '—' : summary.totalLeads} color="#d97706" tint="#fffbeb" />
         </div>
 
         {/* Trial-activation broadcast email */}
-        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 20px', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>
-            <Mail size={15} color="#2563eb" /> Trial Activation Email
+        <div style={{ ...cardStyle, padding: '20px 22px', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9, fontWeight: 700, fontSize: 14.5, marginBottom: 4, color: theme.textPrimary }}>
+            <div style={{ width: 26, height: 26, borderRadius: 8, background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Mail size={13} color={theme.accentSolid} />
+            </div>
+            Trial Activation Email
           </div>
-          <div style={{ fontSize: 12.5, color: '#94a3b8', marginBottom: 14 }}>
+          <div style={{ fontSize: 12.5, color: theme.textMuted, marginBottom: 16 }}>
             Sends the selected companies their embed code + a pointer to the Help &amp; Docs tab. Nothing sends until you click Send below, and only after you've loaded the preview and picked who gets it.
           </div>
 
-          <form onSubmit={handleSendPreview} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f1f5f9' }}>
+          <form onSubmit={handleSendPreview} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16, paddingBottom: 16, borderBottom: `1px solid ${theme.borderSoft}` }}>
             <input
               type="email" required placeholder="you@example.com"
               value={previewToEmail} onChange={e => { setPreviewToEmail(e.target.value); setPreviewSendResult(null); setPreviewSendError(null); }}
               style={{ ...inputStyle, flex: 1, minWidth: 200 }}
             />
-            <button type="submit" disabled={previewSending} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#eff6ff', border: '1.5px solid #bfdbfe', borderRadius: 9, padding: '9px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#1d4ed8', whiteSpace: 'nowrap' }}>
+            <button type="submit" disabled={previewSending} style={{ ...secondaryBtnStyle, background: '#eef2ff', borderColor: 'rgba(79,70,229,0.2)', color: theme.accentSolid, whiteSpace: 'nowrap' }}>
               <Send size={13} /> {previewSending ? 'Sending…' : 'Email me a preview'}
             </button>
           </form>
@@ -227,20 +223,29 @@ export default function AdminCompanies({ adminKey }) {
           {previewSendError && <div style={{ fontSize: 12.5, color: '#dc2626', fontWeight: 600, marginTop: -10, marginBottom: 14 }}>{previewSendError}</div>}
 
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: trialPreview ? 14 : 0 }}>
-            <button onClick={loadTrialPreview} disabled={trialPreviewLoading} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 9, padding: '9px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+            <button onClick={loadTrialPreview} disabled={trialPreviewLoading} style={secondaryBtnStyle}>
               <Eye size={14} /> {trialPreviewLoading ? 'Loading preview…' : 'Preview recipients & copy'}
             </button>
             {trialPreview && (
-              <button onClick={handleSendTrialEmails} disabled={trialSending || trialSendResult || selectedIds.size === 0} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: trialSendResult ? '#94a3b8' : selectedIds.size === 0 ? '#cbd5e1' : '#16a34a', border: 'none', borderRadius: 9, padding: '9px 16px', fontWeight: 700, fontSize: 13, cursor: (trialSending || trialSendResult || selectedIds.size === 0) ? 'not-allowed' : 'pointer', color: 'white' }}>
+              <button
+                onClick={handleSendTrialEmails}
+                disabled={trialSending || trialSendResult || selectedIds.size === 0}
+                style={{
+                  ...primaryBtnStyle,
+                  background: trialSendResult ? '#94a3b8' : selectedIds.size === 0 ? '#cbd5e1' : 'linear-gradient(135deg, #16a34a 0%, #0d9488 100%)',
+                  boxShadow: (trialSendResult || selectedIds.size === 0) ? 'none' : '0 8px 20px -8px rgba(22,163,74,0.45)',
+                  cursor: (trialSending || trialSendResult || selectedIds.size === 0) ? 'not-allowed' : 'pointer',
+                }}
+              >
                 <Send size={14} /> {trialSending ? 'Sending…' : trialSendResult ? 'Sent' : `Send to ${selectedIds.size} selected compan${selectedIds.size === 1 ? 'y' : 'ies'}`}
               </button>
             )}
           </div>
 
-          {trialPreviewError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#dc2626', fontSize: 12.5, marginTop: 6 }}>{trialPreviewError}</div>}
+          {trialPreviewError && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: theme.radiusMd, padding: '10px 14px', color: '#dc2626', fontSize: 12.5, marginTop: 6 }}>{trialPreviewError}</div>}
 
           {trialSendResult && (
-            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '12px 14px', color: '#15803d', fontSize: 13, fontWeight: 600 }}>
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: theme.radiusMd, padding: '12px 14px', color: '#15803d', fontSize: 13, fontWeight: 600 }}>
               Sent to {trialSendResult.sentCount} compan{trialSendResult.sentCount === 1 ? 'y' : 'ies'}.
               {trialSendResult.failedCount > 0 && <span style={{ color: '#dc2626' }}> {trialSendResult.failedCount} failed.</span>}
               {trialSendResult.skippedCount > 0 && <span style={{ color: '#94a3b8' }}> {trialSendResult.skippedCount} skipped (no email on file).</span>}
@@ -249,25 +254,25 @@ export default function AdminCompanies({ adminKey }) {
 
           {trialPreview && !trialSendResult && (
             <div>
-              <div style={{ fontSize: 12, color: '#374151', marginBottom: 8 }}>
+              <div style={{ fontSize: 12, color: theme.textSecondary, marginBottom: 8 }}>
                 <strong>Subject:</strong> {trialPreview.subject}
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <div style={{ fontSize: 12, color: '#64748b' }}>
+                <div style={{ fontSize: 12, color: theme.textMuted }}>
                   {selectedIds.size} of {trialPreview.recipientCount} selected{trialPreview.skippedCount > 0 ? ` · ${trialPreview.skippedCount} skipped (no email on file)` : ''}
                 </div>
-                <button onClick={toggleSelectAll} style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 600, fontSize: 12, cursor: 'pointer', padding: 0 }}>
+                <button onClick={toggleSelectAll} style={{ background: 'none', border: 'none', color: theme.accentSolid, fontWeight: 700, fontSize: 12, cursor: 'pointer', padding: 0 }}>
                   {selectedIds.size === trialPreview.recipients.length ? 'Deselect all' : 'Select all'}
                 </button>
               </div>
-              <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid #f1f5f9', borderRadius: 8 }}>
+              <div style={{ maxHeight: 220, overflowY: 'auto', border: `1px solid ${theme.borderSoft}`, borderRadius: theme.radiusSm }}>
                 {trialPreview.recipients.map(r => (
-                  <label key={r.companyId} style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', padding: '7px 12px', borderBottom: '1px solid #f8fafc', fontSize: 12.5, cursor: 'pointer', background: selectedIds.has(r.companyId) ? 'white' : '#fafafa' }}>
+                  <label key={r.companyId} style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', padding: '7px 12px', borderBottom: `1px solid ${theme.borderSoft}`, fontSize: 12.5, cursor: 'pointer', background: selectedIds.has(r.companyId) ? 'white' : '#fafafa' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
-                      <input type="checkbox" checked={selectedIds.has(r.companyId)} onChange={() => toggleSelected(r.companyId)} style={{ cursor: 'pointer', flexShrink: 0 }} />
-                      <span style={{ fontWeight: 600, color: selectedIds.has(r.companyId) ? '#0f172a' : '#94a3b8' }}>{r.companyName}</span>
+                      <input type="checkbox" checked={selectedIds.has(r.companyId)} onChange={() => toggleSelected(r.companyId)} style={{ cursor: 'pointer', flexShrink: 0, accentColor: theme.accentSolid }} />
+                      <span style={{ fontWeight: 600, color: selectedIds.has(r.companyId) ? theme.textPrimary : theme.textMuted }}>{r.companyName}</span>
                     </div>
-                    <span style={{ color: selectedIds.has(r.companyId) ? '#64748b' : '#cbd5e1' }}>{r.email}</span>
+                    <span style={{ color: selectedIds.has(r.companyId) ? theme.textMuted : '#cbd5e1' }}>{r.email}</span>
                   </label>
                 ))}
               </div>
@@ -278,39 +283,42 @@ export default function AdminCompanies({ adminKey }) {
         {/* Filters */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: 220 }}>
-            <Search size={14} color="#94a3b8" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+            <Search size={14} color={theme.textMuted} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
             <input
               placeholder="Search by company name or email…"
               value={search} onChange={e => setSearch(e.target.value)}
               style={{ ...inputStyle, paddingLeft: 34 }}
             />
           </div>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ ...inputStyle, width: 'auto', cursor: 'pointer' }}>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={selectStyle}>
             <option value="all">All statuses</option>
             {Object.entries(STATUS_STYLE).map(([key, s]) => <option key={key} value={key}>{s.label}</option>)}
           </select>
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8' }}>Loading...</div>
+          <div style={{ textAlign: 'center', padding: 40, color: theme.textMuted }}>Loading...</div>
         ) : filtered.length === 0 ? (
-          <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: 40, textAlign: 'center', color: '#94a3b8' }}>
+          <div style={{ ...cardStyle, padding: 40, textAlign: 'center', color: theme.textMuted }}>
             {companies.length === 0 ? 'No companies yet.' : 'No companies match your filters.'}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {filtered.map(c => (
-              <div key={c.companyId} style={{ background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 12, padding: '15px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+              <div key={c.companyId} style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: avatarGradient(c.companyName || c.companyId), display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15, fontWeight: 700, color: 'white', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }}>
+                  {c.companyName ? c.companyName[0].toUpperCase() : '?'}
+                </div>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{c.companyName}</span>
+                    <span style={{ fontWeight: 700, fontSize: 15, color: theme.textPrimary }}>{c.companyName}</span>
                     <StatusBadge sub={c.subscription} />
                   </div>
-                  <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 3 }}>{c.email || '(no email on file)'}</div>
+                  <div style={{ fontSize: 12.5, color: theme.textSecondary, marginTop: 3 }}>{c.email || '(no email on file)'}</div>
                   {(c.phone || c.website) && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 3 }}>
                       {c.phone && (
-                        <a href={`tel:${c.phone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12.5, color: '#64748b', textDecoration: 'none' }}>
+                        <a href={`tel:${c.phone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12.5, color: theme.textMuted, textDecoration: 'none' }}>
                           <Phone size={11} /> {c.phone}
                         </a>
                       )}
@@ -318,7 +326,7 @@ export default function AdminCompanies({ adminKey }) {
                         <a
                           href={/^https?:\/\//i.test(c.website) ? c.website : `https://${c.website}`}
                           target="_blank" rel="noopener noreferrer"
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12.5, color: '#64748b', textDecoration: 'none' }}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12.5, color: theme.textMuted, textDecoration: 'none' }}
                         >
                           <Globe size={11} /> {c.website.replace(/^https?:\/\//i, '').replace(/\/$/, '')}
                         </a>
@@ -326,25 +334,25 @@ export default function AdminCompanies({ adminKey }) {
                     </div>
                   )}
                   {c.serviceStates?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 6 }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 7 }}>
                       {c.serviceStates.map(st => (
-                        <span key={st} style={{ fontSize: 10.5, color: '#475569', background: '#f1f5f9', borderRadius: 5, padding: '2px 7px' }}>{st}</span>
+                        <span key={st} style={pill(theme.textSecondary, theme.contentBg)}>{st}</span>
                       ))}
                     </div>
                   )}
                 </div>
-                <div style={{ display: 'flex', gap: 22, flexShrink: 0, fontSize: 12.5, color: '#374151' }}>
+                <div style={{ display: 'flex', gap: 22, flexShrink: 0, fontSize: 12.5, color: theme.textSecondary }}>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{c.servicesEnabled}/{c.servicesTotal}</div>
-                    <div style={{ color: '#94a3b8', fontSize: 11 }}>services on</div>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: theme.textPrimary }}>{c.servicesEnabled}/{c.servicesTotal}</div>
+                    <div style={{ color: theme.textMuted, fontSize: 11 }}>services on</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{c.leadCount}</div>
-                    <div style={{ color: '#94a3b8', fontSize: 11 }}>leads</div>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: theme.textPrimary }}>{c.leadCount}</div>
+                    <div style={{ color: theme.textMuted, fontSize: 11 }}>leads</div>
                   </div>
                   <div style={{ textAlign: 'center', minWidth: 78 }}>
-                    <div style={{ fontWeight: 700, fontSize: 13, color: '#0f172a' }}>{c.signedUpAt ? new Date(c.signedUpAt).toLocaleDateString() : '—'}</div>
-                    <div style={{ color: '#94a3b8', fontSize: 11 }}>signed up</div>
+                    <div style={{ fontWeight: 700, fontSize: 13, color: theme.textPrimary }}>{c.signedUpAt ? new Date(c.signedUpAt).toLocaleDateString() : '—'}</div>
+                    <div style={{ color: theme.textMuted, fontSize: 11 }}>signed up</div>
                   </div>
                 </div>
                 <button
@@ -353,8 +361,8 @@ export default function AdminCompanies({ adminKey }) {
                   title="Permanently delete this account"
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    width: 34, height: 34, flexShrink: 0, borderRadius: 8,
-                    border: '1px solid #fecaca', background: 'white', color: '#dc2626',
+                    width: 34, height: 34, flexShrink: 0, borderRadius: theme.radiusSm,
+                    border: '1px solid rgba(220,38,38,0.25)', background: '#fef2f2', color: '#dc2626',
                     cursor: deletingId === c.companyId ? 'not-allowed' : 'pointer',
                     opacity: deletingId === c.companyId ? 0.5 : 1,
                   }}
@@ -366,7 +374,7 @@ export default function AdminCompanies({ adminKey }) {
           </div>
         )}
 
-        <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12, color: '#94a3b8' }}>
+        <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12, color: theme.textMuted }}>
           <Users size={12} style={{ verticalAlign: -1, marginRight: 4 }} />
           To pause or change a subscriber's billing without deleting their account, use Stripe directly for now.
         </div>

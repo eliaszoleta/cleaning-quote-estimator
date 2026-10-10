@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw, Target } from 'lucide-react';
+import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw, Target, Users } from 'lucide-react';
 import { getAdminHomepageLeads, patchAdminHomepageLead, deleteAdminHomepageLeadForever } from '../../utils/api';
 import { formatPrice, serviceTypeLabel, formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
+import { theme, cardStyle, inputStyle, secondaryBtnStyle, dangerBtnStyle, pill, avatarGradient, PageHeader } from './adminTheme';
 
 const SERVICE_COLORS = {
   home_residential: '#2563eb', apartment: '#7c3aed', commercial: '#0891b2',
@@ -312,49 +313,47 @@ export default function AdminHomepageLeads({ adminKey }) {
     URL.revokeObjectURL(url);
   };
 
-  const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' };
-  const btnStyle = { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 13px', border: '1px solid #e2e8f0', borderRadius: 7, background: 'white', cursor: 'pointer', fontSize: 12.5, fontWeight: 600, color: '#374151' };
+  const selectStyle = { ...inputStyle, padding: '9px 12px', width: 'auto', cursor: 'pointer', color: theme.textSecondary };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '32px 16px' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: 24, color: '#0f172a' }}>Homepage Leads</div>
-            <div style={{ fontSize: 13, color: '#64748b', marginTop: 3 }}>Everyone who opted in for their estimate by email through the main estimator on cleanestimator.com — not tied to any subscriber account.</div>
-          </div>
-        </div>
+    <div style={{ minHeight: '100vh', background: theme.contentBg, padding: '30px 32px' }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto' }}>
+        <PageHeader
+          icon={Users}
+          title="Homepage Leads"
+          subtitle="Everyone who opted in for their estimate by email through the main estimator on cleanestimator.com — not tied to any subscriber account."
+        />
 
-        <div style={{ display: 'flex', gap: 20, height: 'calc(100vh - 180px)' }}>
+        <div style={{ display: 'flex', gap: 20, height: 'calc(100vh - 170px)' }}>
           {/* Lead list */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             <div style={{ marginBottom: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <h2 style={{ fontSize: 16, fontWeight: 800, color: theme.textPrimary, letterSpacing: '-0.2px' }}>
                   Leads
                 </h2>
                 <div style={{ display: 'flex', gap: 7 }}>
-                  <button onClick={() => loadLeads(adminKey)} style={btnStyle}>
+                  <button onClick={() => loadLeads(adminKey)} style={secondaryBtnStyle}>
                     <RefreshCw size={13} /> Refresh
                   </button>
-                  <button onClick={exportCSV} disabled={filtered.length === 0} style={{ ...btnStyle, opacity: filtered.length === 0 ? 0.5 : 1 }}>
+                  <button onClick={exportCSV} disabled={filtered.length === 0} style={{ ...secondaryBtnStyle, opacity: filtered.length === 0 ? 0.5 : 1 }}>
                     <Download size={13} /> {selectedIds.size > 0 ? `Export Selected (${selectedIds.size})` : 'Export CSV'}
                   </button>
-                  <button onClick={exportFacebookCSV} disabled={filtered.length === 0} title="Formatted for Meta Ads Manager > Audiences > Custom Audience > Customer List" style={{ ...btnStyle, opacity: filtered.length === 0 ? 0.5 : 1 }}>
+                  <button onClick={exportFacebookCSV} disabled={filtered.length === 0} title="Formatted for Meta Ads Manager > Audiences > Custom Audience > Customer List" style={{ ...secondaryBtnStyle, opacity: filtered.length === 0 ? 0.5 : 1 }}>
                     <Target size={13} /> Export for Facebook
                   </button>
                 </div>
               </div>
-              <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 8, padding: 3, marginBottom: 10, width: 'fit-content' }}>
+              <div style={{ display: 'flex', background: 'rgba(15,23,42,0.05)', borderRadius: 10, padding: 3, marginBottom: 12, width: 'fit-content' }}>
                 {[['active', `Active (${activeCount})`], ['trash', `Trash (${trashCount})`]].map(([v, label]) => (
                   <button
                     key={v} onClick={() => switchView(v)}
                     style={{
-                      padding: '7px 14px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                      padding: '7px 15px', borderRadius: 8, border: 'none', cursor: 'pointer',
                       fontWeight: 700, fontSize: 12.5,
-                      background: view === v ? 'white' : 'transparent',
-                      color: view === v ? '#0f172a' : '#64748b',
-                      boxShadow: view === v ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                      background: view === v ? theme.cardBg : 'transparent',
+                      color: view === v ? theme.textPrimary : theme.textMuted,
+                      boxShadow: view === v ? theme.shadowSm : 'none',
                       transition: 'all 0.15s',
                     }}
                   >
@@ -367,49 +366,29 @@ export default function AdminHomepageLeads({ adminKey }) {
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search by name, email, city, ZIP…"
-                  style={{ flex: 1, minWidth: 200, padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, outline: 'none', color: '#0f172a' }}
+                  style={{ ...inputStyle, flex: 1, minWidth: 200 }}
                 />
-                <select
-                  value={filter}
-                  onChange={e => setFilter(e.target.value)}
-                  style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
-                >
+                <select value={filter} onChange={e => setFilter(e.target.value)} style={selectStyle}>
                   <option value="all">All services</option>
                   {serviceTypes.map(t => <option key={t} value={t}>{serviceTypeLabel(t)}</option>)}
                 </select>
-                <select
-                  value={stateFilter}
-                  onChange={e => selectStateFilter(e.target.value)}
-                  style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
-                >
+                <select value={stateFilter} onChange={e => selectStateFilter(e.target.value)} style={selectStyle}>
                   <option value="all">All states</option>
                   {states.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
                 {cities.length > 0 && (
-                  <select
-                    value={cityFilter}
-                    onChange={e => setCityFilter(e.target.value)}
-                    style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
-                  >
+                  <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} style={selectStyle}>
                     <option value="all">All cities</option>
                     {cities.map(c => <option key={c} value={c}>{c} ({cityCounts[c]})</option>)}
                   </select>
                 )}
-                <select
-                  value={dateFilter}
-                  onChange={e => setDateFilter(e.target.value)}
-                  style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
-                >
+                <select value={dateFilter} onChange={e => setDateFilter(e.target.value)} style={selectStyle}>
                   <option value="all">All time</option>
                   <option value="this_week">This week</option>
                   <option value="this_month">This month</option>
                   <option value="last_month">Last month</option>
                 </select>
-                <select
-                  value={userTypeFilter}
-                  onChange={e => setUserTypeFilter(e.target.value)}
-                  style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
-                >
+                <select value={userTypeFilter} onChange={e => setUserTypeFilter(e.target.value)} style={selectStyle}>
                   <option value="all">Homeowner & business</option>
                   <option value="homeowner">Homeowner only</option>
                   <option value="business">Cleaning business only</option>
@@ -418,28 +397,33 @@ export default function AdminHomepageLeads({ adminKey }) {
             </div>
 
             {filtered.length > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 14px', marginBottom: 10, background: selectedIds.size > 0 ? '#eff6ff' : '#f8fafc', border: `1px solid ${selectedIds.size > 0 ? '#bfdbfe' : '#e2e8f0'}`, borderRadius: 8, transition: 'background 0.15s, border-color 0.15s' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, color: '#374151' }}>
-                  <input type="checkbox" checked={allFilteredSelected} onChange={toggleSelectAll} style={{ width: 15, height: 15, cursor: 'pointer' }} />
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 12, padding: '9px 14px', marginBottom: 10,
+                background: selectedIds.size > 0 ? '#eef2ff' : theme.cardBg,
+                border: `1px solid ${selectedIds.size > 0 ? 'rgba(79,70,229,0.25)' : theme.border}`,
+                borderRadius: theme.radiusMd, transition: 'background 0.15s, border-color 0.15s',
+              }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, color: theme.textSecondary }}>
+                  <input type="checkbox" checked={allFilteredSelected} onChange={toggleSelectAll} style={{ width: 15, height: 15, cursor: 'pointer', accentColor: theme.accentSolid }} />
                   {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
                 </label>
                 {selectedIds.size > 0 && (
                   <div style={{ display: 'flex', gap: 7, marginLeft: 'auto' }}>
                     {view === 'trash' ? (
                       <>
-                        <button onClick={bulkRestore} style={{ ...btnStyle, background: '#f0fdf4', color: '#16a34a', borderColor: '#bbf7d0' }}>
+                        <button onClick={bulkRestore} style={{ ...secondaryBtnStyle, background: '#f0fdf4', color: '#16a34a', borderColor: '#bbf7d0' }}>
                           <RotateCcw size={13} /> Restore
                         </button>
-                        <button onClick={bulkDeleteForever} style={{ ...btnStyle, background: '#fef2f2', color: '#dc2626', borderColor: '#fecaca' }}>
+                        <button onClick={bulkDeleteForever} style={dangerBtnStyle}>
                           <Trash2 size={13} /> Delete Forever
                         </button>
                       </>
                     ) : (
-                      <button onClick={bulkMoveToTrash} style={{ ...btnStyle, background: '#fef2f2', color: '#dc2626', borderColor: '#fecaca' }}>
+                      <button onClick={bulkMoveToTrash} style={dangerBtnStyle}>
                         <Trash2 size={13} /> Move to Trash
                       </button>
                     )}
-                    <button onClick={() => setSelectedIds(new Set())} style={btnStyle}>
+                    <button onClick={() => setSelectedIds(new Set())} style={secondaryBtnStyle}>
                       <X size={13} /> Clear
                     </button>
                   </div>
@@ -448,16 +432,16 @@ export default function AdminHomepageLeads({ adminKey }) {
             )}
 
             {loading ? (
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 14 }}>Loading…</div>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.textMuted, fontSize: 14 }}>Loading…</div>
             ) : filtered.length === 0 ? (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'white', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
-                  <Inbox size={24} color="#94a3b8" />
+              <div style={{ ...cardStyle, flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
+                  <Inbox size={24} color={theme.accentSolid} />
                 </div>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#374151', marginBottom: 5 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: theme.textSecondary, marginBottom: 5 }}>
                   {search || filter !== 'all' || stateFilter !== 'all' || cityFilter !== 'all' || dateFilter !== 'all' || userTypeFilter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
                 </div>
-                <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', maxWidth: 300, margin: 0 }}>
+                <p style={{ fontSize: 13, color: theme.textMuted, textAlign: 'center', maxWidth: 300, margin: 0 }}>
                   {search || filter !== 'all' || stateFilter !== 'all' || cityFilter !== 'all' || dateFilter !== 'all' || userTypeFilter !== 'all'
                     ? 'Try changing your search or filter.'
                     : view === 'trash'
@@ -466,7 +450,7 @@ export default function AdminHomepageLeads({ adminKey }) {
                 </p>
               </div>
             ) : (
-              <div style={{ flex: 1, overflowY: 'auto', background: 'white', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+              <div style={{ ...cardStyle, flex: 1, overflowY: 'auto' }}>
                 {filtered.map((lead, i) => {
                   const color = SERVICE_COLORS[lead.service_type] || '#64748b';
                   const isSelected = selectedLead?.id === lead.id;
@@ -476,8 +460,8 @@ export default function AdminHomepageLeads({ adminKey }) {
                       key={lead.id}
                       onClick={() => openLead(lead)}
                       style={{
-                        padding: '13px 18px', borderBottom: i < filtered.length - 1 ? '1px solid #f8fafc' : 'none',
-                        cursor: 'pointer', background: isSelected ? '#eff6ff' : 'white',
+                        padding: '13px 18px', borderBottom: i < filtered.length - 1 ? `1px solid ${theme.borderSoft}` : 'none',
+                        cursor: 'pointer', background: isSelected ? '#eef2ff' : 'transparent',
                         display: 'flex', gap: 13, alignItems: 'center', transition: 'background 0.1s',
                       }}
                     >
@@ -486,36 +470,32 @@ export default function AdminHomepageLeads({ adminKey }) {
                         checked={isChecked}
                         onClick={e => e.stopPropagation()}
                         onChange={() => toggleSelect(lead.id)}
-                        style={{ width: 15, height: 15, cursor: 'pointer', flexShrink: 0 }}
+                        style={{ width: 15, height: 15, cursor: 'pointer', flexShrink: 0, accentColor: theme.accentSolid }}
                       />
-                      <div style={{ width: 36, height: 36, borderRadius: 9, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15, fontWeight: 700, color }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 11, background: avatarGradient(lead.name || lead.email), display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14, fontWeight: 700, color: 'white', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }}>
                         {lead.name ? lead.name[0].toUpperCase() : '?'}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                          <div style={{ fontWeight: 600, fontSize: 13.5, color: '#0f172a' }}>{lead.name || '(No name)'}</div>
+                          <div style={{ fontWeight: 600, fontSize: 13.5, color: theme.textPrimary }}>{lead.name || '(No name)'}</div>
                           {userTypeLabel(lead.user_type) && (
-                            <span style={{
-                              fontSize: 10.5, fontWeight: 700, padding: '1px 7px', borderRadius: 5, flexShrink: 0,
-                              background: lead.user_type === 'business' ? '#f5f3ff' : '#ecfdf5',
-                              color: lead.user_type === 'business' ? '#7c3aed' : '#059669',
-                            }}>
+                            <span style={pill(lead.user_type === 'business' ? '#7c3aed' : '#059669', lead.user_type === 'business' ? '#f5f3ff' : '#ecfdf5')}>
                               {userTypeLabel(lead.user_type)}
                             </span>
                           )}
                         </div>
-                        <div style={{ fontSize: 12, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: 12, color: theme.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {lead.email || 'No email'}{lead.phone && ` · ${lead.phone}`}
                         </div>
                       </div>
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ background: `${color}18`, color, padding: '2px 8px', borderRadius: 6, fontSize: 11.5, fontWeight: 700, marginBottom: 3, display: 'inline-block' }}>
+                        <div style={{ ...pill(color, `${color}18`), marginBottom: 3 }}>
                           {serviceTypeLabel(lead.service_type)}
                         </div>
-                        <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>
+                        <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 700 }}>
                           {lead.estimated_price_low ? `${formatPrice(lead.estimated_price_low)} – ${formatPrice(lead.estimated_price_high)}` : '—'}
                         </div>
-                        <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{formatDateTime(lead.created_at)}</div>
+                        <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>{formatDateTime(lead.created_at)}</div>
                       </div>
                     </div>
                   );
@@ -526,18 +506,23 @@ export default function AdminHomepageLeads({ adminKey }) {
 
           {/* Lead detail panel */}
           {selectedLead && (
-            <div style={{ width: 340, background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 14, flexShrink: 0, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <div style={{ ...cardStyle, width: 340, padding: '20px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 14, flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <h3 style={{ fontWeight: 800, fontSize: 17, color: '#0f172a', marginBottom: 2 }}>{selectedLead.name || '(No name)'}</h3>
-                  <div style={{ fontSize: 12, color: '#94a3b8' }}>{formatDateTime(selectedLead.created_at)}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 11, background: avatarGradient(selectedLead.name || selectedLead.email), display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15, fontWeight: 700, color: 'white' }}>
+                    {selectedLead.name ? selectedLead.name[0].toUpperCase() : '?'}
+                  </div>
+                  <div>
+                    <h3 style={{ fontWeight: 800, fontSize: 16, color: theme.textPrimary, marginBottom: 2 }}>{selectedLead.name || '(No name)'}</h3>
+                    <div style={{ fontSize: 12, color: theme.textMuted }}>{formatDateTime(selectedLead.created_at)}</div>
+                  </div>
                 </div>
-                <button onClick={() => setSelectedLead(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 4, borderRadius: 6, display: 'flex', alignItems: 'center' }}>
+                <button onClick={() => setSelectedLead(null)} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: 4, borderRadius: 6, display: 'flex', alignItems: 'center' }}>
                   <X size={18} />
                 </button>
               </div>
 
-              <div style={{ background: '#f8fafc', borderRadius: 9, padding: '13px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <div style={{ background: theme.contentBg, borderRadius: theme.radiusMd, padding: '13px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {[
                   ['Email',    selectedLead.email,  `mailto:${selectedLead.email}`],
                   ['Phone',    selectedLead.phone,  `tel:${selectedLead.phone}`],
@@ -548,10 +533,10 @@ export default function AdminHomepageLeads({ adminKey }) {
                   ['Timeline', selectedLead.timeline || '—', null],
                 ].filter(([, val]) => val && val !== '—' && val !== '').map(([label, val, href]) => (
                   <div key={label} style={{ display: 'flex', gap: 8 }}>
-                    <span style={{ fontSize: 11.5, fontWeight: 700, color: '#94a3b8', minWidth: 72, paddingTop: 1 }}>{label}</span>
+                    <span style={{ fontSize: 11.5, fontWeight: 700, color: theme.textMuted, minWidth: 72, paddingTop: 1 }}>{label}</span>
                     {href
-                      ? <a href={href} style={{ fontSize: 13, color: '#2563eb', fontWeight: 500 }}>{val}</a>
-                      : <span style={{ fontSize: 13, color: '#0f172a', fontWeight: 500 }}>{val}</span>
+                      ? <a href={href} style={{ fontSize: 13, color: theme.accentSolid, fontWeight: 600 }}>{val}</a>
+                      : <span style={{ fontSize: 13, color: theme.textPrimary, fontWeight: 500 }}>{val}</span>
                     }
                   </div>
                 ))}
@@ -559,11 +544,11 @@ export default function AdminHomepageLeads({ adminKey }) {
 
               {selectedLead.service_details && Object.keys(selectedLead.service_details).filter(k => k !== 'city').length > 0 && (
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Service Details</div>
-                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '11px 13px' }}>
+                  <div style={{ fontWeight: 700, fontSize: 11.5, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Service Details</div>
+                  <div style={{ background: theme.contentBg, borderRadius: theme.radiusMd, padding: '11px 13px' }}>
                     {Object.entries(selectedLead.service_details).filter(([k]) => k !== 'city').map(([k, v]) => (
-                      <div key={k} style={{ fontSize: 12, color: '#374151', marginBottom: 4 }}>
-                        <span style={{ fontWeight: 600, color: '#64748b', textTransform: 'capitalize' }}>{k.replace(/([A-Z])/g, ' $1').trim()}: </span>
+                      <div key={k} style={{ fontSize: 12, color: theme.textSecondary, marginBottom: 4 }}>
+                        <span style={{ fontWeight: 600, color: theme.textMuted, textTransform: 'capitalize' }}>{k.replace(/([A-Z])/g, ' $1').trim()}: </span>
                         {Array.isArray(v) ? v.join(', ') : String(v)}
                       </div>
                     ))}
@@ -573,8 +558,8 @@ export default function AdminHomepageLeads({ adminKey }) {
 
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}>
-                  <div style={{ fontWeight: 700, fontSize: 12, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Internal Notes</div>
-                  {noteStatus === 'saving' && <span style={{ fontSize: 11, color: '#94a3b8' }}>Saving…</span>}
+                  <div style={{ fontWeight: 700, fontSize: 11.5, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Internal Notes</div>
+                  {noteStatus === 'saving' && <span style={{ fontSize: 11, color: theme.textMuted }}>Saving…</span>}
                   {noteStatus === 'saved' && <span style={{ fontSize: 11, color: '#16a34a', fontWeight: 600 }}>Saved</span>}
                 </div>
                 <textarea
@@ -582,20 +567,20 @@ export default function AdminHomepageLeads({ adminKey }) {
                   onChange={e => handleNotesChange(e.target.value)}
                   onBlur={flushNoteSave}
                   placeholder="Add notes about this lead…"
-                  style={{ width: '100%', padding: '9px 11px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, resize: 'vertical', minHeight: 80, outline: 'none', color: '#0f172a', fontFamily: 'inherit' }}
+                  style={{ ...inputStyle, resize: 'vertical', minHeight: 80 }}
                 />
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7, paddingTop: 8, borderTop: '1px solid #f1f5f9' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7, paddingTop: 8, borderTop: `1px solid ${theme.borderSoft}` }}>
                 {(selectedLead.email || selectedLead.phone) && (
                   <div style={{ display: 'flex', gap: 7 }}>
                     {selectedLead.email && (
-                      <a href={`mailto:${selectedLead.email}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#2563eb', color: 'white', textAlign: 'center', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 13 }}>
+                      <a href={`mailto:${selectedLead.email}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: theme.accentGradient, color: 'white', textAlign: 'center', borderRadius: theme.radiusSm, textDecoration: 'none', fontWeight: 700, fontSize: 13, boxShadow: theme.shadowGlow }}>
                         <Mail size={13} /> Email
                       </a>
                     )}
                     {selectedLead.phone && (
-                      <a href={`tel:${selectedLead.phone}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#16a34a', color: 'white', textAlign: 'center', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 13 }}>
+                      <a href={`tel:${selectedLead.phone}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#16a34a', color: 'white', textAlign: 'center', borderRadius: theme.radiusSm, textDecoration: 'none', fontWeight: 700, fontSize: 13 }}>
                         <Phone size={13} /> Call
                       </a>
                     )}
@@ -605,22 +590,19 @@ export default function AdminHomepageLeads({ adminKey }) {
                   <div style={{ display: 'flex', gap: 7 }}>
                     <button
                       onClick={() => restoreLead(selectedLead.id)}
-                      style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                      style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', borderRadius: theme.radiusSm, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
                     >
                       <RotateCcw size={13} /> Restore
                     </button>
                     <button
                       onClick={() => hardDeleteLead(selectedLead.id)}
-                      style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+                      style={{ flex: 1, ...dangerBtnStyle, justifyContent: 'center' }}
                     >
                       <Trash2 size={13} /> Delete Forever
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => archiveLead(selectedLead.id)}
-                    style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
-                  >
+                  <button onClick={() => archiveLead(selectedLead.id)} style={{ width: '100%', ...dangerBtnStyle, justifyContent: 'center' }}>
                     <Trash2 size={13} /> Move to Trash
                   </button>
                 )}
