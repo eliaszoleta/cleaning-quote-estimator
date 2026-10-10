@@ -49,6 +49,8 @@ const PrivacyPolicy = lazy(() => import('./components/pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./components/pages/TermsOfService'));
 const ServicePage = lazy(() => import('./components/pages/ServicePage'));
 const StatePage = lazy(() => import('./components/pages/StatePage'));
+const StartCleaningBusinessIndex = lazy(() => import('./components/pages/StartCleaningBusinessIndex'));
+const StartCleaningBusinessStatePage = lazy(() => import('./components/pages/StartCleaningBusinessStatePage'));
 const CityPage = lazy(() => import('./components/pages/CityPage'));
 const CalculatorPage = lazy(() => import('./components/pages/CalculatorPage'));
 const EstimatorPage = lazy(() => import('./components/pages/EstimatorPage'));
@@ -105,6 +107,8 @@ const isBuyCityPlacement = pathname === '/buy-city-placement';
 const isServicePage = pathname.startsWith('/cleaning-services/');
 const isCityPage = pathname.startsWith('/cleaning-cost/city/');
 const isStatePage = pathname.startsWith('/cleaning-cost/') && !isCityPage;
+const isStartBusinessIndex = pathname === '/start-a-cleaning-business';
+const isStartBusinessState = pathname.startsWith('/start-a-cleaning-business/');
 const isCalculatorPage = pathname === '/cleaning-cost-calculator';
 const isEstimatorPage = pathname === '/cleaning-cost-estimator';
 const isMethodologyPage = pathname === '/how-we-calculate-prices';
@@ -320,6 +324,10 @@ export default function App() {
   if (isServicePage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><ServicePage slug={pathname.replace('/cleaning-services/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isCityPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><CityPage slug={pathname.replace('/cleaning-cost/city/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isStatePage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><StatePage slug={pathname.replace('/cleaning-cost/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
+
+  if (isStartBusinessState) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><StartCleaningBusinessStatePage slug={pathname.replace('/start-a-cleaning-business/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
+
+  if (isStartBusinessIndex) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><StartCleaningBusinessIndex /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><CalculatorPage /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isEstimatorPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><EstimatorPage /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isMethodologyPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><MethodologyPage /></Suspense></main><Footer /></div></HelmetProvider>;

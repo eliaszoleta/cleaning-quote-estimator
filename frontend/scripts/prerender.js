@@ -44,6 +44,16 @@ function loadStatesData() {
   return fn();
 }
 
+function loadStateBusinessStartupData() {
+  const raw = fs.readFileSync(path.join(SRC, 'data/stateBusinessStartup.js'), 'utf8');
+  const src = raw
+    .replace(/^export const /gm, 'const ')
+    .replace(/^export function /gm, 'function ');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(src + '\nreturn { STATE_BUSINESS_STARTUP, getStateBusinessStartupByCode };');
+  return fn();
+}
+
 // cityPricing.js imports getStateBySlug/adjustForState from statePricing.js and
 // getAllServices/typicalCost from services.js (real ES imports the webpack/React
 // build resolves natively) instead of duplicating that pricing data -- a second
@@ -1135,6 +1145,200 @@ function renderStatePage(state, servicesMod, statesMod, faqsMod, assets, citiesM
   });
 }
 
+const START_BUSINESS_ACCENT = '#ea580c';
+const START_BUSINESS_ACCENT_DARK = '#c2410c';
+
+// States with a full, genuinely state-specific deep-dive post (not just the
+// templated page) -- see blogPosts.js's 'starting-out' category. Must stay
+// in sync with DEEP_POST_BY_CODE in StartCleaningBusinessStatePage.js.
+const DEEP_POST_BY_CODE = {
+  CA: 'how-to-start-a-cleaning-business-in-california',
+  TX: 'how-to-start-a-cleaning-business-in-texas',
+  FL: 'how-to-start-a-cleaning-business-in-florida',
+  NY: 'how-to-start-a-cleaning-business-in-new-york',
+  IL: 'how-to-start-a-cleaning-business-in-illinois',
+  GA: 'how-to-start-a-cleaning-business-in-georgia',
+  PA: 'how-to-start-a-cleaning-business-in-pennsylvania',
+  AZ: 'how-to-start-a-cleaning-business-in-arizona',
+};
+
+function startBusinessChecklistHtml() {
+  const steps = [
+    ['Choose a business structure', 'Most cleaning businesses should form an LLC rather than operate as a sole proprietor, for the liability protection.', '/blog/llc-vs-sole-proprietorship-cleaning-business', 'LLC vs. sole proprietorship'],
+    ['Get licensed locally', 'A general business license from your city or county, on top of state registration.', '/blog/cleaning-business-license-permits-guide', 'Full licensing guide'],
+    ['Get insured and bonded', 'General liability insurance and bonding, before your first paid job.', '/blog/cleaning-business-insurance-bonding-guide', 'Insurance & bonding guide'],
+    ['Buy your equipment', 'Start lean: a vacuum, mop system, microfiber cloths, and basic supplies.', '/blog/cleaning-business-equipment-supplies-checklist', 'Equipment checklist'],
+    ['Set your pricing', 'Base your price on your actual time/supply costs plus your local market rate.', '/blog/how-to-price-cleaning-services-new-business', 'Pricing guide'],
+    ['Get online', 'A real website with an instant estimate calculator converts visitors into booked jobs.', '/website-for-cleaning-companies', 'Get a free website'],
+  ];
+  return steps.map(([title, body, href, linkText], i) => `<div style="display:flex;gap:12px;margin-bottom:14px">
+    <div style="flex-shrink:0;margin-top:1px;color:${START_BUSINESS_ACCENT};font-weight:800">&#10003;</div>
+    <div><div style="font-weight:700;font-size:14.5px;color:#0f172a;margin-bottom:2px">${i + 1}. ${esc(title)}</div>
+    <div style="font-size:13.5px;color:#64748b;line-height:1.6">${esc(body)} <a href="${href}" style="color:${START_BUSINESS_ACCENT};font-weight:600">${esc(linkText)} &rarr;</a></div></div>
+  </div>`).join('');
+}
+
+function startBusinessFaqs(stateName) {
+  return [
+    { q: `How much does it cost to form an LLC in ${stateName}?`, a: `See the exact filing fee and agency above. Total realistic startup cost for a solo cleaning business in ${stateName} -- including registration, insurance, and basic equipment -- typically runs $500-$2,000.` },
+    { q: `Do I need a special cleaning license in ${stateName}?`, a: `Most states, including ${stateName}, don't require a cleaning-specific license for standard residential or commercial cleaning -- what you need is a general business license (local) plus state business registration.` },
+    { q: `What's the fastest way to get my first clients in ${stateName}?`, a: `Your personal network almost always provides your first few jobs. From there, a free Google Business Profile, asking every client for a review, and getting a real website online are the highest-leverage next steps.` },
+    { q: `Should I start with residential or commercial cleaning in ${stateName}?`, a: `Most new businesses start residential (lower barrier, faster first clients) and add commercial contracts once they have the track record and insurance to win them.` },
+  ];
+}
+
+function renderStartBusinessStatePage(state, biz, statesMod, assets) {
+  const otherStates = statesMod.getAllStates().filter(s => s.slug !== state.slug);
+  const otherStatesHtml = otherStates.map(s => `<a href="/start-a-cleaning-business/${s.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(s.name)}</a>`).join(' ');
+  const faqs = startBusinessFaqs(state.name);
+  const deepPostSlug = DEEP_POST_BY_CODE[state.code];
+  const deepPostHtml = deepPostSlug ? `<a href="/blog/${deepPostSlug}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:16px 20px;margin-bottom:24px;text-decoration:none;flex-wrap:wrap">
+    <span style="font-size:14px;font-weight:700;color:#0f172a">Read the full ${esc(state.name)}-specific guide &mdash; market details, climate factors, and more &rarr;</span>
+    <span style="font-size:13px;font-weight:700;color:${START_BUSINESS_ACCENT};white-space:nowrap">Read guide</span>
+  </a>` : '';
+
+  const seoTitle = `How to Start a Cleaning Business in ${state.name} (2026): Costs, LLC Fees & Licensing | Clean Estimator`;
+  const seoDesc = `Everything you need to start a cleaning business in ${state.name}: LLC filing fee (${fmt(biz.llcFee)}), licensing, insurance, pricing, and getting your first clients.`;
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:24px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <a href="/start-a-cleaning-business" style="color:#64748b;text-decoration:none">Start a Cleaning Business</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">${esc(state.name)}</span>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <div style="font-size:12px;font-weight:700;color:${START_BUSINESS_ACCENT};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">${esc(state.name)}</div>
+    <h1 style="font-size:clamp(24px,4vw,32px);font-weight:800;color:#0f172a;line-height:1.25;margin-bottom:10px">How to Start a Cleaning Business in ${esc(state.name)}</h1>
+    <p style="font-size:15.5px;color:#64748b;line-height:1.7">What it costs to register, license, and insure a cleaning business in ${esc(state.name)}, plus the full step-by-step checklist to get your first client.</p>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:16px">${esc(state.name)} LLC Filing Quick Facts</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:16px">
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px 16px">
+        <div style="font-size:11px;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">LLC Filing Fee</div>
+        <div style="font-size:22px;font-weight:800;color:#0f172a">${fmt(biz.llcFee)}</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px">
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">Filing Agency</div>
+        <div style="font-size:14px;font-weight:700;color:#0f172a;line-height:1.4">${esc(biz.agency)}</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px">
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">State Income Tax</div>
+        <div style="font-size:14px;font-weight:700;color:#0f172a">${biz.noIncomeTax ? 'None' : 'Applies'}</div>
+      </div>
+    </div>
+    <p style="font-size:13.5px;color:#475569;line-height:1.7;margin:0">${esc(biz.note)}</p>
+    <p style="font-size:11.5px;color:#94a3b8;line-height:1.6;margin:12px 0 0">Filing fees change periodically &mdash; confirm the current fee directly with the ${esc(biz.agency)} before filing. This is general informational content, not legal or tax advice.</p>
+  </div>
+  ${deepPostHtml}
+  <div style="background:linear-gradient(135deg,${START_BUSINESS_ACCENT},${START_BUSINESS_ACCENT_DARK});border-radius:12px;padding:18px 24px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="color:white"><div style="font-weight:700;font-size:15px">Get your ${esc(state.name)} cleaning business online</div><div style="font-size:13px;opacity:0.9">$5 setup &middot; 2 months free &middot; then $249/mo</div></div>
+    <a href="/website-for-cleaning-companies" style="background:white;color:${START_BUSINESS_ACCENT_DARK};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap">Get a Free Website &rarr;</a>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:16px">Startup Checklist for ${esc(state.name)}</h2>
+    ${startBusinessChecklistHtml()}
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px 36px;margin-bottom:24px">
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-bottom:8px">What Cleaners in ${esc(state.name)} Charge</h2>
+    <p style="font-size:13.5px;color:#64748b;line-height:1.7">A standard house cleaning in ${esc(state.name)} typically runs <strong style="color:#0f172a">${fmt(state.low)}&ndash;${fmt(state.high)}</strong> for a 2,000 sq ft home &mdash; a useful benchmark when you're setting your own starting prices. See the <a href="/cleaning-cost/${state.slug}" style="color:${START_BUSINESS_ACCENT};font-weight:600">full ${esc(state.name)} pricing breakdown</a>, or our <a href="/blog/how-to-price-cleaning-services-new-business" style="color:${START_BUSINESS_ACCENT};font-weight:600">complete pricing guide</a>.</p>
+    <h2 style="font-size:19px;font-weight:800;color:#0f172a;margin-top:32px;margin-bottom:14px">FAQs</h2>
+    ${faqAccordionHtml(faqs)}
+  </div>
+  <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:24px 28px;margin-bottom:32px;text-align:center">
+    <div style="font-weight:800;font-size:18px;color:#0f172a;margin-bottom:6px">Not ready to build your own marketing yet?</div>
+    <p style="font-size:14px;color:#64748b;margin-bottom:16px">Clean Estimator's Local Partner Program gives one cleaning business per city exclusive, guaranteed lead visibility &mdash; no website required to start.</p>
+    <a href="/partner-with-us" style="background:${START_BUSINESS_ACCENT};color:white;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">See If Your City Is Available &rarr;</a>
+  </div>
+  <div style="margin-bottom:32px">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">The Full Starting-Out Guide</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <a href="/blog/new-cleaning-business-startup-checklist" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">Full Startup Checklist</a>
+      <a href="/blog/cost-to-start-a-cleaning-business-budget-breakdown" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">Full Budget Breakdown</a>
+      <a href="/blog/cleaning-business-equipment-supplies-checklist" style="font-size:12.5px;color:#64748b;text-decoration:none;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">Equipment Checklist</a>
+      <a href="/blog/category/starting-out" style="font-size:12.5px;color:${START_BUSINESS_ACCENT};font-weight:700;text-decoration:none;background:white;border:1px solid #fed7aa;border-radius:20px;padding:6px 12px">See All Starting-Out Guides &rarr;</a>
+    </div>
+  </div>
+  <div>
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px">Start a Cleaning Business in Other States</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${otherStatesHtml}</div>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'Start a Cleaning Business', item: `${DOMAIN}/start-a-cleaning-business` },
+    { name: `Start a Cleaning Business in ${state.name}`, item: `${DOMAIN}/start-a-cleaning-business/${state.slug}` },
+  ]);
+
+  return renderStaticPage({
+    path: `/start-a-cleaning-business/${state.slug}`,
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 780,
+    assets,
+    extraHead: `<script type="application/ld+json">${faqSchema(faqs)}</script><script type="application/ld+json">${breadcrumb}</script>`,
+  });
+}
+
+function renderStartBusinessIndexPage(statesMod, blogPosts, assets) {
+  const states = statesMod.getAllStates();
+  const posts = blogPosts.filter(p => p.category === 'starting-out');
+
+  const postsHtml = posts.map(post => `<a href="/blog/${post.slug}" style="display:block;background:white;border:1px solid #e2e8f0;border-radius:12px;padding:18px;text-decoration:none">
+    <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">${esc(post.readTime)}</div>
+    <div style="font-size:15px;font-weight:700;color:#0f172a;line-height:1.4;margin-bottom:8px">${esc(post.title)}</div>
+    <span style="font-size:13px;color:${START_BUSINESS_ACCENT};font-weight:700">Read guide &rarr;</span>
+  </a>`).join('');
+
+  const statesHtml = states.map(s => `<a href="/start-a-cleaning-business/${s.slug}" style="font-size:12.5px;color:#64748b;text-decoration:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:20px;padding:6px 12px">${esc(s.name)}</a>`).join(' ');
+
+  const seoTitle = 'How to Start a Cleaning Business (2026): Costs, Licensing & State-by-State Guide | Clean Estimator';
+  const seoDesc = 'Everything you need to start a cleaning business: LLC setup, licensing, insurance, pricing, equipment, and taxes — plus exact LLC filing fees for all 50 states.';
+
+  const body = `  <div style="display:flex;gap:6px;font-size:13px;color:#94a3b8;margin-bottom:24px;flex-wrap:wrap">
+    <a href="/" style="color:#64748b;text-decoration:none">Home</a><span>&rsaquo;</span>
+    <span style="color:#0f172a">Start a Cleaning Business</span>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:36px;margin-bottom:28px">
+    <div style="font-size:12px;font-weight:700;color:${START_BUSINESS_ACCENT};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">Starting Your Business</div>
+    <h1 style="font-size:clamp(26px,4.5vw,36px);font-weight:800;color:#0f172a;line-height:1.2;margin-bottom:14px">How to Start a Cleaning Business</h1>
+    <p style="font-size:16px;color:#64748b;line-height:1.7">Everything you need to go from idea to your first paid job: business structure, licensing, insurance, pricing, equipment, taxes, contracts, and getting your first clients &mdash; plus the exact LLC filing fee for every state.</p>
+  </div>
+  <div style="background:linear-gradient(135deg,${START_BUSINESS_ACCENT},${START_BUSINESS_ACCENT_DARK});border-radius:12px;padding:18px 24px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div style="color:white"><div style="font-weight:700;font-size:15px">Ready to get online?</div><div style="font-size:13px;opacity:0.9">$5 setup &middot; 2 months free &middot; then $249/mo</div></div>
+    <a href="/website-for-cleaning-companies" style="background:white;color:${START_BUSINESS_ACCENT_DARK};padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap">Get a Free Website &rarr;</a>
+  </div>
+  <div style="margin-bottom:36px">
+    <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:16px">The Complete Starting-Out Guide</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">${postsHtml}</div>
+  </div>
+  <div style="background:white;border-radius:14px;border:1px solid #e2e8f0;padding:32px;margin-bottom:28px">
+    <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:6px">Find Your State's LLC Filing Fee</h2>
+    <p style="font-size:13.5px;color:#64748b;margin-bottom:18px">LLC filing fees, filing agencies, and state-specific notes for every state.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">${statesHtml}</div>
+  </div>
+  <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:24px 28px;text-align:center">
+    <div style="font-weight:800;font-size:18px;color:#0f172a;margin-bottom:6px">Not ready to build your own marketing yet?</div>
+    <p style="font-size:14px;color:#64748b;margin-bottom:16px">Clean Estimator's Local Partner Program gives one cleaning business per city exclusive, guaranteed lead visibility &mdash; no website required to start.</p>
+    <a href="/partner-with-us" style="background:${START_BUSINESS_ACCENT};color:white;padding:12px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">See If Your City Is Available &rarr;</a>
+  </div>`;
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'Start a Cleaning Business', item: `${DOMAIN}/start-a-cleaning-business` },
+  ]);
+
+  return renderStaticPage({
+    path: '/start-a-cleaning-business',
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    maxWidth: 880,
+    assets,
+    extraHead: `<script type="application/ld+json">${breadcrumb}</script>`,
+  });
+}
+
 function renderCityPage(city, servicesMod, citiesMod, faqsMod, assets) {
   const otherCitiesInState = citiesMod.getCitiesByState(city.stateSlugRef).filter(c => c.slug !== city.slug);
   const featuredCities = citiesMod.getFeaturedCities().filter(c => c.slug !== city.slug).slice(0, 8);
@@ -1536,6 +1740,16 @@ function main() {
   const states = statesMod.getAllStates();
   for (const state of states) {
     writeFile('cleaning-cost/' + state.slug, renderStatePage(state, servicesMod, statesMod, faqsMod, assets, citiesMod));
+    count++;
+  }
+
+  const bizMod = loadStateBusinessStartupData();
+  writeFile('start-a-cleaning-business', renderStartBusinessIndexPage(statesMod, BLOG_POSTS, assets));
+  count++;
+  for (const state of states) {
+    const biz = bizMod.getStateBusinessStartupByCode(state.code);
+    if (!biz) continue;
+    writeFile('start-a-cleaning-business/' + state.slug, renderStartBusinessStatePage(state, biz, statesMod, assets));
     count++;
   }
 

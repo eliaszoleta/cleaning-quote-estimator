@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye, Trash2, Phone, Globe } from 'lucide-react';
 import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails, sendTrialEmailPreview, deleteAdminCompanyForever } from '../../utils/api';
 import { useConfirm } from '../dashboard/ConfirmDialog';
-import { theme, cardStyle, inputStyle, secondaryBtnStyle, primaryBtnStyle, dangerBtnStyle, pill, avatarGradient, StatTile, PageHeader } from './adminTheme';
+import { theme, cardStyle, inputStyle, secondaryBtnStyle, primaryBtnStyle, pill, avatarGradient, StatTile, PageHeader } from './adminTheme';
 
 const STATUS_STYLE = {
   active:            { label: 'Active',        color: '#16a34a', bg: '#f0fdf4' },

@@ -84,6 +84,7 @@ const staticPages = [
   { path: '/estimator',        priority: '0.8', changefreq: 'monthly', lastmod: TODAY },
   { path: '/partner-with-us',        priority: '0.7', changefreq: 'monthly', lastmod: TODAY },
   { path: '/website-for-cleaning-companies', priority: '0.7', changefreq: 'monthly', lastmod: TODAY },
+  { path: '/start-a-cleaning-business', priority: '0.8', changefreq: 'monthly', lastmod: TODAY },
   { path: '/partner-city-pricing',   priority: '0.5', changefreq: 'monthly', lastmod: TODAY },
   { path: '/about',            priority: '0.6', changefreq: 'monthly', lastmod: '2026-01-01' },
   { path: '/contact',          priority: '0.5', changefreq: 'monthly', lastmod: '2026-01-01' },
@@ -135,6 +136,11 @@ const xml = [
     urlEntry({ loc: `${SITE_URL}/cleaning-cost/city/${slug}`, lastmod: TODAY, changefreq: 'monthly', priority: '0.7' })
   ),
   '',
+  '  <!-- Start a cleaning business by state (auto-generated from statePricing.js) -->',
+  ...stateSlugs.map(slug =>
+    urlEntry({ loc: `${SITE_URL}/start-a-cleaning-business/${slug}`, lastmod: TODAY, changefreq: 'monthly', priority: '0.75' })
+  ),
+  '',
   '</urlset>',
 ].join('\n') + '\n';
 
@@ -142,4 +148,4 @@ const xml = [
 const outPath = path.join(__dirname, '../public/sitemap.xml');
 fs.writeFileSync(outPath, xml, 'utf8');
 
-console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories, ${serviceSlugs.length} services, ${serviceSlugs.length} service calculators, ${stateSlugs.length} states, ${citySlugs.length} cities`);
+console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories, ${serviceSlugs.length} services, ${serviceSlugs.length} service calculators, ${stateSlugs.length} states, ${citySlugs.length} cities, ${stateSlugs.length} start-a-cleaning-business states`);
