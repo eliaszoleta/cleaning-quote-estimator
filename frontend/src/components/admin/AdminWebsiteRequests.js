@@ -4,8 +4,6 @@ import { getAdminWebsiteRequests, createAdminWebsiteRequest, patchAdminWebsiteRe
 import { formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 
-const STORAGE_KEY = 'admin_website_requests_key';
-
 const STATUS_META = {
   submitted: { label: 'Submitted', color: '#64748b' },
   sample_ready: { label: 'Sample Ready', color: '#d97706' },
@@ -23,13 +21,10 @@ const EMPTY_ADD_FORM = { name: '', business: '', email: '', phone: '', business_
 // the prospect with their /website-approval/:token link (the $5-setup/
 // 2-months-free/$249-month-3 approve-and-pay flow). Mirrors
 // AdminHomepageLeads.js's list/detail/key-gate pattern.
-export default function AdminWebsiteRequests() {
-  const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem(STORAGE_KEY) || '');
-  const [authed, setAuthed] = useState(() => !!sessionStorage.getItem(STORAGE_KEY));
-  const [keyInput, setKeyInput] = useState('');
-  const [loginError, setLoginError] = useState(null);
-  const [loggingIn, setLoggingIn] = useState(false);
-
+// adminKey comes from the shared login in AdminDashboard.js (the
+// consolidated /admin shell) -- this component no longer manages its own
+// auth state.
+export default function AdminWebsiteRequests({ adminKey }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -66,7 +61,7 @@ export default function AdminWebsiteRequests() {
     }
   }, []);
 
-  useEffect(() => { if (authed && adminKey) loadRequests(adminKey); }, [authed, adminKey, loadRequests]);
+  useEffect(() => { if (adminKey) loadRequests(adminKey); }, [adminKey, loadRequests]);
   useEffect(() => () => { if (notesTimer.current) clearTimeout(notesTimer.current); }, []);
   useEffect(() => {
     if (selected) {
@@ -77,22 +72,6 @@ export default function AdminWebsiteRequests() {
       setLinkError('');
     }
   }, [selected?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoggingIn(true);
-    setLoginError(null);
-    try {
-      await getAdminWebsiteRequests(keyInput);
-      sessionStorage.setItem(STORAGE_KEY, keyInput);
-      setAdminKey(keyInput);
-      setAuthed(true);
-    } catch (err) {
-      setLoginError(err.message || 'Incorrect admin key');
-    } finally {
-      setLoggingIn(false);
-    }
-  };
 
   const filtered = requests.filter(r => {
     if (statusFilter !== 'all' && r.status !== statusFilter) return false;
@@ -285,20 +264,6 @@ export default function AdminWebsiteRequests() {
 
   const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' };
   const btnStyle = { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 13px', border: '1px solid #e2e8f0', borderRadius: 7, background: 'white', cursor: 'pointer', fontSize: 12.5, fontWeight: 600, color: '#374151' };
-
-  if (!authed) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-      <form onSubmit={handleLogin} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 36, width: 340, boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
-        <div style={{ fontWeight: 800, fontSize: 20, color: '#0f172a', marginBottom: 6 }}>Admin Login</div>
-        <div style={{ fontSize: 13, color: '#64748b', marginBottom: 24 }}>Website Requests</div>
-        <input type="password" placeholder="Admin key" value={keyInput} onChange={e => { setKeyInput(e.target.value); setLoginError(null); }} style={{ ...inputStyle, marginBottom: 12, borderColor: loginError ? '#ef4444' : '#e2e8f0' }} autoFocus />
-        {loginError && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 10 }}>{loginError}</div>}
-        <button type="submit" disabled={loggingIn} style={{ width: '100%', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, padding: '11px 0', fontWeight: 700, fontSize: 15, cursor: 'pointer', opacity: loggingIn ? 0.7 : 1 }}>
-          {loggingIn ? 'Checking...' : 'Log In'}
-        </button>
-      </form>
-    </div>
-  );
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '32px 16px' }}>

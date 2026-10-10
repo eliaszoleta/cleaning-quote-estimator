@@ -11,11 +11,14 @@ const subscriptionRouter = require('./routes/subscription');
 const leadsRouter = require('./routes/leads');
 const partnerCheckoutRouter = require('./routes/partnerCheckout');
 const adminRouter = require('./routes/admin');
+const emailMarketingRouter = require('./routes/emailMarketing');
 const clientRouter = require('./routes/client');
 const websiteRequestRouter = require('./routes/websiteRequest');
 const { requireAuth } = require('./middleware/auth');
 const { checkTrialReminders } = require('./services/trialScheduler');
 const { checkPendingDeletions } = require('./services/deletionScheduler');
+const { ensureSeeded: ensureEmailTemplatesSeeded } = require('./services/emailTemplates');
+const { checkScheduledCampaigns } = require('./services/emailCampaignScheduler');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -139,6 +142,15 @@ app.post('/api/website-request/webhook',
   express.raw({ type: 'application/json' }),
   websiteRequestRouter.webhookHandler
 );
+// Resend's delivery-event webhook (sent/delivered/bounced/opened/clicked)
+// for the Email Marketing tab's KPI tracking -- same raw-body-before-json
+// requirement as the Stripe webhooks above, since its Svix-format signature
+// (see emailMarketing.js's verifyResendSignature) is computed over the
+// exact raw bytes.
+app.post('/api/admin/email-marketing/webhook/resend',
+  express.raw({ type: 'application/json' }),
+  emailMarketingRouter.webhookHandler
+);
 
 // Logo uploads carry a base64-encoded image, well over the 10kb default
 // below — register a larger-limit parser for just this path first (the
@@ -201,6 +213,18 @@ app.use('/api/admin', rateLimit({
   legacyHeaders: false,
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }), adminRouter);
+
+// Separate router (not folded into admin.js) for the Email Marketing tab --
+// template CRUD, audience preview, individual sends, and campaigns. Same
+// x-admin-key gate (see requireAdminKey in emailMarketing.js), own rate
+// limit since compose/preview can mean a handful of quick successive calls.
+app.use('/api/admin/email-marketing', rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}), emailMarketingRouter);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 // Includes the exact commit this process was built from (RAILWAY_GIT_COMMIT_SHA
@@ -275,6 +299,18 @@ app.listen(PORT, () => {
     checkTrialReminders().catch(err => console.error('checkTrialReminders failed:', err.message));
     checkPendingDeletions().catch(err => console.error('checkPendingDeletions failed:', err.message));
   }, 60 * 60 * 1000);
+
+  // One-time (per boot, effectively once ever per DB) seed of the built-in
+  // lifecycle email templates -- upserts with ignoreDuplicates, so this is
+  // a no-op after the first successful run even if it fires again next
+  // deploy. Then the campaign scheduler, on its own shorter interval (not
+  // the hourly one above) so a "send now" campaign starts within ~60s
+  // instead of waiting up to an hour.
+  ensureEmailTemplatesSeeded().catch(err => console.error('ensureEmailTemplatesSeeded (startup run) failed:', err.message));
+  checkScheduledCampaigns().catch(err => console.error('checkScheduledCampaigns (startup run) failed:', err.message));
+  setInterval(() => {
+    checkScheduledCampaigns().catch(err => console.error('checkScheduledCampaigns failed:', err.message));
+  }, 60 * 1000);
 });
 
 module.exports = app;

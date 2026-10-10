@@ -254,3 +254,57 @@ export async function postWebsiteRequestVerifySetup(token, sessionId) {
     method: 'POST', body: JSON.stringify({ sessionId }),
   });
 }
+
+// AdminEmailMarketing.js -- templates, audience preview, individual sends,
+// and campaigns. Same adminKey convention as the rest of the admin API.
+export async function getAdminEmailTemplates(adminKey) {
+  return apiFetch('/api/admin/email-marketing/templates', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function createAdminEmailTemplate(adminKey, payload) {
+  return apiFetch('/api/admin/email-marketing/templates', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function updateAdminEmailTemplate(adminKey, id, payload) {
+  return apiFetch(`/api/admin/email-marketing/templates/${id}`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteAdminEmailTemplate(adminKey, id) {
+  return apiFetch(`/api/admin/email-marketing/templates/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
+}
+
+export async function previewAdminEmailAudience(adminKey, audience) {
+  return apiFetch('/api/admin/email-marketing/audience/preview', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ audience }),
+  });
+}
+
+export async function sendAdminIndividualEmail(adminKey, payload) {
+  return apiFetch('/api/admin/email-marketing/send-individual', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function getAdminEmailCampaigns(adminKey) {
+  return apiFetch('/api/admin/email-marketing/campaigns', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function getAdminEmailCampaign(adminKey, id) {
+  return apiFetch(`/api/admin/email-marketing/campaigns/${id}`, { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function createAdminEmailCampaign(adminKey, payload) {
+  return apiFetch('/api/admin/email-marketing/campaigns', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function cancelAdminEmailCampaign(adminKey, id) {
+  return apiFetch(`/api/admin/email-marketing/campaigns/${id}/cancel`, {
+    method: 'POST', headers: { 'x-admin-key': adminKey },
+  });
+}

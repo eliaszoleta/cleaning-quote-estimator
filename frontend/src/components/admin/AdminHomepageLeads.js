@@ -4,8 +4,6 @@ import { getAdminHomepageLeads, patchAdminHomepageLead, deleteAdminHomepageLeadF
 import { formatPrice, serviceTypeLabel, formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 
-const STORAGE_KEY = 'admin_homepage_leads_key';
-
 const SERVICE_COLORS = {
   home_residential: '#2563eb', apartment: '#7c3aed', commercial: '#0891b2',
   carpet: '#16a34a', air_duct: '#d97706', dryer_vent: '#dc2626',
@@ -37,13 +35,10 @@ function matchesDateFilter(createdAt, dateFilter) {
 // /api/calculate. Mirrors LeadsTab.js's list/detail/trash UI (the company
 // dashboard's equivalent for a single subscriber's own leads), driven by
 // the x-admin-key admin API instead of a Supabase Auth session token.
-export default function AdminHomepageLeads() {
-  const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem(STORAGE_KEY) || '');
-  const [authed, setAuthed] = useState(() => !!sessionStorage.getItem(STORAGE_KEY));
-  const [keyInput, setKeyInput] = useState('');
-  const [loginError, setLoginError] = useState(null);
-  const [loggingIn, setLoggingIn] = useState(false);
-
+// adminKey comes from the shared login in AdminDashboard.js (the
+// consolidated /admin shell) -- this component no longer manages its own
+// auth state.
+export default function AdminHomepageLeads({ adminKey }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -75,30 +70,11 @@ export default function AdminHomepageLeads() {
     }
   }, []);
 
-  useEffect(() => { if (authed && adminKey) loadLeads(adminKey); }, [authed, adminKey, loadLeads]);
+  useEffect(() => { if (adminKey) loadLeads(adminKey); }, [adminKey, loadLeads]);
   useEffect(() => () => { if (notesTimer.current) clearTimeout(notesTimer.current); }, []);
   useEffect(() => {
     if (selectedLead) setNotes(selectedLead.notes || '');
   }, [selectedLead?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoggingIn(true);
-    setLoginError(null);
-    try {
-      // Same try-the-real-request pattern as AdminCompanies.js / AdminPartners.js
-      // -- no separate "verify password" endpoint, a 401 here just means a
-      // wrong key.
-      await getAdminHomepageLeads(keyInput);
-      sessionStorage.setItem(STORAGE_KEY, keyInput);
-      setAdminKey(keyInput);
-      setAuthed(true);
-    } catch (err) {
-      setLoginError(err.message || 'Incorrect admin key');
-    } finally {
-      setLoggingIn(false);
-    }
-  };
 
   // Date filter narrows the whole pool first -- the Active/Trash tab counts
   // and the list itself should agree on what "this month" includes, not
@@ -338,20 +314,6 @@ export default function AdminHomepageLeads() {
 
   const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' };
   const btnStyle = { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 13px', border: '1px solid #e2e8f0', borderRadius: 7, background: 'white', cursor: 'pointer', fontSize: 12.5, fontWeight: 600, color: '#374151' };
-
-  if (!authed) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-      <form onSubmit={handleLogin} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 36, width: 340, boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
-        <div style={{ fontWeight: 800, fontSize: 20, color: '#0f172a', marginBottom: 6 }}>Admin Login</div>
-        <div style={{ fontSize: 13, color: '#64748b', marginBottom: 24 }}>Homepage Leads</div>
-        <input type="password" placeholder="Admin key" value={keyInput} onChange={e => { setKeyInput(e.target.value); setLoginError(null); }} style={{ ...inputStyle, marginBottom: 12, borderColor: loginError ? '#ef4444' : '#e2e8f0' }} autoFocus />
-        {loginError && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 10 }}>{loginError}</div>}
-        <button type="submit" disabled={loggingIn} style={{ width: '100%', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, padding: '11px 0', fontWeight: 700, fontSize: 15, cursor: 'pointer', opacity: loggingIn ? 0.7 : 1 }}>
-          {loggingIn ? 'Checking...' : 'Log In'}
-        </button>
-      </form>
-    </div>
-  );
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '32px 16px' }}>

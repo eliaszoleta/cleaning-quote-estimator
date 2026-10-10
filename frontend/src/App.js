@@ -26,10 +26,7 @@ const ResultsScreen = lazy(() => import('./components/calculator/ResultsScreen')
 const CompanyDashboard = lazy(() => import('./components/dashboard/CompanyDashboard'));
 const AuthPage = lazy(() => import('./components/dashboard/AuthPage'));
 const ResetPasswordPage = lazy(() => import('./components/dashboard/ResetPasswordPage'));
-const AdminPartners = lazy(() => import('./components/admin/AdminPartners'));
-const AdminCompanies = lazy(() => import('./components/admin/AdminCompanies'));
-const AdminHomepageLeads = lazy(() => import('./components/admin/AdminHomepageLeads'));
-const AdminWebsiteRequests = lazy(() => import('./components/admin/AdminWebsiteRequests'));
+const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard'));
 const ClientPortal = lazy(() => import('./components/client/ClientPortal'));
 const SEOContent = lazy(() => import('./components/ui/SEOContent'));
 const BlogIndex = lazy(() => import('./components/blog/BlogIndex'));
@@ -85,10 +82,16 @@ const isFounder = pathname === '/founder';
 const isContact = pathname === '/contact';
 const isPrivacy = pathname === '/privacy-policy';
 const isTerms = pathname === '/terms-of-service';
-const isAdminPartners = pathname === '/admin/partners';
-const isAdminCompanies = pathname === '/admin/companies';
-const isAdminHomepageLeads = pathname === '/admin/leads';
-const isAdminWebsiteRequests = pathname === '/admin/website-requests';
+// One consolidated dashboard (tabs, not separate pages/logins) now serves
+// all of these -- /admin and every legacy sub-path still work as direct
+// links, each just opening the shell on the matching tab instead of its
+// own standalone page.
+const ADMIN_TAB_SLUGS = ['website-requests', 'leads', 'companies', 'partners', 'email-marketing'];
+const isAdminDashboard = pathname === '/admin' || pathname.startsWith('/admin/');
+const adminInitialTab = (() => {
+  const slug = pathname.replace(/^\/admin\/?/, '');
+  return ADMIN_TAB_SLUGS.includes(slug) ? slug : 'website-requests';
+})();
 const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
 const isWebsiteSubscription = pathname === '/website-for-cleaning-companies';
@@ -212,13 +215,7 @@ export default function App() {
 
   if (isResults) return <HelmetProvider><ResultsPage /></HelmetProvider>;
 
-  if (isAdminPartners) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminPartners /></Suspense></HelmetProvider>;
-
-  if (isAdminCompanies) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminCompanies /></Suspense></HelmetProvider>;
-
-  if (isAdminHomepageLeads) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminHomepageLeads /></Suspense></HelmetProvider>;
-
-  if (isAdminWebsiteRequests) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminWebsiteRequests /></Suspense></HelmetProvider>;
+  if (isAdminDashboard) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminDashboard initialTab={adminInitialTab} /></Suspense></HelmetProvider>;
 
   if (isClientPortal) return <HelmetProvider><Suspense fallback={<PageFallback />}><ClientPortal /></Suspense></HelmetProvider>;
 

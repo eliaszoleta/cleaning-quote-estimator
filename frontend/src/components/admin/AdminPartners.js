@@ -5,8 +5,6 @@ import { Plus, Trash2, ToggleLeft, ToggleRight, X } from 'lucide-react';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 import { getAdminPartners, createAdminPartner, updateAdminPartner, toggleAdminPartner, deleteAdminPartner } from '../../utils/api';
 
-const STORAGE_KEY = 'admin_partners_key';
-
 const EMPTY_LOCATION = { city: '', state: '' };
 
 const EMPTY_FORM = {
@@ -21,12 +19,10 @@ const EMPTY_FORM = {
   locations: [EMPTY_LOCATION],
 };
 
-export default function AdminPartners() {
-  const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem(STORAGE_KEY) || '');
-  const [authed, setAuthed] = useState(() => !!sessionStorage.getItem(STORAGE_KEY));
-  const [keyInput, setKeyInput] = useState('');
-  const [loginError, setLoginError] = useState(null);
-  const [loggingIn, setLoggingIn] = useState(false);
+// adminKey comes from the shared login in AdminDashboard.js (the
+// consolidated /admin shell) -- this component no longer manages its own
+// auth state.
+export default function AdminPartners({ adminKey }) {
   const [partners, setPartners] = useState([]);
   const [locationsByPartner, setLocationsByPartner] = useState({});
   const [stats, setStats] = useState({});
@@ -66,26 +62,7 @@ export default function AdminPartners() {
     }
   }, []);
 
-  useEffect(() => { if (authed && adminKey) load(adminKey); }, [authed, adminKey, load]);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoggingIn(true);
-    setLoginError(null);
-    try {
-      // The login form doubles as the credential check -- there's no
-      // separate "verify key" endpoint, this just tries the real request
-      // and treats a 401 as a wrong key. Same pattern as AdminCompanies.js.
-      await getAdminPartners(keyInput);
-      sessionStorage.setItem(STORAGE_KEY, keyInput);
-      setAdminKey(keyInput);
-      setAuthed(true);
-    } catch (err) {
-      setLoginError(err.message || 'Incorrect admin key');
-    } finally {
-      setLoggingIn(false);
-    }
-  };
+  useEffect(() => { if (adminKey) load(adminKey); }, [adminKey, load]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -164,20 +141,6 @@ export default function AdminPartners() {
   const removeLocation = (index) => setForm(f => ({ ...f, locations: f.locations.filter((_, i) => i !== index) }));
 
   const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' };
-
-  if (!authed) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-      <form onSubmit={handleLogin} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 36, width: 340, boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
-        <div style={{ fontWeight: 800, fontSize: 20, color: '#0f172a', marginBottom: 6 }}>Admin Login</div>
-        <div style={{ fontSize: 13, color: '#64748b', marginBottom: 24 }}>Clean Estimator Partner Management</div>
-        <input type="password" placeholder="Admin key" value={keyInput} onChange={e => { setKeyInput(e.target.value); setLoginError(null); }} style={{ ...inputStyle, marginBottom: 12, borderColor: loginError ? '#ef4444' : '#e2e8f0' }} autoFocus />
-        {loginError && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 10 }}>{loginError}</div>}
-        <button type="submit" disabled={loggingIn} style={{ width: '100%', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, padding: '11px 0', fontWeight: 700, fontSize: 15, cursor: 'pointer', opacity: loggingIn ? 0.7 : 1 }}>
-          {loggingIn ? 'Checking...' : 'Log In'}
-        </button>
-      </form>
-    </div>
-  );
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '32px 16px' }}>

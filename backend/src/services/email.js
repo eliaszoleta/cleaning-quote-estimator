@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { stateNameFromCode } = require('../data/partnerCityTiers');
+const { sendTemplatedEmail } = require('./emailTemplates');
 
 // Lead capture (LeadCaptureStep.js) tells visitors "we'll email your
 // estimate" -- this is what actually makes that true. Sends via Resend
@@ -303,82 +304,24 @@ function fmtCityList(cities) {
   return `${cities.slice(0, -1).join(', ')}, and ${cities[cities.length - 1]}`;
 }
 
-function buildPartnerWelcomeText({ businessName, cities }) {
-  const cityList = fmtCityList(cities);
-  return [
-    `Congratulations, ${businessName}!`,
-    '',
-    `You're officially a Clean Estimator partner in ${cityList}. Your listing is live now -- on the results card, the floating banner, and the estimate email in every city you bought.`,
-    '',
-    'Next: set up your dashboard',
-    "Go to https://www.cleanestimator.com/client and sign up with this same email address to unlock your KPI dashboard -- impressions, calls, and click-through-rate for every city.",
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildPartnerWelcomeHtml({ businessName, cities }) {
-  const cityList = fmtCityList(cities);
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Congratulations, ${businessName}!</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    You're officially a Clean Estimator partner in <strong>${cityList}</strong>. Your listing is live now — on the results card, the floating banner, and the estimate email in every city you bought.
-  </p>
-
-  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Next: set up your dashboard</p>
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Go to <a href="https://www.cleanestimator.com/client" style="color:#2563eb;">cleanestimator.com/client</a> and sign up with this same email address to unlock your KPI dashboard — impressions, calls, and click-through-rate for every city.
-  </p>
-
-  <p style="margin:8px 0 0;">
-    <a href="https://www.cleanestimator.com/client" style="color:#2563eb;font-size:14px;font-weight:600;">Set up my dashboard →</a>
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
-}
-
 // Sent right after a self-serve "buy city placement" checkout provisions a
 // new active partner (backend/src/routes/partnerCheckout.js) -- the in-app
 // success page shows the same congrats + /client instructions, but a
 // buyer who closes that tab before it loads (or never sees it, e.g. the
 // webhook provisioned them after they'd already navigated away) would
 // otherwise have no way to find out their listing is live or how to get
-// dashboard access. Fire-and-forget, same as sendEstimateEmail.
+// dashboard access. Fire-and-forget, same as sendEstimateEmail. Content
+// lives in the editable email_templates table (key: 'partner_welcome'),
+// not here -- see emailTemplates.js.
 async function sendPartnerWelcomeEmail({ to, businessName, cities }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendPartnerWelcomeEmail skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendPartnerWelcomeEmail skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: `Welcome to the Clean Estimator Partner Program, ${businessName}!`,
-        html: buildPartnerWelcomeHtml({ businessName, cities }),
-        text: buildPartnerWelcomeText({ businessName, cities }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendPartnerWelcomeEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
+  const { sent } = await sendTemplatedEmail({
+    template: 'partner_welcome',
+    to,
+    toName: businessName,
+    vars: { businessName, cityList: fmtCityList(cities) },
+    recipientType: 'partner',
+  });
+  return sent;
 }
 
 const TIMELINE_LABELS = {
@@ -747,72 +690,6 @@ function buildEmbedIframeCode(companyId) {
 </script>`;
 }
 
-function buildCompanyWelcomeText({ companyId }) {
-  return [
-    'Welcome to Clean Estimator!',
-    '',
-    "Your account is live and your embedded estimator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:",
-    '',
-    buildEmbedIframeCode(companyId),
-    '',
-    "Paste that anywhere in your website's HTML — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The estimator will appear right there and resize itself to fit.",
-    '',
-    "Two things are already working, no setup needed: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.",
-    '',
-    'Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard:',
-    'https://www.cleanestimator.com/company?tab=branding',
-    '',
-    'New to Clean Estimator? Log in to your dashboard and open the Help & Docs tab — it walks through how the estimator works, how pricing is calculated (with the real data behind it), and answers to the most common questions:',
-    'https://www.cleanestimator.com/company?tab=help',
-    '',
-    "You can always get this same code later from the Embed Widget tab.",
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildCompanyWelcomeHtml({ companyId }) {
-  const code = buildEmbedIframeCode(companyId);
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Welcome to Clean Estimator!</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your account is live and your embedded estimator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:
-  </p>
-
-  <pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-family:'Menlo','Monaco',monospace;font-size:11.5px;line-height:1.6;color:#334155;white-space:pre-wrap;word-break:break-all;margin:0 0 20px;">${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Paste that anywhere in your website's HTML — a <strong>Custom HTML / Embed block</strong> in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The estimator will appear right there and resize itself to fit.
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Two things are already working, no setup needed: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=branding" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Set up my dashboard →</a>
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    New to Clean Estimator? Open the <a href="https://www.cleanestimator.com/company?tab=help" style="color:#2563eb;font-weight:700;">Help &amp; Docs</a> tab in your dashboard — it walks through how the estimator works, how pricing is calculated (with the real data behind it), and answers to the most common questions.
-  </p>
-
-  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    You can always get this same code later from the <strong>Embed Widget</strong> tab.
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
-}
-
 // Sent once, the moment a company's config row is first created (see
 // company.js's GET /:id handler) -- i.e. right after they confirm their
 // email and log in for the first time. Gets their embed code in front of
@@ -821,112 +698,37 @@ function buildCompanyWelcomeHtml({ companyId }) {
 // `subject` is overridable so the same content can be reused for a
 // one-off manual broadcast to existing accounts (see admin.js's
 // trial-email preview/send routes) with wording suited to "your trial is
-// already active" rather than "your account was just created".
+// already active" rather than "your account was just created". Content
+// lives in the editable email_templates table (key: 'company_welcome').
 async function sendCompanyWelcomeEmail({ to, companyId, subject }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendCompanyWelcomeEmail skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendCompanyWelcomeEmail skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: subject || 'Your Clean Estimator account is ready — here\'s your embed code',
-        html: buildCompanyWelcomeHtml({ companyId }),
-        text: buildCompanyWelcomeText({ companyId }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendCompanyWelcomeEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
+  const code = buildEmbedIframeCode(companyId);
+  const { sent } = await sendTemplatedEmail({
+    template: 'company_welcome',
+    to,
+    vars: { embedCode: code, embedCodeHtml: code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') },
+    subjectOverride: subject,
+    recipientType: 'company',
+    recipientRef: companyId,
+  });
+  return sent;
 }
 
 // ─── Trial reminder emails ─────────────────────────────────────────────────
 
-function buildTrialEndingSoonText({ companyName, daysLeft }) {
-  return [
-    `Hi ${companyName},`,
-    '',
-    `Your free Clean Estimator trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. After that, your embedded estimator will pause on your website until you subscribe.`,
-    '',
-    'Subscribe now to keep it running without interruption:',
-    'https://www.cleanestimator.com/company?tab=subscription',
-    '',
-    'No action needed if you plan to subscribe before then -- this is just a heads up.',
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildTrialEndingSoonHtml({ companyName, daysLeft }) {
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your free Clean Estimator trial ends in <strong>${daysLeft} day${daysLeft === 1 ? '' : 's'}</strong>. After that, your embedded estimator will pause on your website until you subscribe.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Subscribe now →</a>
-  </p>
-
-  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    No action needed if you already plan to subscribe before then — this is just a heads up.
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
-}
-
 // Sent once, 2 days before a company's 30-day free trial ends (see
 // checkTrialReminders in services/trialScheduler.js). Deduped via
-// config.subscription.trialEndingSoonEmailSentAt so it only ever goes out once.
+// config.subscription.trialEndingSoonEmailSentAt so it only ever goes out
+// once. Content lives in the editable email_templates table
+// (key: 'trial_ending_soon').
 async function sendTrialEndingSoonEmail({ to, companyName, daysLeft }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendTrialEndingSoonEmail skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendTrialEndingSoonEmail skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: `Your Clean Estimator trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`,
-        html: buildTrialEndingSoonHtml({ companyName, daysLeft }),
-        text: buildTrialEndingSoonText({ companyName, daysLeft }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendTrialEndingSoonEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
+  const { sent } = await sendTemplatedEmail({
+    template: 'trial_ending_soon',
+    to,
+    toName: companyName,
+    vars: { companyName, daysLeftText: `${daysLeft} day${daysLeft === 1 ? '' : 's'}` },
+    recipientType: 'company',
+  });
+  return sent;
 }
 
 // ─── Trial check-in emails ──────────────────────────────────────────────────
@@ -937,301 +739,64 @@ async function sendTrialEndingSoonEmail({ to, companyName, daysLeft }) {
 // company that stops engaging mid-trial gets a nudge, a pointer to Help &
 // Docs, and an easy reply-to path before they forget the tool exists.
 
-function buildTrialCheckin1Text({ companyName }) {
-  return [
-    `Hi ${companyName},`,
-    '',
-    "You're about a week into your free trial — just checking in.",
-    '',
-    "If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the Embed Your Widget tab in your dashboard.",
-    '',
-    "If anything's confusing or not working the way you expected, just reply to this email or check the Help & Docs tab — happy to help.",
-    '',
-    'https://www.cleanestimator.com/company',
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildTrialCheckin1Html({ companyName }) {
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    You're about a week into your free trial — just checking in.
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the Embed Your Widget tab in your dashboard.
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    If anything's confusing or not working the way you expected, just reply to this email or check the Help &amp; Docs tab — happy to help.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Go to my dashboard →</a>
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
-}
-
 // Sent once, the first time a company's trial reaches 7 days elapsed (see
 // checkTrialReminders in services/trialScheduler.js). Deduped via
-// trialCheckin1EmailSentAt on config.subscription.
+// trialCheckin1EmailSentAt on config.subscription. Content lives in the
+// editable email_templates table (key: 'trial_checkin_1').
 async function sendTrialCheckin1Email({ to, companyName }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendTrialCheckin1Email skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendTrialCheckin1Email skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: "How's Clean Estimator working out so far?",
-        html: buildTrialCheckin1Html({ companyName }),
-        text: buildTrialCheckin1Text({ companyName }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendTrialCheckin1Email failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
-}
-
-function buildTrialCheckin2Text({ companyName }) {
-  return [
-    `Hi ${companyName},`,
-    '',
-    "Two weeks into your trial. A couple of things worth a look if you haven't found them yet:",
-    '',
-    '- Branding tab -- set your logo, colors, and call-to-action so the cleaning cost estimator looks like it\'s actually yours',
-    '- Leads tab -- every completed estimate lands here automatically, with the visitor\'s full contact info and price',
-    '',
-    'Questions about either (or anything else)? Just reply -- a real person reads these.',
-    '',
-    'https://www.cleanestimator.com/company?tab=help',
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildTrialCheckin2Html({ companyName }) {
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 16px;">
-    Two weeks into your trial. A couple of things worth a look if you haven't found them yet:
-  </p>
-
-  <ul style="font-size:14px;line-height:1.7;margin:0 0 20px;padding-left:20px;">
-    <li><strong>Branding tab</strong> — set your logo, colors, and call-to-action so the cleaning cost estimator looks like it's actually yours</li>
-    <li><strong>Leads tab</strong> — every completed estimate lands here automatically, with the visitor's full contact info and price</li>
-  </ul>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Questions about either (or anything else)? Just reply — a real person reads these.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=help" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Open Help &amp; Docs →</a>
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
+  const { sent } = await sendTemplatedEmail({
+    template: 'trial_checkin_1',
+    to,
+    toName: companyName,
+    vars: { companyName },
+    recipientType: 'company',
+  });
+  return sent;
 }
 
 // Sent once, the first time a company's trial reaches 14 days elapsed.
-// Deduped via trialCheckin2EmailSentAt.
+// Deduped via trialCheckin2EmailSentAt. Content lives in the editable
+// email_templates table (key: 'trial_checkin_2').
 async function sendTrialCheckin2Email({ to, companyName }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendTrialCheckin2Email skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendTrialCheckin2Email skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: 'Two weeks in — a couple of things worth checking out',
-        html: buildTrialCheckin2Html({ companyName }),
-        text: buildTrialCheckin2Text({ companyName }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendTrialCheckin2Email failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
-}
-
-function buildTrialCheckin3Text({ companyName }) {
-  return [
-    `Hi ${companyName},`,
-    '',
-    "Your 30-day trial wraps up in about a week -- flagging it now so it doesn't catch you off guard.",
-    '',
-    "If it's been useful, no action needed -- we'll send the official heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends.",
-    '',
-    'https://www.cleanestimator.com/company',
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildTrialCheckin3Html({ companyName }) {
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your 30-day trial wraps up in about a week — flagging it now so it doesn't catch you off guard.
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    If it's been useful, no action needed — we'll send the official heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View my dashboard →</a>
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
+  const { sent } = await sendTemplatedEmail({
+    template: 'trial_checkin_2',
+    to,
+    toName: companyName,
+    vars: { companyName },
+    recipientType: 'company',
+  });
+  return sent;
 }
 
 // Sent once, the first time a company's trial reaches 21 days elapsed.
 // Deduped via trialCheckin3EmailSentAt. Deliberately softer than the
 // day-28 "ending soon" email (no urgency framing) -- that one still does
-// the actual countdown.
+// the actual countdown. Content lives in the editable email_templates
+// table (key: 'trial_checkin_3').
 async function sendTrialCheckin3Email({ to, companyName }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendTrialCheckin3Email skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendTrialCheckin3Email skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: 'About a week left on your trial',
-        html: buildTrialCheckin3Html({ companyName }),
-        text: buildTrialCheckin3Text({ companyName }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendTrialCheckin3Email failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
-}
-
-function buildTrialEndedText({ companyName }) {
-  return [
-    `Hi ${companyName},`,
-    '',
-    "Your 30-day free Clean Estimator trial has ended, and your embedded estimator is now paused on your website -- visitors will see a paused notice instead of the estimator until you subscribe.",
-    '',
-    'Subscribe now to turn it back on:',
-    'https://www.cleanestimator.com/company?tab=subscription',
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildTrialEndedHtml({ companyName }) {
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your 30-day free Clean Estimator trial has ended, and your embedded estimator is now <strong>paused</strong> on your website — visitors will see a paused notice instead of the estimator until you subscribe.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Subscribe to reactivate →</a>
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
+  const { sent } = await sendTemplatedEmail({
+    template: 'trial_checkin_3',
+    to,
+    toName: companyName,
+    vars: { companyName },
+    recipientType: 'company',
+  });
+  return sent;
 }
 
 // Sent once, the day a company's 30-day free trial actually ends and their
 // widget gets paused (see checkTrialReminders). Deduped via
-// config.subscription.trialEndedEmailSentAt.
+// config.subscription.trialEndedEmailSentAt. Content lives in the editable
+// email_templates table (key: 'trial_ended').
 async function sendTrialEndedEmail({ to, companyName }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendTrialEndedEmail skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendTrialEndedEmail skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: 'Your Clean Estimator widget has been paused',
-        html: buildTrialEndedHtml({ companyName }),
-        text: buildTrialEndedText({ companyName }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendTrialEndedEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
+  const { sent } = await sendTemplatedEmail({
+    template: 'trial_ended',
+    to,
+    toName: companyName,
+    vars: { companyName },
+    recipientType: 'company',
+  });
+  return sent;
 }
 
 // ─── Account deletion (30-day grace period) ────────────────────────────────
@@ -1240,79 +805,19 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-function buildAccountDeletionScheduledText({ companyName, scheduledFor }) {
-  const dateStr = formatDate(scheduledFor);
-  return [
-    `Hi ${companyName},`,
-    '',
-    `We've received your request to delete your Clean Estimator account. Your account, leads, and settings are scheduled to be permanently deleted on ${dateStr} (30 days from today).`,
-    '',
-    "Your embedded estimator has been paused in the meantime, but nothing has been deleted yet -- you can still log in any time before then to change your mind.",
-    '',
-    'Changed your mind? Log in and click "Cancel Deletion" in Settings:',
-    'https://www.cleanestimator.com/company?tab=settings',
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildAccountDeletionScheduledHtml({ companyName, scheduledFor }) {
-  const dateStr = formatDate(scheduledFor);
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${companyName},</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    We've received your request to delete your Clean Estimator account. Your account, leads, and settings are scheduled to be permanently deleted on <strong>${dateStr}</strong> (30 days from today).
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your embedded estimator has been paused in the meantime, but nothing has been deleted yet — you can still log in any time before then to change your mind.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=settings" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Log in to cancel deletion →</a>
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
-}
-
 // Sent once, the moment a company requests account deletion (see company.js's
 // DELETE /account handler), which now schedules a 30-day grace-period
-// deletion instead of deleting immediately.
+// deletion instead of deleting immediately. Content lives in the editable
+// email_templates table (key: 'account_deletion_scheduled').
 async function sendAccountDeletionScheduledEmail({ to, companyName, scheduledFor }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendAccountDeletionScheduledEmail skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendAccountDeletionScheduledEmail skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: 'Your Clean Estimator account deletion is scheduled',
-        html: buildAccountDeletionScheduledHtml({ companyName, scheduledFor }),
-        text: buildAccountDeletionScheduledText({ companyName, scheduledFor }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendAccountDeletionScheduledEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
+  const { sent } = await sendTemplatedEmail({
+    template: 'account_deletion_scheduled',
+    to,
+    toName: companyName,
+    vars: { companyName, scheduledForText: formatDate(scheduledFor) },
+    recipientType: 'company',
+  });
+  return sent;
 }
 
 // ─── Website request notification ──────────────────────────────────────────
@@ -1474,37 +979,6 @@ async function sendWebsiteRequestNotificationEmail(args) {
   }
 }
 
-function buildWebsiteRequestReceivedText({ name, business }) {
-  return [
-    `Hi ${name},`,
-    '',
-    `Got your request for a website for ${business}. We're building your sample now and will send a link to review it in a few days.`,
-    '',
-    'No action needed from you right now -- just reply to this email anytime if you have a question.',
-    '',
-    'Clean Estimator',
-  ].join('\n');
-}
-
-function buildWebsiteRequestReceivedHtml({ name, business }) {
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${name},</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Got your request for a website for ${business}. We're building your sample now and will send a link to review it in a few days.
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    No action needed from you right now -- just reply to this email anytime if you have a question.
-  </p>
-
-  <p style="font-size:13px;color:#555555;line-height:1.6;margin:28px 0 0;">
-    Clean Estimator
-  </p>
-</div>`;
-}
-
 // Sent to the applicant right after they submit the public "Get a Website"
 // form (POST /api/website-request below) -- previously that form only
 // triggered the internal notification above, leaving the applicant with no
@@ -1513,36 +987,17 @@ function buildWebsiteRequestReceivedHtml({ name, business }) {
 // admin's own manual-add path (see POST /api/admin/website-requests) --
 // a client an admin enters by hand wasn't necessarily told "a sample is
 // coming in a few days," so that promise shouldn't go out on their behalf.
+// Content lives in the editable email_templates table
+// (key: 'website_request_received').
 async function sendWebsiteRequestReceivedEmail({ to, name, business }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendWebsiteRequestReceivedEmail skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendWebsiteRequestReceivedEmail skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: `We got your request, ${business}`,
-        html: buildWebsiteRequestReceivedHtml({ name, business }),
-        text: buildWebsiteRequestReceivedText({ name, business }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendWebsiteRequestReceivedEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
+  const { sent } = await sendTemplatedEmail({
+    template: 'website_request_received',
+    to,
+    toName: name,
+    vars: { name, business },
+    recipientType: 'other',
+  });
+  return sent;
 }
 
 // ─── Website-request approval flow emails ──────────────────────────────────
@@ -1550,124 +1005,18 @@ async function sendWebsiteRequestReceivedEmail({ to, name, business }) {
 // which goes to WEBSITE_REQUEST_NOTIFY_EMAIL) as their sample moves through
 // routes/websiteRequest.js and routes/admin.js's approval flow.
 
-function buildWebsiteSampleReadyText({ name, business, sampleUrl, approvalUrl }) {
-  return [
-    `Hi ${name},`,
-    '',
-    `Your free cleaning website for ${business} is ready to review.`,
-    '',
-    `Take a look: ${sampleUrl}`,
-    '',
-    "Like what you see? Approve it to get started — just $5 one-time to lock in your build, then your first 2 months are completely free. After that it's a flat $249/month, cancel anytime.",
-    '',
-    `Review & approve: ${approvalUrl}`,
-    '',
-    "No obligation — if it's not for you, just ignore this and nothing happens.",
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildWebsiteSampleReadyHtml({ name, business, sampleUrl, approvalUrl }) {
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${name},</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your free cleaning website for <strong>${business}</strong> is ready to review.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="${sampleUrl}" style="display:inline-block;background-color:#0f172a;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View your website →</a>
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Like what you see? Approve it to get started — just $5 one-time to lock in your build, then your first 2 months are completely free. After that it's a flat $249/month, cancel anytime.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="${approvalUrl}" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Review &amp; approve →</a>
-  </p>
-
-  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    No obligation — if it's not for you, just ignore this and nothing happens.
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
-}
-
 // Sent by PATCH /api/admin/website-requests/:id when an admin attaches a
-// sample link and the request moves to 'sample_ready'.
+// sample link and the request moves to 'sample_ready'. Content lives in the
+// editable email_templates table (key: 'website_sample_ready').
 async function sendWebsiteSampleReadyEmail({ to, name, business, sampleUrl, approvalUrl }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendWebsiteSampleReadyEmail skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendWebsiteSampleReadyEmail skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: `Your website for ${business} is ready`,
-        html: buildWebsiteSampleReadyHtml({ name, business, sampleUrl, approvalUrl }),
-        text: buildWebsiteSampleReadyText({ name, business, sampleUrl, approvalUrl }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendWebsiteSampleReadyEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
-}
-
-function buildWebsiteSubscriptionConfirmedText({ name, business, trialDays, monthlyPrice }) {
-  return [
-    `Hi ${name},`,
-    '',
-    `You're all set! Your cleaning website for ${business} is approved and your subscription is active.`,
-    '',
-    `Your first ${trialDays} days are completely free. After that, you'll be billed ${fmtMoney(monthlyPrice)}/month flat — cancel anytime.`,
-    '',
-    "We'll be in touch shortly to finish setting up your live site and domain.",
-    '',
-    'Clean Estimator - cleanestimator.com',
-  ].join('\n');
-}
-
-function buildWebsiteSubscriptionConfirmedHtml({ name, business, trialDays, monthlyPrice }) {
-  return `
-<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${name},</p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    You're all set! Your cleaning website for <strong>${business}</strong> is approved and your subscription is active.
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your first ${trialDays} days are completely free. After that, you'll be billed ${fmtMoney(monthlyPrice)}/month flat — cancel anytime.
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    We'll be in touch shortly to finish setting up your live site and domain.
-  </p>
-
-  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
-    Clean Estimator · <a href="https://www.cleanestimator.com" style="color:#999999;">cleanestimator.com</a>
-  </p>
-</div>`;
+  const { sent } = await sendTemplatedEmail({
+    template: 'website_sample_ready',
+    to,
+    toName: name,
+    vars: { name, business, sampleUrl, approvalUrl },
+    recipientType: 'other',
+  });
+  return sent;
 }
 
 // Sent once an admin links the client's $249/mo subscription in the admin
@@ -1675,37 +1024,17 @@ function buildWebsiteSubscriptionConfirmedHtml({ name, business, trialDays, mont
 // itself clears -- Stripe already sends its own receipt for that charge
 // automatically, so a second email at that same moment would be redundant,
 // and the "2 months free, billed starting month 3" it describes isn't
-// actually true yet until that subscription really exists.
+// actually true yet until that subscription really exists. Content lives in
+// the editable email_templates table (key: 'website_subscription_confirmed').
 async function sendWebsiteSubscriptionConfirmedEmail({ to, name, business, trialDays, monthlyPrice }) {
-  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
-  if (!RESEND_API_KEY) {
-    console.warn('sendWebsiteSubscriptionConfirmedEmail skipped: Resend not configured (RESEND_API_KEY)');
-    return false;
-  }
-  if (!to) {
-    console.warn('sendWebsiteSubscriptionConfirmedEmail skipped: no recipient email');
-    return false;
-  }
-
-  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-
-  try {
-    await axios.post(
-      `${RESEND_API_BASE}/emails`,
-      {
-        from: `Clean Estimator <${fromAddress}>`,
-        to: [to],
-        subject: `You're all set, ${business}! Your cleaning website is confirmed`,
-        html: buildWebsiteSubscriptionConfirmedHtml({ name, business, trialDays, monthlyPrice }),
-        text: buildWebsiteSubscriptionConfirmedText({ name, business, trialDays, monthlyPrice }),
-      },
-      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
-    );
-    return true;
-  } catch (err) {
-    console.warn('sendWebsiteSubscriptionConfirmedEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
-    return false;
-  }
+  const { sent } = await sendTemplatedEmail({
+    template: 'website_subscription_confirmed',
+    to,
+    toName: name,
+    vars: { name, business, trialDays, monthlyPriceText: fmtMoney(monthlyPrice) },
+    recipientType: 'other',
+  });
+  return sent;
 }
 
 module.exports = {

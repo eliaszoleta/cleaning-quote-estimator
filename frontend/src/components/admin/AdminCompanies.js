@@ -3,8 +3,6 @@ import { Building2, Search, RefreshCw, Users, TrendingUp, Inbox, Mail, Send, Eye
 import { getAdminCompanies, getTrialEmailPreview, sendTrialEmails, sendTrialEmailPreview, deleteAdminCompanyForever } from '../../utils/api';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 
-const STORAGE_KEY = 'admin_companies_key';
-
 const STATUS_STYLE = {
   active:            { label: 'Active',        color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
   active_canceling:  { label: 'Canceling',      color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
@@ -24,13 +22,10 @@ function StatusBadge({ sub }) {
   );
 }
 
-export default function AdminCompanies() {
-  const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem(STORAGE_KEY) || '');
-  const [authed, setAuthed] = useState(() => !!sessionStorage.getItem(STORAGE_KEY));
-  const [keyInput, setKeyInput] = useState('');
-  const [loginError, setLoginError] = useState(null);
-  const [loggingIn, setLoggingIn] = useState(false);
-
+// adminKey comes from the shared login in AdminDashboard.js (the
+// consolidated /admin shell) -- this component no longer manages its own
+// auth state.
+export default function AdminCompanies({ adminKey }) {
   const [companies, setCompanies] = useState([]);
   const [summary, setSummary] = useState({ count: 0, activeCount: 0, totalLeads: 0 });
   const [loading, setLoading] = useState(false);
@@ -70,26 +65,7 @@ export default function AdminCompanies() {
     }
   }, []);
 
-  useEffect(() => { if (authed && adminKey) load(adminKey); }, [authed, adminKey, load]);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoggingIn(true);
-    setLoginError(null);
-    try {
-      // The login form doubles as the credential check -- there's no
-      // separate "verify password" endpoint, this just tries the real
-      // request and treats a 401 as a wrong key.
-      await getAdminCompanies(keyInput);
-      sessionStorage.setItem(STORAGE_KEY, keyInput);
-      setAdminKey(keyInput);
-      setAuthed(true);
-    } catch (err) {
-      setLoginError(err.message || 'Incorrect admin key');
-    } finally {
-      setLoggingIn(false);
-    }
-  };
+  useEffect(() => { if (adminKey) load(adminKey); }, [adminKey, load]);
 
   const loadTrialPreview = async () => {
     setTrialPreviewLoading(true);
@@ -196,20 +172,6 @@ export default function AdminCompanies() {
   });
 
   const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, outline: 'none', boxSizing: 'border-box' };
-
-  if (!authed) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-      <form onSubmit={handleLogin} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 36, width: 340, boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
-        <div style={{ fontWeight: 800, fontSize: 20, color: '#0f172a', marginBottom: 6 }}>Admin Login</div>
-        <div style={{ fontSize: 13, color: '#64748b', marginBottom: 24 }}>Clean Estimator Company Accounts</div>
-        <input type="password" placeholder="Admin key" value={keyInput} onChange={e => { setKeyInput(e.target.value); setLoginError(null); }} style={{ ...inputStyle, marginBottom: 12, borderColor: loginError ? '#ef4444' : '#e2e8f0' }} autoFocus />
-        {loginError && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 10 }}>{loginError}</div>}
-        <button type="submit" disabled={loggingIn} style={{ width: '100%', background: '#2563eb', color: 'white', border: 'none', borderRadius: 8, padding: '11px 0', fontWeight: 700, fontSize: 15, cursor: 'pointer', opacity: loggingIn ? 0.7 : 1 }}>
-          {loggingIn ? 'Checking...' : 'Log In'}
-        </button>
-      </form>
-    </div>
-  );
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '32px 16px' }}>
