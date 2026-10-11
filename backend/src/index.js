@@ -223,6 +223,20 @@ app.use('/api/company-leads', requireAuth, leadsRouter);
 app.use('/api/client', clientRouter);
 
 // ─── Internal admin routes ───────────────────────────────────────────────────
+// Google account connect/callback/status/disconnect for /book-a-call. MUST
+// be registered before the blanket '/api/admin' mount below -- Express
+// matches app.use() by path *prefix*, so '/api/admin/google-calendar/...'
+// also matches '/api/admin', and admin.js's router.use(requireAdminKey) is
+// blanket middleware that runs for every request entering that router
+// (before any of its own routes are even checked), rejecting with 401
+// before ever falling through to this router. That broke Google's own
+// redirect back to /callback, which carries no x-admin-key header at all
+// (discovered live: the browser landed on this backend's bare JSON 401
+// instead of completing the connection). No blanket rate limit here --
+// /callback is a one-off browser redirect from Google, not something to
+// throttle like a repeated API call.
+app.use('/api/admin/google-calendar', googleCalendarAdminRouter);
+
 // Own auth (x-admin-key header, see requireAdminKey in admin.js), not
 // requireAuth -- this isn't a subscriber viewing their own account, it's the
 // platform owner viewing every subscriber's account, so the usual
@@ -256,11 +270,6 @@ app.use('/api/admin/booking', rateLimit({
   legacyHeaders: false,
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }), adminBookingRouter);
-
-// Google account connect/callback/status/disconnect for /book-a-call. No
-// blanket rate limit here -- /callback is a one-off browser redirect from
-// Google, not something to throttle like a repeated API call.
-app.use('/api/admin/google-calendar', googleCalendarAdminRouter);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 // Includes the exact commit this process was built from (RAILWAY_GIT_COMMIT_SHA
