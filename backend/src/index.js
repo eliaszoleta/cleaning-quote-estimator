@@ -14,6 +14,10 @@ const adminRouter = require('./routes/admin');
 const emailMarketingRouter = require('./routes/emailMarketing');
 const clientRouter = require('./routes/client');
 const websiteRequestRouter = require('./routes/websiteRequest');
+const bookingRouter = require('./routes/booking');
+const adminBookingRouter = require('./routes/adminBooking');
+const googleCalendarAdminRouter = require('./routes/googleCalendarAdmin');
+const { checkDueReminders } = require('./services/bookingReminderScheduler');
 const { requireAuth } = require('./middleware/auth');
 const { checkTrialReminders } = require('./services/trialScheduler');
 const { checkPendingDeletions } = require('./services/deletionScheduler');
@@ -116,6 +120,18 @@ app.use('/api/website-request', rateLimit({
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }));
 
+// POST /api/booking/create — public and unauthenticated (a prospect
+// booking a call), same spam throttle as the other public POST endpoints.
+// GET /api/booking/availability is read-only and gets the default limiter
+// below along with it, generous enough for a visitor paging through days.
+app.use('/api/booking', rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
 // /api/auth/* isn't actually used by the dashboard (AuthPage.js calls
 // Supabase directly) but stays mounted and reachable regardless -- a thin
 // proxy to Supabase's own login/signup endpoints with no rate limit would
@@ -182,6 +198,11 @@ app.use('/api/partner-checkout', partnerCheckoutRouter);
 // sites, so the default dashboard-origins CORS already covers it.
 app.use('/api/website-request', websiteRequestRouter);
 
+// Public /book-a-call API — availability + create + cancel, no login (same
+// reasoning as website-request above: a prospect booking a call isn't a
+// logged-in company user).
+app.use('/api/booking', bookingRouter);
+
 // ─── Auth-protected routes ────────────────────────────────────────────────────
 // requireAuth is applied per-route inside companyRouter, not blanket here --
 // GET /:id/public must stay reachable without auth (it's what the embedded
@@ -225,6 +246,21 @@ app.use('/api/admin/email-marketing', rateLimit({
   legacyHeaders: false,
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }), emailMarketingRouter);
+
+// Admin side of /book-a-call -- weekly-availability settings + bookings
+// list/cancel. Same x-admin-key gate (requireAdminKey inside the router).
+app.use('/api/admin/booking', rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}), adminBookingRouter);
+
+// Google account connect/callback/status/disconnect for /book-a-call. No
+// blanket rate limit here -- /callback is a one-off browser redirect from
+// Google, not something to throttle like a repeated API call.
+app.use('/api/admin/google-calendar', googleCalendarAdminRouter);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 // Includes the exact commit this process was built from (RAILWAY_GIT_COMMIT_SHA
@@ -310,6 +346,15 @@ app.listen(PORT, () => {
   checkScheduledCampaigns().catch(err => console.error('checkScheduledCampaigns (startup run) failed:', err.message));
   setInterval(() => {
     checkScheduledCampaigns().catch(err => console.error('checkScheduledCampaigns failed:', err.message));
+  }, 60 * 1000);
+
+  // /book-a-call's 24h/3h/30min-before reminder emails -- same short
+  // interval as the campaign scheduler above (not the hourly trial one),
+  // since the 30-minute-before reminder needs a tick well under 30 minutes
+  // to ever fire on time.
+  checkDueReminders().catch(err => console.error('checkDueReminders (startup run) failed:', err.message));
+  setInterval(() => {
+    checkDueReminders().catch(err => console.error('checkDueReminders failed:', err.message));
   }, 60 * 1000);
 });
 

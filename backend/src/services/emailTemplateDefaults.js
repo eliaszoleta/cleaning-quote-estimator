@@ -468,4 +468,187 @@ module.exports = [
   ${FOOTER_HTML}
 </div>`,
   },
+  {
+    key: 'booking_confirmation',
+    name: 'Booking confirmation (book-a-call)',
+    subject: "You're booked! Your call is confirmed for {{dateTimeText}}",
+    variables: [
+      { name: 'name', example: 'Jane' },
+      { name: 'dateTimeText', example: 'Tuesday, October 21, 2026 at 2:00 PM CDT' },
+      { name: 'meetLink', example: 'https://meet.google.com/abc-defg-hij' },
+      { name: 'cancelUrl', example: 'https://www.cleanestimator.com/cancel-booking?token=abc123' },
+    ],
+    text: [
+      'Hi {{name}},',
+      '',
+      "You're all set! Your call is confirmed for:",
+      '{{dateTimeText}}',
+      '',
+      "How to join (it's simple, no downloads or accounts needed):",
+      '1. A few minutes before your call, click this link: {{meetLink}}',
+      '2. Click "Join now" -- it opens right in your web browser',
+      '3. When your browser asks, click "Allow" so it can turn on your camera and microphone',
+      '',
+      "That's it! You'll be connected and ready to talk.",
+      '',
+      'Need to cancel or reschedule? {{cancelUrl}}',
+      '',
+      'See you then!',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">You're all set, {{name}}!</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 6px;">Your call is confirmed for:</p>
+  <p style="font-size:17px;font-weight:700;color:#0f172a;margin:0 0 22px;">{{dateTimeText}}</p>
+
+  <p style="margin:0 0 22px;">
+    <a href="{{meetLink}}" style="display:inline-block;background-color:#16a34a;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 30px;border-radius:8px;">Join the video call →</a>
+  </p>
+
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 10px;">How to join (it's simple)</p>
+  <ol style="font-size:14px;line-height:1.8;margin:0 0 22px;padding-left:20px;">
+    <li>A few minutes before your call, click the green button above (or this link: <a href="{{meetLink}}" style="color:#2563eb;">{{meetLink}}</a>)</li>
+    <li>Click <strong>"Join now"</strong> -- it opens right in your web browser, no account or download needed</li>
+    <li>When your browser asks, click <strong>"Allow"</strong> so it can turn on your camera and microphone</li>
+  </ol>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">That's it — you'll be connected and ready to talk.</p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    Need to cancel or reschedule? <a href="{{cancelUrl}}" style="color:#2563eb;">Click here</a>.
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
+  {
+    key: 'booking_reminder_24h',
+    name: 'Booking reminder — 24 hours before',
+    subject: 'Reminder: your call is tomorrow — {{dateTimeText}}',
+    variables: [
+      { name: 'name', example: 'Jane' },
+      { name: 'dateTimeText', example: 'Tuesday, October 21, 2026 at 2:00 PM CDT' },
+      { name: 'meetLink', example: 'https://meet.google.com/abc-defg-hij' },
+      { name: 'cancelUrl', example: 'https://www.cleanestimator.com/cancel-booking?token=abc123' },
+    ],
+    text: [
+      'Hi {{name}},',
+      '',
+      'Just a reminder -- your call is coming up:',
+      '{{dateTimeText}}',
+      '',
+      'When it starts, click this link to join: {{meetLink}}',
+      '(It opens right in your browser -- no download or account needed. Just click "Join now" and allow your camera/microphone.)',
+      '',
+      'Need to cancel or reschedule? {{cancelUrl}}',
+      '',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Reminder, {{name}} — your call is tomorrow</p>
+
+  <p style="font-size:17px;font-weight:700;color:#0f172a;margin:0 0 22px;">{{dateTimeText}}</p>
+
+  <p style="margin:0 0 22px;">
+    <a href="{{meetLink}}" style="display:inline-block;background-color:#16a34a;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 30px;border-radius:8px;">Join the video call →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;color:#555555;margin:0 0 20px;">
+    When it's time, just click the button above, then click <strong>"Join now"</strong> -- no download or account needed, your browser handles everything.
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    Need to cancel or reschedule? <a href="{{cancelUrl}}" style="color:#2563eb;">Click here</a>.
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
+  {
+    key: 'booking_reminder_3h',
+    name: 'Booking reminder — 3 hours before',
+    subject: 'Reminder: your call is in a few hours — {{dateTimeText}}',
+    variables: [
+      { name: 'name', example: 'Jane' },
+      { name: 'dateTimeText', example: 'Tuesday, October 21, 2026 at 2:00 PM CDT' },
+      { name: 'meetLink', example: 'https://meet.google.com/abc-defg-hij' },
+      { name: 'cancelUrl', example: 'https://www.cleanestimator.com/cancel-booking?token=abc123' },
+    ],
+    text: [
+      'Hi {{name}},',
+      '',
+      'Your call is in a few hours:',
+      '{{dateTimeText}}',
+      '',
+      'When it starts, click this link to join: {{meetLink}}',
+      '(It opens right in your browser -- no download or account needed. Just click "Join now" and allow your camera/microphone.)',
+      '',
+      'Need to cancel or reschedule? {{cancelUrl}}',
+      '',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Reminder, {{name}} — your call is in a few hours</p>
+
+  <p style="font-size:17px;font-weight:700;color:#0f172a;margin:0 0 22px;">{{dateTimeText}}</p>
+
+  <p style="margin:0 0 22px;">
+    <a href="{{meetLink}}" style="display:inline-block;background-color:#16a34a;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 30px;border-radius:8px;">Join the video call →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;color:#555555;margin:0 0 20px;">
+    When it's time, just click the button above, then click <strong>"Join now"</strong> -- no download or account needed, your browser handles everything.
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    Need to cancel or reschedule? <a href="{{cancelUrl}}" style="color:#2563eb;">Click here</a>.
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
+  {
+    key: 'booking_reminder_30m',
+    name: 'Booking reminder — 30 minutes before',
+    subject: 'Starting soon: your call is in 30 minutes',
+    variables: [
+      { name: 'name', example: 'Jane' },
+      { name: 'dateTimeText', example: 'Tuesday, October 21, 2026 at 2:00 PM CDT' },
+      { name: 'meetLink', example: 'https://meet.google.com/abc-defg-hij' },
+      { name: 'cancelUrl', example: 'https://www.cleanestimator.com/cancel-booking?token=abc123' },
+    ],
+    text: [
+      'Hi {{name}},',
+      '',
+      'Your call starts in about 30 minutes:',
+      '{{dateTimeText}}',
+      '',
+      'Click this link to join: {{meetLink}}',
+      '(It opens right in your browser -- no download or account needed. Just click "Join now" and allow your camera/microphone.)',
+      '',
+      "Running late or need to cancel? {{cancelUrl}}",
+      '',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Starting soon, {{name}} — your call is in 30 minutes</p>
+
+  <p style="font-size:17px;font-weight:700;color:#0f172a;margin:0 0 22px;">{{dateTimeText}}</p>
+
+  <p style="margin:0 0 22px;">
+    <a href="{{meetLink}}" style="display:inline-block;background-color:#16a34a;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 30px;border-radius:8px;">Join the video call →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;color:#555555;margin:0 0 20px;">
+    Just click the button above, then click <strong>"Join now"</strong> -- no download or account needed, your browser handles everything.
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    Running late or need to cancel? <a href="{{cancelUrl}}" style="color:#2563eb;">Click here</a>.
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
 ];

@@ -55,6 +55,8 @@ const CityPage = lazy(() => import('./components/pages/CityPage'));
 const CalculatorPage = lazy(() => import('./components/pages/CalculatorPage'));
 const EstimatorPage = lazy(() => import('./components/pages/EstimatorPage'));
 const MethodologyPage = lazy(() => import('./components/pages/MethodologyPage'));
+const BookingPage = lazy(() => import('./components/pages/BookingPage'));
+const CancelBookingPage = lazy(() => import('./components/pages/CancelBookingPage'));
 const EmbedWrapper = lazy(() => import('./components/EmbedWrapper'));
 
 // Shown only for the brief window (usually one animation frame or two)
@@ -88,7 +90,7 @@ const isTerms = pathname === '/terms-of-service';
 // all of these -- /admin and every legacy sub-path still work as direct
 // links, each just opening the shell on the matching tab instead of its
 // own standalone page.
-const ADMIN_TAB_SLUGS = ['website-requests', 'leads', 'companies', 'partners', 'email-marketing'];
+const ADMIN_TAB_SLUGS = ['website-requests', 'leads', 'companies', 'partners', 'email-marketing', 'booking'];
 const isAdminDashboard = pathname === '/admin' || pathname.startsWith('/admin/');
 const adminInitialTab = (() => {
   const slug = pathname.replace(/^\/admin\/?/, '');
@@ -112,6 +114,8 @@ const isStartBusinessState = pathname.startsWith('/start-a-cleaning-business/');
 const isCalculatorPage = pathname === '/cleaning-cost-calculator';
 const isEstimatorPage = pathname === '/cleaning-cost-estimator';
 const isMethodologyPage = pathname === '/how-we-calculate-prices';
+const isBookACall = pathname === '/book-a-call';
+const isCancelBooking = pathname === '/cancel-booking';
 const isServiceCalculatorPage = getAllServices().some(s => pathname === '/' + calculatorSlugFor(s));
 
 const embedCompanyId = isEmbed ? searchParams.get('company') : null;
@@ -331,6 +335,8 @@ export default function App() {
   if (isCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><CalculatorPage /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isEstimatorPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><EstimatorPage /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isMethodologyPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><MethodologyPage /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isBookACall) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><BookingPage /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isCancelBooking) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><CancelBookingPage token={searchParams.get('token') || ''} /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isServiceCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><ServiceCalculatorPage slug={pathname.slice(1)} /></main><Footer /></div></HelmetProvider>;
 
   if (isCompany) {

@@ -308,3 +308,58 @@ export async function cancelAdminEmailCampaign(adminKey, id) {
     method: 'POST', headers: { 'x-admin-key': adminKey },
   });
 }
+
+// BookingPage.js -- the self-hosted Calendly replacement at /book-a-call.
+// Public, unauthenticated (a prospect picking a time, same as /api/calculate).
+export async function getBookingAvailability(date) {
+  return apiFetch(`/api/booking/availability?date=${encodeURIComponent(date)}`);
+}
+
+export async function createBooking(payload) {
+  return apiFetch('/api/booking/create', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+// CancelBookingPage.js -- /cancel-booking?token=..., same no-login,
+// token-is-the-auth pattern as getWebsiteRequestByToken above.
+export async function getBookingByToken(token) {
+  return apiFetch(`/api/booking/by-token/${token}`);
+}
+
+export async function cancelBooking(token) {
+  return apiFetch('/api/booking/cancel', { method: 'POST', body: JSON.stringify({ token }) });
+}
+
+// AdminBookings.js -- weekly-availability settings, bookings list, and the
+// Google Calendar connect/status/disconnect, same adminKey convention as
+// the rest of the admin API.
+export async function getAdminBookingSettings(adminKey) {
+  return apiFetch('/api/admin/booking/settings', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function updateAdminBookingSettings(adminKey, payload) {
+  return apiFetch('/api/admin/booking/settings', {
+    method: 'PUT', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function getAdminBookings(adminKey) {
+  return apiFetch('/api/admin/booking/bookings', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function cancelAdminBooking(adminKey, id) {
+  return apiFetch(`/api/admin/booking/bookings/${id}/cancel`, {
+    method: 'POST', headers: { 'x-admin-key': adminKey },
+  });
+}
+
+export async function getGoogleCalendarAuthUrl(adminKey) {
+  return apiFetch('/api/admin/google-calendar/auth-url', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function getGoogleCalendarStatus(adminKey) {
+  return apiFetch('/api/admin/google-calendar/status', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function disconnectGoogleCalendar(adminKey) {
+  return apiFetch('/api/admin/google-calendar/disconnect', { method: 'POST', headers: { 'x-admin-key': adminKey } });
+}
