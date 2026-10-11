@@ -21,6 +21,7 @@ import MoldStep from './steps/MoldStep';
 import WaterDamageStep from './steps/WaterDamageStep';
 import LeadCaptureStep from './steps/LeadCaptureStep';
 import ResultsScreen from './ResultsScreen';
+import EstimateSentScreen from './EstimateSentScreen';
 
 const SERVICE_STEPS = {
   home_residential: ['service', 'location', 'home', 'lead', 'results'],
@@ -246,7 +247,29 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // but results should look exactly like the homepage's full results screen
   // (its own grey background, its own card, Share/Print/disclaimer outside
   // it) -- only a real third-party embed (EmbedWrapper) needs it flush too.
+  //
+  // On our own site (not a real third-party embed, and not the
+  // partner-recruitment demo page, which needs the real card to show
+  // prospects what it looks like) the full breakdown is never shown here --
+  // the backend already emails it the moment handleLeadNext's
+  // /api/calculate call returns, so showing it immediately on-screen too
+  // just made that email redundant and visitors never opened it. This way
+  // the email is the one place to see the numbers.
+  const showInstantResults = (embedded && !siteLanding) || !!demoPartner;
+
   if (currentStep === 'results' && result) {
+    if (!showInstantResults) {
+      return (
+        <div style={fontFamily ? { fontFamily: getFontStack(fontFamily) } : undefined}>
+          <EstimateSentScreen
+            name={leadInfo?.name}
+            email={leadInfo?.email}
+            serviceType={serviceType}
+            onReset={handleReset}
+          />
+        </div>
+      );
+    }
     return (
       <div style={fontFamily ? { fontFamily: getFontStack(fontFamily) } : undefined}>
         <ResultsScreen

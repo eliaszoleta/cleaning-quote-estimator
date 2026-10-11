@@ -146,7 +146,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
             disabled={!canSubmit}
             style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '13px 20px', borderRadius: 10, border: 'none', cursor: canSubmit ? 'pointer' : 'not-allowed', fontSize: 14, fontWeight: 700, color: 'white', background: canSubmit ? primaryColor : '#cbd5e1', transition: 'all 0.15s' }}
           >
-            {loading ? <><Loader2 size={15} className="spin" /> Calculating…</> : 'See Free Estimate →'}
+            {loading ? <><Loader2 size={15} className="spin" /> Calculating…</> : 'Get Free Estimate →'}
           </button>
         </div>
 
