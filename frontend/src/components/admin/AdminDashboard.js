@@ -1,5 +1,5 @@
 import React, { useState, lazy, Suspense } from 'react';
-import { Inbox, Users, Building2, HeartHandshake, Mail, LogOut, Sparkles, CalendarClock } from 'lucide-react';
+import { Inbox, UserPlus, Building2, Handshake, Mail, LogOut, Sparkles, CalendarClock } from 'lucide-react';
 import { getAdminCompanies } from '../../utils/api';
 import { theme } from './adminTheme';
 
@@ -22,9 +22,9 @@ const STORAGE_KEY = 'admin_dashboard_key';
 // login screens at four separate URLs.
 const TABS = [
   { slug: 'website-requests', label: 'Website Requests', Icon: Inbox,          Component: AdminWebsiteRequests },
-  { slug: 'leads',            label: 'Leads',             Icon: Users,         Component: AdminHomepageLeads },
+  { slug: 'leads',            label: 'Leads',             Icon: UserPlus,      Component: AdminHomepageLeads },
   { slug: 'companies',        label: 'Companies',         Icon: Building2,     Component: AdminCompanies },
-  { slug: 'partners',         label: 'Partners',          Icon: HeartHandshake, Component: AdminPartners },
+  { slug: 'partners',         label: 'Partners',          Icon: Handshake,     Component: AdminPartners },
   { slug: 'email-marketing',  label: 'Email Marketing',   Icon: Mail,          Component: AdminEmailMarketing },
   { slug: 'booking',         label: 'Bookings',          Icon: CalendarClock, Component: AdminBookings },
 ];
