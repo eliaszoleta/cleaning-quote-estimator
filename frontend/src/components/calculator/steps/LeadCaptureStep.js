@@ -67,7 +67,11 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
               onFocus={e => { e.target.style.borderColor = showError('email', emailValid) ? '#dc2626' : primaryColor; }}
               onBlur={e => { touch('email'); e.target.style.borderColor = !emailValid ? '#dc2626' : '#e2e8f0'; }}
             />
-            {showError('email', emailValid) && <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please enter a valid email.</p>}
+            {showError('email', emailValid) ? (
+              <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please enter a valid email.</p>
+            ) : (
+              <p style={{ color: '#94a3b8', fontSize: 11.5, marginTop: 4 }}>Make sure this is a real, working address — your estimate can only be delivered here, so a mistyped or fake email means you won't receive it.</p>
+            )}
           </div>
 
           <div>
