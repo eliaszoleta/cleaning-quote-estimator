@@ -20,7 +20,21 @@ export default function RunEstimateTab({ config, user }) {
   // real markup/minimum-charge settings when a companyId is present (it
   // re-fetches the saved config server-side by that id); without it, the
   // backend computes with an empty, un-customized config.
-  const companyConfig = { ...(config || {}), companyId: user?.id || null };
+  //
+  // services/serviceStates/serviceCities are dropped on purpose -- those are
+  // Widget Mode's public-facing restrictions (which services the embedded
+  // widget shows, which states/cities it's scoped to), purely a client-side
+  // display filter the backend never enforces. Calculator Mode is an
+  // internal tool for pricing ANY job, so it always offers all 9 services
+  // and all 50 states regardless of what Widget Mode is configured to show
+  // visitors.
+  const companyConfig = {
+    ...(config || {}),
+    companyId: user?.id || null,
+    services: undefined,
+    serviceStates: [],
+    serviceCities: {},
+  };
 
   const handleShareEmail = async ({ to, serviceType, zip, state, serviceDetails }) => {
     const { data: { session } } = await supabase.auth.getSession();
