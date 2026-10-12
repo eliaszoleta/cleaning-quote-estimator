@@ -17,12 +17,15 @@ const websiteRequestRouter = require('./routes/websiteRequest');
 const bookingRouter = require('./routes/booking');
 const adminBookingRouter = require('./routes/adminBooking');
 const googleCalendarAdminRouter = require('./routes/googleCalendarAdmin');
+const chatWidgetRouter = require('./routes/chatWidget');
+const adminChatbotsRouter = require('./routes/adminChatbots');
 const { checkDueReminders } = require('./services/bookingReminderScheduler');
 const { requireAuth } = require('./middleware/auth');
 const { checkTrialReminders } = require('./services/trialScheduler');
 const { checkPendingDeletions } = require('./services/deletionScheduler');
 const { ensureSeeded: ensureEmailTemplatesSeeded } = require('./services/emailTemplates');
 const { checkScheduledCampaigns } = require('./services/emailCampaignScheduler');
+const { checkIdleConversations } = require('./services/chatbotSummary');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -35,6 +38,9 @@ const publicCors = cors({ origin: '*', methods: ['GET', 'POST'], allowedHeaders:
 app.use('/api/calculate', publicCors);
 app.use('/api/company/:id/public', publicCors);
 app.use('/api/leads', publicCors);
+// Chatbot widget — embedded on each client's own cleaning-company website
+// (arbitrary domains we don't control), same reasoning as /api/calculate.
+app.use('/api/chat', publicCors);
 
 // Dashboard CORS — restricted to known origins
 const dashboardOrigins = [
@@ -132,6 +138,18 @@ app.use('/api/booking', rateLimit({
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }));
 
+// POST /api/chat/:chatbotId/message — public and unauthenticated (any
+// visitor on any client's embedded widget), and a live conversation can
+// mean several quick messages back and forth, so this is more generous
+// than the other public-POST limits above (form submits, not a chat).
+app.use('/api/chat', rateLimit({
+  windowMs: 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
 // /api/auth/* isn't actually used by the dashboard (AuthPage.js calls
 // Supabase directly) but stays mounted and reachable regardless -- a thin
 // proxy to Supabase's own login/signup endpoints with no rate limit would
@@ -203,6 +221,11 @@ app.use('/api/website-request', websiteRequestRouter);
 // logged-in company user).
 app.use('/api/booking', bookingRouter);
 
+// Public chatbot-widget API — the chatbotId in the URL is itself the only
+// "auth" an embedded visitor needs, same no-login pattern as the routes
+// above.
+app.use('/api/chat', chatWidgetRouter);
+
 // ─── Auth-protected routes ────────────────────────────────────────────────────
 // requireAuth is applied per-route inside companyRouter, not blanket here --
 // GET /:id/public must stay reachable without auth (it's what the embedded
@@ -270,6 +293,16 @@ app.use('/api/admin/booking', rateLimit({
   legacyHeaders: false,
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }), adminBookingRouter);
+
+// Admin CRUD for chatbots (business info/prompt, lead alert email, embed
+// snippet) + their captured leads list. Same x-admin-key gate.
+app.use('/api/admin/chatbots', rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}), adminChatbotsRouter);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 // Includes the exact commit this process was built from (RAILWAY_GIT_COMMIT_SHA
@@ -364,6 +397,14 @@ app.listen(PORT, () => {
   checkDueReminders().catch(err => console.error('checkDueReminders (startup run) failed:', err.message));
   setInterval(() => {
     checkDueReminders().catch(err => console.error('checkDueReminders failed:', err.message));
+  }, 60 * 1000);
+
+  // Closes out chatbot conversations a visitor went quiet on without
+  // explicitly closing the widget -- same short interval as the campaign
+  // scheduler above, well under the 10-minute idle threshold it checks for.
+  checkIdleConversations().catch(err => console.error('checkIdleConversations (startup run) failed:', err.message));
+  setInterval(() => {
+    checkIdleConversations().catch(err => console.error('checkIdleConversations failed:', err.message));
   }, 60 * 1000);
 });
 

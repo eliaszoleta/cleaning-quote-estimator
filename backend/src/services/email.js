@@ -1046,6 +1046,94 @@ async function sendWebsiteSubscriptionConfirmedEmail({ to, name, business, trial
   return sent;
 }
 
+// ─── Chatbot widget (Growth/Pro tier) lead alerts ──────────────────────────
+// Sent by routes/chatWidget.js the moment a visitor's name + phone are
+// captured, and again by services/chatbotSummary.js once the conversation
+// summary is ready (summary=null on the first call). Not routed through the
+// DB-backed template system sendTemplatedEmail wraps -- that system is for
+// content an admin edits per *marketing* campaign; here every chatbot
+// needs its own "From" display name and recipient, which is plain per-row
+// config (chatbots.from_name / .lead_alert_email), not template content.
+//
+// Deliberately not run through sendEstimateEmail's brandName pattern even
+// though it's the same idea (custom display name, our own verified From
+// address) -- that function is public-widget-triggered and has no
+// alert-recipient concept at all, so it isn't a fit to extend.
+function buildChatbotLeadAlertHtml({ chatbot, lead, summary }) {
+  const phoneDisplay = fmtPhone(lead.phone);
+  return `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">${summary ? 'Chat conversation summary' : 'New chat lead'}</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    <strong>${lead.name}</strong> just ${summary ? 'finished chatting' : 'started chatting'} with your website's AI chatbot.
+  </p>
+
+  <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">
+    <tr><td style="padding:6px 16px 6px 0;color:#666666;font-size:13px;">Name</td><td style="padding:6px 0;font-size:13px;font-weight:600;">${lead.name}</td></tr>
+    <tr><td style="padding:6px 16px 6px 0;color:#666666;font-size:13px;">Phone</td><td style="padding:6px 0;font-size:13px;font-weight:600;">${phoneDisplay}</td></tr>
+  </table>
+
+  ${summary ? `
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Conversation summary</p>
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;white-space:pre-wrap;">${summary}</p>
+  ` : `
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;color:#666666;">They're still chatting -- you'll get a summary once the conversation wraps up.</p>
+  `}
+
+  <p style="font-size:12px;color:#999999;line-height:1.6;margin:28px 0 0;border-top:1px solid #e0e0e0;padding-top:16px;">
+    ${chatbot.business_name} · sent by your website chatbot
+  </p>
+</div>`;
+}
+
+function buildChatbotLeadAlertText({ chatbot, lead, summary }) {
+  const phoneDisplay = fmtPhone(lead.phone);
+  const lines = [
+    summary ? 'Chat conversation summary' : 'New chat lead',
+    '',
+    `Name: ${lead.name}`,
+    `Phone: ${phoneDisplay}`,
+    '',
+  ];
+  lines.push(summary ? `Summary:\n${summary}` : "They're still chatting -- you'll get a summary once the conversation wraps up.");
+  lines.push('', `${chatbot.business_name} · sent by your website chatbot`);
+  return lines.join('\n');
+}
+
+async function sendChatbotLeadAlertEmail({ chatbot, lead, summary = null }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendChatbotLeadAlertEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+  if (!chatbot?.lead_alert_email) {
+    console.warn('sendChatbotLeadAlertEmail skipped: chatbot has no lead_alert_email configured');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+  const fromName = chatbot.from_name || chatbot.business_name;
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `${fromName} <${fromAddress}>`,
+        to: [chatbot.lead_alert_email],
+        subject: `${summary ? 'Chat summary' : 'New chat lead'}: ${lead.name} — ${fmtSubjectTimestamp()}`,
+        html: buildChatbotLeadAlertHtml({ chatbot, lead, summary }),
+        text: buildChatbotLeadAlertText({ chatbot, lead, summary }),
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendChatbotLeadAlertEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
 module.exports = {
   sendEstimateEmail,
   sendPartnerWelcomeEmail,
@@ -1062,4 +1150,5 @@ module.exports = {
   sendWebsiteRequestReceivedEmail,
   sendWebsiteSampleReadyEmail,
   sendWebsiteSubscriptionConfirmedEmail,
+  sendChatbotLeadAlertEmail,
 };

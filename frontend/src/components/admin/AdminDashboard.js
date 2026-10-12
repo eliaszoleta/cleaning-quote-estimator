@@ -1,5 +1,5 @@
 import React, { useState, lazy, Suspense } from 'react';
-import { Inbox, UserPlus, Building2, Handshake, Mail, LogOut, Sparkles, CalendarClock } from 'lucide-react';
+import { Inbox, UserPlus, Building2, Handshake, Mail, LogOut, Sparkles, CalendarClock, Bot } from 'lucide-react';
 import { getAdminCompanies } from '../../utils/api';
 import { theme } from './adminTheme';
 
@@ -9,6 +9,7 @@ const AdminCompanies = lazy(() => import('./AdminCompanies'));
 const AdminPartners = lazy(() => import('./AdminPartners'));
 const AdminEmailMarketing = lazy(() => import('./AdminEmailMarketing'));
 const AdminBookings = lazy(() => import('./AdminBookings'));
+const AdminChatbots = lazy(() => import('./AdminChatbots'));
 
 const STORAGE_KEY = 'admin_dashboard_key';
 
@@ -27,6 +28,7 @@ const TABS = [
   { slug: 'partners',         label: 'Partners',          Icon: Handshake,     Component: AdminPartners },
   { slug: 'email-marketing',  label: 'Email Marketing',   Icon: Mail,          Component: AdminEmailMarketing },
   { slug: 'booking',         label: 'Bookings',          Icon: CalendarClock, Component: AdminBookings },
+  { slug: 'chatbots',        label: 'AI Chatbots',       Icon: Bot,           Component: AdminChatbots },
 ];
 
 const SIDEBAR_WIDTH = 236;

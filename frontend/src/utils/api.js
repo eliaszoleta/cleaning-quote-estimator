@@ -363,3 +363,30 @@ export async function getGoogleCalendarStatus(adminKey) {
 export async function disconnectGoogleCalendar(adminKey) {
   return apiFetch('/api/admin/google-calendar/disconnect', { method: 'POST', headers: { 'x-admin-key': adminKey } });
 }
+
+// AdminChatbots.js -- CRUD for the Growth/Pro-tier chatbots (business
+// info/prompt, lead alert email, From name) plus each one's captured
+// leads, same adminKey convention as the rest of the admin API.
+export async function getAdminChatbots(adminKey) {
+  return apiFetch('/api/admin/chatbots', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function createAdminChatbot(adminKey, payload) {
+  return apiFetch('/api/admin/chatbots', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function updateAdminChatbot(adminKey, id, payload) {
+  return apiFetch(`/api/admin/chatbots/${id}`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteAdminChatbot(adminKey, id) {
+  return apiFetch(`/api/admin/chatbots/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
+}
+
+export async function getAdminChatbotLeads(adminKey, id) {
+  return apiFetch(`/api/admin/chatbots/${id}/leads`, { headers: { 'x-admin-key': adminKey } });
+}
