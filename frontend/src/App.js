@@ -1,6 +1,8 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
+import { Loader2, Zap } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import { postCheckout } from './utils/api';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import ServiceCalculatorPage, { calculatorSlugFor } from './components/pages/ServiceCalculatorPage';
@@ -75,6 +77,15 @@ function PageFallback() {
 const pathname = window.location.pathname.replace(/\/$/, '') || '/';
 const searchParams = new URLSearchParams(window.location.search);
 
+// Supabase's email-confirmation link redirects back here with
+// #...&type=signup in the URL hash (distinct from the #...&type=recovery
+// used for password resets, already handled below via the
+// PASSWORD_RECOVERY auth event) -- read synchronously, before
+// supabase-js's detectSessionInUrl consumes and clears the hash, so this
+// only ever fires on the actual confirmation-link visit, never on a later
+// /company page load with the same still-active session.
+const isEmailConfirmation = pathname === '/company' && /type=signup/.test(window.location.hash);
+
 const isEmbed = pathname.startsWith('/embed');
 const isResults = pathname === '/results';
 const isCompany = pathname === '/company' || pathname.startsWith('/company');
@@ -131,6 +142,52 @@ function BlogRouter() {
   return <BlogIndex />;
 }
 
+// A brand-new account confirming its email lands back on /company with a
+// session already established by supabase-js -- this gives that visit the
+// same "straight to Stripe Checkout" treatment AuthPage.js gives a signup
+// that didn't need email confirmation, so every new company goes through
+// checkout before ever seeing the dashboard, regardless of which signup
+// path their Supabase project is configured for. Falls through to the
+// normal dashboard (via onDone) if creating the checkout session fails,
+// rather than stranding a just-confirmed account on an error -- same
+// fallback AuthPage.js uses.
+function ActivateAfterConfirm({ onDone }) {
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        if (!token) { onDone(); return; }
+        const res = await postCheckout(token);
+        if (!cancelled) window.location.href = res.url;
+      } catch (err) {
+        if (!cancelled) onDone();
+      }
+    })();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', top: -160, right: -100, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
+      <div style={{ background: 'white', borderRadius: 22, padding: '52px 44px', maxWidth: 420, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)', textAlign: 'center' }}>
+        <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
+          <Loader2 size={32} color="#2563eb" strokeWidth={1.8} className="spin" />
+        </div>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.3px' }}>Last step — activate your calculator</h2>
+        <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7 }}>
+          Email confirmed. We're taking you to a secure checkout page to activate Clean Estimator.
+        </p>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: '#2563eb', padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, marginTop: 14 }}>
+          <Zap size={13} /> 30 days free, then $25/month
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ResultsPage() {
   const [data, setData] = useState(null);
   useEffect(() => {
@@ -175,6 +232,11 @@ export default function App() {
   // the visitor straight into the full dashboard instead of making them set
   // a new password first.
   const [passwordRecovery, setPasswordRecovery] = useState(false);
+  // Set once ActivateAfterConfirm has run (either it sent the browser to
+  // Stripe and this never gets read again, or creating the checkout
+  // session failed and this lets the normal dashboard render instead of
+  // retrying on every re-render).
+  const [skipActivation, setSkipActivation] = useState(false);
 
   useEffect(() => {
     if (!isCompany || !supabase) { setAuthLoading(false); return; }
@@ -369,6 +431,7 @@ export default function App() {
     );
     if (passwordRecovery) return <HelmetProvider>{companyHelmet}<Suspense fallback={<PageFallback />}><ResetPasswordPage onDone={() => setPasswordRecovery(false)} /></Suspense></HelmetProvider>;
     if (!user) return <HelmetProvider>{companyHelmet}<Suspense fallback={<PageFallback />}><AuthPage onAuth={setUser} /></Suspense></HelmetProvider>;
+    if (isEmailConfirmation && !skipActivation) return <HelmetProvider>{companyHelmet}<ActivateAfterConfirm onDone={() => setSkipActivation(true)} /></HelmetProvider>;
     return <HelmetProvider>{companyHelmet}<Suspense fallback={<PageFallback />}><CompanyDashboard user={user} onLogout={handleLogout} /></Suspense></HelmetProvider>;
   }
 

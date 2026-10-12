@@ -170,7 +170,7 @@ export default function AuthPage({ onAuth }) {
           <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7, marginBottom: 10 }}>We sent a confirmation link to</p>
           <div style={{ display: 'inline-block', background: '#f1f5f9', borderRadius: 6, padding: '6px 16px', fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 24 }}>{email}</div>
           <p style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7, marginBottom: 32 }}>
-            Click the link in the email to confirm your account.<br />You'll land directly in your dashboard.
+            Click the link in the email to confirm your account, then activate your calculator with a quick checkout step — 30 days free before your first charge.
           </p>
           <button onClick={() => { setEmailSent(false); setMode('login'); }}
             style={{ width: '100%', padding: '13px 0', borderRadius: 8, border: 'none', background: '#2563eb', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}>
