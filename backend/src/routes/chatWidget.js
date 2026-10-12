@@ -9,16 +9,17 @@
 // call the save_contact tool the moment it has both. The *enforcement*
 // isn't a hard backend block on replying -- that would feel robotic for a
 // stray early question -- it's that a lead only ever gets written to
-// chatbot_leads (and alerted/synced) once save_contact actually fires with
-// backend-validated values, never from free-text parsing of the
+// chatbot_leads (and synced to the Sheet) once save_contact actually fires
+// with backend-validated values, never from free-text parsing of the
 // conversation. Once that tool has fired, `tools` is omitted from every
 // later request on this conversation so Claude can't call it again or get
-// confused about whether it already has the contact info.
+// confused about whether it already has the contact info. The lead ALERT
+// EMAIL itself doesn't fire here at all -- see services/chatbotSummary.js,
+// which sends it once, after the conversation ends, with the summary.
 const express = require('express');
 const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
 const Anthropic = require('@anthropic-ai/sdk');
-const { sendChatbotLeadAlertEmail } = require('../services/email');
 const { syncLeadToSheet } = require('../services/chatbotSheetsSync');
 const { summarizeConversation } = require('../services/chatbotSummary');
 
@@ -191,7 +192,13 @@ router.post('/:chatbotId/message', async (req, res) => {
       messages.push({ role: 'assistant', content: response.content });
 
       if (newlyCaptured) {
-        sendChatbotLeadAlertEmail({ chatbot, lead }).catch(err => console.warn('sendChatbotLeadAlertEmail failed:', err.message));
+        // No email here -- the lead alert fires once, after the
+        // conversation actually ends (see services/chatbotSummary.js),
+        // with name, phone, AND the summary together in one message
+        // instead of an empty "someone's chatting" alert now plus a
+        // second one later. The Sheet still gets this row immediately
+        // (status "captured", no summary yet) so the lead is visible
+        // there right away even before the chat wraps up.
         syncLeadToSheet({ chatbot, lead }).catch(err => console.warn('syncLeadToSheet failed:', err.message));
       }
     }
