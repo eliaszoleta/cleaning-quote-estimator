@@ -100,6 +100,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // own popup pitching the unlimited internal tool, not folded into the
   // generic `error` banner.
   const [limitReached, setLimitReached] = useState(false);
+  // Set when calculate.js's subscription-active check blocked the request
+  // (subscriptionInactive -- the account isn't active: trial never
+  // completed Checkout, or a real subscription lapsed/expired/past-due).
+  // Only ever shown as a popup when skipLeadCapture is set -- that's only
+  // ever true from RunEstimateTab.js, i.e. the account owner hitting this
+  // from their own Calculator Mode, not a stranger on the embedded widget.
+  const [subscriptionPaused, setSubscriptionPaused] = useState(false);
 
   // Skips the lead-capture step entirely when the company has it disabled
   // (ServicesTab.js's "Enable Lead Capture" toggle) or the caller forces it
@@ -193,6 +200,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setResult(null);
     setError(null);
     setLimitReached(false);
+    setSubscriptionPaused(false);
     setStepIndex(1);
   };
 
@@ -211,6 +219,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setLeadInfo(lead);
     setError(null);
     setLimitReached(false);
+    setSubscriptionPaused(false);
     setLoading(true);
     try {
       // Same match ResultsScreen shows on-page (skipped when embedded, same
@@ -245,6 +254,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     } catch (err) {
       if (err.responseData?.limitReached) {
         setLimitReached(true);
+      } else if (err.responseData?.subscriptionInactive && skipLeadCapture) {
+        // skipLeadCapture is only ever set by RunEstimateTab.js -- the
+        // account owner running their own calculator, not a stranger on
+        // the embedded widget -- so only they get the "please subscribe"
+        // popup. A visitor on the actual widget still just sees the plain,
+        // customer-safe inline error below.
+        setSubscriptionPaused(true);
       } else {
         setError(err.message || 'Calculation failed. Please try again.');
       }
@@ -275,6 +291,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setResult(null);
     setError(null);
     setLimitReached(false);
+    setSubscriptionPaused(false);
   };
 
   // Branding from companyConfig (or defaults)
@@ -370,6 +387,41 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
               style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: 13, cursor: 'pointer' }}
             >
               Maybe later
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Only shown to the account owner (skipLeadCapture -- see the
+          catch block above), never on the embedded widget a stranger
+          might be using. */}
+      {subscriptionPaused && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
+          onClick={() => setSubscriptionPaused(false)}
+        >
+          <div
+            style={{ background: 'white', borderRadius: 16, padding: '36px 32px', maxWidth: 420, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.35)', textAlign: 'center' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#fffbeb', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+              <AlertCircle size={26} color="#d97706" strokeWidth={2} />
+            </div>
+            <h3 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Calculator paused</h3>
+            <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.65, marginBottom: 22 }}>
+              Your trial has ended or your subscription needs attention, so your calculator is paused. Subscribe to turn it back on.
+            </p>
+            <a
+              href="/company?tab=subscription"
+              style={{ display: 'block', background: '#2563eb', color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15, marginBottom: 12 }}
+            >
+              Go to Subscription →
+            </a>
+            <button
+              onClick={() => setSubscriptionPaused(false)}
+              style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: 13, cursor: 'pointer' }}
+            >
+              Close
             </button>
           </div>
         </div>

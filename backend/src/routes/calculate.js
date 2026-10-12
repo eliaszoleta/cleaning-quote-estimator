@@ -179,7 +179,13 @@ router.post('/', async (req, res) => {
       // trial clock -- an even bigger loophole than the one it replaces.
       const ownerEmail = await getOwnerEmail(companyId);
       if (!computeSubscriptionStatus(companyConfig, ownerEmail).active) {
-        return res.status(402).json({ success: false, error: 'This estimator is temporarily unavailable. Please contact the business directly.' });
+        // subscriptionInactive lets CleaningCalculator.js tell this apart
+        // from a generic error -- shown as a plain, customer-safe inline
+        // message on the embedded widget (a stranger visiting a company's
+        // site shouldn't see "please subscribe"), but as a clear "Calculator
+        // paused, please subscribe" popup when it's the account owner
+        // hitting this from their own dashboard's Calculator Mode.
+        return res.status(402).json({ success: false, subscriptionInactive: true, error: 'This estimator is temporarily unavailable. Please contact the business directly.' });
       }
     } else if (leadInfo?.userType === 'business') {
       const ip = req.ip || req.socket?.remoteAddress || null;
