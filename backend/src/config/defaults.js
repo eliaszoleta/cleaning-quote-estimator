@@ -235,6 +235,18 @@ const COMMERCIAL_VISITS_PER_MONTH = {
 // Day porter monthly rate (loaded labor including benefits/overhead)
 const DAY_PORTER_DAILY_RATE = { low: 218, high: 265 };
 
+// Restroom cleaning per restroom, per visit -- ~10-15 min of fixture-level
+// work (toilets, sinks, mirrors, floors, restocking) at a loaded labor
+// rate in the same ballpark as DAY_PORTER_DAILY_RATE above (~$27-33/hr).
+// Charged on the ACTUAL restroom count the customer enters, every visit --
+// not a flat one-time add-on above some assumed "typical for this sqft"
+// baseline (see calculateCommercial's history: that baseline meant a
+// restroom count at or under it never affected the price or showed up in
+// the breakdown at all, even though the customer had explicitly entered
+// it, and even when it DID apply it was a flat amount that didn't scale
+// with how many times a month the building was actually cleaned).
+const COMMERCIAL_RESTROOM_PER_VISIT_RATE = { low: 4, high: 7 };
+
 // Carpet cleaning prices
 const CARPET_PRICE_PER_ROOM = { low: 44, high: 55 };
 const CARPET_PRICE_PER_SQFT = { low: 0.28, high: 0.35 };
@@ -430,6 +442,7 @@ module.exports = {
   COMMERCIAL_SERVICE_LEVELS,
   COMMERCIAL_VISITS_PER_MONTH,
   DAY_PORTER_DAILY_RATE,
+  COMMERCIAL_RESTROOM_PER_VISIT_RATE,
   CARPET_PRICE_PER_ROOM,
   CARPET_PRICE_PER_SQFT,
   CARPET_MINIMUM,

@@ -12,6 +12,7 @@ const {
   COMMERCIAL_SERVICE_LEVELS,
   COMMERCIAL_VISITS_PER_MONTH,
   DAY_PORTER_DAILY_RATE,
+  COMMERCIAL_RESTROOM_PER_VISIT_RATE,
   CARPET_PRICE_PER_ROOM,
   CARPET_PRICE_PER_SQFT,
   CARPET_MINIMUM,
@@ -287,19 +288,33 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
   // already-surcharged per-visit rate by 0.15 (the old approach) overstates
   // the real +15% delta, since 15% of a value that's already ×1.15 is more
   // than the actual difference between the with- and without-surcharge price.
-  const perVisitBaseLow = Math.round(sqft * sqftRate.low * levelMult.low * stateMultiplier * markup);
-  const perVisitBaseHigh = Math.round(sqft * sqftRate.high * levelMult.high * stateMultiplier * markup);
+  const sqftPerVisitLow = Math.round(sqft * sqftRate.low * levelMult.low * stateMultiplier * markup);
+  const sqftPerVisitHigh = Math.round(sqft * sqftRate.high * levelMult.high * stateMultiplier * markup);
+
+  // Restrooms are priced per restroom per visit, on the ACTUAL count the
+  // customer entered -- not a flat one-time surcharge above some assumed
+  // "typical for this sqft" baseline (the old approach: a count at or
+  // under that baseline never affected the price or appeared in the
+  // breakdown at all, even though the customer had explicitly entered it).
+  // Folded into perVisitBase (not added separately after) so it also
+  // scales correctly with visit frequency and the after-hours surcharge
+  // below, same as the sqft-based rate.
+  const restroomPerVisitLow = Math.round(restrooms * COMMERCIAL_RESTROOM_PER_VISIT_RATE.low * stateMultiplier * markup);
+  const restroomPerVisitHigh = Math.round(restrooms * COMMERCIAL_RESTROOM_PER_VISIT_RATE.high * stateMultiplier * markup);
+
+  const perVisitBaseLow = sqftPerVisitLow + restroomPerVisitLow;
+  const perVisitBaseHigh = sqftPerVisitHigh + restroomPerVisitHigh;
+
+  // Two separate lines (not one combined figure) so the customer's own
+  // restroom count always shows up in the breakdown on its own, exactly as
+  // entered -- not folded invisibly into the sqft line.
+  const adjustments = [
+    { label: `${buildingType} @ ${sqft.toLocaleString()} sq ft (${visitsPerMonth}x/month @ $${sqftPerVisitLow}–$${sqftPerVisitHigh}/visit)`, low: sqftPerVisitLow * visitsPerMonth, high: sqftPerVisitHigh * visitsPerMonth },
+    { label: `${restrooms} restroom${restrooms === 1 ? '' : 's'} (${visitsPerMonth}x/month @ $${restroomPerVisitLow}–$${restroomPerVisitHigh}/visit)`, low: restroomPerVisitLow * visitsPerMonth, high: restroomPerVisitHigh * visitsPerMonth },
+  ];
 
   const monthlyBaseLow = perVisitBaseLow * visitsPerMonth;
   const monthlyBaseHigh = perVisitBaseHigh * visitsPerMonth;
-
-  // One line showing the actual monthly dollar amount this represents,
-  // instead of a per-visit rate paired with a separate "N visits/month"
-  // line that carried no dollar figure of its own -- the biggest number in
-  // a commercial quote was previously invisible in its own breakdown.
-  const adjustments = [
-    { label: `${buildingType} @ ${sqft.toLocaleString()} sq ft (${visitsPerMonth}x/month @ $${perVisitBaseLow}–$${perVisitBaseHigh}/visit)`, low: monthlyBaseLow, high: monthlyBaseHigh },
-  ];
 
   let afterHoursMonthlyLow = 0, afterHoursMonthlyHigh = 0;
   if (afterHours) {
@@ -324,33 +339,10 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'Day porter (monthly)', low: porterMonthlyLow, high: porterMonthlyHigh });
   }
 
-  // $30/restroom beyond a baseline that scales with the property's size --
-  // a flat "2 included" regardless of building size meant a 500 sq ft
-  // office and a 14,000 sq ft medical building were held to the same bar,
-  // so a large building with a perfectly normal restroom count for its
-  // size (plumbing code scales fixture counts with occupancy/sqft) got
-  // surcharged as if every restroom past 2 were unusual. The smallest tier
-  // matches the old flat constant so the common small-office default
-  // (~2,000 sq ft) is unaffected; larger tiers raise the included baseline
-  // to track what's actually typical for that size instead of guessing one
-  // number for every building.
-  const restroomBaseline =
-    sqft <= 3000 ? 2 :
-    sqft <= 8000 ? 3 :
-    sqft <= 15000 ? 4 :
-    sqft <= 25000 ? 5 : 6;
-  const extraRestrooms = restrooms > restroomBaseline ? restrooms - restroomBaseline : 0;
-  const restroomSurcharge = Math.round(extraRestrooms * 30 * stateMultiplier * markup);
-  // Spell out the baseline instead of just showing the raw restroom count --
-  // a label like "14 restrooms surcharge: $360" reads as if all 14 are
-  // being charged, when only the restrooms beyond what's typical for a
-  // property this size actually are.
-  if (restroomSurcharge > 0) adjustments.push({ label: `${extraRestrooms} extra restrooms (${restrooms} total, ${restroomBaseline} typical for ${sqft.toLocaleString()} sq ft) surcharge`, low: restroomSurcharge, high: restroomSurcharge });
-
   return {
     serviceType: 'commercial',
-    totalLow: monthlyLow + porterMonthlyLow + restroomSurcharge,
-    totalHigh: monthlyHigh + porterMonthlyHigh + restroomSurcharge,
+    totalLow: monthlyLow + porterMonthlyLow,
+    totalHigh: monthlyHigh + porterMonthlyHigh,
     basePrice: (perVisitBaseLow + perVisitBaseHigh) / 2,
     adjustments,
     unit: 'per_month',
@@ -360,6 +352,7 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
     keyFactors: [
       { label: 'Building type', impact: buildingType },
       { label: 'Square footage', impact: sqft.toLocaleString() + ' sq ft' },
+      { label: 'Restrooms', impact: String(restrooms) },
       { label: 'Frequency', impact: frequency },
     ],
     disclaimer: null,
