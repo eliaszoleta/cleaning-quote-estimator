@@ -448,7 +448,7 @@ export default function WebsiteSubscription() {
                   <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', color: 'white', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>3</div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 16, color: 'white', marginBottom: 4 }}>Like it? Pick your domain and subscribe</div>
-                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Already own a domain? We'll use it. Starting fresh? We'll help you pick one. Billing only starts here.</div>
+                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Already own a domain? We'll use it. Starting fresh? We'll help you pick one. Just ${SETUP_FEE} here to approve — your first {FREE_MONTHS} months are free, and real billing doesn't start until month {FREE_MONTHS + 1}.</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
