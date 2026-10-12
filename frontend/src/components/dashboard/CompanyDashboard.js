@@ -38,7 +38,9 @@ export default function CompanyDashboard({ user, onLogout }) {
   // full dashboard (sidebar + tabs), 'calculator' hides all of that and
   // fills the page with nothing but the calculator itself, the same way it
   // renders on the public site -- no tab chrome, no surrounding text.
-  const [viewMode, setViewMode] = useState('widget');
+  // Calculator is the default landing view -- the internal pricing tool is
+  // the primary pitch now, so that's what a company sees first on login.
+  const [viewMode, setViewMode] = useState('calculator');
   // Which pane the Settings tab shows -- API Keys moved from its own
   // sidebar item into a sub-section of Settings, so this is what deep
   // links like ?tab=settings&section=api now target. Subscription is a
@@ -111,6 +113,7 @@ export default function CompanyDashboard({ user, onLogout }) {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
     if (tab && NAV.find(n => n.id === tab)) {
+      setViewMode('widget');
       setActiveTab(tab);
       if (tab === 'settings') {
         const section = params.get('section');
@@ -121,6 +124,7 @@ export default function CompanyDashboard({ user, onLogout }) {
     const sessionId = params.get('session_id');
     const subscribed = params.get('subscribed');
     if (sessionId && subscribed === 'true') {
+      setViewMode('widget');
       setActiveTab('subscription');
       verifyCheckoutSession(sessionId);
     }
