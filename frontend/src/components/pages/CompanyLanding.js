@@ -310,7 +310,7 @@ export default function CompanyLanding() {
                 </span>
                 <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, color: '#0f172a', marginBottom: 14, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
                 <p style={{ color: '#64748b', fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: 400 }}>
-                  One plan, everything included, no surprises. Run it as your internal pricing tool from day one — add the website widget whenever you're ready, at no extra cost.
+                  One plan, everything included, no surprises. Run it as your internal pricing tool from day one — add it as a calculator widget on your website whenever you're ready, at no extra cost.
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, maxWidth: 420 }}>
                   {TRUST_BADGES.map(({ Icon, text }) => (
