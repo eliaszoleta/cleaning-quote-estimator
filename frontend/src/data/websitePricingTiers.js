@@ -14,12 +14,12 @@ export const WEBSITE_PLAN_TIERS = [
     price: 97,
     tagline: 'A real website with leads landing in your inbox',
     addedFeatures: [
-      'A professional cleaning website, built and hosted for you',
+      'A professional cleaning website built and hosted for you — designed to get you found on Google and bring in leads',
       'A quote request form built into your site',
       'Instant email alert the moment any form is submitted',
     ],
     features: [
-      'A professional cleaning website, built and hosted for you',
+      'A professional cleaning website built and hosted for you — designed to get you found on Google and bring in leads',
       'A quote request form built into your site',
       'Email alert for every single form submission -- no lead sits unseen',
       'Mobile-friendly design, a domain of your choice, fully managed hosting',
