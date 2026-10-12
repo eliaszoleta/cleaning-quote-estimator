@@ -557,11 +557,12 @@ export default function WebsiteSubscription() {
               <div style={{ borderTop: '2px dashed #cbd5e1' }} />
 
               <div style={{ background: 'white', padding: 'clamp(22px, 5vw, 30px) clamp(24px, 6vw, 36px)', textAlign: 'center' }}>
-                <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, marginBottom: 22 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22, textAlign: 'left' }}>
                   {selectedTier.features.map(item => (
-                    <span key={item} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', fontWeight: 600 }}>
-                      <IconCheck size={13} /> {item}
-                    </span>
+                    <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: 13, color: '#374151', fontWeight: 600 }}>
+                      <span style={{ marginTop: 1, flexShrink: 0 }}><IconCheck size={13} /></span>
+                      <span>{item}</span>
+                    </div>
                   ))}
                 </div>
                 <a
