@@ -94,6 +94,12 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // Set when the backend's daily cleaning-business estimate limit kicked in
+  // (see calculate.js -- only ever reachable on the public calculator, when
+  // "I am a..." was answered "Cleaning business / cleaner"). Shown as its
+  // own popup pitching the unlimited internal tool, not folded into the
+  // generic `error` banner.
+  const [limitReached, setLimitReached] = useState(false);
 
   // Skips the lead-capture step entirely when the company has it disabled
   // (ServicesTab.js's "Enable Lead Capture" toggle) or the caller forces it
@@ -186,6 +192,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setServiceDetails({});
     setResult(null);
     setError(null);
+    setLimitReached(false);
     setStepIndex(1);
   };
 
@@ -203,6 +210,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     const effectiveDetails = detailsOverride || serviceDetails;
     setLeadInfo(lead);
     setError(null);
+    setLimitReached(false);
     setLoading(true);
     try {
       // Same match ResultsScreen shows on-page (skipped when embedded, same
@@ -235,7 +243,11 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
       }
       goNext();
     } catch (err) {
-      setError(err.message || 'Calculation failed. Please try again.');
+      if (err.responseData?.limitReached) {
+        setLimitReached(true);
+      } else {
+        setError(err.message || 'Calculation failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -262,6 +274,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setLeadInfo(null);
     setResult(null);
     setError(null);
+    setLimitReached(false);
   };
 
   // Branding from companyConfig (or defaults)
@@ -318,6 +331,50 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   return (
     <>
+      {/* Only ever set when calculate.js's public-business daily limit
+          blocked the request -- which only happens with no companyId, so
+          this never shows inside a company's own embedded widget. */}
+      {limitReached && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
+          onClick={() => setLimitReached(false)}
+        >
+          <div
+            style={{ background: 'white', borderRadius: 16, padding: '36px 32px', maxWidth: 420, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.35)', textAlign: 'center' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+              <AlertCircle size={26} color="#dc2626" strokeWidth={2} />
+            </div>
+            <h3 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Daily limit reached</h3>
+            <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.65, marginBottom: 22 }}>
+              Cleaning businesses can run 2 free estimates a day on this tool. Want unlimited calculations for your business?
+            </p>
+            <div style={{ background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: 12, padding: '16px 18px', marginBottom: 20, textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <Zap size={15} color="#2563eb" />
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>Clean Estimator — Internal Pricing Tool</span>
+              </div>
+              <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.55, margin: 0 }}>
+                Unlimited calculations, your own numbers, instant results — 30 days free, then $25/month.
+              </p>
+            </div>
+            <a
+              href="/estimator"
+              style={{ display: 'block', background: '#2563eb', color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15, marginBottom: 12 }}
+            >
+              See Clean Estimator →
+            </a>
+            <button
+              onClick={() => setLimitReached(false)}
+              style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: 13, cursor: 'pointer' }}
+            >
+              Maybe later
+            </button>
+          </div>
+        </div>
+      )}
+
       {!embedded && (
         <Helmet>
           <title>Free Cleaning Cost Calculator 2026 | Clean Estimator</title>

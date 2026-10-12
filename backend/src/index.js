@@ -31,6 +31,15 @@ const { checkIdleConversations } = require('./services/chatbotSummary');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust Railway's reverse proxy so req.ip reflects the real client IP
+// (from X-Forwarded-For) instead of the proxy's own address -- without
+// this, every visitor behind it would look like the same single IP to
+// both express-rate-limit's existing per-IP limiters and the public-
+// business daily-estimate-limit check in routes/calculate.js, which both
+// key directly on req.ip. `1` trusts exactly one hop, matching
+// Railway's setup (one proxy in front of this service).
+app.set('trust proxy', 1);
+
 // Security headers
 app.use(helmet({ crossOriginResourcePolicy: false }));
 
