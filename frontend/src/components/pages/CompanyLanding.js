@@ -88,6 +88,9 @@ const HERO_GALLERY = [
   { src: '/images/marketing/hero-result-mold-remediation.png', alt: 'Mold remediation estimate result' },
   { src: '/images/marketing/hero-result-apartment.png', alt: 'Apartment cleaning estimate result' },
   { src: '/images/marketing/hero-result-carpet.png', alt: 'Carpet cleaning estimate result' },
+  { src: '/images/marketing/hero-result-tile-grout.png', alt: 'Tile and grout cleaning estimate result' },
+  { src: '/images/marketing/hero-result-air-duct.png', alt: 'Air duct cleaning estimate result' },
+  { src: '/images/marketing/hero-result-house-cleaning.png', alt: 'House cleaning estimate result' },
 ];
 
 // Browser chrome around an auto-advancing slideshow of real result
