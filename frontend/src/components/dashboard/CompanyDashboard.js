@@ -5,7 +5,7 @@ import {
   Globe, X, CalendarClock, CreditCard, Zap,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
-import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
+import { getSubscriptionStatus, verifyCheckout, postCheckout, postPortal } from '../../utils/api';
 import { supabase } from '../../lib/supabase';
 import OverviewTab from './tabs/OverviewTab';
 import BrandingTab from './tabs/BrandingTab';
@@ -32,6 +32,70 @@ const NAV = [
 
 const WALKTHROUGH_URL = '/book-a-call';
 
+// Shown instead of the dashboard whenever subStatus.active is false --
+// neither Widget Mode nor Calculator Mode render behind this. Account
+// activation now only ever happens through Stripe Checkout (see
+// subscription.js's POST /checkout and companyConfig.js's
+// getOrCreateCompanyConfig), so simply never completing it -- closing the
+// tab, declining, re-visiting an old signup-confirmation link -- used to
+// still land someone in a fully working dashboard with a free no-card
+// trial quietly already running. This, plus the matching server-side
+// check in calculate.js, closes that off: no checkout, no calculator.
+function ActivationGate({ subStatus, onLogout }) {
+  const [loadingAction, setLoadingAction] = useState(false);
+  const [error, setError] = useState('');
+
+  const isPastDue = subStatus.status === 'past_due';
+  const isNeverActivated = subStatus.status === 'requires_trial_setup';
+
+  const handleAction = async () => {
+    setLoadingAction(true);
+    setError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Not signed in');
+      const res = isPastDue ? await postPortal(token) : await postCheckout(token);
+      window.location.href = res.url;
+    } catch (err) {
+      setError(err.message || 'Something went wrong. Please try again.');
+      setLoadingAction(false);
+    }
+  };
+
+  const title = isNeverActivated ? 'Activate your account' : isPastDue ? 'Update your payment method' : 'Reactivate your account';
+  const body = isNeverActivated
+    ? 'Your calculator is ready, but checkout was never finished. Activate your account to start your 30-day free trial.'
+    : isPastDue
+    ? 'Your last payment failed. Update your payment method to keep your calculator running.'
+    : 'Your subscription has ended. Reactivate to get back into your calculator.';
+  const cta = isPastDue ? 'Update payment method' : isNeverActivated ? 'Activate — start free trial' : 'Reactivate my account';
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', top: -160, right: -100, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
+      <div style={{ background: 'white', borderRadius: 22, padding: '52px 44px', maxWidth: 440, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)', textAlign: 'center' }}>
+        <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+          <Zap size={28} color="#2563eb" strokeWidth={1.8} />
+        </div>
+        <h2 style={{ fontSize: 21, fontWeight: 800, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.3px' }}>{title}</h2>
+        <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>{body}</p>
+        {error && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', marginBottom: 16, color: '#dc2626', fontSize: 13, fontWeight: 500 }}>⚠ {error}</div>
+        )}
+        <button
+          onClick={handleAction}
+          disabled={loadingAction}
+          style={{ width: '100%', padding: '13px 0', borderRadius: 8, border: 'none', background: loadingAction ? '#94a3b8' : '#2563eb', color: 'white', fontWeight: 700, fontSize: 15, cursor: loadingAction ? 'not-allowed' : 'pointer', boxShadow: loadingAction ? 'none' : '0 4px 16px rgba(37,99,235,0.3)' }}
+        >
+          {loadingAction ? 'Redirecting…' : `${cta} →`}
+        </button>
+        <button onClick={onLogout} style={{ marginTop: 16, background: 'none', border: 'none', color: '#94a3b8', fontSize: 13, cursor: 'pointer' }}>Sign out</button>
+      </div>
+    </div>
+  );
+}
+
 export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
   // Top-level switch, independent of the tab sidebar: 'widget' is today's
@@ -47,6 +111,12 @@ export default function CompanyDashboard({ user, onLogout }) {
   // top-level sidebar tab of its own (see NAV) rather than a section here.
   const [settingsSection, setSettingsSection] = useState('account');
   const [subStatus, setSubStatus] = useState(null);
+  // Distinguishes "haven't heard back yet" (subStatus still null, keep
+  // showing the loading spinner) from "tried and failed" (a transient
+  // network/API error) -- without this, a failed fetch would leave
+  // subStatus null forever and the dashboard would spin indefinitely
+  // instead of falling back to rendering normally, same as it always has.
+  const [subStatusError, setSubStatusError] = useState(false);
   const [localConfig, setLocalConfig] = useState(null);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
   // Not persisted -- meant to always show again on a fresh login (App.js
@@ -141,11 +211,12 @@ export default function CompanyDashboard({ user, onLogout }) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-      if (!token) return;
+      if (!token) { setSubStatusError(true); return; }
       const res = await getSubscriptionStatus(token);
       setSubStatus(res.data);
     } catch (err) {
       console.warn('Could not load subscription status:', err.message);
+      setSubStatusError(true);
     }
   };
 
@@ -166,7 +237,13 @@ export default function CompanyDashboard({ user, onLogout }) {
   const deletionPending = config?.pendingDeletion;
   const showWelcome = justCreated && !welcomeDismissed;
 
-  if (loading) return (
+  // Also waits on subStatus before deciding what to render -- otherwise an
+  // account that needs the ActivationGate below would flash the real
+  // dashboard first, for however long the subscription-status request
+  // takes to resolve. Falls through once subStatusError is set (a fetch
+  // that failed outright), same as before this gate existed, rather than
+  // spinning forever over a transient network issue.
+  if (loading || (subStatus === null && !subStatusError)) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9' }}>
       <div style={{ textAlign: 'center', color: '#64748b' }}>
         <Loader2 size={32} className="spin" style={{ margin: '0 auto 12px', display: 'block', color: '#2563eb' }} />
@@ -174,6 +251,10 @@ export default function CompanyDashboard({ user, onLogout }) {
       </div>
     </div>
   );
+
+  if (subStatus && !subStatus.active) {
+    return <ActivationGate subStatus={subStatus} onLogout={onLogout} />;
+  }
 
   const tabProps = { config, saveConfig, saving, saved, error, user, subStatus, onSubRefresh: loadSubStatus };
 

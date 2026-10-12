@@ -82,13 +82,24 @@ async function saveCompanyConfig(companyId, config) {
 
 // Companies hit this from two different routes on dashboard load in
 // parallel -- GET /api/company/:id and GET /api/subscription/status -- with
-// no ordering guarantee between them. Both need the exact same "create with
-// a 30-day trial if this is a brand-new account, backfill trialStartedAt if
-// it's missing on an old one" logic, or whichever request loses the race
-// reads a config that doesn't exist yet and reports requires_trial_setup
-// even though the other request is about to create it a moment later. A
-// module-level flag (set synchronously, before the first await below) closes
-// the window for two near-simultaneous first calls both deciding to create.
+// no ordering guarantee between them. Both need the exact same "create a
+// default row if this is a brand-new account" logic, or whichever request
+// loses the race reads a config that doesn't exist yet and reports
+// requires_trial_setup even though the other request is about to create it
+// a moment later. A module-level flag (set synchronously, before the first
+// await below) closes the window for two near-simultaneous first calls both
+// deciding to create.
+//
+// Deliberately does NOT start a free trial here (trialStartedAt stays
+// unset either way) -- that used to happen automatically on first dashboard
+// load, which meant simply never completing Stripe Checkout (closing the
+// tab, declining, even just re-visiting an old signup-confirmation link)
+// quietly granted a full no-card 30-day trial anyway, defeating the entire
+// point of requiring a card up front. The only way trialStartedAt (or a
+// real Stripe subscription) ever gets set now is POST /checkout's own
+// seeding logic followed by an actual completed Stripe Checkout -- see
+// subscription.js. An account that hasn't done that stays
+// requires_trial_setup indefinitely, which CompanyDashboard.js gates on.
 const recentlyCreated = new Set();
 
 async function getOrCreateCompanyConfig(companyId, seed = {}) {
@@ -101,21 +112,9 @@ async function getOrCreateCompanyConfig(companyId, seed = {}) {
       companyName: seed.companyName || DEFAULT_COMPANY_CONFIG.companyName,
       phone: seed.phone || DEFAULT_COMPANY_CONFIG.phone,
       website: seed.website || DEFAULT_COMPANY_CONFIG.website,
-      subscription: {
-        ...DEFAULT_COMPANY_CONFIG.subscription,
-        trialStartedAt: new Date().toISOString(),
-      },
     };
     await saveCompanyConfig(companyId, config);
     return { config, created };
-  }
-  if (!config.subscription?.trialStartedAt && !config.subscription?.stripeSubscriptionId) {
-    config.subscription = {
-      ...DEFAULT_COMPANY_CONFIG.subscription,
-      ...(config.subscription || {}),
-      trialStartedAt: new Date().toISOString(),
-    };
-    await saveCompanyConfig(companyId, config);
   }
   return { config, created: false };
 }

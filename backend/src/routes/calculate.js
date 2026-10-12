@@ -3,6 +3,7 @@ const router = express.Router();
 const { calculateCleaning } = require('../services/cleaningCalculation');
 const { STATE_PRICING_MULTIPLIERS, STATE_AVERAGE_HOME_CLEANING_COST, STATE_NAMES } = require('../config/defaults');
 const { getCompanyConfig } = require('../services/companyConfig');
+const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { saveLead } = require('./leads');
 const { sendEstimateEmail, sendPartnerLeadEmail, sendCompanyLeadEmail } = require('../services/email');
 const { resolveCityForZip } = require('../services/zipCity');
@@ -77,6 +78,18 @@ router.post('/', async (req, res) => {
     let companyConfig = {};
     if (companyId) {
       try { companyConfig = (await getCompanyConfig(companyId)) || {}; } catch {}
+      // Real enforcement, not just a dashboard banner: an account that
+      // hasn't completed Stripe Checkout (or whose subscription has since
+      // lapsed) never gets a working calculator -- neither the public
+      // embed widget nor the dashboard's own Calculator Mode, both of
+      // which route through this same endpoint with companyId set. Without
+      // this, removing the old no-card auto-trial (see
+      // companyConfig.js's getOrCreateCompanyConfig) would still leave an
+      // unactivated account free to calculate forever, just without the
+      // trial clock -- an even bigger loophole than the one it replaces.
+      if (!computeSubscriptionStatus(companyConfig, null).active) {
+        return res.status(402).json({ success: false, error: 'This estimator is temporarily unavailable. Please contact the business directly.' });
+      }
     }
 
     const result = await calculateCleaning(
