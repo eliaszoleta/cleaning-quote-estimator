@@ -187,7 +187,7 @@ export default function SEOContent() {
       'Every service asks about size, scope, and frequency — not just ZIP code',
       'ZIP-code specific pricing across all 50 US states',
       'Local Partner Program: exclusive, one-partner-per-city placement recommending a local cleaning company to homeowners, from $175/month per city ($350/month in major metros)',
-      'Internal pricing tool for cleaning companies, with an embeddable white-labeled widget included, $25/month after a 30-day free trial',
+      'Internal pricing tool for cleaning companies, with an embeddable white-labeled calculator widget for their website included, $25/month after a 30-day free trial',
       'House cleaning cost calculator',
       'Carpet cleaning cost estimator',
       'Air duct cleaning cost calculator',
@@ -432,7 +432,7 @@ export default function SEOContent() {
               <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '24px 26px' }}>
                 <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Internal Pricing Tool</h3>
                 <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: '0 0 14px' }}>
-                  Run unlimited accurate price estimates for your own quoting, with a branded, white-labeled widget for your website included if you also want public lead capture. $25/month after a 30-day free trial.
+                  Run unlimited accurate price estimates for your own quoting, with a branded, white-labeled calculator widget for your website included if you also want public lead capture. $25/month after a 30-day free trial.
                 </p>
                 <a href="/estimator" style={{ fontSize: 13.5, color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>See pricing tool details &rarr;</a>
               </div>

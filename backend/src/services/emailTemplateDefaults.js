@@ -76,7 +76,7 @@ module.exports = [
       '',
       'Got a result you want a teammate to see? Click "Email to Coworker" on the results screen and it goes straight to their inbox.',
       '',
-      "Want to capture leads from your website too? The same plan already includes a white-labeled, embeddable widget — here's your embed code:",
+      "Want to capture leads from your website too? The same plan already includes a white-labeled, embeddable calculator widget for your site — here's your embed code:",
       '',
       '{{embedCode}}',
       '',
@@ -111,7 +111,7 @@ module.exports = [
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Want to capture leads from your website too? The same plan already includes a white-labeled, embeddable widget — here's your embed code:
+    Want to capture leads from your website too? The same plan already includes a white-labeled, embeddable calculator widget for your site — here's your embed code:
   </p>
 
   <pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-family:'Menlo','Monaco',monospace;font-size:11.5px;line-height:1.6;color:#334155;white-space:pre-wrap;word-break:break-all;margin:0 0 20px;">{{embedCodeHtml}}</pre>

@@ -12,7 +12,8 @@ import NoWebsiteBanner from '../ui/NoWebsiteBanner';
 const PRIMARY = '#1d4ed8';
 
 // One plan, one accurate pricing engine -- used internally by default, with
-// a website widget included for anyone who also wants public lead capture.
+// a calculator widget for the company's website included for anyone who
+// also wants public lead capture.
 const FEATURES = [
   { Icon: Zap,           color: '#7c3aed', bg: '#f5f3ff', title: 'Unlimited internal calculations', desc: 'Run as many estimates as you need, every month, with no per-quote cost.' },
   { Icon: Lock,          color: '#1d4ed8', bg: '#eff6ff', title: 'Instant result, nothing public',  desc: "See the number immediately on your own screen — it's never shown to a customer unless you decide to share it." },
@@ -20,7 +21,7 @@ const FEATURES = [
   { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',       desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
   { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',      desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
   { Icon: ClipboardList, color: '#2563eb', bg: '#fdf4ff', title: 'All 9 service calculators',       desc: 'Regular cleaning, deep clean, move-out, Airbnb turnover, post-construction, and more.' },
-  { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Website widget included',         desc: 'Want public lead capture too? The same plan includes an embeddable, white-label widget for your site — no upgrade required.' },
+  { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Calculator widget for your website', desc: 'Want public lead capture too? The same plan includes an embeddable, white-label calculator widget for your site — no upgrade required.' },
 ];
 
 // Why we moved away from pitching a public price-range widget as the
@@ -36,7 +37,7 @@ const STEPS = [
   { n: '1', Icon: Rocket,   color: '#1d4ed8', bg: '#eff6ff', title: 'Sign up',               desc: 'Create your account and start your 30-day free trial.' },
   { n: '2', Icon: Settings, color: '#7c3aed', bg: '#f5f3ff', title: 'Set up your profile',    desc: 'Add your logo, service area, and the services you offer — accurate pricing is already built in.' },
   { n: '3', Icon: Zap,      color: '#ea580c', bg: '#fff7ed', title: 'Run instant estimates',  desc: 'Get an accurate number the moment you need one — for your own quoting, not a public page.' },
-  { n: '4', Icon: Code2,    color: '#0891b2', bg: '#ecfeff', title: 'Embed it too, if you want', desc: "Want leads coming straight from your website? Paste the same widget's embed code anytime — it's included." },
+  { n: '4', Icon: Code2,    color: '#0891b2', bg: '#ecfeff', title: 'Embed it too, if you want', desc: "Want leads coming straight from your website? Paste its calculator widget code on your site anytime — it's included." },
 ];
 
 const TESTIMONIALS = [
@@ -51,8 +52,8 @@ const PLAN_FEATURES = [
   'Email a result to a coworker in one click',
   'ZIP-code accurate pricing & per-service markup control',
   'All 9 service calculators',
-  'Website widget included, if/when you want public lead capture',
-  'Automatic lead capture + instant email alerts when you use the widget',
+  'Calculator widget for your website, included whenever you want public lead capture',
+  'Automatic lead capture + instant email alerts once it\'s on your site',
   'API access for CRM sync',
 ];
 
@@ -129,7 +130,7 @@ export default function CompanyLanding() {
     <>
       <Helmet>
         <title>Internal Cleaning Price Estimator for Cleaning Companies | Clean Estimator</title>
-        <meta name="description" content="An internal pricing tool for cleaning businesses. Run unlimited accurate estimates instantly on screen — with a website widget included if you also want public lead capture. $25/month, 30-day free trial." />
+        <meta name="description" content="An internal pricing tool for cleaning businesses. Run unlimited accurate estimates instantly on screen — with a calculator widget for your website included if you also want public lead capture. $25/month, 30-day free trial." />
         <link rel="canonical" href="https://www.cleanestimator.com/estimator" />
       </Helmet>
       <div className="app">
