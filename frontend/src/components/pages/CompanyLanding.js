@@ -34,7 +34,7 @@ const PROBLEMS = [
 
 const STEPS = [
   { n: '1', Icon: Rocket,   color: '#1d4ed8', bg: '#eff6ff', title: 'Sign up',               desc: 'Create your account and start your 30-day free trial — no credit card required.' },
-  { n: '2', Icon: Settings, color: '#7c3aed', bg: '#f5f3ff', title: 'Set your pricing',       desc: 'Add your markup, minimum charges, and service area so every estimate reflects your real numbers.' },
+  { n: '2', Icon: Settings, color: '#7c3aed', bg: '#f5f3ff', title: 'Set up your profile',    desc: 'Add your logo, service area, and the services you offer — accurate pricing is already built in.' },
   { n: '3', Icon: Zap,      color: '#ea580c', bg: '#fff7ed', title: 'Run instant estimates',  desc: 'Get an accurate number the moment you need one — for your own quoting, not a public page.' },
   { n: '4', Icon: Code2,    color: '#0891b2', bg: '#ecfeff', title: 'Embed it too, if you want', desc: "Want leads coming straight from your website? Paste the same widget's embed code anytime — it's included." },
 ];
@@ -129,7 +129,7 @@ export default function CompanyLanding() {
     <>
       <Helmet>
         <title>Internal Cleaning Price Estimator for Cleaning Companies | Clean Estimator</title>
-        <meta name="description" content="An internal pricing tool for cleaning businesses. Run unlimited accurate estimates with your own markup and minimum charges, instantly on screen — with a website widget included if you also want public lead capture. $25/month, 30-day free trial." />
+        <meta name="description" content="An internal pricing tool for cleaning businesses. Run unlimited accurate estimates instantly on screen — with a website widget included if you also want public lead capture. $25/month, 30-day free trial." />
         <link rel="canonical" href="https://www.cleanestimator.com/estimator" />
       </Helmet>
       <div className="app">
@@ -159,7 +159,7 @@ export default function CompanyLanding() {
                   <span style={{ color: '#60a5fa' }}>without tipping your hand</span>
                 </h1>
                 <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.65 }}>
-                  Clean Estimator is an internal pricing tool for cleaning businesses: unlimited accurate estimates using your own markup and minimum charges, ready the second you click. Want a public-facing version for your website too? It's included — no separate plan to buy.
+                  Clean Estimator is an internal pricing tool for cleaning businesses: accurate price estimates ready the second you click — no more guessing what to charge. Want a public-facing version for your website too? It's included — no separate plan to buy.
                 </p>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                   <a href="/company" className="ce-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
