@@ -66,8 +66,8 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   const sc = statusConfig[status] || { Icon: AlertTriangle, iconColor: '#94a3b8', bg: '#f8fafc', border: '#e2e8f0', title: 'No Active Plan' };
 
   const statusDetail = (() => {
-    if (status === 'requires_trial_setup') return 'Get 30 days free — no credit card required.';
-    if (status === 'trialing' && subStatus?.daysLeft > 0) return `${subStatus.daysLeft} days remaining in your free trial — no credit card on file, subscribe anytime to keep your widget running after it ends.`;
+    if (status === 'requires_trial_setup') return 'Activate your calculator to start your 30-day free trial.';
+    if (status === 'trialing' && subStatus?.daysLeft > 0) return `${subStatus.daysLeft} days remaining in your free trial — subscribe anytime to keep your widget running after it ends.`;
     if (status === 'trialing') return 'Your trial ends today. Subscribe now to keep your widget from pausing.';
     if (status === 'active' && subStatus?.currentPeriodEnd) return `Renews on ${new Date(subStatus.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`;
     if (status === 'active_canceling' && subStatus?.currentPeriodEnd) return `Active until ${new Date(subStatus.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Will not renew.`;

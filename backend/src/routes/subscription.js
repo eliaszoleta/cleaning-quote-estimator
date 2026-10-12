@@ -3,6 +3,7 @@ const router = express.Router();
 const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { sendCompanyWelcomeEmail } = require('../services/email');
+const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
@@ -34,18 +35,38 @@ router.post('/checkout', async (req, res) => {
 
   try {
     const stripe = getStripe();
-    const config = (await getCompanyConfig(companyId)) || {};
+    let config = await getCompanyConfig(companyId);
+
+    // AuthPage.js now sends a brand-new signup straight here, before the
+    // dashboard's own getOrCreateCompanyConfig (GET /api/company/:id) ever
+    // runs -- so this is often the very first time this company's row gets
+    // created. Seed it with the same defaults + signup profile fields that
+    // route would, EXCEPT trialStartedAt: deliberately left unset, since
+    // this checkout is about to hand the trial off to Stripe itself (see
+    // alreadyHadTrial below) rather than starting the old app-managed,
+    // no-card clock for an account that's headed straight into Checkout.
+    if (!config) {
+      config = {
+        ...DEFAULT_COMPANY_CONFIG,
+        companyName: req.user.metadata?.company_name || DEFAULT_COMPANY_CONFIG.companyName,
+        phone: req.user.metadata?.phone || DEFAULT_COMPANY_CONFIG.phone,
+        website: req.user.metadata?.website || DEFAULT_COMPANY_CONFIG.website,
+      };
+      await saveCompanyConfig(companyId, config);
+    }
     const existingCustomerId = config.subscription?.stripeCustomerId;
 
     const priceId = process.env.STRIPE_PRICE_ID;
     if (!priceId) return res.status(500).json({ success: false, error: 'Stripe pricing not configured' });
 
-    // No Stripe-side trial here -- the 30-day free trial is app-managed
-    // (subscription.trialStartedAt, started at signup in company.js, see
-    // subscriptionStatus.js). By the time someone actually completes this
-    // checkout, they're converting to a real paid subscription billed
-    // immediately, whether that's during their free trial (upgrading early)
-    // or after it's ended.
+    // A real Stripe-side trial (card collected now, first charge in 30
+    // days) only for an account that's never had a trial before in any
+    // form -- never started the old app-managed one, and never had a
+    // subscription. An account reactivating or upgrading after already
+    // using its 30 free days converts to a paid subscription immediately,
+    // same as before.
+    const alreadyHadTrial = !!(config.subscription?.trialStartedAt || config.subscription?.stripeSubscriptionId);
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -53,6 +74,7 @@ router.post('/checkout', async (req, res) => {
       customer: existingCustomerId || undefined,
       customer_email: existingCustomerId ? undefined : req.user.email,
       metadata: { companyId },
+      ...(alreadyHadTrial ? {} : { subscription_data: { trial_period_days: 30 } }),
       success_url: `${FRONTEND_URL}/company?subscribed=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/company?tab=subscription`,
     });

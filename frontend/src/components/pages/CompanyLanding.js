@@ -33,7 +33,7 @@ const PROBLEMS = [
 ];
 
 const STEPS = [
-  { n: '1', Icon: Rocket,   color: '#1d4ed8', bg: '#eff6ff', title: 'Sign up',               desc: 'Create your account and start your 30-day free trial — no credit card required.' },
+  { n: '1', Icon: Rocket,   color: '#1d4ed8', bg: '#eff6ff', title: 'Sign up',               desc: 'Create your account and start your 30-day free trial.' },
   { n: '2', Icon: Settings, color: '#7c3aed', bg: '#f5f3ff', title: 'Set up your profile',    desc: 'Add your logo, service area, and the services you offer — accurate pricing is already built in.' },
   { n: '3', Icon: Zap,      color: '#ea580c', bg: '#fff7ed', title: 'Run instant estimates',  desc: 'Get an accurate number the moment you need one — for your own quoting, not a public page.' },
   { n: '4', Icon: Code2,    color: '#0891b2', bg: '#ecfeff', title: 'Embed it too, if you want', desc: "Want leads coming straight from your website? Paste the same widget's embed code anytime — it's included." },
@@ -57,7 +57,7 @@ const PLAN_FEATURES = [
 ];
 
 const TRUST_BADGES = [
-  { Icon: ShieldCheck, text: 'No credit card required for trial' },
+  { Icon: ShieldCheck, text: '30-day free trial' },
   { Icon: Zap,          text: 'Live in under 30 minutes' },
   { Icon: Check,        text: 'Cancel anytime' },
 ];
@@ -162,7 +162,7 @@ export default function CompanyLanding() {
                   Clean Estimator is an internal pricing tool for cleaning businesses: accurate price estimates ready the second you click — no more guessing what to charge. Want a public-facing version for your website too? It's included — no separate plan to buy.
                 </p>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  <a href="/company" className="ce-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
+                  <a href="/company?mode=signup" className="ce-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
                     Start Free Trial <Arrow size={16} />
                   </a>
                   <a href="#pricing" className="ce-btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,255,255,0.07)', color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 15.5, border: '1px solid rgba(255,255,255,0.15)' }}>
@@ -346,7 +346,7 @@ export default function CompanyLanding() {
                       </li>
                     ))}
                   </ul>
-                  <a href="/company" className="ce-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
+                  <a href="/company?mode=signup" className="ce-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
                     Start Free Trial <Arrow size={15} />
                   </a>
                 </div>

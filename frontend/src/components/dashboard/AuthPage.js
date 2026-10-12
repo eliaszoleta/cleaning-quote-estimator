@@ -1,11 +1,24 @@
 import React, { useState } from 'react';
-import { Mail, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Mail, CheckCircle2, Eye, EyeOff, Zap, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { postCheckout } from '../../utils/api';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
+// CompanyLanding.js's "Start Free Trial" CTAs link here with ?mode=signup
+// so clicking them opens straight on Create Account instead of Sign In --
+// a returning user navigating to /company directly still lands on Sign In
+// by default.
+function initialMode() {
+  try {
+    return new URLSearchParams(window.location.search).get('mode') === 'signup' ? 'signup' : 'login';
+  } catch {
+    return 'login';
+  }
+}
+
 export default function AuthPage({ onAuth }) {
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,6 +31,11 @@ export default function AuthPage({ onAuth }) {
   const [error, setError] = useState('');
   const [emailSent, setEmailSent] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  // True for the brief window between a fresh signup succeeding and the
+  // browser actually navigating to Stripe Checkout -- window.location.href
+  // doesn't leave this page instantly, so without this the form would just
+  // sit there looking idle (or snap back to enabled) for that gap.
+  const [redirectingToCheckout, setRedirectingToCheckout] = useState(false);
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
@@ -89,7 +107,26 @@ export default function AuthPage({ onAuth }) {
         if (data.user && !data.session) {
           setEmailSent(true);
         } else if (data.session) {
-          onAuth(data.user);
+          // Last step to activate: send them straight to Stripe Checkout
+          // (30-day trial applied server-side -- see subscription.js's
+          // POST /checkout) instead of dropping them into the dashboard
+          // first. window.location.href doesn't navigate away instantly,
+          // so redirectingToCheckout keeps this screen showing a clear
+          // "taking you to checkout" state for that gap rather than
+          // leaving the form looking idle.
+          setRedirectingToCheckout(true);
+          try {
+            const res = await postCheckout(data.session.access_token);
+            window.location.href = res.url;
+            return;
+          } catch (checkoutErr) {
+            // Checkout session creation failed -- the account itself was
+            // still created successfully, so let them into the dashboard
+            // rather than stranding them on an error. They can start
+            // checkout again anytime from the Subscription tab.
+            setRedirectingToCheckout(false);
+            onAuth(data.user);
+          }
         }
       } else {
         const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
@@ -177,6 +214,27 @@ export default function AuthPage({ onAuth }) {
     );
   }
 
+  // ── Redirecting to checkout screen ──────────────────────────────────────────
+  if (redirectingToCheckout) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -160, right: -100, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
+        <div style={{ background: 'white', borderRadius: 22, padding: '52px 44px', maxWidth: 420, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)', textAlign: 'center' }}>
+          <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
+            <Loader2 size={32} color="#2563eb" strokeWidth={1.8} className="spin" />
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.3px' }}>Last step — activate your calculator</h2>
+          <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7, marginBottom: 4 }}>
+            Your account is created. We're taking you to a secure checkout page to activate Clean Estimator.
+          </p>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: '#2563eb', padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, marginTop: 14 }}>
+            <Zap size={13} /> 30 days free, then $25/month
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ── Forgot password screen ──────────────────────────────────────────────────
   if (mode === 'forgot') {
     return (
@@ -241,7 +299,7 @@ export default function AuthPage({ onAuth }) {
           {mode === 'login' ? 'Welcome back' : 'Create your account'}
         </h1>
         <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28, lineHeight: 1.5 }}>
-          {mode === 'login' ? 'Sign in to manage your widget, leads, and billing.' : '30-day free trial — no credit card required'}
+          {mode === 'login' ? 'Sign in to manage your widget, leads, and billing.' : 'Start your 30-day free trial'}
         </p>
 
         {/* Toggle */}
