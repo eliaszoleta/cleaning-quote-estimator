@@ -653,7 +653,7 @@ export default function WebsiteSubscription() {
                 'We review it and build your live website',
                 'You review the build before deciding anything',
                 `Like it? Approve it for just $${SETUP_FEE}`,
-                `Then get ${FREE_MONTHS} months free, $${selectedTier.price}/mo (${selectedTier.name}) after that`,
+                `Then get ${FREE_MONTHS} months free`,
               ].map((line, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
                   <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(96,165,250,0.2)', color: '#60a5fa', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
@@ -675,30 +675,6 @@ export default function WebsiteSubscription() {
                 style={{ position: 'absolute', left: '-9999px', top: 'auto', width: 1, height: 1, overflow: 'hidden' }}
               />
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 14, marginBottom: 14 }}>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Choose Your Plan *</label>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(140px, 100%), 1fr))', gap: 8 }}>
-                    {WEBSITE_PLAN_TIERS.map(tier => {
-                      const active = tier.id === selectedTierId;
-                      return (
-                        <button
-                          key={tier.id}
-                          type="button"
-                          onClick={() => setSelectedTierId(tier.id)}
-                          style={{
-                            textAlign: 'left', cursor: 'pointer', borderRadius: 10, padding: '10px 12px',
-                            background: active ? '#eff6ff' : 'white',
-                            border: active ? `1.5px solid ${PRIMARY}` : '1.5px solid #e2e8f0',
-                          }}
-                        >
-                          <div style={{ fontSize: 11.5, fontWeight: 800, color: active ? PRIMARY : '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{tier.name}</div>
-                          <div style={{ fontSize: 17, fontWeight: 900, color: '#0f172a' }}>${tier.price}<span style={{ fontSize: 11.5, fontWeight: 600, color: '#94a3b8' }}>/mo</span></div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <p style={{ fontSize: 11.5, color: '#94a3b8', margin: '8px 0 0' }}>{selectedTier.tagline} <a href="#pricing" style={{ color: PRIMARY, fontWeight: 600 }}>Compare plans ↑</a></p>
-                </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full Name *</label>
                   <input required style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Jane Smith" />
