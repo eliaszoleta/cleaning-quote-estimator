@@ -93,13 +93,13 @@ const HERO_GALLERY = [
   { src: '/images/marketing/hero-result-house-cleaning.png', alt: 'House cleaning estimate result' },
 ];
 
-// Browser chrome around an auto-advancing slideshow of real result
-// screenshots -- a live embedded instance kept fighting the fixed-height
-// frame (scroll or clipping depending on how it was sized), so crossfading
-// between plain images sidesteps that entirely. Fixed-height + object-fit
-// cover keeps the frame a constant size while the slides crossfade, even
-// though the screenshots themselves are different heights (a commercial
-// estimate's breakdown table is taller than a carpet one's).
+// Auto-advancing slideshow of real result screenshots -- no browser-chrome
+// wrapper around it, just the screenshots themselves crossfading, since the
+// fake "yourcompany.com" address bar implied a public website page when
+// these are actually internal results. Fixed-height + object-fit cover
+// keeps the frame a constant size while the slides crossfade, even though
+// the screenshots themselves are different heights (a commercial estimate's
+// breakdown table is taller than a carpet one's).
 function WidgetPreview() {
   const [index, setIndex] = useState(0);
 
@@ -112,45 +112,34 @@ function WidgetPreview() {
 
   return (
     <div className="ce-float" style={{ position: 'relative' }}>
-      <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: '0 30px 70px -20px rgba(2,6,23,0.55), 0 8px 20px rgba(2,6,23,0.25)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '11px 16px', background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fca5a5' }} />
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fcd34d' }} />
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#86efac' }} />
-          <div style={{ marginLeft: 10, flex: 1, background: 'white', border: '1px solid #e2e8f0', borderRadius: 6, padding: '4px 10px', fontSize: 11, color: '#94a3b8' }}>
-            yourcompany.com
-          </div>
-        </div>
+      <div style={{ position: 'relative', width: '100%', height: 'clamp(380px, 52vw, 520px)', borderRadius: 16, overflow: 'hidden', boxShadow: '0 30px 70px -20px rgba(2,6,23,0.55), 0 8px 20px rgba(2,6,23,0.25)' }}>
+        {HERO_GALLERY.map((img, i) => (
+          <img
+            key={img.src}
+            src={img.src}
+            alt={img.alt}
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              objectFit: 'cover', objectPosition: 'top center',
+              opacity: i === index ? 1 : 0,
+              transition: 'opacity 0.7s ease',
+            }}
+          />
+        ))}
+      </div>
 
-        <div style={{ position: 'relative', width: '100%', height: 'clamp(380px, 52vw, 520px)', background: '#f8fafc' }}>
-          {HERO_GALLERY.map((img, i) => (
-            <img
-              key={img.src}
-              src={img.src}
-              alt={img.alt}
-              style={{
-                position: 'absolute', inset: 0, width: '100%', height: '100%',
-                objectFit: 'cover', objectPosition: 'top center',
-                opacity: i === index ? 1 : 0,
-                transition: 'opacity 0.7s ease',
-              }}
-            />
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '12px 0', background: '#f8fafc', borderTop: '1px solid #f1f5f9' }}>
-          {HERO_GALLERY.map((img, i) => (
-            <button
-              key={img.src}
-              onClick={() => setIndex(i)}
-              aria-label={`Show slide ${i + 1}`}
-              style={{
-                width: i === index ? 16 : 6, height: 6, borderRadius: 3, border: 'none', padding: 0, cursor: 'pointer',
-                background: i === index ? PRIMARY : '#cbd5e1', transition: 'width 0.3s ease, background 0.3s ease',
-              }}
-            />
-          ))}
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 14 }}>
+        {HERO_GALLERY.map((img, i) => (
+          <button
+            key={img.src}
+            onClick={() => setIndex(i)}
+            aria-label={`Show slide ${i + 1}`}
+            style={{
+              width: i === index ? 16 : 6, height: 6, borderRadius: 3, border: 'none', padding: 0, cursor: 'pointer',
+              background: i === index ? PRIMARY : 'rgba(255,255,255,0.35)', transition: 'width 0.3s ease, background 0.3s ease',
+            }}
+          />
+        ))}
       </div>
 
       {/* Floating "instant result" chip -- intentionally doesn't show a
