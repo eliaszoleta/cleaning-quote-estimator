@@ -1,5 +1,4 @@
 import React from 'react';
-import { Zap } from 'lucide-react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
 import { postEstimateShare } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
@@ -11,7 +10,10 @@ import { supabase } from '../../../lib/supabase';
 // business's own staff a fast, accurate internal pricing tool. Reuses
 // CleaningCalculator wholesale (the same component the public widget and
 // Branding tab's live preview already use) via embedded+skipLeadCapture,
-// rather than building a second calculator from scratch.
+// rather than building a second calculator from scratch. Rendered full-page
+// by Calculator Mode in CompanyDashboard.js -- no header, no surrounding
+// copy, just the calculator card, mirroring how CalculatorPage.js presents
+// it on the public site.
 export default function RunEstimateTab({ config, user }) {
   // companyId has to be set on the companyConfig object handed to
   // CleaningCalculator -- POST /api/calculate only applies this company's
@@ -28,18 +30,8 @@ export default function RunEstimateTab({ config, user }) {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-          <Zap size={20} color="#2563eb" />
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px', margin: 0 }}>Run an Estimate</h2>
-        </div>
-        <p style={{ color: '#64748b', fontSize: 14, maxWidth: 640, lineHeight: 1.6 }}>
-          Run unlimited price estimates for your own quoting — using your real pricing, markup, and service settings. Nothing here is shown to a customer or saved as a lead; the result is yours alone, and you can email it to a coworker when you're done.
-        </p>
-      </div>
-
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(15,23,42,0.06)' }}>
+    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: 'clamp(24px, 5vw, 64px) 20px' }}>
+      <div style={{ width: '100%', maxWidth: 720, background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
         <CleaningCalculator
           companyConfig={companyConfig}
           embedded={true}

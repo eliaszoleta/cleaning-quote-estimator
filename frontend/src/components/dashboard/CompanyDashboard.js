@@ -20,7 +20,6 @@ import RunEstimateTab from './tabs/RunEstimateTab';
 
 const NAV = [
   { id: 'overview',      Icon: LayoutDashboard,   label: 'Dashboard' },
-  { id: 'runEstimate',   Icon: Zap,                label: 'Run an Estimate' },
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
   { id: 'leads',         Icon: Users,              label: 'Leads' },
   { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
@@ -35,6 +34,11 @@ const WALKTHROUGH_URL = '/book-a-call';
 
 export default function CompanyDashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
+  // Top-level switch, independent of the tab sidebar: 'widget' is today's
+  // full dashboard (sidebar + tabs), 'calculator' hides all of that and
+  // fills the page with nothing but the calculator itself, the same way it
+  // renders on the public site -- no tab chrome, no surrounding text.
+  const [viewMode, setViewMode] = useState('widget');
   // Which pane the Settings tab shows -- API Keys moved from its own
   // sidebar item into a sub-section of Settings, so this is what deep
   // links like ?tab=settings&section=api now target. Subscription is a
@@ -171,7 +175,6 @@ export default function CompanyDashboard({ user, onLogout }) {
 
   const TABS = {
     overview:     <OverviewTab {...tabProps} />,
-    runEstimate:  <RunEstimateTab config={config} user={user} />,
     help:         <HelpTab />,
     branding:     <BrandingTab config={localConfig} update={update} onSave={handleGlobalSave} saving={saving} saved={saved} />,
     services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} autoSave={autoSave} />,
@@ -216,6 +219,32 @@ export default function CompanyDashboard({ user, onLogout }) {
           </a>
         </div>
 
+        {/* Center: Widget Mode / Calculator Mode switch -- Widget Mode is
+            the full dashboard (sidebar + tabs) exactly as before; Calculator
+            Mode drops all of that and shows nothing but the calculator,
+            full-page, for running a quick internal estimate. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 24, padding: 3 }}>
+          {[
+            { id: 'widget', label: 'Widget Mode', Icon: Code2 },
+            { id: 'calculator', label: 'Calculator Mode', Icon: Zap },
+          ].map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              onClick={() => setViewMode(id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                background: viewMode === id ? '#2563eb' : 'transparent',
+                color: viewMode === id ? 'white' : '#94a3b8',
+                fontWeight: 700, fontSize: 12.5, whiteSpace: 'nowrap',
+                transition: 'background 0.15s, color 0.15s',
+              }}
+            >
+              <Icon size={13} /> {label}
+            </button>
+          ))}
+        </div>
+
         {/* Right: badge, save, user */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <a
@@ -245,25 +274,27 @@ export default function CompanyDashboard({ user, onLogout }) {
             </div>
           )}
 
-          <button
-            onClick={handleGlobalSave}
-            disabled={saving}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '7px 16px',
-              background: saving ? '#334155' : '#2563eb',
-              color: 'white', border: 'none', borderRadius: 7,
-              fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
-              fontSize: 13, transition: 'background 0.15s',
-            }}
-          >
-            {saving
-              ? <><Loader2 size={13} className="spin" /> Saving…</>
-              : <><Save size={13} /> Save Changes</>
-            }
-          </button>
+          {viewMode === 'widget' && (
+            <button
+              onClick={handleGlobalSave}
+              disabled={saving}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '7px 16px',
+                background: saving ? '#334155' : '#2563eb',
+                color: 'white', border: 'none', borderRadius: 7,
+                fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
+                fontSize: 13, transition: 'background 0.15s',
+              }}
+            >
+              {saving
+                ? <><Loader2 size={13} className="spin" /> Saving…</>
+                : <><Save size={13} /> Save Changes</>
+              }
+            </button>
+          )}
 
-          {saved && (
+          {viewMode === 'widget' && saved && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#4ade80', fontSize: 13, fontWeight: 600 }}>
               <Check size={14} strokeLinecap="square" strokeLinejoin="miter" /> Saved
             </div>
@@ -290,7 +321,12 @@ export default function CompanyDashboard({ user, onLogout }) {
         </div>
       </header>
 
-      {/* Nav -- left sidebar, sticky under the header. */}
+      {viewMode === 'calculator' ? (
+        /* Calculator Mode -- no sidebar, no tabs, nothing but the
+           calculator itself, same as the public site. */
+        <RunEstimateTab config={config} user={user} />
+      ) : (
+      /* Nav -- left sidebar, sticky under the header. */
       <div className="dash-main">
         <nav className="dash-nav">
           {NAV.map(({ id, Icon, label }) => (
@@ -390,6 +426,7 @@ export default function CompanyDashboard({ user, onLogout }) {
           </main>
         </div>
       </div>
+      )}
 
       {/* First-time welcome pointer -- shown exactly once, on the very
           first login after signup (see the `created` comment on
