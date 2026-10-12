@@ -169,7 +169,10 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
     recurringAnnualSavings: annualSavings,
     keyFactors: [
       { label: 'Home size', impact: sqftTier },
+      { label: 'Bedrooms', impact: String(bedrooms) },
+      { label: 'Bathrooms', impact: String(bathrooms) },
       { label: 'Cleaning type', impact: cleaningType },
+      { label: 'Condition', impact: condition },
       { label: 'Frequency', impact: frequency },
     ],
     disclaimer: null,
@@ -256,6 +259,7 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
     recurringAnnualSavings: annualSavings,
     keyFactors: [
       { label: 'Apartment size', impact: size },
+      { label: 'Bathrooms', impact: String(bathrooms) },
       { label: 'Cleaning type', impact: cleaningType },
       { label: 'Furnished', impact: furnished ? 'Yes' : 'No' },
     ],
@@ -353,6 +357,7 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
       { label: 'Building type', impact: buildingType },
       { label: 'Square footage', impact: sqft.toLocaleString() + ' sq ft' },
       { label: 'Restrooms', impact: String(restrooms) },
+      { label: 'Service level', impact: serviceLevel },
       { label: 'Frequency', impact: frequency },
     ],
     disclaimer: null,
@@ -513,9 +518,16 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
     recurringMonthlyLow: null,
     recurringMonthlyHigh: null,
     recurringAnnualSavings: null,
+    // Vent count and HVAC system count are only ever asked for a
+    // residential job (AirDuctStep.js shows a sqft slider instead for
+    // commercial) -- showing them here for a commercial quote would
+    // display a value the customer never actually saw or chose.
     keyFactors: [
       { label: 'Property type', impact: propertyType },
-      { label: 'Vent count', impact: ventCount.replace('_', '–') },
+      ...(propertyType === 'commercial' ? [] : [
+        { label: 'Vent count', impact: ventCount.replace('_', '–') },
+        { label: 'HVAC systems', impact: String(systemCount) },
+      ]),
       { label: 'Mold concern', impact: moldSuspected ? 'Yes (+surcharge)' : 'No' },
     ],
     disclaimer: moldSuspected ? 'Mold in ductwork requires professional inspection before remediation. Final pricing depends on extent of mold growth.' : null,
@@ -570,14 +582,22 @@ function calculateDryerVent(details, stateMultiplier, companyConfig) {
       adjustments.push({ label: `Vent type: ${ventType.replace(/_/g, ' ')}`, low: adj.low, high: adj.high });
     }
 
-    if (clogSuspected) {
-      range = addRange(range, DRYER_VENT_CLOG_ADDON);
-      const adj = applyMultiplier(DRYER_VENT_CLOG_ADDON, stateMultiplier * markup);
-      adjustments.push({ label: 'Clog removal', low: adj.low, high: adj.high });
-    }
-
     range = applyMultiplier(range, stateMultiplier * markup);
     basePriceDisplay = (DRYER_VENT_BASE.low + DRYER_VENT_BASE.high) / 2;
+  }
+
+  // Clog removal applies regardless of property type -- the calculator
+  // asks "Suspected clog?" (with "+$50-$100" shown as the expected cost)
+  // on both the residential and commercial branch of this step, but this
+  // surcharge used to live inside the residential-only branch above, so a
+  // commercial job with clogSuspected=true was silently charged nothing
+  // extra despite the frontend promising otherwise. Applied here, after
+  // both branches have already been fully state/markup-adjusted, so it's
+  // one consistent addon regardless of which branch produced `range`.
+  if (clogSuspected) {
+    const adj = applyMultiplier(DRYER_VENT_CLOG_ADDON, stateMultiplier * markup);
+    range = addRange(range, adj);
+    adjustments.push({ label: 'Clog removal', low: adj.low, high: adj.high });
   }
 
   if (multiUnit && dryerCount >= 10) {
@@ -599,8 +619,12 @@ function calculateDryerVent(details, stateMultiplier, companyConfig) {
     recurringMonthlyHigh: null,
     recurringAnnualSavings: null,
     keyFactors: [
-      { label: 'Vent length', impact: ventLength },
-      { label: 'Vent type', impact: ventType },
+      // Vent length/type are only ever asked on the residential branch of
+      // this step; dryer count is only ever asked on the commercial
+      // branch -- same reasoning as air duct's keyFactors above.
+      ...(propertyType === 'commercial'
+        ? [{ label: 'Dryers', impact: String(dryerCount) }]
+        : [{ label: 'Vent length', impact: ventLength }, { label: 'Vent type', impact: ventType }]),
       { label: 'Clog detected', impact: clogSuspected ? 'Yes' : 'No' },
     ],
     disclaimer: 'Clogged dryer vents are a leading cause of house fires. Regular cleaning (annually) is strongly recommended.',
@@ -745,6 +769,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     recurringAnnualSavings: null,
     keyFactors: [
       { label: 'Affected area', impact: affectedSize },
+      { label: 'Property type', impact: propertyType },
       { label: 'Mold type', impact: moldType },
       { label: 'Moisture source', impact: sourceFixed === 'yes' ? 'Fixed' : sourceFixed === 'not_fixed' ? 'Still leaking' : 'Unknown' },
       { label: 'Locations', impact: locations.join(', ') },
@@ -774,9 +799,16 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
 
   // Extraction + drying scales with the actual affected sq ft (from the calculator's area
   // slider) instead of quoting every job the same flat range, floored at a small-loss minimum.
+  const sqftExtractionLow = sqft * WATER_EXTRACTION_DRYING_PER_SQFT.low;
+  const sqftExtractionHigh = sqft * WATER_EXTRACTION_DRYING_PER_SQFT.high;
+  // Whether the small-loss floor, not the sqft-scaled amount, is what's
+  // actually driving this line -- same number either way, but the label
+  // below says so instead of silently presenting a floored minimum as if
+  // it were sqft-derived.
+  const minimumApplied = sqftExtractionLow < WATER_EXTRACTION_DRYING_MINIMUM.low || sqftExtractionHigh < WATER_EXTRACTION_DRYING_MINIMUM.high;
   const rawExtraction = {
-    low: Math.max(sqft * WATER_EXTRACTION_DRYING_PER_SQFT.low, WATER_EXTRACTION_DRYING_MINIMUM.low),
-    high: Math.max(sqft * WATER_EXTRACTION_DRYING_PER_SQFT.high, WATER_EXTRACTION_DRYING_MINIMUM.high),
+    low: Math.max(sqftExtractionLow, WATER_EXTRACTION_DRYING_MINIMUM.low),
+    high: Math.max(sqftExtractionHigh, WATER_EXTRACTION_DRYING_MINIMUM.high),
   };
 
   let range = {
@@ -785,7 +817,7 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
   };
   range = applyMultiplier(range, stateMultiplier * markup);
 
-  const adjustments = [{ label: 'Water extraction + drying (3–5 days)', low: range.low, high: range.high }];
+  const adjustments = [{ label: `Water extraction + drying (3–5 days)${minimumApplied ? ' -- small-loss minimum applied' : ''}`, low: range.low, high: range.high }];
 
   if (damageClass === 'wet_walls' || damageClass === 'structural') {
     const adj = applyMultiplier({ ...WATER_STRUCTURAL_DRYING_ADDON }, stateMultiplier * markup);
@@ -840,6 +872,7 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
       { label: 'Water category', impact: waterCategory + ' water' },
       { label: 'Cause', impact: cause.replace(/_/g, ' ') },
       { label: 'Affected area', impact: `${sqft.toLocaleString()} sq ft` },
+      { label: 'Damage class', impact: damageClass.replace(/_/g, ' ') },
       { label: 'Time elapsed', impact: whenHappened },
       { label: 'Insurance', impact: hasInsurance ? 'May be covered' : 'Out of pocket' },
     ],
