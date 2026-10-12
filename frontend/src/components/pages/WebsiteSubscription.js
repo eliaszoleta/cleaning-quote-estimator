@@ -469,7 +469,7 @@ export default function WebsiteSubscription() {
       <div id="pricing" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: '#f8fafc' }}>
         <div style={{ maxWidth: 1040, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>3 Plans, Zero Risk</h2>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>3 Plans, Zero Risk, 2 Months FREE</h2>
             <p style={{ fontSize: 15, color: '#64748b' }}>Just ${SETUP_FEE} to start. {FREE_MONTHS} months free on any plan. Pick the plan below, or change it in the form.</p>
           </div>
 
