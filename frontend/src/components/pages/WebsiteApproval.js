@@ -6,11 +6,12 @@ import {
   postWebsiteRequestCheckout,
   postWebsiteRequestVerifySetup,
 } from '../../utils/api';
+import { getTierById } from '../../data/websitePricingTiers';
 
 const PRIMARY_GRADIENT = '#1d4ed8';
 const SETUP_FEE = 5;
 const FREE_MONTHS = 2;
-const MONTHLY_PRICE = 249;
+const DEFAULT_TIER_ID = 'pro';
 
 // The "Get a Website" approval + payment page -- /website-approval/:token,
 // linked from the sample-ready email (see services/email.js's
@@ -20,8 +21,8 @@ const MONTHLY_PRICE = 249;
 // reviewing their free sample, then ONE Stripe Checkout redirect that
 // charges the $5 setup fee directly on Stripe's own hosted page (including
 // any 3D Secure challenge, handled entirely by Stripe before it ever
-// redirects back here -- no custom confirmation step needed). The $249/mo
-// trial subscription itself isn't created here at all -- an admin sets it
+// redirects back here -- no custom confirmation step needed). The per-tier
+// (Starter/Growth/Pro) trial subscription itself isn't created here at all -- an admin sets it
 // up by hand in Stripe once the fee is paid (see routes/admin.js), so
 // 'approved' is a real, if temporary, end state from this page's point of
 // view, not something a button on this page advances.
@@ -125,6 +126,9 @@ export default function WebsiteApproval({ token }) {
     );
   }
 
+  const tier = getTierById(request?.planTier || DEFAULT_TIER_ID) || getTierById(DEFAULT_TIER_ID);
+  const monthlyPrice = tier.price;
+
   return (
     <>
       <Helmet>
@@ -191,8 +195,8 @@ export default function WebsiteApproval({ token }) {
                 <div style={{ fontSize: 12, fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>What happens when you approve</div>
                 {[
                   { label: 'Today', desc: `$${SETUP_FEE} one-time setup fee` },
-                  { label: `Months 1-${FREE_MONTHS}`, desc: 'Completely free' },
-                  { label: `Month ${FREE_MONTHS + 1}+`, desc: `$${MONTHLY_PRICE}/mo flat, cancel anytime` },
+                  { label: `Months 1-${FREE_MONTHS}`, desc: `Completely free (${tier.name} plan)` },
+                  { label: `Month ${FREE_MONTHS + 1}+`, desc: `$${monthlyPrice}/mo flat, cancel anytime` },
                 ].map((step, i) => (
                   <div key={step.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0' }}>
                     <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#e2e8f0', color: '#475569', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
@@ -222,7 +226,7 @@ export default function WebsiteApproval({ token }) {
               <CheckCircle2 size={40} color="#16a34a" style={{ marginBottom: 14 }} />
               <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>You're approved!</h1>
               <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                Your $5 setup fee for {request.business} is paid. We'll have your {FREE_MONTHS} months free trial up and running shortly — you won't be charged again until month 3 (${MONTHLY_PRICE}/mo), and we'll email you once it's live.
+                Your $5 setup fee for {request.business} is paid. We'll have your {FREE_MONTHS} months free trial on the {tier.name} plan up and running shortly — you won't be charged again until month 3 (${monthlyPrice}/mo), and we'll email you once it's live.
               </p>
             </>
           )}
@@ -232,7 +236,7 @@ export default function WebsiteApproval({ token }) {
               <CheckCircle2 size={40} color="#16a34a" style={{ marginBottom: 14 }} />
               <h1 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>You're all set!</h1>
               <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, margin: 0 }}>
-                Your subscription for {request.business} is active. Your first {FREE_MONTHS} months are completely free — after that it's a flat ${MONTHLY_PRICE}/month, cancel anytime. We'll be in touch shortly to finish setting up your live site and domain.
+                Your {tier.name} plan subscription for {request.business} is active. Your first {FREE_MONTHS} months are completely free — after that it's a flat ${monthlyPrice}/month, cancel anytime. We'll be in touch shortly to finish setting up your live site and domain.
               </p>
             </>
           )}

@@ -524,9 +524,13 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 // the real trial length/price live in Stripe itself (the admin sets both
 // when manually creating each client's subscription; see the PATCH route's
 // stripe_subscription_id handling), these just need to match what's quoted
-// on the pricing page and the $5 receipt (routes/websiteRequest.js).
+// on the pricing page and the $5 receipt (routes/websiteRequest.js). Price
+// depends on which of the 3 tiers this request selected -- keep in sync
+// with routes/websiteRequest.js's PLAN_TIERS and
+// frontend/src/data/websitePricingTiers.js.
 const WEBSITE_TRIAL_DAYS = 60;
-const WEBSITE_MONTHLY_PRICE = 249;
+const WEBSITE_TIER_PRICES = { starter: 97, growth: 179, pro: 249 };
+const WEBSITE_DEFAULT_TIER = 'pro';
 
 // GET /api/admin/website-requests
 router.get('/website-requests', async (req, res) => {
@@ -676,7 +680,7 @@ router.patch('/website-requests/:id', async (req, res) => {
         name: updated.name,
         business: updated.business,
         trialDays: WEBSITE_TRIAL_DAYS,
-        monthlyPrice: WEBSITE_MONTHLY_PRICE,
+        monthlyPrice: WEBSITE_TIER_PRICES[updated.plan_tier] || WEBSITE_TIER_PRICES[WEBSITE_DEFAULT_TIER],
       }).catch(err => console.error('sendWebsiteSubscriptionConfirmedEmail failed:', err.message));
     }
 

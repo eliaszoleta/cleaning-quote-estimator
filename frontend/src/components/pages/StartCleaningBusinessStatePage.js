@@ -144,7 +144,7 @@ export default function StartCleaningBusinessStatePage({ slug }) {
           <div style={{ background: 'linear-gradient(135deg, #ea580c, #c2410c)', borderRadius: 12, padding: '18px 24px', marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <div style={{ color: 'white' }}>
               <div style={{ fontWeight: 700, fontSize: 15 }}>Get your {state.name} cleaning business online</div>
-              <div style={{ fontSize: 13, opacity: 0.9 }}>$5 setup · 2 months free · then $249/mo</div>
+              <div style={{ fontSize: 13, opacity: 0.9 }}>$5 setup · 2 months free · plans from $97/mo</div>
             </div>
             <a href="/website-for-cleaning-companies" style={{ background: 'white', color: '#c2410c', padding: '10px 20px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 14, whiteSpace: 'nowrap' }}>
               Get a Free Website →

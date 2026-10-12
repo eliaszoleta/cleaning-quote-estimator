@@ -4,6 +4,10 @@ import { getAdminWebsiteRequests, createAdminWebsiteRequest, patchAdminWebsiteRe
 import { formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 import { theme, cardStyle, inputStyle, labelStyle, secondaryBtnStyle, primaryBtnStyle, dangerBtnStyle, pill, avatarGradient, PageHeader } from './adminTheme';
+import { getTierById } from '../../data/websitePricingTiers';
+
+const DEFAULT_TIER_ID = 'pro';
+const tierOf = (row) => getTierById(row?.plan_tier || DEFAULT_TIER_ID) || getTierById(DEFAULT_TIER_ID);
 
 const STATUS_META = {
   submitted: { label: 'Submitted', color: '#64748b' },
@@ -20,7 +24,7 @@ const EMPTY_ADD_FORM = { name: '', business: '', email: '', phone: '', business_
 // apply form) -- previously email-only (see routes/websiteRequest.js), now a
 // real list so a sample build + a sample_url can be attached, which notifies
 // the prospect with their /website-approval/:token link (the $5-setup/
-// 2-months-free/$249-month-3 approve-and-pay flow). Mirrors
+// 2-months-free/plan-price-month-3 approve-and-pay flow). Mirrors
 // AdminHomepageLeads.js's list/detail/key-gate pattern.
 // adminKey comes from the shared login in AdminDashboard.js (the
 // consolidated /admin shell) -- this component no longer manages its own
@@ -187,8 +191,9 @@ export default function AdminWebsiteRequests({ adminKey }) {
     }
   };
 
-  // Links the $249/mo trial subscription an admin created by hand in the
-  // Stripe Dashboard (see WEBSITE_TRIAL_DAYS/WEBSITE_MONTHLY_PRICE in
+  // Links the per-tier trial subscription (price depends on which of the 3
+  // plans this request selected) an admin created by hand in the Stripe
+  // Dashboard (see WEBSITE_TRIAL_DAYS/WEBSITE_TIER_PRICES in
   // routes/admin.js) -- the backend verifies the id actually exists in
   // Stripe and belongs to this request's customer before trusting it, so a
   // typo or pasted-the-wrong-id mistake surfaces here instead of silently
@@ -396,8 +401,9 @@ export default function AdminWebsiteRequests({ adminKey }) {
                         </div>
                       </div>
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ ...pill(meta.color, `${meta.color}18`), marginBottom: 3 }}>
-                          {meta.label}
+                        <div style={{ display: 'flex', gap: 5, justifyContent: 'flex-end', marginBottom: 3 }}>
+                          <div style={pill(theme.accentSolid, `${theme.accentSolid}18`)}>{tierOf(r).name}</div>
+                          <div style={pill(meta.color, `${meta.color}18`)}>{meta.label}</div>
                         </div>
                         <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>{formatDateTime(r.created_at)}</div>
                       </div>
@@ -417,7 +423,10 @@ export default function AdminWebsiteRequests({ adminKey }) {
                     {selected.business ? selected.business[0].toUpperCase() : '?'}
                   </div>
                   <div>
-                    <h3 style={{ fontWeight: 800, fontSize: 16, color: theme.textPrimary, marginBottom: 2 }}>{selected.business}</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <h3 style={{ fontWeight: 800, fontSize: 16, color: theme.textPrimary, marginBottom: 2 }}>{selected.business}</h3>
+                      <div style={pill(theme.accentSolid, `${theme.accentSolid}18`)}>{tierOf(selected).name} &middot; ${tierOf(selected).price}/mo</div>
+                    </div>
                     <div style={{ fontSize: 12, color: theme.textMuted }}>{selected.name} · {formatDateTime(selected.created_at)}</div>
                   </div>
                 </div>
@@ -460,8 +469,8 @@ export default function AdminWebsiteRequests({ adminKey }) {
               )}
 
               {/* Billing status -- read-only summary of where this request
-                  is in the $5-setup / 2-months-free / $249-month-3 flow.
-                  Switches to the canceled styling once canceled_at is set,
+                  is in the $5-setup / 2-months-free / month-3-at-plan-price
+                  flow. Switches to the canceled styling once canceled_at is set,
                   rather than just appending a canceled line to an otherwise
                   still-green "active" box. */}
               {(selected.setup_fee_paid_at || selected.subscription_started_at) && (
@@ -469,21 +478,22 @@ export default function AdminWebsiteRequests({ adminKey }) {
                   <div style={{ fontWeight: 700, fontSize: 11.5, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Billing</div>
                   <div style={{ background: selected.canceled_at ? theme.contentBg : '#f0fdf4', border: `1px solid ${selected.canceled_at ? theme.border : '#bbf7d0'}`, borderRadius: theme.radiusMd, padding: '11px 13px', display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {selected.setup_fee_paid_at && <div style={{ fontSize: 12.5, color: selected.canceled_at ? theme.textMuted : '#15803d', fontWeight: 600 }}>$5 setup fee paid {formatDateTime(selected.setup_fee_paid_at)}</div>}
-                    {selected.subscription_started_at && <div style={{ fontSize: 12.5, color: selected.canceled_at ? theme.textMuted : '#15803d', fontWeight: 600 }}>Subscription {selected.canceled_at ? 'started' : 'active since'} {formatDateTime(selected.subscription_started_at)} (2 months free, then $249/mo)</div>}
+                    {selected.subscription_started_at && <div style={{ fontSize: 12.5, color: selected.canceled_at ? theme.textMuted : '#15803d', fontWeight: 600 }}>Subscription {selected.canceled_at ? 'started' : 'active since'} {formatDateTime(selected.subscription_started_at)} (2 months free, then ${tierOf(selected).price}/mo on {tierOf(selected).name})</div>}
                     {selected.canceled_at && <div style={{ fontSize: 12.5, color: '#dc2626', fontWeight: 600 }}>Canceled {formatDateTime(selected.canceled_at)}</div>}
                   </div>
                 </div>
               )}
 
               {/* Shown once the $5 fee is paid but no subscription is linked
-                  yet -- the $249/mo trial itself is created by hand in the
+                  yet -- the trial itself (price depends on their selected
+                  tier) is created by hand in the
                   Stripe Dashboard (60-day trial, their saved card), then
                   pasted in here to activate the client and notify them. */}
               {selected.status === 'approved' && (
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 11.5, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Link Subscription</div>
                   <p style={{ fontSize: 11.5, color: theme.textMuted, margin: '0 0 8px', lineHeight: 1.5 }}>
-                    Create their $249/mo subscription in Stripe (60-day trial, using their saved card), then paste the subscription ID here to activate and notify them.
+                    They requested the <strong>{tierOf(selected).name}</strong> plan (${tierOf(selected).price}/mo). Create their subscription in Stripe at that price (60-day trial, using their saved card), then paste the subscription ID here to activate and notify them.
                   </p>
                   <div style={{ display: 'flex', gap: 7 }}>
                     <input

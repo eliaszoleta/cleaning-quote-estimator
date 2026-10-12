@@ -5,7 +5,18 @@ const { sendWebsiteRequestNotificationEmail, sendWebsiteRequestReceivedEmail } =
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 const SETUP_FEE_CENTS = 500; // $5
-const MONTHLY_PRICE_CENTS = 24900; // $249 -- quoted in the $5 receipt's description only; the actual $249/mo trial subscription itself is created manually by an admin in Stripe (see routes/admin.js)
+
+// The 3 plan tiers offered on WebsiteSubscription.js -- price is quoted in
+// the $5 receipt's description only (see checkout route below); the actual
+// $X/mo trial subscription itself is created manually by an admin in Stripe
+// (see routes/admin.js), using whichever tier this request's plan_tier says.
+// Keep these prices in sync with frontend/src/data/websitePricingTiers.js.
+const PLAN_TIERS = {
+  starter: { name: 'Starter', priceCents: 9700 },
+  growth: { name: 'Growth', priceCents: 17900 },
+  pro: { name: 'Pro', priceCents: 24900 },
+};
+const DEFAULT_PLAN_TIER = 'pro';
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -39,6 +50,7 @@ router.post('/', async (req, res) => {
     businessAddress, serviceAreas,
     hasDomain, domain1, domain2, domain3,
     currentWebsite, facebookPage, message,
+    planTier,
     website2, // honeypot -- real visitors never see or fill this field
   } = req.body || {};
 
@@ -54,6 +66,10 @@ router.post('/', async (req, res) => {
   if (!currentWebsite && !facebookPage) {
     return res.status(400).json({ success: false, error: 'Please provide your current website or Facebook page/profile.' });
   }
+  if (planTier && !PLAN_TIERS[planTier]) {
+    return res.status(400).json({ success: false, error: 'Invalid plan tier.' });
+  }
+  const resolvedPlanTier = planTier || DEFAULT_PLAN_TIER;
 
   let saved = false;
   const sb = getSupabase();
@@ -73,6 +89,7 @@ router.post('/', async (req, res) => {
         current_website: currentWebsite || null,
         facebook_page: facebookPage || null,
         message: message || null,
+        plan_tier: resolvedPlanTier,
       });
       if (error) console.error('website_requests insert failed:', error.message);
       else saved = true;
@@ -97,6 +114,9 @@ router.post('/', async (req, res) => {
       businessAddress, serviceAreas,
       hasDomain, domain1, domain2, domain3,
       currentWebsite, facebookPage, message,
+      planTier: resolvedPlanTier,
+      planName: PLAN_TIERS[resolvedPlanTier].name,
+      planPrice: PLAN_TIERS[resolvedPlanTier].priceCents / 100,
     });
     if (!sent) console.warn('Website request notification email did not send for:', email);
     res.json({ success: true });
@@ -117,6 +137,7 @@ function toPublicRequest(row) {
     status: row.status,
     sampleUrl: row.sample_url || null,
     createdAt: row.created_at,
+    planTier: row.plan_tier || DEFAULT_PLAN_TIER,
     setupFeePaidAt: row.setup_fee_paid_at || null,
     subscriptionStartedAt: row.subscription_started_at || null,
   };
@@ -201,6 +222,7 @@ router.post('/by-token/:token/checkout', async (req, res) => {
 
     const stripe = getStripe();
     const customerId = await getOrCreateCustomer(stripe, sb, request);
+    const tier = PLAN_TIERS[request.plan_tier] || PLAN_TIERS[DEFAULT_PLAN_TIER];
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -211,15 +233,15 @@ router.post('/by-token/:token/checkout', async (req, res) => {
           currency: 'usd',
           unit_amount: SETUP_FEE_CENTS,
           product_data: {
-            name: 'Clean Estimator — Cleaning Website Setup Fee',
-            description: `First 2 months free, then $${MONTHLY_PRICE_CENTS / 100}/month starting month 3. Cancel anytime.`,
+            name: `Clean Estimator — Cleaning Website Setup Fee (${tier.name} plan)`,
+            description: `First 2 months free, then $${tier.priceCents / 100}/month starting month 3. Cancel anytime.`,
           },
         },
         quantity: 1,
       }],
       payment_intent_data: {
         receipt_email: request.email,
-        description: `Website setup fee — first 2 months free, then $${MONTHLY_PRICE_CENTS / 100}/month starting month 3. Cancel anytime.`,
+        description: `Website setup fee (${tier.name} plan) — first 2 months free, then $${tier.priceCents / 100}/month starting month 3. Cancel anytime.`,
         setup_future_usage: 'off_session',
         metadata: { type: 'website_request_setup', requestId: request.id },
       },

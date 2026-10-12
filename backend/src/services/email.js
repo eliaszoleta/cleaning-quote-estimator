@@ -870,14 +870,20 @@ function buildWebsiteRequestDomainLines({ hasDomain, currentWebsite, domain1, do
 // "Not provided"/"None" placeholder when left blank -- so the notification
 // always shows the complete shape of what was submitted, and nothing an
 // applicant left blank is silently missing versus one they filled in.
+function fmtPlanLine({ planName, planPrice }) {
+  return planName ? `Plan selected: ${planName} ($${planPrice}/mo after the 2 free months)` : null;
+}
+
 function buildWebsiteRequestText(args) {
   const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
   const domainLines = buildWebsiteRequestDomainLines(args);
+  const planLine = fmtPlanLine(args);
 
   const lines = [
     'New website + chatbot application!',
     '',
     `${name} (${business}) just applied for a Done-For-You cleaning website.`,
+    ...(planLine ? ['', planLine] : []),
     '',
     'Contact info:',
     `  Email: ${email}`,
@@ -906,6 +912,7 @@ function buildWebsiteRequestText(args) {
 function buildWebsiteRequestHtml(args) {
   const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
   const domainLines = buildWebsiteRequestDomainLines(args);
+  const planLine = fmtPlanLine(args);
 
   const contactRows = labeledRows([
     `Email: ${email}`,
@@ -926,6 +933,8 @@ function buildWebsiteRequestHtml(args) {
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
     <strong>${name}</strong> (${business}) just applied for a Done-For-You cleaning website.
   </p>
+
+  ${planLine ? `<p style="font-size:14px;line-height:1.6;margin:0 0 20px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;"><strong>${planLine}</strong></p>` : ''}
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
   <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${contactRows}</table>
@@ -966,7 +975,7 @@ async function sendWebsiteRequestNotificationEmail(args) {
         from: `Clean Estimator <${fromAddress}>`,
         to: [notifyEmail],
         reply_to: args.email || undefined,
-        subject: `New website application — ${args.business || args.name} — ${fmtSubjectTimestamp()}`,
+        subject: `New website application${args.planName ? ` (${args.planName})` : ''} — ${args.business || args.name} — ${fmtSubjectTimestamp()}`,
         html: buildWebsiteRequestHtml(args),
         text: buildWebsiteRequestText(args),
       },

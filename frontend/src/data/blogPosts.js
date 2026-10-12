@@ -5572,7 +5572,7 @@ Cleaning is genuinely one of the lower-cost service businesses to start — but 
 | Core cleaning equipment | $270 | $670 | See our [full equipment checklist](/blog/cleaning-business-equipment-supplies-checklist) |
 | First month of supplies | $75 | $140 | Ongoing monthly cost |
 | Business license (local) | $25 | $150 | One-time or annual, depends on jurisdiction |
-| Website | $0 | $249 | A [done-for-you website](/website-for-cleaning-companies) runs $5 upfront + $249/month after a 2-month free trial, vs. building one yourself for free |
+| Website | $0 | $97 | A [done-for-you website](/website-for-cleaning-companies) runs $5 upfront + plans from $97/month after a 2-month free trial, vs. building one yourself for free |
 | First-month marketing | $100 | $500 | Google Business Profile is free; this covers optional paid boosts, flyers, etc. |
 | **Total realistic range** | **~$560** | **~$2,320** | |
 
@@ -5610,7 +5610,7 @@ Insurance and bonding, and a real website. Both directly affect whether clients 
 **How much should I keep in reserve before quitting a day job to do this full-time?**
 A common rule of thumb is 3–6 months of personal living expenses in reserve, on top of the startup costs above — cleaning businesses can ramp client volume reasonably quickly, but it's rarely instant.
 
-[Get a professional website for a $5 setup fee — 2 months free, then $249/mo →](/website-for-cleaning-companies)
+[Get a professional website for a $5 setup fee — 2 months free, plans from $97/mo →](/website-for-cleaning-companies)
     `,
   },
   {
@@ -5958,7 +5958,7 @@ A simple, clear one-page agreement covering scope, pricing, cancellation policy,
 ## 9. Set Up Your Online Presence
 
 - **Claim your Google Business Profile** — free, and often the first thing a prospective client checks.
-- **Get a real website** — a [done-for-you website](/website-for-cleaning-companies) gets you online with a $5 setup fee, 2 months free, then $249/month, including a built-in instant estimate calculator so visitors get a real price before they ever call you.
+- **Get a real website** — a [done-for-you website](/website-for-cleaning-companies) gets you online with a $5 setup fee, 2 months free, then plans from $97/month, including a built-in instant estimate calculator so visitors get a real price before they ever call you.
 
 ## 10. Decide How You'll Staff Growth
 
