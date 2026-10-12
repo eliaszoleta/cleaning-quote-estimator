@@ -471,7 +471,7 @@ export default function WebsiteSubscription() {
         <div style={{ maxWidth: 1040, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
             <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>3 Plans, Zero Risk, 2 Months FREE</h2>
-            <p style={{ fontSize: 15, color: '#64748b' }}>We build your site first — once you approve it for just ${SETUP_FEE}, you get {FREE_MONTHS} months free on any plan, and your first real charge isn't until month {FREE_MONTHS + 1}.</p>
+            <p style={{ fontSize: 15, color: '#64748b' }}>We build your site first — if you like it, you can approve it to go live for just ${SETUP_FEE}. You get {FREE_MONTHS} months free on any plan, and your first real charge isn't until month {FREE_MONTHS + 1}.</p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 18, marginBottom: 32 }}>
