@@ -110,6 +110,15 @@ export async function getCompanyLeads(token, includeDeleted = false) {
   return apiFetch(`/api/company-leads/company${includeDeleted ? '?deleted=true' : ''}`, { headers: { Authorization: `Bearer ${token}` } });
 }
 
+// "Run an Estimate" tab's "Share via email" action -- re-computes the
+// estimate server-side from the same inputs and emails it to `to`. No lead
+// is saved and no company-notification email fires.
+export async function postEstimateShare(token, payload) {
+  return apiFetch('/api/estimate-share', {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload),
+  });
+}
+
 export async function patchLead(token, leadId, updates) {
   return apiFetch(`/api/company-leads/company/${leadId}`, {
     method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(updates),

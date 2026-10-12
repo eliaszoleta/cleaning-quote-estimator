@@ -31,13 +31,14 @@ router.get('/status', async (req, res) => {
 // POST /api/subscription/checkout
 router.post('/checkout', async (req, res) => {
   const companyId = req.user.id;
-  const priceId = process.env.STRIPE_PRICE_ID;
-  if (!priceId) return res.status(500).json({ success: false, error: 'Stripe pricing not configured' });
 
   try {
     const stripe = getStripe();
     const config = (await getCompanyConfig(companyId)) || {};
     const existingCustomerId = config.subscription?.stripeCustomerId;
+
+    const priceId = process.env.STRIPE_PRICE_ID;
+    if (!priceId) return res.status(500).json({ success: false, error: 'Stripe pricing not configured' });
 
     // No Stripe-side trial here -- the 30-day free trial is app-managed
     // (subscription.trialStartedAt, started at signup in company.js, see

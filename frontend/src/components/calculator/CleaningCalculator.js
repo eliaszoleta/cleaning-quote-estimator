@@ -64,9 +64,19 @@ const DETAIL_STEP_COMPONENT = {
   water_damage: WaterDamageStep,
 };
 
-const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Send', 'Results'];
+// Maps a step id to its progress-bar label -- indexed by step name rather
+// than position, so it stays correct whether or not 'lead' is actually
+// present in `steps` (see skipLeadCapture below). Every per-service detail
+// step (home/apartment/commercial/...) shares the 'Details' label.
+function labelForStep(step) {
+  if (step === 'service') return 'Service';
+  if (step === 'location') return 'Location';
+  if (step === 'lead') return 'Send';
+  if (step === 'results') return 'Results';
+  return 'Details';
+}
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null }) {
   const cardRef = useRef(null);
   // Measures the card's own rendered width, not window.innerWidth -- this
   // renders both in a real <iframe width="100%"> embed (where window IS
@@ -85,7 +95,18 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const steps = serviceType ? SERVICE_STEPS[serviceType] : ['service'];
+  // Skips the lead-capture step entirely when the company has it disabled
+  // (ServicesTab.js's "Enable Lead Capture" toggle) or the caller forces it
+  // off (skipLeadCapture -- the dashboard's own "Run an Estimate" tab,
+  // where there's no outside visitor to capture). Filtering `steps` itself
+  // here is what actually keeps the step unreachable -- a previous version
+  // only filtered a separate, display-only array used for the progress bar,
+  // so the real lead step still showed up in normal navigation regardless
+  // of either toggle.
+  const enableLead = !skipLeadCapture && companyConfig?.enableLeadCapture !== false;
+  const steps = serviceType
+    ? (enableLead ? SERVICE_STEPS[serviceType] : SERVICE_STEPS[serviceType].filter(s => s !== 'lead'))
+    : ['service'];
   const currentStep = steps[stepIndex];
 
   useEffect(() => {
@@ -173,12 +194,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     goNext();
   };
 
-  const handleDetailsNext = (details) => {
-    setServiceDetails(details);
-    goNext();
-  };
-
-  const handleLeadNext = async (lead) => {
+  // Shared by the normal (lead-capture) flow and the skip-lead flow below.
+  // Takes `detailsOverride` rather than always reading the `serviceDetails`
+  // state, because the skip-lead caller invokes this in the same tick as
+  // setServiceDetails(details) -- that state update hasn't committed yet,
+  // so reading `serviceDetails` here would still see the previous value.
+  const runCalculation = async (lead, detailsOverride) => {
+    const effectiveDetails = detailsOverride || serviceDetails;
     setLeadInfo(lead);
     setError(null);
     setLoading(true);
@@ -196,7 +218,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         // calculation engine actually uses), just stashed in
         // serviceDetails' existing free-form JSONB column as lead
         // context, no schema change needed.
-        serviceDetails: location.city ? { ...serviceDetails, city: location.city } : serviceDetails,
+        serviceDetails: location.city ? { ...effectiveDetails, city: location.city } : effectiveDetails,
         companyId: companyConfig?.companyId || null,
         leadInfo: lead?.email ? lead : null,
         partnerInfo: partnerMatch,
@@ -219,6 +241,19 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     }
   };
 
+  const handleLeadNext = (lead) => runCalculation(lead);
+
+  const handleDetailsNext = (details) => {
+    setServiceDetails(details);
+    if (enableLead) {
+      goNext();
+    } else {
+      // No lead step to trigger the calculation from in this flow --
+      // run it directly off the details just submitted.
+      runCalculation(null, details);
+    }
+  };
+
   const handleReset = () => {
     setServiceType(null);
     setStepIndex(0);
@@ -232,15 +267,9 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // Branding from companyConfig (or defaults)
   const primaryColor = companyConfig?.primaryColor || '#2563eb';
   const companyName = companyConfig?.companyName || null;
-  const enableLead = companyConfig?.enableLeadCapture !== false;
   const customQuestions = companyConfig?.customLeadQuestions || [];
 
-  // If lead capture disabled, skip lead step
-  const effectiveSteps = !enableLead
-    ? steps.filter(s => s !== 'lead')
-    : steps;
-
-  const progressStep = Math.min(stepIndex, 4);
+  const progressStep = Math.min(stepIndex, steps.length - 1);
 
   // Results page. On a siteLanding page (our own standalone calculator
   // pages) the wizard steps stay flush/embedded inside the page's own card,
@@ -279,6 +308,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           embedded={embedded && !siteLanding}
           onReset={handleReset}
           demoPartner={demoPartner}
+          onShareEmail={onShareEmail ? (email) => onShareEmail({ to: email, serviceType, zip: location.zip || null, state: location.state || null, serviceDetails }) : undefined}
         />
       </div>
     );
@@ -351,19 +381,19 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           {currentStep !== 'service' && currentStep !== 'results' && (
             <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, padding: '16px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                {PROGRESS_LABELS.slice(0, effectiveSteps.length).map((label, i) => (
-                  <span key={label} style={{
+                {steps.map((step, i) => (
+                  <span key={step} style={{
                     fontSize: 12, fontWeight: 600,
                     color: i <= progressStep ? primaryColor : COLORS.muted,
                   }}>
-                    {label}
+                    {labelForStep(step)}
                   </span>
                 ))}
               </div>
               <div style={{ height: 4, background: COLORS.border, borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%',
-                  width: `${(progressStep / (effectiveSteps.length - 1)) * 100}%`,
+                  width: `${(progressStep / (steps.length - 1)) * 100}%`,
                   background: primaryColor,
                   borderRadius: 2,
                   transition: 'width 0.3s ease',

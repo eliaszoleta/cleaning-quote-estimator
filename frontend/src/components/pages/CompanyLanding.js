@@ -1,9 +1,9 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
-  Palette, ClipboardList, MapPin, Settings, Code2, Key, Check, Star,
-  BellRing, Send, Quote, ShieldCheck, Zap, ArrowRight, Rocket, Sparkles, Tag,
-  Building2,
+  ClipboardList, MapPin, Settings, Check, Star,
+  Quote, ShieldCheck, Zap, ArrowRight, Rocket, Sparkles, Tag,
+  Building2, TrendingDown, Filter, Mail, Code2, Lock, Send,
 } from 'lucide-react';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
@@ -11,45 +11,54 @@ import NoWebsiteBanner from '../ui/NoWebsiteBanner';
 
 const PRIMARY = '#1d4ed8';
 
+// One plan, one accurate pricing engine -- used internally by default, with
+// a website widget included for anyone who also wants public lead capture.
 const FEATURES = [
-  { Icon: Palette,       color: '#7c3aed', bg: '#f5f3ff', title: 'White-label branding',       desc: 'Your logo, colors, and call-to-action text. Visitors never see the Clean Estimator name.' },
-  { Icon: ClipboardList, color: '#2563eb', bg: '#eff6ff', title: 'Every lead is 100% yours',    desc: 'Name, email, phone, timeline, and the exact price they were quoted — stored permanently in your own dashboard. Never shared with other cleaners, never resold, never visible to anyone but you.' },
-  { Icon: BellRing,      color: '#dc2626', bg: '#fef2f2', title: 'Instant lead alerts — zero setup', desc: "The moment someone gets an estimate on your site, you get an email with their name, phone, and full price breakdown. No CRM, no Zapier, nothing to configure — it works the day you embed the widget." },
-  { Icon: Send,          color: '#0d9488', bg: '#f0fdfa', title: 'Every estimate email is branded as yours', desc: "Visitors get a follow-up email carrying your logo, your phone number, and your call-to-action — not ours. Every completed estimate is another touchpoint with your business sitting in their inbox." },
-  { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',   desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
-  { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',  desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
-  { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Easy to embed',               desc: 'Paste the embed code to add the calculator to any website, Wix, Squarespace, or WordPress.' },
-  { Icon: Key,           color: '#d97706', bg: '#fffbeb', title: 'API for CRM sync',            desc: 'Already have a CRM? Pull leads via REST API into HubSpot, Salesforce, or any tool using Zapier or Make — optional, on top of the email alerts you get by default.' },
+  { Icon: Zap,           color: '#7c3aed', bg: '#f5f3ff', title: 'Unlimited internal calculations', desc: 'Run as many estimates as you need, every month, with no per-quote cost.' },
+  { Icon: Lock,          color: '#1d4ed8', bg: '#eff6ff', title: 'Instant result, nothing public',  desc: "See the number immediately on your own screen — it's never shown to a customer unless you decide to share it." },
+  { Icon: Send,          color: '#0d9488', bg: '#f0fdfa', title: 'Email a result to a coworker',    desc: 'One click sends a specific estimate to a teammate\'s inbox — no shared logins needed.' },
+  { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',       desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
+  { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',      desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
+  { Icon: ClipboardList, color: '#2563eb', bg: '#fdf4ff', title: 'All 9 service calculators',       desc: 'Regular cleaning, deep clean, move-out, Airbnb turnover, post-construction, and more.' },
+  { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Website widget included',         desc: 'Want public lead capture too? The same plan includes an embeddable, white-label widget for your site — no upgrade required.' },
+];
+
+// Why we moved away from pitching a public price-range widget as the
+// default: showing a customer a minimum price before they've even talked
+// to you invites exactly the lowballing a business owner doesn't want.
+const PROBLEMS = [
+  { Icon: TrendingDown, color: '#dc2626', bg: '#fef2f2', title: 'Customers negotiate toward the floor', desc: 'Show someone a "$249–$319" range and they\'ll push for $249 every time — even on jobs that should price higher.' },
+  { Icon: Filter,       color: '#d97706', bg: '#fffbeb', title: 'A public price invites tire-kickers',  desc: 'Price-shoppers who were never going to book will happily grab a number and move on to the next cheaper quote.' },
+  { Icon: ShieldCheck,  color: '#16a34a', bg: '#f0fdf4', title: 'Keep pricing power on your side',       desc: 'Run the numbers yourself, quote with confidence, and only show a price when you decide to.' },
 ];
 
 const STEPS = [
-  { n: '1', Icon: Rocket,       color: '#1d4ed8', bg: '#eff6ff', title: 'Sign up',               desc: 'Create your account and start your 30-day free trial — no credit card required.' },
-  { n: '2', Icon: Palette,      color: '#7c3aed', bg: '#f5f3ff', title: 'Customize your widget', desc: 'Add your logo, set your brand colors, configure which services you offer, and write your CTA.' },
-  { n: '3', Icon: Code2,        color: '#0891b2', bg: '#ecfeff', title: 'Embed on your site',    desc: "Copy the embed code and paste it anywhere on your website. That's it." },
-  { n: '4', Icon: BellRing,     color: '#dc2626', bg: '#fef2f2', title: 'Capture leads',         desc: 'Watch leads flow in. Manage them in your dashboard or sync to your CRM.' },
+  { n: '1', Icon: Rocket,   color: '#1d4ed8', bg: '#eff6ff', title: 'Sign up',               desc: 'Create your account and start your 30-day free trial — no credit card required.' },
+  { n: '2', Icon: Settings, color: '#7c3aed', bg: '#f5f3ff', title: 'Set your pricing',       desc: 'Add your markup, minimum charges, and service area so every estimate reflects your real numbers.' },
+  { n: '3', Icon: Zap,      color: '#ea580c', bg: '#fff7ed', title: 'Run instant estimates',  desc: 'Get an accurate number the moment you need one — for your own quoting, not a public page.' },
+  { n: '4', Icon: Code2,    color: '#0891b2', bg: '#ecfeff', title: 'Embed it too, if you want', desc: "Want leads coming straight from your website? Paste the same widget's embed code anytime — it's included." },
 ];
 
 const TESTIMONIALS = [
-  { name: 'Sarah M.',  company: 'Sparkle Cleaning Services — Austin, TX', text: "We've been using Clean Estimator for 4 months and it's generated 47 qualified leads. Conversion rate is way higher than our contact form because visitors are pre-qualified." },
-  { name: 'James R.',  company: 'Pro Restoration Group — Denver, CO',      text: 'The water damage and mold calculators are exactly what we needed. Customers come in already understanding the price range, so there\'s less sticker shock on-site.' },
-  { name: 'Maria L.',  company: 'Crystal Clean Commercial — Miami, FL',    text: "Setup took about 20 minutes. The embed is seamless — my website visitors don't even realize it's a third-party tool." },
+  { name: 'Daniel K.', company: 'KeyStone Cleaning Co. — Columbus, OH',  text: "We stopped showing customers a price range. I run the numbers myself in two minutes flat and text over a confident quote — no more haggling from the bottom of a range." },
+  { name: 'Sarah M.',  company: 'Sparkle Cleaning Services — Austin, TX', text: "We embedded it on our site too and it's generated 47 qualified leads in 4 months. Conversion rate is way higher than our contact form because visitors are pre-qualified." },
+  { name: 'Maria L.',  company: 'Crystal Clean Commercial — Miami, FL',  text: "Setup took about 20 minutes. The embed is seamless — my website visitors don't even realize it's a third-party tool." },
 ];
 
 const PLAN_FEATURES = [
-  'Unlimited calculator sessions',
-  'White-label branding',
-  'Every lead 100% yours, never shared',
-  'Instant email alerts on every lead',
-  'Branded follow-up emails to visitors',
-  'API access',
+  'Unlimited internal price calculations using your own pricing',
+  'Instant result on screen — never a public price range',
+  'Email a result to a coworker in one click',
+  'ZIP-code accurate pricing & per-service markup control',
   'All 9 service calculators',
-  'CSV export',
-  'Priority support',
+  'Website widget included, if/when you want public lead capture',
+  'Automatic lead capture + instant email alerts when you use the widget',
+  'API access for CRM sync',
 ];
 
 const TRUST_BADGES = [
   { Icon: ShieldCheck, text: 'No credit card required for trial' },
-  { Icon: Zap,          text: 'Live on your site in 30 minutes' },
+  { Icon: Zap,          text: 'Live in under 30 minutes' },
   { Icon: Check,        text: 'Cancel anytime' },
 ];
 
@@ -87,24 +96,27 @@ function WidgetPreview() {
         </div>
         <img
           src="/images/marketing/service-form.png"
-          alt="Clean Estimator widget — pick a service step"
+          alt="Clean Estimator — pick a service step"
           style={{ display: 'block', width: '100%', height: 'auto' }}
         />
       </div>
 
-      {/* Floating lead-alert chip */}
+      {/* Floating "instant result" chip -- intentionally doesn't show a
+          price, since the whole point of the Internal Estimator (now the
+          primary pitch on this page) is that the number stays off any
+          public-facing screen. */}
       <div style={{
         position: 'absolute', left: -18, bottom: -22, display: 'flex', alignItems: 'center', gap: 10,
         background: 'white', borderRadius: 12, padding: '11px 16px 11px 12px',
         boxShadow: '0 14px 32px -8px rgba(2,6,23,0.35)', border: '1px solid #f1f5f9',
       }}>
-        <div style={{ width: 30, height: 30, borderRadius: 8, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <BellRing size={14} color="#dc2626" strokeWidth={2.2} />
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Zap size={14} color="#2563eb" strokeWidth={2.2} />
         </div>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>New lead: Sarah M.</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>Estimate ready</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10.5, color: '#94a3b8' }}>
-            <span className="ce-pulse-dot" /> just now &middot; $249&ndash;$319 quoted
+            <span className="ce-pulse-dot" /> calculated in 2 seconds &middot; yours alone
           </div>
         </div>
       </div>
@@ -116,8 +128,8 @@ export default function CompanyLanding() {
   return (
     <>
       <Helmet>
-        <title>Embed a Cleaning Cost Calculator on Your Website | Clean Estimator for Companies</title>
-        <meta name="description" content="Add a branded cleaning cost estimator to your website. Capture leads, customize pricing, white-label branding. 30-day free trial, no credit card required. $97/month." />
+        <title>Internal Cleaning Price Estimator for Cleaning Companies | Clean Estimator</title>
+        <meta name="description" content="An internal pricing tool for cleaning businesses. Run unlimited accurate estimates with your own markup and minimum charges, instantly on screen — with a website widget included if you also want public lead capture. $25/month, 30-day free trial." />
         <link rel="canonical" href="https://www.cleanestimator.com/estimator" />
       </Helmet>
       <div className="app">
@@ -143,18 +155,18 @@ export default function CompanyLanding() {
                   For cleaning companies
                 </span>
                 <h1 style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px', color: 'white' }}>
-                  Give every homeowner an instant cleaning estimate<br />
-                  <span style={{ color: '#60a5fa' }}>on your website</span>
+                  Price every job right<br />
+                  <span style={{ color: '#60a5fa' }}>without tipping your hand</span>
                 </h1>
                 <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.65 }}>
-                  Capture more leads, reduce tire-kickers, and close more jobs with a white-label estimator that works 24/7 — and emails you the second someone's ready to book.
+                  Clean Estimator is an internal pricing tool for cleaning businesses: unlimited accurate estimates using your own markup and minimum charges, ready the second you click. Want a public-facing version for your website too? It's included — no separate plan to buy.
                 </p>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                   <a href="/company" className="ce-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
                     Start Free Trial <Arrow size={16} />
                   </a>
-                  <a href="https://www.cleanestimator.com/#services" className="ce-btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,255,255,0.07)', color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 15.5, border: '1px solid rgba(255,255,255,0.15)' }}>
-                    See Demo
+                  <a href="#pricing" className="ce-btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,255,255,0.07)', color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600, fontSize: 15.5, border: '1px solid rgba(255,255,255,0.15)' }}>
+                    See Pricing
                   </a>
                 </div>
               </div>
@@ -181,12 +193,22 @@ export default function CompanyLanding() {
             </div>
           </div>
 
-          {/* Features */}
+          {/* The "why" -- makes the case for keeping pricing internal before
+              the page asks for a sale, since that's the actual strategic
+              shift this redesign represents. */}
           <div style={{ padding: 'clamp(40px, 9vw, 84px) 20px', maxWidth: 1120, margin: '0 auto' }}>
-            <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Everything you need</h2>
-            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>No technical skills required. Set up in under 30 minutes.</p>
+            <div style={{ textAlign: 'center', marginBottom: 14 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fef2f2', color: '#dc2626', padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', border: '1px solid #fecaca' }}>
+                <Lock size={12} />
+                Why go internal
+              </span>
+            </div>
+            <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>A public price range works against you</h2>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)', maxWidth: 640, marginLeft: 'auto', marginRight: 'auto' }}>
+              That's why most companies on Clean Estimator now run pricing internally instead of publishing it.
+            </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
-              {FEATURES.map(({ Icon, color, bg, title, desc }) => (
+              {PROBLEMS.map(({ Icon, color, bg, title, desc }) => (
                 <div key={title} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
                   <FeatureIcon Icon={Icon} color={color} bg={bg} />
                   <h3 style={{ fontSize: 15.5, fontWeight: 700, color: '#0f172a', margin: '16px 0 8px' }}>{title}</h3>
@@ -196,14 +218,28 @@ export default function CompanyLanding() {
             </div>
           </div>
 
+          {/* Features -- the shared pricing engine both plans run on. */}
+          <div style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
+            <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+              <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>One accurate pricing engine, two ways to use it</h2>
+              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)', maxWidth: 560, marginLeft: 'auto', marginRight: 'auto' }}>Keep it internal, or put it on your website — the calculations underneath are the same either way.</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
+                {FEATURES.map(({ Icon, color, bg, title, desc }) => (
+                  <div key={title} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
+                    <FeatureIcon Icon={Icon} color={color} bg={bg} />
+                    <h3 style={{ fontSize: 15.5, fontWeight: 700, color: '#0f172a', margin: '16px 0 8px' }}>{title}</h3>
+                    <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.65, margin: 0 }}>{desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* How it works -- an icon+number "stepper" badge per card (icon
               says what the step is, the small numbered dot says where it
               falls in the sequence) with a connecting arrow between cards
-              on wide screens, instead of a bare numbered square. Reuses the
-              Features grid's own icon/color pairings (Palette, Code2,
-              BellRing) so the same icon means the same thing in both
-              places on this page. */}
-          <div style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', position: 'relative', overflow: 'hidden' }}>
+              on wide screens, instead of a bare numbered square. */}
+          <div style={{ padding: 'clamp(40px, 9vw, 84px) 20px', position: 'relative', overflow: 'hidden' }}>
             <div aria-hidden="true" style={{ position: 'absolute', top: -80, right: '8%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.08), transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ maxWidth: 1120, margin: '0 auto', position: 'relative' }}>
               <div style={{ textAlign: 'center', marginBottom: 14 }}>
@@ -240,31 +276,30 @@ export default function CompanyLanding() {
           </div>
 
           {/* Testimonials */}
-          <div style={{ padding: 'clamp(40px, 9vw, 84px) 20px', maxWidth: 1120, margin: '0 auto' }}>
-            <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 'clamp(24px, 5vw, 44px)', letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
-              {TESTIMONIALS.map(t => (
-                <div key={t.name} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
-                  <Quote size={20} color="#dbeafe" fill="#dbeafe" style={{ marginBottom: 10 }} />
-                  <div style={{ display: 'flex', gap: 2, marginBottom: 12 }}>
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} size={14} color="#f59e0b" fill="#f59e0b" />
-                    ))}
+          <div style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', padding: 'clamp(40px, 9vw, 84px) 20px' }}>
+            <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+              <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 'clamp(24px, 5vw, 44px)', letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
+                {TESTIMONIALS.map(t => (
+                  <div key={t.name} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
+                    <Quote size={20} color="#dbeafe" fill="#dbeafe" style={{ marginBottom: 10 }} />
+                    <div style={{ display: 'flex', gap: 2, marginBottom: 12 }}>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} size={14} color="#f59e0b" fill="#f59e0b" />
+                      ))}
+                    </div>
+                    <p style={{ fontSize: 14.5, color: '#374151', lineHeight: 1.7, marginBottom: 18 }}>{t.text}</p>
+                    <div style={{ fontWeight: 700, fontSize: 13.5, color: '#0f172a' }}>{t.name}</div>
+                    <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 2 }}>{t.company}</div>
                   </div>
-                  <p style={{ fontSize: 14.5, color: '#374151', lineHeight: 1.7, marginBottom: 18 }}>{t.text}</p>
-                  <div style={{ fontWeight: 700, fontSize: 13.5, color: '#0f172a' }}>{t.name}</div>
-                  <div style={{ fontSize: 12.5, color: '#64748b', marginTop: 2 }}>{t.company}</div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Pricing + closing CTA, merged into one section -- these used to
-              be two separate full-bleed blocks each ending in its own big
-              blue button, which read as a hard-sell "buy now, then buy
-              again" pattern rather than a normal SaaS pricing section. One
-              section, one plan, one call to action. */}
-          <div id="pricing" style={{ background: '#f8fafc', padding: 'clamp(40px, 9vw, 84px) 20px', borderTop: '1px solid #e2e8f0', position: 'relative', overflow: 'hidden' }}>
+          {/* Pricing + closing CTA, merged into one section -- one plan, one
+              call to action, same as before the two-way split was tried. */}
+          <div id="pricing" style={{ padding: 'clamp(40px, 9vw, 84px) 20px', position: 'relative', overflow: 'hidden' }}>
             <div aria-hidden="true" style={{ position: 'absolute', top: -60, left: '4%', width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.07), transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ maxWidth: 980, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 56, alignItems: 'center', position: 'relative' }}>
 
@@ -275,7 +310,7 @@ export default function CompanyLanding() {
                 </span>
                 <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, color: '#0f172a', marginBottom: 14, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
                 <p style={{ color: '#64748b', fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: 400 }}>
-                  One plan, everything included, no surprises. Built for independent cleaning companies who want more booked jobs from their own website.
+                  One plan, everything included, no surprises. Run it as your internal pricing tool from day one — add the website widget whenever you're ready, at no extra cost.
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, maxWidth: 420 }}>
                   {TRUST_BADGES.map(({ Icon, text }) => (
@@ -292,15 +327,19 @@ export default function CompanyLanding() {
               <div className="ce-card" style={{ ...cardStyle, borderRadius: 14, padding: 0, overflow: 'hidden' }}>
                 <div style={{ height: 3, background: 'linear-gradient(90deg, #3b82f6, #818cf8)' }} />
                 <div style={{ padding: '30px 28px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                    <Lock size={16} color={PRIMARY} />
+                    <span style={{ fontWeight: 800, fontSize: 16.5, color: '#0f172a' }}>Internal Estimator</span>
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: 6 }}>
-                    <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$97</span>
+                    <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$25</span>
                     <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
                   </div>
                   <div style={{ color: '#64748b', fontSize: 13, marginBottom: 22 }}>After your 30-day free trial &middot; cancel anytime</div>
                   <ul style={{ listStyle: 'none', padding: 0, marginBottom: 24, textAlign: 'left' }}>
                     {PLAN_FEATURES.map(item => (
-                      <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10, fontSize: 14, color: '#374151' }}>
-                        <span style={{ width: 17, height: 17, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <li key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 10, fontSize: 14, color: '#374151', lineHeight: 1.4 }}>
+                        <span style={{ width: 17, height: 17, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                           <Check size={10} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" />
                         </span>
                         {item}
@@ -314,6 +353,9 @@ export default function CompanyLanding() {
               </div>
 
             </div>
+            <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12.5, marginTop: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <Mail size={13} /> Questions? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a> and we'll help you get set up.
+            </p>
           </div>
 
         </main>
@@ -322,7 +364,7 @@ export default function CompanyLanding() {
 
       {/* Small, tasteful motion only -- a hover lift on cards/badges, an
           arrow nudge on buttons, a slow idle float on the hero mockup, and
-          a live-status pulse on its "new lead" chip. Respects
+          a live-status pulse on its "instant result" chip. Respects
           prefers-reduced-motion. */}
       <style>{`
         .ce-hero-grid { grid-template-columns: minmax(320px, 1fr) minmax(440px, 560px); }

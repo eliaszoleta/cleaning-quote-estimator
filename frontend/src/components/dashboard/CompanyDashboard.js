@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
   Users, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle, Percent,
-  Globe, X, CalendarClock, CreditCard,
+  Globe, X, CalendarClock, CreditCard, Zap,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout } from '../../utils/api';
@@ -16,9 +16,11 @@ import LeadsTab from './tabs/LeadsTab';
 import SettingsTab from './tabs/SettingsTab';
 import SubscriptionTab from './tabs/SubscriptionTab';
 import HelpTab from './tabs/HelpTab';
+import RunEstimateTab from './tabs/RunEstimateTab';
 
 const NAV = [
   { id: 'overview',      Icon: LayoutDashboard,   label: 'Dashboard' },
+  { id: 'runEstimate',   Icon: Zap,                label: 'Run an Estimate' },
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
   { id: 'leads',         Icon: Users,              label: 'Leads' },
   { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
@@ -126,6 +128,7 @@ export default function CompanyDashboard({ user, onLogout }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id]);
 
+
   const loadSubStatus = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -168,6 +171,7 @@ export default function CompanyDashboard({ user, onLogout }) {
 
   const TABS = {
     overview:     <OverviewTab {...tabProps} />,
+    runEstimate:  <RunEstimateTab config={config} user={user} />,
     help:         <HelpTab />,
     branding:     <BrandingTab config={localConfig} update={update} onSave={handleGlobalSave} saving={saving} saved={saved} />,
     services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} autoSave={autoSave} />,

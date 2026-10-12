@@ -8,6 +8,7 @@ const calculateRouter = require('./routes/calculate');
 const companyRouter = require('./routes/company');
 const authRouter = require('./routes/auth');
 const subscriptionRouter = require('./routes/subscription');
+const estimateShareRouter = require('./routes/estimateShare');
 const leadsRouter = require('./routes/leads');
 const partnerCheckoutRouter = require('./routes/partnerCheckout');
 const adminRouter = require('./routes/admin');
@@ -239,6 +240,17 @@ app.use('/api/chat', chatWidgetRouter);
 app.use('/api/company', companyRouter);
 app.use('/api/subscription', requireAuth, subscriptionRouter);
 app.use('/api/company-leads', requireAuth, leadsRouter);
+// "Run an Estimate" dashboard tab's "Share via email" action -- a logged-in
+// company sending one of their own computed estimates to a coworker, not a
+// public lead-capture path. Own modest rate limit since a compromised
+// session shouldn't be able to hammer email sends through it.
+app.use('/api/estimate-share', requireAuth, rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}), estimateShareRouter);
 
 // ─── Partner self-service routes ──────────────────────────────────────────────
 // requireAuth is applied inside client.js itself (every route there needs

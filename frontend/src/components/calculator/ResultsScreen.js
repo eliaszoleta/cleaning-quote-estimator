@@ -6,10 +6,32 @@ import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import PartnerCard from '../partners/PartnerCard';
 import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 
-export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner }) {
+export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner, onShareEmail }) {
   const [shared, setShared] = useState(false);
   const [partner, setPartner] = useState(null);
   const rootRef = useRef(null);
+
+  // "Email to Coworker" -- only ever passed by the dashboard's "Run an
+  // Estimate" tab (see CompanyRunEstimateTab.js), so this button and its
+  // inline form only appear there, independent of `embedded` (unlike the
+  // copy-a-link Share button below, which is a public-site-only feature and
+  // stays gated on !embedded).
+  const [shareEmailOpen, setShareEmailOpen] = useState(false);
+  const [shareEmailValue, setShareEmailValue] = useState('');
+  const [shareEmailStatus, setShareEmailStatus] = useState(''); // '' | 'sending' | 'sent' | 'error'
+
+  const submitShareEmail = async () => {
+    if (!shareEmailValue.trim() || !onShareEmail || shareEmailStatus === 'sending') return;
+    setShareEmailStatus('sending');
+    try {
+      await onShareEmail(shareEmailValue.trim());
+      setShareEmailStatus('sent');
+      setShareEmailValue('');
+      setTimeout(() => { setShareEmailOpen(false); setShareEmailStatus(''); }, 2000);
+    } catch {
+      setShareEmailStatus('error');
+    }
+  };
 
   // Scrolling the window to y=0 assumed the results were at the top of the
   // page, which is true for the standalone /results flow but not for a
@@ -240,7 +262,35 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 <Printer size={14} /> Print
               </button>
             )}
+            {onShareEmail && (
+              <button onClick={() => setShareEmailOpen(v => !v)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', border: `1.5px solid ${COLORS.border}`, borderRadius: RADIUS.sm, background: COLORS.surface, cursor: 'pointer', fontWeight: 600, fontSize: 13.5, color: '#374151' }}>
+                <Mail size={14} /> Email to Coworker
+              </button>
+            )}
           </div>
+
+          {onShareEmail && shareEmailOpen && (
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginTop: 12 }}>
+              <input
+                type="email"
+                value={shareEmailValue}
+                onChange={e => setShareEmailValue(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && submitShareEmail()}
+                placeholder="coworker@email.com"
+                style={{ padding: '9px 14px', borderRadius: RADIUS.sm, border: `1.5px solid ${COLORS.border}`, fontSize: 13.5, minWidth: 220 }}
+              />
+              <button
+                onClick={submitShareEmail}
+                disabled={shareEmailStatus === 'sending' || !shareEmailValue.trim()}
+                style={{ padding: '9px 18px', borderRadius: RADIUS.sm, border: 'none', background: primaryColor, color: 'white', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', opacity: (shareEmailStatus === 'sending' || !shareEmailValue.trim()) ? 0.6 : 1 }}
+              >
+                {shareEmailStatus === 'sending' ? 'Sending…' : shareEmailStatus === 'sent' ? 'Sent!' : 'Send'}
+              </button>
+              {shareEmailStatus === 'error' && (
+                <span style={{ fontSize: 12.5, color: COLORS.danger, alignSelf: 'center' }}>Failed to send — try again.</span>
+              )}
+            </div>
+          )}
 
           {!embedded && (
             <p style={{ textAlign: 'center', fontSize: 11.5, color: COLORS.muted, marginTop: 16, maxWidth: 520, margin: '16px auto 0' }}>
