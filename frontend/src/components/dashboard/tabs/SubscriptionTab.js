@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Zap, AlertTriangle, Globe, Paintbrush, Users, SlidersHorizontal, KeyRound, BarChart3, Phone, Infinity, Check, Loader2, Lock } from 'lucide-react';
+import { CheckCircle2, Zap, AlertTriangle, Globe, Users, SlidersHorizontal, KeyRound, Send, ClipboardList, Infinity, Loader2, Lock } from 'lucide-react';
 import { postCheckout, postPortal } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 
+// Mirrors CompanyLanding.js's PLAN_FEATURES -- one plan, pitched primarily
+// as an internal pricing tool, with the website widget included rather
+// than a separate, pricier upsell.
 const FEATURES = [
-  { Icon: Globe,             text: 'Embeddable estimator widget on your website' },
-  { Icon: Paintbrush,        text: 'Custom branding — colors, logo, CTA text' },
-  { Icon: Users,             text: 'Lead capture & CRM dashboard' },
-  { Icon: SlidersHorizontal, text: 'Per-service enable/disable and markup control' },
-  { Icon: KeyRound,          text: 'API access for CRM integration' },
-  { Icon: BarChart3,         text: 'Lead analytics and CSV export' },
-  { Icon: Phone,             text: 'Priority support' },
-  { Icon: Infinity,          text: 'Unlimited estimator sessions per month' },
+  { Icon: Infinity,          text: 'Unlimited internal price calculations using your own pricing' },
+  { Icon: Lock,              text: 'Instant result on screen — never a public price range' },
+  { Icon: Send,              text: 'Email a result to a coworker in one click' },
+  { Icon: SlidersHorizontal, text: 'ZIP-code accurate pricing & per-service markup control' },
+  { Icon: ClipboardList,     text: 'All 9 service calculators' },
+  { Icon: Globe,             text: 'Website widget included, if/when you want public lead capture' },
+  { Icon: Users,             text: 'Automatic lead capture + instant email alerts when you use the widget' },
+  { Icon: KeyRound,          text: 'API access for CRM sync' },
 ];
 
 export default function SubscriptionTab({ subStatus, onSubRefresh }) {
@@ -133,7 +136,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
       {/* Pricing */}
       <div style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)', border: '1px solid #bfdbfe', borderRadius: 7, padding: '20px 22px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginBottom: 4 }}>
-          <span style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>$97</span>
+          <span style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>$25</span>
           <span style={{ fontSize: 14, color: '#64748b', fontWeight: 500 }}>/month</span>
         </div>
         <div style={{ fontSize: 13, color: '#64748b', display: 'flex', alignItems: 'center', gap: 5 }}>Cancel anytime. &nbsp;·&nbsp; <Lock size={12} color="#64748b" /> Secure billing via Stripe</div>
