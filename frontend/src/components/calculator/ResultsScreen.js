@@ -211,7 +211,12 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
               {showPartnerCard && <PartnerCard partner={effectivePartner} />}
 
-              {!showPartnerCard && (
+              {/* "Ready to book" / contact-us card only makes sense when a
+                  customer is looking at someone else's estimate -- in
+                  Calculator Mode (onShareEmail only ever passed there, same
+                  signal the Email-to-Coworker button above uses) the viewer
+                  IS the business, so there's no one to contact. */}
+              {!showPartnerCard && !onShareEmail && (
                 <div style={{ background: embedded && companyName ? `${primaryColor}08` : COLORS.surfaceMuted, border: `1px solid ${embedded && companyName ? primaryColor + '28' : COLORS.border}`, borderRadius: RADIUS.md, padding: '18px 20px' }}>
                   <div style={{ fontWeight: 700, fontSize: 15, color: COLORS.ink, marginBottom: 4 }}>
                     {companyName ? `Ready to book with ${companyName}?` : 'Ready to get real quotes?'}
