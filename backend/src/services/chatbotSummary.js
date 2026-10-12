@@ -73,6 +73,17 @@ async function summarizeConversation(conversationId) {
   const transcript = transcriptText(conversation.messages);
   if (!transcript) return false;
 
+  // For a returning visitor, fold their existing summary into the prompt
+  // and ask for an UPDATED one rather than summarizing this conversation
+  // in isolation -- a short "is Friday still open?" follow-up shouldn't
+  // wipe out the carpet-cleaning/timeline/address details a prior, longer
+  // conversation already established. Still only ever one summary stored
+  // (chatbot_leads.last_summary is overwritten, not appended to) -- no
+  // version history, just the current best understanding of this lead.
+  const priorSummaryBlock = lead.last_summary
+    ? `This visitor has an existing summary from a previous conversation:\n${lead.last_summary}\n\nUpdate it based on this new conversation: keep anything still accurate, change anything that's changed (e.g. urgency, what they need, timeline), and add anything new. Don't just summarize the new conversation alone -- produce the single best current summary of this lead.\n\n`
+    : '';
+
   let parsed;
   try {
     const response = await anthropic.messages.create({
@@ -81,7 +92,7 @@ async function summarizeConversation(conversationId) {
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SUMMARY_SCHEMA } },
       messages: [{
         role: 'user',
-        content: `Summarize this live-chat conversation between a cleaning-company chatbot and a visitor, for the business's sales team. Visitor: ${lead.name}.\n\n${transcript}`,
+        content: `${priorSummaryBlock}Summarize this live-chat conversation between a cleaning-company chatbot and a visitor, for the business's sales team. Visitor: ${lead.name}.\n\n${transcript}`,
       }],
     });
     const textBlock = response.content.find(b => b.type === 'text');
