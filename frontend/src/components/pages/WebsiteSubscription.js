@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Globe, Search, PhoneMissed, Sparkles } from 'lucide-react';
+import { Globe, Search, PhoneMissed, Sparkles, ChevronDown } from 'lucide-react';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { postWebsiteRequest } from '../../utils/api';
 import { WEBSITE_PLAN_TIERS, getTierById } from '../../data/websitePricingTiers';
@@ -191,6 +191,7 @@ export default function WebsiteSubscription() {
   const [error, setError] = useState('');
   const [selectedTierId, setSelectedTierId] = useState(DEFAULT_TIER_ID);
   const selectedTier = getTierById(selectedTierId) || getTierById(DEFAULT_TIER_ID);
+  const [openFaqIndex, setOpenFaqIndex] = useState(-1);
   const [form, setForm] = useState({
     name: '', business: '', email: '', phone: '', servicesOffered: [], otherServices: '',
     businessAddress: '', serviceAreas: '',
@@ -619,12 +620,26 @@ export default function WebsiteSubscription() {
               { q: 'Can I use a domain I already own?', a: "Yes. If you already have a domain, we'll use it. If not, we'll help you pick one and get it set up as part of onboarding." },
               { q: 'Is there a setup fee?', a: `Just a $${SETUP_FEE} one-time setup fee once you approve your build — that's it, on any plan. Your first ${FREE_MONTHS} months are completely free, and you're only billed starting month ${FREE_MONTHS + 1} (${WEBSITE_PLAN_TIERS.map(t => `$${t.price}/mo on ${t.name}`).join(', ')}).` },
               { q: 'How long until my website build is ready?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your business and review your application. Your site goes fully live on your domain once you approve the build and subscribe." },
-            ].map((item, i) => (
-              <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)' }}>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 8 }}>{item.q}</div>
-                <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{item.a}</div>
-              </div>
-            ))}
+            ].map((item, i) => {
+              const open = openFaqIndex === i;
+              return (
+                <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)', overflow: 'hidden' }}>
+                  <button
+                    onClick={() => setOpenFaqIndex(open ? -1 : i)}
+                    aria-expanded={open}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '18px 22px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                  >
+                    <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{item.q}</span>
+                    <ChevronDown size={18} color="#94a3b8" style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+                  </button>
+                  {open && (
+                    <div style={{ padding: '0 22px 18px' }}>
+                      <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{item.a}</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
