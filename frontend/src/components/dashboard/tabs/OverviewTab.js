@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, CalendarDays, DollarSign, Globe, Inbox, Paintbrush, Code2, CreditCard } from 'lucide-react';
 import { getCompanyLeads } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
-import { formatPrice, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
+import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
 export default function OverviewTab({ config, subStatus, user }) {
@@ -25,8 +25,17 @@ export default function OverviewTab({ config, subStatus, user }) {
 
   const recentLeads = leads.slice(0, 5);
   const thisMonth = leads.filter(l => new Date(l.created_at) > new Date(Date.now() - 30 * 86400000));
-  const avgEstimate = leads.length > 0
-    ? leads.reduce((s, l) => s + ((l.estimated_price_low || 0) + (l.estimated_price_high || 0)) / 2, 0) / leads.length
+  // Commercial leads are quoted as a recurring MONTHLY total, every other
+  // service as a flat one-time price (see calculateCommercial's unit:
+  // 'per_month' vs. everything else's unit: 'flat') -- averaging those
+  // together would blend two different units into one number that means
+  // nothing (a single $6,000/mo commercial lead could make a company's
+  // typical $150 house-cleaning lead look like it averages $1,000+). This
+  // stat is scoped to one-time-quote leads only, which is what "Avg
+  // Estimate" reads as to someone scanning the dashboard.
+  const oneTimeLeads = leads.filter(l => l.service_type !== 'commercial');
+  const avgEstimate = oneTimeLeads.length > 0
+    ? oneTimeLeads.reduce((s, l) => s + ((l.estimated_price_low || 0) + (l.estimated_price_high || 0)) / 2, 0) / oneTimeLeads.length
     : 0;
 
   const stats = [
@@ -134,7 +143,7 @@ export default function OverviewTab({ config, subStatus, user }) {
                   <td style={{ padding: '12px 14px', fontSize: 13, color: '#374151' }}>{serviceTypeLabel(l.service_type)}</td>
                   <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: '#16a34a' }}>
                     {l.estimated_price_low && l.estimated_price_high
-                      ? `${formatPrice(l.estimated_price_low)} – ${formatPrice(l.estimated_price_high)}`
+                      ? formatPriceRange(l.estimated_price_low, l.estimated_price_high, l.service_type)
                       : '—'}
                   </td>
                   <td style={{ padding: '12px 14px', fontSize: 12, color: '#94a3b8' }}>{formatDateTime(l.created_at)}</td>

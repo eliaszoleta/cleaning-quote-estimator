@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw, Target, Users } from 'lucide-react';
 import { getAdminHomepageLeads, patchAdminHomepageLead, deleteAdminHomepageLeadForever } from '../../utils/api';
-import { formatPrice, serviceTypeLabel, formatDateTime } from '../../utils/formatters';
+import { formatPriceRange, serviceTypeLabel, formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 import { theme, cardStyle, inputStyle, secondaryBtnStyle, dangerBtnStyle, pill, avatarGradient, PageHeader } from './adminTheme';
 
@@ -493,7 +493,7 @@ export default function AdminHomepageLeads({ adminKey }) {
                           {serviceTypeLabel(lead.service_type)}
                         </div>
                         <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 700 }}>
-                          {lead.estimated_price_low ? `${formatPrice(lead.estimated_price_low)} – ${formatPrice(lead.estimated_price_high)}` : '—'}
+                          {lead.estimated_price_low ? formatPriceRange(lead.estimated_price_low, lead.estimated_price_high, lead.service_type) : '—'}
                         </div>
                         <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>{formatDateTime(lead.created_at)}</div>
                       </div>
@@ -529,7 +529,7 @@ export default function AdminHomepageLeads({ adminKey }) {
                   ['Type',     userTypeLabel(selectedLead.user_type), null],
                   ['Service',  serviceTypeLabel(selectedLead.service_type), null],
                   ['Location', [selectedLead.city, selectedLead.state, selectedLead.zip].filter(Boolean).join(' · '), null],
-                  ['Estimate', selectedLead.estimated_price_low ? `${formatPrice(selectedLead.estimated_price_low)} – ${formatPrice(selectedLead.estimated_price_high)}` : '—', null],
+                  ['Estimate', selectedLead.estimated_price_low ? formatPriceRange(selectedLead.estimated_price_low, selectedLead.estimated_price_high, selectedLead.service_type) : '—', null],
                   ['Timeline', selectedLead.timeline || '—', null],
                 ].filter(([, val]) => val && val !== '—' && val !== '').map(([label, val, href]) => (
                   <div key={label} style={{ display: 'flex', gap: 8 }}>
