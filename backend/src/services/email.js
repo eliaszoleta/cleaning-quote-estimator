@@ -692,9 +692,10 @@ function buildEmbedIframeCode(companyId) {
 
 // Sent once, the moment a company's config row is first created (see
 // company.js's GET /:id handler) -- i.e. right after they confirm their
-// email and log in for the first time. Gets their embed code in front of
-// them immediately instead of relying on them to find the Embed Widget tab
-// themselves. Fire-and-forget, same pattern as the other company emails.
+// email and log in for the first time. Points them at Calculator Mode (the
+// account's main pitch) and gets their embed code in front of them too,
+// instead of relying on them to find the Estimator tab themselves.
+// Fire-and-forget, same pattern as the other company emails.
 // `subject` is overridable so the same content can be reused for a
 // one-off manual broadcast to existing accounts (see admin.js's
 // trial-email preview/send routes) with wording suited to "your trial is

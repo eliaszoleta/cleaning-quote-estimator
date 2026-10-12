@@ -61,7 +61,7 @@ module.exports = [
   {
     key: 'company_welcome',
     name: 'Company welcome / embed code',
-    subject: "Your Clean Estimator account is ready — here's your embed code",
+    subject: 'Your Clean Estimator account is ready — start pricing jobs instantly',
     variables: [
       { name: 'embedCode', example: '<iframe ...>...</iframe>' },
       { name: 'embedCodeHtml', example: '(HTML-escaped embed code, for the &lt;pre&gt; block)' },
@@ -69,21 +69,28 @@ module.exports = [
     text: [
       'Welcome to Clean Estimator!',
       '',
-      "Your account is live and your embedded estimator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:",
+      "Your account is live and your 30-day free trial has started. Clean Estimator is your internal pricing tool: log in, switch to Calculator Mode, and run instant, accurate price estimates for your own quoting — no price range shown to a customer, nothing to manage as a lead, just a fast number you can trust.",
+      '',
+      'Open my calculator →',
+      'https://www.cleanestimator.com/company',
+      '',
+      'Got a result you want a teammate to see? Click "Email to Coworker" on the results screen and it goes straight to their inbox.',
+      '',
+      "Want to capture leads from your website too? The same plan already includes a white-labeled, embeddable widget — here's your embed code:",
       '',
       '{{embedCode}}',
       '',
       "Paste that anywhere in your website's HTML — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself. The estimator will appear right there and resize itself to fit.",
       '',
-      "Two things are already working, no setup needed: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.",
+      "If you do use it: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.",
       '',
-      'Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard:',
+      'Want to set your business name, colors, and which services you offer first? All in your dashboard:',
       'https://www.cleanestimator.com/company?tab=branding',
       '',
-      'New to Clean Estimator? Log in to your dashboard and open the Help & Docs tab — it walks through how the estimator works, how pricing is calculated (with the real data behind it), and answers to the most common questions:',
+      'New to Clean Estimator? Log in to your dashboard and open the Help & Docs tab — it walks through how pricing is calculated (with the real data behind it) and answers to the most common questions:',
       'https://www.cleanestimator.com/company?tab=help',
       '',
-      'You can always get this same code later from the Embed Widget tab.',
+      'You can always get this same embed code later from the Estimator tab.',
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -92,7 +99,19 @@ module.exports = [
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Welcome to Clean Estimator!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your account is live and your embedded estimator is ready to go right now — 30-day free trial, no credit card needed. Here's your embed code:
+    Your account is live and your 30-day free trial has started. Clean Estimator is your internal pricing tool: log in, switch to <strong>Calculator Mode</strong>, and run instant, accurate price estimates for your own quoting — no price range shown to a customer, nothing to manage as a lead, just a fast number you can trust.
+  </p>
+
+  <p style="margin:0 0 24px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Open my calculator →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 24px;">
+    Got a result you want a teammate to see? Click <strong>“Email to Coworker”</strong> on the results screen and it goes straight to their inbox.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Want to capture leads from your website too? The same plan already includes a white-labeled, embeddable widget — here's your embed code:
   </p>
 
   <pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-family:'Menlo','Monaco',monospace;font-size:11.5px;line-height:1.6;color:#334155;white-space:pre-wrap;word-break:break-all;margin:0 0 20px;">{{embedCodeHtml}}</pre>
@@ -102,23 +121,19 @@ module.exports = [
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Two things are already working, no setup needed: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.
+    If you do use it: you'll get an email the instant someone completes an estimate on your site, and every visitor gets their own follow-up email branded with your logo and phone number, not ours.
   </p>
 
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Before you paste it, you may want to set your business name, colors, and which services you offer — all in your dashboard.
+  <p style="font-size:14px;line-height:1.6;margin:0 0 8px;">
+    Want to set your business name, colors, and which services you offer first? All in your <a href="https://www.cleanestimator.com/company?tab=branding" style="color:#2563eb;font-weight:700;">dashboard</a>.
   </p>
 
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=branding" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Set up my dashboard →</a>
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    New to Clean Estimator? Open the <a href="https://www.cleanestimator.com/company?tab=help" style="color:#2563eb;font-weight:700;">Help &amp; Docs</a> tab in your dashboard — it walks through how the estimator works, how pricing is calculated (with the real data behind it), and answers to the most common questions.
+  <p style="font-size:14px;line-height:1.6;margin:20px 0 20px;">
+    New to Clean Estimator? Open the <a href="https://www.cleanestimator.com/company?tab=help" style="color:#2563eb;font-weight:700;">Help &amp; Docs</a> tab in your dashboard — it walks through how pricing is calculated (with the real data behind it) and answers to the most common questions.
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    You can always get this same code later from the <strong>Embed Widget</strong> tab.
+    You can always get this same embed code later from the <strong>Estimator</strong> tab.
   </p>
   ${FOOTER_HTML}
 </div>`,
