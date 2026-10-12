@@ -76,6 +76,32 @@ function getStateMultiplier(state) {
   return STATE_PRICING_MULTIPLIERS[state] || 1.0;
 }
 
+// Every adjustment line is rounded to a whole dollar independently of the
+// others (so the breakdown reads as clean dollar amounts, not cents), but
+// round(a) + round(b) doesn't always equal round(a + b) -- stack enough
+// independently-rounded lines and their sum can land $1 off from the
+// actual total, low and high. Applied as a final safety net to every
+// service rather than hand-verifying each one line-by-line: it compares
+// the breakdown's own sum against the real total and, if they differ,
+// folds the (always tiny, at most a dollar or two) difference into the
+// last included line. Skips any line marked `separate: true` (e.g. water
+// damage's full-restoration estimate), which is intentionally not part of
+// the total and must never be touched to make the sum balance.
+function reconcileAdjustments(adjustments, totalLow, totalHigh) {
+  const included = adjustments.filter(a => !a.separate);
+  if (!included.length) return adjustments;
+  const sumLow = included.reduce((s, a) => s + a.low, 0);
+  const sumHigh = included.reduce((s, a) => s + a.high, 0);
+  const diffLow = totalLow - sumLow;
+  const diffHigh = totalHigh - sumHigh;
+  if (diffLow !== 0 || diffHigh !== 0) {
+    const last = included[included.length - 1];
+    last.low += diffLow;
+    last.high += diffHigh;
+  }
+  return adjustments;
+}
+
 // ─── Service Calculators ──────────────────────────────────────────────────────
 
 function calculateHomeResidential(details, stateMultiplier, companyConfig) {
@@ -157,10 +183,14 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: -Math.round(range.low * discount), high: -Math.round(range.high * discount) });
   }
 
+  const finalLow = recurringLow || range.low;
+  const finalHigh = recurringHigh || range.high;
+  reconcileAdjustments(adjustments, finalLow, finalHigh);
+
   return {
     serviceType: 'home_residential',
-    totalLow: recurringLow || range.low,
-    totalHigh: recurringHigh || range.high,
+    totalLow: finalLow,
+    totalHigh: finalHigh,
     basePrice: (base.low + base.high) / 2,
     adjustments,
     unit: 'flat',
@@ -247,10 +277,14 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: -Math.round(range.low * discount), high: -Math.round(range.high * discount) });
   }
 
+  const finalLow = recurringLow || range.low;
+  const finalHigh = recurringHigh || range.high;
+  reconcileAdjustments(adjustments, finalLow, finalHigh);
+
   return {
     serviceType: 'apartment',
-    totalLow: recurringLow || range.low,
-    totalHigh: recurringHigh || range.high,
+    totalLow: finalLow,
+    totalHigh: finalHigh,
     basePrice: (base.low + base.high) / 2,
     adjustments,
     unit: 'flat',
@@ -343,15 +377,19 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'Day porter (monthly)', low: porterMonthlyLow, high: porterMonthlyHigh });
   }
 
+  const finalLow = monthlyLow + porterMonthlyLow;
+  const finalHigh = monthlyHigh + porterMonthlyHigh;
+  reconcileAdjustments(adjustments, finalLow, finalHigh);
+
   return {
     serviceType: 'commercial',
-    totalLow: monthlyLow + porterMonthlyLow,
-    totalHigh: monthlyHigh + porterMonthlyHigh,
+    totalLow: finalLow,
+    totalHigh: finalHigh,
     basePrice: (perVisitBaseLow + perVisitBaseHigh) / 2,
     adjustments,
     unit: 'per_month',
-    recurringMonthlyLow: monthlyLow + porterMonthlyLow,
-    recurringMonthlyHigh: monthlyHigh + porterMonthlyHigh,
+    recurringMonthlyLow: finalLow,
+    recurringMonthlyHigh: finalHigh,
     recurringAnnualSavings: null,
     keyFactors: [
       { label: 'Building type', impact: buildingType },
@@ -420,6 +458,7 @@ function calculateCarpet(details, stateMultiplier, companyConfig) {
   }
 
   range = applyMinCharge(range, minCharge, adjustments);
+  reconcileAdjustments(adjustments, range.low, range.high);
 
   return {
     serviceType: 'carpet',
@@ -507,6 +546,7 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
   }
 
   range = applyMinCharge(range, minCharge, adjustments);
+  reconcileAdjustments(adjustments, range.low, range.high);
 
   return {
     serviceType: 'air_duct',
@@ -607,6 +647,7 @@ function calculateDryerVent(details, stateMultiplier, companyConfig) {
   }
 
   range = applyMinCharge(range, minCharge, adjustments);
+  reconcileAdjustments(adjustments, range.low, range.high);
 
   return {
     serviceType: 'dryer_vent',
@@ -680,6 +721,7 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
   }
 
   range = applyMinCharge(range, minCharge, adjustments);
+  reconcileAdjustments(adjustments, range.low, range.high);
 
   return {
     serviceType: 'tile_grout',
@@ -754,6 +796,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
   if (minCharge > 0) {
     range = applyMinCharge(range, minCharge, adjustments);
   }
+  reconcileAdjustments(adjustments, range.low, range.high);
 
   const sourceWarning = sourceFixed === 'not_fixed' || sourceFixed === 'not_sure';
 
@@ -857,6 +900,7 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
     const adj = applyMultiplier(fullRestoration, stateMultiplier * markup);
     adjustments.push({ label: 'Full restoration (drywall, flooring) — separate estimate, not included above', low: adj.low, high: adj.high, separate: true });
   }
+  reconcileAdjustments(adjustments, range.low, range.high);
 
   return {
     serviceType: 'water_damage',
