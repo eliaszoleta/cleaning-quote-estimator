@@ -378,7 +378,7 @@ export default function WebsiteSubscription() {
             <p style={{ fontSize: 15, color: '#64748b', maxWidth: 540, margin: '0 auto', lineHeight: 1.6 }}>The foundation on all 3 plans. The chatbot, phone number, and lead app are add-ons on Growth and Pro — see pricing below.</p>
           </div>
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(20px, 5vw, 32px)' }}>
-            <Check>A custom cleaning website built for your business — not a generic template</Check>
+            <Check>A custom cleaning website built for your business — designed to get you found on Google and bring in leads</Check>
             <Check>A domain name of your choice</Check>
             <Check>Fast, secure hosting, fully managed — nothing for you to set up</Check>
             <Check>Mobile-friendly design, since most of your visitors are on their phone</Check>
