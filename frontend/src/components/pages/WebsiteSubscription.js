@@ -265,14 +265,14 @@ export default function WebsiteSubscription() {
       <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: 'clamp(40px, 9vw, 96px) 20px clamp(48px, 9vw, 110px)' }}>
         <div style={{ maxWidth: 780, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
-            Cleaning Website, Built and Hosted for You
+            Cleaning Website + Lead App
           </div>
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
             A Professional Cleaning Website, Built and Hosted for You —<br />
-            <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>Pick How Much Lead-Catching Power You Want</span>
+            <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>With Every Lead Landing Right In Your Pocket</span>
           </h1>
           <p style={{ fontSize: 15, color: '#94a3b8', maxWidth: 540, margin: '0 auto 28px', lineHeight: 1.55 }}>
-            No cleaning website yet? We build it and host it for you. Start with a quote form that emails you every lead instantly, add an AI chatbot, or go all-in with a lead app that puts every chat, text, and call in your pocket — <strong style={{ color: 'white', fontWeight: 700 }}>plans start at ${LOWEST_PRICE}/month</strong>, no big upfront cost.
+            No cleaning website yet? We build it, host it, and connect every quote request, text, and call to a mobile app you carry with you — for one flat monthly rate, no big upfront cost.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 14 }}>
             <a href="#apply" className="ws-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
