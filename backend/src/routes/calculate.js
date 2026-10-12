@@ -21,6 +21,28 @@ function getSupabase() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
+// This route has no authenticated req.user (companyId just arrives in the
+// body, from the public embed widget or the dashboard's own Calculator
+// Mode) -- so computeSubscriptionStatus's ALWAYS_ACTIVE_EMAIL bypass
+// (Elias's own demo/testing account) was always being checked against
+// `null` and never actually applying here, even though it correctly
+// applies on GET /api/subscription/status where req.user.email is
+// available. Same companyId-to-owner-email lookup trialScheduler.js
+// already uses, so that demo account's own calculator works regardless of
+// whether it's ever been through Checkout.
+async function getOwnerEmail(companyId) {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  try {
+    const { data, error } = await supabase.auth.admin.getUserById(companyId);
+    if (error) return null;
+    return data?.user?.email || null;
+  } catch (err) {
+    console.warn('getOwnerEmail failed:', err.message);
+    return null;
+  }
+}
+
 // req.body.partnerInfo is whatever the browser's own (client-side, anon-key)
 // partner match produced -- never trust its .email for anything that sends
 // mail, or anyone could POST directly to this endpoint with a fabricated
@@ -155,7 +177,8 @@ router.post('/', async (req, res) => {
       // companyConfig.js's getOrCreateCompanyConfig) would still leave an
       // unactivated account free to calculate forever, just without the
       // trial clock -- an even bigger loophole than the one it replaces.
-      if (!computeSubscriptionStatus(companyConfig, null).active) {
+      const ownerEmail = await getOwnerEmail(companyId);
+      if (!computeSubscriptionStatus(companyConfig, ownerEmail).active) {
         return res.status(402).json({ success: false, error: 'This estimator is temporarily unavailable. Please contact the business directly.' });
       }
     } else if (leadInfo?.userType === 'business') {
