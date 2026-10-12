@@ -495,12 +495,18 @@ export default function WebsiteSubscription() {
                       Most Popular
                     </div>
                   )}
-                  <div style={{ fontSize: 12.5, fontWeight: 800, color: active ? '#bfdbfe' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>{tier.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8, flexWrap: 'wrap' }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 800, color: active ? '#bfdbfe' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{tier.name}</div>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: active ? '#86efac' : '#16a34a', background: active ? 'rgba(74,222,128,0.18)' : '#dcfce7', padding: '2px 8px', borderRadius: 20, whiteSpace: 'nowrap' }}>2 Months FREE</div>
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 10 }}>
                     <span style={{ fontSize: 'clamp(30px, 6vw, 38px)', fontWeight: 900, color: active ? 'white' : '#0f172a', letterSpacing: '-1px', lineHeight: 1 }}>${tier.price}</span>
                     <span style={{ fontSize: 13.5, color: active ? '#bfdbfe' : '#64748b', fontWeight: 600 }}>/mo</span>
                   </div>
                   <p style={{ fontSize: 13, color: active ? '#dbeafe' : '#64748b', lineHeight: 1.55, margin: '0 0 16px', minHeight: 40 }}>{tier.tagline}</p>
+                  {tier.includesLabel && (
+                    <div style={{ fontSize: 11.5, fontWeight: 700, color: active ? '#93c5fd' : PRIMARY, marginBottom: 8 }}>{tier.includesLabel}</div>
+                  )}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {tier.addedFeatures.map(f => (
                       <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>

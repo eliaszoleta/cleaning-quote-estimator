@@ -32,6 +32,7 @@ export const WEBSITE_PLAN_TIERS = [
     price: 179,
     tagline: 'Add an AI chatbot that works the site while you work the job',
     recommended: true,
+    includesLabel: 'All in Starter, plus:',
     addedFeatures: [
       'An AI chatbot that answers visitor questions and supports customers, even after hours',
       'Email alert with a summary of every chat conversation, so you know what each visitor needed',
@@ -48,6 +49,7 @@ export const WEBSITE_PLAN_TIERS = [
     name: 'Pro',
     price: 249,
     tagline: 'Every lead -- chat, text, or call -- in one app, ready to answer',
+    includesLabel: 'All in Starter and Growth, plus:',
     addedFeatures: [
       'A dedicated business phone number',
       'A lead app where every chat, text, and inquiry lives -- reply or call back right from it',
