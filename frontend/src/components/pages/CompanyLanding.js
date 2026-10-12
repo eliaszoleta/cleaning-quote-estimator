@@ -46,7 +46,7 @@ const TESTIMONIALS = [
 ];
 
 const PLAN_FEATURES = [
-  'Unlimited internal price calculations using your own pricing',
+  'Unlimited internal price calculations',
   'Instant result on screen — never a public price range',
   'Email a result to a coworker in one click',
   'ZIP-code accurate pricing & per-service markup control',

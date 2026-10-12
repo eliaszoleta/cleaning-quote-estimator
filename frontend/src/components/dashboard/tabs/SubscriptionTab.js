@@ -7,7 +7,7 @@ import { supabase } from '../../../lib/supabase';
 // as an internal pricing tool, with the website widget included rather
 // than a separate, pricier upsell.
 const FEATURES = [
-  { Icon: Infinity,          text: 'Unlimited internal price calculations using your own pricing' },
+  { Icon: Infinity,          text: 'Unlimited internal price calculations' },
   { Icon: Lock,              text: 'Instant result on screen — never a public price range' },
   { Icon: Send,              text: 'Email a result to a coworker in one click' },
   { Icon: SlidersHorizontal, text: 'ZIP-code accurate pricing & per-service markup control' },
