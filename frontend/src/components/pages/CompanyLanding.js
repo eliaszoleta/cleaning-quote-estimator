@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   ClipboardList, MapPin, Settings, Check, Star,
@@ -79,11 +79,34 @@ function Arrow({ size }) {
   return <span className="ce-arrow"><ArrowRight size={size} /></span>;
 }
 
-// Browser chrome around a static screenshot of the widget's front step --
-// a live embedded instance kept fighting the fixed-height frame (scroll or
-// clipping depending on how it was sized), so a plain image sidesteps that
-// entirely. Swap the image file to update what's shown.
+// Real results across a few of the 9 service types -- shows the range of
+// what the engine actually prices, not just the one "pick a service" step
+// a single static screenshot used to freeze on.
+const HERO_GALLERY = [
+  { src: '/images/marketing/hero-result-commercial.png', alt: 'Commercial cleaning estimate result' },
+  { src: '/images/marketing/hero-result-water-damage.png', alt: 'Water damage restoration estimate result' },
+  { src: '/images/marketing/hero-result-mold-remediation.png', alt: 'Mold remediation estimate result' },
+  { src: '/images/marketing/hero-result-apartment.png', alt: 'Apartment cleaning estimate result' },
+  { src: '/images/marketing/hero-result-carpet.png', alt: 'Carpet cleaning estimate result' },
+];
+
+// Browser chrome around an auto-advancing slideshow of real result
+// screenshots -- a live embedded instance kept fighting the fixed-height
+// frame (scroll or clipping depending on how it was sized), so crossfading
+// between plain images sidesteps that entirely. Fixed-height + object-fit
+// cover keeps the frame a constant size while the slides crossfade, even
+// though the screenshots themselves are different heights (a commercial
+// estimate's breakdown table is taller than a carpet one's).
 function WidgetPreview() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex(i => (i + 1) % HERO_GALLERY.length);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="ce-float" style={{ position: 'relative' }}>
       <div style={{ background: 'white', borderRadius: 16, overflow: 'hidden', boxShadow: '0 30px 70px -20px rgba(2,6,23,0.55), 0 8px 20px rgba(2,6,23,0.25)' }}>
@@ -95,11 +118,36 @@ function WidgetPreview() {
             yourcompany.com
           </div>
         </div>
-        <img
-          src="/images/marketing/service-form.png"
-          alt="Clean Estimator — pick a service step"
-          style={{ display: 'block', width: '100%', height: 'auto' }}
-        />
+
+        <div style={{ position: 'relative', width: '100%', height: 'clamp(380px, 52vw, 520px)', background: '#f8fafc' }}>
+          {HERO_GALLERY.map((img, i) => (
+            <img
+              key={img.src}
+              src={img.src}
+              alt={img.alt}
+              style={{
+                position: 'absolute', inset: 0, width: '100%', height: '100%',
+                objectFit: 'cover', objectPosition: 'top center',
+                opacity: i === index ? 1 : 0,
+                transition: 'opacity 0.7s ease',
+              }}
+            />
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '12px 0', background: '#f8fafc', borderTop: '1px solid #f1f5f9' }}>
+          {HERO_GALLERY.map((img, i) => (
+            <button
+              key={img.src}
+              onClick={() => setIndex(i)}
+              aria-label={`Show slide ${i + 1}`}
+              style={{
+                width: i === index ? 16 : 6, height: 6, borderRadius: 3, border: 'none', padding: 0, cursor: 'pointer',
+                background: i === index ? PRIMARY : '#cbd5e1', transition: 'width 0.3s ease, background 0.3s ease',
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Floating "instant result" chip -- intentionally doesn't show a
