@@ -210,6 +210,30 @@ async function handleStripeEvent(event) {
         };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: activated company ${companyId}`);
+
+        // The dashboard's own "first load ever" welcome-email check
+        // (getOrCreateCompanyConfig's `created` flag) never fires for these
+        // accounts anymore -- AuthPage.js now sends a brand-new signup
+        // straight to POST /checkout, which creates this company's row
+        // itself before the dashboard ever loads, so by the time the user
+        // lands back here post-Checkout the row already exists and looks
+        // like it was never "just created". This webhook is the first point
+        // that reliably knows checkout actually succeeded, so send it from
+        // here instead. Deduped via welcomeEmailSentAt -- webhook deliveries
+        // can repeat.
+        if (!config.subscription.welcomeEmailSentAt) {
+          const email = await getOwnerEmail(companyId);
+          if (email) {
+            const sent = await sendCompanyWelcomeEmail({ to: email, companyId });
+            if (sent) {
+              const fresh = (await getCompanyConfig(companyId)) || config;
+              await saveCompanyConfig(companyId, {
+                ...fresh,
+                subscription: { ...fresh.subscription, welcomeEmailSentAt: new Date().toISOString() },
+              });
+            }
+          }
+        }
       } catch (err) {
         console.error(`Webhook checkout.session.completed failed for company ${companyId}:`, err.message);
         throw err;
