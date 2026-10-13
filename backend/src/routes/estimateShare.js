@@ -17,7 +17,7 @@ const { getCompanyConfig } = require('../services/companyConfig');
 const { sendEstimateEmail } = require('../services/email');
 
 const VALID_SERVICE_TYPES = [
-  'home_residential', 'apartment', 'commercial', 'carpet',
+  'home_residential', 'apartment', 'commercial', 'carpet', 'upholstery',
   'air_duct', 'dryer_vent', 'tile_grout', 'mold_remediation', 'water_damage',
 ];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

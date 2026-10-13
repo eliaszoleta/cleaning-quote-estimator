@@ -31,6 +31,7 @@ export function serviceTypeLabel(type) {
     apartment: 'Apartment Cleaning',
     commercial: 'Commercial Cleaning',
     carpet: 'Carpet Cleaning',
+    upholstery: 'Upholstery Cleaning',
     air_duct: 'Air Duct Cleaning',
     dryer_vent: 'Dryer Vent Cleaning',
     tile_grout: 'Tile & Grout',

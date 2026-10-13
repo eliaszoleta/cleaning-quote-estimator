@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ChevronDown, Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, Check } from 'lucide-react';
+import { ChevronDown, Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, Check } from 'lucide-react';
 import { getServiceBySlug, getRelatedServices, typicalCost } from '../../data/services';
 import { getFeaturedStates, adjustForState } from '../../data/statePricing';
 import './PageHero.css';
@@ -10,6 +10,7 @@ const ICONS = {
   apartment: Building2,
   commercial: Building,
   carpet: Layers,
+  upholstery: Sofa,
   air_duct: Wind,
   dryer_vent: Flame,
   tile_grout: Grid3x3,

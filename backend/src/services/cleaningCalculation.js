@@ -20,6 +20,11 @@ const {
   CARPET_METHOD_MULTIPLIERS,
   CARPET_ADDONS,
   CARPET_STAIRS_PER_FLIGHT,
+  UPHOLSTERY_ITEM_PRICES,
+  UPHOLSTERY_CONDITION_MULTIPLIERS,
+  UPHOLSTERY_LEATHER_MULTIPLIER,
+  UPHOLSTERY_ADDONS,
+  UPHOLSTERY_MINIMUM,
   AIR_DUCT_BASE,
   AIR_DUCT_PER_VENT,
   AIR_DUCT_PER_SYSTEM,
@@ -474,6 +479,97 @@ function calculateCarpet(details, stateMultiplier, companyConfig) {
       { label: 'Area', impact: sqft ? sqft + ' sq ft' : rooms + ' rooms' },
       { label: 'Condition', impact: condition },
       { label: 'Method', impact: method },
+    ],
+    disclaimer: null,
+    urgencyLevel: 'normal',
+  };
+}
+
+const UPHOLSTERY_ITEM_LABELS = {
+  chair: 'Chair/Recliner',
+  loveseat: 'Loveseat',
+  sofa: 'Sofa',
+  sectional: 'Sectional',
+  ottoman: 'Ottoman',
+};
+
+function calculateUpholstery(details, stateMultiplier, companyConfig) {
+  const {
+    items = {},
+    fabricType = 'fabric',
+    condition = 'moderate',
+    extras = [],
+  } = details;
+
+  const cfg = companyConfig?.services?.upholstery || {};
+  const markup = cfg.markup || 1.0;
+  const minCharge = cfg.minimumCharge || 90;
+  const effMult = stateMultiplier * markup;
+
+  const condMult = UPHOLSTERY_CONDITION_MULTIPLIERS[condition] || UPHOLSTERY_CONDITION_MULTIPLIERS.moderate;
+  const leatherMult = fabricType === 'leather' ? UPHOLSTERY_LEATHER_MULTIPLIER : { low: 1, high: 1 };
+
+  let range = { low: 0, high: 0 };
+  const adjustments = [];
+  let totalItems = 0;
+
+  // Each item type is its own line (not collapsed into one "upholstery"
+  // total like carpet's per-room price) since a visitor cleaning a sofa
+  // and 2 chairs genuinely wants to see those broken out separately --
+  // they're different prices, not quantities of the same thing.
+  for (const [itemId, base] of Object.entries(UPHOLSTERY_ITEM_PRICES)) {
+    const qty = Math.max(0, Math.round(items[itemId] || 0));
+    if (qty <= 0) continue;
+    totalItems += qty;
+    const lineRange = applyMultiplier({
+      low: base.low * condMult.low * leatherMult.low * qty,
+      high: base.high * condMult.high * leatherMult.high * qty,
+    }, effMult);
+    range = addRange(range, lineRange);
+    const label = UPHOLSTERY_ITEM_LABELS[itemId];
+    adjustments.push({ label: `${qty} ${label}${qty > 1 ? 's' : ''}`, low: lineRange.low, high: lineRange.high });
+  }
+
+  // No pieces selected (shouldn't happen -- the step defaults to 1 sofa --
+  // but the API can be called directly) -- default to a single sofa rather
+  // than return a $0 estimate.
+  if (totalItems === 0) {
+    totalItems = 1;
+    const base = UPHOLSTERY_ITEM_PRICES.sofa;
+    const lineRange = applyMultiplier({
+      low: base.low * condMult.low * leatherMult.low,
+      high: base.high * condMult.high * leatherMult.high,
+    }, effMult);
+    range = lineRange;
+    adjustments.push({ label: '1 Sofa', low: lineRange.low, high: lineRange.high });
+  }
+
+  for (const extra of extras) {
+    if (UPHOLSTERY_ADDONS[extra]) {
+      const perPiece = UPHOLSTERY_ADDONS[extra];
+      const adj = applyMultiplier({ low: perPiece.low * totalItems, high: perPiece.high * totalItems }, effMult);
+      range = addRange(range, adj);
+      adjustments.push({ label: `${extra.replace(/_/g, ' ')} (${totalItems} piece${totalItems > 1 ? 's' : ''})`, low: adj.low, high: adj.high });
+    }
+  }
+
+  range = applyMinCharge(range, minCharge, adjustments);
+  reconcileAdjustments(adjustments, range.low, range.high);
+
+  return {
+    serviceType: 'upholstery',
+    totalLow: range.low,
+    totalHigh: range.high,
+    basePrice: (UPHOLSTERY_ITEM_PRICES.sofa.low + UPHOLSTERY_ITEM_PRICES.sofa.high) / 2,
+    adjustments,
+    unit: 'flat',
+    recurringMonthlyLow: null,
+    recurringMonthlyHigh: null,
+    recurringAnnualSavings: null,
+    keyFactors: [
+      { label: 'Pieces', impact: `${totalItems} item${totalItems > 1 ? 's' : ''}` },
+      { label: 'Fabric', impact: fabricType },
+      { label: 'Condition', impact: condition },
     ],
     disclaimer: null,
     urgencyLevel: 'normal',
@@ -950,6 +1046,7 @@ async function calculateCleaning(inputs, companyConfig = {}) {
     case 'apartment':         result = calculateApartment(serviceDetails, stateMultiplier, companyConfig); break;
     case 'commercial':        result = calculateCommercial(serviceDetails, stateMultiplier, companyConfig); break;
     case 'carpet':            result = calculateCarpet(serviceDetails, stateMultiplier, companyConfig); break;
+    case 'upholstery':        result = calculateUpholstery(serviceDetails, stateMultiplier, companyConfig); break;
     case 'air_duct':          result = calculateAirDuct(serviceDetails, stateMultiplier, companyConfig); break;
     case 'dryer_vent':        result = calculateDryerVent(serviceDetails, stateMultiplier, companyConfig); break;
     case 'tile_grout':        result = calculateTileGrout(serviceDetails, stateMultiplier, companyConfig); break;

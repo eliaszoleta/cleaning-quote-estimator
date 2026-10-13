@@ -146,6 +146,11 @@ const DEFAULT_COMPANY_CONFIG = {
       enabled: true,
       markup: 1.0,
     },
+    upholstery: {
+      enabled: true,
+      minimumCharge: 90,
+      markup: 1.0,
+    },
   },
 };
 
@@ -273,6 +278,36 @@ const CARPET_ADDONS = {
 };
 
 const CARPET_STAIRS_PER_FLIGHT = { low: 52, high: 68 }; // 13-15 steps × $3.50-$4.50/step
+
+// Upholstery cleaning -- priced per piece (not per sq ft/room like carpet),
+// since that's how the real market actually quotes furniture cleaning.
+// Source: Angi/HomeAdvisor furniture cleaning cost guide (national avg
+// ~$173, chairs $10-80, sectionals $100-300), cross-checked against
+// Thumbtack-sourced provider rate data for loveseats/sofas.
+const UPHOLSTERY_ITEM_PRICES = {
+  chair:     { low: 40,  high: 70  }, // armchair or recliner
+  loveseat:  { low: 75,  high: 110 },
+  sofa:      { low: 120, high: 175 }, // 3-seat sofa -- most common job
+  sectional: { low: 175, high: 280 },
+  ottoman:   { low: 20,  high: 35  },
+};
+
+const UPHOLSTERY_CONDITION_MULTIPLIERS = {
+  light:   { low: 1.0,  high: 1.0  },
+  moderate:{ low: 1.12, high: 1.18 },
+  heavy:   { low: 1.37, high: 1.45 },
+  pet:     { low: 1.65, high: 1.82 },
+};
+
+// HomeAdvisor: leather cleaning "often costs double" standard upholstery.
+const UPHOLSTERY_LEATHER_MULTIPLIER = { low: 1.80, high: 2.00 };
+
+const UPHOLSTERY_ADDONS = {
+  fabric_protector: { low: 15, high: 25 }, // per piece
+  deodorizer:        { low: 12, high: 20 }, // per piece
+};
+
+const UPHOLSTERY_MINIMUM = { low: 90, high: 120 };
 
 // Air duct cleaning
 const AIR_DUCT_BASE = { low: 330, high: 420 }; // up to ~12 vents residential
@@ -450,6 +485,11 @@ module.exports = {
   CARPET_METHOD_MULTIPLIERS,
   CARPET_ADDONS,
   CARPET_STAIRS_PER_FLIGHT,
+  UPHOLSTERY_ITEM_PRICES,
+  UPHOLSTERY_CONDITION_MULTIPLIERS,
+  UPHOLSTERY_LEATHER_MULTIPLIER,
+  UPHOLSTERY_ADDONS,
+  UPHOLSTERY_MINIMUM,
   AIR_DUCT_BASE,
   AIR_DUCT_PER_VENT,
   AIR_DUCT_PER_SYSTEM,

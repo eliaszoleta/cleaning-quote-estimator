@@ -8,7 +8,7 @@ import './PageHero.css';
 const WHY_POINTS = [
   { Icon: MapPin, title: 'ZIP-Code Accurate', body: 'Every price this cleaning cost calculator returns is adjusted for your local labor rates and cost of living, not a flat national guess.' },
   { Icon: Zap, title: 'Instant Results', body: 'Answer a few quick questions and get your estimate in under 60 seconds — no waiting for a callback from a cleaning company.' },
-  { Icon: ShieldCheck, title: '9 Service Types Covered', body: 'From standard house cleaning to mold remediation and water damage restoration, this calculator covers the full range of cleaning and restoration services.' },
+  { Icon: ShieldCheck, title: '10 Service Types Covered', body: 'From standard house cleaning to mold remediation and water damage restoration, this calculator covers the full range of cleaning and restoration services.' },
   { Icon: Gift, title: '100% Free, No Signup', body: 'Use the cleaning cost calculator as many times as you want. No account, no credit card, and no obligation to book.' },
 ];
 
@@ -96,7 +96,7 @@ export default function CalculatorPage() {
       <PageHero
         breadcrumbLabel="Cleaning Cost Calculator"
         title="Cleaning Cost Calculator"
-        subtitle="This free cleaning cost calculator gives you an instant, ZIP-code specific price for house cleaning, carpet cleaning, commercial cleaning, and 6 other services. Built as a standalone cleaning calculator you can bookmark and reuse — no signup, no phone calls, just enter your details and get a real cleaning estimator price range in under 60 seconds."
+        subtitle="This free cleaning cost calculator gives you an instant, ZIP-code specific price for house cleaning, carpet cleaning, commercial cleaning, and 7 other services. Built as a standalone cleaning calculator you can bookmark and reuse — no signup, no phone calls, just enter your details and get a real cleaning estimator price range in under 60 seconds."
         subtitleAlign="justify"
       />
 

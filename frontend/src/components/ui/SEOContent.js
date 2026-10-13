@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles } from 'lucide-react';
+import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles } from 'lucide-react';
 import { getAllFaqs } from '../../data/faqs';
 import { getAllServices, typicalCost } from '../../data/services';
 import { getFeaturedStates } from '../../data/statePricing';
@@ -21,6 +21,7 @@ const ICONS = {
   apartment: Building2,
   commercial: Building,
   carpet: Layers,
+  upholstery: Sofa,
   air_duct: Wind,
   dryer_vent: Flame,
   tile_grout: Grid3x3,
@@ -32,6 +33,7 @@ const COLORS = {
   apartment: { color: '#4f46e5', bg: '#eef2ff' },
   commercial: { color: '#7c3aed', bg: '#f5f3ff' },
   carpet: { color: '#059669', bg: '#ecfdf5' },
+  upholstery: { color: '#be185d', bg: '#fdf2f8' },
   air_duct: { color: '#0891b2', bg: '#ecfeff' },
   dryer_vent: { color: '#ea580c', bg: '#fff7ed' },
   tile_grout: { color: '#0d9488', bg: '#f0fdfa' },
@@ -52,6 +54,7 @@ const DETAIL_OVERRIDES = {
   apartment: 'per visit',
   commercial: 'per month, 2,000 sq ft office (weekly)',
   carpet: 'for a 5-room home',
+  upholstery: 'per piece, sofa shown',
   air_duct: 'per system',
   dryer_vent: 'per dryer',
   tile_grout: 'for 300 sq ft',
@@ -109,6 +112,12 @@ const SERVICE_PRICE_FACTORS = {
     'Cleaning method: steam, dry cleaning, or encapsulation',
     'Number of stairs',
     'Add-ons: area rugs, Scotchgard protection, deodorizer, pet odor treatment',
+  ],
+  upholstery: [
+    'Which pieces: sofa, loveseat, chair/recliner, sectional, or ottoman (each priced separately)',
+    'Fabric type: fabric or leather (leather runs about double)',
+    'Soil level: light, moderate, heavy, or pet stains/odors',
+    'Add-ons: fabric protector, deodorizer',
   ],
   air_duct: [
     'Residential (vent count and HVAC system count) or commercial (square footage)',
@@ -261,7 +270,7 @@ export default function SEOContent() {
               No phone calls, no waiting on a callback — just a real cleaning cost estimate online from a dedicated <a href="/cleaning-cost-estimator" style={{ color: '#2563eb', fontWeight: 600 }}>cleaning cost estimator</a>, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.
             </p>
             <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
-              It works the same way across all 9 services — house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, air duct cleaning, dryer vent cleaning, tile &amp; grout cleaning, mold remediation, and water damage restoration — each with its own scope questions, not a one-size-fits-all form.
+              It works the same way across all 10 services — house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, upholstery cleaning, air duct cleaning, dryer vent cleaning, tile &amp; grout cleaning, mold remediation, and water damage restoration — each with its own scope questions, not a one-size-fits-all form.
             </p>
             <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto' }}>
               It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.
@@ -281,12 +290,12 @@ export default function SEOContent() {
 
           <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>Key Pricing Factors</h2>
           <p style={{ textAlign: 'center', color: '#64748b', fontSize: 14.5, maxWidth: 620, margin: '0 auto 18px', lineHeight: 1.7 }}>
-            Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 9 services, not just house cleaning.
+            Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 10 services, not just house cleaning.
           </p>
           <ul style={{ margin: '0 0 24px', paddingLeft: 20, color: '#374151', fontSize: 15, lineHeight: 1.9 }}>
             <li><strong>Square Footage:</strong> Base price scales with home or space size — larger square footage means a higher price.</li>
             <li><strong>Room Count:</strong> Extra bedrooms and bathrooms add roughly $15–$25 each on top of the base price.</li>
-            <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our 9 services asks its own scope questions. See the full breakdown by service below.</li>
+            <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our 10 services asks its own scope questions. See the full breakdown by service below.</li>
             <li><strong>Cleaning Frequency:</strong> Weekly service saves 20%, biweekly 15%, and monthly 10% off the one-time rate.</li>
             <li><strong>Add-Ons:</strong> Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and similar extras are priced separately.</li>
           </ul>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets } from 'lucide-react';
+import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Sofa } from 'lucide-react';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
 const TILE_MIN = 260;
@@ -22,7 +22,7 @@ function pickSquareColumns(n, maxCols) {
     const rows = Math.ceil(n / c);
     const squareness = Math.abs(c - rows);
     const emptyCells = c * rows - n;
-    // squareness and emptyCells (both single digits for up to 9 services)
+    // squareness and emptyCells (both single digits for up to 10 services)
     // dominate c in this weighting, so the comparison is effectively
     // squareness first, emptyCells second, and highest c last as the
     // tiebreak when both of those are equal.
@@ -47,6 +47,7 @@ const SERVICES = [
   { id: 'apartment',        configKey: 'apartment',       Icon: Building2,      label: 'Apartment Cleaning',       desc: 'Studio to 4+ bedrooms',             color: '#4f46e5', bg: '#eef2ff' },
   { id: 'commercial',       configKey: 'commercial',      Icon: Building,       label: 'Commercial Cleaning',      desc: 'Offices, retail, warehouses',        color: '#7c3aed', bg: '#f5f3ff' },
   { id: 'carpet',           configKey: 'carpet',          Icon: Layers,         label: 'Carpet Cleaning',          desc: 'Steam, dry-clean, stain removal',    color: '#059669', bg: '#ecfdf5' },
+  { id: 'upholstery',       configKey: 'upholstery',      Icon: Sofa,           label: 'Upholstery Cleaning',      desc: 'Sofas, chairs, sectionals & more',   color: '#be185d', bg: '#fdf2f8' },
   { id: 'air_duct',         configKey: 'airDuct',         Icon: Wind,           label: 'Air Duct Cleaning',        desc: 'HVAC duct cleaning & sanitizing',    color: '#0891b2', bg: '#ecfeff' },
   { id: 'dryer_vent',       configKey: 'dryerVent',       Icon: Flame,          label: 'Dryer Vent Cleaning',      desc: 'Fire prevention, efficiency',        color: '#ea580c', bg: '#fff7ed' },
   { id: 'tile_grout',       configKey: 'tileGrout',       Icon: Grid3x3,        label: 'Tile & Grout Cleaning',    desc: 'Deep clean, sealing, recoloring',    color: '#0d9488', bg: '#f0fdfa' },
@@ -137,7 +138,7 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
         // services were enabled -- an uneven "3 then 3" split instead of a
         // clean 2-per-row grid. Only companies' embedded widget ever has a
         // subset of services enabled in the first place -- the main
-        // cleanestimator.com calculator always shows all 9, so it keeps the
+        // cleanestimator.com calculator always shows all 10, so it keeps the
         // original, unbounded 195px/1fr instead of being changed for a
         // problem it can't actually hit.
         //

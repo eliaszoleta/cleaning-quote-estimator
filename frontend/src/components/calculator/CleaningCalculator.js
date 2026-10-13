@@ -14,6 +14,7 @@ import HomeStep from './steps/HomeStep';
 import ApartmentStep from './steps/ApartmentStep';
 import CommercialStep from './steps/CommercialStep';
 import CarpetStep from './steps/CarpetStep';
+import UpholsteryStep from './steps/UpholsteryStep';
 import AirDuctStep from './steps/AirDuctStep';
 import DryerVentStep from './steps/DryerVentStep';
 import TileGroutStep from './steps/TileGroutStep';
@@ -28,6 +29,7 @@ const SERVICE_STEPS = {
   apartment: ['service', 'location', 'apartment', 'lead', 'results'],
   commercial: ['service', 'location', 'commercial', 'lead', 'results'],
   carpet: ['service', 'location', 'carpet', 'lead', 'results'],
+  upholstery: ['service', 'location', 'upholstery', 'lead', 'results'],
   air_duct: ['service', 'location', 'air_duct', 'lead', 'results'],
   dryer_vent: ['service', 'location', 'dryer_vent', 'lead', 'results'],
   tile_grout: ['service', 'location', 'tile_grout', 'lead', 'results'],
@@ -45,6 +47,7 @@ const SERVICE_CONFIG_KEYS = {
   apartment: 'apartment',
   commercial: 'commercial',
   carpet: 'carpet',
+  upholstery: 'upholstery',
   air_duct: 'airDuct',
   dryer_vent: 'dryerVent',
   tile_grout: 'tileGrout',
@@ -57,6 +60,7 @@ const DETAIL_STEP_COMPONENT = {
   apartment: ApartmentStep,
   commercial: CommercialStep,
   carpet: CarpetStep,
+  upholstery: UpholsteryStep,
   air_duct: AirDuctStep,
   dryer_vent: DryerVentStep,
   tile_grout: TileGroutStep,
@@ -561,7 +565,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', rowGap: 10, columnGap: 28, flexWrap: 'wrap' }}>
             {[
               { Icon: MapPin,    label: 'All 50 states',     color: '#059669' },
-              { Icon: BarChart3, label: '9 service types',   color: '#2563eb' },
+              { Icon: BarChart3, label: '10 service types',   color: '#2563eb' },
               { Icon: ShieldOff, label: 'No email required', color: '#7c3aed' },
               { Icon: Zap,       label: 'Instant results',   color: '#ea580c' },
             ].map(({ Icon, label, color }) => (

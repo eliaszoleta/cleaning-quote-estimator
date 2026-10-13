@@ -48,12 +48,12 @@ function pricingTimeline(monthlyPrice) {
   ];
 }
 
-// Same 9 services offered elsewhere on the site (ServiceSelect.js,
+// Same 10 services offered elsewhere on the site (ServiceSelect.js,
 // ServicesTab.js) -- kept as plain labels here since this form is just
 // collecting what to put on the site, not tied to the calculator's
 // configKey/pricing logic.
 const SERVICES_OFFERED = [
-  'House Cleaning', 'Apartment Cleaning', 'Commercial Cleaning', 'Carpet Cleaning',
+  'House Cleaning', 'Apartment Cleaning', 'Commercial Cleaning', 'Carpet Cleaning', 'Upholstery Cleaning',
   'Air Duct Cleaning', 'Dryer Vent Cleaning', 'Tile & Grout Cleaning', 'Mold Remediation', 'Water Damage Restoration',
 ];
 

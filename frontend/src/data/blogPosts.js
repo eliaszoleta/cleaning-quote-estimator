@@ -5059,7 +5059,7 @@ Asks a few questions (service, size, location) and shows a real price range imme
 
 If your site only has a contact form today, adding an instant quote calculator is usually the single highest-impact change you can make — it doesn't replace the form, it upgrades it, since a good calculator collects the same contact details a form would, just with a real price shown first. Booking widgets and live chat are worth layering in later, once you're consistently getting quote requests and need to help visitors take the next step faster.
 
-[Clean Estimator](/estimator) covers all 9 major cleaning service types with one embeddable calculator, branded to your business, with lead alerts and a dashboard built in — a 30-day free trial to start.
+[Clean Estimator](/estimator) covers all 10 major cleaning service types with one embeddable calculator, branded to your business, with lead alerts and a dashboard built in — a 30-day free trial to start.
 
 ## FAQ
 
@@ -5113,7 +5113,7 @@ Getting an estimate calculator running on your site doesn't require a developer:
 - Copy the embed code into your website
 - Leads start flowing into your dashboard (and your inbox) automatically
 
-[Clean Estimator](/estimator) covers house cleaning, apartments, commercial, carpet, air duct, dryer vent, tile & grout, mold remediation, and water damage — all 9 in one calculator, with a 30-day free trial.
+[Clean Estimator](/estimator) covers house cleaning, apartments, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, and water damage — all 10 in one calculator, with a 30-day free trial.
 
 ## FAQ
 

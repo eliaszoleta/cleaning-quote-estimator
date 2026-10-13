@@ -7,7 +7,7 @@ import { theme, cardStyle, inputStyle, secondaryBtnStyle, dangerBtnStyle, pill, 
 
 const SERVICE_COLORS = {
   home_residential: '#2563eb', apartment: '#7c3aed', commercial: '#0891b2',
-  carpet: '#16a34a', air_duct: '#d97706', dryer_vent: '#dc2626',
+  carpet: '#16a34a', upholstery: '#be185d', air_duct: '#d97706', dryer_vent: '#dc2626',
   tile_grout: '#64748b', mold_remediation: '#991b1b', water_damage: '#0284c7',
 };
 

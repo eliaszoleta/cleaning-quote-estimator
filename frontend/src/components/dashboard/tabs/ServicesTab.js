@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X } from 'lucide-react';
+import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X } from 'lucide-react';
 import { getAllStates } from '../../../data/statePricing';
 
 const ALL_STATES = getAllStates();
@@ -9,6 +9,7 @@ const SERVICES = [
   { id: 'apartment',       label: 'Apartment Cleaning',  Icon: Building2     },
   { id: 'commercial',      label: 'Commercial Cleaning', Icon: Building      },
   { id: 'carpet',          label: 'Carpet Cleaning',     Icon: Layers        },
+  { id: 'upholstery',      label: 'Upholstery Cleaning', Icon: Sofa          },
   { id: 'airDuct',         label: 'Air Duct Cleaning',   Icon: Wind          },
   { id: 'dryerVent',       label: 'Dryer Vent Cleaning', Icon: Flame         },
   { id: 'tileGrout',       label: 'Tile & Grout',        Icon: Grid3x3       },

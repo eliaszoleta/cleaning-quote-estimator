@@ -10,6 +10,7 @@ const CROSS_CHECKS = [
   { service: 'Air Duct Cleaning (base system)', ours: '$330–$420', published: '$268–$509, avg ~$379–$389', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-air-duct-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-ducts-and-vents']] },
   { service: 'Mold Remediation (10–100 sq ft)', ours: '$1,950–$2,700', published: '~$1,000–$2,500 for 100 sq ft, avg $2,368', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-mold-remediation-service-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/environmental-safety/remove-mold-and-toxic-materials/']] },
   { service: 'Dryer Vent Cleaning', ours: '$105–$253', published: '$104–$250+ depending on vent length', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-dryer-vent-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-dryer-vents/']] },
+  { service: 'Upholstery Cleaning (sofa)', ours: '$120–$175', published: '$120–$250, national avg ~$173', sources: [['Angi/HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-furniture/']] },
 ];
 
 const SECTIONS = [

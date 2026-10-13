@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ChevronDown, Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin } from 'lucide-react';
+import { ChevronDown, Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin } from 'lucide-react';
 import { getCityBySlug, getCitiesByState, getFeaturedCities, cityServicePrices } from '../../data/cityPricing';
 import { getAllFaqs } from '../../data/faqs';
 import './PageHero.css';
@@ -10,6 +10,7 @@ const ICONS = {
   apartment: Building2,
   commercial: Building,
   carpet: Layers,
+  upholstery: Sofa,
   air_duct: Wind,
   dryer_vent: Flame,
   tile_grout: Grid3x3,
