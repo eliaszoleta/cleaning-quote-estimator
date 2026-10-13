@@ -8245,7 +8245,7 @@ Some estimate tools are built primarily as a public, embeddable widget that show
 
 ## Pricing
 
-Clean Estimator is **$25/month**, with a **30-day free trial**, no per-lead fees, cancel anytime, and typically live in under 30 minutes from signup.
+Clean Estimator is **$25/month**, with a **30-day free trial** and no per-lead fees. Signup takes about two minutes, and you can run your first estimate immediately after — pricing is already built in, so there's nothing to configure first. Customizing your branding and adding the optional website widget is the only part that takes longer (usually under 30 minutes, no developer needed), and it's entirely optional.
 
 ## Who This Is Actually For
 
