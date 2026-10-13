@@ -64,7 +64,11 @@ export default function CarpetStep({ value, onBack, onNext, primaryColor }) {
 
       <StepSection label="Add-ons">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[['area_rug','Area Rug'],['scotchgard','Scotchgard Protection'],['deodorizer','Deodorizer'],['pet_treatment','Pet Odor Treatment']].map(([id,label]) => (
+          {/* ids must match CARPET_ADDONS' keys in defaults.js exactly --
+              'scotchgard' and 'pet_treatment' used to not match the
+              backend's 'stain_protector'/'pet_odor' keys at all, so both
+              silently cost $0 when selected. */}
+          {[['area_rug','Area Rug'],['stain_protector','Scotchgard Protection'],['deodorizer','Deodorizer'],['pet_odor','Pet Odor Treatment']].map(([id,label]) => (
             <StepPillToggle key={id} selected={extras.includes(id)} onClick={() => toggleExtra(id)} primaryColor={primaryColor}>{label}</StepPillToggle>
           ))}
         </div>

@@ -48,7 +48,14 @@ export default function AirDuctStep({ value, onBack, onNext, primaryColor }) {
 
       <StepSection label="Add-on services">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[['sanitizing','UV Sanitizing'],['dryer_vent','Dryer Vent (bundle)'],['coil_cleaning','Coil Cleaning'],['filter_replacement','Filter Replacement']].map(([id,label]) => (
+          {/* ids must match AIR_DUCT_ADDONS' keys in defaults.js exactly --
+              'sanitizing' and 'dryer_vent' used to not match the backend's
+              'sanitization'/'dryer_vent_combo' keys at all, so both silently
+              cost $0 when selected. 'Filter Replacement' (no matching key at
+              all, and not really the same service as the unused
+              hepa_filtration/uv_light tiers) was dropped rather than
+              invented a price for it. */}
+          {[['sanitization','UV Sanitizing'],['dryer_vent_combo','Dryer Vent (bundle)'],['coil_cleaning','Coil Cleaning']].map(([id,label]) => (
             <StepPillToggle key={id} selected={extras.includes(id)} onClick={() => toggleExtra(id)} primaryColor={primaryColor}>{label}</StepPillToggle>
           ))}
         </div>

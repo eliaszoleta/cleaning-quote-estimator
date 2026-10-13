@@ -183,15 +183,22 @@ const CLEANING_TYPE_MULTIPLIERS = {
 };
 
 // Extra add-on costs (residential/apartment)
+// inside_cabinets and pet_hair are estimated/interpolated (not externally
+// sourced like the rest of this table) -- added after an audit found both
+// were selectable on HomeStep.js/ApartmentStep.js with no matching key here
+// at all, silently charging $0. Positioned relative to the nearest
+// comparable sourced line item rather than left unpriced.
 const HOME_EXTRAS = {
   inside_oven:      { low: 38, high: 50 },
   inside_fridge:    { low: 30, high: 42 },
+  inside_cabinets:  { low: 35, high: 46 }, // comparable scope to inside_oven/inside_fridge
   interior_windows: { low: 52, high: 65 },
   laundry:          { low: 34, high: 44 },
   dishes:           { low: 24, high: 32 },
   garage:           { low: 63, high: 80 },
   basement:         { low: 76, high: 96 },
   balcony_patio:    { low: 43, high: 56 },
+  pet_hair:         { low: 30, high: 40 }, // whole-home pass, comparable to inside_fridge tier
 };
 
 // Home condition multipliers
@@ -334,11 +341,20 @@ const DRYER_VENT_LENGTH_ADDON = {
   very_long:  { low: 85, high: 115 },
 };
 
+// underground/periscope are estimated/interpolated (not externally sourced
+// like the rest of this table) -- added after an audit found both were
+// selectable on DryerVentStep.js with no matching key here at all, silently
+// treated as free (same as 'standard'). Positioned relative to the nearest
+// comparable sourced tier: underground requires trenching/excavation access
+// (harder than roof routing), periscope is specialized tight-space work
+// (between roof and underground).
 const DRYER_VENT_TYPE_ADDON = {
   standard:   { low: 0,  high: 0  },
   roof:       { low: 30, high: 48 },
   side_wall:  { low: 12, high: 22 },
   floor:      { low: 17, high: 28 },
+  underground:{ low: 55, high: 80 },
+  periscope:  { low: 40, high: 60 },
 };
 
 const DRYER_VENT_CLOG_ADDON = { low: 35, high: 55 };

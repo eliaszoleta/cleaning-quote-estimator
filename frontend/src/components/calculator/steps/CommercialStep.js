@@ -28,7 +28,10 @@ const SERVICE_LEVELS = [
   { id: 'premium', label: 'Premium', desc: '+ detailed, windows, floors' },
 ];
 
-export default function CommercialStep({ value, onBack, onNext, primaryColor }) {
+export default function CommercialStep({ value, onBack, onNext, primaryColor, companyConfig }) {
+  // Only reflects a real, company-set discount (Services tab) -- off by
+  // default, same as HomeStep.js/ApartmentStep.js's own frequencyDiscounts.
+  const frequencyDiscounts = companyConfig?.services?.commercial?.frequencyDiscounts || {};
   const [buildingType, setBuildingType] = useState(value.buildingType || 'office');
   const [sqft, setSqft] = useState(value.sqft || 2000);
   const [restrooms, setRestrooms] = useState(value.restrooms || 2);
@@ -69,9 +72,15 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor }) 
 
       <StepSection label="Cleaning frequency">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {FREQUENCIES.map(f => (
-            <StepChip key={f.id} selected={frequency === f.id} onClick={() => setFrequency(f.id)} primaryColor={primaryColor}>{f.label}</StepChip>
-          ))}
+          {FREQUENCIES.map(f => {
+            const discountPct = Math.round((frequencyDiscounts[f.id] || 0) * 100);
+            return (
+              <StepChip key={f.id} selected={frequency === f.id} onClick={() => setFrequency(f.id)} primaryColor={primaryColor}>
+                {f.label}
+                {discountPct > 0 && <span style={{ fontSize: 11, marginLeft: 4, opacity: 0.85 }}>({discountPct}% off)</span>}
+              </StepChip>
+            );
+          })}
         </div>
       </StepSection>
 
