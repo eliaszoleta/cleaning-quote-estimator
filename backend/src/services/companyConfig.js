@@ -136,6 +136,45 @@ async function listAllCompanyConfigs() {
   return Array.from(fileCache.entries()).map(([companyId, config]) => ({ companyId, config }));
 }
 
+// Same as listAllCompanyConfigs, but joined with each account's Supabase
+// Auth signup email/created_at (same pagination pattern as admin.js's own
+// listCompaniesWithConfig) -- the activation-reminder check (trialScheduler.js's
+// checkActivationReminders) needs to know WHEN an account signed up, not just
+// its current config, since "never finished checkout" has no timestamp of
+// its own anywhere in the config -- the company row gets created the moment
+// POST /checkout starts, same instant as the Auth user itself.
+async function listAllCompanyConfigsWithOwnerInfo() {
+  const sb = getSupabase();
+  if (!sb) return listAllCompanyConfigs().then(rows => rows.map(r => ({ ...r, email: null, signedUpAt: null })));
+
+  const { data: configRows, error: cfgErr } = await sb
+    .from('cleaning_company_configs')
+    .select('company_id, config');
+  if (cfgErr) {
+    console.error('[companyConfig] LIST (with owner info) error:', cfgErr.message, cfgErr.code);
+    throw new Error(cfgErr.message);
+  }
+
+  let users = [];
+  let page = 1;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const { data, error } = await sb.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) throw error;
+    users = users.concat(data.users);
+    if (data.users.length < 1000) break;
+    page += 1;
+  }
+  const userById = new Map(users.map(u => [u.id, u]));
+
+  return (configRows || []).map(row => ({
+    companyId: row.company_id,
+    config: row.config || {},
+    email: userById.get(row.company_id)?.email || null,
+    signedUpAt: userById.get(row.company_id)?.created_at || null,
+  }));
+}
+
 // ─── Duplicate-account detection ───────────────────────────────────────────
 // Called from the signup form (company.js's POST /check-duplicate, before
 // supabase.auth.signUp() runs) to stop the same real-world business from
@@ -177,4 +216,4 @@ async function findDuplicateCompany({ companyName, phone, website }) {
   return null;
 }
 
-module.exports = { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, listAllCompanyConfigs, findDuplicateCompany, DEFAULT_COMPANY_CONFIG };
+module.exports = { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, findDuplicateCompany, DEFAULT_COMPANY_CONFIG };

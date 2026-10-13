@@ -715,6 +715,23 @@ async function sendCompanyWelcomeEmail({ to, companyId, subject }) {
   return sent;
 }
 
+// Sent once, ~12 hours after a company's account was created if checkout
+// still hasn't been completed (status stays 'requires_trial_setup' --
+// see checkActivationReminders in services/trialScheduler.js). These
+// accounts show up in the admin Companies list as "Not started". Deduped
+// via activationReminderEmailSentAt on config.subscription. Content lives
+// in the editable email_templates table (key: 'activation_reminder').
+async function sendActivationReminderEmail({ to, companyName }) {
+  const { sent } = await sendTemplatedEmail({
+    template: 'activation_reminder',
+    to,
+    toName: companyName,
+    vars: { companyName },
+    recipientType: 'company',
+  });
+  return sent;
+}
+
 // ─── Trial check-in email ────────────────────────────────────────────────
 // Just one touchpoint during the trial itself now -- day 7, a nudge to
 // actually open Calculator Mode. The day-14/21 check-ins, the day-28
@@ -1116,6 +1133,7 @@ module.exports = {
   sendPaymentFailedEmail,
   sendSubscriptionCanceledEmail,
   sendTrialCheckin1Email,
+  sendActivationReminderEmail,
   sendAccountDeletionScheduledEmail,
   sendWebsiteRequestNotificationEmail,
   sendWebsiteRequestReceivedEmail,

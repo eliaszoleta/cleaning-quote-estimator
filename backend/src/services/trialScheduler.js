@@ -1,7 +1,9 @@
-const { listAllCompanyConfigs, getCompanyConfig, saveCompanyConfig } = require('./companyConfig');
-const { sendTrialCheckin1Email } = require('./email');
+const { listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, getCompanyConfig, saveCompanyConfig } = require('./companyConfig');
+const { sendTrialCheckin1Email, sendActivationReminderEmail } = require('./email');
+const { computeSubscriptionStatus } = require('./subscriptionStatus');
 
 const TRIAL_DAYS = 30;
+const ACTIVATION_REMINDER_DELAY_HOURS = 12;
 
 function getSupabase() {
   const { createClient } = require('@supabase/supabase-js');
@@ -89,4 +91,46 @@ async function checkTrialReminders() {
   }
 }
 
-module.exports = { checkTrialReminders };
+// Checks every company still sitting at status 'requires_trial_setup' --
+// signed up, but never finished Stripe Checkout, so no trial ever actually
+// started (shows up in the admin Companies list as "Not started"). Sends
+// one nudge email ~12 hours after signup if they're still in that state,
+// deduped via activationReminderEmailSentAt on config.subscription so it
+// only ever goes out once per company, same pattern as checkTrialReminders
+// above. Needs each account's signup timestamp (nothing in config itself
+// records when an incomplete signup happened), hence the separate
+// owner-info-joined list rather than listAllCompanyConfigs.
+async function checkActivationReminders() {
+  let rows;
+  try {
+    rows = await listAllCompanyConfigsWithOwnerInfo();
+  } catch (err) {
+    console.error('checkActivationReminders: failed to list company configs:', err.message);
+    return;
+  }
+
+  const cutoff = Date.now() - ACTIVATION_REMINDER_DELAY_HOURS * 60 * 60 * 1000;
+
+  for (const { companyId, config, email, signedUpAt } of rows) {
+    const sub = config?.subscription || {};
+    if (sub.activationReminderEmailSentAt) continue;
+    if (!email || !signedUpAt) continue;
+    if (computeSubscriptionStatus(config, email).status !== 'requires_trial_setup') continue;
+    if (new Date(signedUpAt).getTime() > cutoff) continue;
+
+    try {
+      const companyName = config.companyName || 'there';
+      if (await sendActivationReminderEmail({ to: email, companyName })) {
+        const fresh = (await getCompanyConfig(companyId)) || config;
+        await saveCompanyConfig(companyId, {
+          ...fresh,
+          subscription: { ...fresh.subscription, activationReminderEmailSentAt: new Date().toISOString() },
+        });
+      }
+    } catch (err) {
+      console.error(`checkActivationReminders: failed for company ${companyId}:`, err.message);
+    }
+  }
+}
+
+module.exports = { checkTrialReminders, checkActivationReminders };
