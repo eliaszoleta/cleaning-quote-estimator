@@ -99,3 +99,22 @@
     padding: 0 16px 48px;
   }
 }
+
+/* Shared data-table pattern for blog posts, service/state/city pricing
+   tables, etc. (anything using the .pg-data-table / .pg-data-table-wrap
+   classes). On desktop these render at width:100%, same as before. Below
+   640px, letting the table keep shrinking to the viewport crams every
+   column into a few characters of width and wraps/clips cell text --
+   instead, give the table a min-width so columns keep a readable width
+   and let the wrapper scroll horizontally. Desktop is untouched since
+   this only applies under the breakpoint. */
+.pg-data-table { width: 100%; }
+@media (max-width: 640px) {
+  .pg-data-table-wrap {
+    -webkit-overflow-scrolling: touch;
+  }
+  .pg-data-table {
+    width: auto;
+    min-width: 540px;
+  }
+}

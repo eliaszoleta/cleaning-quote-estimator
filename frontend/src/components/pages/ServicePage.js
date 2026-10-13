@@ -36,8 +36,8 @@ function unitSuffix(service) {
 
 function TiersTable({ service }) {
   return (
-    <div style={{ overflowX: 'auto', margin: '20px 0' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+    <div className="pg-data-table-wrap" style={{ overflowX: 'auto', margin: '20px 0' }}>
+      <table className="pg-data-table" style={{ borderCollapse: 'collapse', fontSize: 14 }}>
         <thead>
           <tr style={{ background: '#f8fafc' }}>
             <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#374151', borderBottom: '2px solid #e2e8f0' }}>Tier</th>
