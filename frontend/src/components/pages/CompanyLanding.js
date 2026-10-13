@@ -200,7 +200,7 @@ export default function CompanyLanding() {
                   <span style={{ color: '#60a5fa' }}>without tipping your hand</span>
                 </h1>
                 <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.65 }}>
-                  Clean Estimator is an internal pricing tool for cleaning businesses: accurate price estimates ready the second you click — no more guessing what to charge. Want a public-facing version for your website too? It's included — no separate plan to buy.
+                  Clean Estimator is an internal pricing tool for cleaning businesses: an instant, on-screen estimate ready the second you click — no more guessing what to charge. Want a public-facing version for your website too? It's included — no separate plan to buy.
                 </p>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                   <a href="/company?mode=signup" className="ce-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
