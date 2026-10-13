@@ -47,7 +47,11 @@ export default function TileGroutStep({ value, onBack, onNext, primaryColor }) {
 
       <StepSection label="Current condition">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[['light','Lightly soiled'],['moderate','Moderately dirty'],['heavy','Heavy buildup'],['neglected','Years of neglect']].map(([id,label]) => (
+          {/* 'Years of neglect' used to send id 'neglected', but
+              TILE_CONDITION_MULTIPLIERS' top key is 'damaged' -- silently
+              applied the 'heavy' multiplier (1.32-1.42x) instead of the
+              correct, higher 'damaged' one (1.42-1.55x). */}
+          {[['light','Lightly soiled'],['moderate','Moderately dirty'],['heavy','Heavy buildup'],['damaged','Years of neglect']].map(([id,label]) => (
             <StepChip key={id} selected={condition === id} onClick={() => setCondition(id)} primaryColor={primaryColor}>{label}</StepChip>
           ))}
         </div>
