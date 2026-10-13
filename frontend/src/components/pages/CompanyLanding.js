@@ -50,7 +50,7 @@ const PLAN_FEATURES = [
   'Unlimited internal price calculations',
   'Instant result on screen — never a public price range',
   'Email a result to a coworker in one click',
-  'ZIP-code accurate pricing, plus your own markup on top',
+  'ZIP-code accurate pricing & per-service markup control',
   'All 10 service calculators',
   'Calculator widget for your website, included whenever you want public lead capture',
   'Automatic lead capture + instant email alerts once it\'s on your site',
