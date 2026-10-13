@@ -200,10 +200,10 @@ export default function CompanyLanding() {
                   <span style={{ color: '#60a5fa' }}>without tipping your hand</span>
                 </h1>
                 <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 480, marginBottom: 32, lineHeight: 1.65 }}>
-                  Clean Estimator is an internal pricing tool for cleaning businesses: an instant,{' '}
+                  Clean Estimator is an internal pricing tool for cleaning businesses: unlimited, instant,{' '}
                   <span style={{ position: 'relative', fontWeight: 700, color: '#78350f', padding: '1px 6px', whiteSpace: 'nowrap' }}>
                     <span aria-hidden="true" style={{ position: 'absolute', inset: '2px -2px', background: '#fde047', borderRadius: '3px 7px 4px 8px / 5px 3px 6px 4px', transform: 'rotate(-0.6deg)', zIndex: 0 }} />
-                    <span style={{ position: 'relative', zIndex: 1 }}>on-screen estimate</span>
+                    <span style={{ position: 'relative', zIndex: 1 }}>on-screen estimates</span>
                   </span>
                   {' '}ready the second you click — no more guessing what to charge. Want a public-facing version for your website too? It's included — no separate plan to buy.
                 </p>
