@@ -85,6 +85,22 @@ export default function MethodologyPage() {
         <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
       </Helmet>
 
+      {/* The comparison table has 4 columns (Service, Our Estimate,
+          Published Range, Source) -- too many to fit a phone's width even
+          with overflow-x scrolling, which just left the last column or two
+          silently clipped at the screen edge with no visual hint there was
+          more to scroll to. Below 640px, swap it for a stacked card per
+          row instead -- CSS-only (no JS breakpoint state) so there's no
+          flash of the wrong layout on load. */}
+      <style>{`
+        .mp-table-wrap { display: block; }
+        .mp-cards { display: none; }
+        @media (max-width: 640px) {
+          .mp-table-wrap { display: none; }
+          .mp-cards { display: flex; }
+        }
+      `}</style>
+
       <div className="page-hero-band" style={{ paddingBottom: 56 }}>
         <div className="page-hero-glow" aria-hidden="true" />
         <div className="page-hero-inner" style={{ maxWidth: 780, textAlign: 'left' }}>
@@ -101,19 +117,25 @@ export default function MethodologyPage() {
       <div style={{ maxWidth: 780, margin: '0 auto', padding: 'clamp(24px, 6vw, 40px) 20px clamp(24px, 6vw, 40px)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {SECTIONS.map(({ Icon, title: t, body }) => (
-            <div key={t} style={{ background: 'white', borderRadius: 16, padding: 'clamp(18px, 4.5vw, 26px) clamp(16px, 4.5vw, 28px)', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 4px 16px rgba(15,23,42,0.05)', display: 'flex', gap: 18 }}>
-              <span style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Icon size={22} strokeWidth={2} />
-              </span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>{t}</h2>
+            <div key={t} style={{ background: 'white', borderRadius: 16, padding: 'clamp(16px, 4.5vw, 26px) clamp(14px, 4.5vw, 28px)', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 4px 16px rgba(15,23,42,0.05)' }}>
+              {/* Icon sits in its own row above the title instead of
+                  beside the paragraph -- freeing up the card's full width
+                  for text instead of permanently reserving an icon+gap's
+                  worth of space next to every line. */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                <span style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#eff6ff,#dbeafe)', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon size={18} strokeWidth={2} />
+                </span>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 }}>{t}</h2>
+              </div>
+              <div style={{ minWidth: 0 }}>
                 {body && <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7, margin: 0 }}>{body}</p>}
                 {t === 'How Our Numbers Compare to Published Industry Guides' && (
                   <>
                     <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7, margin: '0 0 14px' }}>
                       We don't just claim our numbers are researched — here's where they land next to current, publicly published cost guides from Angi, HomeAdvisor, HomeGuide, and Housecall Pro (checked August 2026). We're not claiming these sites as our original data source; this is an independent cross-check showing our ranges are in the same ballpark as what's publicly reported elsewhere.
                     </p>
-                    <div style={{ overflowX: 'auto' }}>
+                    <div className="mp-table-wrap" style={{ overflowX: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
                         <thead>
                           <tr style={{ background: '#f8fafc' }}>
@@ -141,6 +163,27 @@ export default function MethodologyPage() {
                           ))}
                         </tbody>
                       </table>
+                    </div>
+
+                    <div className="mp-cards" style={{ flexDirection: 'column', gap: 12 }}>
+                      {CROSS_CHECKS.map(row => (
+                        <div key={row.service} style={{ border: '1px solid #e2e8f0', borderRadius: 10, padding: '12px 14px', background: '#f8fafc' }}>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', marginBottom: 8 }}>{row.service}</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13.5 }}>
+                            <div><span style={{ color: '#64748b' }}>Our Estimate: </span><span style={{ color: '#1d4ed8', fontWeight: 700 }}>{row.ours}</span></div>
+                            <div><span style={{ color: '#64748b' }}>Published Range: </span><span style={{ color: '#475569' }}>{row.published}</span></div>
+                            <div>
+                              <span style={{ color: '#64748b' }}>Source: </span>
+                              {row.sources.map(([name, href], i) => (
+                                <React.Fragment key={name}>
+                                  {i > 0 && ', '}
+                                  <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>{name}</a>
+                                </React.Fragment>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </>
                 )}
