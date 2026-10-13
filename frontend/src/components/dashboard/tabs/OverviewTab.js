@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Users, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard } from 'lucide-react';
-import { getCompanyLeads } from '../../../utils/api';
+import { Users, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
+import { getCompanyLeads, getCompanyEstimateRuns } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
@@ -8,8 +8,14 @@ import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 export default function OverviewTab({ config, subStatus, user }) {
   const [leads, setLeads] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(true);
+  // Total + this-month count of this company's successful /api/calculate
+  // runs (internal Calculator Mode and the embedded widget combined). Added
+  // alongside the leads-based stats below because a company using Clean
+  // Estimator purely internally -- the primary pitch -- otherwise shows up
+  // nowhere at all: no email captured, so nothing in `leads` either.
+  const [estimateRuns, setEstimateRuns] = useState({ total: 0, thisMonth: 0 });
 
-  useEffect(() => { loadLeads(); }, []);
+  useEffect(() => { loadLeads(); loadEstimateRuns(); }, []);
 
   const loadLeads = async () => {
     try {
@@ -21,6 +27,16 @@ export default function OverviewTab({ config, subStatus, user }) {
     } catch {} finally {
       setLoadingLeads(false);
     }
+  };
+
+  const loadEstimateRuns = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) return;
+      const res = await getCompanyEstimateRuns(token);
+      setEstimateRuns(res.data || { total: 0, thisMonth: 0 });
+    } catch {}
   };
 
   const recentLeads = leads.slice(0, 5);
@@ -39,11 +55,34 @@ export default function OverviewTab({ config, subStatus, user }) {
     : 0;
 
   const stats = [
+    { label: 'Estimates Run',  value: estimateRuns.total,                                        Icon: Zap,         color: '#7c3aed', bg: '#f5f3ff' },
     { label: 'Total Leads',    value: leads.length,                                              Icon: Users,       color: '#1d4ed8', bg: '#eff6ff' },
     { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a', bg: '#f0fdf4' },
     { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate) : '—',         Icon: DollarSign,  color: '#d97706', bg: '#fffbeb' },
     { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—', Icon: Globe,       color: subStatus?.active ? '#16a34a' : '#dc2626', bg: subStatus?.active ? '#f0fdf4' : '#fef2f2' },
   ];
+
+  // Setup checklist -- shown until every required step is done, then
+  // disappears entirely (classic onboarding-checklist UX) so it doesn't
+  // permanently clutter a returning, fully-set-up user's dashboard. Each
+  // step reads a real signal off config/estimateRuns/leads rather than a
+  // separate "onboarding progress" flag that could drift out of sync with
+  // what the account has actually done.
+  const checklistSteps = [
+    { label: 'Set your service area',       done: (config?.serviceStates?.length || 0) > 0, href: '?tab=services', Icon: MapPin },
+    { label: 'Add your branding',           done: !!config?.logo,                            href: '?tab=branding', Icon: Palette },
+    // '' resolves to a bare /company link (not /company?tab=...) -- Calculator
+    // Mode is CompanyDashboard.js's own default viewMode, not a URL-addressable
+    // tab, so this is how you land there instead of back on this Overview tab.
+    { label: 'Run your first estimate',     done: estimateRuns.total > 0,                     href: '', Icon: PlayCircle },
+  ];
+  const requiredDone = checklistSteps.filter(s => s.done).length;
+  const showChecklist = requiredDone < checklistSteps.length;
+  // Embedding the widget is a bonus step, not required -- the primary pitch
+  // is internal-only use, so it's shown as an optional nudge once the three
+  // required steps above are complete, not blocking the checklist from
+  // disappearing.
+  const widgetEmbedded = leads.length > 0;
 
   const quickActions = [
     { label: 'Services & Pricing', href: '?tab=services',      Icon: SlidersHorizontal },
@@ -62,6 +101,55 @@ export default function OverviewTab({ config, subStatus, user }) {
           Welcome back{config?.companyName ? `, ${config.companyName}` : ''}.
         </p>
       </div>
+
+      {/* Setup checklist -- the only thing a brand-new account saw before
+          this was an all-zero stat grid and a one-time "check Help & Docs"
+          popup, with no guided next step. Disappears once the required
+          steps are done so it never clutters a returning, set-up account. */}
+      {showChecklist && (
+        <div style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, padding: '20px 22px', marginBottom: 20, boxShadow: SHADOWS.sm }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14, flexWrap: 'wrap', gap: 6 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: COLORS.ink, margin: 0 }}>Get set up</h3>
+            <span style={{ fontSize: 12.5, color: COLORS.muted, fontWeight: 600 }}>{requiredDone} of {checklistSteps.length} done</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {checklistSteps.map(({ label, done, href, Icon }) => (
+              <a
+                key={label}
+                href={done ? undefined : `/company${href}`}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '11px 14px', borderRadius: 7,
+                  border: `1.5px solid ${done ? COLORS.border : COLORS.primary}`,
+                  background: done ? COLORS.surfaceMuted : COLORS.primaryMuted,
+                  textDecoration: 'none', cursor: done ? 'default' : 'pointer',
+                }}
+              >
+                <span style={{
+                  width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: done ? '#16a34a' : 'white', border: done ? 'none' : `1.5px solid ${COLORS.primary}`,
+                }}>
+                  {done ? <Check size={13} color="white" strokeWidth={3} /> : <Icon size={12} color={COLORS.primary} strokeWidth={2.3} />}
+                </span>
+                <span style={{ fontSize: 13.5, fontWeight: 600, color: done ? COLORS.muted : COLORS.ink, textDecoration: done ? 'line-through' : 'none' }}>
+                  {label}
+                </span>
+              </a>
+            ))}
+            {!widgetEmbedded && (
+              <a href="/company?tab=branding" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 7, border: `1.5px dashed ${COLORS.border}`, textDecoration: 'none' }}>
+                <span style={{ width: 24, height: 24, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', border: `1.5px solid ${COLORS.border}` }}>
+                  <Code2 size={12} color={COLORS.muted} strokeWidth={2.3} />
+                </span>
+                <span style={{ fontSize: 13.5, fontWeight: 600, color: COLORS.body }}>
+                  Optional: embed the calculator widget on your website too
+                </span>
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 24 }}>

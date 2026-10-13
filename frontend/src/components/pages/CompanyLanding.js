@@ -58,7 +58,7 @@ const PLAN_FEATURES = [
 ];
 
 const TRUST_BADGES = [
-  { Icon: ShieldCheck, text: '30-day free trial' },
+  { Icon: ShieldCheck, text: '30-day free trial (card required)' },
   { Icon: Zap,          text: 'First estimate in 2 minutes' },
   { Icon: Check,        text: 'Cancel anytime' },
 ];
@@ -402,6 +402,9 @@ export default function CompanyLanding() {
                   <a href="/company?mode=signup" className="ce-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
                     Start Free Trial <Arrow size={15} />
                   </a>
+                  <div style={{ color: '#94a3b8', fontSize: 11.5, textAlign: 'center', marginTop: 10 }}>
+                    Card required to start — you won't be charged for 30 days.
+                  </div>
                 </div>
               </div>
 

@@ -27,17 +27,36 @@ async function getOwnerEmail(companyId) {
   }
 }
 
-// Checks every company's free-trial state and sends whichever of these five
+// Checks every company's free-trial state and sends whichever of these
 // emails is next due, each exactly once (deduped via sent-at flags stored
 // on config.subscription): three check-ins at days 7/14/21 filling what was
 // previously 27 days of total silence after the day-0 welcome email, then
-// the existing day-28/29 "ending soon" reminder, then the day-30 "ended"
-// email once the embed widget actually pauses.
+// a day-28/29 "ending soon" reminder.
 //
-// One email per company per run, in chronological order (ended > ending-
-// soon > checkin1 > checkin2 > checkin3) -- this also handles accounts that
-// were already mid-trial when the three check-ins shipped: an account with
-// none of the checkin flags set yet just receives whichever is earliest-due
+// Two trial models coexist here:
+// - Current accounts: a real Stripe-managed trial (card collected at
+//   signup, see subscription.js's POST /checkout). sub.currentPeriodEnd is
+//   the trial end date Stripe itself is tracking, so daysLeft/daysElapsed
+//   are derived from that instead of a locally-tracked start date -- this
+//   used to only check sub.trialStartedAt, which nothing has set since
+//   Checkout-based signup shipped, so these five emails silently never
+//   fired for any current signup (every attempt here had trialStartedAt
+//   unset and stripeSubscriptionId set, which the old `if` skipped
+//   entirely). There's no "trial ended" email in this path -- Stripe just
+//   charges the card and the subscription flips to "active" on its own;
+//   see subscription.js's webhook handler for the event-driven
+//   trial_converted confirmation email that replaces it, sent the moment
+//   that transition happens rather than polled for here.
+// - Legacy accounts: the old no-card trial (trialStartedAt set, never
+//   touched Stripe) that predates the Checkout-based signup flow. Kept
+//   running exactly as before, days-elapsed-since-trialStartedAt math and
+//   all, including the "ended / widget paused" email once it actually
+//   does lose access with no card on file to charge.
+//
+// One email per company per run, in chronological order (ending-soon >
+// checkin1 > checkin2 > checkin3) -- this also handles accounts that were
+// already mid-trial when the three check-ins shipped: an account with none
+// of the checkin flags set yet just receives whichever is earliest-due
 // this run, then the next on the following run(s), catching up over a few
 // hours instead of never getting them. The `daysLeft > 3` guard on all
 // three check-ins keeps that catch-up from firing a "how's week 1 going?"
@@ -59,12 +78,19 @@ async function checkTrialReminders() {
   }
 
   for (const { companyId, config } of rows) {
-    const sub = config?.subscription;
-    if (!sub?.trialStartedAt) continue;
-    if (sub.stripeSubscriptionId) continue; // already subscribed (or previously was) -- not a bare trial anymore
+    const sub = config?.subscription || {};
+    const companyName = config.companyName || 'there';
 
-    const daysElapsed = (Date.now() - new Date(sub.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24);
-    const daysLeft = Math.ceil(TRIAL_DAYS - daysElapsed);
+    const isLegacyTrial = !!sub.trialStartedAt && !sub.stripeSubscriptionId;
+    const isStripeTrial = !!sub.stripeSubscriptionId && sub.status === 'trialing' && !!sub.currentPeriodEnd;
+    if (!isLegacyTrial && !isStripeTrial) continue;
+
+    const daysElapsed = isLegacyTrial
+      ? (Date.now() - new Date(sub.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24)
+      : TRIAL_DAYS - Math.max(0, Math.ceil((new Date(sub.currentPeriodEnd) - Date.now()) / (1000 * 60 * 60 * 24)));
+    const daysLeft = isLegacyTrial
+      ? Math.ceil(TRIAL_DAYS - daysElapsed)
+      : Math.max(0, Math.ceil((new Date(sub.currentPeriodEnd) - Date.now()) / (1000 * 60 * 60 * 24)));
 
     // Shared by every branch below: send, then re-fetch fresh (rather than
     // reuse the bulk-listed snapshot) right before saving the sent-at flag,
@@ -79,9 +105,7 @@ async function checkTrialReminders() {
     };
 
     try {
-      const companyName = config.companyName || 'there';
-
-      if (daysLeft <= 0 && !sub.trialEndedEmailSentAt) {
+      if (isLegacyTrial && daysLeft <= 0 && !sub.trialEndedEmailSentAt) {
         const email = await getOwnerEmail(companyId);
         if (!email) continue;
         if (await sendTrialEndedEmail({ to: email, companyName })) await markSent('trialEndedEmailSentAt');

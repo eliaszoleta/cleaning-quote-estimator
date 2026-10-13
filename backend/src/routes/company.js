@@ -128,6 +128,40 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
+// POST /api/company/:id/feedback — auth required. "Before you go" feedback
+// SubscriptionTab.js asks for right before handing off to Stripe's hosted
+// Billing Portal (see 021_cancellation_feedback.sql for why this is asked
+// up front rather than captured reactively on actual cancellation -- this
+// app has no way to tell from the portal itself whether they ended up
+// canceling or just updated a card). Both fields are optional; an empty
+// submission is simply not saved.
+router.post('/:id/feedback', requireAuth, async (req, res) => {
+  const { id } = req.params;
+  if (req.user.id !== id) return res.status(403).json({ success: false, error: 'Forbidden' });
+
+  const { reason, note } = req.body || {};
+  if (!reason && !note) return res.json({ success: true, skipped: true });
+
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return res.json({ success: true, skipped: true }); // no DB configured (local dev)
+    const supabase = createClient(url, key, { auth: { persistSession: false } });
+    const { error } = await supabase.from('cancellation_feedback').insert({
+      company_id: id,
+      reason: reason || null,
+      note: note || null,
+    });
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('POST company feedback error:', err.message);
+    // Fail open -- a feedback-save failure should never block the portal redirect.
+    res.json({ success: true, skipped: true });
+  }
+});
+
 // POST /api/company/:id/upload-logo — auth required. Takes a small image as
 // base64 JSON (not multipart -- avoids adding a multer dependency for what's
 // a rare, small upload, same reasoning as partnerCheckout.js's own

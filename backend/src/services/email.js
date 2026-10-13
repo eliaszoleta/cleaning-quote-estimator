@@ -786,13 +786,75 @@ async function sendTrialCheckin3Email({ to, companyName }) {
   return sent;
 }
 
-// Sent once, the day a company's 30-day free trial actually ends and their
-// widget gets paused (see checkTrialReminders). Deduped via
-// config.subscription.trialEndedEmailSentAt. Content lives in the editable
-// email_templates table (key: 'trial_ended').
+// Legacy path only -- sent once, the day a company's old, no-card
+// trialStartedAt-based trial actually runs out with no Stripe subscription
+// ever attached, so the embedded widget genuinely does get paused (see
+// checkTrialReminders). Deduped via config.subscription.trialEndedEmailSentAt.
+// Content lives in the editable email_templates table (key: 'trial_ended').
+// Not used for a current, Stripe-managed trial -- see sendTrialConvertedEmail
+// below for that case, where nothing pauses because the card just gets
+// charged automatically.
 async function sendTrialEndedEmail({ to, companyName }) {
   const { sent } = await sendTemplatedEmail({
     template: 'trial_ended',
+    to,
+    toName: companyName,
+    vars: { companyName },
+    recipientType: 'company',
+  });
+  return sent;
+}
+
+// Sent once, triggered by the customer.subscription.updated webhook the
+// moment Stripe transitions a subscription from "trialing" to "active" --
+// i.e. the trial just ended and the card on file was just charged. Event-
+// driven rather than polled (see checkTrialReminders) since that's the
+// exact moment Stripe itself decides the trial is over; nothing pauses in
+// this flow, so this is a receipt/confirmation, not a reactivation pitch
+// like the legacy trial_ended email above. Deduped via
+// config.subscription.trialConvertedEmailSentAt (webhook deliveries can
+// repeat). Content lives in the editable email_templates table
+// (key: 'trial_converted').
+async function sendTrialConvertedEmail({ to, companyName }) {
+  const { sent } = await sendTemplatedEmail({
+    template: 'trial_converted',
+    to,
+    toName: companyName,
+    vars: { companyName },
+    recipientType: 'company',
+  });
+  return sent;
+}
+
+// Sent from the invoice.payment_failed webhook the moment a card declines --
+// computeSubscriptionStatus treats "past_due" as inactive immediately (no
+// grace window in app logic), so without this the customer only finds out
+// by logging back in and hitting the dashboard's ActivationGate. Deduped by
+// Stripe invoice id (config.subscription.lastPaymentFailedInvoiceId), not a
+// one-time flag -- Stripe's own retry schedule fires this webhook multiple
+// times for the SAME invoice, which shouldn't re-send, but a genuinely new
+// failed invoice next billing cycle should. Content lives in the editable
+// email_templates table (key: 'payment_failed').
+async function sendPaymentFailedEmail({ to, companyName }) {
+  const { sent } = await sendTemplatedEmail({
+    template: 'payment_failed',
+    to,
+    toName: companyName,
+    vars: { companyName },
+    recipientType: 'company',
+  });
+  return sent;
+}
+
+// Sent once, from the customer.subscription.deleted webhook -- a genuine
+// win-back touchpoint, not a reactivation-pitch send-and-forget: asks what
+// went wrong and invites a reply, alongside the restart link. Deduped via
+// config.subscription.cancellationEmailSentAt (webhook deliveries can
+// repeat). Content lives in the editable email_templates table
+// (key: 'subscription_canceled').
+async function sendSubscriptionCanceledEmail({ to, companyName }) {
+  const { sent } = await sendTemplatedEmail({
+    template: 'subscription_canceled',
     to,
     toName: companyName,
     vars: { companyName },
@@ -1141,6 +1203,9 @@ module.exports = {
   sendCompanyWelcomeEmail,
   sendTrialEndingSoonEmail,
   sendTrialEndedEmail,
+  sendTrialConvertedEmail,
+  sendPaymentFailedEmail,
+  sendSubscriptionCanceledEmail,
   sendTrialCheckin1Email,
   sendTrialCheckin2Email,
   sendTrialCheckin3Email,

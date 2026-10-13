@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { sendCompanyWelcomeEmail } = require('../services/email');
+const { sendCompanyWelcomeEmail, sendTrialConvertedEmail, sendPaymentFailedEmail, sendSubscriptionCanceledEmail } = require('../services/email');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -166,6 +166,24 @@ async function findCompanyByCustomer(customerId) {
   }
 }
 
+// Same pattern as calculate.js/trialScheduler.js's own copy of this --
+// Supabase auth user lookup, not stored on the company config itself.
+async function getOwnerEmail(companyId) {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return null;
+    const supabase = createClient(url, key, { auth: { persistSession: false } });
+    const { data, error } = await supabase.auth.admin.getUserById(companyId);
+    if (error) return null;
+    return data?.user?.email || null;
+  } catch (err) {
+    console.warn('subscription.js: getOwnerEmail failed:', err.message);
+    return null;
+  }
+}
+
 async function handleStripeEvent(event) {
   const stripe = getStripe();
 
@@ -205,6 +223,12 @@ async function handleStripeEvent(event) {
         const companyId = await findCompanyByCustomer(sub.customer);
         if (!companyId) break;
         const config = (await getCompanyConfig(companyId)) || {};
+        // Stripe's trial-period clock, not this webhook, is what actually
+        // ends a trial -- catch the transition here (previous_attributes
+        // only lists fields that just changed) so the "you're now a paying
+        // customer" email fires at the exact moment the card gets charged,
+        // rather than this app polling for it.
+        const justConvertedFromTrial = event.data.previous_attributes?.status === 'trialing' && sub.status === 'active';
         config.subscription = {
           ...(config.subscription || {}),
           status: sub.status,
@@ -216,6 +240,23 @@ async function handleStripeEvent(event) {
         };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: subscription updated to "${sub.status}" (cancelAtPeriodEnd: ${sub.cancel_at_period_end}) for company ${companyId}`);
+
+        // Deduped via trialConvertedEmailSentAt -- Stripe can redeliver the
+        // same webhook event, and this flag is the only thing standing
+        // between a redelivery and a duplicate "you've been charged" email.
+        if (justConvertedFromTrial && !config.subscription.trialConvertedEmailSentAt) {
+          const email = await getOwnerEmail(companyId);
+          if (email) {
+            const sent = await sendTrialConvertedEmail({ to: email, companyName: config.companyName || 'there' });
+            if (sent) {
+              const fresh = (await getCompanyConfig(companyId)) || config;
+              await saveCompanyConfig(companyId, {
+                ...fresh,
+                subscription: { ...fresh.subscription, trialConvertedEmailSentAt: new Date().toISOString() },
+              });
+            }
+          }
+        }
       } catch (err) {
         console.error(`Webhook customer.subscription.updated failed:`, err.message);
         throw err;
@@ -232,6 +273,21 @@ async function handleStripeEvent(event) {
         config.subscription = { ...(config.subscription || {}), status: 'canceled', stripeSubscriptionId: sub.id };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: canceled subscription for company ${companyId}`);
+
+        // Deduped via cancellationEmailSentAt -- webhook deliveries can repeat.
+        if (!config.subscription.cancellationEmailSentAt) {
+          const email = await getOwnerEmail(companyId);
+          if (email) {
+            const sent = await sendSubscriptionCanceledEmail({ to: email, companyName: config.companyName || 'there' });
+            if (sent) {
+              const fresh = (await getCompanyConfig(companyId)) || config;
+              await saveCompanyConfig(companyId, {
+                ...fresh,
+                subscription: { ...fresh.subscription, cancellationEmailSentAt: new Date().toISOString() },
+              });
+            }
+          }
+        }
       } catch (err) {
         console.error(`Webhook customer.subscription.deleted failed:`, err.message);
         throw err;
@@ -249,6 +305,24 @@ async function handleStripeEvent(event) {
         config.subscription = { ...(config.subscription || {}), status: 'past_due' };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: marked past_due for company ${companyId}`);
+
+        // Deduped by invoice id, not a one-time flag -- Stripe's own retry
+        // schedule fires this same webhook multiple times for the SAME
+        // invoice (shouldn't re-send each time), but a genuinely new failed
+        // invoice next billing cycle has a different id and should.
+        if (config.subscription.lastPaymentFailedInvoiceId !== invoice.id) {
+          const email = await getOwnerEmail(companyId);
+          if (email) {
+            const sent = await sendPaymentFailedEmail({ to: email, companyName: config.companyName || 'there' });
+            if (sent) {
+              const fresh = (await getCompanyConfig(companyId)) || config;
+              await saveCompanyConfig(companyId, {
+                ...fresh,
+                subscription: { ...fresh.subscription, lastPaymentFailedInvoiceId: invoice.id },
+              });
+            }
+          }
+        }
       } catch (err) {
         console.error(`Webhook invoice.payment_failed failed:`, err.message);
         throw err;

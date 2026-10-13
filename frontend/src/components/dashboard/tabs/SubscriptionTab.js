@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Zap, AlertTriangle, Globe, Users, SlidersHorizontal, KeyRound, Send, ClipboardList, Infinity, Loader2, Lock } from 'lucide-react';
-import { postCheckout, postPortal } from '../../../utils/api';
+import { CheckCircle2, Zap, AlertTriangle, Globe, Users, SlidersHorizontal, KeyRound, Send, ClipboardList, Infinity, Loader2, Lock, X } from 'lucide-react';
+import { postCheckout, postPortal, postCompanyFeedback } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
+
+// Options for the optional "before you go" feedback step -- see
+// 021_cancellation_feedback.sql for why this is asked up front rather than
+// captured reactively on actual cancellation (Stripe's hosted Billing
+// Portal is a black box this app can't tell "updated a card" apart from
+// "canceled" inside).
+const FEEDBACK_REASONS = [
+  'Just updating payment info',
+  'Too expensive',
+  'Not using it enough',
+  'Missing a feature I need',
+  'Switching to something else',
+  'Other',
+];
 
 // Mirrors CompanyLanding.js's PLAN_FEATURES -- one plan, pitched primarily
 // as an internal pricing tool, with the calculator widget for your
@@ -20,16 +34,19 @@ const FEATURES = [
 export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState('');
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackReason, setFeedbackReason] = useState('');
+  const [feedbackNote, setFeedbackNote] = useState('');
 
-  const getToken = async () => {
+  const getSessionInfo = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    return session?.access_token;
+    return { token: session?.access_token, companyId: session?.user?.id };
   };
 
   const handleCheckout = async () => {
     setLoading('checkout'); setError('');
     try {
-      const token = await getToken();
+      const { token } = await getSessionInfo();
       const res = await postCheckout(token);
       window.location.href = res.url;
     } catch (err) {
@@ -41,13 +58,26 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   const handlePortal = async () => {
     setLoading('portal'); setError('');
     try {
-      const token = await getToken();
+      const { token } = await getSessionInfo();
       const res = await postPortal(token);
       window.location.href = res.url;
     } catch (err) {
       setError(err.message);
       setLoading(null);
     }
+  };
+
+  // Submits feedback (if any was given) then always proceeds to the portal
+  // either way -- a failed/empty feedback save should never block billing.
+  const handleFeedbackContinue = async () => {
+    setShowFeedback(false);
+    if (feedbackReason || feedbackNote.trim()) {
+      try {
+        const { token, companyId } = await getSessionInfo();
+        if (token && companyId) await postCompanyFeedback(token, companyId, { reason: feedbackReason, note: feedbackNote.trim() });
+      } catch {} // best-effort -- never blocks the portal redirect below
+    }
+    handlePortal();
   };
 
   const isActive = subStatus?.active;
@@ -77,6 +107,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   })();
 
   return (
+    <>
     <div style={{ maxWidth: 600 }}>
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Subscription</h2>
@@ -109,7 +140,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
               </button>
             )}
             {(status === 'active' || status === 'active_canceling' || status === 'past_due') && (
-              <button onClick={handlePortal} disabled={loading === 'portal'}
+              <button onClick={() => setShowFeedback(true)} disabled={loading === 'portal'}
                 style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'portal' ? '#94a3b8' : '#0f172a', color: 'white', border: 'none', borderRadius: 7, fontWeight: 700, fontSize: 14, cursor: loading === 'portal' ? 'not-allowed' : 'pointer' }}>
                 {loading === 'portal' ? <><Loader2 size={14} className="spin" /> Loading…</> : 'Manage Billing →'}
               </button>
@@ -142,5 +173,70 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
         <div style={{ fontSize: 13, color: '#64748b', display: 'flex', alignItems: 'center', gap: 5 }}>Cancel anytime. &nbsp;·&nbsp; <Lock size={12} color="#64748b" /> Secure billing via Stripe</div>
       </div>
     </div>
+
+    {/* "Before you go" feedback -- asked right before the portal redirect,
+        since nothing on the other side of that redirect (Stripe's hosted
+        Billing Portal) can be customized or distinguished after the fact.
+        Entirely optional -- both buttons proceed to the portal either way. */}
+    {showFeedback && (
+      <div
+        style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
+        onClick={() => setShowFeedback(false)}
+      >
+        <div
+          style={{ background: 'white', borderRadius: 16, padding: '28px 26px', maxWidth: 420, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.35)' }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+            <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0 }}>Before you go</h3>
+            <button onClick={() => setShowFeedback(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: 4 }}>
+              <X size={18} />
+            </button>
+          </div>
+          <p style={{ color: '#64748b', fontSize: 13.5, lineHeight: 1.5, marginBottom: 16 }}>
+            Totally optional — what brings you to billing today? Helps us know what to fix.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 14 }}>
+            {FEEDBACK_REASONS.map(r => (
+              <button
+                key={r}
+                onClick={() => setFeedbackReason(r)}
+                style={{
+                  textAlign: 'left', padding: '9px 12px', borderRadius: 8, cursor: 'pointer',
+                  border: `1.5px solid ${feedbackReason === r ? '#2563eb' : '#e2e8f0'}`,
+                  background: feedbackReason === r ? '#eff6ff' : 'white',
+                  color: feedbackReason === r ? '#1d4ed8' : '#374151',
+                  fontWeight: feedbackReason === r ? 700 : 500, fontSize: 13.5,
+                }}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <textarea
+            value={feedbackNote}
+            onChange={e => setFeedbackNote(e.target.value)}
+            placeholder="Anything else? (optional)"
+            rows={2}
+            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1.5px solid #e2e8f0', fontSize: 13.5, fontFamily: 'inherit', resize: 'vertical', marginBottom: 18, boxSizing: 'border-box' }}
+          />
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={() => { setShowFeedback(false); handlePortal(); }}
+              style={{ flex: 1, background: 'none', border: '1.5px solid #e2e8f0', color: '#64748b', padding: '11px 0', borderRadius: 9, fontWeight: 600, fontSize: 13.5, cursor: 'pointer' }}
+            >
+              Skip
+            </button>
+            <button
+              onClick={handleFeedbackContinue}
+              style={{ flex: 1.4, background: '#2563eb', border: 'none', color: 'white', padding: '11px 0', borderRadius: 9, fontWeight: 700, fontSize: 13.5, cursor: 'pointer' }}
+            >
+              Continue to Billing →
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

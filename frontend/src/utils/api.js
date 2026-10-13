@@ -69,6 +69,16 @@ export async function postPortal(token) {
   return apiFetch('/api/subscription/portal', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
 }
 
+// SubscriptionTab.js's optional "before you go" feedback, asked right
+// before handing off to postPortal above -- see 021_cancellation_feedback.sql
+// for why it's collected up front rather than reactively on actual
+// cancellation.
+export async function postCompanyFeedback(token, companyId, payload) {
+  return apiFetch(`/api/company/${companyId}/feedback`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload),
+  });
+}
+
 export async function verifyCheckout(token, sessionId) {
   return apiFetch('/api/subscription/verify-checkout', {
     method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ sessionId }),
@@ -108,6 +118,14 @@ export async function updateClientPartner(token, payload) {
 // fetching twice.
 export async function getCompanyLeads(token, includeDeleted = false) {
   return apiFetch(`/api/company-leads/company${includeDeleted ? '?deleted=true' : ''}`, { headers: { Authorization: `Bearer ${token}` } });
+}
+
+// Total + this-month count of this company's successful /api/calculate runs
+// (internal Calculator Mode and the embedded widget combined) -- see
+// leads.js's GET /company/estimate-runs for why this exists alongside the
+// leads count.
+export async function getCompanyEstimateRuns(token) {
+  return apiFetch('/api/company-leads/company/estimate-runs', { headers: { Authorization: `Bearer ${token}` } });
 }
 
 // "Run an Estimate" tab's "Share via email" action -- re-computes the

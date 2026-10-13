@@ -144,6 +144,24 @@ async function recordPublicEstimateAttempt(ip) {
   }
 }
 
+// Every successful companyId-scoped calculation -- internal Calculator Mode
+// and the embedded widget both set companyId, so this is a holistic "this
+// account used Clean Estimator" count, not just widget leads. Without this,
+// a company using the tool purely internally (the primary pitch -- see
+// CompanyLanding.js) left zero trace anywhere, so the dashboard had no way
+// to reflect real usage for exactly the use case it's sold on. Read back by
+// leads.js's GET /company/estimate-runs for OverviewTab's stat.
+async function recordCompanyEstimateRun(companyId, serviceType) {
+  const supabase = getSupabase();
+  if (!supabase || !companyId) return;
+  try {
+    const { error } = await supabase.from('company_estimate_runs').insert({ company_id: companyId, service_type: serviceType || null });
+    if (error) console.warn('recordCompanyEstimateRun insert failed:', error.message);
+  } catch (err) {
+    console.warn('recordCompanyEstimateRun failed:', err.message);
+  }
+}
+
 // POST /api/calculate
 router.post('/', async (req, res) => {
   const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo } = req.body;
@@ -346,6 +364,8 @@ router.post('/', async (req, res) => {
     if (!companyId) {
       const ip = req.ip || req.socket?.remoteAddress || null;
       recordPublicEstimateAttempt(ip).catch(err => console.warn('recordPublicEstimateAttempt failed:', err.message));
+    } else {
+      recordCompanyEstimateRun(companyId, serviceType).catch(err => console.warn('recordCompanyEstimateRun failed:', err.message));
     }
 
     res.json({ success: true, data: result });

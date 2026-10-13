@@ -141,7 +141,7 @@ module.exports = [
   {
     key: 'trial_ending_soon',
     name: 'Trial ending soon',
-    subject: 'Your Clean Estimator trial ends in {{daysLeftText}}',
+    subject: "Your Clean Estimator trial ends in {{daysLeftText}} — here's what happens next",
     variables: [
       { name: 'companyName', example: 'Sparkle Clean Co' },
       { name: 'daysLeftText', example: '2 days' },
@@ -149,12 +149,12 @@ module.exports = [
     text: [
       'Hi {{companyName}},',
       '',
-      'Your free Clean Estimator trial ends in {{daysLeftText}}. After that, your embedded estimator will pause on your website until you subscribe.',
+      "Your free Clean Estimator trial ends in {{daysLeftText}}. After that, the card on file will be charged $25 for your first month, and your account just keeps running exactly as it has -- unlimited internal estimates whenever you need them, plus your embedded widget if you're using one.",
       '',
-      'Subscribe now to keep it running without interruption:',
+      "No action needed if you're planning to continue. If you'd rather not, you can cancel anytime before then from your billing page:",
       'https://www.cleanestimator.com/company?tab=subscription',
       '',
-      'No action needed if you plan to subscribe before then -- this is just a heads up.',
+      'Questions about pricing or anything else? Just reply -- a real person reads these.',
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -163,15 +163,19 @@ module.exports = [
   <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your free Clean Estimator trial ends in <strong>{{daysLeftText}}</strong>. After that, your embedded estimator will pause on your website until you subscribe.
+    Your free Clean Estimator trial ends in <strong>{{daysLeftText}}</strong>. After that, the card on file will be charged $25 for your first month, and your account just keeps running exactly as it has — unlimited internal estimates whenever you need them, plus your embedded widget if you're using one.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    No action needed if you're planning to continue. If you'd rather not, you can cancel anytime before then from your billing page.
   </p>
 
   <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Subscribe now →</a>
+    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View my billing →</a>
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    No action needed if you already plan to subscribe before then — this is just a heads up.
+    Questions about pricing or anything else? Just reply — a real person reads these.
   </p>
   ${FOOTER_HTML}
 </div>`,
@@ -179,18 +183,20 @@ module.exports = [
   {
     key: 'trial_checkin_1',
     name: 'Trial check-in — day 7',
-    subject: "How's Clean Estimator working out so far?",
+    subject: 'Have you run your first estimate yet?',
     variables: [{ name: 'companyName', example: 'Sparkle Clean Co' }],
     text: [
       'Hi {{companyName}},',
       '',
       "You're about a week into your free trial — just checking in.",
       '',
-      "If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the bottom of the Branding tab in your dashboard.",
-      '',
-      "If anything's confusing or not working the way you expected, just reply to this email or check the Help & Docs tab — happy to help.",
+      "The fastest way to see the value: open Calculator Mode and run a real quote for a job you're pricing this week. It takes about 10 seconds and gives you an accurate, consistent number instead of going off gut feel.",
       '',
       'https://www.cleanestimator.com/company',
+      '',
+      "Want leads coming from your website too? That's included on the same plan -- grab the embed code from the bottom of the Branding tab whenever you're ready.",
+      '',
+      "If anything's confusing or not working the way you expected, just reply to this email or check the Help & Docs tab — happy to help.",
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -203,15 +209,19 @@ module.exports = [
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the bottom of the Branding tab in your dashboard.
+    The fastest way to see the value: open <strong>Calculator Mode</strong> and run a real quote for a job you're pricing this week. It takes about 10 seconds and gives you an accurate, consistent number instead of going off gut feel.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Run an estimate →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Want leads coming from your website too? That's included on the same plan — grab the embed code from the bottom of the Branding tab whenever you're ready.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
     If anything's confusing or not working the way you expected, just reply to this email or check the Help &amp; Docs tab — happy to help.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Go to my dashboard →</a>
   </p>
   ${FOOTER_HTML}
 </div>`,
@@ -219,19 +229,18 @@ module.exports = [
   {
     key: 'trial_checkin_2',
     name: 'Trial check-in — day 14',
-    subject: 'Two weeks in — a couple of things worth checking out',
+    subject: 'Two weeks in — make sure your pricing is dialed in',
     variables: [{ name: 'companyName', example: 'Sparkle Clean Co' }],
     text: [
       'Hi {{companyName}},',
       '',
-      "Two weeks into your trial. A couple of things worth a look if you haven't found them yet:",
+      "Two weeks into your trial. One thing worth checking if you haven't yet: your markup and minimum charges in the Services & Pricing tab. Clean Estimator starts you off with researched, location-adjusted base pricing -- but your markup is what makes sure every number actually matches your real costs and margin.",
       '',
-      "- Branding tab -- set your logo, colors, and call-to-action so the cleaning cost estimator looks like it's actually yours",
-      "- Leads tab -- every completed estimate lands here automatically, with the visitor's full contact info and price",
+      'https://www.cleanestimator.com/company?tab=services',
+      '',
+      "If you're also running the embedded widget on your site, every completed estimate shows up automatically in your Leads tab, with the visitor's full contact info.",
       '',
       'Questions about either (or anything else)? Just reply -- a real person reads these.',
-      '',
-      'https://www.cleanestimator.com/company?tab=help',
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -239,21 +248,20 @@ module.exports = [
 <div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
   <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
 
-  <p style="font-size:14px;line-height:1.6;margin:0 0 16px;">
-    Two weeks into your trial. A couple of things worth a look if you haven't found them yet:
-  </p>
-
-  <ul style="font-size:14px;line-height:1.7;margin:0 0 20px;padding-left:20px;">
-    <li><strong>Branding tab</strong> — set your logo, colors, and call-to-action so the cleaning cost estimator looks like it's actually yours</li>
-    <li><strong>Leads tab</strong> — every completed estimate lands here automatically, with the visitor's full contact info and price</li>
-  </ul>
-
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Questions about either (or anything else)? Just reply — a real person reads these.
+    Two weeks into your trial. One thing worth checking if you haven't yet: your <strong>markup and minimum charges</strong> in the Services &amp; Pricing tab. Clean Estimator starts you off with researched, location-adjusted base pricing — but your markup is what makes sure every number actually matches your real costs and margin.
   </p>
 
   <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=help" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Open Help &amp; Docs →</a>
+    <a href="https://www.cleanestimator.com/company?tab=services" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Check my pricing →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    If you're also running the embedded widget on your site, every completed estimate shows up automatically in your Leads tab, with the visitor's full contact info.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Questions about either (or anything else)? Just reply — a real person reads these.
   </p>
   ${FOOTER_HTML}
 </div>`,
@@ -266,11 +274,11 @@ module.exports = [
     text: [
       'Hi {{companyName}},',
       '',
-      "Your 30-day trial wraps up in about a week -- flagging it now so it doesn't catch you off guard.",
+      "Your 30-day trial wraps up in about a week. After that, the card on file will be charged $25/month automatically and your account just keeps running -- no action needed if you're planning to stick around.",
       '',
-      "If it's been useful, no action needed -- we'll send the official heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends.",
+      "If it's been useful, great -- you'll get one more heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends. And if it's not a fit, you can cancel anytime from your billing page, no hard feelings.",
       '',
-      'https://www.cleanestimator.com/company',
+      'https://www.cleanestimator.com/company?tab=subscription',
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -279,15 +287,50 @@ module.exports = [
   <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your 30-day trial wraps up in about a week — flagging it now so it doesn't catch you off guard.
+    Your 30-day trial wraps up in about a week. After that, the card on file will be charged $25/month automatically and your account just keeps running — no action needed if you're planning to stick around.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    If it's been useful, no action needed — we'll send the official heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends.
+    If it's been useful, great — you'll get one more heads-up closer to the date. If you've hit a snag or have pricing questions, reply and I'll help sort it out before the trial ends. And if it's not a fit, you can cancel anytime from your billing page, no hard feelings.
   </p>
 
   <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View my dashboard →</a>
+    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">View my billing →</a>
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
+  {
+    key: 'trial_converted',
+    name: 'Trial converted to paid',
+    subject: "You're all set — your trial just converted to a paid plan",
+    variables: [{ name: 'companyName', example: 'Sparkle Clean Co' }],
+    text: [
+      'Hi {{companyName}},',
+      '',
+      'Your 30-day free trial just ended, and your card was charged $25 for your first month. Nothing else changes -- Clean Estimator keeps running exactly as it has, with unlimited internal estimates whenever you need them.',
+      '',
+      'Manage your billing or cancel anytime here:',
+      'https://www.cleanestimator.com/company?tab=subscription',
+      '',
+      "Thanks for sticking with it -- if there's anything we can do better, just reply.",
+      '',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your 30-day free trial just ended, and your card was charged $25 for your first month. Nothing else changes — Clean Estimator keeps running exactly as it has, with unlimited internal estimates whenever you need them.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Manage billing →</a>
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    Thanks for sticking with it — if there's anything we can do better, just reply.
   </p>
   ${FOOTER_HTML}
 </div>`,
@@ -317,6 +360,82 @@ module.exports = [
 
   <p style="margin:0 0 20px;">
     <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Subscribe to reactivate →</a>
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
+  {
+    key: 'payment_failed',
+    name: 'Payment failed',
+    subject: "Your Clean Estimator payment didn't go through",
+    variables: [{ name: 'companyName', example: 'Sparkle Clean Co' }],
+    text: [
+      'Hi {{companyName}},',
+      '',
+      "We tried to charge your card for Clean Estimator and it didn't go through. Your account is paused until this is resolved -- no estimates can be run until your payment method is updated.",
+      '',
+      'Update your payment method here:',
+      'https://www.cleanestimator.com/company?tab=subscription',
+      '',
+      "If this was a one-time card issue, updating it should get you back up and running right away. Questions? Just reply.",
+      '',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    We tried to charge your card for Clean Estimator and it didn't go through. Your account is <strong>paused</strong> until this is resolved — no estimates can be run until your payment method is updated.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#dc2626;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Update payment method →</a>
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    If this was a one-time card issue, updating it should get you back up and running right away. Questions? Just reply.
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
+  {
+    key: 'subscription_canceled',
+    name: 'Subscription canceled (win-back)',
+    subject: 'Sorry to see you go — your Clean Estimator subscription has ended',
+    variables: [{ name: 'companyName', example: 'Sparkle Clean Co' }],
+    text: [
+      'Hi {{companyName}},',
+      '',
+      "Your Clean Estimator subscription has been canceled, and your account is no longer active -- no more estimates can be run until you resubscribe.",
+      '',
+      "If something didn't work for you, we'd genuinely like to know -- just reply and tell us what happened.",
+      '',
+      'Changed your mind? You can restart anytime, same price, same plan:',
+      'https://www.cleanestimator.com/company?tab=subscription',
+      '',
+      'Thanks for giving it a try.',
+      '',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your Clean Estimator subscription has been canceled, and your account is no longer active — no more estimates can be run until you resubscribe.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    If something didn't work for you, we'd genuinely like to know — just reply and tell us what happened.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Restart my subscription →</a>
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    Thanks for giving it a try.
   </p>
   ${FOOTER_HTML}
 </div>`,
