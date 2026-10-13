@@ -8088,6 +8088,192 @@ Sudden water damage from a burst pipe or appliance failure is often covered by h
 [Get an instant estimate](/?service=water_damage) — speed matters most here, so getting a quote immediately is itself part of minimizing total damage.
     `,
   },
+  {
+    slug: 'how-to-calculate-cleaning-job-estimate',
+    title: 'How to Calculate a Cleaning Job Estimate: The Formula Cleaning Businesses Use',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-12-05',
+    readTime: '8 min',
+    excerpt: 'Pricing a cleaning job comes down to five variables: base rate, size, condition, location, and add-ons. Here\'s the actual formula, with real numbers, plus how most growing cleaning businesses skip the manual math.',
+    content: `
+## The Short Answer
+
+A cleaning job estimate is built from five variables: **base rate** (per sq ft, per room, or flat by service type) **× size or scope**, adjusted for **condition** (light, moderate, heavy, move-out), multiplied by a **location factor**, plus any **add-ons** (inside fridge, inside oven, pet hair, etc.), with a **minimum charge** as a floor so no job prices below what it costs you to show up. Get those five inputs right and consistent, and your quotes stop depending on which estimator happened to answer the phone that day.
+
+## Why This Matters More Than It Seems
+
+Inconsistent pricing is one of the most common, least talked-about problems in a growing cleaning business. One estimator quotes a 3-bed/2-bath home at $180, another quotes the same home at $230 the following week — not because either one is wrong, but because the pricing logic lives in each person's head instead of a shared system. Customers compare notes, underpriced jobs eat your margin, and overpriced jobs lose bookings you should have won.
+
+## The Formula, Step by Step
+
+### 1. Start With a Base Rate by Service Type
+
+Every service type has its own base pricing logic:
+
+| Service | Typical Base Pricing Model |
+|---|---|
+| House cleaning | Per sq ft, or flat by home size tier |
+| Apartment cleaning | Per sq ft or per bedroom count |
+| Commercial cleaning | Per sq ft per visit, scaled by frequency |
+| Carpet cleaning | Per room, with a whole-home minimum |
+| Upholstery cleaning | Per piece (chair, sofa, sectional, etc.) |
+| Air duct / dryer vent | Per vent or flat by system size |
+| Tile & grout | Per sq ft by material |
+| Mold remediation / water damage | Per sq ft or flat by affected area |
+
+### 2. Adjust for Condition
+
+A light, routine clean and a heavy, first-time or move-out clean are not the same job, even at the same square footage. Most cleaning businesses apply a condition multiplier:
+
+- **Light/routine**: base rate, no adjustment
+- **Moderate**: +12–18%
+- **Heavy/deep clean**: +35–45%
+- **Move-in/move-out**: +60–140%, since these jobs include inside cabinets, appliances, and baseboards a routine clean skips
+
+### 3. Apply a Location Multiplier
+
+The same job genuinely costs more to deliver in a high cost-of-living market than a low one — labor, insurance, and supply costs all scale with local cost of living. A flat national price either overcharges customers in cheaper markets or underprices your own labor in expensive ones. A location multiplier (often built from state- or ZIP-level cost-of-living data) corrects for this automatically instead of you guessing per city.
+
+### 4. Add Line-Item Add-Ons
+
+Add-ons should be priced and listed separately, not folded into a vague "it depends" quote:
+
+- Inside fridge: $25–$50
+- Inside oven: $25–$40
+- Interior windows: $50–$100
+- Pet hair / pet stains: 10–25% upcharge depending on service
+- Laundry: $30–$60
+
+### 5. Apply a Minimum Charge
+
+No job should price below what it costs you in labor, drive time, and supplies to show up at all — even a tiny studio apartment or a single chair cleaning needs a floor. Most cleaning businesses set this at $90–$150 depending on service type.
+
+## A Worked Example
+
+A 2,200 sq ft home, moderate condition, in a mid-cost-of-living state, with inside-oven add-on:
+
+| Step | Calculation | Running Total |
+|---|---|---|
+| Base rate (house cleaning, 2,200 sq ft) | ~$0.08/sq ft | $176 |
+| Condition adjustment (+15%, moderate) | $176 × 1.15 | $202 |
+| Location multiplier (0.98, mid-cost state) | $202 × 0.98 | $198 |
+| Add-on: inside oven | + $30 | $228 |
+| **Final estimate** | | **~$228** |
+
+Run this by hand for every job, every service type, every estimator on your team, and the math either slows your team down or — more commonly — gets skipped in favor of a rough guess.
+
+## Where This Breaks Down Manually
+
+- **It doesn't scale past one person.** The formula only stays consistent if everyone on your team applies it the same way, every time — which rarely survives contact with a busy schedule and multiple estimators.
+- **Location data goes stale.** Cost-of-living and local market rates shift; a spreadsheet built a year ago is quietly wrong today.
+- **Ten service types means ten formulas.** Carpet, upholstery, mold remediation, and water damage all price completely differently — maintaining all of them by hand is realistic for one service, not ten.
+
+## The Faster Way: A Calculator Built on This Exact Formula
+
+[Clean Estimator](/estimator) runs this formula — base rate, condition, ZIP-code-accurate location multiplier, add-ons, and your own minimum charge — automatically, across all 10 service types, so every estimator on your team gets the same number for the same job. You set your own markup per service; the calculator handles the rest and gives you the number on screen in seconds, not a public price your customer sees before you've talked to them.
+
+## FAQ
+
+**What's the easiest way to calculate a cleaning job estimate?**
+Use a consistent formula — base rate by service type, adjusted for condition, location, and add-ons, with a minimum charge floor — applied the same way every time. Doing this by hand works for one person; a shared calculator is what keeps it consistent once you have a team.
+
+**How do cleaning companies price jobs so differently for the same house?**
+Usually because the pricing logic lives in each estimator's head instead of a shared formula — different people weigh condition, size, and add-ons differently without realizing it.
+
+**Is there a free way to calculate cleaning estimates?**
+[Clean Estimator](/estimator) offers a 30-day free trial with unlimited estimates across all 10 service types, so you can test the formula against your own jobs before committing.
+
+**Do I need to already know my pricing to use an estimate calculator?**
+No — you set your own markup and minimum charges on top of researched, location-adjusted base pricing, so you're not starting from a blank spreadsheet.
+
+[Start your free trial →](/estimator)
+    `,
+  },
+  {
+    slug: 'best-cleaning-estimate-calculator-software',
+    title: 'Best Cleaning Business Estimate Calculator Software in 2026',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-12-06',
+    readTime: '8 min',
+    excerpt: 'Gut-feel pricing, a spreadsheet, or a dedicated calculator — here\'s how the three actual options for pricing cleaning jobs compare, and what to look for if you\'re evaluating estimate software for your business.',
+    content: `
+## The Short Answer
+
+For a cleaning business pricing jobs across multiple service types, locations, or estimators, a dedicated cleaning estimate calculator is worth it once gut-feel pricing or a spreadsheet starts producing inconsistent quotes. [Clean Estimator](/estimator) is built specifically for this: location-accurate pricing across all 10 cleaning service types, your own markup and minimum charges, and an instant on-screen number for $25/month with a 30-day free trial.
+
+## How Cleaning Businesses Actually Price Jobs
+
+There are really only three approaches in practice:
+
+| Approach | How It Works | Where It Breaks Down |
+|---|---|---|
+| Gut-feel / experience pricing | Estimator quotes from memory and instinct | Inconsistent between estimators; no record of how a number was reached |
+| Spreadsheet template | A formula built in Excel/Google Sheets, manually filled in per job | Doesn't scale past one service type or one person maintaining it; location data goes stale |
+| Dedicated estimate calculator | Software runs the pricing formula automatically per job | Requires picking the right tool — most general quoting software isn't built for cleaning-specific pricing logic |
+
+## What to Actually Look For in a Cleaning Estimate Calculator
+
+Not all "quoting software" is built for how cleaning businesses specifically price jobs. Before picking one, check for:
+
+- **Service-specific pricing logic** — carpet (per room), upholstery (per piece), commercial (per sq ft per visit), and mold remediation (per affected area) all price completely differently. A generic flat-rate calculator doesn't fit most cleaning businesses.
+- **Location-accurate pricing** — a flat national number either overcharges in cheaper markets or underprices your labor in expensive ones.
+- **Team consistency** — every estimator should get the same number for the same job inputs, not a tool that only one person knows how to use correctly.
+- **Your own markup control** — the tool should price off your actual costs and margin targets, not someone else's assumed markup.
+- **Speed** — if it takes longer than making the call yourself, your team won't actually use it.
+- **Privacy over what's shown to the customer** — you likely don't want every estimate publicly displayed as a take-it-or-leave-it price before you've talked to the customer; see our note on this below.
+
+## Why a Public Price Range Isn't Always the Right Default
+
+Some estimate tools are built primarily as a public, embeddable widget that shows a price range directly to website visitors. That's genuinely useful for lead capture, but it has a real downside for internal pricing: show a customer "$249–$319" and they will push for the bottom of that range, every time — even on jobs that should reasonably price higher once you factor in true condition or access details. An internal-first tool, where you run the number yourself and decide what to share, keeps that pricing power on your side.
+
+## Clean Estimator: What It Actually Does
+
+[Clean Estimator](/estimator) is built around running the estimate internally first, with the public widget as an optional add-on rather than the default:
+
+| Feature | What It Does |
+|---|---|
+| Unlimited internal calculations | Run as many estimates as you need, every month, no per-quote cost |
+| Instant result, on screen only | The number appears immediately for you — it's never shown to a customer unless you decide to share it |
+| Email a result to a coworker | One click sends a specific estimate to a teammate's inbox, no shared logins |
+| ZIP-code accurate pricing | State-specific pricing multipliers so quotes reflect your actual local market |
+| Per-service markup control | Adjust pricing up or down per service, set your own minimum charges |
+| All 10 service calculators | House cleaning, apartments, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, water damage |
+| Calculator widget for your website | Included on the same plan if you also want public lead capture — no separate upgrade |
+| API access | Sync estimates with your CRM |
+
+## Pricing
+
+Clean Estimator is **$25/month**, with a **30-day free trial**, no per-lead fees, cancel anytime, and typically live in under 30 minutes from signup.
+
+## Who This Is Actually For
+
+- Cleaning businesses with more than one person quoting jobs, where consistency has become a real problem
+- Businesses offering multiple service types (carpet, upholstery, commercial, restoration) where a single flat-rate spreadsheet doesn't realistically cover the pricing logic
+- Owners who want to keep quoting power internal rather than publishing a price range before talking to the customer
+- Teams that want the option to add public lead capture later without switching tools
+
+## FAQ
+
+**What's the best cleaning business estimate calculator?**
+For a cleaning business pricing jobs across multiple service types or team members, a dedicated calculator built specifically for cleaning pricing logic — like [Clean Estimator](/estimator) — outperforms a general-purpose quoting tool or a manually maintained spreadsheet, since it's built around how cleaning jobs are actually priced by service type, condition, and location.
+
+**How much does cleaning estimate software typically cost?**
+Clean Estimator is $25/month flat, with unlimited estimates and no per-lead charges — a 30-day free trial is available to test it against your own jobs first.
+
+**Can I use an estimate calculator without putting pricing on my public website?**
+Yes — Clean Estimator runs internally by default, so you get the instant number on your own screen and decide whether or not to ever show pricing publicly. The public calculator widget is available on the same plan but is optional, not required.
+
+**Does one calculator work for all cleaning service types, or do I need separate tools?**
+A calculator built specifically for cleaning businesses should cover your full service mix in one tool — Clean Estimator covers all 10 common cleaning service types (including carpet, upholstery, and restoration services) rather than just standard house cleaning.
+
+**Is there a free trial for cleaning estimate software?**
+Yes — Clean Estimator offers a 30-day free trial with unlimited estimates before you're charged anything.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
