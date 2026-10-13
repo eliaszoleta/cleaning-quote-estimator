@@ -112,7 +112,7 @@ function WidgetPreview() {
 
   return (
     <div className="ce-float" style={{ position: 'relative' }}>
-      <div style={{ position: 'relative', width: '100%', height: 'clamp(380px, 52vw, 520px)', borderRadius: 16, overflow: 'hidden', boxShadow: '0 30px 70px -20px rgba(2,6,23,0.55), 0 8px 20px rgba(2,6,23,0.25)' }}>
+      <div style={{ position: 'relative', width: '100%', height: 'clamp(380px, 52vw, 520px)', borderRadius: 16, overflow: 'hidden', background: 'white', boxShadow: '0 30px 70px -20px rgba(2,6,23,0.55), 0 8px 20px rgba(2,6,23,0.25)' }}>
         {HERO_GALLERY.map((img, i) => (
           <img
             key={img.src}
@@ -120,7 +120,7 @@ function WidgetPreview() {
             alt={img.alt}
             style={{
               position: 'absolute', inset: 0, width: '100%', height: '100%',
-              objectFit: 'cover', objectPosition: 'top center',
+              objectFit: 'contain', objectPosition: 'top center',
               opacity: i === index ? 1 : 0,
               transition: 'opacity 0.7s ease',
             }}
