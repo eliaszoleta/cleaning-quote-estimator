@@ -118,3 +118,18 @@
     min-width: 540px;
   }
 }
+
+/* Blog category list cards: title/excerpt and the "Read" link sit side by
+   side on desktop. On mobile, that squeezes the title/excerpt into a
+   narrow left column while "Read" floats pinned to the top right. Stack
+   them instead so the text gets the card's full width and "Read" drops
+   below it. Desktop (above 640px) keeps the original side-by-side row. */
+@media (max-width: 640px) {
+  .bcat-card-row {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+  .bcat-card-read {
+    margin-top: 12px !important;
+  }
+}
