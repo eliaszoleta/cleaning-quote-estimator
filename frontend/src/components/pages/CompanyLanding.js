@@ -59,7 +59,7 @@ const PLAN_FEATURES = [
 
 const TRUST_BADGES = [
   { Icon: ShieldCheck, text: '30-day free trial' },
-  { Icon: Zap,          text: 'Live in under 30 minutes' },
+  { Icon: Zap,          text: 'First estimate in 2 minutes' },
   { Icon: Check,        text: 'Cancel anytime' },
 ];
 
@@ -294,8 +294,8 @@ export default function CompanyLanding() {
                   Simple onboarding
                 </span>
               </div>
-              <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Up and running in 30 minutes</h2>
-              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer required.</p>
+              <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Start quoting in minutes</h2>
+              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer required — run your first estimate right after signup, then customize your branding and embed the widget on your site whenever you want, all in under 30 minutes.</p>
               <div className="ce-steps-grid">
                 {STEPS.map((s, i) => (
                   <React.Fragment key={s.n}>
