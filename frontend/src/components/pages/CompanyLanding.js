@@ -376,7 +376,14 @@ export default function CompanyLanding() {
                     <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$25</span>
                     <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
                   </div>
-                  <div style={{ color: '#64748b', fontSize: 13, marginBottom: 22 }}>After your 30-day free trial &middot; cancel anytime</div>
+                  <div style={{ color: '#64748b', fontSize: 13, marginBottom: 22 }}>
+                    After your{' '}
+                    <span style={{ position: 'relative', fontWeight: 700, color: '#78350f', padding: '1px 6px', whiteSpace: 'nowrap' }}>
+                      <span aria-hidden="true" style={{ position: 'absolute', inset: '2px -2px', background: '#fde047', borderRadius: '3px 7px 4px 8px / 5px 3px 6px 4px', transform: 'rotate(-0.6deg)', zIndex: 0 }} />
+                      <span style={{ position: 'relative', zIndex: 1 }}>30-day free trial</span>
+                    </span>
+                    {' '}&middot; cancel anytime
+                  </div>
                   <ul style={{ listStyle: 'none', padding: 0, marginBottom: 24, textAlign: 'left' }}>
                     {PLAN_FEATURES.map(item => (
                       <li key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 10, fontSize: 14, color: '#374151', lineHeight: 1.4 }}>
