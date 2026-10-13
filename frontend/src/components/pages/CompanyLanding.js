@@ -19,7 +19,7 @@ const FEATURES = [
   { Icon: Lock,          color: '#1d4ed8', bg: '#eff6ff', title: 'Instant result, nothing public',  desc: "See the number immediately on your own screen — it's never shown to a customer unless you decide to share it." },
   { Icon: Send,          color: '#0d9488', bg: '#f0fdfa', title: 'Email a result to a coworker',    desc: 'One click sends a specific estimate to a teammate\'s inbox — no shared logins needed.' },
   { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',       desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
-  { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',      desc: 'Adjust pricing up or down per service. Set your own minimum charges.' },
+  { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',      desc: 'A multiplier on top of our location-accurate base price, so you can match your own costs and margin. Set your own minimum charges too.' },
   { Icon: ClipboardList, color: '#2563eb', bg: '#fdf4ff', title: 'All 10 service calculators',       desc: 'Regular cleaning, deep clean, move-out, Airbnb turnover, post-construction, and more.' },
   { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Calculator widget for your website', desc: 'Want public lead capture too? The same plan includes an embeddable, white-label calculator widget for your site — no upgrade required.' },
 ];
@@ -50,7 +50,7 @@ const PLAN_FEATURES = [
   'Unlimited internal price calculations',
   'Instant result on screen — never a public price range',
   'Email a result to a coworker in one click',
-  'ZIP-code accurate pricing & per-service markup control',
+  'ZIP-code accurate pricing, plus your own markup on top',
   'All 10 service calculators',
   'Calculator widget for your website, included whenever you want public lead capture',
   'Automatic lead capture + instant email alerts once it\'s on your site',

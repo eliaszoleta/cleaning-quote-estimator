@@ -10,7 +10,7 @@ const FEATURES = [
   { Icon: Infinity,          text: 'Unlimited internal price calculations' },
   { Icon: Lock,              text: 'Instant result on screen — never a public price range' },
   { Icon: Send,              text: 'Email a result to a coworker in one click' },
-  { Icon: SlidersHorizontal, text: 'ZIP-code accurate pricing & per-service markup control' },
+  { Icon: SlidersHorizontal, text: 'ZIP-code accurate pricing, plus your own markup on top' },
   { Icon: ClipboardList,     text: 'All 10 service calculators' },
   { Icon: Globe,             text: 'Calculator widget for your website, included whenever you want public lead capture' },
   { Icon: Users,             text: "Automatic lead capture + instant email alerts once it's on your site" },

@@ -8201,7 +8201,7 @@ No — you set your own markup and minimum charges on top of researched, locatio
     content: `
 ## The Short Answer
 
-For a cleaning business pricing jobs across multiple service types, locations, or estimators, a dedicated cleaning estimate calculator is worth it once gut-feel pricing or a spreadsheet starts producing inconsistent quotes. [Clean Estimator](/estimator) is built specifically for this: location-accurate pricing across all 10 cleaning service types, your own markup and minimum charges, and an instant on-screen number for $25/month with a 30-day free trial.
+For a cleaning business pricing jobs across multiple service types, locations, or estimators, a dedicated cleaning estimate calculator is worth it once gut-feel pricing or a spreadsheet starts producing inconsistent quotes. [Clean Estimator](/estimator) is built specifically for this: location-accurate pricing across all 10 cleaning service types, your own markup on top to match your margins, and an instant on-screen number for $25/month with a 30-day free trial.
 
 ## How Cleaning Businesses Actually Price Jobs
 

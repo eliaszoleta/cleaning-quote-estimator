@@ -54,7 +54,7 @@ function Step({ number, title, children, isLast }) {
 
 const STATS = [
   { number: '50', label: 'States covered' },
-  { number: '9', label: 'Service types' },
+  { number: '10', label: 'Service types' },
   { number: '100%', label: 'Free, no signup' },
 ];
 
@@ -131,7 +131,7 @@ export default function About() {
               Instant price ranges for house cleaning, carpet cleaning, commercial cleaning, and 7 other services — no signup, no phone calls.
             </ProductCard>
             <ProductCard Icon={Code2} color="#0891b2" bg="#ecfeff" title="Embeddable Widget" href="/estimator" linkLabel="For companies">
-              Cleaning companies embed our calculator on their own site — their logo, their colors, their own markup — to capture leads instead of losing visitors to a contact form.
+              Cleaning companies embed our calculator on their own site — their logo, their colors, the same accurate pricing they already use internally — to capture leads instead of losing visitors to a contact form.
             </ProductCard>
             <ProductCard Icon={Handshake} color="#db2777" bg="#fdf2f8" title="Local Partner Program" href="/partner-with-us" linkLabel="Get leads">
               We connect visitors who want a real quote with an exclusive local cleaning partner in their city — a warm, ready-to-call lead instead of a cold listing.
