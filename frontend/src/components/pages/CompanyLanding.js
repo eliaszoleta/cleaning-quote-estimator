@@ -406,8 +406,8 @@ export default function CompanyLanding() {
               </div>
 
             </div>
-            <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12.5, marginTop: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-              <Mail size={13} /> Questions? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a> and we'll help you get set up.
+            <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 12.5, marginTop: 32 }}>
+              <Mail size={13} style={{ verticalAlign: -2, marginRight: 6 }} /> Questions? Email <a href="mailto:info@cleanestimator.com" style={{ color: '#2563eb' }}>info@cleanestimator.com</a> and we'll help you get set up.
             </p>
           </div>
 
