@@ -99,6 +99,20 @@ function ActivationGate({ subStatus, onLogout }) {
 }
 
 export default function CompanyDashboard({ user, onLogout }) {
+  // The header below used to be a single fixed-height flex row with no
+  // responsive handling at all -- logo, mode switch, walkthrough link,
+  // badge, Save Changes, email, and Sign Out together run well past a
+  // phone's width, forcing the whole page into horizontal scroll just to
+  // reach Sign Out. isMobile drops/shrinks the non-essential pieces below
+  // so everything still fits in one row (same 768px breakpoint .dash-nav
+  // already uses in App.css).
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const [activeTab, setActiveTab] = useState('overview');
   // Top-level switch, independent of the tab sidebar: 'widget' is today's
   // full dashboard (sidebar + tabs), 'calculator' hides all of that and
@@ -285,43 +299,48 @@ export default function CompanyDashboard({ user, onLogout }) {
       <header style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #16213b 100%)', color: 'white', height: 60,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 24px', position: 'sticky', top: 0, zIndex: 100,
+        padding: isMobile ? '0 8px' : '0 24px', position: 'sticky', top: 0, zIndex: 100,
         borderBottom: '1px solid #1e293b',
         boxShadow: '0 1px 0 #1e293b, 0 4px 20px rgba(0,0,0,0.35)',
+        gap: isMobile ? 4 : 8,
       }}>
-        {/* Left: logo + breadcrumb */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {/* Left: logo + breadcrumb -- text dropped on mobile, same as
+            Header.js's public nav, so the icon alone anchors this side. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
             <div style={{
               width: 28, height: 28, borderRadius: 7,
               background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 0 0 1px rgba(255,255,255,0.1)',
+              flexShrink: 0,
             }}>
               <span style={{ color: 'white', fontSize: 13, fontWeight: 900 }}>✦</span>
             </div>
-            <span style={{ color: 'white', fontWeight: 700, fontSize: 15, letterSpacing: '-0.2px' }}>Clean Estimator</span>
+            {!isMobile && <span style={{ color: 'white', fontWeight: 700, fontSize: 15, letterSpacing: '-0.2px' }}>Clean Estimator</span>}
           </a>
         </div>
 
         {/* Center: Widget Mode / Calculator Mode switch -- Widget Mode is
             the full dashboard (sidebar + tabs) exactly as before; Calculator
             Mode drops all of that and shows nothing but the calculator,
-            full-page, for running a quick internal estimate. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 24, padding: 3 }}>
+            full-page, for running a quick internal estimate. Shorter labels
+            on mobile ("Widget"/"Calculator") since this is the one control
+            in the header that has to stay fully legible at any width. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 24, padding: 3, flexShrink: 0 }}>
           {[
-            { id: 'widget', label: 'Widget Mode', Icon: Code2 },
-            { id: 'calculator', label: 'Calculator Mode', Icon: Zap },
+            { id: 'widget', label: isMobile ? 'Widget' : 'Widget Mode', Icon: Code2 },
+            { id: 'calculator', label: isMobile ? 'Calculator' : 'Calculator Mode', Icon: Zap },
           ].map(({ id, label, Icon }) => (
             <button
               key={id}
               onClick={() => setViewMode(id)}
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                padding: isMobile ? '6px 8px' : '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
                 background: viewMode === id ? '#2563eb' : 'transparent',
                 color: viewMode === id ? 'white' : '#94a3b8',
-                fontWeight: 700, fontSize: 12.5, whiteSpace: 'nowrap',
+                fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5, whiteSpace: 'nowrap',
                 transition: 'background 0.15s, color 0.15s',
               }}
             >
@@ -330,30 +349,36 @@ export default function CompanyDashboard({ user, onLogout }) {
           ))}
         </div>
 
-        {/* Right: badge, save, user */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <a
-            href={WALKTHROUGH_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="pulse-cta"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '6px 12px', borderRadius: 20,
-              border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.06)',
-              color: 'white', textDecoration: 'none', fontSize: 12.5, fontWeight: 600,
-              transition: 'background 0.15s, border-color 0.15s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; }}
-          >
-            <CalendarClock size={13} /> Schedule a Walkthrough
-          </a>
+        {/* Right: badge, save, user -- Schedule a Walkthrough, the Saved
+            confirmation, the divider, and the email address all drop on
+            mobile (promotional/secondary, not needed to use the
+            dashboard); Save and Sign Out shrink to icon-only buttons. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 10, flexShrink: 0 }}>
+          {!isMobile && (
+            <a
+              href={WALKTHROUGH_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pulse-cta"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 12px', borderRadius: 20,
+                border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.06)',
+                color: 'white', textDecoration: 'none', fontSize: 12.5, fontWeight: 600,
+                transition: 'background 0.15s, border-color 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; }}
+            >
+              <CalendarClock size={13} /> Schedule a Walkthrough
+            </a>
+          )}
 
           {subBadge && (
             <div style={{
               fontSize: 11.5, padding: '3px 10px', borderRadius: 20, fontWeight: 700,
               background: subBadge.bg, color: subBadge.color, letterSpacing: '0.02em',
+              whiteSpace: 'nowrap',
             }}>
               {subBadge.label}
             </div>
@@ -363,9 +388,10 @@ export default function CompanyDashboard({ user, onLogout }) {
             <button
               onClick={handleGlobalSave}
               disabled={saving}
+              title="Save Changes"
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                padding: '7px 16px',
+                padding: isMobile ? '7px 9px' : '7px 16px',
                 background: saving ? '#334155' : '#2563eb',
                 color: 'white', border: 'none', borderRadius: 7,
                 fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer',
@@ -373,35 +399,37 @@ export default function CompanyDashboard({ user, onLogout }) {
               }}
             >
               {saving
-                ? <><Loader2 size={13} className="spin" /> Saving…</>
-                : <><Save size={13} /> Save Changes</>
+                ? <Loader2 size={13} className="spin" />
+                : <Save size={13} />
               }
+              {!isMobile && (saving ? ' Saving…' : ' Save Changes')}
             </button>
           )}
 
-          {viewMode === 'widget' && saved && (
+          {!isMobile && viewMode === 'widget' && saved && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#4ade80', fontSize: 13, fontWeight: 600 }}>
               <Check size={14} strokeLinecap="square" strokeLinejoin="miter" /> Saved
             </div>
           )}
 
-          <div style={{ width: 1, height: 20, background: '#1e293b', margin: '0 2px' }} />
+          {!isMobile && <div style={{ width: 1, height: 20, background: '#1e293b', margin: '0 2px' }} />}
 
-          <span style={{ color: '#64748b', fontSize: 12 }}>{user.email}</span>
+          {!isMobile && <span style={{ color: '#64748b', fontSize: 12 }}>{user.email}</span>}
 
           <button
             onClick={onLogout}
             title="Sign out"
+            aria-label="Sign out"
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
               background: 'transparent', color: '#64748b', border: '1px solid #1e293b',
-              padding: '6px 12px', borderRadius: 7, cursor: 'pointer', fontSize: 12, fontWeight: 600,
+              padding: isMobile ? '6px 9px' : '6px 12px', borderRadius: 7, cursor: 'pointer', fontSize: 12, fontWeight: 600,
               transition: 'all 0.15s',
             }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = '#334155'; e.currentTarget.style.color = '#94a3b8'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e293b'; e.currentTarget.style.color = '#64748b'; }}
           >
-            <LogOut size={13} /> Sign Out
+            <LogOut size={13} /> {!isMobile && 'Sign Out'}
           </button>
         </div>
       </header>
