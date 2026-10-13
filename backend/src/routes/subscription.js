@@ -212,6 +212,11 @@ async function handleStripeEvent(event) {
         const config = (await getCompanyConfig(companyId)) || {};
         const sub = fullSession.subscription;
         const subObj = sub && typeof sub !== 'string' ? sub : null;
+        // Captured before the overwrite below -- this is what tells a true
+        // win-back reactivation (was 'canceled', now completing checkout
+        // again) apart from a brand-new signup for the welcome-email logic
+        // further down.
+        const wasCanceled = config.subscription?.status === 'canceled';
         config.subscription = {
           ...(config.subscription || {}),
           stripeCustomerId: fullSession.customer,
@@ -233,20 +238,29 @@ async function handleStripeEvent(event) {
         // lands back here post-Checkout the row already exists and looks
         // like it was never "just created". This webhook is the first point
         // that reliably knows checkout actually succeeded, so send it from
-        // here instead. Deduped via welcomeEmailSentAt -- webhook deliveries
-        // can repeat.
-        if (!config.subscription.welcomeEmailSentAt) {
+        // here instead. Deduped via welcomeEmailSentAt for a first-ever
+        // signup -- but that flag is already set forever once a company's
+        // very first checkout succeeds, which used to silently swallow any
+        // confirmation on a LATER win-back reactivation (cancel, then
+        // resubscribe months later): welcomeEmailSentAt being "already set"
+        // isn't actually "already told them about THIS checkout". wasCanceled
+        // (captured above, before this event overwrote subscription.status)
+        // bypasses that dedup specifically for a true reactivation, since
+        // each cancel-then-resubscribe cycle is its own event worth a
+        // confirmation, same reasoning as payment_failed's per-invoice dedup.
+        if (!config.subscription.welcomeEmailSentAt || wasCanceled) {
           const email = await getOwnerEmail(companyId);
           if (email) {
-            // This same webhook fires for a brand-new trial AND for a
-            // reactivation (an expired/canceled account completing
-            // checkout again, which charges the card immediately with no
-            // trial attached -- see POST /checkout's trialPeriodDays
-            // logic). Framing both as "your free trial has started" would
-            // be false for the second case, so the opening line is swapped
-            // based on what this specific session actually granted.
+            // This same webhook fires for a brand-new trial, a reactivation
+            // of an expired no-card trial, AND a win-back reactivation of a
+            // previously canceled paying account -- all charge the card
+            // immediately with no trial attached except the first, so the
+            // opening line is chosen from what this specific session
+            // actually granted plus whether this is a returning cancellation.
             const statusLine = subObj?.status === 'trialing'
               ? undefined // use sendCompanyWelcomeEmail's default "trial started" line
+              : wasCanceled
+              ? "Welcome back! Your subscription has been reactivated, and your card was charged $25 for this month."
               : "Your account is now active — your card was charged $25 for your first month.";
             const sent = await sendCompanyWelcomeEmail({ to: email, companyId, statusLine });
             if (sent) {
