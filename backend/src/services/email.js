@@ -700,14 +700,23 @@ function buildEmbedIframeCode(companyId) {
 // `subject` is overridable so the same content can be reused for a
 // one-off manual broadcast to existing accounts (see admin.js's
 // trial-email preview/send routes) with wording suited to "your trial is
-// already active" rather than "your account was just created". Content
-// lives in the editable email_templates table (key: 'company_welcome').
-async function sendCompanyWelcomeEmail({ to, companyId, subject }) {
+// already active" rather than "your account was just created". `statusLine`
+// defaults to the normal "trial just started" framing, but subscription.js's
+// checkout webhook overrides it for a reactivation (expired/canceled
+// account completing checkout with no trial attached -- card charged
+// immediately) so this email never falsely tells someone who was just
+// charged $25 that a free trial began. Content lives in the editable
+// email_templates table (key: 'company_welcome').
+async function sendCompanyWelcomeEmail({ to, companyId, subject, statusLine }) {
   const code = buildEmbedIframeCode(companyId);
   const { sent } = await sendTemplatedEmail({
     template: 'company_welcome',
     to,
-    vars: { embedCode: code, embedCodeHtml: code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') },
+    vars: {
+      embedCode: code,
+      embedCodeHtml: code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+      statusLine: statusLine || "Your account is live and your 30-day free trial has started.",
+    },
     subjectOverride: subject,
     recipientType: 'company',
     recipientRef: companyId,

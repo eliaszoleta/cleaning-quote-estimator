@@ -238,7 +238,17 @@ async function handleStripeEvent(event) {
         if (!config.subscription.welcomeEmailSentAt) {
           const email = await getOwnerEmail(companyId);
           if (email) {
-            const sent = await sendCompanyWelcomeEmail({ to: email, companyId });
+            // This same webhook fires for a brand-new trial AND for a
+            // reactivation (an expired/canceled account completing
+            // checkout again, which charges the card immediately with no
+            // trial attached -- see POST /checkout's trialPeriodDays
+            // logic). Framing both as "your free trial has started" would
+            // be false for the second case, so the opening line is swapped
+            // based on what this specific session actually granted.
+            const statusLine = subObj?.status === 'trialing'
+              ? undefined // use sendCompanyWelcomeEmail's default "trial started" line
+              : "Your account is now active — your card was charged $25 for your first month.";
+            const sent = await sendCompanyWelcomeEmail({ to: email, companyId, statusLine });
             if (sent) {
               const fresh = (await getCompanyConfig(companyId)) || config;
               await saveCompanyConfig(companyId, {

@@ -50,11 +50,16 @@ function ActivationGate({ subStatus, onLogout }) {
   const isPastDue = subStatus.status === 'past_due';
   const isNeverActivated = subStatus.status === 'requires_trial_setup';
   // Legacy no-card trial, still within its real remaining days -- distinct
-  // from isNeverActivated (no trial started at all) and the "expired"
-  // fall-through below (no days left). Only the dashboard login is gated
-  // here; the account's own already-live public widget keeps working
-  // normally for these same remaining days (see subscriptionStatus.js).
+  // from isNeverActivated (no trial started at all) and isExpiredTrial
+  // below (no days left). Only the dashboard login is gated here; the
+  // account's own already-live public widget keeps working normally for
+  // these same remaining days (see subscriptionStatus.js).
   const isNoCardTrial = !!subStatus.needsCardForTrial;
+  // Legacy no-card trial that ran out with no card ever added -- distinct
+  // from a canceled paying subscription (subStatus.status === 'canceled'),
+  // which falls through to the generic copy below instead, since that's a
+  // different situation (they were already paying and chose to stop).
+  const isExpiredTrial = subStatus.status === 'expired';
 
   const handleAction = async () => {
     setLoadingAction(true);
@@ -71,15 +76,17 @@ function ActivationGate({ subStatus, onLogout }) {
     }
   };
 
-  const title = isNoCardTrial ? 'Add a payment method' : isNeverActivated ? 'Activate your account' : isPastDue ? 'Update your payment method' : 'Reactivate your account';
+  const title = isNoCardTrial ? 'Add a payment method' : isExpiredTrial ? 'Your trial has expired' : isNeverActivated ? 'Activate your account' : isPastDue ? 'Update your payment method' : 'Reactivate your account';
   const body = isNoCardTrial
     ? `You have ${subStatus.daysLeft} day${subStatus.daysLeft === 1 ? '' : 's'} left on your free trial. Add a card to keep it running — you won't be charged until your trial actually ends.`
+    : isExpiredTrial
+    ? 'Your 30-day free trial has ended with no card on file, so your calculator is paused. Subscribe for $25/month to activate your account.'
     : isNeverActivated
     ? 'Your calculator is ready, but checkout was never finished. Activate your account to start your 30-day free trial.'
     : isPastDue
     ? 'Your last payment failed. Update your payment method to keep your calculator running.'
     : 'Your subscription has ended. Reactivate to get back into your calculator.';
-  const cta = isNoCardTrial ? 'Add payment method — keep my trial' : isPastDue ? 'Update payment method' : isNeverActivated ? 'Activate — start free trial' : 'Reactivate my account';
+  const cta = isNoCardTrial ? 'Add payment method — keep my trial' : isExpiredTrial ? 'Subscribe — $25/month' : isPastDue ? 'Update payment method' : isNeverActivated ? 'Activate — start free trial' : 'Reactivate my account';
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
