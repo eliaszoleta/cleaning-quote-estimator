@@ -79,6 +79,21 @@ const styles = {
     color: COLORS.primary,
     transition: 'all 0.15s',
   },
+  // "Get Estimator" is the single most important nav link (it's the whole
+  // product, not just a page) -- a filled pill instead of plain text so it
+  // reads as its own CTA next to the other links, with pulse-cta (App.css)
+  // adding the subtle attention ring.
+  estimatorLink: {
+    padding: '8px 16px',
+    borderRadius: 999,
+    textDecoration: 'none',
+    fontSize: 14,
+    fontWeight: 700,
+    color: COLORS.primaryHover,
+    background: COLORS.primaryMuted,
+    border: `1px solid ${COLORS.primary}33`,
+    transition: 'all 0.15s',
+  },
   cta: {
     background: COLORS.primary,
     color: 'white',
@@ -158,6 +173,7 @@ export default function Header() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <a
               href="/estimator"
+              className="pulse-cta"
               style={styles.ctaMobile}
               onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 14px rgba(30,64,175,0.32)'; }}
               onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(30,64,175,0.22)'; }}
@@ -199,9 +215,10 @@ export default function Header() {
             </a>
             <a
               href="/estimator"
-              style={styles.navLink}
-              onMouseEnter={e => { e.target.style.color = '#0f172a'; e.target.style.background = '#f1f5f9'; }}
-              onMouseLeave={e => { e.target.style.color = '#475569'; e.target.style.background = 'transparent'; }}
+              className="pulse-cta"
+              style={styles.estimatorLink}
+              onMouseEnter={e => { e.target.style.background = '#dbeafe'; }}
+              onMouseLeave={e => { e.target.style.background = COLORS.primaryMuted; }}
             >
               Get Estimator
             </a>
