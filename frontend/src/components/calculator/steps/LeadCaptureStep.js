@@ -50,7 +50,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
             <label style={labelStyle}>Name</label>
-            <input type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith"
+            <input type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="King David"
               style={{ ...inputStyle, borderColor: showError('name', nameValid) ? '#dc2626' : '#e2e8f0' }}
               onFocus={e => { e.target.style.borderColor = showError('name', nameValid) ? '#dc2626' : primaryColor; }}
               onBlur={e => { touch('name'); e.target.style.borderColor = !nameValid ? '#dc2626' : '#e2e8f0'; }}
