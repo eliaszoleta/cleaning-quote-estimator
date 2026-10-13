@@ -98,11 +98,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  // Set when the backend's daily cleaning-business estimate limit kicked in
-  // (see calculate.js -- only ever reachable on the public calculator, when
-  // "I am a..." was answered "Cleaning business / cleaner"). Shown as its
-  // own popup pitching the unlimited internal tool, not folded into the
-  // generic `error` banner.
+  // Set when the backend's daily public-estimate limit kicked in (see
+  // calculate.js -- only ever reachable on the public calculator). Fires
+  // either from the stricter cap on answering "I am a..." as "Cleaning
+  // business / cleaner", or from a role-independent total-attempts cap for
+  // the same ip/email/phone, so it isn't only reachable via that answer.
+  // Shown as its own popup pitching the unlimited internal tool, not
+  // folded into the generic `error` banner.
   const [limitReached, setLimitReached] = useState(false);
   // Set when calculate.js's subscription-active check blocked the request
   // (subscriptionInactive -- the account isn't active: trial never
@@ -352,9 +354,11 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   return (
     <>
-      {/* Only ever set when calculate.js's public-business daily limit
-          blocked the request -- which only happens with no companyId, so
-          this never shows inside a company's own embedded widget. */}
+      {/* Only ever set when calculate.js's public daily limit blocked the
+          request (whether from the stricter "I'm a business" cap or the
+          role-independent total cap) -- which only happens with no
+          companyId, so this never shows inside a company's own embedded
+          widget. */}
       {limitReached && (
         <div
           style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
@@ -369,7 +373,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             </div>
             <h3 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Daily limit reached</h3>
             <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.65, marginBottom: 22 }}>
-              Cleaning businesses can run 2 free estimates a day on this tool. Want unlimited calculations for your business?
+              You've reached today's free estimate limit on this tool. Want unlimited calculations for your business?
             </p>
             <div style={{ background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: 12, padding: '16px 18px', marginBottom: 20, textAlign: 'left' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>

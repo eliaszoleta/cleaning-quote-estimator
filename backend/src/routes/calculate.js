@@ -83,17 +83,29 @@ async function logLeadEmailEvent(partnerId) {
   }
 }
 
-// ─── Public calculator daily limit (cleaning businesses only) ─────────────────
+// ─── Public calculator daily limit ─────────────────────────────────────────
 // The free, unbranded calculator (homepage, state/city/service pages) is
 // meant for a homeowner pricing their own one-off job. A cleaning business
 // using it instead of subscribing to run unlimited internal estimates
 // defeats the entire point of the $25/mo plan, so anyone who answers
 // LeadCaptureStep's "I am a..." question as "Cleaning business / cleaner"
-// gets capped at this many free estimates per calendar day. Never applies
-// to a "Homeowner" answer, and never applies when companyId is set (a
-// company's own embedded widget or their dashboard's Calculator Mode --
-// both already gated on an active subscription above, not this).
+// gets capped at PUBLIC_BUSINESS_DAILY_LIMIT free estimates per calendar day.
+//
+// That self-reported answer used to be the ONLY thing this gate looked at --
+// attempts recorded as "Homeowner" were never counted at all. That meant the
+// entire limit was an honor-system checkbox: a business just answering
+// "Homeowner" on every attempt got unlimited free estimates with zero
+// enforcement, same ip/email/phone and all. Every attempt (either answer) is
+// now recorded and counted, with a separate, higher PUBLIC_TOTAL_DAILY_LIMIT
+// applied regardless of role -- strict for a declared business (still just
+// PUBLIC_BUSINESS_DAILY_LIMIT), but a genuine homeowner comparing a couple
+// of services in one sitting still isn't blocked, while someone running the
+// same identifier through repeatedly -- whatever they answer -- eventually
+// is. Never applies when companyId is set (a company's own embedded widget
+// or their dashboard's Calculator Mode -- both already gated on an active
+// subscription above, not this).
 const PUBLIC_BUSINESS_DAILY_LIMIT = 2;
+const PUBLIC_TOTAL_DAILY_LIMIT = 4;
 
 function startOfTodayISO() {
   const d = new Date();
@@ -109,42 +121,46 @@ function startOfTodayISO() {
 // exactly this lookup (see the migration). Blocks if ANY identifier alone
 // already shows the day's limit -- matching by ip catches someone who
 // skips email/phone on a later attempt, matching by email/phone catches
-// someone switching networks (and thus IP) between attempts.
-async function isPublicBusinessDailyLimitReached({ ip, email, phone }) {
+// someone switching networks (and thus IP) between attempts. Two counts per
+// identifier: a business-only count (for the strict, role-declared limit)
+// and a total count across both roles (for the role-independent ceiling).
+async function publicDailyLimitReached({ ip, email, phone }) {
   const supabase = getSupabase();
-  if (!supabase) return false; // no DB configured (local dev) -- never block
+  if (!supabase) return { blocked: false, businessLimited: false }; // no DB configured (local dev) -- never block
   const since = startOfTodayISO();
   try {
+    const identifiers = [['ip', ip], ['email', email], ['phone', phone]].filter(([, value]) => !!value);
     const counts = await Promise.all(
-      [['ip', ip], ['email', email], ['phone', phone]]
-        .filter(([, value]) => !!value)
-        .map(async ([column, value]) => {
-          const { count, error } = await supabase
-            .from('public_estimate_attempts')
-            .select('id', { count: 'exact', head: true })
-            .gte('created_at', since)
-            .eq(column, value);
-          // supabase-js doesn't throw on an API-level error (bad key,
-          // missing table, etc.) -- it resolves with { error, count: null }
-          // -- so this has to be checked explicitly or a real
-          // misconfiguration would silently read as "0 attempts so far"
-          // forever instead of ever surfacing in the logs.
-          if (error) { console.warn(`isPublicBusinessDailyLimitReached(${column}) query failed:`, error.message); return 0; }
-          return count || 0;
-        })
+      identifiers.map(async ([column, value]) => {
+        const countQuery = (extra) => {
+          let q = supabase.from('public_estimate_attempts').select('id', { count: 'exact', head: true }).gte('created_at', since).eq(column, value);
+          return extra ? q.eq('user_type', extra) : q;
+        };
+        const [totalRes, businessRes] = await Promise.all([countQuery(), countQuery('business')]);
+        // supabase-js doesn't throw on an API-level error (bad key, missing
+        // table/column, etc.) -- it resolves with { error, count: null } --
+        // so this has to be checked explicitly or a real misconfiguration
+        // would silently read as "0 attempts so far" forever instead of
+        // ever surfacing in the logs.
+        if (totalRes.error) console.warn(`publicDailyLimitReached(${column} total) query failed:`, totalRes.error.message);
+        if (businessRes.error) console.warn(`publicDailyLimitReached(${column} business) query failed:`, businessRes.error.message);
+        return { total: totalRes.error ? 0 : (totalRes.count || 0), business: businessRes.error ? 0 : (businessRes.count || 0) };
+      })
     );
-    return counts.some(c => c >= PUBLIC_BUSINESS_DAILY_LIMIT);
+    const businessLimited = counts.some(c => c.business >= PUBLIC_BUSINESS_DAILY_LIMIT);
+    const totalLimited = counts.some(c => c.total >= PUBLIC_TOTAL_DAILY_LIMIT);
+    return { blocked: businessLimited || totalLimited, businessLimited };
   } catch (err) {
-    console.warn('isPublicBusinessDailyLimitReached check failed:', err.message);
-    return false; // fail open -- a DB hiccup shouldn't block a real visitor
+    console.warn('publicDailyLimitReached check failed:', err.message);
+    return { blocked: false, businessLimited: false }; // fail open -- a DB hiccup shouldn't block a real visitor
   }
 }
 
-async function recordPublicEstimateAttempt({ ip, email, phone }) {
+async function recordPublicEstimateAttempt({ ip, email, phone, userType }) {
   const supabase = getSupabase();
   if (!supabase) return;
   try {
-    const { error } = await supabase.from('public_estimate_attempts').insert({ ip: ip || null, email: email || null, phone: phone || null });
+    const { error } = await supabase.from('public_estimate_attempts').insert({ ip: ip || null, email: email || null, phone: phone || null, user_type: userType || null });
     if (error) console.warn('recordPublicEstimateAttempt insert failed:', error.message);
   } catch (err) {
     console.warn('recordPublicEstimateAttempt failed:', err.message);
@@ -187,13 +203,16 @@ router.post('/', async (req, res) => {
         // hitting this from their own dashboard's Calculator Mode.
         return res.status(402).json({ success: false, subscriptionInactive: true, error: 'This estimator is temporarily unavailable. Please contact the business directly.' });
       }
-    } else if (leadInfo?.userType === 'business') {
+    } else {
       const ip = req.ip || req.socket?.remoteAddress || null;
-      if (await isPublicBusinessDailyLimitReached({ ip, email: leadInfo?.email || null, phone: leadInfo?.phone || null })) {
+      const { blocked, businessLimited } = await publicDailyLimitReached({ ip, email: leadInfo?.email || null, phone: leadInfo?.phone || null });
+      if (blocked) {
         return res.status(429).json({
           success: false,
           limitReached: true,
-          error: `Cleaning businesses are limited to ${PUBLIC_BUSINESS_DAILY_LIMIT} free estimates per day on this tool.`,
+          error: businessLimited
+            ? `Cleaning businesses are limited to ${PUBLIC_BUSINESS_DAILY_LIMIT} free estimates per day on this tool.`
+            : `You've reached today's limit of ${PUBLIC_TOTAL_DAILY_LIMIT} free estimates on this tool. Need unlimited estimates for your business? Clean Estimator is $25/month with a 30-day free trial.`,
         });
       }
     }
@@ -348,10 +367,11 @@ router.post('/', async (req, res) => {
     // Only counts toward the daily cap once the calculation actually
     // succeeded -- a request that errored out before this point never
     // got a usable estimate, so it shouldn't cost the visitor one of
-    // their two free attempts.
-    if (!companyId && leadInfo?.userType === 'business') {
+    // their free attempts. Recorded for every public attempt now, not
+    // just ones self-declared "business" -- see publicDailyLimitReached.
+    if (!companyId) {
       const ip = req.ip || req.socket?.remoteAddress || null;
-      recordPublicEstimateAttempt({ ip, email: leadInfo?.email || null, phone: leadInfo?.phone || null })
+      recordPublicEstimateAttempt({ ip, email: leadInfo?.email || null, phone: leadInfo?.phone || null, userType: leadInfo?.userType || null })
         .catch(err => console.warn('recordPublicEstimateAttempt failed:', err.message));
     }
 
