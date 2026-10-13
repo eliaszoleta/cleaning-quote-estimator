@@ -8220,7 +8220,7 @@ Not all "quoting software" is built for how cleaning businesses specifically pri
 - **Service-specific pricing logic** — carpet (per room), upholstery (per piece), commercial (per sq ft per visit), and mold remediation (per affected area) all price completely differently. A generic flat-rate calculator doesn't fit most cleaning businesses.
 - **Location-accurate pricing** — a flat national number either overcharges in cheaper markets or underprices your labor in expensive ones.
 - **Team consistency** — every estimator should get the same number for the same job inputs, not a tool that only one person knows how to use correctly.
-- **Your own markup control** — the tool should price off your actual costs and margin targets, not someone else's assumed markup.
+- **Your own markup control** — location-accurate pricing gets the base number right for your market, but it's still a market average, not your specific costs. A separate markup multiplier should let you scale that base up or down to match your own overhead and margin targets, applied consistently to every estimate the tool generates — not just a public-facing price range.
 - **Speed** — if it takes longer than making the call yourself, your team won't actually use it.
 - **Privacy over what's shown to the customer** — you likely don't want every estimate publicly displayed as a take-it-or-leave-it price before you've talked to the customer; see our note on this below.
 
@@ -8238,7 +8238,7 @@ Some estimate tools are built primarily as a public, embeddable widget that show
 | Instant result, on screen only | The number appears immediately for you — it's never shown to a customer unless you decide to share it |
 | Email a result to a coworker | One click sends a specific estimate to a teammate's inbox, no shared logins |
 | ZIP-code accurate pricing | State-specific pricing multipliers so quotes reflect your actual local market |
-| Per-service markup control | Adjust pricing up or down per service, set your own minimum charges |
+| Per-service markup control | A separate multiplier on top of the location-adjusted base price, so you can match your own costs and margin — applies everywhere, not just the public widget |
 | All 10 service calculators | House cleaning, apartments, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, water damage |
 | Calculator widget for your website | Included on the same plan if you also want public lead capture — no separate upgrade |
 | API access | Sync estimates with your CRM |
