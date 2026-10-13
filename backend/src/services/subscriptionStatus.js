@@ -65,7 +65,15 @@ function computeSubscriptionStatus(config, email) {
   if (trialStart) {
     const daysElapsed = (Date.now() - trialStart.getTime()) / (1000 * 60 * 60 * 24);
     if (daysElapsed < TRIAL_DAYS) {
-      return { active: true, status: 'trialing', daysLeft: Math.ceil(TRIAL_DAYS - daysElapsed), currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
+      // active stays true -- the embedded public widget (calculate.js
+      // checks this same .active flag for both internal Calculator Mode and
+      // the live widget) keeps working normally for the rest of these real
+      // remaining days. needsCardForTrial is what CompanyDashboard.js checks
+      // separately to still hard-gate the dashboard itself behind "add a
+      // card to keep going" -- deliberately NOT the same flag calculate.js
+      // reads, so a company's already-live widget doesn't go dark just
+      // because they haven't logged back in and added a card yet.
+      return { active: true, status: 'trialing', needsCardForTrial: true, daysLeft: Math.ceil(TRIAL_DAYS - daysElapsed), currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
     }
     return { active: false, status: 'expired', daysLeft: 0, currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
   }

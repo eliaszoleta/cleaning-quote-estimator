@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Zap, AlertTriangle, Globe, Users, SlidersHorizontal, KeyRound, Send, ClipboardList, Infinity, Loader2, Lock, X } from 'lucide-react';
+import { CheckCircle2, Zap, AlertTriangle, Globe, UserPlus, SlidersHorizontal, KeyRound, Send, ClipboardList, Infinity, Loader2, Lock, X } from 'lucide-react';
 import { postCheckout, postPortal, postCompanyFeedback } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 
@@ -27,7 +27,7 @@ const FEATURES = [
   { Icon: SlidersHorizontal, text: 'ZIP-code accurate pricing & per-service markup control' },
   { Icon: ClipboardList,     text: 'All 10 service calculators' },
   { Icon: Globe,             text: 'Calculator widget for your website, included whenever you want public lead capture' },
-  { Icon: Users,             text: "Automatic lead capture + instant email alerts once it's on your site" },
+  { Icon: UserPlus,          text: "Automatic lead capture + instant email alerts once it's on your site" },
   { Icon: KeyRound,          text: 'API access for CRM sync' },
 ];
 

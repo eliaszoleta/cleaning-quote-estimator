@@ -24,8 +24,9 @@ const DEFAULT_SVC = { enabled: true, markup: 1.0, minimumCharge: null };
 // nav tab, which meant leaving this page (where the rest of a service's
 // pricing already lives) just to set a weekly/biweekly/monthly %.
 const DISCOUNT_SERVICES = [
-  { id: 'homeResidential', label: 'House Cleaning',     Icon: Home      },
-  { id: 'apartment',       label: 'Apartment Cleaning', Icon: Building2 },
+  { id: 'homeResidential', label: 'House Cleaning',      Icon: Home      },
+  { id: 'apartment',       label: 'Apartment Cleaning',  Icon: Building2 },
+  { id: 'commercial',      label: 'Commercial Cleaning', Icon: Building  },
 ];
 const DISCOUNT_FREQUENCIES = [
   { id: 'weekly',   label: 'Weekly'    },
@@ -114,12 +115,25 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
 
   const getDiscounts = (id) => ({ ...DEFAULT_DISCOUNTS, ...(getSvc(id).frequencyDiscounts || {}) });
 
+  // Debounced auto-save for markup/minimumCharge/discount %, same reasoning
+  // as BrandingTab.js's: update() keeps the UI and localConfig current
+  // instantly, but the actual persist waits until typing pauses (900ms)
+  // instead of firing a full save per keystroke.
+  const saveTimer = useRef(null);
+  useEffect(() => () => { if (saveTimer.current) clearTimeout(saveTimer.current); }, []);
+  const scheduleAutoSave = (nextServices) => {
+    if (!autoSave) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => autoSave({ services: nextServices }), 900);
+  };
+
   const setDiscount = (id, freq, fraction) => {
     setServices(prev => {
       const svc = { ...DEFAULT_SVC, ...(prev[id] || {}) };
       const nextDiscounts = { ...DEFAULT_DISCOUNTS, ...(svc.frequencyDiscounts || {}), [freq]: fraction };
       const next = { ...prev, [id]: { ...svc, frequencyDiscounts: nextDiscounts } };
       if (update) update({ services: next });
+      scheduleAutoSave(next);
       return next;
     });
   };
@@ -128,6 +142,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     setServices(prev => {
       const next = { ...prev, [id]: { ...getSvc(id), [key]: val } };
       if (update) update({ services: next });
+      scheduleAutoSave(next);
       return next;
     });
   };
@@ -145,15 +160,27 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     if (patchServices) patchServices({ [id]: nextSvc });
   };
 
+  // Lead capture toggle saves instantly, same as the service on/off
+  // toggles above -- it's a discrete flip, not continuous typing.
   const setLeadCapture = (val) => {
     setEnableLeadCapture(val);
     if (update) update({ enableLeadCapture: val });
+    if (autoSave) autoSave({ enableLeadCapture: val });
+  };
+
+  const scheduleQuestionsAutoSave = (nextQuestions) => {
+    if (!autoSave) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => autoSave({ customLeadQuestions: nextQuestions }), 900);
   };
 
   const addQuestion = () => {
     setCustomQuestions(prev => {
       const next = [...prev, { id: `q${Date.now()}`, label: '', type: 'text', placeholder: '', options: [] }];
       if (update) update({ customLeadQuestions: next });
+      // Adding a row is a discrete action, not typing -- save right away
+      // rather than waiting on the debounce below.
+      if (autoSave) autoSave({ customLeadQuestions: next });
       return next;
     });
   };
@@ -162,6 +189,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     setCustomQuestions(prev => {
       const next = prev.filter((_, i) => i !== idx);
       if (update) update({ customLeadQuestions: next });
+      if (autoSave) autoSave({ customLeadQuestions: next });
       return next;
     });
   };
@@ -170,6 +198,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     setCustomQuestions(prev => {
       const next = prev.map((q, i) => i === idx ? { ...q, [key]: val } : q);
       if (update) update({ customLeadQuestions: next });
+      scheduleQuestionsAutoSave(next);
       return next;
     });
   };
@@ -180,7 +209,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     <div>
       <div style={{ marginBottom: 22 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Services & Pricing</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Service Area and toggling a service on/off save instantly. For markup and minimum price changes, click <strong>Save Changes</strong> in the header when done.</p>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Everything on this page saves automatically as you go — no need to click Save.</p>
       </div>
 
       {/* Service area */}

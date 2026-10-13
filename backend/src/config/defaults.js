@@ -111,6 +111,7 @@ const DEFAULT_COMPANY_CONFIG = {
       pricePerSqft: 0.08,
       minimumCharge: 200,
       markup: 1.0,
+      frequencyDiscounts: { weekly: 0, biweekly: 0, monthly: 0 },
     },
     carpet: {
       enabled: true,

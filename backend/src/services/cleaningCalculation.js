@@ -368,11 +368,25 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'After-hours access (+15%)', low: afterHoursMonthlyLow, high: afterHoursMonthlyHigh });
   }
 
-  const { low: monthlyLow, high: monthlyHigh } = applyMinCharge(
+  let { low: monthlyLow, high: monthlyHigh } = applyMinCharge(
     { low: monthlyBaseLow + afterHoursMonthlyLow, high: monthlyBaseHigh + afterHoursMonthlyHigh },
     minCharge,
     adjustments,
   );
+
+  // Recurring-frequency discount -- same mechanism as residential/apartment
+  // (cfg.frequencyDiscounts, set in the Services tab), applied to the
+  // cleaning cost itself rather than day porter staffing, which doesn't get
+  // cheaper just because the client picked a more frequent schedule.
+  const discount = cfg.frequencyDiscounts?.[frequency] || 0;
+  let annualSavings = null;
+  if (discount > 0) {
+    const before = { low: monthlyLow, high: monthlyHigh };
+    monthlyLow = Math.round(monthlyLow * (1 - discount));
+    monthlyHigh = Math.round(monthlyHigh * (1 - discount));
+    annualSavings = Math.round(((before.low + before.high) / 2 - (monthlyLow + monthlyHigh) / 2) * 12);
+    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: monthlyLow - before.low, high: monthlyHigh - before.high });
+  }
 
   let porterMonthlyLow = 0, porterMonthlyHigh = 0;
   if (dayPorter) {
@@ -395,7 +409,7 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
     unit: 'per_month',
     recurringMonthlyLow: finalLow,
     recurringMonthlyHigh: finalHigh,
-    recurringAnnualSavings: null,
+    recurringAnnualSavings: annualSavings,
     keyFactors: [
       { label: 'Building type', impact: buildingType },
       { label: 'Square footage', impact: sqft.toLocaleString() + ' sq ft' },

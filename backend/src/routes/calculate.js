@@ -177,6 +177,10 @@ router.post('/', async (req, res) => {
   try {
     // Load company config if companyId provided
     let companyConfig = {};
+    // Hoisted above the companyId block (not just declared inside it) so
+    // the lead-notification fallback further down can reuse this same
+    // lookup instead of hitting the Supabase admin API a second time.
+    let ownerEmail = null;
     if (companyId) {
       try { companyConfig = (await getCompanyConfig(companyId)) || {}; } catch {}
       // Real enforcement, not just a dashboard banner: an account that
@@ -188,7 +192,7 @@ router.post('/', async (req, res) => {
       // companyConfig.js's getOrCreateCompanyConfig) would still leave an
       // unactivated account free to calculate forever, just without the
       // trial clock -- an even bigger loophole than the one it replaces.
-      const ownerEmail = await getOwnerEmail(companyId);
+      ownerEmail = await getOwnerEmail(companyId);
       if (!computeSubscriptionStatus(companyConfig, ownerEmail).active) {
         // subscriptionInactive lets CleaningCalculator.js tell this apart
         // from a generic error -- shown as a plain, customer-safe inline
@@ -242,10 +246,14 @@ router.post('/', async (req, res) => {
       }
 
       // Reply-to on the visitor's estimate email, so hitting "Reply" reaches
-      // the company directly -- uses the company-chosen lead-notification
-      // address, never the Supabase Auth signup email (that's just a login
-      // credential, not something to expose to visitors or route mail to).
-      const leadNotificationEmail = companyConfig.leadNotificationEmail || null;
+      // the company directly. Prefers the company-chosen lead-notification
+      // address from Branding, but falls back to the owner's own signup
+      // email when that field was never set -- previously this fell
+      // straight to null with no fallback at all, which silently skipped
+      // the internal lead-alert email entirely (see sendCompanyLeadEmail
+      // below) and left the visitor's reply-to as the generic
+      // info@cleanestimator.com instead of reaching the business.
+      const leadNotificationEmail = companyConfig.leadNotificationEmail || ownerEmail || null;
 
       // Fire-and-forget: sendEstimateEmail never throws, so this never
       // blocks or breaks the response on email delivery. Passes the full

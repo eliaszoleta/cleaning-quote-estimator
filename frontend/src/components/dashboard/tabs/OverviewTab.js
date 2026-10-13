@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
+import { UserPlus, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
 import { getCompanyLeads, getCompanyEstimateRuns } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
@@ -56,7 +56,7 @@ export default function OverviewTab({ config, subStatus, user }) {
 
   const stats = [
     { label: 'Estimates Run',  value: estimateRuns.total,                                        Icon: Zap,         color: '#7c3aed', bg: '#f5f3ff' },
-    { label: 'Total Leads',    value: leads.length,                                              Icon: Users,       color: '#1d4ed8', bg: '#eff6ff' },
+    { label: 'Total Leads',    value: leads.length,                                              Icon: UserPlus,    color: '#1d4ed8', bg: '#eff6ff' },
     { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a', bg: '#f0fdf4' },
     { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate) : '—',         Icon: DollarSign,  color: '#d97706', bg: '#fffbeb' },
     { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—', Icon: Globe,       color: subStatus?.active ? '#16a34a' : '#dc2626', bg: subStatus?.active ? '#f0fdf4' : '#fef2f2' },
@@ -87,7 +87,7 @@ export default function OverviewTab({ config, subStatus, user }) {
   const quickActions = [
     { label: 'Services & Pricing', href: '?tab=services',      Icon: SlidersHorizontal },
     { label: 'Branding & Embed Code', href: '?tab=branding',   Icon: Code2       },
-    { label: 'View All Leads',     href: '?tab=leads',         Icon: Users       },
+    { label: 'View All Leads',     href: '?tab=leads',         Icon: UserPlus    },
     { label: 'Manage Billing',     href: '?tab=subscription',  Icon: CreditCard  },
   ];
 

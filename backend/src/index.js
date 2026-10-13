@@ -115,6 +115,17 @@ app.use('/api/company/check-duplicate', rateLimit({
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }));
 
+// POST /api/company/check-email-exists — unauthenticated and paginates
+// every Supabase auth user on each call, called once per failed login
+// attempt (see AuthPage.js) -- same reasoning as check-duplicate above.
+app.use('/api/company/check-email-exists', rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
 // GET /api/leads — API-key gated already, but a leaked/guessed key (or
 // someone brute-forcing one) shouldn't get unlimited attempts.
 app.use('/api/leads', rateLimit({

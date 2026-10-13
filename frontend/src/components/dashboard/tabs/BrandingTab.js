@@ -8,7 +8,7 @@ import { supabase } from '../../../lib/supabase';
 
 const SITE_URL = process.env.REACT_APP_SITE_URL || 'https://www.cleanestimator.com';
 
-export default function BrandingTab({ config, update, onSave, saving, saved, user }) {
+export default function BrandingTab({ config, update, autoSave, onSave, saving, saved, user }) {
   const [copied, setCopied] = useState(null);
   // Session is fetched per-upload (rather than once on mount) so a long
   // idle stretch on this tab before uploading a logo can't hand
@@ -48,11 +48,22 @@ export default function BrandingTab({ config, update, onSave, saving, saved, use
     }
   }, [config]);
 
+  // Debounced auto-save -- every field here used to only stage into
+  // localConfig until the header's Save Changes was clicked, same
+  // "did my change actually take effect?" confusion the Services tab's
+  // toggle/Service-Area auto-save already fixed once. Firing autoSave on
+  // every keystroke would hammer the backend with a full save per
+  // character typed, so this waits until typing pauses (900ms) before
+  // actually persisting -- update() still runs immediately so the live
+  // preview and localConfig (what a manual Save Changes elsewhere would
+  // submit) never lag behind what's on screen.
+  const saveTimer = useRef(null);
+  useEffect(() => () => { if (saveTimer.current) clearTimeout(saveTimer.current); }, []);
+
   const set = (key, val) => {
     setForm(f => {
       const next = { ...f, [key]: val };
-      // Keep localConfig in sync so Save Changes always has the latest branding
-      if (update) update({
+      const patch = {
         companyName: next.companyName,
         logo: next.logo,
         primaryColor: next.primaryColor,
@@ -66,7 +77,14 @@ export default function BrandingTab({ config, update, onSave, saving, saved, use
         fontFamily: next.fontFamily,
         frameHeight: parseInt(next.frameHeight) || 700,
         borderRadius: parseInt(next.borderRadius) || 12,
-      });
+      };
+      // Keep localConfig in sync immediately so the live preview and any
+      // manual Save Changes elsewhere always reflect the latest typing.
+      if (update) update(patch);
+      if (autoSave) {
+        if (saveTimer.current) clearTimeout(saveTimer.current);
+        saveTimer.current = setTimeout(() => autoSave(patch), 900);
+      }
       return next;
     });
   };
@@ -185,10 +203,10 @@ export default function BrandingTab({ config, update, onSave, saving, saved, use
             <Field label="Company name">
               <input style={input} value={form.companyName} onChange={e => set('companyName', e.target.value)} placeholder="Sparkle Cleaning Service" />
             </Field>
-            <LogoField value={form.logo} onChange={url => set('logo', url)} inputStyle={input} upload={uploadLogo} />
+            <LogoField value={form.logo} onChange={url => set('logo', url)} inputStyle={input} upload={uploadLogo} urlOnly />
           </Card>
 
-          <Card title="Lead Notifications" subtitle="Where new leads on your widget get emailed">
+          <Card title="Lead Notifications" subtitle="Where new leads on your widget get emailed" important>
             <Field label="Send leads to" hint="Every time someone completes an estimate on your widget, we'll email the details here.">
               <input style={input} type="email" value={form.leadNotificationEmail} onChange={e => set('leadNotificationEmail', e.target.value)} placeholder="leads@yourcompany.com" />
             </Field>
@@ -249,7 +267,7 @@ export default function BrandingTab({ config, update, onSave, saving, saved, use
             </Field>
           </Card>
 
-          <Card title="Results Page Call-to-Action" subtitle="Shown after the visitor already has their estimate">
+          <Card title="Results Page Call-to-Action" subtitle="Shown after the visitor already has their estimate" important>
             <Field label="Phone number" hint="Shown as a tap-to-call button on the results page, and a clickable link in the estimate email they receive">
               <input style={input} value={form.ctaPhone} onChange={e => set('ctaPhone', e.target.value)} placeholder="(555) 123-4567" />
             </Field>
@@ -410,11 +428,18 @@ function EmbedCard({ title, badge, desc, code, onCopy, copied }) {
   );
 }
 
-function Card({ title, subtitle, children }) {
+function Card({ title, subtitle, important, children }) {
   return (
-    <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden' }}>
-      <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9' }}>
-        <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{title}</div>
+    <div style={{ background: 'white', border: important ? '1.5px solid #fcd34d' : '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', boxShadow: important ? '0 0 0 3px rgba(251,191,36,0.08)' : 'none' }}>
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', background: important ? '#fffbeb' : 'transparent' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{title}</div>
+          {important && (
+            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.04em', color: '#92400e', background: '#fde68a', padding: '2px 7px', borderRadius: 999 }}>
+              IMPORTANT
+            </span>
+          )}
+        </div>
         {subtitle && <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>{subtitle}</div>}
       </div>
       <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>{children}</div>

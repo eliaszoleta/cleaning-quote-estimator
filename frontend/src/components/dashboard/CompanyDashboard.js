@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
-  Users, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle,
+  UserPlus, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle,
   Globe, X, CalendarClock, CreditCard, Zap,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
@@ -25,7 +25,7 @@ import RunEstimateTab from './tabs/RunEstimateTab';
 const NAV = [
   { id: 'overview',      Icon: LayoutDashboard,   label: 'Dashboard' },
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
-  { id: 'leads',         Icon: Users,              label: 'Leads' },
+  { id: 'leads',         Icon: UserPlus,           label: 'Leads' },
   { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
   { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
   { id: 'subscription',  Icon: CreditCard,         label: 'Subscription' },
@@ -49,6 +49,12 @@ function ActivationGate({ subStatus, onLogout }) {
 
   const isPastDue = subStatus.status === 'past_due';
   const isNeverActivated = subStatus.status === 'requires_trial_setup';
+  // Legacy no-card trial, still within its real remaining days -- distinct
+  // from isNeverActivated (no trial started at all) and the "expired"
+  // fall-through below (no days left). Only the dashboard login is gated
+  // here; the account's own already-live public widget keeps working
+  // normally for these same remaining days (see subscriptionStatus.js).
+  const isNoCardTrial = !!subStatus.needsCardForTrial;
 
   const handleAction = async () => {
     setLoadingAction(true);
@@ -65,13 +71,15 @@ function ActivationGate({ subStatus, onLogout }) {
     }
   };
 
-  const title = isNeverActivated ? 'Activate your account' : isPastDue ? 'Update your payment method' : 'Reactivate your account';
-  const body = isNeverActivated
+  const title = isNoCardTrial ? 'Add a payment method' : isNeverActivated ? 'Activate your account' : isPastDue ? 'Update your payment method' : 'Reactivate your account';
+  const body = isNoCardTrial
+    ? `You have ${subStatus.daysLeft} day${subStatus.daysLeft === 1 ? '' : 's'} left on your free trial. Add a card to keep it running — you won't be charged until your trial actually ends.`
+    : isNeverActivated
     ? 'Your calculator is ready, but checkout was never finished. Activate your account to start your 30-day free trial.'
     : isPastDue
     ? 'Your last payment failed. Update your payment method to keep your calculator running.'
     : 'Your subscription has ended. Reactivate to get back into your calculator.';
-  const cta = isPastDue ? 'Update payment method' : isNeverActivated ? 'Activate — start free trial' : 'Reactivate my account';
+  const cta = isNoCardTrial ? 'Add payment method — keep my trial' : isPastDue ? 'Update payment method' : isNeverActivated ? 'Activate — start free trial' : 'Reactivate my account';
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
@@ -268,7 +276,7 @@ export default function CompanyDashboard({ user, onLogout }) {
     </div>
   );
 
-  if (subStatus && !subStatus.active) {
+  if (subStatus && (!subStatus.active || subStatus.needsCardForTrial)) {
     return <ActivationGate subStatus={subStatus} onLogout={onLogout} />;
   }
 
@@ -277,7 +285,7 @@ export default function CompanyDashboard({ user, onLogout }) {
   const TABS = {
     overview:     <OverviewTab {...tabProps} />,
     help:         <HelpTab />,
-    branding:     <BrandingTab config={localConfig} update={update} onSave={handleGlobalSave} saving={saving} saved={saved} user={user} />,
+    branding:     <BrandingTab config={localConfig} update={update} autoSave={autoSave} onSave={handleGlobalSave} saving={saving} saved={saved} user={user} />,
     services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} autoSave={autoSave} />,
     leads:        <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab subStatus={subStatus} onSubRefresh={loadSubStatus} />,

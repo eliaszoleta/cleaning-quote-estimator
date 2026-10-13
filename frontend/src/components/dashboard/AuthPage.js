@@ -130,7 +130,26 @@ export default function AuthPage({ onAuth }) {
         }
       } else {
         const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
-        if (err) throw err;
+        if (err) {
+          // Supabase deliberately returns the same generic error for "no
+          // account with this email" and "wrong password" (anti-enumeration
+          // by design) -- this extra lookup is what lets the message below
+          // actually tell those two apart for the person logging in.
+          let accountExists = true;
+          try {
+            const checkRes = await fetch(`${API_URL}/api/company/check-email-exists`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email }),
+            });
+            const checkData = await checkRes.json();
+            accountExists = checkData.exists !== false;
+          } catch {
+            // Lookup itself failed -- fall back to the generic message rather
+            // than risk wrongly claiming a real account "doesn't exist".
+          }
+          throw new Error(accountExists ? 'Wrong email or password. Please try again.' : 'Account not found. Check your email or sign up below.');
+        }
         onAuth(data.user);
       }
     } catch (err) {

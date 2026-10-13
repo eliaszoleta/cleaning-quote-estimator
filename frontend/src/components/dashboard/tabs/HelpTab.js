@@ -106,7 +106,7 @@ export default function HelpTab() {
           A visitor lands on your website, opens the embedded estimator, and picks a service (house cleaning, carpet cleaning, etc. — whichever you've enabled). They answer a few quick questions about the job — home size, number of bedrooms/bathrooms, condition, how often they want service — and their location.
         </p>
         <p style={pStyle}>
-          Clean Estimator calculates a price range from that: a base rate for the service, adjusted for their state's typical cost of living, adjusted again for the specific details they entered, and finally multiplied by <strong>your</strong> markup. They see an instant price range, no phone call needed — and if they leave their email, you get notified with their contact info the moment it happens (check your inbox, or the Leads tab).
+          Clean Estimator calculates a price range from that: a base rate for the service, adjusted for their state's typical cost of living, adjusted again for the specific details they entered, and finally multiplied by <strong>your</strong> markup. They see an instant price range, no phone call needed — and if they leave their name, email, and phone number, you get notified with their full contact details and the estimate breakdown the moment it happens (check your inbox, or the Leads tab).
         </p>
       </div>
 

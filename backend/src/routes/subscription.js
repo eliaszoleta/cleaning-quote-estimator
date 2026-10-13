@@ -59,13 +59,27 @@ router.post('/checkout', async (req, res) => {
     const priceId = process.env.STRIPE_PRICE_ID;
     if (!priceId) return res.status(500).json({ success: false, error: 'Stripe pricing not configured' });
 
-    // A real Stripe-side trial (card collected now, first charge in 30
-    // days) only for an account that's never had a trial before in any
-    // form -- never started the old app-managed one, and never had a
-    // subscription. An account reactivating or upgrading after already
-    // using its 30 free days converts to a paid subscription immediately,
-    // same as before.
-    const alreadyHadTrial = !!(config.subscription?.trialStartedAt || config.subscription?.stripeSubscriptionId);
+    // Three cases for how much (if any) Stripe trial this Checkout session
+    // should carry:
+    // 1. Already has/had a real Stripe subscription -- resubscribing after
+    //    cancellation or clearing a past-due card. No new trial; charge
+    //    immediately, same as before.
+    // 2. Legacy no-card trial (trialStartedAt set, never touched Stripe) --
+    //    adding a card now shouldn't forfeit whatever real free days are
+    //    still left, nor grant extra ones beyond that. If those days have
+    //    already run out, this collapses to the same "charge immediately"
+    //    behavior as case 1.
+    // 3. Brand new account, no trial ever started -- the full 30-day trial.
+    let trialPeriodDays = null;
+    if (!config.subscription?.stripeSubscriptionId) {
+      if (config.subscription?.trialStartedAt) {
+        const daysElapsed = (Date.now() - new Date(config.subscription.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24);
+        const daysLeft = Math.ceil(30 - daysElapsed);
+        if (daysLeft > 0) trialPeriodDays = daysLeft;
+      } else {
+        trialPeriodDays = 30;
+      }
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -74,7 +88,7 @@ router.post('/checkout', async (req, res) => {
       customer: existingCustomerId || undefined,
       customer_email: existingCustomerId ? undefined : req.user.email,
       metadata: { companyId },
-      ...(alreadyHadTrial ? {} : { subscription_data: { trial_period_days: 30 } }),
+      ...(trialPeriodDays ? { subscription_data: { trial_period_days: trialPeriodDays } } : {}),
       success_url: `${FRONTEND_URL}/company?subscribed=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/company?tab=subscription`,
     });
