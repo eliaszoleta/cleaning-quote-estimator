@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Save, Check, Loader2 } from 'lucide-react';
+import { Save, Check, Loader2, Copy, ExternalLink } from 'lucide-react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
 import { FONT_OPTIONS, getFontStack } from '../../../utils/fonts';
 import LogoField from '../../partners/LogoField';
 import { uploadCompanyLogo } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 
-export default function BrandingTab({ config, update, onSave, saving, saved }) {
+const SITE_URL = process.env.REACT_APP_SITE_URL || 'https://www.cleanestimator.com';
+
+export default function BrandingTab({ config, update, onSave, saving, saved, user }) {
+  const [copied, setCopied] = useState(null);
   // Session is fetched per-upload (rather than once on mount) so a long
   // idle stretch on this tab before uploading a logo can't hand
   // uploadCompanyLogo a token that's since expired.
@@ -100,6 +103,71 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
   const input = {
     width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0',
     borderRadius: 7, fontSize: 14, color: '#0f172a', outline: 'none',
+  };
+
+  // Embed code -- lives here instead of its own tab now, right after the
+  // live preview above, since "grab the code" is the natural next step
+  // once a company is done customizing how the widget looks.
+  const companyId = user.id;
+  const embedHeight = config?.frameHeight || 700;
+  const embedRadius = config?.borderRadius || 12;
+  const iframeId = `cleancalc-iframe-${companyId}`;
+
+  const iframeCode = `<iframe
+  id="${iframeId}"
+  src="${SITE_URL}/embed?company=${companyId}"
+  width="100%"
+  height="${embedHeight}"
+  style="border:none;border-radius:${embedRadius}px;box-shadow:0 4px 24px rgba(0,0,0,0.10);"
+  title="Cleaning Cost Estimator"
+  loading="lazy">
+</iframe>
+<script>
+  (function(){
+    var iframe=document.getElementById('${iframeId}');
+    window.addEventListener('message',function(e){
+      if(!e.data||e.source!==iframe.contentWindow)return;
+      if(e.data.type==='cleancalc-resize'){
+        iframe.style.height=Math.max(e.data.height,300)+'px';
+      } else if(e.data.type==='cleancalc-scroll-to-top'){
+        var top=iframe.getBoundingClientRect().top+window.pageYOffset-70;
+        window.scrollTo({top:top,behavior:'smooth'});
+      }
+    });
+  })();
+</script>`;
+
+  const scriptCode = `<div id="cleancalc-widget"></div>
+<script>
+  (function(){
+    var el=document.createElement('iframe');
+    el.src='${SITE_URL}/embed?company=${companyId}';
+    el.width='100%';el.height='${embedHeight}';
+    el.style.cssText='border:none;border-radius:${embedRadius}px;box-shadow:0 4px 24px rgba(0,0,0,.10);';
+    el.title='Cleaning Cost Estimator';el.loading='lazy';
+    document.getElementById('cleancalc-widget').appendChild(el);
+    window.addEventListener('message',function(e){
+      if(!e.data||e.source!==el.contentWindow)return;
+      if(e.data.type==='cleancalc-resize'){
+        el.style.height=Math.max(e.data.height,300)+'px';
+      } else if(e.data.type==='cleancalc-scroll-to-top'){
+        var top=el.getBoundingClientRect().top+window.pageYOffset-70;
+        window.scrollTo({top:top,behavior:'smooth'});
+      }
+    });
+  })();
+</script>`;
+
+  const wordpressCode = `[cleanestimator_widget company_id="${companyId}" height="${embedHeight}"]`;
+
+  const copyEmbed = async (text, key) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(key);
+      setTimeout(() => setCopied(null), 2500);
+    } catch {
+      window.prompt('Copy this code:', text);
+    }
   };
 
   return (
@@ -226,6 +294,57 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
         </div>
       </div>
 
+      {/* Embed code -- used to be its own "Estimator" tab, now right below
+          the branding this code reflects. */}
+      <div style={{ marginTop: 32, paddingTop: 28, borderTop: '1px solid #e2e8f0' }}>
+        <div style={{ marginBottom: 20 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Embed Your Widget</h2>
+          <p style={{ color: '#64748b', fontSize: 14 }}>Paste the code below anywhere on your website to embed your branded estimator.</p>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <EmbedCard title="Standard iFrame" badge="Recommended" desc="Works on any website. Add a block or section wherever you want it to show up on the page — left, right, or centered — and paste this code there." code={iframeCode} onCopy={() => copyEmbed(iframeCode, 'iframe')} copied={copied === 'iframe'} />
+          <EmbedCard title="JavaScript Snippet" desc="Dynamically injects the widget. Good for CMS platforms." code={scriptCode} onCopy={() => copyEmbed(scriptCode, 'script')} copied={copied === 'script'} />
+          <EmbedCard title="WordPress Shortcode" desc="Install the Clean Estimator WordPress plugin, then paste this shortcode." code={wordpressCode} onCopy={() => copyEmbed(wordpressCode, 'wp')} copied={copied === 'wp'} />
+
+          {/* Installation Guide */}
+          <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 14 }}>Installation Guide</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 12 }}>
+              {[
+                { platform: 'Wix',            steps: ['Go to Edit Site', 'Add an Embed element', 'Paste the iFrame code'] },
+                { platform: 'Squarespace',    steps: ['Add a Code Block', 'Switch to HTML mode', 'Paste the iFrame code'] },
+                { platform: 'WordPress',      steps: ['Open Gutenberg editor', 'Add a Custom HTML block', 'Paste the iFrame code'] },
+                { platform: 'Weebly / Duda', steps: ['Add Embed Code element', 'Paste iFrame in the box', 'Publish your changes'] },
+              ].map(({ platform, steps }) => (
+                <div key={platform} style={{ background: '#f8fafc', borderRadius: 7, padding: '14px 16px' }}>
+                  <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10, color: '#0f172a' }}>{platform}</div>
+                  <ol style={{ paddingLeft: 16, margin: 0 }}>
+                    {steps.map(s => <li key={s} style={{ fontSize: 12.5, color: '#64748b', marginBottom: 5 }}>{s}</li>)}
+                  </ol>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Preview link */}
+          <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 7, padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14 }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: '#1d4ed8', marginBottom: 4 }}>Preview your widget</div>
+              <p style={{ fontSize: 13, color: '#2563eb', margin: 0 }}>See exactly how it looks before embedding on your site.</p>
+            </div>
+            <a
+              href={`/embed?company=${companyId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#2563eb', color: 'white', padding: '10px 18px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 13, boxShadow: '0 4px 16px rgba(30,64,175,0.20)' }}
+            >
+              Open Preview <ExternalLink size={13} />
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Save Changes repeated here -- the header button is easy to miss
           after scrolling down through the settings column, so this gives
           people a save action right where they finish editing. */}
@@ -252,6 +371,40 @@ export default function BrandingTab({ config, update, onSave, saving, saved }) {
             <Check size={15} strokeLinecap="square" strokeLinejoin="miter" /> Saved
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function EmbedCard({ title, badge, desc, code, onCopy, copied }) {
+  return (
+    <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{title}</span>
+            {badge && <span style={{ fontSize: 11, fontWeight: 700, background: '#eff6ff', color: '#2563eb', padding: '2px 7px', borderRadius: 999 }}>{badge}</span>}
+          </div>
+          <div style={{ fontSize: 12.5, color: '#94a3b8', marginTop: 2 }}>{desc}</div>
+        </div>
+        <button
+          onClick={onCopy}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '7px 14px',
+            background: copied ? '#16a34a' : '#0f172a',
+            color: 'white', border: 'none', borderRadius: 7,
+            cursor: 'pointer', fontWeight: 600, fontSize: 12.5,
+            flexShrink: 0, marginLeft: 14, transition: 'background 0.15s',
+          }}
+        >
+          {copied ? <><Check size={13} strokeLinecap="square" strokeLinejoin="miter" /> Copied!</> : <><Copy size={13} /> Copy Code</>}
+        </button>
+      </div>
+      <div style={{ background: '#0f172a', padding: '14px 18px', overflowX: 'auto' }}>
+        <code style={{ fontFamily: "'Menlo','Monaco',monospace", fontSize: 12, color: '#7dd3fc', whiteSpace: 'pre', display: 'block' }}>
+          {code}
+        </code>
       </div>
     </div>
   );

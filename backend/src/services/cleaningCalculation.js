@@ -172,7 +172,7 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
   range = applyMinCharge(range, minCharge, adjustments);
 
   // Frequency discount -- off by default (0%) unless the company has set
-  // one for this frequency in the Discount tab (cfg.frequencyDiscounts).
+  // one for this frequency in the Services tab (cfg.frequencyDiscounts).
   const discount = cfg.frequencyDiscounts?.[frequency] || 0;
   let recurringLow = null, recurringHigh = null, annualSavings = null;
   if (frequency !== 'one_time' && discount > 0) {

@@ -694,7 +694,7 @@ function buildEmbedIframeCode(companyId) {
 // company.js's GET /:id handler) -- i.e. right after they confirm their
 // email and log in for the first time. Points them at Calculator Mode (the
 // account's main pitch) and gets their embed code in front of them too,
-// instead of relying on them to find the Estimator tab themselves.
+// instead of relying on them to find the Branding tab themselves.
 // Fire-and-forget, same pattern as the other company emails.
 // `subject` is overridable so the same content can be reused for a
 // one-off manual broadcast to existing accounts (see admin.js's

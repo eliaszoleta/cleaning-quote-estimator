@@ -18,6 +18,21 @@ const SERVICES = [
 
 const DEFAULT_SVC = { enabled: true, markup: 1.0, minimumCharge: null };
 
+// Recurring-frequency discounts only apply to the two services visitors
+// actually book on a recurring schedule -- used to be its own "Discount"
+// nav tab, which meant leaving this page (where the rest of a service's
+// pricing already lives) just to set a weekly/biweekly/monthly %.
+const DISCOUNT_SERVICES = [
+  { id: 'homeResidential', label: 'House Cleaning',     Icon: Home      },
+  { id: 'apartment',       label: 'Apartment Cleaning', Icon: Building2 },
+];
+const DISCOUNT_FREQUENCIES = [
+  { id: 'weekly',   label: 'Weekly'    },
+  { id: 'biweekly', label: 'Bi-Weekly' },
+  { id: 'monthly',  label: 'Monthly'   },
+];
+const DEFAULT_DISCOUNTS = { weekly: 0, biweekly: 0, monthly: 0 };
+
 export default function ServicesTab({ config, update, patchServices, autoSave }) {
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
@@ -95,6 +110,18 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
   };
 
   const getSvc = (id) => ({ ...DEFAULT_SVC, ...(services[id] || {}) });
+
+  const getDiscounts = (id) => ({ ...DEFAULT_DISCOUNTS, ...(getSvc(id).frequencyDiscounts || {}) });
+
+  const setDiscount = (id, freq, fraction) => {
+    setServices(prev => {
+      const svc = { ...DEFAULT_SVC, ...(prev[id] || {}) };
+      const nextDiscounts = { ...DEFAULT_DISCOUNTS, ...(svc.frequencyDiscounts || {}), [freq]: fraction };
+      const next = { ...prev, [id]: { ...svc, frequencyDiscounts: nextDiscounts } };
+      if (update) update({ services: next });
+      return next;
+    });
+  };
 
   const setSvc = (id, key, val) => {
     setServices(prev => {
@@ -344,6 +371,42 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
         <div style={{ padding: '10px 18px', borderTop: '1px solid #f1f5f9', background: '#f8fafc', fontSize: 12, color: '#94a3b8' }}>
           <strong style={{ color: '#64748b' }}>Markup:</strong> 1.0 = no change, 1.2 = +20%. &nbsp;
           <strong style={{ color: '#64748b' }}>Min $:</strong> minimum quote amount (leave blank for defaults).
+        </div>
+      </div>
+
+      {/* Recurring discounts -- off by default, same as before: a visitor
+          is quoted the full price for a recurring booking unless a
+          percentage is set here. */}
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
+          <div style={{ fontWeight: 700, fontSize: 14 }}>Recurring Discounts</div>
+          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Optional % off for visitors who book weekly, bi-weekly, or monthly cleaning instead of a one-time visit.</div>
+        </div>
+        <div style={{ padding: '6px 8px' }}>
+          {DISCOUNT_SERVICES.map(({ id, label, Icon }) => {
+            const d = getDiscounts(id);
+            return (
+              <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 7, marginBottom: 3, flexWrap: 'wrap' }}>
+                <div style={{ width: 34, height: 34, borderRadius: 7, flexShrink: 0, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={16} color="#2563eb" strokeWidth={2} />
+                </div>
+                <span style={{ minWidth: 155, fontWeight: 600, fontSize: 14, color: '#0f172a' }}>{label}</span>
+                {DISCOUNT_FREQUENCIES.map(({ id: freq, label: freqLabel }) => (
+                  <div key={freq} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>{freqLabel}</label>
+                    <input
+                      type="number" min={0} max={90} step={1}
+                      value={Math.round((d[freq] || 0) * 100) || ''}
+                      onChange={e => setDiscount(id, freq, Math.max(0, Math.min(90, parseFloat(e.target.value) || 0)) / 100)}
+                      placeholder="0"
+                      style={{ ...inp, width: 58 }}
+                    />
+                    <span style={{ fontSize: 12, color: '#cbd5e1' }}>%</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
         </div>
       </div>
 

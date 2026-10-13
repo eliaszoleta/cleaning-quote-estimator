@@ -48,7 +48,7 @@ const FAQ = [
   },
   {
     q: 'A visitor picked Weekly/Bi-Weekly/Monthly but the price didn\'t go down — why?',
-    a: 'Recurring discounts are off by default for every account. Go to the Discount tab and set a percentage for that specific frequency (House Cleaning and Apartment Cleaning each have their own). Until you do, recurring bookings are priced the same as one-time.',
+    a: 'Recurring discounts are off by default for every account. Go to the Services tab and set a percentage for that specific frequency under Recurring Discounts (House Cleaning and Apartment Cleaning each have their own). Until you do, recurring bookings are priced the same as one-time.',
   },
   {
     q: 'Why did my widget suddenly show "paused" to visitors?',
@@ -241,10 +241,10 @@ export default function HelpTab() {
       <div style={cardStyle}>
         <div style={sectionTitle}>
           <div style={iconBadge('#fdf4ff')}><Percent size={16} color="#a21caf" /></div>
-          Offering a recurring discount (Discount tab)
+          Offering a recurring discount (Services tab)
         </div>
         <p style={pStyle}>
-          Off by default — a visitor booking weekly, bi-weekly, or monthly service is quoted the exact same price as a one-time job unless you turn a discount on. The Discount tab lets you set your own percentage per frequency, separately for House Cleaning and Apartment Cleaning (the only two services frequency applies to).
+          Off by default — a visitor booking weekly, bi-weekly, or monthly service is quoted the exact same price as a one-time job unless you turn a discount on. The Services tab's Recurring Discounts section lets you set your own percentage per frequency, separately for House Cleaning and Apartment Cleaning (the only two services frequency applies to).
         </p>
         <p style={pStyle}>
           Leave a frequency blank or at 0% and it simply isn't discounted. Set 15% for Weekly, for example, and only weekly bookings get that price break — Bi-Weekly and Monthly stay at whatever you've set for them separately (or full price, if you haven't set anything).
@@ -304,7 +304,7 @@ export default function HelpTab() {
         <ul style={{ ...pStyle, margin: 0, paddingLeft: 20 }}>
           <li><strong>Size</strong> — square footage, bedrooms, bathrooms (house/apartment), or square footage alone (commercial, carpet, tile, air duct).</li>
           <li><strong>Condition</strong> — standard vs. deep-clean vs. move-in/move-out, or "how dirty is it" for carpet/tile/mold jobs.</li>
-          <li><strong>Frequency</strong> — weekly/biweekly/monthly service only costs less per visit than a one-time job if you've turned on a discount for that frequency in the Discount tab; otherwise it's priced the same as one-time.</li>
+          <li><strong>Frequency</strong> — weekly/biweekly/monthly service only costs less per visit than a one-time job if you've turned on a discount for that frequency under Recurring Discounts on the Services tab; otherwise it's priced the same as one-time.</li>
           <li><strong>Add-ons</strong> — extras like inside-oven, inside-fridge, area rugs, extra stairs, etc., each with their own additional cost.</li>
           <li><strong>Location</strong> — their state, via the cost-of-living adjustment described above.</li>
         </ul>
@@ -323,10 +323,10 @@ export default function HelpTab() {
       <div style={cardStyle}>
         <div style={sectionTitle}>
           <div style={iconBadge('#eff6ff')}><Code2 size={16} color="#2563eb" /></div>
-          Putting it on your website (Estimator tab)
+          Putting it on your website (Branding tab)
         </div>
         <p style={pStyle}>
-          Copy the embed code from the Estimator tab into your site once — after that, every change you make here (markup, branding, enabled services) updates on your live site automatically, with nothing to re-paste.
+          Copy the embed code from the bottom of the Branding tab into your site once — after that, every change you make here (markup, branding, enabled services) updates on your live site automatically, with nothing to re-paste.
         </p>
       </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, CalendarDays, DollarSign, Globe, Inbox, Paintbrush, Code2, CreditCard } from 'lucide-react';
+import { Users, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard } from 'lucide-react';
 import { getCompanyLeads } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
@@ -46,8 +46,8 @@ export default function OverviewTab({ config, subStatus, user }) {
   ];
 
   const quickActions = [
-    { label: 'Customize Branding', href: '?tab=branding',      Icon: Paintbrush  },
-    { label: 'Get Embed Code',     href: '?tab=embed',         Icon: Code2       },
+    { label: 'Services & Pricing', href: '?tab=services',      Icon: SlidersHorizontal },
+    { label: 'Branding & Embed Code', href: '?tab=branding',   Icon: Code2       },
     { label: 'View All Leads',     href: '?tab=leads',         Icon: Users       },
     { label: 'Manage Billing',     href: '?tab=subscription',  Icon: CreditCard  },
   ];

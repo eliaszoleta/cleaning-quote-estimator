@@ -40,7 +40,7 @@ const EXTRAS = [
 ];
 
 export default function HomeStep({ value, onBack, onNext, primaryColor, companyConfig }) {
-  // Only reflects a real, company-set discount (Discount tab) -- off by
+  // Only reflects a real, company-set discount (Services tab) -- off by
   // default, so a fresh account shows no "% off" tag on any frequency
   // until the company actually configures one.
   const frequencyDiscounts = companyConfig?.services?.homeResidential?.frequencyDiscounts || {};

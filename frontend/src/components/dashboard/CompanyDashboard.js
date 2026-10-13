@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
-  Users, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle, Percent,
+  Users, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle,
   Globe, X, CalendarClock, CreditCard, Zap,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
@@ -10,21 +10,23 @@ import { supabase } from '../../lib/supabase';
 import OverviewTab from './tabs/OverviewTab';
 import BrandingTab from './tabs/BrandingTab';
 import ServicesTab from './tabs/ServicesTab';
-import DiscountTab from './tabs/DiscountTab';
-import EmbedTab from './tabs/EmbedTab';
 import LeadsTab from './tabs/LeadsTab';
 import SettingsTab from './tabs/SettingsTab';
 import SubscriptionTab from './tabs/SubscriptionTab';
 import HelpTab from './tabs/HelpTab';
 import RunEstimateTab from './tabs/RunEstimateTab';
 
+// Discount (recurring-frequency %) now lives inside Services & Pricing, and
+// the embed code now lives inside Branding (right after the live preview it
+// already shows) -- both used to be their own nav tab, which meant hopping
+// between tabs to finish one coherent task (price a service, then see its
+// discount; brand the widget, then grab its code). Folding them into the
+// tab they're actually about cuts the nav down without losing anything.
 const NAV = [
   { id: 'overview',      Icon: LayoutDashboard,   label: 'Dashboard' },
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
   { id: 'leads',         Icon: Users,              label: 'Leads' },
   { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
-  { id: 'discount',      Icon: Percent,            label: 'Discount' },
-  { id: 'embed',         Icon: Code2,              label: 'Estimator' },
   { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
   { id: 'subscription',  Icon: CreditCard,         label: 'Subscription' },
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
@@ -261,10 +263,8 @@ export default function CompanyDashboard({ user, onLogout }) {
   const TABS = {
     overview:     <OverviewTab {...tabProps} />,
     help:         <HelpTab />,
-    branding:     <BrandingTab config={localConfig} update={update} onSave={handleGlobalSave} saving={saving} saved={saved} />,
+    branding:     <BrandingTab config={localConfig} update={update} onSave={handleGlobalSave} saving={saving} saved={saved} user={user} />,
     services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} autoSave={autoSave} />,
-    discount:     <DiscountTab config={localConfig} update={update} />,
-    embed:        <EmbedTab {...tabProps} />,
     leads:        <LeadsTab {...tabProps} />,
     subscription: <SubscriptionTab subStatus={subStatus} onSubRefresh={loadSubStatus} />,
     settings:     <SettingsTab user={user} config={config} saveConfig={saveConfig} saving={saving} refetchConfig={refetch} onLogout={onLogout} section={settingsSection} onSectionChange={setSettingsSection} />,

@@ -90,7 +90,7 @@ module.exports = [
       'New to Clean Estimator? Log in to your dashboard and open the Help & Docs tab — it walks through how pricing is calculated (with the real data behind it) and answers to the most common questions:',
       'https://www.cleanestimator.com/company?tab=help',
       '',
-      'You can always get this same embed code later from the Estimator tab.',
+      'You can always get this same embed code later from the Branding tab.',
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -133,7 +133,7 @@ module.exports = [
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    You can always get this same embed code later from the <strong>Estimator</strong> tab.
+    You can always get this same embed code later from the <strong>Branding</strong> tab.
   </p>
   ${FOOTER_HTML}
 </div>`,
@@ -186,7 +186,7 @@ module.exports = [
       '',
       "You're about a week into your free trial — just checking in.",
       '',
-      "If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the Embed Your Widget tab in your dashboard.",
+      "If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the bottom of the Branding tab in your dashboard.",
       '',
       "If anything's confusing or not working the way you expected, just reply to this email or check the Help & Docs tab — happy to help.",
       '',
@@ -203,7 +203,7 @@ module.exports = [
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the Embed Your Widget tab in your dashboard.
+    If you've already got the cleaning cost estimator live on your site, awesome. If you haven't gotten around to it yet, it's a quick copy-paste — grab the code from the bottom of the Branding tab in your dashboard.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">

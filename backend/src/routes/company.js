@@ -81,7 +81,7 @@ router.get('/:id', requireAuth, async (req, res) => {
     if (created) {
       // Fire-and-forget: points them at Calculator Mode and gets their
       // embed code in front of them immediately rather than relying on
-      // them to find the Estimator tab themselves.
+      // them to find the Branding tab themselves.
       sendCompanyWelcomeEmail({ to: req.user.email, companyId: id })
         .catch(err => console.error('Company welcome email failed:', err.message));
     }
