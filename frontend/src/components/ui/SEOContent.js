@@ -132,7 +132,7 @@ const SERVICE_PRICE_FACTORS = {
   ],
   tile_grout: [
     'Area size in square feet',
-    'Tile material: ceramic, porcelain, natural stone, travertine, or slate (natural stone costs 30–40% more)',
+    'Tile material: ceramic, porcelain, or natural stone like travertine, slate, or marble (natural stone costs 30–40% more)',
     'Current condition, plus soap scum or hard water buildup',
     'Services needed: deep clean, grout sealing, grout recoloring, caulk replacement',
   ],
