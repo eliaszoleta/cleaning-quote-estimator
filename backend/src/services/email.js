@@ -715,109 +715,21 @@ async function sendCompanyWelcomeEmail({ to, companyId, subject }) {
   return sent;
 }
 
-// ─── Trial reminder emails ─────────────────────────────────────────────────
-
-// Sent once, 2 days before a company's 30-day free trial ends (see
-// checkTrialReminders in services/trialScheduler.js). Deduped via
-// config.subscription.trialEndingSoonEmailSentAt so it only ever goes out
-// once. Content lives in the editable email_templates table
-// (key: 'trial_ending_soon').
-async function sendTrialEndingSoonEmail({ to, companyName, daysLeft }) {
-  const { sent } = await sendTemplatedEmail({
-    template: 'trial_ending_soon',
-    to,
-    toName: companyName,
-    vars: { companyName, daysLeftText: `${daysLeft} day${daysLeft === 1 ? '' : 's'}` },
-    recipientType: 'company',
-  });
-  return sent;
-}
-
-// ─── Trial check-in emails ──────────────────────────────────────────────────
-// Fill the gap between the day-0 welcome email and the day-28/30 reminders
-// above -- there was previously no contact at all for the ~27 days in
-// between. Sent once each via checkTrialReminders in trialScheduler.js
-// (day 7 / 14 / 21, deduped the same way as the reminder emails), so a
-// company that stops engaging mid-trial gets a nudge, a pointer to Help &
-// Docs, and an easy reply-to path before they forget the tool exists.
-
-// Sent once, the first time a company's trial reaches 7 days elapsed (see
-// checkTrialReminders in services/trialScheduler.js). Deduped via
-// trialCheckin1EmailSentAt on config.subscription. Content lives in the
-// editable email_templates table (key: 'trial_checkin_1').
+// ─── Trial check-in email ────────────────────────────────────────────────
+// Just one touchpoint during the trial itself now -- day 7, a nudge to
+// actually open Calculator Mode. The day-14/21 check-ins, the day-28
+// "ending soon" reminder, the legacy "trial ended / widget paused" email,
+// and the "trial converted to paid" confirmation were all dropped as
+// redundant once the card-required Stripe trial made "subscribe before it
+// ends" moot -- payment_failed and subscription_canceled below cover the
+// cases that actually need a reply. Sent once, the first time a company's
+// trial reaches 7 days elapsed (see checkTrialReminders in
+// services/trialScheduler.js). Deduped via trialCheckin1EmailSentAt on
+// config.subscription. Content lives in the editable email_templates table
+// (key: 'trial_checkin_1').
 async function sendTrialCheckin1Email({ to, companyName }) {
   const { sent } = await sendTemplatedEmail({
     template: 'trial_checkin_1',
-    to,
-    toName: companyName,
-    vars: { companyName },
-    recipientType: 'company',
-  });
-  return sent;
-}
-
-// Sent once, the first time a company's trial reaches 14 days elapsed.
-// Deduped via trialCheckin2EmailSentAt. Content lives in the editable
-// email_templates table (key: 'trial_checkin_2').
-async function sendTrialCheckin2Email({ to, companyName }) {
-  const { sent } = await sendTemplatedEmail({
-    template: 'trial_checkin_2',
-    to,
-    toName: companyName,
-    vars: { companyName },
-    recipientType: 'company',
-  });
-  return sent;
-}
-
-// Sent once, the first time a company's trial reaches 21 days elapsed.
-// Deduped via trialCheckin3EmailSentAt. Deliberately softer than the
-// day-28 "ending soon" email (no urgency framing) -- that one still does
-// the actual countdown. Content lives in the editable email_templates
-// table (key: 'trial_checkin_3').
-async function sendTrialCheckin3Email({ to, companyName }) {
-  const { sent } = await sendTemplatedEmail({
-    template: 'trial_checkin_3',
-    to,
-    toName: companyName,
-    vars: { companyName },
-    recipientType: 'company',
-  });
-  return sent;
-}
-
-// Legacy path only -- sent once, the day a company's old, no-card
-// trialStartedAt-based trial actually runs out with no Stripe subscription
-// ever attached, so the embedded widget genuinely does get paused (see
-// checkTrialReminders). Deduped via config.subscription.trialEndedEmailSentAt.
-// Content lives in the editable email_templates table (key: 'trial_ended').
-// Not used for a current, Stripe-managed trial -- see sendTrialConvertedEmail
-// below for that case, where nothing pauses because the card just gets
-// charged automatically.
-async function sendTrialEndedEmail({ to, companyName }) {
-  const { sent } = await sendTemplatedEmail({
-    template: 'trial_ended',
-    to,
-    toName: companyName,
-    vars: { companyName },
-    recipientType: 'company',
-  });
-  return sent;
-}
-
-// Sent once, triggered by the customer.subscription.updated webhook the
-// moment Stripe transitions a subscription from "trialing" to "active" --
-// i.e. the trial just ended and the card on file was just charged. Event-
-// driven rather than polled (see checkTrialReminders) since that's the
-// exact moment Stripe itself decides the trial is over; nothing pauses in
-// this flow, so this is a receipt/confirmation, not a reactivation pitch
-// like the legacy trial_ended email above. Deduped via
-// config.subscription.trialConvertedEmailSentAt (webhook deliveries can
-// repeat). Content lives in the editable email_templates table
-// (key: 'trial_converted').
-async function sendTrialConvertedEmail({ to, companyName }) {
-  const { sent } = await sendTemplatedEmail({
-    template: 'trial_converted',
     to,
     toName: companyName,
     vars: { companyName },
@@ -1201,14 +1113,9 @@ module.exports = {
   sendPartnerLeadEmail,
   sendCompanyLeadEmail,
   sendCompanyWelcomeEmail,
-  sendTrialEndingSoonEmail,
-  sendTrialEndedEmail,
-  sendTrialConvertedEmail,
   sendPaymentFailedEmail,
   sendSubscriptionCanceledEmail,
   sendTrialCheckin1Email,
-  sendTrialCheckin2Email,
-  sendTrialCheckin3Email,
   sendAccountDeletionScheduledEmail,
   sendWebsiteRequestNotificationEmail,
   sendWebsiteRequestReceivedEmail,

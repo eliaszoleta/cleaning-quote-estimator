@@ -113,7 +113,7 @@ router.patch('/templates/:id', async (req, res) => {
 
 // DELETE /api/admin/email-marketing/templates/:id — only free-form
 // (key IS NULL) templates can be deleted; a lifecycle template's key is
-// looked up directly by code (sendTrialEndingSoonEmail, etc.), so deleting
+// looked up directly by code (sendTrialCheckin1Email, etc.), so deleting
 // that row would break the automated send, not just remove it from a list.
 router.delete('/templates/:id', async (req, res) => {
   const sb = getSupabase();

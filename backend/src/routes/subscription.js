@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { sendCompanyWelcomeEmail, sendTrialConvertedEmail, sendPaymentFailedEmail, sendSubscriptionCanceledEmail } = require('../services/email');
+const { sendCompanyWelcomeEmail, sendPaymentFailedEmail, sendSubscriptionCanceledEmail } = require('../services/email');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -247,12 +247,6 @@ async function handleStripeEvent(event) {
         const companyId = await findCompanyByCustomer(sub.customer);
         if (!companyId) break;
         const config = (await getCompanyConfig(companyId)) || {};
-        // Stripe's trial-period clock, not this webhook, is what actually
-        // ends a trial -- catch the transition here (previous_attributes
-        // only lists fields that just changed) so the "you're now a paying
-        // customer" email fires at the exact moment the card gets charged,
-        // rather than this app polling for it.
-        const justConvertedFromTrial = event.data.previous_attributes?.status === 'trialing' && sub.status === 'active';
         config.subscription = {
           ...(config.subscription || {}),
           status: sub.status,
@@ -264,23 +258,6 @@ async function handleStripeEvent(event) {
         };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: subscription updated to "${sub.status}" (cancelAtPeriodEnd: ${sub.cancel_at_period_end}) for company ${companyId}`);
-
-        // Deduped via trialConvertedEmailSentAt -- Stripe can redeliver the
-        // same webhook event, and this flag is the only thing standing
-        // between a redelivery and a duplicate "you've been charged" email.
-        if (justConvertedFromTrial && !config.subscription.trialConvertedEmailSentAt) {
-          const email = await getOwnerEmail(companyId);
-          if (email) {
-            const sent = await sendTrialConvertedEmail({ to: email, companyName: config.companyName || 'there' });
-            if (sent) {
-              const fresh = (await getCompanyConfig(companyId)) || config;
-              await saveCompanyConfig(companyId, {
-                ...fresh,
-                subscription: { ...fresh.subscription, trialConvertedEmailSentAt: new Date().toISOString() },
-              });
-            }
-          }
-        }
       } catch (err) {
         console.error(`Webhook customer.subscription.updated failed:`, err.message);
         throw err;
