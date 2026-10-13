@@ -43,7 +43,7 @@ const STEPS = [
 const TESTIMONIALS = [
   { name: 'Daniel K.', company: 'KeyStone Cleaning Co. — Columbus, OH',  text: "We stopped showing customers a price range. I run the numbers myself in two minutes flat and text over a confident quote — no more haggling from the bottom of a range." },
   { name: 'Sarah M.',  company: 'Sparkle Cleaning Services — Austin, TX', text: "We embedded it on our site too and it's generated 47 qualified leads in 4 months. Conversion rate is way higher than our contact form because visitors are pre-qualified." },
-  { name: 'Maria L.',  company: 'Crystal Clean Commercial — Miami, FL',  text: "Setup took about 20 minutes. The embed is seamless — my website visitors don't even realize it's a third-party tool." },
+  { name: 'Maria L.',  company: 'Crystal Clean Commercial — Miami, FL',  text: "My estimators run it on their phones during walkthroughs and email me the number before they even leave the driveway. Every one of them quotes the exact same job the exact same price now — that never happened when pricing lived in everyone's head." },
 ];
 
 const PLAN_FEATURES = [
