@@ -36,7 +36,7 @@ export default function MoldStep({ value, onBack, onNext, primaryColor }) {
       </div>
 
       <StepSection label="Estimated affected area">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {[
             ['small','Small','< 10 sq ft (e.g. corner of shower)'],
             ['medium','Medium','10–100 sq ft (e.g. bathroom wall)'],

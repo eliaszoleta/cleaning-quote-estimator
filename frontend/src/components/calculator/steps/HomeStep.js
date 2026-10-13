@@ -80,7 +80,7 @@ export default function HomeStep({ value, onBack, onNext, primaryColor, companyC
     >
       {/* Home size */}
       <StepSection label="Home size">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {SQFT_OPTIONS.map(o => (
             <StepOptionCard key={o.id} selected={sqftTier === o.id} onClick={() => setSqftTier(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 600, fontSize: 14 }}>{o.label}</div>
@@ -117,7 +117,7 @@ export default function HomeStep({ value, onBack, onNext, primaryColor, companyC
 
       {/* Cleaning type */}
       <StepSection label="Cleaning type">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {CLEANING_TYPES.map(o => (
             <StepOptionCard key={o.id} selected={cleaningType === o.id} onClick={() => setCleaningType(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>{o.label}</div>

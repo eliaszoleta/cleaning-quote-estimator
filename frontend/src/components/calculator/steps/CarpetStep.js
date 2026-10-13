@@ -47,7 +47,7 @@ export default function CarpetStep({ value, onBack, onNext, primaryColor }) {
       </StepSection>
 
       <StepSection label="Cleaning method">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        <div className="calc-grid-3">
           {[['steam','Steam (Hot Water Extraction)','Best deep clean, takes 6–12h to dry'],['dry','Dry Cleaning','Quick-dry, less effective on deep stains'],['encapsulation','Encapsulation','Commercial-grade, low moisture']].map(([id,label,desc]) => (
             <StepOptionCard key={id} selected={method === id} onClick={() => setMethod(id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 13, color: method === id ? primaryColor : COLORS.ink }}>{label}</div>

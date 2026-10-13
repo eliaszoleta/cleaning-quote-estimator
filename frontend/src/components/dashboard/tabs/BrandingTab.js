@@ -10,6 +10,17 @@ const SITE_URL = process.env.REACT_APP_SITE_URL || 'https://www.cleanestimator.c
 
 export default function BrandingTab({ config, update, autoSave, onSave, saving, saved, user }) {
   const [copied, setCopied] = useState(null);
+  // This whole tab used to be a hardcoded 2-column grid (settings | live
+  // preview) with no responsive handling at all -- on a phone that forced
+  // two unreadably narrow columns side by side instead of stacking, since
+  // CSS Grid's 1fr/1fr always splits available width evenly regardless of
+  // content. Same breakpoint CompanyDashboard.js already uses for its header.
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
   // Session is fetched per-upload (rather than once on mount) so a long
   // idle stretch on this tab before uploading a logo can't hand
   // uploadCompanyLogo a token that's since expired.
@@ -195,7 +206,7 @@ export default function BrandingTab({ config, update, autoSave, onSave, saving, 
         <p style={{ color: '#64748b', fontSize: 14 }}>Customize how your estimator looks on your website.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 32, alignItems: 'start' }}>
         {/* Settings column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
@@ -302,7 +313,10 @@ export default function BrandingTab({ config, update, autoSave, onSave, saving, 
             what this panel showed. Still just an approximation: the real
             widget always matches whatever width a given site's own page
             actually provides, which this can't know in advance. */}
-        <div style={{ position: 'sticky', top: 96 }}>
+        {/* Sticky only makes sense alongside a second column -- stacked
+            full-width below a long settings form on mobile, a sticky
+            preview would awkwardly pin itself mid-scroll instead. */}
+        <div style={isMobile ? undefined : { position: 'sticky', top: 96 }}>
           <div style={{ maxWidth: 960, margin: '0 auto' }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Live Preview</div>
             <div style={{ border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', background: 'white' }}>

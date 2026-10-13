@@ -25,9 +25,11 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // POST /api/estimate-share
 router.post('/', async (req, res) => {
   const companyId = req.user.id;
-  const { to, serviceType, zip, state, serviceDetails } = req.body || {};
+  const { to, clientName, serviceType, zip, state, serviceDetails } = req.body || {};
+  const trimmedClientName = (clientName || '').trim().slice(0, 100) || null;
 
   if (!to || !EMAIL_RE.test(to)) return res.status(400).json({ success: false, error: 'A valid email address is required' });
+  if (!trimmedClientName) return res.status(400).json({ success: false, error: "The client's name is required" });
   if (!serviceType || !VALID_SERVICE_TYPES.includes(serviceType)) return res.status(400).json({ success: false, error: 'Invalid or missing serviceType' });
   if (!zip && !state) return res.status(400).json({ success: false, error: 'zip or state is required' });
 
@@ -41,6 +43,7 @@ router.post('/', async (req, res) => {
     const sent = await sendEstimateEmail({
       to,
       name: null,
+      clientName: trimmedClientName,
       serviceType,
       result,
       companyConfig,

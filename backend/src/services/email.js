@@ -149,7 +149,7 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
 // A plain-text alternative alongside the HTML body (multipart/alternative)
 // -- sending HTML-only is itself a signal Gmail's classifier associates
 // with bulk/marketing mail, on top of the styling itself.
-function buildText({ name, serviceType, result, companyConfig, partner }) {
+function buildText({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
     totalLow, totalHigh, stateName, unit,
     adjustments = [], recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
@@ -162,10 +162,18 @@ function buildText({ name, serviceType, result, companyConfig, partner }) {
   const lines = [
     `Hi ${firstName},`,
     '',
+  ];
+  // Only set on the internal "Email to Coworker" share path (estimateShare.js)
+  // -- the recipient there is a teammate, not the client themselves, so the
+  // greeting above stays generic while this line is what actually tells them
+  // whose estimate they're looking at.
+  if (clientName) lines.push(`Client: ${clientName}`, '');
+
+  lines.push(
     `Here's your ${serviceLabel.toLowerCase()} estimate${stateName ? ` for ${stateName}` : ''}:`,
     '',
     `${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
-  ];
+  );
 
   if (recurringMonthlyLow && unit !== 'per_month') {
     lines.push(`Recurring: ${fmtMoney(recurringMonthlyLow)} - ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` (save ~${fmtMoney(recurringAnnualSavings)}/year)` : ''}`);
@@ -200,7 +208,7 @@ function buildText({ name, serviceType, result, companyConfig, partner }) {
   return lines.join('\n');
 }
 
-function buildHtml({ name, serviceType, result, companyConfig, partner }) {
+function buildHtml({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
     totalLow, totalHigh, stateName, unit,
     adjustments = [], keyFactors = [],
@@ -210,6 +218,13 @@ function buildHtml({ name, serviceType, result, companyConfig, partner }) {
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
   const brandName = companyConfig?.companyName || 'Clean Estimator';
   const firstName = (name || '').trim().split(' ')[0] || 'there';
+
+  // Same "Email to Coworker" case as buildText's clientName line above --
+  // shown as its own standout line rather than folded into the greeting,
+  // since the greeting addresses the coworker, not the client.
+  const clientLine = clientName
+    ? `<p style="font-size:13px;color:#666666;margin:0 0 16px;">Client: <strong style="color:#111111;">${clientName}</strong></p>`
+    : '';
 
   const recurringLine = (recurringMonthlyLow && unit !== 'per_month')
     ? `<p style="font-size:13px;color:#666666;margin:4px 0 0;">Recurring: ${fmtMoney(recurringMonthlyLow)} – ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` · Save ~${fmtMoney(recurringAnnualSavings)}/year` : ''}</p>`
@@ -232,7 +247,8 @@ function buildHtml({ name, serviceType, result, companyConfig, partner }) {
 
   return `
 <div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
-  <p style="font-size:14px;margin:0 0 20px;">Hi ${firstName},</p>
+  <p style="font-size:14px;margin:0 0 ${clientLine ? 4 : 20}px;">Hi ${firstName},</p>
+  ${clientLine}
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${stateName ? ` for ${stateName}` : ''}:</p>
 
@@ -261,7 +277,7 @@ function buildHtml({ name, serviceType, result, companyConfig, partner }) {
 // Fire-and-forget from the caller's perspective: never throws, returns
 // false (and logs why) instead so a missing config or a delivery failure
 // never breaks the /api/calculate response.
-async function sendEstimateEmail({ to, name, serviceType, result, companyConfig, partner, replyTo }) {
+async function sendEstimateEmail({ to, name, clientName, serviceType, result, companyConfig, partner, replyTo }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendEstimateEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -285,9 +301,15 @@ async function sendEstimateEmail({ to, name, serviceType, result, companyConfig,
         // spoofed), but reply_to lets "Reply" in the visitor's mail client
         // route straight to the business anyway.
         reply_to: replyTo || undefined,
-        subject: `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate is ready`,
-        html: buildHtml({ name, serviceType, result, companyConfig, partner }),
-        text: buildText({ name, serviceType, result, companyConfig, partner }),
+        // clientName (only ever set on the "Email to Coworker" share path --
+        // see estimateShare.js) replaces the generic subject with one that
+        // names whose estimate this is, so a teammate scanning their inbox
+        // doesn't have to open the email to find out.
+        subject: clientName
+          ? `${SERVICE_LABELS[serviceType] || 'Cleaning'} estimate for ${clientName}`
+          : `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate is ready`,
+        html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner }),
+        text: buildText({ name, clientName, serviceType, result, companyConfig, partner }),
       },
       { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
     );

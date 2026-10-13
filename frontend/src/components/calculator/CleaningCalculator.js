@@ -342,7 +342,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           embedded={embedded && !siteLanding}
           onReset={handleReset}
           demoPartner={demoPartner}
-          onShareEmail={onShareEmail ? (email) => onShareEmail({ to: email, serviceType, zip: location.zip || null, state: location.state || null, serviceDetails }) : undefined}
+          onShareEmail={onShareEmail ? (email, clientName) => onShareEmail({ to: email, clientName, serviceType, zip: location.zip || null, state: location.state || null, serviceDetails }) : undefined}
         />
       </div>
     );

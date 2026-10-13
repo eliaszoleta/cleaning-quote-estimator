@@ -73,3 +73,23 @@
     line-height: 1.5;
   }
 }
+
+/* Option-card grids (home size, cleaning type, building type, water
+   category, etc.) -- used to be a hardcoded 2- or 3-column grid with no
+   responsive handling, which on a narrow phone squeezed each card so
+   narrow that a multi-word label like "1,500 - 2,000 sq ft" wrapped
+   awkwardly (often leaving a lone orphan word like "ft" stranded on its
+   own line). Dropping to a single column under 480px gives each card the
+   full available width instead. Applies globally since CleaningCalculator.js
+   imports this stylesheet once at the top of the component tree. */
+.calc-grid-2, .calc-grid-3 {
+  display: grid;
+  gap: 8px;
+}
+.calc-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.calc-grid-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 480px) {
+  .calc-grid-2, .calc-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}

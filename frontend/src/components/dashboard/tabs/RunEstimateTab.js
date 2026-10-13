@@ -36,11 +36,11 @@ export default function RunEstimateTab({ config, user }) {
     serviceCities: {},
   };
 
-  const handleShareEmail = async ({ to, serviceType, zip, state, serviceDetails }) => {
+  const handleShareEmail = async ({ to, clientName, serviceType, zip, state, serviceDetails }) => {
     const { data: { session } } = await supabase.auth.getSession();
     const token = session?.access_token;
     if (!token) throw new Error('Not signed in');
-    await postEstimateShare(token, { to, serviceType, zip, state, serviceDetails });
+    await postEstimateShare(token, { to, clientName, serviceType, zip, state, serviceDetails });
   };
 
   return (

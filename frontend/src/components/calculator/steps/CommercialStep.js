@@ -44,7 +44,7 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor, co
     <StepWrapper title="Commercial property details" subtitle="Prices quoted per month" onBack={onBack} onNext={() => onNext({ buildingType, sqft, restrooms, frequency, serviceLevel, dayPorter, afterHours })} primaryColor={primaryColor}>
 
       <StepSection label="Building type">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {BUILDING_TYPES.map(t => (
             <StepOptionCard key={t.id} selected={buildingType === t.id} onClick={() => setBuildingType(t.id)} primaryColor={primaryColor}>
               <span style={{ fontWeight: 600, fontSize: 14, color: buildingType === t.id ? primaryColor : COLORS.ink }}>{t.label}</span>
@@ -85,7 +85,7 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor, co
       </StepSection>
 
       <StepSection label="Service level">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {SERVICE_LEVELS.map(l => (
             <StepOptionCard key={l.id} selected={serviceLevel === l.id} onClick={() => setServiceLevel(l.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 14, color: serviceLevel === l.id ? primaryColor : COLORS.ink }}>{l.label}</div>
@@ -96,7 +96,7 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor, co
       </StepSection>
 
       <StepSection label="Options">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {[
             { key: 'dayPorter', val: dayPorter, set: setDayPorter, label: 'Day Porter Service', hint: 'On-site porter during business hours' },
             { key: 'afterHours', val: afterHours, set: setAfterHours, label: 'After-Hours Cleaning', hint: '+15% for after-hours access' },

@@ -18,15 +18,20 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
   // stays gated on !embedded).
   const [shareEmailOpen, setShareEmailOpen] = useState(false);
   const [shareEmailValue, setShareEmailValue] = useState('');
+  // Required alongside the email -- without it, a coworker opening this
+  // estimate has no way to tell whose job it's for (the subject line and
+  // email body both rely on this to say "estimate for <client name>").
+  const [shareClientName, setShareClientName] = useState('');
   const [shareEmailStatus, setShareEmailStatus] = useState(''); // '' | 'sending' | 'sent' | 'error'
 
   const submitShareEmail = async () => {
-    if (!shareEmailValue.trim() || !onShareEmail || shareEmailStatus === 'sending') return;
+    if (!shareEmailValue.trim() || !shareClientName.trim() || !onShareEmail || shareEmailStatus === 'sending') return;
     setShareEmailStatus('sending');
     try {
-      await onShareEmail(shareEmailValue.trim());
+      await onShareEmail(shareEmailValue.trim(), shareClientName.trim());
       setShareEmailStatus('sent');
       setShareEmailValue('');
+      setShareClientName('');
       setTimeout(() => { setShareEmailOpen(false); setShareEmailStatus(''); }, 2000);
     } catch {
       setShareEmailStatus('error');
@@ -127,7 +132,12 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, opacity: 0.85, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   <CheckCircle2 size={14} /> {serviceTypeLabel(serviceType)} Estimate · {stateName}
                 </div>
-                <div style={{ fontSize: 'clamp(34px, 8vw, 52px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 8, letterSpacing: '-1px' }}>
+                {/* A lower clamp() floor (was 34px) plus nowrap -- on a narrow
+                    phone a longer range like "$1,345 - $1,632" at 34px had no
+                    room left to shrink into and wrapped onto two lines; this
+                    lets it keep shrinking down to a size that still fits in
+                    one line instead. */}
+                <div style={{ fontSize: 'clamp(26px, 8vw, 52px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 8, letterSpacing: '-1px', whiteSpace: 'nowrap' }}>
                   {formatPrice(totalLow)} – {formatPrice(totalHigh)}
                 </div>
                 <div style={{ fontSize: 13.5, opacity: 0.85 }}>
@@ -277,6 +287,14 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
           {onShareEmail && shareEmailOpen && (
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginTop: 12 }}>
               <input
+                type="text"
+                value={shareClientName}
+                onChange={e => setShareClientName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && submitShareEmail()}
+                placeholder="Client's name"
+                style={{ padding: '9px 14px', borderRadius: RADIUS.sm, border: `1.5px solid ${COLORS.border}`, fontSize: 13.5, minWidth: 160 }}
+              />
+              <input
                 type="email"
                 value={shareEmailValue}
                 onChange={e => setShareEmailValue(e.target.value)}
@@ -286,8 +304,8 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
               />
               <button
                 onClick={submitShareEmail}
-                disabled={shareEmailStatus === 'sending' || !shareEmailValue.trim()}
-                style={{ padding: '9px 18px', borderRadius: RADIUS.sm, border: 'none', background: primaryColor, color: 'white', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', opacity: (shareEmailStatus === 'sending' || !shareEmailValue.trim()) ? 0.6 : 1 }}
+                disabled={shareEmailStatus === 'sending' || !shareEmailValue.trim() || !shareClientName.trim()}
+                style={{ padding: '9px 18px', borderRadius: RADIUS.sm, border: 'none', background: primaryColor, color: 'white', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', opacity: (shareEmailStatus === 'sending' || !shareEmailValue.trim() || !shareClientName.trim()) ? 0.6 : 1 }}
               >
                 {shareEmailStatus === 'sending' ? 'Sending…' : shareEmailStatus === 'sent' ? 'Sent!' : 'Send'}
               </button>

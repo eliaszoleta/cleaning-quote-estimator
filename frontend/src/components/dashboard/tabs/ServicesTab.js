@@ -362,21 +362,31 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
                 </span>
 
                 {s.enabled && (
+                  // Each label+input is its own non-wrapping pair -- these
+                  // used to be direct children of the outer flexWrap row,
+                  // so on a narrow screen the row could wrap between a
+                  // label and its own input ("Markup" landing on one line,
+                  // its number field dropping to the next). Grouping them
+                  // means wrapping only ever happens BETWEEN whole pairs.
                   <>
-                    <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Markup</label>
-                    <input
-                      type="number" step={0.05} min={0.5} max={3.0} value={s.markup}
-                      onChange={e => setSvc(id, 'markup', parseFloat(e.target.value) || 1.0)}
-                      style={{ ...inp, width: 64 }}
-                    />
-                    <span style={{ fontSize: 12, color: '#cbd5e1' }}>×</span>
-                    <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Min $</label>
-                    <input
-                      type="number" min={0} value={s.minimumCharge || ''}
-                      onChange={e => setSvc(id, 'minimumCharge', e.target.value ? parseInt(e.target.value) : null)}
-                      placeholder="None"
-                      style={{ ...inp, width: 74 }}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+                      <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Markup</label>
+                      <input
+                        type="number" step={0.05} min={0.5} max={3.0} value={s.markup}
+                        onChange={e => setSvc(id, 'markup', parseFloat(e.target.value) || 1.0)}
+                        style={{ ...inp, width: 64 }}
+                      />
+                      <span style={{ fontSize: 12, color: '#cbd5e1' }}>×</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+                      <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Min $</label>
+                      <input
+                        type="number" min={0} value={s.minimumCharge || ''}
+                        onChange={e => setSvc(id, 'minimumCharge', e.target.value ? parseInt(e.target.value) : null)}
+                        placeholder="None"
+                        style={{ ...inp, width: 74 }}
+                      />
+                    </div>
                   </>
                 )}
 

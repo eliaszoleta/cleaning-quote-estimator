@@ -37,7 +37,7 @@ export default function WaterDamageStep({ value, onBack, onNext, primaryColor })
       </StepSection>
 
       <StepSection label="Cause of water damage">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {[['pipe_burst','Burst / Broken Pipe'],['appliance_leak','Appliance Leak'],['toilet_overflow','Toilet Overflow'],['roof_leak','Roof Leak'],['flooding','Natural Flooding'],['sewage','Sewage Backup']].map(([id,label]) => (
             <StepOptionCard key={id} selected={cause === id} onClick={() => setCause(id)} primaryColor={primaryColor}>
               <span style={{ fontWeight: 600, fontSize: 13, color: cause === id ? primaryColor : COLORS.ink }}>{label}</span>
@@ -47,7 +47,7 @@ export default function WaterDamageStep({ value, onBack, onNext, primaryColor })
       </StepSection>
 
       <StepSection label="Water category">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        <div className="calc-grid-3">
           {[
             ['clean','Category 1: Clean Water','Pipe burst, appliance supply line'],
             ['gray','Category 2: Gray Water','Washing machine, dishwasher overflow (+30%)'],
