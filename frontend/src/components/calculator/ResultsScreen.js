@@ -154,7 +154,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
               </div>
             </div>
 
-            <div style={{ padding: '24px 28px' }}>
+            <div style={{ padding: '24px 20px' }}>
               {disclaimer && (
                 <div style={{ background: urgencyLevel === 'critical' ? COLORS.dangerMuted : COLORS.warningMuted, border: `1px solid ${urgencyLevel === 'critical' ? COLORS.dangerBorder : COLORS.warningBorder}`, borderRadius: RADIUS.md, padding: '13px 16px', marginBottom: 20, display: 'flex', gap: 10 }}>
                   <div style={{ flexShrink: 0, marginTop: 1 }}>
@@ -173,18 +173,22 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 10 }}>Price breakdown</div>
                 <div style={{ border: `1px solid ${COLORS.borderSubtle}`, borderRadius: RADIUS.md, overflow: 'hidden' }}>
                   {adjustments.filter(adj => !adj.separate).map((adj, i, arr) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', borderBottom: i < arr.length - 1 ? `1px solid ${COLORS.borderSubtle}` : 'none', fontSize: 13.5, background: i % 2 === 0 ? COLORS.surface : '#fafafa' }}>
-                      <span style={{ color: COLORS.ink, textTransform: 'capitalize' }}>{adj.label}</span>
-                      <span style={{ fontWeight: 600, color: (adj.low < 0 || adj.high < 0) ? COLORS.success : COLORS.ink }}>
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '10px 12px', borderBottom: i < arr.length - 1 ? `1px solid ${COLORS.borderSubtle}` : 'none', fontSize: 13.5, background: i % 2 === 0 ? COLORS.surface : '#fafafa' }}>
+                      {/* flex:1 + minWidth:0 on the label so IT wraps first if
+                          the row is tight, instead of the price column
+                          (whiteSpace:nowrap, flexShrink:0) breaking apart
+                          mid-number onto its own second line. */}
+                      <span style={{ flex: 1, minWidth: 0, color: COLORS.ink, textTransform: 'capitalize' }}>{adj.label}</span>
+                      <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 600, color: (adj.low < 0 || adj.high < 0) ? COLORS.success : COLORS.ink }}>
                         {adj.low < 0
                           ? `−${formatPrice(Math.abs(adj.low))} – −${formatPrice(Math.abs(adj.high))}`
                           : (adj.low === 0 && adj.high === 0 ? 'Included' : formatPriceRange(adj.low, adj.high))}
                       </span>
                     </div>
                   ))}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '13px 14px', background: COLORS.surfaceMuted, borderTop: `1.5px solid ${COLORS.border}`, fontWeight: 700, fontSize: 15 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '13px 12px', background: COLORS.surfaceMuted, borderTop: `1.5px solid ${COLORS.border}`, fontWeight: 700, fontSize: 15 }}>
                     <span>Estimated total</span>
-                    <span style={{ color: primaryColor }}>{formatPriceRange(totalLow, totalHigh)}</span>
+                    <span style={{ flexShrink: 0, whiteSpace: 'nowrap', color: primaryColor }}>{formatPriceRange(totalLow, totalHigh)}</span>
                   </div>
                 </div>
                 {adjustments.filter(adj => adj.separate).map((adj, i) => (
