@@ -256,15 +256,6 @@ export default function SEOContent() {
           <h2 style={{ fontSize: 'clamp(14.5px, 4.4vw, 23px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px', textAlign: 'center' }}>
             Get a FREE Cleaning Cost Estimate Online
           </h2>
-          {/* text-align:justify only kicks in at the desktop breakpoint below --
-              on a narrow phone column, justify stretches short lines into
-              uneven "rivers" of whitespace since there isn't enough width per
-              line to distribute the extra space smoothly. */}
-          <style>{`
-            @media (min-width: 768px) {
-              .ce-seo-intro p { text-align: justify; }
-            }
-          `}</style>
           <div className="ce-seo-intro">
             <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
               No phone calls, no waiting on a callback — just a real cleaning cost estimate online from a dedicated <a href="/cleaning-cost-estimator" style={{ color: '#2563eb', fontWeight: 600 }}>cleaning cost estimator</a>, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.
