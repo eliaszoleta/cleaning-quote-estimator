@@ -57,20 +57,27 @@
 }
 
 @media (max-width: 640px) {
+  /* On a phone this band -- badge, title, subtitle, plus the gap before the
+     card sinks in -- was eating close to half the first screenful before
+     "What service do you need?" ever came into view. Tightened on every
+     axis (padding, font-size, line-height, margins) rather than just one,
+     since no single property was the actual culprit. */
   .calc-hero-band {
-    padding: 44px 16px 84px;
+    padding: 28px 16px 56px;
   }
   .calc-hero__badge {
     font-size: 11px;
-    padding: 5px 13px;
-    margin-bottom: 12px;
+    padding: 4px 12px;
+    margin-bottom: 10px;
   }
   .calc-hero__title {
-    margin-bottom: 8px;
+    font-size: 21px;
+    line-height: 1.2;
+    margin-bottom: 6px;
   }
   .calc-hero__subtitle {
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 12.5px;
+    line-height: 1.4;
   }
 }
 

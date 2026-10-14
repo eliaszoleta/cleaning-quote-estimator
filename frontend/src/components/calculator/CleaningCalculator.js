@@ -482,7 +482,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             white with nothing to visually tell them apart. */}
         <div ref={cardRef} style={{
           maxWidth: embedded ? undefined : 720,
-          margin: embedded ? '0 auto' : (currentStep === 'service' ? `${isMobile ? -44 : -72}px auto 0` : '14px auto 0'),
+          margin: embedded ? '0 auto' : (currentStep === 'service' ? `${isMobile ? -32 : -72}px auto 0` : '14px auto 0'),
           position: 'relative',
           background: COLORS.surface,
           borderRadius: embedded ? 0 : 10,
