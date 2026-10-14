@@ -92,7 +92,7 @@ export default function Founder() {
         <section style={{ marginBottom: 44 }}>
           <div style={{ background: COLORS.primaryMuted, border: `1px solid ${COLORS.primaryMutedBorder}`, borderRadius: RADIUS.xl, padding: 'clamp(20px, 5vw, 26px) clamp(22px, 5vw, 30px)' }}>
             <p style={{ fontSize: 'clamp(15px, 3.6vw, 18px)', color: COLORS.ink, lineHeight: 1.6, fontWeight: 500, margin: 0 }}>
-              I guess that makes me a vibe coder, lol — but the apps are real, live, and used by real people.
+              Call it vibe coding if you want — the apps are real, live, and used by real people every day.
             </p>
           </div>
         </section>
