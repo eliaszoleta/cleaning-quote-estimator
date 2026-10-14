@@ -137,16 +137,23 @@ function isNavItemActive(href, pathname, hash) {
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  // matchMedia, not a raw 'resize' listener -- mobile Chrome's address-bar
+  // collapse on scroll fires 'resize' (the layout viewport's height
+  // changes) and can momentarily misreport width too, flipping this flag
+  // mid-scroll on a long page. matchMedia's 'change' event only fires on
+  // an actual breakpoint crossing.
+  const mobileQuery = () => window.matchMedia('(max-width: 768px)');
+  const [isMobile, setIsMobile] = useState(() => mobileQuery().matches);
   const [location, setLocation] = useState(() => ({
     pathname: window.location.pathname,
     hash: window.location.hash,
   }));
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const mq = mobileQuery();
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
   }, []);
 
   useEffect(() => {

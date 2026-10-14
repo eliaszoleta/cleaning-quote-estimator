@@ -50,11 +50,16 @@ export default function AdminWebsiteRequests({ adminKey }) {
   // horizontally to compensate. On mobile, show one pane at a time: the
   // list until a request is selected, then the detail panel full-width
   // (its existing X button already calls setSelected(null) to go back).
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  // matchMedia, not a raw 'resize' listener -- see AdminDashboard.js for
+  // why (mobile Chrome's address-bar collapse on scroll fires 'resize'
+  // and can flip a width-based flag mid-scroll).
+  const mobileQuery = () => window.matchMedia('(max-width: 768px)');
+  const [isMobile, setIsMobile] = useState(() => mobileQuery().matches);
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const mq = mobileQuery();
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
   }, []);
   const [copied, setCopied] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);

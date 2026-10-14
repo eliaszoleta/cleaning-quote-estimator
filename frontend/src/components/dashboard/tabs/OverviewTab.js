@@ -11,11 +11,16 @@ export default function OverviewTab({ config, subStatus, user }) {
   // which on a ~360-400px-wide phone only has room for one 190px+ column,
   // stacking all 5 cards in a single column. Forcing an explicit 2-column
   // grid under 768px fits 2 per row regardless of exact device width.
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  // matchMedia, not a raw 'resize' listener -- see CompanyDashboard.js for
+  // why (mobile Chrome's address-bar collapse on scroll fires 'resize'
+  // and can flip a width-based flag mid-scroll).
+  const mobileQuery = () => window.matchMedia('(max-width: 768px)');
+  const [isMobile, setIsMobile] = useState(() => mobileQuery().matches);
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const mq = mobileQuery();
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
   }, []);
 
   const [leads, setLeads] = useState([]);

@@ -15,11 +15,16 @@ export default function BrandingTab({ config, update, autoSave, onSave, saving, 
   // two unreadably narrow columns side by side instead of stacking, since
   // CSS Grid's 1fr/1fr always splits available width evenly regardless of
   // content. Same breakpoint CompanyDashboard.js already uses for its header.
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  // matchMedia, not a raw 'resize' listener -- see CompanyDashboard.js for
+  // why (mobile Chrome's address-bar collapse on scroll fires 'resize'
+  // and can flip a width-based flag mid-scroll).
+  const mobileQuery = () => window.matchMedia('(max-width: 768px)');
+  const [isMobile, setIsMobile] = useState(() => mobileQuery().matches);
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const mq = mobileQuery();
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
   }, []);
   // Session is fetched per-upload (rather than once on mount) so a long
   // idle stretch on this tab before uploading a logo can't hand

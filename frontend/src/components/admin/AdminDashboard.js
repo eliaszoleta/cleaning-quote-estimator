@@ -46,11 +46,19 @@ export default function AdminDashboard({ initialTab }) {
   // too narrow for its own labels to render without truncating. Collapses
   // into a horizontally-scrollable top bar under 768px instead, same pattern
   // CompanyDashboard.js already uses for its own nav.
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  // matchMedia instead of a raw 'resize' listener -- mobile Chrome fires
+  // 'resize' when its address bar auto-hides/shows during scroll (the
+  // layout viewport's height changes), and on a long scrollable page that
+  // reported flipping this flag mid-scroll, snapping the sidebar back to
+  // its desktop layout. matchMedia's 'change' event only fires on an
+  // actual breakpoint crossing, so scrolling alone can't trigger it.
+  const mobileQuery = () => window.matchMedia('(max-width: 768px)');
+  const [isMobile, setIsMobile] = useState(() => mobileQuery().matches);
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const mq = mobileQuery();
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
   }, []);
 
   const handleLogin = async (e) => {
