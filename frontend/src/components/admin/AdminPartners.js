@@ -242,7 +242,18 @@ export default function AdminPartners({ adminKey }) {
                     {p.business_name ? p.business_name[0].toUpperCase() : '?'}
                   </div>
                 )}
-                <div style={{ flex: 1, minWidth: 0 }}>
+                {/* minWidth: 0 let this column shrink to near-nothing before
+                    flexWrap ever kicked in -- a flex:1 item has a 0 flex-basis,
+                    so it never itself forces the line to overflow; it just gets
+                    squeezed to fit whatever's left after the logo and the
+                    action-button cluster (both flexShrink: 0), no matter how
+                    little that is, which is why every word of the business
+                    name/address wrapped onto its own line. 200 is the same
+                    floor AdminCompanies.js's identical card already uses --
+                    once the column truly can't shrink below that, the line
+                    genuinely overflows and the action cluster wraps to its
+                    own row below instead of fighting it for space. */}
+                <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ fontWeight: 700, fontSize: 15, color: theme.textPrimary }}>{p.business_name}</div>
                   {(p.address || p.phone) && (
                     <div style={{ fontSize: 12.5, color: theme.textSecondary, marginTop: 2 }}>{p.address}{p.address && p.phone && ' · '}{p.phone}</div>
