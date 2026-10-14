@@ -142,7 +142,11 @@ export default function AuthPage({ onAuth }) {
           // "did I forget my password?" loop instead of telling them to
           // just retry.
           if (err.status !== 400) {
-            throw new Error("We couldn't reach the login service. This looks like a temporary issue on our end, not your email or password -- please try again in a moment.");
+            // Reassuring, not alarming -- this fires for paying customers on
+            // a working account, not someone who actually mistyped their
+            // password, so it shouldn't read like something is broken or
+            // make them doubt their own credentials.
+            throw new Error("We're working on a few things behind the scenes right now. Please check back in a few minutes and try signing in again.");
           }
           // Supabase deliberately returns the same generic error for "no
           // account with this email" and "wrong password" (anti-enumeration
