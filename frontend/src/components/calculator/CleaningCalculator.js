@@ -153,22 +153,27 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   }, [initialService, companyConfig]);
 
   // Scroll to card on step change, accounting for sticky navbar height.
-  // When embedded, window here is the IFRAME's own window -- scrolling it
-  // does nothing a visitor can see, since the page that actually scrolls is
-  // the host site's parent window, which this iframe can't call
-  // window.scrollTo on directly (different origin). Posting a message
-  // instead, for the embed snippet's own listener (see EmbedTab.js) to act
-  // on against the real page.
+  // When truly embedded (a company's own site iframing EmbedWrapper.js),
+  // window here is the IFRAME's own window -- scrolling it does nothing a
+  // visitor can see, since the page that actually scrolls is the host
+  // site's parent window, which this iframe can't call window.scrollTo on
+  // directly (different origin). Posting a message instead, for the embed
+  // snippet's own listener (see EmbedTab.js) to act on against the real
+  // page. siteLanding pages (CalculatorPage.js, ServiceCalculatorPage.js,
+  // EstimatorPage.js, PartnerDemoPage.js) also pass embedded=true, but only
+  // for the card's CSS styling -- they're our own top-level page, not an
+  // iframe, so postMessage has no listener and silently does nothing. Those
+  // need the real window.scrollTo just like the homepage calculator.
   useEffect(() => {
     if (stepIndex === 0 || !cardRef.current) return;
-    if (embedded) {
+    if (embedded && !siteLanding) {
       window.parent?.postMessage({ type: 'cleancalc-scroll-to-top' }, '*');
       return;
     }
     const navbarHeight = 70;
     const top = cardRef.current.getBoundingClientRect().top + window.scrollY - navbarHeight;
     window.scrollTo({ top, behavior: 'smooth' });
-  }, [stepIndex, embedded]);
+  }, [stepIndex, embedded, siteLanding]);
 
   // Let a siteLanding page's own wrapper drop its fixed white/shadow card
   // once results are showing, since ResultsScreen renders its own full page
