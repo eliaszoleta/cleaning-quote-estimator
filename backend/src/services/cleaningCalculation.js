@@ -170,7 +170,7 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
   if (condition !== 'good') {
     const before = { ...range };
     range = { low: Math.round(range.low * condMult.low), high: Math.round(range.high * condMult.high) };
-    adjustments.push({ label: `Condition: ${condition}`, low: range.low - before.low, high: range.high - before.high });
+    adjustments.push({ label: `Condition: ${condition.replace(/_/g, ' ')}`, low: range.low - before.low, high: range.high - before.high });
   }
 
   // Minimum
