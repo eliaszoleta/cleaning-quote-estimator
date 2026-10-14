@@ -54,6 +54,15 @@ const {
   WATER_CATEGORY_MULTIPLIERS,
   STATE_NAMES,
 } = require('../config/defaults');
+const {
+  humanize, labelFor,
+  SQFT_TIER_LABELS, CLEANING_TYPE_LABELS, FREQUENCY_LABELS, HOME_CONDITION_LABELS,
+  APARTMENT_SIZE_LABELS, COMMERCIAL_BUILDING_TYPE_LABELS, COMMERCIAL_SERVICE_LEVEL_LABELS,
+  SOILING_CONDITION_LABELS, CARPET_METHOD_LABELS, UPHOLSTERY_FABRIC_LABELS,
+  AIR_DUCT_VENT_COUNT_LABELS, DRYER_VENT_LENGTH_LABELS, DRYER_VENT_TYPE_LABELS,
+  TILE_TYPE_LABELS, TILE_CONDITION_LABELS, MOLD_AFFECTED_SIZE_LABELS, MOLD_TYPE_LABELS,
+  WATER_CATEGORY_LABELS, WATER_CAUSE_LABELS, WATER_DAMAGE_CLASS_LABELS, WATER_WHEN_HAPPENED_LABELS,
+} = require('../config/optionLabels');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function applyMultiplier(range, mult) {
@@ -137,7 +146,7 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
   // the base price when the state-adjusted total is actually ~$95-121 looks
   // like it doesn't add up to the total shown below it.
   const baseAdj = applyMultiplier(base, stateMultiplier * markup);
-  const adjustments = [{ label: `Base price (${sqftTier.replace('_', '–')} sq ft)`, low: baseAdj.low, high: baseAdj.high }];
+  const adjustments = [{ label: `Base price (${labelFor(SQFT_TIER_LABELS, sqftTier)})`, low: baseAdj.low, high: baseAdj.high }];
   if (bdAddon > 0) {
     const adj = applyMultiplier({ low: bdAddon, high: bdAddon }, stateMultiplier * markup);
     adjustments.push({ label: `${bedrooms} bedrooms`, low: adj.low, high: adj.high });
@@ -152,7 +161,7 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
   if (cleaningType !== 'standard') {
     const before = { ...range };
     range = { low: Math.round(range.low * cleanMult.low), high: Math.round(range.high * cleanMult.high) };
-    adjustments.push({ label: `${cleaningType.replace('_', ' ')} multiplier`, low: range.low - before.low, high: range.high - before.high });
+    adjustments.push({ label: `${labelFor(CLEANING_TYPE_LABELS, cleaningType)} multiplier`, low: range.low - before.low, high: range.high - before.high });
   }
 
   // Extras
@@ -170,7 +179,7 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
   if (condition !== 'good') {
     const before = { ...range };
     range = { low: Math.round(range.low * condMult.low), high: Math.round(range.high * condMult.high) };
-    adjustments.push({ label: `Condition: ${condition.replace(/_/g, ' ')}`, low: range.low - before.low, high: range.high - before.high });
+    adjustments.push({ label: `Condition: ${labelFor(HOME_CONDITION_LABELS, condition)}`, low: range.low - before.low, high: range.high - before.high });
   }
 
   // Minimum
@@ -203,12 +212,12 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
     recurringMonthlyHigh: recurringHigh,
     recurringAnnualSavings: annualSavings,
     keyFactors: [
-      { label: 'Home size', impact: sqftTier },
+      { label: 'Home size', impact: labelFor(SQFT_TIER_LABELS, sqftTier) },
       { label: 'Bedrooms', impact: String(bedrooms) },
       { label: 'Bathrooms', impact: String(bathrooms) },
-      { label: 'Cleaning type', impact: cleaningType },
-      { label: 'Condition', impact: condition },
-      { label: 'Frequency', impact: frequency },
+      { label: 'Cleaning type', impact: labelFor(CLEANING_TYPE_LABELS, cleaningType) },
+      { label: 'Condition', impact: labelFor(HOME_CONDITION_LABELS, condition) },
+      { label: 'Frequency', impact: labelFor(FREQUENCY_LABELS, frequency) },
     ],
     disclaimer: null,
     urgencyLevel: 'normal',
@@ -244,7 +253,7 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
   // cleaning-type multiplier were all silently baked into the total with no
   // corresponding line item to explain them.
   const baseAdj = applyMultiplier(base, stateMultiplier * markup);
-  const adjustments = [{ label: `${size.toUpperCase()} apartment`, low: baseAdj.low, high: baseAdj.high }];
+  const adjustments = [{ label: `${labelFor(APARTMENT_SIZE_LABELS, size)} apartment`, low: baseAdj.low, high: baseAdj.high }];
   if (baAddon > 0) {
     const adj = applyMultiplier({ low: baAddon, high: baAddon }, stateMultiplier * markup);
     adjustments.push({ label: `${bathrooms} bathrooms`, low: adj.low, high: adj.high });
@@ -258,7 +267,7 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
   if (cleaningType !== 'standard') {
     const before = { ...range };
     range = { low: Math.round(range.low * cleanMult.low), high: Math.round(range.high * cleanMult.high) };
-    adjustments.push({ label: `${cleaningType.replace('_', ' ')} multiplier`, low: range.low - before.low, high: range.high - before.high });
+    adjustments.push({ label: `${labelFor(CLEANING_TYPE_LABELS, cleaningType)} multiplier`, low: range.low - before.low, high: range.high - before.high });
   }
 
   for (const extra of extras) {
@@ -297,9 +306,9 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
     recurringMonthlyHigh: recurringHigh,
     recurringAnnualSavings: annualSavings,
     keyFactors: [
-      { label: 'Apartment size', impact: size },
+      { label: 'Apartment size', impact: labelFor(APARTMENT_SIZE_LABELS, size) },
       { label: 'Bathrooms', impact: String(bathrooms) },
-      { label: 'Cleaning type', impact: cleaningType },
+      { label: 'Cleaning type', impact: labelFor(CLEANING_TYPE_LABELS, cleaningType) },
       { label: 'Furnished', impact: furnished ? 'Yes' : 'No' },
     ],
     disclaimer: null,
@@ -352,7 +361,7 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
   // restroom count always shows up in the breakdown on its own, exactly as
   // entered -- not folded invisibly into the sqft line.
   const adjustments = [
-    { label: `${buildingType} @ ${sqft.toLocaleString()} sq ft (${visitsPerMonth}x/month @ $${sqftPerVisitLow}–$${sqftPerVisitHigh}/visit)`, low: sqftPerVisitLow * visitsPerMonth, high: sqftPerVisitHigh * visitsPerMonth },
+    { label: `${labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType)} @ ${sqft.toLocaleString()} sq ft (${visitsPerMonth}x/month @ $${sqftPerVisitLow}–$${sqftPerVisitHigh}/visit)`, low: sqftPerVisitLow * visitsPerMonth, high: sqftPerVisitHigh * visitsPerMonth },
     { label: `${restrooms} restroom${restrooms === 1 ? '' : 's'} (${visitsPerMonth}x/month @ $${restroomPerVisitLow}–$${restroomPerVisitHigh}/visit)`, low: restroomPerVisitLow * visitsPerMonth, high: restroomPerVisitHigh * visitsPerMonth },
   ];
 
@@ -411,11 +420,11 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
     recurringMonthlyHigh: finalHigh,
     recurringAnnualSavings: annualSavings,
     keyFactors: [
-      { label: 'Building type', impact: buildingType },
+      { label: 'Building type', impact: labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType) },
       { label: 'Square footage', impact: sqft.toLocaleString() + ' sq ft' },
       { label: 'Restrooms', impact: String(restrooms) },
-      { label: 'Service level', impact: serviceLevel },
-      { label: 'Frequency', impact: frequency },
+      { label: 'Service level', impact: labelFor(COMMERCIAL_SERVICE_LEVEL_LABELS, serviceLevel) },
+      { label: 'Frequency', impact: labelFor(FREQUENCY_LABELS, frequency) },
     ],
     disclaimer: null,
     urgencyLevel: 'normal',
@@ -491,8 +500,8 @@ function calculateCarpet(details, stateMultiplier, companyConfig) {
     recurringAnnualSavings: null,
     keyFactors: [
       { label: 'Area', impact: sqft ? sqft + ' sq ft' : rooms + ' rooms' },
-      { label: 'Condition', impact: condition },
-      { label: 'Method', impact: method },
+      { label: 'Condition', impact: labelFor(SOILING_CONDITION_LABELS, condition) },
+      { label: 'Method', impact: labelFor(CARPET_METHOD_LABELS, method) },
     ],
     disclaimer: null,
     urgencyLevel: 'normal',
@@ -582,8 +591,8 @@ function calculateUpholstery(details, stateMultiplier, companyConfig) {
     recurringAnnualSavings: null,
     keyFactors: [
       { label: 'Pieces', impact: `${totalItems} item${totalItems > 1 ? 's' : ''}` },
-      { label: 'Fabric', impact: fabricType },
-      { label: 'Condition', impact: condition },
+      { label: 'Fabric', impact: labelFor(UPHOLSTERY_FABRIC_LABELS, fabricType) },
+      { label: 'Condition', impact: labelFor(SOILING_CONDITION_LABELS, condition) },
     ],
     disclaimer: null,
     urgencyLevel: 'normal',
@@ -673,9 +682,9 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
     // commercial) -- showing them here for a commercial quote would
     // display a value the customer never actually saw or chose.
     keyFactors: [
-      { label: 'Property type', impact: propertyType },
+      { label: 'Property type', impact: humanize(propertyType) },
       ...(propertyType === 'commercial' ? [] : [
-        { label: 'Vent count', impact: ventCount.replace('_', '–') },
+        { label: 'Vent count', impact: labelFor(AIR_DUCT_VENT_COUNT_LABELS, ventCount) },
         { label: 'HVAC systems', impact: String(systemCount) },
       ]),
       { label: 'Mold concern', impact: moldSuspected ? 'Yes (+surcharge)' : 'No' },
@@ -722,14 +731,14 @@ function calculateDryerVent(details, stateMultiplier, companyConfig) {
     if (lengthAddon.low > 0 || lengthAddon.high > 0) {
       range = addRange(range, lengthAddon);
       const adj = applyMultiplier(lengthAddon, stateMultiplier * markup);
-      adjustments.push({ label: `Vent length: ${ventLength}`, low: adj.low, high: adj.high });
+      adjustments.push({ label: `Vent length: ${labelFor(DRYER_VENT_LENGTH_LABELS, ventLength)}`, low: adj.low, high: adj.high });
     }
 
     const typeAddon = DRYER_VENT_TYPE_ADDON[ventType] || DRYER_VENT_TYPE_ADDON.standard;
     if (typeAddon.low > 0 || typeAddon.high > 0) {
       range = addRange(range, typeAddon);
       const adj = applyMultiplier(typeAddon, stateMultiplier * markup);
-      adjustments.push({ label: `Vent type: ${ventType.replace(/_/g, ' ')}`, low: adj.low, high: adj.high });
+      adjustments.push({ label: `Vent type: ${labelFor(DRYER_VENT_TYPE_LABELS, ventType)}`, low: adj.low, high: adj.high });
     }
 
     range = applyMultiplier(range, stateMultiplier * markup);
@@ -775,7 +784,7 @@ function calculateDryerVent(details, stateMultiplier, companyConfig) {
       // branch -- same reasoning as air duct's keyFactors above.
       ...(propertyType === 'commercial'
         ? [{ label: 'Dryers', impact: String(dryerCount) }]
-        : [{ label: 'Vent length', impact: ventLength }, { label: 'Vent type', impact: ventType }]),
+        : [{ label: 'Vent length', impact: labelFor(DRYER_VENT_LENGTH_LABELS, ventLength) }, { label: 'Vent type', impact: labelFor(DRYER_VENT_TYPE_LABELS, ventType) }]),
       { label: 'Clog detected', impact: clogSuspected ? 'Yes' : 'No' },
     ],
     disclaimer: 'Clogged dryer vents are a leading cause of house fires. Regular cleaning (annually) is strongly recommended.',
@@ -806,7 +815,7 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
     high: Math.round(sqft * tileRate.high * condMult.high),
   };
   range = applyMultiplier(range, stateMultiplier * markup);
-  const adjustments = [{ label: `${sqft} sq ft ${tileType} tile cleaning`, low: range.low, high: range.high }];
+  const adjustments = [{ label: `${sqft} sq ft ${labelFor(TILE_TYPE_LABELS, tileType)} tile cleaning`, low: range.low, high: range.high }];
 
   if (soapScum || hardWater) {
     const surcharge = { low: Math.round(range.low * 0.11), high: Math.round(range.high * 0.13) };
@@ -845,8 +854,8 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
     recurringAnnualSavings: null,
     keyFactors: [
       { label: 'Area', impact: sqft + ' sq ft' },
-      { label: 'Tile type', impact: tileType },
-      { label: 'Condition', impact: condition },
+      { label: 'Tile type', impact: labelFor(TILE_TYPE_LABELS, tileType) },
+      { label: 'Condition', impact: labelFor(TILE_CONDITION_LABELS, condition) },
     ],
     disclaimer: null,
     urgencyLevel: 'normal',
@@ -885,7 +894,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     range = { low: Math.round(range.low * MOLD_COMMERCIAL_MULTIPLIER.low), high: Math.round(range.high * MOLD_COMMERCIAL_MULTIPLIER.high) };
   }
 
-  const adjustments = [{ label: `${affectedSize} mold area remediation`, low: range.low, high: range.high }];
+  const adjustments = [{ label: `${labelFor(MOLD_AFFECTED_SIZE_LABELS, affectedSize)} mold area remediation`, low: range.low, high: range.high }];
 
   if (locations.includes('hvac_ductwork')) {
     const adj = applyMultiplier(MOLD_ADDONS.hvac_cleaning, stateMultiplier * markup);
@@ -921,9 +930,9 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     recurringMonthlyHigh: null,
     recurringAnnualSavings: null,
     keyFactors: [
-      { label: 'Affected area', impact: affectedSize },
-      { label: 'Property type', impact: propertyType },
-      { label: 'Mold type', impact: moldType },
+      { label: 'Affected area', impact: labelFor(MOLD_AFFECTED_SIZE_LABELS, affectedSize) },
+      { label: 'Property type', impact: humanize(propertyType) },
+      { label: 'Mold type', impact: labelFor(MOLD_TYPE_LABELS, moldType) },
       { label: 'Moisture source', impact: sourceFixed === 'yes' ? 'Fixed' : sourceFixed === 'not_fixed' ? 'Still leaking' : 'Unknown' },
       { label: 'Locations', impact: locations.join(', ') },
     ],
@@ -1023,11 +1032,11 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
     recurringMonthlyHigh: null,
     recurringAnnualSavings: null,
     keyFactors: [
-      { label: 'Water category', impact: waterCategory + ' water' },
-      { label: 'Cause', impact: cause.replace(/_/g, ' ') },
+      { label: 'Water category', impact: labelFor(WATER_CATEGORY_LABELS, waterCategory) },
+      { label: 'Cause', impact: labelFor(WATER_CAUSE_LABELS, cause) },
       { label: 'Affected area', impact: `${sqft.toLocaleString()} sq ft` },
-      { label: 'Damage class', impact: damageClass.replace(/_/g, ' ') },
-      { label: 'Time elapsed', impact: whenHappened },
+      { label: 'Damage class', impact: labelFor(WATER_DAMAGE_CLASS_LABELS, damageClass) },
+      { label: 'Time elapsed', impact: labelFor(WATER_WHEN_HAPPENED_LABELS, whenHappened) },
       { label: 'Insurance', impact: hasInsurance ? 'May be covered' : 'Out of pocket' },
     ],
     disclaimer: `URGENT: ${urgencyMsg} These are preliminary estimates only — final pricing requires an in-person assessment. ${hasInsurance ? 'Your homeowner\'s insurance may cover water damage restoration. Contact your insurer immediately and document all damage with photos before cleanup begins.' : 'Contact a licensed water damage restoration company immediately.'}`,
