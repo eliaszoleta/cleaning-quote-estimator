@@ -77,11 +77,20 @@ export default function About() {
           the band gets noticeably shorter on mobile. */}
       <div className="page-hero-band" style={{ padding: 'clamp(18px, 5vw, 40px) 0 72px' }}>
         <div className="page-hero-glow" aria-hidden="true" />
-        <div className="page-hero-inner" style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
+        <div className="page-hero-inner" style={{ maxWidth: 880, margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
           <div style={{ display: 'inline-block', background: 'rgba(37,99,235,0.25)', color: '#93c5fd', padding: '5px 14px', borderRadius: RADIUS.pill, fontSize: 13, fontWeight: 600, marginBottom: 16, border: '1px solid rgba(37,99,235,0.35)' }}>
             About Clean Estimator
           </div>
-          <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
+          {/* nowrap only kicks in at desktop widths, once the wider
+              hero-inner (880px) plus the capped 30px font actually have
+              room for the full headline on one line -- below 900px it
+              still wraps normally rather than clipping. */}
+          <style>{`
+            @media (min-width: 900px) {
+              .about-hero-h1 { white-space: nowrap; }
+            }
+          `}</style>
+          <h1 className="about-hero-h1" style={{ fontSize: 'clamp(22px,4vw,30px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
             Instant Estimates for Cleaning Businesses
           </h1>
           <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640, margin: '0 auto 24px' }}>
