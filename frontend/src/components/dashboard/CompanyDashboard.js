@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
   UserPlus, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle,
-  Globe, X, CalendarClock, CreditCard, Zap,
+  Globe, X, CalendarClock, Zap,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout, postCheckout, postPortal } from '../../utils/api';
@@ -12,23 +12,22 @@ import BrandingTab from './tabs/BrandingTab';
 import ServicesTab from './tabs/ServicesTab';
 import LeadsTab from './tabs/LeadsTab';
 import SettingsTab from './tabs/SettingsTab';
-import SubscriptionTab from './tabs/SubscriptionTab';
 import HelpTab from './tabs/HelpTab';
 import RunEstimateTab from './tabs/RunEstimateTab';
 
-// Discount (recurring-frequency %) now lives inside Services & Pricing, and
-// the embed code now lives inside Branding (right after the live preview it
-// already shows) -- both used to be their own nav tab, which meant hopping
-// between tabs to finish one coherent task (price a service, then see its
-// discount; brand the widget, then grab its code). Folding them into the
-// tab they're actually about cuts the nav down without losing anything.
+// Discount (recurring-frequency %) now lives inside Services & Pricing, the
+// embed code now lives inside Branding (right after the live preview it
+// already shows), and Subscription now lives inside Settings as a third
+// sub-section alongside Account and API Keys -- all three used to be their
+// own nav tab. Folding them into the tab they're actually about (or, for
+// Subscription, the tab billing/account management already lives under)
+// cuts the nav down without losing anything.
 const NAV = [
   { id: 'overview',      Icon: LayoutDashboard,   label: 'Dashboard' },
   { id: 'services',      Icon: SlidersHorizontal,  label: 'Services' },
   { id: 'leads',         Icon: UserPlus,           label: 'Leads' },
   { id: 'branding',      Icon: Paintbrush,         label: 'Branding' },
   { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
-  { id: 'subscription',  Icon: CreditCard,         label: 'Subscription' },
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
 ];
 
@@ -143,10 +142,10 @@ export default function CompanyDashboard({ user, onLogout }) {
   // Calculator is the default landing view -- the internal pricing tool is
   // the primary pitch now, so that's what a company sees first on login.
   const [viewMode, setViewMode] = useState('calculator');
-  // Which pane the Settings tab shows -- API Keys moved from its own
-  // sidebar item into a sub-section of Settings, so this is what deep
-  // links like ?tab=settings&section=api now target. Subscription is a
-  // top-level sidebar tab of its own (see NAV) rather than a section here.
+  // Which pane the Settings tab shows -- API Keys and Subscription both
+  // moved from their own sidebar item into a sub-section of Settings, so
+  // this is what deep links like ?tab=settings&section=api (or
+  // &section=subscription) now target.
   const [settingsSection, setSettingsSection] = useState('account');
   const [subStatus, setSubStatus] = useState(null);
   // Distinguishes "haven't heard back yet" (subStatus still null, keep
@@ -219,21 +218,26 @@ export default function CompanyDashboard({ user, onLogout }) {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab');
+    let tab = params.get('tab');
+    let section = params.get('section');
+    // Subscription used to be its own top-level tab (?tab=subscription);
+    // it's now a Settings sub-section. Old links still point at the old
+    // URL -- sent emails, bookmarks, Stripe's own cancel/return URLs that
+    // haven't rolled out everywhere yet -- so redirect those here instead
+    // of silently dropping them now that 'subscription' isn't in NAV.
+    if (tab === 'subscription') { tab = 'settings'; section = 'subscription'; }
     if (tab && NAV.find(n => n.id === tab)) {
       setViewMode('widget');
       setActiveTab(tab);
-      if (tab === 'settings') {
-        const section = params.get('section');
-        if (section) setSettingsSection(section);
-      }
+      if (tab === 'settings' && section) setSettingsSection(section);
     }
 
     const sessionId = params.get('session_id');
     const subscribed = params.get('subscribed');
     if (sessionId && subscribed === 'true') {
       setViewMode('widget');
-      setActiveTab('subscription');
+      setActiveTab('settings');
+      setSettingsSection('subscription');
       verifyCheckoutSession(sessionId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -265,7 +269,7 @@ export default function CompanyDashboard({ user, onLogout }) {
       if (!token) return;
       const res = await verifyCheckout(token, sessionId);
       setSubStatus(res.data);
-      window.history.replaceState({}, '', '/company?tab=subscription');
+      window.history.replaceState({}, '', '/company?tab=settings&section=subscription');
     } catch (err) {
       console.warn('Checkout verification failed:', err.message);
     }
@@ -302,8 +306,7 @@ export default function CompanyDashboard({ user, onLogout }) {
     branding:     <BrandingTab config={localConfig} update={update} autoSave={autoSave} onSave={handleGlobalSave} saving={saving} saved={saved} user={user} />,
     services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} autoSave={autoSave} />,
     leads:        <LeadsTab {...tabProps} />,
-    subscription: <SubscriptionTab subStatus={subStatus} onSubRefresh={loadSubStatus} />,
-    settings:     <SettingsTab user={user} config={config} saveConfig={saveConfig} saving={saving} refetchConfig={refetch} onLogout={onLogout} section={settingsSection} onSectionChange={setSettingsSection} />,
+    settings:     <SettingsTab user={user} config={config} saveConfig={saveConfig} saving={saving} refetchConfig={refetch} onLogout={onLogout} section={settingsSection} onSectionChange={setSettingsSection} subStatus={subStatus} onSubRefresh={loadSubStatus} />,
   };
 
   const subBadge = subStatus ? (() => {
@@ -507,7 +510,7 @@ export default function CompanyDashboard({ user, onLogout }) {
                 <AlertCircle size={15} />
                 Your widget is currently paused — {subStatus.status === 'requires_trial_setup' ? 'reload the page or reach out if this doesn\'t clear on its own' : subStatus.status === 'expired' ? 'your 30-day free trial has ended' : 'subscription issue'}.
               </div>
-              <button onClick={() => setActiveTab('subscription')} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
+              <button onClick={() => { setActiveTab('settings'); setSettingsSection('subscription'); }} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 7, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>
                 {subStatus.status === 'requires_trial_setup' ? 'Get Started →' : 'Reactivate →'}
               </button>
             </div>

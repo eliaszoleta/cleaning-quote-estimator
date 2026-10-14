@@ -416,7 +416,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
               Your trial has ended or your subscription needs attention, so your calculator is paused. Subscribe to turn it back on.
             </p>
             <a
-              href="/company?tab=subscription"
+              href="/company?tab=settings&section=subscription"
               style={{ display: 'block', background: '#2563eb', color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15, marginBottom: 12 }}
             >
               Go to Subscription →

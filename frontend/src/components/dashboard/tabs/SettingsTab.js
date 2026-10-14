@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, User, KeyRound } from 'lucide-react';
+import { AlertTriangle, User, KeyRound, CreditCard } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import APIKeysTab from './APIKeysTab';
+import SubscriptionTab from './SubscriptionTab';
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
 const SECTIONS = [
   { id: 'account',      Icon: User,       label: 'Account' },
+  { id: 'subscription', Icon: CreditCard, label: 'Subscription' },
   { id: 'api',          Icon: KeyRound,   label: 'API Keys' },
 ];
 
-export default function SettingsTab({ user, config, refetchConfig, saveConfig, saving, section: sectionProp, onSectionChange }) {
+export default function SettingsTab({ user, config, refetchConfig, saveConfig, saving, section: sectionProp, onSectionChange, subStatus, onSubRefresh }) {
   // Falls back to its own state when no section/onSectionChange is passed
   // (defensive -- every current call site controls this from
   // CompanyDashboard so deep links like ?tab=settings&section=api
@@ -147,6 +149,8 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
       </div>
 
       {section === 'api' && <APIKeysTab config={config} saveConfig={saveConfig} saving={saving} />}
+
+      {section === 'subscription' && <SubscriptionTab subStatus={subStatus} onSubRefresh={onSubRefresh} />}
 
       {section === 'account' && (
       <div style={{ maxWidth: 600 }}>

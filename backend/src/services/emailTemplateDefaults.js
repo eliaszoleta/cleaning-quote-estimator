@@ -237,7 +237,7 @@ module.exports = [
       "We tried to charge your card for Clean Estimator and it didn't go through. Your account is paused until this is resolved -- no estimates can be run until your payment method is updated.",
       '',
       'Update your payment method here:',
-      'https://www.cleanestimator.com/company?tab=subscription',
+      'https://www.cleanestimator.com/company?tab=settings&amp;section=subscription',
       '',
       "If this was a one-time card issue, updating it should get you back up and running right away. Questions? Just reply.",
       '',
@@ -252,7 +252,7 @@ module.exports = [
   </p>
 
   <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#dc2626;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Update payment method →</a>
+    <a href="https://www.cleanestimator.com/company?tab=settings&amp;section=subscription" style="display:inline-block;background-color:#dc2626;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Update payment method →</a>
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
@@ -274,7 +274,7 @@ module.exports = [
       "If something didn't work for you, we'd genuinely like to know -- just reply and tell us what happened.",
       '',
       'Changed your mind? You can restart anytime, same price, same plan:',
-      'https://www.cleanestimator.com/company?tab=subscription',
+      'https://www.cleanestimator.com/company?tab=settings&amp;section=subscription',
       '',
       'Thanks for giving it a try.',
       '',
@@ -293,7 +293,7 @@ module.exports = [
   </p>
 
   <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company?tab=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Restart my subscription →</a>
+    <a href="https://www.cleanestimator.com/company?tab=settings&amp;section=subscription" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Restart my subscription →</a>
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">

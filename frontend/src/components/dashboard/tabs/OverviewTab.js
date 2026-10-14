@@ -105,7 +105,7 @@ export default function OverviewTab({ config, subStatus, user }) {
     { label: 'Services & Pricing', href: '?tab=services',      Icon: SlidersHorizontal },
     { label: 'Branding & Embed Code', href: '?tab=branding',   Icon: Code2       },
     { label: 'View All Leads',     href: '?tab=leads',         Icon: UserPlus    },
-    { label: 'Manage Billing',     href: '?tab=subscription',  Icon: CreditCard  },
+    { label: 'Manage Billing',     href: '?tab=settings&section=subscription',  Icon: CreditCard  },
   ];
 
   return (

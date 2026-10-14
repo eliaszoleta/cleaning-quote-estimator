@@ -90,7 +90,7 @@ router.post('/checkout', async (req, res) => {
       metadata: { companyId },
       ...(trialPeriodDays ? { subscription_data: { trial_period_days: trialPeriodDays } } : {}),
       success_url: `${FRONTEND_URL}/company?subscribed=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${FRONTEND_URL}/company?tab=subscription`,
+      cancel_url: `${FRONTEND_URL}/company?tab=settings&section=subscription`,
     });
 
     res.json({ success: true, url: session.url });
@@ -111,7 +111,7 @@ router.post('/portal', async (req, res) => {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${FRONTEND_URL}/company?tab=subscription`,
+      return_url: `${FRONTEND_URL}/company?tab=settings&section=subscription`,
     });
     res.json({ success: true, url: session.url });
   } catch (err) {
