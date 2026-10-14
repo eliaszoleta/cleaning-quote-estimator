@@ -82,7 +82,7 @@ export default function About() {
             About Clean Estimator
           </div>
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
-            Instant Quoting for Cleaning Businesses
+            Instant Estimates for Cleaning Businesses
           </h1>
           <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640, margin: '0 auto 24px' }}>
             Clean Estimator started as a quoting problem for cleaning businesses: slow, manual pricing loses leads to whoever calls the prospect back first. We built an instant, accurate quoting engine cleaning companies could put to work right away — and opened a free version so homeowners get the same price transparency before they ever pick up the phone.
