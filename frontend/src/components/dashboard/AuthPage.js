@@ -146,7 +146,7 @@ export default function AuthPage({ onAuth }) {
             // a working account, not someone who actually mistyped their
             // password, so it shouldn't read like something is broken or
             // make them doubt their own credentials.
-            throw new Error("We're working on a few things behind the scenes right now. Please check back in a few minutes and try signing in again.");
+            throw new Error("We're working on a few things behind the scenes right now. Please check back in a few hours and try signing in again.");
           }
           // Supabase deliberately returns the same generic error for "no
           // account with this email" and "wrong password" (anti-enumeration
