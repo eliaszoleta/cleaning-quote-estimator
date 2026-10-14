@@ -75,7 +75,7 @@ export default function About() {
           instead of the wider 900px hero container. Vertical padding uses
           clamp() with the same max as before, so desktop is unchanged but
           the band gets noticeably shorter on mobile. */}
-      <div className="page-hero-band" style={{ padding: 'clamp(18px, 5vw, 40px) 0 clamp(36px, 9vw, 96px)' }}>
+      <div className="page-hero-band" style={{ padding: 'clamp(18px, 5vw, 40px) 0' }}>
         <div className="page-hero-glow" aria-hidden="true" />
         <div className="page-hero-inner" style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', textAlign: 'left' }}>
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
