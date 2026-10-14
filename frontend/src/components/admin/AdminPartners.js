@@ -234,7 +234,7 @@ export default function AdminPartners({ adminKey }) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {partners.map(p => (
-              <div key={p.id} style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, opacity: p.active ? 1 : 0.6 }}>
+              <div key={p.id} style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', opacity: p.active ? 1 : 0.6 }}>
                 {p.logo_url ? (
                   <img src={p.logo_url} alt={p.business_name} style={{ height: 44, width: 44, objectFit: 'contain', borderRadius: theme.radiusSm, border: `1px solid ${theme.border}`, flexShrink: 0 }} />
                 ) : (
