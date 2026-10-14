@@ -131,6 +131,19 @@ export default function AuthPage({ onAuth }) {
       } else {
         const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
         if (err) {
+          // Supabase's real "Invalid login credentials" error always comes
+          // back as HTTP 400 -- anything else (5xx from Supabase's Auth
+          // service having an outage/restore hiccup, a network failure with
+          // no status at all) is Supabase's own infrastructure failing, not
+          // a wrong email or password. This used to show "Wrong email or
+          // password" for every single error regardless of cause, which is
+          // actively misleading when the real problem is a Supabase incident
+          // -- it sends someone with correct credentials into a confused
+          // "did I forget my password?" loop instead of telling them to
+          // just retry.
+          if (err.status !== 400) {
+            throw new Error("We couldn't reach the login service. This looks like a temporary issue on our end, not your email or password -- please try again in a moment.");
+          }
           // Supabase deliberately returns the same generic error for "no
           // account with this email" and "wrong password" (anti-enumeration
           // by design) -- this extra lookup is what lets the message below
