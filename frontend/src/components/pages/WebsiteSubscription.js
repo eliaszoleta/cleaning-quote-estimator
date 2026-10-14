@@ -732,8 +732,10 @@ export default function WebsiteSubscription() {
       {/* Apply form -- dark closing section with a "what to expect" sidebar
           next to the form instead of a lone centered card, so the risk-
           reversal pitch is visible right where someone decides to commit. */}
-      <div id="apply" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+      <div id="apply" style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(40px, 8vw, 80px) 20px', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: -100, left: '-6%', width: 380, height: 380, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', bottom: -160, right: '0%', width: 440, height: 440, borderRadius: '50%', background: 'radial-gradient(circle, rgba(96,165,250,0.22) 0%, rgba(96,165,250,0) 70%)', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 1000, margin: '0 auto', position: 'relative' }}>
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
             <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: 12 }}>Get Your Free Sample Site</h2>
             <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.65, maxWidth: 480, margin: '0 auto' }}>Tell us a bit about your business and we'll build your website for you to review — no payment required until you approve it.</p>
