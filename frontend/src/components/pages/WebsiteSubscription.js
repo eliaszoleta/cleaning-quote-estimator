@@ -201,7 +201,7 @@ export default function WebsiteSubscription() {
     website2: '',
   });
 
-  const inputStyle = { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: 9, fontSize: 14, outline: 'none', boxSizing: 'border-box', color: '#0f172a', background: 'white' };
+  const inputStyle = { width: '100%', padding: '11px 14px', borderRadius: 9, fontSize: 14, outline: 'none', boxSizing: 'border-box', color: '#0f172a', background: 'white' };
 
   const toggleService = (label) => {
     setForm(f => ({
@@ -386,6 +386,14 @@ export default function WebsiteSubscription() {
         .ws-sample-callout:hover { transform: translateY(-2px); box-shadow: 0 18px 46px rgba(15,23,42,0.22); }
         @media (prefers-reduced-motion: reduce) {
           .ws-sample-callout { transition: none; }
+        }
+        .ws-form-input { border: 1.5px solid #e2e8f0; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+        .ws-form-input:hover { border-color: #cbd5e1; }
+        .ws-form-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+        .ws-submit-btn { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        .ws-submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(29,78,216,0.45); }
+        @media (prefers-reduced-motion: reduce) {
+          .ws-form-input, .ws-submit-btn { transition: none; }
         }
       `}</style>
 
@@ -746,7 +754,7 @@ export default function WebsiteSubscription() {
             </div>
           ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 28, alignItems: 'flex-start' }}>
-            <div style={{ flex: '1 1 280px', maxWidth: 340, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 16, padding: 'clamp(22px, 5vw, 28px)' }}>
+            <div style={{ flex: '1 1 280px', maxWidth: 340, background: 'linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03))', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 16, padding: 'clamp(22px, 5vw, 28px)', boxShadow: '0 10px 28px rgba(0,0,0,0.2)' }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: '#93c5fd', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 18 }}>What to expect</div>
               {[
                 'No payment today — just fill out the form',
@@ -754,14 +762,23 @@ export default function WebsiteSubscription() {
                 'You review the build before deciding anything',
                 `Like it? Approve it for just $${SETUP_FEE}`,
                 `Then get ${FREE_MONTHS} months free`,
-              ].map((line, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
-                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(96,165,250,0.2)', color: '#60a5fa', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
-                  <span style={{ fontSize: 13.5, color: '#cbd5e1', lineHeight: 1.55 }}>{line}</span>
-                </div>
-              ))}
+              ].map((line, i) => {
+                const highlight = i === 3;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14,
+                      ...(highlight ? { background: 'rgba(96,165,250,0.14)', border: '1px solid rgba(96,165,250,0.35)', borderRadius: 10, padding: '8px 10px', margin: '-8px -10px 6px' } : {}),
+                    }}
+                  >
+                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: highlight ? '#60a5fa' : 'rgba(96,165,250,0.2)', color: highlight ? '#0f172a' : '#60a5fa', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
+                    <span style={{ fontSize: 13.5, color: highlight ? '#bfdbfe' : '#cbd5e1', fontWeight: highlight ? 700 : 400, lineHeight: 1.55 }}>{line}</span>
+                  </div>
+                );
+              })}
             </div>
-            <form onSubmit={handleSubmit} style={{ flex: '2 1 380px', minWidth: 0, background: 'white', borderRadius: 16, padding: 'clamp(18px, 5vw, 40px)', boxShadow: '0 14px 40px rgba(0,0,0,0.25)' }}>
+            <form onSubmit={handleSubmit} style={{ flex: '2 1 380px', minWidth: 0, background: 'white', borderRadius: 16, padding: 'clamp(18px, 5vw, 40px)', border: '1px solid rgba(15,23,42,0.06)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
               {/* Honeypot -- off-screen, not display:none (some bots skip
                   display:none fields), never seen or reached by a real user. */}
               <input
@@ -777,19 +794,19 @@ export default function WebsiteSubscription() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 14, marginBottom: 14 }}>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full Name *</label>
-                  <input required style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="King David" />
+                  <input required className="ws-form-input" style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="King David" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Business Name *</label>
-                  <input required style={inputStyle} value={form.business} onChange={e => setForm(f => ({ ...f, business: e.target.value }))} placeholder="Sparkle Clean Co." />
+                  <input required className="ws-form-input" style={inputStyle} value={form.business} onChange={e => setForm(f => ({ ...f, business: e.target.value }))} placeholder="Sparkle Clean Co." />
                 </div>
                 <div>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email *</label>
-                  <input required type="email" style={inputStyle} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="you@yourbusiness.com" />
+                  <input required type="email" className="ws-form-input" style={inputStyle} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="you@yourbusiness.com" />
                 </div>
                 <div>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number *</label>
-                  <input required type="tel" style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
+                  <input required type="tel" className="ws-form-input" style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
@@ -817,17 +834,17 @@ export default function WebsiteSubscription() {
                       );
                     })}
                   </div>
-                  <input style={inputStyle} value={form.otherServices} onChange={e => setForm(f => ({ ...f, otherServices: e.target.value }))} placeholder="Offer something not listed? Add it here (e.g. Pressure Washing, Window Cleaning)" />
+                  <input className="ws-form-input" style={inputStyle} value={form.otherServices} onChange={e => setForm(f => ({ ...f, otherServices: e.target.value }))} placeholder="Offer something not listed? Add it here (e.g. Pressure Washing, Window Cleaning)" />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cleaning Business Address *</label>
-                  <input required style={inputStyle} value={form.businessAddress} onChange={e => setForm(f => ({ ...f, businessAddress: e.target.value }))} placeholder="123 Main St, Austin, TX 78701" />
+                  <input required className="ws-form-input" style={inputStyle} value={form.businessAddress} onChange={e => setForm(f => ({ ...f, businessAddress: e.target.value }))} placeholder="123 Main St, Austin, TX 78701" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Service Areas *</label>
                   <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>Cities or areas you actually serve, so we can list them on your site.</p>
-                  <input required style={inputStyle} value={form.serviceAreas} onChange={e => setForm(f => ({ ...f, serviceAreas: e.target.value }))} placeholder="e.g. Austin, Round Rock, Cedar Park" />
+                  <input required className="ws-form-input" style={inputStyle} value={form.serviceAreas} onChange={e => setForm(f => ({ ...f, serviceAreas: e.target.value }))} placeholder="e.g. Austin, Round Rock, Cedar Park" />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
@@ -839,9 +856,9 @@ export default function WebsiteSubscription() {
                   <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>{form.hasDomain ? 'Add it below under Current Cleaning Website.' : 'Give us at least 3 ideas in case your first choice is taken — #1 is your priority.'}</p>
                   {!form.hasDomain && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <input style={inputStyle} value={form.domain1} onChange={e => setForm(f => ({ ...f, domain1: e.target.value }))} placeholder="1st choice (priority) — e.g. sparklecleanco.com" />
-                      <input style={inputStyle} value={form.domain2} onChange={e => setForm(f => ({ ...f, domain2: e.target.value }))} placeholder="2nd choice" />
-                      <input style={inputStyle} value={form.domain3} onChange={e => setForm(f => ({ ...f, domain3: e.target.value }))} placeholder="3rd choice" />
+                      <input className="ws-form-input" style={inputStyle} value={form.domain1} onChange={e => setForm(f => ({ ...f, domain1: e.target.value }))} placeholder="1st choice (priority) — e.g. sparklecleanco.com" />
+                      <input className="ws-form-input" style={inputStyle} value={form.domain2} onChange={e => setForm(f => ({ ...f, domain2: e.target.value }))} placeholder="2nd choice" />
+                      <input className="ws-form-input" style={inputStyle} value={form.domain3} onChange={e => setForm(f => ({ ...f, domain3: e.target.value }))} placeholder="3rd choice" />
                     </div>
                   )}
                 </div>
@@ -851,22 +868,22 @@ export default function WebsiteSubscription() {
                 </div>
                 <div>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Cleaning Website</label>
-                  <input style={inputStyle} value={form.currentWebsite} onChange={e => setForm(f => ({ ...f, currentWebsite: e.target.value }))} placeholder="e.g. sparklecleanco.com" />
+                  <input className="ws-form-input" style={inputStyle} value={form.currentWebsite} onChange={e => setForm(f => ({ ...f, currentWebsite: e.target.value }))} placeholder="e.g. sparklecleanco.com" />
                 </div>
                 <div>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Facebook Page/Profile</label>
-                  <input style={inputStyle} value={form.facebookPage} onChange={e => setForm(f => ({ ...f, facebookPage: e.target.value }))} placeholder="https://facebook.com/yourpage or your profile URL" />
+                  <input className="ws-form-input" style={inputStyle} value={form.facebookPage} onChange={e => setForm(f => ({ ...f, facebookPage: e.target.value }))} placeholder="https://facebook.com/yourpage or your profile URL" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tell Us About Your Business</label>
                   <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>Your story, how you got started, who founded it — anything you'd want visitors to know about you.</p>
-                  <textarea rows={4} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="e.g. Founded in 2019 by... We started because... What makes us different is..." />
+                  <textarea rows={4} className="ws-form-input" style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="e.g. Founded in 2019 by... We started because... What makes us different is..." />
                 </div>
               </div>
               {error && (
                 <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, padding: '10px 14px', fontSize: 13.5, color: '#dc2626', marginBottom: 14 }}>{error}</div>
               )}
-              <button type="submit" disabled={sending} style={{ width: '100%', background: sending ? '#93c5fd' : PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 10, padding: '14px 0', fontWeight: 800, fontSize: 16, cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'opacity 0.2s', boxShadow: sending ? 'none' : '0 8px 22px rgba(29,78,216,0.35)' }}>
+              <button type="submit" disabled={sending} className="ws-submit-btn" style={{ width: '100%', background: sending ? '#93c5fd' : PRIMARY_GRADIENT, color: 'white', border: 'none', borderRadius: 10, padding: '14px 0', fontWeight: 800, fontSize: 16, cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, boxShadow: sending ? 'none' : '0 8px 22px rgba(29,78,216,0.35)' }}>
                 {sending ? 'Sending...' : <> Request Cleaning Website <IconArrow size={18} color="white" /> </>}
               </button>
               <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 14, marginBottom: 0 }}>We'll follow up within 48 hours with your live website build — you won't be charged until you approve it.</p>
