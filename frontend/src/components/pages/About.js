@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ShieldAlert, MessageCircle, Sparkles, Code2, Handshake } from 'lucide-react';
+import { ShieldAlert, MessageCircle, Sparkles, Code2, Handshake, Lightbulb } from 'lucide-react';
 import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 import './PageHero.css';
 
@@ -75,9 +75,12 @@ export default function About() {
           instead of the wider 900px hero container. Vertical padding uses
           clamp() with the same max as before, so desktop is unchanged but
           the band gets noticeably shorter on mobile. */}
-      <div className="page-hero-band" style={{ padding: 'clamp(18px, 5vw, 40px) 0' }}>
+      <div className="page-hero-band" style={{ padding: 'clamp(18px, 5vw, 40px) 0 72px' }}>
         <div className="page-hero-glow" aria-hidden="true" />
         <div className="page-hero-inner" style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', textAlign: 'left' }}>
+          <div className="page-hero-breadcrumb">
+            <a href="/">Home</a><span>›</span><span>About</span>
+          </div>
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
             About Clean Estimator
           </h1>
@@ -100,7 +103,20 @@ export default function About() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '28px 20px clamp(36px, 7vw, 80px)', position: 'relative' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px clamp(36px, 7vw, 80px)', position: 'relative' }}>
+
+        {/* Content card sunk into the hero band's bottom edge, same
+            treatment as BlogPost.js -- plus the identical "free estimate"
+            CTA bar at the top of it, since a visitor reading about the
+            company is exactly who that nudge toward the free calculator
+            is for. */}
+        <div style={{ background: 'white', borderRadius: 14, border: `1px solid ${COLORS.border}`, padding: 'clamp(18px, 5vw, 36px) clamp(16px, 4.5vw, 36px)', marginTop: -48, boxShadow: '0 8px 30px rgba(15,23,42,0.08)', position: 'relative' }}>
+          <div style={{ background: 'linear-gradient(135deg,#eff6ff,#f5f8ff)', border: `1px solid ${COLORS.primaryMutedBorder}`, borderRadius: 14, padding: 'clamp(14px, 4vw, 18px) clamp(14px, 4vw, 22px)', marginBottom: 'clamp(24px, 6vw, 36px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+            <span style={{ fontSize: 14, color: COLORS.primary, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <Lightbulb size={17} strokeWidth={2} /> Get a free local estimate for your project
+            </span>
+            <a href="/" style={{ background: COLORS.primary, color: 'white', padding: '9px 20px', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: '0 2px 8px rgba(30,64,175,0.25)' }}>Use Free Calculator &#8594;</a>
+          </div>
 
         {/* Our mission -- a soft tinted card instead of a plain left-rule
             paragraph, so it reads as a designed statement piece up top
@@ -182,7 +198,7 @@ export default function About() {
         {/* Disclaimer note -- the one place a tinted box is warranted, since
             it's a genuine notice that should visually stand apart from the
             surrounding prose, not another repeat of the same card style. */}
-        <section style={{ marginBottom: 32 }}>
+        <section style={{ marginBottom: 0 }}>
           <div style={{ background: COLORS.primaryMuted, borderRadius: RADIUS.lg, padding: '18px 22px', border: `1px solid ${COLORS.primaryMutedBorder}`, display: 'flex', gap: 12 }}>
             <ShieldAlert size={18} color={COLORS.primaryHover} style={{ flexShrink: 0, marginTop: 2 }} />
             <p style={{ ...pStyle, fontSize: 13.5 }}>
@@ -190,9 +206,10 @@ export default function About() {
             </p>
           </div>
         </section>
+        </div>
 
         {/* Contact CTA */}
-        <section style={{ background: COLORS.heroGradient, borderRadius: RADIUS.xl, padding: '40px 32px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <section style={{ background: COLORS.heroGradient, borderRadius: RADIUS.xl, padding: '40px 32px', marginTop: 40, textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', bottom: -100, right: -60, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.25) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
           <div style={{ position: 'relative' }}>
             <div style={{ width: 44, height: 44, borderRadius: RADIUS.sm, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
