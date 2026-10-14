@@ -62,8 +62,8 @@ export default function About() {
   return (
     <div style={{ minHeight: '100vh' }}>
       <Helmet>
-        <title>About Clean Estimator | Free Cleaning Cost Estimator</title>
-        <meta name="description" content="Clean Estimator provides free, accurate cleaning cost estimates for homeowners and businesses across all 50 U.S. states." />
+        <title>About Clean Estimator | Instant Quoting for Cleaning Businesses</title>
+        <meta name="description" content="Clean Estimator helps cleaning companies quote instantly and win more leads with a white-labeled calculator for their own site, plus a free public cost estimator for homeowners across all 50 U.S. states." />
         <link rel="canonical" href="https://www.cleanestimator.com/about" />
       </Helmet>
 
@@ -82,7 +82,7 @@ export default function About() {
             About Clean Estimator
           </h1>
           <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640 }}>
-            We built Clean Estimator to solve a frustrating problem: no one knows what cleaning actually costs until they've already called 3 companies and waited for callbacks.
+            Clean Estimator started as a quoting problem for cleaning businesses: slow, manual pricing loses leads to whoever calls the prospect back first. We built an instant, accurate quoting engine cleaning companies could put to work right away — and opened a free version so homeowners get the same price transparency before they ever pick up the phone.
           </p>
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function About() {
             Our Mission
           </div>
           <p style={{ fontSize: 'clamp(15px, 4vw, 21px)', color: COLORS.ink, lineHeight: 1.6, fontWeight: 500, margin: 0, maxWidth: 640 }}>
-            Make cleaning service pricing transparent, accessible, and instant. We want every homeowner and business owner to walk into a cleaning consultation already knowing what to expect — so they can negotiate confidently and avoid overpaying.
+            Give cleaning businesses an instant, accurate quoting tool that turns website visitors into booked jobs instead of lost leads — and give homeowners that same price transparency, so every conversation starts with real numbers instead of a guessing game.
           </p>
         </section>
 
@@ -124,17 +124,17 @@ export default function About() {
         <section style={{ marginBottom: 52 }}>
           <h2 style={{ ...h2Style, marginBottom: 10 }}>What We Offer</h2>
           <p style={{ ...pStyle, marginBottom: 24, maxWidth: 640 }}>
-            Clean Estimator is three things working together: a free pricing tool for anyone comparing cleaning costs, a white-labeled version of that same tool cleaning companies embed on their own site, and a local partner program that turns those estimates into real leads.
+            Clean Estimator is three things working together: a white-labeled quoting widget cleaning companies embed on their own site to capture leads instantly, a local partner program that turns estimate requests into real jobs, and a free public calculator anyone can use to see typical pricing.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <ProductCard Icon={Sparkles} color="#d97706" bg="#fffbeb" title="Free Cost Calculator" href="/cleaning-cost-calculator" linkLabel="Try it">
-              Instant price ranges for house cleaning, carpet cleaning, commercial cleaning, and 7 other services — no signup, no phone calls.
-            </ProductCard>
             <ProductCard Icon={Code2} color="#0891b2" bg="#ecfeff" title="Embeddable Widget" href="/estimator" linkLabel="For companies">
               Cleaning companies embed our calculator on their own site — their logo, their colors, the same accurate pricing they already use internally — to capture leads instead of losing visitors to a contact form.
             </ProductCard>
             <ProductCard Icon={Handshake} color="#db2777" bg="#fdf2f8" title="Local Partner Program" href="/partner-with-us" linkLabel="Get leads">
               We connect visitors who want a real quote with an exclusive local cleaning partner in their city — a warm, ready-to-call lead instead of a cold listing.
+            </ProductCard>
+            <ProductCard Icon={Sparkles} color="#d97706" bg="#fffbeb" title="Free Cost Calculator" href="/cleaning-cost-calculator" linkLabel="Try it">
+              Instant price ranges for house cleaning, carpet cleaning, commercial cleaning, and 7 other services — no signup, no phone calls.
             </ProductCard>
           </div>
         </section>
@@ -170,10 +170,10 @@ export default function About() {
           <h2 style={{ ...h2Style, marginBottom: 18 }}>Who We Serve</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px 32px' }}>
             <p style={pStyle}>
-              <strong style={{ color: COLORS.ink }}>Homeowners &amp; property managers</strong> looking for fast, unbiased price guidance before calling cleaning companies.
+              <strong style={{ color: COLORS.ink }}>Cleaning companies</strong> who want to quote instantly on their own site, capture more leads, and stop losing jobs to slower competitors.
             </p>
             <p style={pStyle}>
-              <strong style={{ color: COLORS.ink }}>Cleaning companies</strong> who want to embed our calculator on their own site to capture leads with accurate, localized estimates.
+              <strong style={{ color: COLORS.ink }}>Homeowners &amp; property managers</strong> looking for fast, unbiased price guidance before calling cleaning companies.
             </p>
           </div>
         </section>
