@@ -77,14 +77,14 @@ export default function About() {
           the band gets noticeably shorter on mobile. */}
       <div className="page-hero-band" style={{ padding: 'clamp(18px, 5vw, 40px) 0 72px' }}>
         <div className="page-hero-glow" aria-hidden="true" />
-        <div className="page-hero-inner" style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', textAlign: 'left' }}>
+        <div className="page-hero-inner" style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
           <div style={{ display: 'inline-block', background: 'rgba(37,99,235,0.25)', color: '#93c5fd', padding: '5px 14px', borderRadius: RADIUS.pill, fontSize: 13, fontWeight: 600, marginBottom: 16, border: '1px solid rgba(37,99,235,0.35)' }}>
             About Clean Estimator
           </div>
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
             Instant Quoting for Cleaning Businesses
           </h1>
-          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640, marginBottom: 24 }}>
+          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640, margin: '0 auto 24px' }}>
             Clean Estimator started as a quoting problem for cleaning businesses: slow, manual pricing loses leads to whoever calls the prospect back first. We built an instant, accurate quoting engine cleaning companies could put to work right away — and opened a free version so homeowners get the same price transparency before they ever pick up the phone.
           </p>
 
@@ -92,7 +92,7 @@ export default function About() {
               disconnected hairline-divided row in the light body below --
               reads as part of the same statement instead of a separate
               afterthought section. */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 10 }}>
             {STATS.map(s => (
               <div key={s.label} style={{ display: 'flex', alignItems: 'baseline', gap: 6, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: RADIUS.pill, padding: '8px 16px' }}>
                 <span style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{s.number}</span>
