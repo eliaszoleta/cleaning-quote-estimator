@@ -583,8 +583,13 @@ ${bodyHtml}
 // extraction and an LLM doing retrieval/citation actually need, rather than
 // the more conversational copy written for a human reading the real page.
 function renderAbout(assets) {
-  const seoTitle = 'About Clean Estimator | Instant Quoting Platform for Cleaning Businesses';
-  const seoDesc = 'Clean Estimator is an instant quoting and lead-capture platform for cleaning businesses, plus a free public cleaning cost calculator for homeowners. Serving all 50 U.S. states.';
+  // Title/description deliberately kept at their original wording -- Google
+  // is already showing this exact text as the live SERP snippet for /about,
+  // and the user wants that snippet to stay put rather than shift on the
+  // next recrawl. The body content below is still the rewritten, more
+  // complete version; only these two crawler-facing fields are held back.
+  const seoTitle = 'About Clean Estimator | Free Cleaning Cost Estimator';
+  const seoDesc = 'Clean Estimator provides free, accurate cleaning cost estimates for homeowners and businesses across all 50 U.S. states.';
 
   const offerings = [
     ['Internal Estimator', 'The core product, built for cleaning companies. Unlimited, instant, accurate on-screen price estimates for a company\'s own staff to quote jobs — on a phone call, during a walkthrough, or from the office — instead of pricing from memory or a spreadsheet. $25/month with a 30-day free trial.'],

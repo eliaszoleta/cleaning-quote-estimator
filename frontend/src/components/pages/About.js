@@ -62,8 +62,8 @@ export default function About() {
   return (
     <div style={{ minHeight: '100vh' }}>
       <Helmet>
-        <title>About Clean Estimator | Instant Quoting for Cleaning Businesses</title>
-        <meta name="description" content="Clean Estimator helps cleaning companies quote instantly and win more leads with a white-labeled calculator for their own site, plus a free public cost estimator for homeowners across all 50 U.S. states." />
+        <title>About Clean Estimator | Free Cleaning Cost Estimator</title>
+        <meta name="description" content="Clean Estimator provides free, accurate cleaning cost estimates for homeowners and businesses across all 50 U.S. states." />
         <link rel="canonical" href="https://www.cleanestimator.com/about" />
       </Helmet>
 
