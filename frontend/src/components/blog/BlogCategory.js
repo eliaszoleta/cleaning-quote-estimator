@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, SprayCan, Building2, ShieldAlert, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Home, SprayCan, Building2, ShieldAlert, Rocket, ArrowRight, ArrowLeft } from 'lucide-react';
 import { getPostsByCategory, CATEGORIES, BLOG_POSTS } from '../../data/blogPosts';
 import '../pages/PageHero.css';
 
@@ -9,6 +9,7 @@ const CATEGORY_ICONS = {
   carpet: { Icon: SprayCan, color: '#7c3aed', bg: 'linear-gradient(135deg,#f5f3ff,#ede9fe)' },
   commercial: { Icon: Building2, color: '#0891b2', bg: 'linear-gradient(135deg,#ecfeff,#cffafe)' },
   restoration: { Icon: ShieldAlert, color: '#dc2626', bg: 'linear-gradient(135deg,#fef2f2,#fee2e2)' },
+  'starting-out': { Icon: Rocket, color: '#ea580c', bg: 'linear-gradient(135deg,#fff7ed,#ffedd5)' },
 };
 
 function CategoryPill({ id, label, href }) {
@@ -110,15 +111,15 @@ export default function BlogCategory({ category }) {
                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#bfdbfe'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(15,23,42,0.04), 0 10px 26px rgba(30,64,175,0.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)'; e.currentTarget.style.transform = 'none'; }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
-                  <div style={{ flex: 1 }}>
+                <div className="bcat-card-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 12, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
                       {post.readTime} read · {new Date(post.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                     </div>
                     <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 8, lineHeight: 1.35 }}>{post.title}</h2>
                     <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.6 }}>{post.excerpt}</p>
                   </div>
-                  <span style={{ color: '#1d4ed8', fontWeight: 700, fontSize: 15, flexShrink: 0, marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 5 }}>Read <ArrowRight size={15} strokeWidth={2.5} /></span>
+                  <span className="bcat-card-read" style={{ color: '#1d4ed8', fontWeight: 700, fontSize: 15, flexShrink: 0, marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 5 }}>Read <ArrowRight size={15} strokeWidth={2.5} /></span>
                 </div>
               </a>
             ))}

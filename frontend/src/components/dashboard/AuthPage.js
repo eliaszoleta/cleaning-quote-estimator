@@ -1,11 +1,24 @@
 import React, { useState } from 'react';
-import { Mail, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Mail, CheckCircle2, Eye, EyeOff, Zap, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { postCheckout } from '../../utils/api';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
+// CompanyLanding.js's "Start Free Trial" CTAs link here with ?mode=signup
+// so clicking them opens straight on Create Account instead of Sign In --
+// a returning user navigating to /company directly still lands on Sign In
+// by default.
+function initialMode() {
+  try {
+    return new URLSearchParams(window.location.search).get('mode') === 'signup' ? 'signup' : 'login';
+  } catch {
+    return 'login';
+  }
+}
+
 export default function AuthPage({ onAuth }) {
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,6 +31,11 @@ export default function AuthPage({ onAuth }) {
   const [error, setError] = useState('');
   const [emailSent, setEmailSent] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  // True for the brief window between a fresh signup succeeding and the
+  // browser actually navigating to Stripe Checkout -- window.location.href
+  // doesn't leave this page instantly, so without this the form would just
+  // sit there looking idle (or snap back to enabled) for that gap.
+  const [redirectingToCheckout, setRedirectingToCheckout] = useState(false);
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
@@ -89,11 +107,66 @@ export default function AuthPage({ onAuth }) {
         if (data.user && !data.session) {
           setEmailSent(true);
         } else if (data.session) {
-          onAuth(data.user);
+          // Last step to activate: send them straight to Stripe Checkout
+          // (30-day trial applied server-side -- see subscription.js's
+          // POST /checkout) instead of dropping them into the dashboard
+          // first. window.location.href doesn't navigate away instantly,
+          // so redirectingToCheckout keeps this screen showing a clear
+          // "taking you to checkout" state for that gap rather than
+          // leaving the form looking idle.
+          setRedirectingToCheckout(true);
+          try {
+            const res = await postCheckout(data.session.access_token);
+            window.location.href = res.url;
+            return;
+          } catch (checkoutErr) {
+            // Checkout session creation failed -- the account itself was
+            // still created successfully, so let them into the dashboard
+            // rather than stranding them on an error. They can start
+            // checkout again anytime from the Subscription tab.
+            setRedirectingToCheckout(false);
+            onAuth(data.user);
+          }
         }
       } else {
         const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
-        if (err) throw err;
+        if (err) {
+          // Supabase's real "Invalid login credentials" error always comes
+          // back as HTTP 400 -- anything else (5xx from Supabase's Auth
+          // service having an outage/restore hiccup, a network failure with
+          // no status at all) is Supabase's own infrastructure failing, not
+          // a wrong email or password. This used to show "Wrong email or
+          // password" for every single error regardless of cause, which is
+          // actively misleading when the real problem is a Supabase incident
+          // -- it sends someone with correct credentials into a confused
+          // "did I forget my password?" loop instead of telling them to
+          // just retry.
+          if (err.status !== 400) {
+            // Reassuring, not alarming -- this fires for paying customers on
+            // a working account, not someone who actually mistyped their
+            // password, so it shouldn't read like something is broken or
+            // make them doubt their own credentials.
+            throw new Error("We're working on a few things behind the scenes right now. Please check back in a few hours and try signing in again.");
+          }
+          // Supabase deliberately returns the same generic error for "no
+          // account with this email" and "wrong password" (anti-enumeration
+          // by design) -- this extra lookup is what lets the message below
+          // actually tell those two apart for the person logging in.
+          let accountExists = true;
+          try {
+            const checkRes = await fetch(`${API_URL}/api/company/check-email-exists`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email }),
+            });
+            const checkData = await checkRes.json();
+            accountExists = checkData.exists !== false;
+          } catch {
+            // Lookup itself failed -- fall back to the generic message rather
+            // than risk wrongly claiming a real account "doesn't exist".
+          }
+          throw new Error(accountExists ? 'Wrong email or password. Please try again.' : 'Account not found. Check your email or sign up below.');
+        }
         onAuth(data.user);
       }
     } catch (err) {
@@ -133,7 +206,7 @@ export default function AuthPage({ onAuth }) {
           <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7, marginBottom: 10 }}>We sent a confirmation link to</p>
           <div style={{ display: 'inline-block', background: '#f1f5f9', borderRadius: 6, padding: '6px 16px', fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 24 }}>{email}</div>
           <p style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7, marginBottom: 32 }}>
-            Click the link in the email to confirm your account.<br />You'll land directly in your dashboard.
+            Click the link in the email to confirm your account, then activate your calculator with a quick checkout step — 30 days free before your first charge.
           </p>
           <button onClick={() => { setEmailSent(false); setMode('login'); }}
             style={{ width: '100%', padding: '13px 0', borderRadius: 8, border: 'none', background: '#2563eb', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}>
@@ -172,6 +245,27 @@ export default function AuthPage({ onAuth }) {
             style={{ width: '100%', padding: '13px 0', borderRadius: 8, border: 'none', background: '#2563eb', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}>
             Back to Sign In
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Redirecting to checkout screen ──────────────────────────────────────────
+  if (redirectingToCheckout) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -160, right: -100, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
+        <div style={{ background: 'white', borderRadius: 22, padding: '52px 44px', maxWidth: 420, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)', textAlign: 'center' }}>
+          <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
+            <Loader2 size={32} color="#2563eb" strokeWidth={1.8} className="spin" />
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.3px' }}>Last step — activate your calculator</h2>
+          <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7, marginBottom: 4 }}>
+            Your account is created. We're taking you to a secure checkout page to activate Clean Estimator.
+          </p>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: '#2563eb', padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, marginTop: 14 }}>
+            <Zap size={13} /> 30 days free, then $25/month
+          </div>
         </div>
       </div>
     );
@@ -223,7 +317,7 @@ export default function AuthPage({ onAuth }) {
   // ── Main auth card ─────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ background: 'white', borderRadius: 22, padding: 'clamp(28px, 6vw, 48px) clamp(20px, 5vw, 44px)', maxWidth: 440, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}>
+      <div style={{ background: 'white', borderRadius: 22, padding: 'clamp(28px, 6vw, 48px) clamp(20px, 5vw, 56px)', maxWidth: 520, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)' }}>
 
         {/* Logo -- flexWrap left at its nowrap default and every child pinned
             with whiteSpace:nowrap so this stays one line on a narrow phone
@@ -241,7 +335,7 @@ export default function AuthPage({ onAuth }) {
           {mode === 'login' ? 'Welcome back' : 'Create your account'}
         </h1>
         <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28, lineHeight: 1.5 }}>
-          {mode === 'login' ? 'Sign in to manage your widget, leads, and billing.' : '30-day free trial — no credit card required'}
+          {mode === 'login' ? 'Sign in to manage your widget, leads, and billing.' : 'Start your 30-day free trial — card required, not charged until it ends.'}
         </p>
 
         {/* Toggle */}
@@ -283,9 +377,9 @@ export default function AuthPage({ onAuth }) {
 
           {mode === 'signup' && (
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Website</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Website or Facebook page</label>
               <input type="text" required value={website} onChange={e => setWebsite(e.target.value)}
-                placeholder="www.yourcompany.com" style={inputStyle}
+                placeholder="www.yourcompany.com or facebook.com/yourpage" style={inputStyle}
                 onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
                 onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
             </div>

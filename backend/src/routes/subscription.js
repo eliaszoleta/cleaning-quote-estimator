@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { sendCompanyWelcomeEmail } = require('../services/email');
+const { sendCompanyWelcomeEmail, sendPaymentFailedEmail, sendSubscriptionCanceledEmail } = require('../services/email');
+const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
@@ -22,7 +23,7 @@ router.get('/status', async (req, res) => {
       sendCompanyWelcomeEmail({ to: req.user.email, companyId: req.user.id })
         .catch(err => console.error('Company welcome email failed:', err.message));
     }
-    res.json({ success: true, data: computeSubscriptionStatus(config) });
+    res.json({ success: true, data: computeSubscriptionStatus(config, req.user.email) });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to get subscription status' });
   }
@@ -31,20 +32,55 @@ router.get('/status', async (req, res) => {
 // POST /api/subscription/checkout
 router.post('/checkout', async (req, res) => {
   const companyId = req.user.id;
-  const priceId = process.env.STRIPE_PRICE_ID;
-  if (!priceId) return res.status(500).json({ success: false, error: 'Stripe pricing not configured' });
 
   try {
     const stripe = getStripe();
-    const config = (await getCompanyConfig(companyId)) || {};
+    let config = await getCompanyConfig(companyId);
+
+    // AuthPage.js now sends a brand-new signup straight here, before the
+    // dashboard's own getOrCreateCompanyConfig (GET /api/company/:id) ever
+    // runs -- so this is often the very first time this company's row gets
+    // created. Seed it with the same defaults + signup profile fields that
+    // route would, EXCEPT trialStartedAt: deliberately left unset, since
+    // this checkout is about to hand the trial off to Stripe itself (see
+    // alreadyHadTrial below) rather than starting the old app-managed,
+    // no-card clock for an account that's headed straight into Checkout.
+    if (!config) {
+      config = {
+        ...DEFAULT_COMPANY_CONFIG,
+        companyName: req.user.metadata?.company_name || DEFAULT_COMPANY_CONFIG.companyName,
+        phone: req.user.metadata?.phone || DEFAULT_COMPANY_CONFIG.phone,
+        website: req.user.metadata?.website || DEFAULT_COMPANY_CONFIG.website,
+      };
+      await saveCompanyConfig(companyId, config);
+    }
     const existingCustomerId = config.subscription?.stripeCustomerId;
 
-    // No Stripe-side trial here -- the 30-day free trial is app-managed
-    // (subscription.trialStartedAt, started at signup in company.js, see
-    // subscriptionStatus.js). By the time someone actually completes this
-    // checkout, they're converting to a real paid subscription billed
-    // immediately, whether that's during their free trial (upgrading early)
-    // or after it's ended.
+    const priceId = process.env.STRIPE_PRICE_ID;
+    if (!priceId) return res.status(500).json({ success: false, error: 'Stripe pricing not configured' });
+
+    // Three cases for how much (if any) Stripe trial this Checkout session
+    // should carry:
+    // 1. Already has/had a real Stripe subscription -- resubscribing after
+    //    cancellation or clearing a past-due card. No new trial; charge
+    //    immediately, same as before.
+    // 2. Legacy no-card trial (trialStartedAt set, never touched Stripe) --
+    //    adding a card now shouldn't forfeit whatever real free days are
+    //    still left, nor grant extra ones beyond that. If those days have
+    //    already run out, this collapses to the same "charge immediately"
+    //    behavior as case 1.
+    // 3. Brand new account, no trial ever started -- the full 30-day trial.
+    let trialPeriodDays = null;
+    if (!config.subscription?.stripeSubscriptionId) {
+      if (config.subscription?.trialStartedAt) {
+        const daysElapsed = (Date.now() - new Date(config.subscription.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24);
+        const daysLeft = Math.ceil(30 - daysElapsed);
+        if (daysLeft > 0) trialPeriodDays = daysLeft;
+      } else {
+        trialPeriodDays = 30;
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -52,6 +88,7 @@ router.post('/checkout', async (req, res) => {
       customer: existingCustomerId || undefined,
       customer_email: existingCustomerId ? undefined : req.user.email,
       metadata: { companyId },
+      ...(trialPeriodDays ? { subscription_data: { trial_period_days: trialPeriodDays } } : {}),
       success_url: `${FRONTEND_URL}/company?subscribed=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/company?tab=subscription`,
     });
@@ -100,7 +137,7 @@ router.post('/verify-checkout', async (req, res) => {
     const config = (await getCompanyConfig(companyId)) || {};
 
     if (session.payment_status !== 'paid' && session.status !== 'complete') {
-      return res.json({ success: true, data: computeSubscriptionStatus(config) });
+      return res.json({ success: true, data: computeSubscriptionStatus(config, req.user.email) });
     }
 
     const sub = session.subscription;
@@ -116,7 +153,7 @@ router.post('/verify-checkout', async (req, res) => {
         : null,
     };
     await saveCompanyConfig(companyId, config);
-    res.json({ success: true, data: computeSubscriptionStatus(config) });
+    res.json({ success: true, data: computeSubscriptionStatus(config, req.user.email) });
   } catch (err) {
     console.error('verify-checkout error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to verify checkout session' });
@@ -143,6 +180,24 @@ async function findCompanyByCustomer(customerId) {
   }
 }
 
+// Same pattern as calculate.js/trialScheduler.js's own copy of this --
+// Supabase auth user lookup, not stored on the company config itself.
+async function getOwnerEmail(companyId) {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return null;
+    const supabase = createClient(url, key, { auth: { persistSession: false } });
+    const { data, error } = await supabase.auth.admin.getUserById(companyId);
+    if (error) return null;
+    return data?.user?.email || null;
+  } catch (err) {
+    console.warn('subscription.js: getOwnerEmail failed:', err.message);
+    return null;
+  }
+}
+
 async function handleStripeEvent(event) {
   const stripe = getStripe();
 
@@ -157,6 +212,11 @@ async function handleStripeEvent(event) {
         const config = (await getCompanyConfig(companyId)) || {};
         const sub = fullSession.subscription;
         const subObj = sub && typeof sub !== 'string' ? sub : null;
+        // Captured before the overwrite below -- this is what tells a true
+        // win-back reactivation (was 'canceled', now completing checkout
+        // again) apart from a brand-new signup for the welcome-email logic
+        // further down.
+        const wasCanceled = config.subscription?.status === 'canceled';
         config.subscription = {
           ...(config.subscription || {}),
           stripeCustomerId: fullSession.customer,
@@ -169,6 +229,49 @@ async function handleStripeEvent(event) {
         };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: activated company ${companyId}`);
+
+        // The dashboard's own "first load ever" welcome-email check
+        // (getOrCreateCompanyConfig's `created` flag) never fires for these
+        // accounts anymore -- AuthPage.js now sends a brand-new signup
+        // straight to POST /checkout, which creates this company's row
+        // itself before the dashboard ever loads, so by the time the user
+        // lands back here post-Checkout the row already exists and looks
+        // like it was never "just created". This webhook is the first point
+        // that reliably knows checkout actually succeeded, so send it from
+        // here instead. Deduped via welcomeEmailSentAt for a first-ever
+        // signup -- but that flag is already set forever once a company's
+        // very first checkout succeeds, which used to silently swallow any
+        // confirmation on a LATER win-back reactivation (cancel, then
+        // resubscribe months later): welcomeEmailSentAt being "already set"
+        // isn't actually "already told them about THIS checkout". wasCanceled
+        // (captured above, before this event overwrote subscription.status)
+        // bypasses that dedup specifically for a true reactivation, since
+        // each cancel-then-resubscribe cycle is its own event worth a
+        // confirmation, same reasoning as payment_failed's per-invoice dedup.
+        if (!config.subscription.welcomeEmailSentAt || wasCanceled) {
+          const email = await getOwnerEmail(companyId);
+          if (email) {
+            // This same webhook fires for a brand-new trial, a reactivation
+            // of an expired no-card trial, AND a win-back reactivation of a
+            // previously canceled paying account -- all charge the card
+            // immediately with no trial attached except the first, so the
+            // opening line is chosen from what this specific session
+            // actually granted plus whether this is a returning cancellation.
+            const statusLine = subObj?.status === 'trialing'
+              ? undefined // use sendCompanyWelcomeEmail's default "trial started" line
+              : wasCanceled
+              ? "Welcome back! Your subscription has been reactivated, and your card was charged $25 for this month."
+              : "Your account is now active — your card was charged $25 for your first month.";
+            const sent = await sendCompanyWelcomeEmail({ to: email, companyId, statusLine });
+            if (sent) {
+              const fresh = (await getCompanyConfig(companyId)) || config;
+              await saveCompanyConfig(companyId, {
+                ...fresh,
+                subscription: { ...fresh.subscription, welcomeEmailSentAt: new Date().toISOString() },
+              });
+            }
+          }
+        }
       } catch (err) {
         console.error(`Webhook checkout.session.completed failed for company ${companyId}:`, err.message);
         throw err;
@@ -209,6 +312,21 @@ async function handleStripeEvent(event) {
         config.subscription = { ...(config.subscription || {}), status: 'canceled', stripeSubscriptionId: sub.id };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: canceled subscription for company ${companyId}`);
+
+        // Deduped via cancellationEmailSentAt -- webhook deliveries can repeat.
+        if (!config.subscription.cancellationEmailSentAt) {
+          const email = await getOwnerEmail(companyId);
+          if (email) {
+            const sent = await sendSubscriptionCanceledEmail({ to: email, companyName: config.companyName || 'there' });
+            if (sent) {
+              const fresh = (await getCompanyConfig(companyId)) || config;
+              await saveCompanyConfig(companyId, {
+                ...fresh,
+                subscription: { ...fresh.subscription, cancellationEmailSentAt: new Date().toISOString() },
+              });
+            }
+          }
+        }
       } catch (err) {
         console.error(`Webhook customer.subscription.deleted failed:`, err.message);
         throw err;
@@ -226,6 +344,24 @@ async function handleStripeEvent(event) {
         config.subscription = { ...(config.subscription || {}), status: 'past_due' };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: marked past_due for company ${companyId}`);
+
+        // Deduped by invoice id, not a one-time flag -- Stripe's own retry
+        // schedule fires this same webhook multiple times for the SAME
+        // invoice (shouldn't re-send each time), but a genuinely new failed
+        // invoice next billing cycle has a different id and should.
+        if (config.subscription.lastPaymentFailedInvoiceId !== invoice.id) {
+          const email = await getOwnerEmail(companyId);
+          if (email) {
+            const sent = await sendPaymentFailedEmail({ to: email, companyName: config.companyName || 'there' });
+            if (sent) {
+              const fresh = (await getCompanyConfig(companyId)) || config;
+              await saveCompanyConfig(companyId, {
+                ...fresh,
+                subscription: { ...fresh.subscription, lastPaymentFailedInvoiceId: invoice.id },
+              });
+            }
+          }
+        }
       } catch (err) {
         console.error(`Webhook invoice.payment_failed failed:`, err.message);
         throw err;

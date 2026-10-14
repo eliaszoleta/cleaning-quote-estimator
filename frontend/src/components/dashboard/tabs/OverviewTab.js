@@ -1,15 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Users, CalendarDays, DollarSign, Globe, Inbox, Paintbrush, Code2, CreditCard } from 'lucide-react';
-import { getCompanyLeads } from '../../../utils/api';
+import { UserPlus, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
+import { getCompanyLeads, getCompanyEstimateRuns } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
-import { formatPrice, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
+import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
 export default function OverviewTab({ config, subStatus, user }) {
+  // Same isMobile pattern as CompanyDashboard.js/BrandingTab.js -- the stat
+  // grid below used to rely on CSS auto-fit alone (minmax(190px, 1fr)),
+  // which on a ~360-400px-wide phone only has room for one 190px+ column,
+  // stacking all 5 cards in a single column. Forcing an explicit 2-column
+  // grid under 768px fits 2 per row regardless of exact device width.
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const [leads, setLeads] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(true);
+  // Total + this-month count of this company's successful /api/calculate
+  // runs (internal Calculator Mode and the embedded widget combined). Added
+  // alongside the leads-based stats below because a company using Clean
+  // Estimator purely internally -- the primary pitch -- otherwise shows up
+  // nowhere at all: no email captured, so nothing in `leads` either.
+  const [estimateRuns, setEstimateRuns] = useState({ total: 0, thisMonth: 0 });
 
-  useEffect(() => { loadLeads(); }, []);
+  useEffect(() => { loadLeads(); loadEstimateRuns(); }, []);
 
   const loadLeads = async () => {
     try {
@@ -23,24 +41,66 @@ export default function OverviewTab({ config, subStatus, user }) {
     }
   };
 
+  const loadEstimateRuns = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) return;
+      const res = await getCompanyEstimateRuns(token);
+      setEstimateRuns(res.data || { total: 0, thisMonth: 0 });
+    } catch {}
+  };
+
   const recentLeads = leads.slice(0, 5);
   const thisMonth = leads.filter(l => new Date(l.created_at) > new Date(Date.now() - 30 * 86400000));
-  const avgEstimate = leads.length > 0
-    ? leads.reduce((s, l) => s + ((l.estimated_price_low || 0) + (l.estimated_price_high || 0)) / 2, 0) / leads.length
+  // Commercial leads are quoted as a recurring MONTHLY total, every other
+  // service as a flat one-time price (see calculateCommercial's unit:
+  // 'per_month' vs. everything else's unit: 'flat') -- averaging those
+  // together would blend two different units into one number that means
+  // nothing (a single $6,000/mo commercial lead could make a company's
+  // typical $150 house-cleaning lead look like it averages $1,000+). This
+  // stat is scoped to one-time-quote leads only, which is what "Avg
+  // Estimate" reads as to someone scanning the dashboard.
+  const oneTimeLeads = leads.filter(l => l.service_type !== 'commercial');
+  const avgEstimate = oneTimeLeads.length > 0
+    ? oneTimeLeads.reduce((s, l) => s + ((l.estimated_price_low || 0) + (l.estimated_price_high || 0)) / 2, 0) / oneTimeLeads.length
     : 0;
 
   const stats = [
-    { label: 'Total Leads',    value: leads.length,                                              Icon: Users,       color: '#1d4ed8', bg: '#eff6ff' },
+    { label: 'Estimates Run',  value: estimateRuns.total,                                        Icon: Zap,         color: '#7c3aed', bg: '#f5f3ff' },
+    { label: 'Total Leads',    value: leads.length,                                              Icon: UserPlus,    color: '#1d4ed8', bg: '#eff6ff' },
     { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a', bg: '#f0fdf4' },
     { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate) : '—',         Icon: DollarSign,  color: '#d97706', bg: '#fffbeb' },
     { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—', Icon: Globe,       color: subStatus?.active ? '#16a34a' : '#dc2626', bg: subStatus?.active ? '#f0fdf4' : '#fef2f2' },
   ];
 
+  // Setup checklist -- shown until every required step is done, then
+  // disappears entirely (classic onboarding-checklist UX) so it doesn't
+  // permanently clutter a returning, fully-set-up user's dashboard. Each
+  // step reads a real signal off config/estimateRuns/leads rather than a
+  // separate "onboarding progress" flag that could drift out of sync with
+  // what the account has actually done.
+  const checklistSteps = [
+    { label: 'Set your service area',       done: (config?.serviceStates?.length || 0) > 0, href: '?tab=services', Icon: MapPin },
+    { label: 'Add your branding',           done: !!config?.logo,                            href: '?tab=branding', Icon: Palette },
+    // '' resolves to a bare /company link (not /company?tab=...) -- Calculator
+    // Mode is CompanyDashboard.js's own default viewMode, not a URL-addressable
+    // tab, so this is how you land there instead of back on this Overview tab.
+    { label: 'Run your first estimate',     done: estimateRuns.total > 0,                     href: '', Icon: PlayCircle },
+  ];
+  const requiredDone = checklistSteps.filter(s => s.done).length;
+  const showChecklist = requiredDone < checklistSteps.length;
+  // Embedding the widget is a bonus step, not required -- the primary pitch
+  // is internal-only use, so it's shown as an optional nudge once the three
+  // required steps above are complete, not blocking the checklist from
+  // disappearing.
+  const widgetEmbedded = leads.length > 0;
+
   const quickActions = [
-    { label: 'Customize Branding', href: '?tab=branding',      Icon: Paintbrush  },
-    { label: 'Get Embed Code',     href: '?tab=embed',         Icon: Code2       },
-    { label: 'View All Leads',     href: '?tab=leads',         Icon: Users       },
-    { label: 'Manage Billing',     href: '?tab=settings&section=subscription',  Icon: CreditCard  },
+    { label: 'Services & Pricing', href: '?tab=services',      Icon: SlidersHorizontal },
+    { label: 'Branding & Embed Code', href: '?tab=branding',   Icon: Code2       },
+    { label: 'View All Leads',     href: '?tab=leads',         Icon: UserPlus    },
+    { label: 'Manage Billing',     href: '?tab=subscription',  Icon: CreditCard  },
   ];
 
   return (
@@ -54,18 +114,67 @@ export default function OverviewTab({ config, subStatus, user }) {
         </p>
       </div>
 
+      {/* Setup checklist -- the only thing a brand-new account saw before
+          this was an all-zero stat grid and a one-time "check Help & Docs"
+          popup, with no guided next step. Disappears once the required
+          steps are done so it never clutters a returning, set-up account. */}
+      {showChecklist && (
+        <div style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, padding: '20px 22px', marginBottom: 20, boxShadow: SHADOWS.sm }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14, flexWrap: 'wrap', gap: 6 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: COLORS.ink, margin: 0 }}>Get set up</h3>
+            <span style={{ fontSize: 12.5, color: COLORS.muted, fontWeight: 600 }}>{requiredDone} of {checklistSteps.length} done</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {checklistSteps.map(({ label, done, href, Icon }) => (
+              <a
+                key={label}
+                href={done ? undefined : `/company${href}`}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '11px 14px', borderRadius: 7,
+                  border: `1.5px solid ${done ? COLORS.border : COLORS.primary}`,
+                  background: done ? COLORS.surfaceMuted : COLORS.primaryMuted,
+                  textDecoration: 'none', cursor: done ? 'default' : 'pointer',
+                }}
+              >
+                <span style={{
+                  width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: done ? '#16a34a' : 'white', border: done ? 'none' : `1.5px solid ${COLORS.primary}`,
+                }}>
+                  {done ? <Check size={13} color="white" strokeWidth={3} /> : <Icon size={12} color={COLORS.primary} strokeWidth={2.3} />}
+                </span>
+                <span style={{ fontSize: 13.5, fontWeight: 600, color: done ? COLORS.muted : COLORS.ink, textDecoration: done ? 'line-through' : 'none' }}>
+                  {label}
+                </span>
+              </a>
+            ))}
+            {!widgetEmbedded && (
+              <a href="/company?tab=branding" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', borderRadius: 7, border: `1.5px dashed ${COLORS.border}`, textDecoration: 'none' }}>
+                <span style={{ width: 24, height: 24, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', border: `1.5px solid ${COLORS.border}` }}>
+                  <Code2 size={12} color={COLORS.muted} strokeWidth={2.3} />
+                </span>
+                <span style={{ fontSize: 13.5, fontWeight: 600, color: COLORS.body }}>
+                  Optional: embed the calculator widget on your website too
+                </span>
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(190px, 1fr))', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
         {stats.map(({ label, value, Icon, color, bg }) => (
-          <div key={label} style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm, padding: '18px 20px', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+          <div key={label} style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm, padding: isMobile ? '14px 14px' : '18px 20px', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
             onMouseEnter={e => { e.currentTarget.style.boxShadow = SHADOWS.md; e.currentTarget.style.transform = 'translateY(-2px)'; }}
             onMouseLeave={e => { e.currentTarget.style.boxShadow = SHADOWS.sm; e.currentTarget.style.transform = 'none'; }}
           >
-            <div style={{ width: 38, height: 38, borderRadius: 7, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
-              <Icon size={18} strokeWidth={2.1} />
+            <div style={{ width: isMobile ? 32 : 38, height: isMobile ? 32 : 38, borderRadius: 7, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: isMobile ? 10 : 14 }}>
+              <Icon size={isMobile ? 16 : 18} strokeWidth={2.1} />
             </div>
-            <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.5px', lineHeight: 1, color: COLORS.ink, marginBottom: 8 }}>{value}</div>
-            <div style={{ fontSize: 12, color: COLORS.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+            <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 800, letterSpacing: '-0.5px', lineHeight: 1, color: COLORS.ink, marginBottom: 8 }}>{value}</div>
+            <div style={{ fontSize: 11.5, color: COLORS.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
           </div>
         ))}
       </div>
@@ -134,7 +243,7 @@ export default function OverviewTab({ config, subStatus, user }) {
                   <td style={{ padding: '12px 14px', fontSize: 13, color: '#374151' }}>{serviceTypeLabel(l.service_type)}</td>
                   <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: '#16a34a' }}>
                     {l.estimated_price_low && l.estimated_price_high
-                      ? `${formatPrice(l.estimated_price_low)} – ${formatPrice(l.estimated_price_high)}`
+                      ? formatPriceRange(l.estimated_price_low, l.estimated_price_high, l.service_type)
                       : '—'}
                   </td>
                   <td style={{ padding: '12px 14px', fontSize: 12, color: '#94a3b8' }}>{formatDateTime(l.created_at)}</td>

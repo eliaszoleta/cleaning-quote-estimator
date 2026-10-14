@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X } from 'lucide-react';
+import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X } from 'lucide-react';
 import { getAllStates } from '../../../data/statePricing';
 
 const ALL_STATES = getAllStates();
@@ -9,6 +9,7 @@ const SERVICES = [
   { id: 'apartment',       label: 'Apartment Cleaning',  Icon: Building2     },
   { id: 'commercial',      label: 'Commercial Cleaning', Icon: Building      },
   { id: 'carpet',          label: 'Carpet Cleaning',     Icon: Layers        },
+  { id: 'upholstery',      label: 'Upholstery Cleaning', Icon: Sofa          },
   { id: 'airDuct',         label: 'Air Duct Cleaning',   Icon: Wind          },
   { id: 'dryerVent',       label: 'Dryer Vent Cleaning', Icon: Flame         },
   { id: 'tileGrout',       label: 'Tile & Grout',        Icon: Grid3x3       },
@@ -17,6 +18,22 @@ const SERVICES = [
 ];
 
 const DEFAULT_SVC = { enabled: true, markup: 1.0, minimumCharge: null };
+
+// Recurring-frequency discounts only apply to the two services visitors
+// actually book on a recurring schedule -- used to be its own "Discount"
+// nav tab, which meant leaving this page (where the rest of a service's
+// pricing already lives) just to set a weekly/biweekly/monthly %.
+const DISCOUNT_SERVICES = [
+  { id: 'homeResidential', label: 'House Cleaning',      Icon: Home      },
+  { id: 'apartment',       label: 'Apartment Cleaning',  Icon: Building2 },
+  { id: 'commercial',      label: 'Commercial Cleaning', Icon: Building  },
+];
+const DISCOUNT_FREQUENCIES = [
+  { id: 'weekly',   label: 'Weekly'    },
+  { id: 'biweekly', label: 'Bi-Weekly' },
+  { id: 'monthly',  label: 'Monthly'   },
+];
+const DEFAULT_DISCOUNTS = { weekly: 0, biweekly: 0, monthly: 0 };
 
 export default function ServicesTab({ config, update, patchServices, autoSave }) {
   const [services, setServices] = useState({});
@@ -96,10 +113,36 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
 
   const getSvc = (id) => ({ ...DEFAULT_SVC, ...(services[id] || {}) });
 
+  const getDiscounts = (id) => ({ ...DEFAULT_DISCOUNTS, ...(getSvc(id).frequencyDiscounts || {}) });
+
+  // Debounced auto-save for markup/minimumCharge/discount %, same reasoning
+  // as BrandingTab.js's: update() keeps the UI and localConfig current
+  // instantly, but the actual persist waits until typing pauses (900ms)
+  // instead of firing a full save per keystroke.
+  const saveTimer = useRef(null);
+  useEffect(() => () => { if (saveTimer.current) clearTimeout(saveTimer.current); }, []);
+  const scheduleAutoSave = (nextServices) => {
+    if (!autoSave) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => autoSave({ services: nextServices }), 900);
+  };
+
+  const setDiscount = (id, freq, fraction) => {
+    setServices(prev => {
+      const svc = { ...DEFAULT_SVC, ...(prev[id] || {}) };
+      const nextDiscounts = { ...DEFAULT_DISCOUNTS, ...(svc.frequencyDiscounts || {}), [freq]: fraction };
+      const next = { ...prev, [id]: { ...svc, frequencyDiscounts: nextDiscounts } };
+      if (update) update({ services: next });
+      scheduleAutoSave(next);
+      return next;
+    });
+  };
+
   const setSvc = (id, key, val) => {
     setServices(prev => {
       const next = { ...prev, [id]: { ...getSvc(id), [key]: val } };
       if (update) update({ services: next });
+      scheduleAutoSave(next);
       return next;
     });
   };
@@ -117,15 +160,27 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     if (patchServices) patchServices({ [id]: nextSvc });
   };
 
+  // Lead capture toggle saves instantly, same as the service on/off
+  // toggles above -- it's a discrete flip, not continuous typing.
   const setLeadCapture = (val) => {
     setEnableLeadCapture(val);
     if (update) update({ enableLeadCapture: val });
+    if (autoSave) autoSave({ enableLeadCapture: val });
+  };
+
+  const scheduleQuestionsAutoSave = (nextQuestions) => {
+    if (!autoSave) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => autoSave({ customLeadQuestions: nextQuestions }), 900);
   };
 
   const addQuestion = () => {
     setCustomQuestions(prev => {
       const next = [...prev, { id: `q${Date.now()}`, label: '', type: 'text', placeholder: '', options: [] }];
       if (update) update({ customLeadQuestions: next });
+      // Adding a row is a discrete action, not typing -- save right away
+      // rather than waiting on the debounce below.
+      if (autoSave) autoSave({ customLeadQuestions: next });
       return next;
     });
   };
@@ -134,6 +189,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     setCustomQuestions(prev => {
       const next = prev.filter((_, i) => i !== idx);
       if (update) update({ customLeadQuestions: next });
+      if (autoSave) autoSave({ customLeadQuestions: next });
       return next;
     });
   };
@@ -142,6 +198,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     setCustomQuestions(prev => {
       const next = prev.map((q, i) => i === idx ? { ...q, [key]: val } : q);
       if (update) update({ customLeadQuestions: next });
+      scheduleQuestionsAutoSave(next);
       return next;
     });
   };
@@ -152,7 +209,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
     <div>
       <div style={{ marginBottom: 22 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Services & Pricing</h2>
-        <p style={{ color: '#64748b', fontSize: 14 }}>Service Area and toggling a service on/off save instantly. For markup and minimum price changes, click <strong>Save Changes</strong> in the header when done.</p>
+        <p style={{ color: '#64748b', fontSize: 14 }}>Everything on this page saves automatically as you go — no need to click Save.</p>
       </div>
 
       {/* Service area */}
@@ -305,21 +362,31 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
                 </span>
 
                 {s.enabled && (
+                  // Each label+input is its own non-wrapping pair -- these
+                  // used to be direct children of the outer flexWrap row,
+                  // so on a narrow screen the row could wrap between a
+                  // label and its own input ("Markup" landing on one line,
+                  // its number field dropping to the next). Grouping them
+                  // means wrapping only ever happens BETWEEN whole pairs.
                   <>
-                    <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Markup</label>
-                    <input
-                      type="number" step={0.05} min={0.5} max={3.0} value={s.markup}
-                      onChange={e => setSvc(id, 'markup', parseFloat(e.target.value) || 1.0)}
-                      style={{ ...inp, width: 64 }}
-                    />
-                    <span style={{ fontSize: 12, color: '#cbd5e1' }}>×</span>
-                    <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Min $</label>
-                    <input
-                      type="number" min={0} value={s.minimumCharge || ''}
-                      onChange={e => setSvc(id, 'minimumCharge', e.target.value ? parseInt(e.target.value) : null)}
-                      placeholder="None"
-                      style={{ ...inp, width: 74 }}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+                      <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Markup</label>
+                      <input
+                        type="number" step={0.05} min={0.5} max={3.0} value={s.markup}
+                        onChange={e => setSvc(id, 'markup', parseFloat(e.target.value) || 1.0)}
+                        style={{ ...inp, width: 64 }}
+                      />
+                      <span style={{ fontSize: 12, color: '#cbd5e1' }}>×</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+                      <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Min $</label>
+                      <input
+                        type="number" min={0} value={s.minimumCharge || ''}
+                        onChange={e => setSvc(id, 'minimumCharge', e.target.value ? parseInt(e.target.value) : null)}
+                        placeholder="None"
+                        style={{ ...inp, width: 74 }}
+                      />
+                    </div>
                   </>
                 )}
 
@@ -344,6 +411,42 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
         <div style={{ padding: '10px 18px', borderTop: '1px solid #f1f5f9', background: '#f8fafc', fontSize: 12, color: '#94a3b8' }}>
           <strong style={{ color: '#64748b' }}>Markup:</strong> 1.0 = no change, 1.2 = +20%. &nbsp;
           <strong style={{ color: '#64748b' }}>Min $:</strong> minimum quote amount (leave blank for defaults).
+        </div>
+      </div>
+
+      {/* Recurring discounts -- off by default, same as before: a visitor
+          is quoted the full price for a recurring booking unless a
+          percentage is set here. */}
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
+          <div style={{ fontWeight: 700, fontSize: 14 }}>Recurring Discounts</div>
+          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Optional % off for visitors who book weekly, bi-weekly, or monthly cleaning instead of a one-time visit.</div>
+        </div>
+        <div style={{ padding: '6px 8px' }}>
+          {DISCOUNT_SERVICES.map(({ id, label, Icon }) => {
+            const d = getDiscounts(id);
+            return (
+              <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 7, marginBottom: 3, flexWrap: 'wrap' }}>
+                <div style={{ width: 34, height: 34, borderRadius: 7, flexShrink: 0, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={16} color="#2563eb" strokeWidth={2} />
+                </div>
+                <span style={{ minWidth: 155, fontWeight: 600, fontSize: 14, color: '#0f172a' }}>{label}</span>
+                {DISCOUNT_FREQUENCIES.map(({ id: freq, label: freqLabel }) => (
+                  <div key={freq} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>{freqLabel}</label>
+                    <input
+                      type="number" min={0} max={90} step={1}
+                      value={Math.round((d[freq] || 0) * 100) || ''}
+                      onChange={e => setDiscount(id, freq, Math.max(0, Math.min(90, parseFloat(e.target.value) || 0)) / 100)}
+                      placeholder="0"
+                      style={{ ...inp, width: 58 }}
+                    />
+                    <span style={{ fontSize: 12, color: '#cbd5e1' }}>%</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
         </div>
       </div>
 

@@ -3,9 +3,16 @@ export function formatPrice(n) {
   return '$' + Math.round(n).toLocaleString();
 }
 
-export function formatPriceRange(low, high) {
+// Commercial cleaning is the one service quoted as a recurring monthly
+// total (see calculateCommercial's unit: 'per_month' in
+// backend/src/services/cleaningCalculation.js) rather than a flat one-time
+// price -- every lead-list view that shows a bare price range needs this
+// same "/mo" suffix on a commercial lead, or it reads as a one-time quote
+// several times smaller than the home-cleaning lead next to it.
+export function formatPriceRange(low, high, serviceType) {
   if (low == null || high == null) return '—';
-  return `${formatPrice(low)} – ${formatPrice(high)}`;
+  const suffix = serviceType === 'commercial' ? '/mo' : '';
+  return `${formatPrice(low)} – ${formatPrice(high)}${suffix}`;
 }
 
 export function formatDate(iso) {
@@ -24,6 +31,7 @@ export function serviceTypeLabel(type) {
     apartment: 'Apartment Cleaning',
     commercial: 'Commercial Cleaning',
     carpet: 'Carpet Cleaning',
+    upholstery: 'Upholstery Cleaning',
     air_duct: 'Air Duct Cleaning',
     dryer_vent: 'Dryer Vent Cleaning',
     tile_grout: 'Tile & Grout',

@@ -1,8 +1,8 @@
 // ─── Cleaning service data ──────────────────────────────────────────────────
 // Pricing mirrors backend/src/config/defaults.js (HOME_SQFT_BASE_PRICES,
 // APARTMENT_SIZE_PRICES, COMMERCIAL_SQFT_RATES, CARPET_PRICE_PER_ROOM,
-// AIR_DUCT_BASE, DRYER_VENT_BASE, TILE_PRICE_PER_SQFT, MOLD_PRICE_RANGES,
-// WATER_EXTRACTION_DRYING_PER_SQFT). Update both files together if pricing
+// UPHOLSTERY_ITEM_PRICES, AIR_DUCT_BASE, DRYER_VENT_BASE, TILE_PRICE_PER_SQFT,
+// MOLD_PRICE_RANGES, WATER_EXTRACTION_DRYING_PER_SQFT). Update both files together if pricing
 // data changes. `id` matches the calculator's SERVICE_STEPS key
 // (frontend/src/components/calculator/CleaningCalculator.js) so a service
 // page's CTA can deep-link straight into that flow via /?service=<id>.
@@ -139,7 +139,39 @@ const SERVICES = [
       { q: 'What\'s the difference between steam and dry carpet cleaning?', a: 'Steam cleaning (hot water extraction) is the industry standard and most effective at deep soil removal. Dry cleaning costs 10–13% more but has little to no drying time, useful for high-traffic commercial spaces.' },
       { q: 'Are stairs included in carpet cleaning pricing?', a: 'No, carpeted stairs are priced separately at $52–$68 per flight (13–15 steps).' },
     ],
-    relatedSlugs: ['tile-and-grout-cleaning-cost', 'house-cleaning-cost'],
+    relatedSlugs: ['upholstery-cleaning-cost', 'tile-and-grout-cleaning-cost', 'house-cleaning-cost'],
+  },
+  {
+    id: 'upholstery',
+    slug: 'upholstery-cleaning-cost',
+    name: 'Upholstery Cleaning',
+    shortLabel: 'Upholstery Cleaning',
+    tagline: 'Professional fabric and leather furniture cleaning, priced per piece and scaled to soiling and material.',
+    seoTitle: 'Upholstery Cleaning Cost 2026: Price Per Piece | Clean Estimator',
+    metaDescription: 'Upholstery cleaning costs $40–$280 per piece depending on furniture type and soiling, from a single chair to a full sectional. See 2026 pricing by item, plus leather and pet-stain costs.',
+    unitType: 'flat',
+    unit: 'per piece',
+    typicalTierIndex: 2,
+    tiers: [
+      { label: 'Chair / Recliner', low: 40, high: 70, note: 'Single armchair or recliner' },
+      { label: 'Loveseat', low: 75, high: 110, note: '2-seat couch' },
+      { label: 'Sofa (Most Common)', low: 120, high: 175, note: '3-seat couch, the most requested upholstery job' },
+      { label: 'Sectional', low: 175, high: 280, note: 'L-shaped or multi-piece sofa' },
+      { label: 'Ottoman', low: 20, high: 35, note: 'Smallest/cheapest single piece' },
+    ],
+    bullets: [
+      'Leather furniture costs about double standard fabric cleaning due to specialized conditioning products',
+      'Pet-stained or heavily soiled pieces cost 65–82% more than light, routine cleaning — the same soiling scale used for carpet',
+      'Fabric protector adds $15–$25 per piece; deodorizer adds $12–$20 per piece',
+      'Whole-job minimum charge is $90–$120 regardless of how small the job is',
+    ],
+    faqs: [
+      { q: 'How much does upholstery cleaning cost?', a: 'It depends on the piece: a single chair or recliner runs $40–$70, a sofa (the most common job) runs $120–$175, and a full sectional runs $175–$280. Most companies also charge a $90–$120 minimum per visit.' },
+      { q: 'Does leather cost more to clean than fabric?', a: 'Yes — leather cleaning typically costs about double standard fabric upholstery cleaning, since it requires specialized, pH-balanced conditioning products rather than steam extraction.' },
+      { q: 'How much more does pet-stained furniture cost to clean?', a: 'Pet stains or odors add 65–82% to the base price — the same soiling scale carpet cleaning uses — due to the enzyme treatment and extra extraction passes required.' },
+      { q: 'Can I get multiple pieces cleaned in one visit?', a: 'Yes — most visits clean several pieces at once (e.g. a sofa and two chairs), each priced and added separately, which is typically more cost-effective than booking separate visits.' },
+    ],
+    relatedSlugs: ['carpet-cleaning-cost', 'house-cleaning-cost'],
   },
   {
     id: 'air_duct',

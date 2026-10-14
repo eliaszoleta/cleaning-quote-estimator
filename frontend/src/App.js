@@ -1,50 +1,90 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
+import { Loader2, Zap } from 'lucide-react';
 import { supabase } from './lib/supabase';
-import CleaningCalculator from './components/calculator/CleaningCalculator';
-import ResultsScreen from './components/calculator/ResultsScreen';
-import CompanyDashboard from './components/dashboard/CompanyDashboard';
-import AuthPage from './components/dashboard/AuthPage';
-import ResetPasswordPage from './components/dashboard/ResetPasswordPage';
-import AdminPartners from './components/admin/AdminPartners';
-import AdminCompanies from './components/admin/AdminCompanies';
-import AdminHomepageLeads from './components/admin/AdminHomepageLeads';
-import ClientPortal from './components/client/ClientPortal';
+import { postCheckout } from './utils/api';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
-import SEOContent from './components/ui/SEOContent';
-import BlogIndex from './components/blog/BlogIndex';
-import BlogPost from './components/blog/BlogPost';
-import BlogCategory from './components/blog/BlogCategory';
-import CompanyLanding from './components/pages/CompanyLanding';
-import PartnerWithUs from './components/pages/PartnerWithUs';
-import WebsiteSubscription from './components/pages/WebsiteSubscription';
-import DemoGallery from './components/demo-sites/DemoGallery';
-import DemoSitePage from './components/demo-sites/DemoSitePage';
-import PartnerCityPricing from './components/pages/PartnerCityPricing';
-import PartnerDemoPage from './components/pages/PartnerDemoPage';
-import BuyCityPlacement from './components/pages/BuyCityPlacement';
-import PartnerCheckoutSuccess from './components/pages/PartnerCheckoutSuccess';
-import About from './components/pages/About';
-import Founder from './components/pages/Founder';
-import Contact from './components/pages/Contact';
-import PrivacyPolicy from './components/pages/PrivacyPolicy';
-import TermsOfService from './components/pages/TermsOfService';
-import ServicePage from './components/pages/ServicePage';
-import StatePage from './components/pages/StatePage';
-import CityPage from './components/pages/CityPage';
-import CalculatorPage from './components/pages/CalculatorPage';
-import EstimatorPage from './components/pages/EstimatorPage';
-import MethodologyPage from './components/pages/MethodologyPage';
 import ServiceCalculatorPage, { calculatorSlugFor } from './components/pages/ServiceCalculatorPage';
 import { getAllServices } from './data/services';
-import EmbedWrapper from './components/EmbedWrapper';
 import { initMetaPixel } from './utils/metaPixel';
 import { initNextdoorPixel } from './utils/nextdoorPixel';
 import './App.css';
 
+// Route-specific screens are code-split so a visitor to any one page (most
+// often the homepage) only downloads that page's JS instead of the entire
+// site -- dashboard, admin panels, blog engine, demo-site gallery, and every
+// other page's code bundled together. Before this, all of it shipped in one
+// ~380KB gzipped main.js that had to finish downloading and executing before
+// the prerendered static HTML (see scripts/prerender.js) got replaced by the
+// real app, which is exactly the "plain page, then a beat later the real
+// site" flash visitors were seeing -- the swap couldn't happen any faster
+// than that whole bundle could load. Header/Footer and ServiceCalculatorPage
+// stay eager: the first two render on nearly every route anyway, and
+// ServiceCalculatorPage's calculatorSlugFor export has to run synchronously
+// above, before first render, which a lazy() wrapper can't provide.
+const CleaningCalculator = lazy(() => import('./components/calculator/CleaningCalculator'));
+const ResultsScreen = lazy(() => import('./components/calculator/ResultsScreen'));
+const CompanyDashboard = lazy(() => import('./components/dashboard/CompanyDashboard'));
+const AuthPage = lazy(() => import('./components/dashboard/AuthPage'));
+const ResetPasswordPage = lazy(() => import('./components/dashboard/ResetPasswordPage'));
+const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard'));
+const ClientPortal = lazy(() => import('./components/client/ClientPortal'));
+const SEOContent = lazy(() => import('./components/ui/SEOContent'));
+const BlogIndex = lazy(() => import('./components/blog/BlogIndex'));
+const BlogPost = lazy(() => import('./components/blog/BlogPost'));
+const BlogCategory = lazy(() => import('./components/blog/BlogCategory'));
+const CompanyLanding = lazy(() => import('./components/pages/CompanyLanding'));
+const PartnerWithUs = lazy(() => import('./components/pages/PartnerWithUs'));
+const WebsiteSubscription = lazy(() => import('./components/pages/WebsiteSubscription'));
+const WebsiteApproval = lazy(() => import('./components/pages/WebsiteApproval'));
+const DemoGallery = lazy(() => import('./components/demo-sites/DemoGallery'));
+const DemoSitePage = lazy(() => import('./components/demo-sites/DemoSitePage'));
+const PartnerCityPricing = lazy(() => import('./components/pages/PartnerCityPricing'));
+const PartnerDemoPage = lazy(() => import('./components/pages/PartnerDemoPage'));
+const BuyCityPlacement = lazy(() => import('./components/pages/BuyCityPlacement'));
+const PartnerCheckoutSuccess = lazy(() => import('./components/pages/PartnerCheckoutSuccess'));
+const About = lazy(() => import('./components/pages/About'));
+const Founder = lazy(() => import('./components/pages/Founder'));
+const Contact = lazy(() => import('./components/pages/Contact'));
+const PrivacyPolicy = lazy(() => import('./components/pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./components/pages/TermsOfService'));
+const ServicePage = lazy(() => import('./components/pages/ServicePage'));
+const StatePage = lazy(() => import('./components/pages/StatePage'));
+const StartCleaningBusinessIndex = lazy(() => import('./components/pages/StartCleaningBusinessIndex'));
+const StartCleaningBusinessStatePage = lazy(() => import('./components/pages/StartCleaningBusinessStatePage'));
+const CityPage = lazy(() => import('./components/pages/CityPage'));
+const CalculatorPage = lazy(() => import('./components/pages/CalculatorPage'));
+const EstimatorPage = lazy(() => import('./components/pages/EstimatorPage'));
+const MethodologyPage = lazy(() => import('./components/pages/MethodologyPage'));
+const BookingPage = lazy(() => import('./components/pages/BookingPage'));
+const CancelBookingPage = lazy(() => import('./components/pages/CancelBookingPage'));
+const EmbedWrapper = lazy(() => import('./components/EmbedWrapper'));
+
+// Shown only for the brief window (usually one animation frame or two)
+// between a lazy chunk being requested and it arriving -- every route that
+// uses this already has real content on screen already (the prerendered
+// static HTML, or the previous page before a client-side nav), so this never
+// needs to look like a real loading state.
+function PageFallback() {
+  return (
+    <div style={{ minHeight: '40vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 14 }}>
+      Loading&hellip;
+    </div>
+  );
+}
+
 const pathname = window.location.pathname.replace(/\/$/, '') || '/';
 const searchParams = new URLSearchParams(window.location.search);
+
+// Supabase's email-confirmation link redirects back here with
+// #...&type=signup in the URL hash (distinct from the #...&type=recovery
+// used for password resets, already handled below via the
+// PASSWORD_RECOVERY auth event) -- read synchronously, before
+// supabase-js's detectSessionInUrl consumes and clears the hash, so this
+// only ever fires on the actual confirmation-link visit, never on a later
+// /company page load with the same still-active session.
+const isEmailConfirmation = pathname === '/company' && /type=signup/.test(window.location.hash);
 
 const isEmbed = pathname.startsWith('/embed');
 const isResults = pathname === '/results';
@@ -57,14 +97,22 @@ const isFounder = pathname === '/founder';
 const isContact = pathname === '/contact';
 const isPrivacy = pathname === '/privacy-policy';
 const isTerms = pathname === '/terms-of-service';
-const isAdminPartners = pathname === '/admin/partners';
-const isAdminCompanies = pathname === '/admin/companies';
-const isAdminHomepageLeads = pathname === '/admin/leads';
+// One consolidated dashboard (tabs, not separate pages/logins) now serves
+// all of these -- /admin and every legacy sub-path still work as direct
+// links, each just opening the shell on the matching tab instead of its
+// own standalone page.
+const ADMIN_TAB_SLUGS = ['website-requests', 'leads', 'companies', 'partners', 'email-marketing', 'booking'];
+const isAdminDashboard = pathname === '/admin' || pathname.startsWith('/admin/');
+const adminInitialTab = (() => {
+  const slug = pathname.replace(/^\/admin\/?/, '');
+  return ADMIN_TAB_SLUGS.includes(slug) ? slug : 'website-requests';
+})();
 const isClientPortal = pathname === '/client' || pathname.startsWith('/client');
 const isPartnerWithUs = pathname === '/partner-with-us';
 const isWebsiteSubscription = pathname === '/website-for-cleaning-companies';
+const websiteApprovalMatch = pathname.match(/^\/website-approval\/([a-f0-9]+)$/);
 const isDemoGallery = pathname === '/website-example';
-const demoSiteMatch = pathname.match(/^\/website-example\/([a-z0-9-]+)(?:\/(about|services|service-areas|contact))?$/);
+const demoSiteMatch = pathname.match(/^\/website-example\/([a-z0-9-]+)(?:\/(about|services|service-areas|contact)(?:\/([a-z0-9-]+))?)?$/);
 const isPartnerCityPricing = pathname === '/partner-city-pricing';
 const isPartnerDemo = pathname === '/partner-demo';
 const isBuyCityPlacementSuccess = pathname === '/buy-city-placement/success';
@@ -72,9 +120,13 @@ const isBuyCityPlacement = pathname === '/buy-city-placement';
 const isServicePage = pathname.startsWith('/cleaning-services/');
 const isCityPage = pathname.startsWith('/cleaning-cost/city/');
 const isStatePage = pathname.startsWith('/cleaning-cost/') && !isCityPage;
+const isStartBusinessIndex = pathname === '/start-a-cleaning-business';
+const isStartBusinessState = pathname.startsWith('/start-a-cleaning-business/');
 const isCalculatorPage = pathname === '/cleaning-cost-calculator';
 const isEstimatorPage = pathname === '/cleaning-cost-estimator';
 const isMethodologyPage = pathname === '/how-we-calculate-prices';
+const isBookACall = pathname === '/book-a-call';
+const isCancelBooking = pathname === '/cancel-booking';
 const isServiceCalculatorPage = getAllServices().some(s => pathname === '/' + calculatorSlugFor(s));
 
 const embedCompanyId = isEmbed ? searchParams.get('company') : null;
@@ -88,6 +140,52 @@ function BlogRouter() {
     return <BlogPost slug={pathname.replace('/blog/', '')} />;
   }
   return <BlogIndex />;
+}
+
+// A brand-new account confirming its email lands back on /company with a
+// session already established by supabase-js -- this gives that visit the
+// same "straight to Stripe Checkout" treatment AuthPage.js gives a signup
+// that didn't need email confirmation, so every new company goes through
+// checkout before ever seeing the dashboard, regardless of which signup
+// path their Supabase project is configured for. Falls through to the
+// normal dashboard (via onDone) if creating the checkout session fails,
+// rather than stranding a just-confirmed account on an error -- same
+// fallback AuthPage.js uses.
+function ActivateAfterConfirm({ onDone }) {
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        if (!token) { onDone(); return; }
+        const res = await postCheckout(token);
+        if (!cancelled) window.location.href = res.url;
+      } catch (err) {
+        if (!cancelled) onDone();
+      }
+    })();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', top: -160, right: -100, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
+      <div style={{ background: 'white', borderRadius: 22, padding: '52px 44px', maxWidth: 420, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)', textAlign: 'center' }}>
+        <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
+          <Loader2 size={32} color="#2563eb" strokeWidth={1.8} className="spin" />
+        </div>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.3px' }}>Last step — activate your calculator</h2>
+        <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7 }}>
+          Email confirmed. We're taking you to a secure checkout page to activate Clean Estimator.
+        </p>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: '#2563eb', padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, marginTop: 14 }}>
+          <Zap size={13} /> 30 days free, then $25/month
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function ResultsPage() {
@@ -109,13 +207,15 @@ function ResultsPage() {
     <div className="app">
       <Header />
       <main>
-        <ResultsScreen
-          result={data.r}
-          serviceDetails={data.d}
-          companyConfig={null}
-          embedded={false}
-          onReset={() => { window.location.href = '/'; }}
-        />
+        <Suspense fallback={<PageFallback />}>
+          <ResultsScreen
+            result={data.r}
+            serviceDetails={data.d}
+            companyConfig={null}
+            embedded={false}
+            onReset={() => { window.location.href = '/'; }}
+          />
+        </Suspense>
       </main>
       <Footer />
     </div>
@@ -132,6 +232,11 @@ export default function App() {
   // the visitor straight into the full dashboard instead of making them set
   // a new password first.
   const [passwordRecovery, setPasswordRecovery] = useState(false);
+  // Set once ActivateAfterConfirm has run (either it sent the browser to
+  // Stripe and this never gets read again, or creating the checkout
+  // session failed and this lets the normal dashboard render instead of
+  // retrying on every re-render).
+  const [skipActivation, setSkipActivation] = useState(false);
 
   useEffect(() => {
     if (!isCompany || !supabase) { setAuthLoading(false); return; }
@@ -172,25 +277,23 @@ export default function App() {
 
   if (isEmbed) return (
     <HelmetProvider>
-      <EmbedWrapper companyId={embedCompanyId} />
+      <Suspense fallback={<PageFallback />}>
+        <EmbedWrapper companyId={embedCompanyId} />
+      </Suspense>
     </HelmetProvider>
   );
 
   if (isResults) return <HelmetProvider><ResultsPage /></HelmetProvider>;
 
-  if (isAdminPartners) return <HelmetProvider><AdminPartners /></HelmetProvider>;
+  if (isAdminDashboard) return <HelmetProvider><Suspense fallback={<PageFallback />}><AdminDashboard initialTab={adminInitialTab} /></Suspense></HelmetProvider>;
 
-  if (isAdminCompanies) return <HelmetProvider><AdminCompanies /></HelmetProvider>;
-
-  if (isAdminHomepageLeads) return <HelmetProvider><AdminHomepageLeads /></HelmetProvider>;
-
-  if (isClientPortal) return <HelmetProvider><ClientPortal /></HelmetProvider>;
+  if (isClientPortal) return <HelmetProvider><Suspense fallback={<PageFallback />}><ClientPortal /></Suspense></HelmetProvider>;
 
   if (isPartnerWithUs) return (
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><PartnerWithUs /></main>
+        <main><Suspense fallback={<PageFallback />}><PartnerWithUs /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -201,13 +304,17 @@ export default function App() {
   // nav/footer would break the illusion (each demo site has its own nav).
   if (isDemoGallery) return (
     <HelmetProvider>
-      <DemoGallery />
+      <Suspense fallback={<PageFallback />}>
+        <DemoGallery />
+      </Suspense>
     </HelmetProvider>
   );
 
   if (demoSiteMatch) return (
     <HelmetProvider>
-      <DemoSitePage slug={demoSiteMatch[1]} page={demoSiteMatch[2]} />
+      <Suspense fallback={<PageFallback />}>
+        <DemoSitePage slug={demoSiteMatch[1]} page={demoSiteMatch[2]} subSlug={demoSiteMatch[3]} />
+      </Suspense>
     </HelmetProvider>
   );
 
@@ -215,7 +322,17 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><WebsiteSubscription /></main>
+        <main><Suspense fallback={<PageFallback />}><WebsiteSubscription /></Suspense></main>
+        <Footer />
+      </div>
+    </HelmetProvider>
+  );
+
+  if (websiteApprovalMatch) return (
+    <HelmetProvider>
+      <div className="app">
+        <Header />
+        <main><Suspense fallback={<PageFallback />}><WebsiteApproval token={websiteApprovalMatch[1]} /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -225,7 +342,7 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><PartnerCityPricing /></main>
+        <main><Suspense fallback={<PageFallback />}><PartnerCityPricing /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -235,7 +352,7 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><PartnerDemoPage /></main>
+        <main><Suspense fallback={<PageFallback />}><PartnerDemoPage /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -245,7 +362,7 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><PartnerCheckoutSuccess /></main>
+        <main><Suspense fallback={<PageFallback />}><PartnerCheckoutSuccess /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
@@ -255,27 +372,33 @@ export default function App() {
     <HelmetProvider>
       <div className="app">
         <Header />
-        <main><BuyCityPlacement /></main>
+        <main><Suspense fallback={<PageFallback />}><BuyCityPlacement /></Suspense></main>
         <Footer />
       </div>
     </HelmetProvider>
   );
 
-  if (isEstimatorLanding) return <HelmetProvider><CompanyLanding /></HelmetProvider>;
+  if (isEstimatorLanding) return <HelmetProvider><Suspense fallback={<PageFallback />}><CompanyLanding /></Suspense></HelmetProvider>;
 
-  if (isBlog) return <HelmetProvider><div className="app"><Header /><main><BlogRouter /></main><Footer /></div></HelmetProvider>;
+  if (isBlog) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><BlogRouter /></Suspense></main><Footer /></div></HelmetProvider>;
 
-  if (isAbout) return <HelmetProvider><div className="app"><Header /><main><About /></main><Footer /></div></HelmetProvider>;
-  if (isFounder) return <HelmetProvider><div className="app"><Header /><main><Founder /></main><Footer /></div></HelmetProvider>;
-  if (isContact) return <HelmetProvider><div className="app"><Header /><main><Contact /></main><Footer /></div></HelmetProvider>;
-  if (isPrivacy) return <HelmetProvider><div className="app"><Header /><main><PrivacyPolicy /></main><Footer /></div></HelmetProvider>;
-  if (isTerms) return <HelmetProvider><div className="app"><Header /><main><TermsOfService /></main><Footer /></div></HelmetProvider>;
-  if (isServicePage) return <HelmetProvider><div className="app"><Header /><main><ServicePage slug={pathname.replace('/cleaning-services/', '')} /></main><Footer /></div></HelmetProvider>;
-  if (isCityPage) return <HelmetProvider><div className="app"><Header /><main><CityPage slug={pathname.replace('/cleaning-cost/city/', '')} /></main><Footer /></div></HelmetProvider>;
-  if (isStatePage) return <HelmetProvider><div className="app"><Header /><main><StatePage slug={pathname.replace('/cleaning-cost/', '')} /></main><Footer /></div></HelmetProvider>;
-  if (isCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><CalculatorPage /></main><Footer /></div></HelmetProvider>;
-  if (isEstimatorPage) return <HelmetProvider><div className="app"><Header /><main><EstimatorPage /></main><Footer /></div></HelmetProvider>;
-  if (isMethodologyPage) return <HelmetProvider><div className="app"><Header /><main><MethodologyPage /></main><Footer /></div></HelmetProvider>;
+  if (isAbout) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><About /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isFounder) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><Founder /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isContact) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><Contact /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isPrivacy) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><PrivacyPolicy /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isTerms) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><TermsOfService /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isServicePage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><ServicePage slug={pathname.replace('/cleaning-services/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isCityPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><CityPage slug={pathname.replace('/cleaning-cost/city/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isStatePage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><StatePage slug={pathname.replace('/cleaning-cost/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
+
+  if (isStartBusinessState) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><StartCleaningBusinessStatePage slug={pathname.replace('/start-a-cleaning-business/', '')} /></Suspense></main><Footer /></div></HelmetProvider>;
+
+  if (isStartBusinessIndex) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><StartCleaningBusinessIndex /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><CalculatorPage /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isEstimatorPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><EstimatorPage /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isMethodologyPage) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><MethodologyPage /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isBookACall) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><BookingPage /></Suspense></main><Footer /></div></HelmetProvider>;
+  if (isCancelBooking) return <HelmetProvider><div className="app"><Header /><main><Suspense fallback={<PageFallback />}><CancelBookingPage token={searchParams.get('token') || ''} /></Suspense></main><Footer /></div></HelmetProvider>;
   if (isServiceCalculatorPage) return <HelmetProvider><div className="app"><Header /><main><ServiceCalculatorPage slug={pathname.slice(1)} /></main><Footer /></div></HelmetProvider>;
 
   if (isCompany) {
@@ -306,9 +429,10 @@ export default function App() {
         </main><Footer /></div>
       </HelmetProvider>
     );
-    if (passwordRecovery) return <HelmetProvider>{companyHelmet}<ResetPasswordPage onDone={() => setPasswordRecovery(false)} /></HelmetProvider>;
-    if (!user) return <HelmetProvider>{companyHelmet}<AuthPage onAuth={setUser} /></HelmetProvider>;
-    return <HelmetProvider>{companyHelmet}<CompanyDashboard user={user} onLogout={handleLogout} /></HelmetProvider>;
+    if (passwordRecovery) return <HelmetProvider>{companyHelmet}<Suspense fallback={<PageFallback />}><ResetPasswordPage onDone={() => setPasswordRecovery(false)} /></Suspense></HelmetProvider>;
+    if (!user) return <HelmetProvider>{companyHelmet}<Suspense fallback={<PageFallback />}><AuthPage onAuth={setUser} /></Suspense></HelmetProvider>;
+    if (isEmailConfirmation && !skipActivation) return <HelmetProvider>{companyHelmet}<ActivateAfterConfirm onDone={() => setSkipActivation(true)} /></HelmetProvider>;
+    return <HelmetProvider>{companyHelmet}<Suspense fallback={<PageFallback />}><CompanyDashboard user={user} onLogout={handleLogout} /></Suspense></HelmetProvider>;
   }
 
   return (
@@ -330,8 +454,10 @@ export default function App() {
       <div className="app">
         <Header />
         <main>
-          <CleaningCalculator />
-          <SEOContent />
+          <Suspense fallback={<PageFallback />}>
+            <CleaningCalculator />
+            <SEOContent />
+          </Suspense>
         </main>
         <Footer />
       </div>

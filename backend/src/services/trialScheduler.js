@@ -1,10 +1,9 @@
-const { listAllCompanyConfigs, getCompanyConfig, saveCompanyConfig } = require('./companyConfig');
-const {
-  sendTrialEndingSoonEmail, sendTrialEndedEmail,
-  sendTrialCheckin1Email, sendTrialCheckin2Email, sendTrialCheckin3Email,
-} = require('./email');
+const { listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, getCompanyConfig, saveCompanyConfig } = require('./companyConfig');
+const { sendTrialCheckin1Email, sendActivationReminderEmail } = require('./email');
+const { computeSubscriptionStatus } = require('./subscriptionStatus');
 
 const TRIAL_DAYS = 30;
+const ACTIVATION_REMINDER_DELAY_HOURS = 12;
 
 function getSupabase() {
   const { createClient } = require('@supabase/supabase-js');
@@ -27,28 +26,29 @@ async function getOwnerEmail(companyId) {
   }
 }
 
-// Checks every company's free-trial state and sends whichever of these five
-// emails is next due, each exactly once (deduped via sent-at flags stored
-// on config.subscription): three check-ins at days 7/14/21 filling what was
-// previously 27 days of total silence after the day-0 welcome email, then
-// the existing day-28/29 "ending soon" reminder, then the day-30 "ended"
-// email once the embed widget actually pauses.
+// Checks every company's free-trial state and sends the single day-7
+// check-in exactly once per company (deduped via trialCheckin1EmailSentAt
+// on config.subscription). The day-14/21 check-ins, the day-28 "ending
+// soon" reminder, the legacy "trial ended / widget paused" email, and the
+// "trial converted to paid" confirmation were all dropped -- with a card
+// required up front, "subscribe before it ends" nagging doesn't apply
+// anymore; payment_failed and subscription_canceled (subscription.js's
+// webhook handlers) cover the cases that actually need a reply.
 //
-// One email per company per run, in chronological order (ended > ending-
-// soon > checkin1 > checkin2 > checkin3) -- this also handles accounts that
-// were already mid-trial when the three check-ins shipped: an account with
-// none of the checkin flags set yet just receives whichever is earliest-due
-// this run, then the next on the following run(s), catching up over a few
-// hours instead of never getting them. The `daysLeft > 3` guard on all
-// three check-ins keeps that catch-up from firing a "how's week 1 going?"
-// email days before the trial actually ends.
+// Two trial models coexist here:
+// - Current accounts: a real Stripe-managed trial (card collected at
+//   signup, see subscription.js's POST /checkout). sub.currentPeriodEnd is
+//   the trial end date Stripe itself is tracking, so daysElapsed is derived
+//   from that instead of a locally-tracked start date.
+// - Legacy accounts: the old no-card trial (trialStartedAt set, never
+//   touched Stripe) that predates the Checkout-based signup flow. Same
+//   day-7 check-in, just measured from trialStartedAt instead.
 //
 // No cron infrastructure exists in this app (no Railway cron service, no
 // node-cron dependency) -- this runs on a plain setInterval from
 // index.js instead, since the backend is a single always-on Railway
 // service (see railway.toml), not serverless. Safe to call repeatedly;
-// the sent-at flags mean it only ever actually sends once per company
-// per email regardless of how often this runs.
+// the sent-at flag means it only ever actually sends once per company.
 async function checkTrialReminders() {
   let rows;
   try {
@@ -59,48 +59,31 @@ async function checkTrialReminders() {
   }
 
   for (const { companyId, config } of rows) {
-    const sub = config?.subscription;
-    if (!sub?.trialStartedAt) continue;
-    if (sub.stripeSubscriptionId) continue; // already subscribed (or previously was) -- not a bare trial anymore
+    const sub = config?.subscription || {};
+    const companyName = config.companyName || 'there';
 
-    const daysElapsed = (Date.now() - new Date(sub.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24);
-    const daysLeft = Math.ceil(TRIAL_DAYS - daysElapsed);
+    const isLegacyTrial = !!sub.trialStartedAt && !sub.stripeSubscriptionId;
+    const isStripeTrial = !!sub.stripeSubscriptionId && sub.status === 'trialing' && !!sub.currentPeriodEnd;
+    if (!isLegacyTrial && !isStripeTrial) continue;
+    if (sub.trialCheckin1EmailSentAt) continue;
 
-    // Shared by every branch below: send, then re-fetch fresh (rather than
-    // reuse the bulk-listed snapshot) right before saving the sent-at flag,
-    // so a concurrent change elsewhere (e.g. they subscribe via Stripe
-    // mid-run) doesn't get clobbered by this write.
-    const markSent = async (flagKey) => {
-      const fresh = (await getCompanyConfig(companyId)) || config;
-      await saveCompanyConfig(companyId, {
-        ...fresh,
-        subscription: { ...fresh.subscription, [flagKey]: new Date().toISOString() },
-      });
-    };
+    const daysElapsed = isLegacyTrial
+      ? (Date.now() - new Date(sub.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24)
+      : TRIAL_DAYS - Math.max(0, Math.ceil((new Date(sub.currentPeriodEnd) - Date.now()) / (1000 * 60 * 60 * 24)));
+    // Upper bound keeps a long-stale legacy trial (already past its 30
+    // days, no card to charge, quietly never converted) from getting a
+    // "how's week 1 going?" email months late.
+    if (daysElapsed < 7 || daysElapsed > TRIAL_DAYS) continue;
 
     try {
-      const companyName = config.companyName || 'there';
-
-      if (daysLeft <= 0 && !sub.trialEndedEmailSentAt) {
-        const email = await getOwnerEmail(companyId);
-        if (!email) continue;
-        if (await sendTrialEndedEmail({ to: email, companyName })) await markSent('trialEndedEmailSentAt');
-      } else if (daysLeft >= 1 && daysLeft <= 2 && !sub.trialEndingSoonEmailSentAt) {
-        const email = await getOwnerEmail(companyId);
-        if (!email) continue;
-        if (await sendTrialEndingSoonEmail({ to: email, companyName, daysLeft })) await markSent('trialEndingSoonEmailSentAt');
-      } else if (daysLeft > 3 && daysElapsed >= 7 && !sub.trialCheckin1EmailSentAt) {
-        const email = await getOwnerEmail(companyId);
-        if (!email) continue;
-        if (await sendTrialCheckin1Email({ to: email, companyName })) await markSent('trialCheckin1EmailSentAt');
-      } else if (daysLeft > 3 && daysElapsed >= 14 && !sub.trialCheckin2EmailSentAt) {
-        const email = await getOwnerEmail(companyId);
-        if (!email) continue;
-        if (await sendTrialCheckin2Email({ to: email, companyName })) await markSent('trialCheckin2EmailSentAt');
-      } else if (daysLeft > 3 && daysElapsed >= 21 && !sub.trialCheckin3EmailSentAt) {
-        const email = await getOwnerEmail(companyId);
-        if (!email) continue;
-        if (await sendTrialCheckin3Email({ to: email, companyName })) await markSent('trialCheckin3EmailSentAt');
+      const email = await getOwnerEmail(companyId);
+      if (!email) continue;
+      if (await sendTrialCheckin1Email({ to: email, companyName })) {
+        const fresh = (await getCompanyConfig(companyId)) || config;
+        await saveCompanyConfig(companyId, {
+          ...fresh,
+          subscription: { ...fresh.subscription, trialCheckin1EmailSentAt: new Date().toISOString() },
+        });
       }
     } catch (err) {
       console.error(`checkTrialReminders: failed for company ${companyId}:`, err.message);
@@ -108,4 +91,46 @@ async function checkTrialReminders() {
   }
 }
 
-module.exports = { checkTrialReminders };
+// Checks every company still sitting at status 'requires_trial_setup' --
+// signed up, but never finished Stripe Checkout, so no trial ever actually
+// started (shows up in the admin Companies list as "Not started"). Sends
+// one nudge email ~12 hours after signup if they're still in that state,
+// deduped via activationReminderEmailSentAt on config.subscription so it
+// only ever goes out once per company, same pattern as checkTrialReminders
+// above. Needs each account's signup timestamp (nothing in config itself
+// records when an incomplete signup happened), hence the separate
+// owner-info-joined list rather than listAllCompanyConfigs.
+async function checkActivationReminders() {
+  let rows;
+  try {
+    rows = await listAllCompanyConfigsWithOwnerInfo();
+  } catch (err) {
+    console.error('checkActivationReminders: failed to list company configs:', err.message);
+    return;
+  }
+
+  const cutoff = Date.now() - ACTIVATION_REMINDER_DELAY_HOURS * 60 * 60 * 1000;
+
+  for (const { companyId, config, email, signedUpAt } of rows) {
+    const sub = config?.subscription || {};
+    if (sub.activationReminderEmailSentAt) continue;
+    if (!email || !signedUpAt) continue;
+    if (computeSubscriptionStatus(config, email).status !== 'requires_trial_setup') continue;
+    if (new Date(signedUpAt).getTime() > cutoff) continue;
+
+    try {
+      const companyName = config.companyName || 'there';
+      if (await sendActivationReminderEmail({ to: email, companyName })) {
+        const fresh = (await getCompanyConfig(companyId)) || config;
+        await saveCompanyConfig(companyId, {
+          ...fresh,
+          subscription: { ...fresh.subscription, activationReminderEmailSentAt: new Date().toISOString() },
+        });
+      }
+    } catch (err) {
+      console.error(`checkActivationReminders: failed for company ${companyId}:`, err.message);
+    }
+  }
+}
+
+module.exports = { checkTrialReminders, checkActivationReminders };

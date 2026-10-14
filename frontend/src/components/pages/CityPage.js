@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ChevronDown, Home, Building2, Building, Layers, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin } from 'lucide-react';
+import { ChevronDown, Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin } from 'lucide-react';
 import { getCityBySlug, getCitiesByState, getFeaturedCities, cityServicePrices } from '../../data/cityPricing';
 import { getAllFaqs } from '../../data/faqs';
 import './PageHero.css';
@@ -10,6 +10,7 @@ const ICONS = {
   apartment: Building2,
   commercial: Building,
   carpet: Layers,
+  upholstery: Sofa,
   air_duct: Wind,
   dryer_vent: Flame,
   tile_grout: Grid3x3,
@@ -30,8 +31,8 @@ function formatPrice(n) {
 function CityServiceTable({ city }) {
   const rows = cityServicePrices(city);
   return (
-    <div style={{ overflowX: 'auto', margin: '20px 0' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+    <div className="pg-data-table-wrap" style={{ overflowX: 'auto', margin: '20px 0' }}>
+      <table className="pg-data-table" style={{ borderCollapse: 'collapse', fontSize: 14 }}>
         <thead>
           <tr style={{ background: '#f8fafc' }}>
             <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: '#374151', borderBottom: '2px solid #e2e8f0' }}>Service</th>

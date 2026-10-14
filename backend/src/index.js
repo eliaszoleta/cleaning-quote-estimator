@@ -8,17 +8,38 @@ const calculateRouter = require('./routes/calculate');
 const companyRouter = require('./routes/company');
 const authRouter = require('./routes/auth');
 const subscriptionRouter = require('./routes/subscription');
+const estimateShareRouter = require('./routes/estimateShare');
 const leadsRouter = require('./routes/leads');
 const partnerCheckoutRouter = require('./routes/partnerCheckout');
 const adminRouter = require('./routes/admin');
+const emailMarketingRouter = require('./routes/emailMarketing');
 const clientRouter = require('./routes/client');
 const websiteRequestRouter = require('./routes/websiteRequest');
+const bookingRouter = require('./routes/booking');
+const adminBookingRouter = require('./routes/adminBooking');
+const googleCalendarAdminRouter = require('./routes/googleCalendarAdmin');
+const chatWidgetRouter = require('./routes/chatWidget');
+const adminChatbotsRouter = require('./routes/adminChatbots');
+const { checkDueReminders } = require('./services/bookingReminderScheduler');
 const { requireAuth } = require('./middleware/auth');
-const { checkTrialReminders } = require('./services/trialScheduler');
+const { checkTrialReminders, checkActivationReminders } = require('./services/trialScheduler');
 const { checkPendingDeletions } = require('./services/deletionScheduler');
+const { cleanupPublicEstimateAttempts } = require('./services/publicAttemptsCleanup');
+const { ensureSeeded: ensureEmailTemplatesSeeded } = require('./services/emailTemplates');
+const { checkScheduledCampaigns } = require('./services/emailCampaignScheduler');
+const { checkIdleConversations } = require('./services/chatbotSummary');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Trust Railway's reverse proxy so req.ip reflects the real client IP
+// (from X-Forwarded-For) instead of the proxy's own address -- without
+// this, every visitor behind it would look like the same single IP to
+// both express-rate-limit's existing per-IP limiters and the public-
+// business daily-estimate-limit check in routes/calculate.js, which both
+// key directly on req.ip. `1` trusts exactly one hop, matching
+// Railway's setup (one proxy in front of this service).
+app.set('trust proxy', 1);
 
 // Security headers
 app.use(helmet({ crossOriginResourcePolicy: false }));
@@ -28,6 +49,9 @@ const publicCors = cors({ origin: '*', methods: ['GET', 'POST'], allowedHeaders:
 app.use('/api/calculate', publicCors);
 app.use('/api/company/:id/public', publicCors);
 app.use('/api/leads', publicCors);
+// Chatbot widget — embedded on each client's own cleaning-company website
+// (arbitrary domains we don't control), same reasoning as /api/calculate.
+app.use('/api/chat', publicCors);
 
 // Dashboard CORS — restricted to known origins
 const dashboardOrigins = [
@@ -92,6 +116,17 @@ app.use('/api/company/check-duplicate', rateLimit({
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }));
 
+// POST /api/company/check-email-exists — unauthenticated and paginates
+// every Supabase auth user on each call, called once per failed login
+// attempt (see AuthPage.js) -- same reasoning as check-duplicate above.
+app.use('/api/company/check-email-exists', rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
 // GET /api/leads — API-key gated already, but a leaked/guessed key (or
 // someone brute-forcing one) shouldn't get unlimited attempts.
 app.use('/api/leads', rateLimit({
@@ -108,6 +143,30 @@ app.use('/api/leads', rateLimit({
 app.use('/api/website-request', rateLimit({
   windowMs: 60 * 1000,
   max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
+// POST /api/booking/create — public and unauthenticated (a prospect
+// booking a call), same spam throttle as the other public POST endpoints.
+// GET /api/booking/availability is read-only and gets the default limiter
+// below along with it, generous enough for a visitor paging through days.
+app.use('/api/booking', rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}));
+
+// POST /api/chat/:chatbotId/message — public and unauthenticated (any
+// visitor on any client's embedded widget), and a live conversation can
+// mean several quick messages back and forth, so this is more generous
+// than the other public-POST limits above (form submits, not a chat).
+app.use('/api/chat', rateLimit({
+  windowMs: 60 * 1000,
+  max: 40,
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
@@ -134,6 +193,19 @@ app.post('/api/subscription/webhook',
 app.post('/api/partner-checkout/webhook',
   express.raw({ type: 'application/json' }),
   partnerCheckoutRouter.webhookHandler
+);
+app.post('/api/website-request/webhook',
+  express.raw({ type: 'application/json' }),
+  websiteRequestRouter.webhookHandler
+);
+// Resend's delivery-event webhook (sent/delivered/bounced/opened/clicked)
+// for the Email Marketing tab's KPI tracking -- same raw-body-before-json
+// requirement as the Stripe webhooks above, since its Svix-format signature
+// (see emailMarketing.js's verifyResendSignature) is computed over the
+// exact raw bytes.
+app.post('/api/admin/email-marketing/webhook/resend',
+  express.raw({ type: 'application/json' }),
+  emailMarketingRouter.webhookHandler
 );
 
 // Logo uploads carry a base64-encoded image, well over the 10kb default
@@ -166,6 +238,16 @@ app.use('/api/partner-checkout', partnerCheckoutRouter);
 // sites, so the default dashboard-origins CORS already covers it.
 app.use('/api/website-request', websiteRequestRouter);
 
+// Public /book-a-call API — availability + create + cancel, no login (same
+// reasoning as website-request above: a prospect booking a call isn't a
+// logged-in company user).
+app.use('/api/booking', bookingRouter);
+
+// Public chatbot-widget API — the chatbotId in the URL is itself the only
+// "auth" an embedded visitor needs, same no-login pattern as the routes
+// above.
+app.use('/api/chat', chatWidgetRouter);
+
 // ─── Auth-protected routes ────────────────────────────────────────────────────
 // requireAuth is applied per-route inside companyRouter, not blanket here --
 // GET /:id/public must stay reachable without auth (it's what the embedded
@@ -179,6 +261,17 @@ app.use('/api/website-request', websiteRequestRouter);
 app.use('/api/company', companyRouter);
 app.use('/api/subscription', requireAuth, subscriptionRouter);
 app.use('/api/company-leads', requireAuth, leadsRouter);
+// "Run an Estimate" dashboard tab's "Share via email" action -- a logged-in
+// company sending one of their own computed estimates to a coworker, not a
+// public lead-capture path. Own modest rate limit since a compromised
+// session shouldn't be able to hammer email sends through it.
+app.use('/api/estimate-share', requireAuth, rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}), estimateShareRouter);
 
 // ─── Partner self-service routes ──────────────────────────────────────────────
 // requireAuth is applied inside client.js itself (every route there needs
@@ -186,6 +279,20 @@ app.use('/api/company-leads', requireAuth, leadsRouter);
 app.use('/api/client', clientRouter);
 
 // ─── Internal admin routes ───────────────────────────────────────────────────
+// Google account connect/callback/status/disconnect for /book-a-call. MUST
+// be registered before the blanket '/api/admin' mount below -- Express
+// matches app.use() by path *prefix*, so '/api/admin/google-calendar/...'
+// also matches '/api/admin', and admin.js's router.use(requireAdminKey) is
+// blanket middleware that runs for every request entering that router
+// (before any of its own routes are even checked), rejecting with 401
+// before ever falling through to this router. That broke Google's own
+// redirect back to /callback, which carries no x-admin-key header at all
+// (discovered live: the browser landed on this backend's bare JSON 401
+// instead of completing the connection). No blanket rate limit here --
+// /callback is a one-off browser redirect from Google, not something to
+// throttle like a repeated API call.
+app.use('/api/admin/google-calendar', googleCalendarAdminRouter);
+
 // Own auth (x-admin-key header, see requireAdminKey in admin.js), not
 // requireAuth -- this isn't a subscriber viewing their own account, it's the
 // platform owner viewing every subscriber's account, so the usual
@@ -197,6 +304,38 @@ app.use('/api/admin', rateLimit({
   legacyHeaders: false,
   message: { success: false, error: 'Too many requests. Please wait a moment.' },
 }), adminRouter);
+
+// Separate router (not folded into admin.js) for the Email Marketing tab --
+// template CRUD, audience preview, individual sends, and campaigns. Same
+// x-admin-key gate (see requireAdminKey in emailMarketing.js), own rate
+// limit since compose/preview can mean a handful of quick successive calls.
+app.use('/api/admin/email-marketing', rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}), emailMarketingRouter);
+
+// Admin side of /book-a-call -- weekly-availability settings + bookings
+// list/cancel. Same x-admin-key gate (requireAdminKey inside the router).
+app.use('/api/admin/booking', rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}), adminBookingRouter);
+
+// Admin CRUD for chatbots (business info/prompt, lead alert email, embed
+// snippet) + their captured leads list. Same x-admin-key gate.
+app.use('/api/admin/chatbots', rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please wait a moment.' },
+}), adminChatbotsRouter);
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 // Includes the exact commit this process was built from (RAILWAY_GIT_COMMIT_SHA
@@ -266,11 +405,44 @@ app.listen(PORT, () => {
   // trial reminder emails going out on time without adding a new
   // dependency or requiring a separate scheduled service to be configured.
   checkTrialReminders().catch(err => console.error('checkTrialReminders (startup run) failed:', err.message));
+  checkActivationReminders().catch(err => console.error('checkActivationReminders (startup run) failed:', err.message));
   checkPendingDeletions().catch(err => console.error('checkPendingDeletions (startup run) failed:', err.message));
+  cleanupPublicEstimateAttempts().catch(err => console.error('cleanupPublicEstimateAttempts (startup run) failed:', err.message));
   setInterval(() => {
     checkTrialReminders().catch(err => console.error('checkTrialReminders failed:', err.message));
+    checkActivationReminders().catch(err => console.error('checkActivationReminders failed:', err.message));
     checkPendingDeletions().catch(err => console.error('checkPendingDeletions failed:', err.message));
+    cleanupPublicEstimateAttempts().catch(err => console.error('cleanupPublicEstimateAttempts failed:', err.message));
   }, 60 * 60 * 1000);
+
+  // One-time (per boot, effectively once ever per DB) seed of the built-in
+  // lifecycle email templates -- upserts with ignoreDuplicates, so this is
+  // a no-op after the first successful run even if it fires again next
+  // deploy. Then the campaign scheduler, on its own shorter interval (not
+  // the hourly one above) so a "send now" campaign starts within ~60s
+  // instead of waiting up to an hour.
+  ensureEmailTemplatesSeeded().catch(err => console.error('ensureEmailTemplatesSeeded (startup run) failed:', err.message));
+  checkScheduledCampaigns().catch(err => console.error('checkScheduledCampaigns (startup run) failed:', err.message));
+  setInterval(() => {
+    checkScheduledCampaigns().catch(err => console.error('checkScheduledCampaigns failed:', err.message));
+  }, 60 * 1000);
+
+  // /book-a-call's 24h/3h/30min-before reminder emails -- same short
+  // interval as the campaign scheduler above (not the hourly trial one),
+  // since the 30-minute-before reminder needs a tick well under 30 minutes
+  // to ever fire on time.
+  checkDueReminders().catch(err => console.error('checkDueReminders (startup run) failed:', err.message));
+  setInterval(() => {
+    checkDueReminders().catch(err => console.error('checkDueReminders failed:', err.message));
+  }, 60 * 1000);
+
+  // Closes out chatbot conversations a visitor went quiet on without
+  // explicitly closing the widget -- same short interval as the campaign
+  // scheduler above, well under the 10-minute idle threshold it checks for.
+  checkIdleConversations().catch(err => console.error('checkIdleConversations (startup run) failed:', err.message));
+  setInterval(() => {
+    checkIdleConversations().catch(err => console.error('checkIdleConversations failed:', err.message));
+  }, 60 * 1000);
 });
 
 module.exports = app;

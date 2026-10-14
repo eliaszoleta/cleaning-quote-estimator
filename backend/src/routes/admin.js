@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { sendCompanyWelcomeEmail } = require('../services/email');
+const { sendCompanyWelcomeEmail, sendWebsiteSampleReadyEmail, sendWebsiteSubscriptionConfirmedEmail } = require('../services/email');
+const { getCompanyConfig } = require('../services/companyConfig');
+const { resolveCityForZip } = require('../services/zipCity');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SERVICE_KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -90,13 +92,15 @@ router.get('/companies', async (req, res) => {
 
     const companies = rows.map(row => {
       const { config } = row;
-      const sub = computeSubscriptionStatus(config);
+      const sub = computeSubscriptionStatus(config, row.email);
       const services = config.services || {};
       const enabledCount = Object.values(services).filter(s => s?.enabled !== false).length;
       return {
         companyId: row.companyId,
         companyName: config.companyName || '(unnamed)',
         email: row.email,
+        phone: config.phone || null,
+        website: config.website || null,
         signedUpAt: row.signedUpAt,
         lastConfigUpdate: row.updatedAt,
         subscription: sub,
@@ -120,6 +124,55 @@ router.get('/companies', async (req, res) => {
   } catch (err) {
     console.error('Admin companies list error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to load companies' });
+  }
+});
+
+// DELETE /api/admin/companies/:id — permanently delete a company account
+// right now: cancels any active Stripe subscription, deletes every lead
+// they've captured, their config row, and their Supabase auth user. Unlike
+// the self-service DELETE /api/company/account (which only schedules a
+// 30-day grace period -- see deletionScheduler.js for what actually runs
+// once that elapses), this is immediate and irreversible, for the admin
+// panel's own "permanently delete this account" action. Requires
+// { confirm: true } in the body, same deliberate-second-step pattern as
+// send-trial-email below, since a GET/bookmark/retry must never trigger this.
+router.delete('/companies/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+  if (req.body?.confirm !== true) {
+    return res.status(400).json({ success: false, error: 'Refusing to delete without { confirm: true } in the request body.' });
+  }
+
+  const { id } = req.params;
+
+  try {
+    // Cancel any active Stripe subscription first -- otherwise deleting the
+    // account leaves someone still being billed with no dashboard left to
+    // cancel it from.
+    const config = await getCompanyConfig(id);
+    const subId = config?.subscription?.stripeSubscriptionId;
+    if (subId && process.env.STRIPE_SECRET_KEY) {
+      try {
+        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.cancel(subId);
+      } catch (err) {
+        console.warn(`Admin delete company ${id}: Stripe cancel warning:`, err.message);
+      }
+    }
+
+    const { error: leadsErr } = await sb.from('leads').delete().eq('company_id', id);
+    if (leadsErr) throw leadsErr;
+
+    const { error: cfgErr } = await sb.from('cleaning_company_configs').delete().eq('company_id', id);
+    if (cfgErr) throw cfgErr;
+
+    const { error: userErr } = await sb.auth.admin.deleteUser(id);
+    if (userErr) throw userErr;
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(`Admin delete company ${id} error:`, err.message);
+    res.status(500).json({ success: false, error: err.message || 'Failed to delete company' });
   }
 });
 
@@ -232,6 +285,18 @@ router.post('/companies/send-trial-email-preview', async (req, res) => {
 // everything else in this file.
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// The homepage's own calculator never asks for a city -- LocationStep.js
+// only asks that question when a company has scoped its embedded widget to
+// specific states/cities (see `scoped` there), which the unscoped main
+// calculator on cleanestimator.com never is. So a homepage lead only ever
+// has zip + state on file, which is what showed up in the admin panel as a
+// bare ZIP with no city. Resolved here at read time via resolveCityForZip
+// (shared with the partner/company lead-notification emails -- see
+// services/zipCity.js) instead of bundling/maintaining a full ~41k-row US
+// ZIP database, and without writing the resolved value back to the row (a
+// GET shouldn't have side effects, and re-resolving on each server restart
+// is cheap enough at this volume).
+
 // GET /api/admin/homepage-leads
 router.get('/homepage-leads', async (req, res) => {
   const sb = getSupabase();
@@ -245,7 +310,22 @@ router.get('/homepage-leads', async (req, res) => {
     if (!includeDeleted) query = query.is('deleted_at', null);
     const { data, error } = await query;
     if (error) throw error;
-    res.json({ success: true, count: data.length, data: data || [] });
+
+    // Resolve each unique ZIP once (not once per lead -- many leads share
+    // a ZIP), then attach the result as a top-level `city` field. Prefers
+    // an explicit service_details.city when one exists (a scoped-widget
+    // lead that really was asked, vs. a homepage lead being backfilled),
+    // so this never overrides real visitor input with a guess.
+    const rows = data || [];
+    const uniqueZips = [...new Set(rows.map(r => r.zip).filter(Boolean))];
+    const cityByZip = new Map();
+    await Promise.all(uniqueZips.map(async zip => { cityByZip.set(zip, await resolveCityForZip(zip)); }));
+    const enriched = rows.map(row => ({
+      ...row,
+      city: row.service_details?.city || cityByZip.get(row.zip) || null,
+    }));
+
+    res.json({ success: true, count: enriched.length, data: enriched });
   } catch (err) {
     console.error('Admin homepage-leads list error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to load leads' });
@@ -430,6 +510,283 @@ router.delete('/partners/:id', async (req, res) => {
   } catch (err) {
     console.error('Admin delete partner error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to delete partner' });
+  }
+});
+
+// ─── Website requests ("Get a Website" applications) ──────────────────────
+// Previously email-only (see routes/websiteRequest.js's original comment:
+// "the email *is* the record") -- now persisted so there's a real queue to
+// review, mark sample-ready, and track through the $5-setup/2-months-free/
+// $249-month-3 approval flow at /website-approval/:token.
+
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+// Presentation-only values for the activation confirmation email below --
+// the real trial length/price live in Stripe itself (the admin sets both
+// when manually creating each client's subscription; see the PATCH route's
+// stripe_subscription_id handling), these just need to match what's quoted
+// on the pricing page and the $5 receipt (routes/websiteRequest.js). Price
+// depends on which of the 3 tiers this request selected -- keep in sync
+// with routes/websiteRequest.js's PLAN_TIERS and
+// frontend/src/data/websitePricingTiers.js.
+const WEBSITE_TRIAL_DAYS = 60;
+const WEBSITE_TIER_PRICES = { starter: 97, growth: 179, pro: 249 };
+const WEBSITE_DEFAULT_TIER = 'pro';
+
+// GET /api/admin/website-requests
+router.get('/website-requests', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  try {
+    const { data, error } = await sb.from('website_requests').select('*').order('created_at', { ascending: false }).limit(500);
+    if (error) throw error;
+    const rows = (data || []).map(row => ({
+      ...row,
+      approvalUrl: `${FRONTEND_URL}/website-approval/${row.approval_token}`,
+    }));
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error('Admin website-requests list error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to load website requests' });
+  }
+});
+
+// POST /api/admin/website-requests — lets an admin add a client directly
+// (e.g. one who reached out outside the public apply form) instead of only
+// ever reviewing requests that came in through it. Deliberately sends
+// neither the internal "new application" notification (the admin already
+// knows -- they're the one entering it) nor the applicant's own "we got
+// your request" confirmation (see sendWebsiteRequestReceivedEmail in
+// routes/websiteRequest.js, which is only ever called from the public
+// POST /api/website-request) -- that email promises a sample is coming
+// "within a few days," which isn't a promise this route should make on an
+// admin's behalf. The row lands as a normal 'submitted' request otherwise,
+// so it moves through sample_ready / approved / active exactly like one
+// from the public form from here on.
+router.post('/website-requests', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { name, business, email, phone, business_address: businessAddress } = req.body || {};
+  if (!name || !business || !email) {
+    return res.status(400).json({ success: false, error: 'Name, business, and email are required.' });
+  }
+
+  try {
+    const { data, error } = await sb.from('website_requests').insert({
+      name, business, email,
+      phone: phone || null,
+      business_address: businessAddress || null,
+    }).select().single();
+    if (error) throw error;
+
+    res.json({ success: true, data: { ...data, approvalUrl: `${FRONTEND_URL}/website-approval/${data.approval_token}` } });
+  } catch (err) {
+    console.error('Admin create website-request error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to create website request' });
+  }
+});
+
+// PATCH /api/admin/website-requests/:id — sets sample_url / status /
+// admin_notes / stripe_subscription_id. Moving status to 'sample_ready'
+// (either explicitly, or implicitly by attaching a sample_url to a request
+// that's still 'submitted') emails the prospect their approval link -- same
+// fire-and-forget philosophy as every other notification email in this
+// codebase, so a Resend hiccup doesn't fail the admin's save.
+//
+// stripe_subscription_id is how an admin links a client's $249/mo trial
+// subscription once they've created it by hand in the Stripe Dashboard
+// (see routes/websiteRequest.js -- the automated checkout only ever
+// collects the $5 setup fee, on purpose; Stripe runs the trial and all
+// future billing on its own from the moment that subscription exists, no
+// code involved). Verified against Stripe itself before trusting it, since
+// a pasted id is exactly the kind of thing a typo or copy-paste mistake
+// happens to. Linking it is what emails the client their "2 months free,
+// billed starting month 3" confirmation (see justBecameActive below) --
+// Stripe already sends its own receipt the moment the $5 fee clears, so
+// this is deliberately the one and only point this second, different email
+// goes out, once the subscription it's describing actually exists.
+router.patch('/website-requests/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  const { id } = req.params;
+  const { sample_url, status, admin_notes, stripe_subscription_id } = req.body || {};
+  const allowedStatuses = ['submitted', 'sample_ready', 'approved', 'active', 'declined', 'canceled'];
+  if (status !== undefined && !allowedStatuses.includes(status)) {
+    return res.status(400).json({ success: false, error: 'Invalid status' });
+  }
+
+  try {
+    const { data: existing, error: fetchErr } = await sb.from('website_requests').select('*').eq('id', id).maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (!existing) return res.status(404).json({ success: false, error: 'Not found' });
+
+    const updates = { updated_at: new Date().toISOString() };
+    if (sample_url !== undefined) updates.sample_url = sample_url;
+    if (admin_notes !== undefined) updates.admin_notes = admin_notes;
+
+    let subscriptionLinked = false;
+    if (stripe_subscription_id && !existing.stripe_subscription_id) {
+      if (!process.env.STRIPE_SECRET_KEY) {
+        return res.status(503).json({ success: false, error: 'Stripe is not configured' });
+      }
+      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      let subscription;
+      try {
+        subscription = await stripe.subscriptions.retrieve(stripe_subscription_id.trim());
+      } catch (err) {
+        return res.status(400).json({ success: false, error: 'That subscription ID could not be found in Stripe.' });
+      }
+      if (existing.stripe_customer_id && subscription.customer !== existing.stripe_customer_id) {
+        return res.status(400).json({ success: false, error: "That subscription belongs to a different customer than this request's — double-check the ID." });
+      }
+      updates.stripe_subscription_id = subscription.id;
+      updates.subscription_started_at = new Date().toISOString();
+      subscriptionLinked = true;
+    }
+
+    // Explicit status always wins; otherwise linking a subscription implies
+    // 'active', and (failing that) attaching a sample link to a fresh
+    // request implicitly marks it 'sample_ready' -- an admin pasting a URL
+    // and clicking Save shouldn't also require a separate status dropdown
+    // change to actually notify the prospect.
+    if (status !== undefined) {
+      updates.status = status;
+    } else if (subscriptionLinked) {
+      updates.status = 'active';
+    } else if (existing.status === 'submitted' && (sample_url || existing.sample_url)) {
+      updates.status = 'sample_ready';
+    }
+
+    const { data: updated, error: updateErr } = await sb.from('website_requests').update(updates).eq('id', id).select().single();
+    if (updateErr) throw updateErr;
+
+    const justBecameSampleReady = existing.status !== 'sample_ready' && updated.status === 'sample_ready';
+    if (justBecameSampleReady && updated.sample_url) {
+      sendWebsiteSampleReadyEmail({
+        to: updated.email,
+        name: updated.name,
+        business: updated.business,
+        sampleUrl: updated.sample_url,
+        approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}`,
+      }).catch(err => console.error('sendWebsiteSampleReadyEmail failed:', err.message));
+    }
+
+    const justBecameActive = existing.status !== 'active' && updated.status === 'active' && updated.stripe_subscription_id;
+    if (justBecameActive) {
+      sendWebsiteSubscriptionConfirmedEmail({
+        to: updated.email,
+        name: updated.name,
+        business: updated.business,
+        trialDays: WEBSITE_TRIAL_DAYS,
+        monthlyPrice: WEBSITE_TIER_PRICES[updated.plan_tier] || WEBSITE_TIER_PRICES[WEBSITE_DEFAULT_TIER],
+      }).catch(err => console.error('sendWebsiteSubscriptionConfirmedEmail failed:', err.message));
+    }
+
+    res.json({ success: true, data: { ...updated, approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}` } });
+  } catch (err) {
+    console.error('Admin update website-request error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to update website request' });
+  }
+});
+
+// POST /api/admin/website-requests/:id/cancel-subscription — cancels the
+// client's Stripe subscription immediately (not at period end -- by the
+// time anyone's asking to cancel they're either still in the free trial
+// with nothing paid for this period, or past it and "cancel anytime" on
+// the pricing page doesn't promise a prorated runout) and marks the
+// request 'canceled'. Requires { confirm: true }, same deliberate-
+// second-step pattern as DELETE /companies/:id above, since a GET/
+// bookmark/retry must never trigger this.
+router.post('/website-requests/:id/cancel-subscription', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+  if (req.body?.confirm !== true) {
+    return res.status(400).json({ success: false, error: 'Refusing to cancel without { confirm: true } in the request body.' });
+  }
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return res.status(503).json({ success: false, error: 'Stripe is not configured' });
+  }
+
+  const { id } = req.params;
+
+  try {
+    const { data: request, error: fetchErr } = await sb.from('website_requests').select('*').eq('id', id).maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (!request) return res.status(404).json({ success: false, error: 'Not found' });
+    if (request.status === 'canceled') return res.status(400).json({ success: false, error: 'Already canceled.' });
+    if (!request.stripe_subscription_id) {
+      return res.status(400).json({ success: false, error: 'This request has no active subscription to cancel.' });
+    }
+
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    try {
+      await stripe.subscriptions.cancel(request.stripe_subscription_id);
+    } catch (err) {
+      // Already canceled on Stripe's own side (e.g. a previous attempt's
+      // Stripe call succeeded but the DB update below it failed) -- treat
+      // as success rather than blocking the admin from marking it canceled
+      // here too.
+      if (err.code !== 'resource_missing') throw err;
+    }
+
+    const { data: updated, error: updateErr } = await sb
+      .from('website_requests')
+      .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    if (updateErr) throw updateErr;
+
+    res.json({ success: true, data: { ...updated, approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}` } });
+  } catch (err) {
+    console.error('Admin cancel website-request subscription error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to cancel subscription' });
+  }
+});
+
+// DELETE /api/admin/website-requests/:id — permanently deletes a website
+// request. Cancels any still-active Stripe subscription first (same reason
+// as DELETE /companies/:id above -- otherwise someone keeps getting billed
+// with no record left anywhere to trace it back to or cancel it from).
+// Requires { confirm: true }, same deliberate-second-step pattern as every
+// other destructive action in this file, since a GET/bookmark/retry must
+// never trigger this. Immediate and irreversible -- there's no grace
+// period or undo, unlike a client's own self-service account deletion.
+router.delete('/website-requests/:id', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+  if (req.body?.confirm !== true) {
+    return res.status(400).json({ success: false, error: 'Refusing to delete without { confirm: true } in the request body.' });
+  }
+
+  const { id } = req.params;
+
+  try {
+    const { data: request, error: fetchErr } = await sb.from('website_requests').select('*').eq('id', id).maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (!request) return res.status(404).json({ success: false, error: 'Not found' });
+
+    if (request.stripe_subscription_id && request.status !== 'canceled' && process.env.STRIPE_SECRET_KEY) {
+      try {
+        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.cancel(request.stripe_subscription_id);
+      } catch (err) {
+        // Already canceled on Stripe's own side is fine; anything else is a
+        // real failure, but still shouldn't block deleting the local record
+        // -- log it loudly instead so it can be double-checked by hand.
+        if (err.code !== 'resource_missing') console.warn(`Admin delete website-request ${id}: Stripe cancel warning:`, err.message);
+      }
+    }
+
+    const { error: deleteErr } = await sb.from('website_requests').delete().eq('id', id);
+    if (deleteErr) throw deleteErr;
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(`Admin delete website-request ${id} error:`, err.message);
+    res.status(500).json({ success: false, error: 'Failed to delete website request' });
   }
 });
 

@@ -47,7 +47,7 @@ export default function CarpetStep({ value, onBack, onNext, primaryColor }) {
       </StepSection>
 
       <StepSection label="Cleaning method">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+        <div className="calc-grid-3">
           {[['steam','Steam (Hot Water Extraction)','Best deep clean, takes 6–12h to dry'],['dry','Dry Cleaning','Quick-dry, less effective on deep stains'],['encapsulation','Encapsulation','Commercial-grade, low moisture']].map(([id,label,desc]) => (
             <StepOptionCard key={id} selected={method === id} onClick={() => setMethod(id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 13, color: method === id ? primaryColor : COLORS.ink }}>{label}</div>
@@ -64,7 +64,11 @@ export default function CarpetStep({ value, onBack, onNext, primaryColor }) {
 
       <StepSection label="Add-ons">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[['area_rug','Area Rug'],['scotchgard','Scotchgard Protection'],['deodorizer','Deodorizer'],['pet_treatment','Pet Odor Treatment']].map(([id,label]) => (
+          {/* ids must match CARPET_ADDONS' keys in defaults.js exactly --
+              'scotchgard' and 'pet_treatment' used to not match the
+              backend's 'stain_protector'/'pet_odor' keys at all, so both
+              silently cost $0 when selected. */}
+          {[['area_rug','Area Rug'],['stain_protector','Scotchgard Protection'],['deodorizer','Deodorizer'],['pet_odor','Pet Odor Treatment']].map(([id,label]) => (
             <StepPillToggle key={id} selected={extras.includes(id)} onClick={() => toggleExtra(id)} primaryColor={primaryColor}>{label}</StepPillToggle>
           ))}
         </div>

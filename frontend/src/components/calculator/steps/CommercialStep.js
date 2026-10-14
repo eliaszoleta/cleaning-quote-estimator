@@ -28,7 +28,10 @@ const SERVICE_LEVELS = [
   { id: 'premium', label: 'Premium', desc: '+ detailed, windows, floors' },
 ];
 
-export default function CommercialStep({ value, onBack, onNext, primaryColor }) {
+export default function CommercialStep({ value, onBack, onNext, primaryColor, companyConfig }) {
+  // Only reflects a real, company-set discount (Services tab) -- off by
+  // default, same as HomeStep.js/ApartmentStep.js's own frequencyDiscounts.
+  const frequencyDiscounts = companyConfig?.services?.commercial?.frequencyDiscounts || {};
   const [buildingType, setBuildingType] = useState(value.buildingType || 'office');
   const [sqft, setSqft] = useState(value.sqft || 2000);
   const [restrooms, setRestrooms] = useState(value.restrooms || 2);
@@ -41,7 +44,7 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor }) 
     <StepWrapper title="Commercial property details" subtitle="Prices quoted per month" onBack={onBack} onNext={() => onNext({ buildingType, sqft, restrooms, frequency, serviceLevel, dayPorter, afterHours })} primaryColor={primaryColor}>
 
       <StepSection label="Building type">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {BUILDING_TYPES.map(t => (
             <StepOptionCard key={t.id} selected={buildingType === t.id} onClick={() => setBuildingType(t.id)} primaryColor={primaryColor}>
               <span style={{ fontWeight: 600, fontSize: 14, color: buildingType === t.id ? primaryColor : COLORS.ink }}>{t.label}</span>
@@ -69,14 +72,20 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor }) 
 
       <StepSection label="Cleaning frequency">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {FREQUENCIES.map(f => (
-            <StepChip key={f.id} selected={frequency === f.id} onClick={() => setFrequency(f.id)} primaryColor={primaryColor}>{f.label}</StepChip>
-          ))}
+          {FREQUENCIES.map(f => {
+            const discountPct = Math.round((frequencyDiscounts[f.id] || 0) * 100);
+            return (
+              <StepChip key={f.id} selected={frequency === f.id} onClick={() => setFrequency(f.id)} primaryColor={primaryColor}>
+                {f.label}
+                {discountPct > 0 && <span style={{ fontSize: 11, marginLeft: 4, opacity: 0.85 }}>({discountPct}% off)</span>}
+              </StepChip>
+            );
+          })}
         </div>
       </StepSection>
 
       <StepSection label="Service level">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {SERVICE_LEVELS.map(l => (
             <StepOptionCard key={l.id} selected={serviceLevel === l.id} onClick={() => setServiceLevel(l.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 14, color: serviceLevel === l.id ? primaryColor : COLORS.ink }}>{l.label}</div>
@@ -87,7 +96,7 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor }) 
       </StepSection>
 
       <StepSection label="Options">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {[
             { key: 'dayPorter', val: dayPorter, set: setDayPorter, label: 'Day Porter Service', hint: 'On-site porter during business hours' },
             { key: 'afterHours', val: afterHours, set: setAfterHours, label: 'After-Hours Cleaning', hint: '+15% for after-hours access' },

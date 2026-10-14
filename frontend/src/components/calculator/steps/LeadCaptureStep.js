@@ -8,25 +8,28 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
   const [phone, setPhone] = useState('');
   const [timeline, setTimeline] = useState('');
   const [preferredContact, setPreferredContact] = useState('email');
+  const [userType, setUserType] = useState('');
   const [customAnswers, setCustomAnswers] = useState({});
   const [touched, setTouched] = useState({});
 
   const ctaHeadline = companyConfig?.ctaHeadline || 'Get your instant estimate';
+  const ctaHeadlineEnabled = companyConfig?.ctaHeadlineEnabled !== false;
   const ctaSubtext = companyConfig?.ctaSubtext || "We'll email your results and, if there's a match in your area, recommend a local cleaning professional.";
 
   const nameValid = name.trim().length > 0;
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const phoneValid = phone.replace(/\D/g, '').length === 10;
-  const canSubmit = !loading && nameValid && emailValid && phoneValid;
+  const userTypeValid = userType === 'homeowner' || userType === 'business';
+  const canSubmit = !loading && nameValid && emailValid && phoneValid && userTypeValid;
 
   const touch = (field) => setTouched(prev => ({ ...prev, [field]: true }));
   const showError = (field, valid) => touched[field] && !valid;
 
   const handleSubmit = (e) => {
     e?.preventDefault();
-    setTouched({ name: true, email: true, phone: true });
+    setTouched({ name: true, email: true, phone: true, userType: true });
     if (!canSubmit) return;
-    onNext({ name: name.trim(), email: email.trim(), phone: phone.trim(), timeline, preferredContact, customAnswers });
+    onNext({ name: name.trim(), email: email.trim(), phone: phone.trim(), timeline, preferredContact, userType, customAnswers });
   };
 
   const inputStyle = {
@@ -38,14 +41,16 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
 
   return (
     <div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 5, letterSpacing: '-0.2px' }}>{ctaHeadline}</h2>
+      {ctaHeadlineEnabled && (
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 5, letterSpacing: '-0.2px' }}>{ctaHeadline}</h2>
+      )}
       <p style={{ color: '#64748b', fontSize: 13.5, marginBottom: 22 }}>{ctaSubtext}</p>
 
       <form onSubmit={handleSubmit}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
             <label style={labelStyle}>Name</label>
-            <input type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith"
+            <input type="text" required value={name} onChange={e => setName(e.target.value)} placeholder="King David"
               style={{ ...inputStyle, borderColor: showError('name', nameValid) ? '#dc2626' : '#e2e8f0' }}
               onFocus={e => { e.target.style.borderColor = showError('name', nameValid) ? '#dc2626' : primaryColor; }}
               onBlur={e => { touch('name'); e.target.style.borderColor = !nameValid ? '#dc2626' : '#e2e8f0'; }}
@@ -62,7 +67,11 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
               onFocus={e => { e.target.style.borderColor = showError('email', emailValid) ? '#dc2626' : primaryColor; }}
               onBlur={e => { touch('email'); e.target.style.borderColor = !emailValid ? '#dc2626' : '#e2e8f0'; }}
             />
-            {showError('email', emailValid) && <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please enter a valid email.</p>}
+            {showError('email', emailValid) ? (
+              <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please enter a valid email.</p>
+            ) : (
+              <p style={{ color: '#94a3b8', fontSize: 11.5, marginTop: 4 }}>Make sure this is a real, working address — your estimate can only be delivered here, so a mistyped or fake email means you won't receive it.</p>
+            )}
           </div>
 
           <div>
@@ -94,6 +103,26 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
             </div>
           </div>
 
+          <div>
+            <label style={labelStyle}>I am a…</label>
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+              {[['homeowner', 'Homeowner'], ['business', 'Cleaning business / cleaner']].map(([id, label]) => (
+                <button
+                  key={id} type="button" onClick={() => { setUserType(id); touch('userType'); }}
+                  style={{
+                    padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
+                    border: `1.5px solid ${userType === id ? primaryColor : showError('userType', userTypeValid) ? '#dc2626' : '#e2e8f0'}`,
+                    background: userType === id ? primaryColor : 'white',
+                    color: userType === id ? 'white' : '#374151',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {showError('userType', userTypeValid) && <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>Please select one.</p>}
+          </div>
+
           {customQuestions.map((q, i) => (
             <div key={i}>
               <label style={labelStyle}>{q.label}</label>
@@ -121,7 +150,7 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
             disabled={!canSubmit}
             style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '13px 20px', borderRadius: 10, border: 'none', cursor: canSubmit ? 'pointer' : 'not-allowed', fontSize: 14, fontWeight: 700, color: 'white', background: canSubmit ? primaryColor : '#cbd5e1', transition: 'all 0.15s' }}
           >
-            {loading ? <><Loader2 size={15} className="spin" /> Calculating…</> : 'See Free Estimate →'}
+            {loading ? <><Loader2 size={15} className="spin" /> Calculating…</> : 'Get Free Estimate →'}
           </button>
         </div>
 

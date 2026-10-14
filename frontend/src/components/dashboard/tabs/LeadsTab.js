@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw } from 'lucide-react';
 import { getCompanyLeads, patchLead, deleteLeadForever } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
-import { formatPrice, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
+import { formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
 import { useConfirm } from '../ConfirmDialog';
 
 const SERVICE_COLORS = {
   home_residential: '#2563eb', apartment: '#7c3aed', commercial: '#0891b2',
-  carpet: '#16a34a', air_duct: '#d97706', dryer_vent: '#dc2626',
+  carpet: '#16a34a', upholstery: '#be185d', air_duct: '#d97706', dryer_vent: '#dc2626',
   tile_grout: '#64748b', mold_remediation: '#991b1b', water_damage: '#0284c7',
 };
 
@@ -15,6 +15,7 @@ export default function LeadsTab({ user }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [userTypeFilter, setUserTypeFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [selectedLead, setSelectedLead] = useState(null);
   const [notes, setNotes] = useState('');
@@ -69,6 +70,7 @@ export default function LeadsTab({ user }) {
 
   const filtered = baseLeads.filter(l => {
     if (filter !== 'all' && l.service_type !== filter) return false;
+    if (userTypeFilter !== 'all' && l.user_type !== userTypeFilter) return false;
     if (search) {
       const q = search.toLowerCase();
       return (l.name || '').toLowerCase().includes(q) || (l.email || '').toLowerCase().includes(q) || (l.zip || '').includes(q);
@@ -78,7 +80,9 @@ export default function LeadsTab({ user }) {
 
   const serviceTypes = [...new Set(baseLeads.map(l => l.service_type))];
 
-  const switchView = (v) => { setView(v); setFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
+  const userTypeLabel = (t) => t === 'homeowner' ? 'Homeowner' : t === 'business' ? 'Cleaning business' : null;
+
+  const switchView = (v) => { setView(v); setFilter('all'); setUserTypeFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
 
   const toggleSelect = (id) => {
     setSelectedIds(prev => {
@@ -247,9 +251,9 @@ export default function LeadsTab({ user }) {
     // CleaningCalculator.js), so it lives in service_details, not its own
     // lead column -- pulled out here so it's an actual CSV column instead of
     // something only visible by opening each lead's Service Details panel.
-    const headers = ['Name', 'Email', 'Phone', 'Service', 'City', 'State', 'ZIP', 'Estimate Low', 'Estimate High', 'Timeline', 'Date', 'Notes'];
+    const headers = ['Name', 'Email', 'Phone', 'Type', 'Service', 'City', 'State', 'ZIP', 'Estimate Low', 'Estimate High', 'Timeline', 'Date', 'Notes'];
     const rows = rowsSource.map(l => [
-      l.name || '', l.email || '', l.phone || '', serviceTypeLabel(l.service_type),
+      l.name || '', l.email || '', l.phone || '', userTypeLabel(l.user_type) || '', serviceTypeLabel(l.service_type),
       l.service_details?.city || '', l.state || '', l.zip || '',
       l.estimated_price_low || '', l.estimated_price_high || '',
       l.timeline || '', new Date(l.created_at).toLocaleDateString(), l.notes || '',
@@ -321,6 +325,15 @@ export default function LeadsTab({ user }) {
               <option value="all">All services</option>
               {serviceTypes.map(t => <option key={t} value={t}>{serviceTypeLabel(t)}</option>)}
             </select>
+            <select
+              value={userTypeFilter}
+              onChange={e => setUserTypeFilter(e.target.value)}
+              style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
+            >
+              <option value="all">Homeowner & business</option>
+              <option value="homeowner">Homeowner only</option>
+              <option value="business">Cleaning business only</option>
+            </select>
           </div>
         </div>
 
@@ -366,10 +379,10 @@ export default function LeadsTab({ user }) {
               <Inbox size={24} color="#94a3b8" />
             </div>
             <div style={{ fontWeight: 700, fontSize: 15, color: '#374151', marginBottom: 5 }}>
-              {search || filter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
+              {search || filter !== 'all' || userTypeFilter !== 'all' ? 'No matching leads' : view === 'trash' ? 'Trash is empty' : 'No leads yet'}
             </div>
             <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', maxWidth: 280, margin: 0 }}>
-              {search || filter !== 'all'
+              {search || filter !== 'all' || userTypeFilter !== 'all'
                 ? 'Try changing your search or filter.'
                 : view === 'trash'
                   ? "Leads you archive show up here, and can be restored."
@@ -403,7 +416,18 @@ export default function LeadsTab({ user }) {
                     {lead.name ? lead.name[0].toUpperCase() : '?'}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 13.5, color: '#0f172a', marginBottom: 2 }}>{lead.name || '(No name)'}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                      <div style={{ fontWeight: 600, fontSize: 13.5, color: '#0f172a' }}>{lead.name || '(No name)'}</div>
+                      {userTypeLabel(lead.user_type) && (
+                        <span style={{
+                          fontSize: 10.5, fontWeight: 700, padding: '1px 7px', borderRadius: 5, flexShrink: 0,
+                          background: lead.user_type === 'business' ? '#f5f3ff' : '#ecfdf5',
+                          color: lead.user_type === 'business' ? '#7c3aed' : '#059669',
+                        }}>
+                          {userTypeLabel(lead.user_type)}
+                        </span>
+                      )}
+                    </div>
                     <div style={{ fontSize: 12, color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {lead.email || 'No email'}{lead.phone && ` · ${lead.phone}`}
                     </div>
@@ -413,7 +437,7 @@ export default function LeadsTab({ user }) {
                       {serviceTypeLabel(lead.service_type)}
                     </div>
                     <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>
-                      {lead.estimated_price_low ? `${formatPrice(lead.estimated_price_low)} – ${formatPrice(lead.estimated_price_high)}` : '—'}
+                      {lead.estimated_price_low ? formatPriceRange(lead.estimated_price_low, lead.estimated_price_high, lead.service_type) : '—'}
                     </div>
                     <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{formatDateTime(lead.created_at)}</div>
                   </div>
@@ -441,9 +465,10 @@ export default function LeadsTab({ user }) {
             {[
               ['Email',    selectedLead.email,  `mailto:${selectedLead.email}`],
               ['Phone',    selectedLead.phone,  `tel:${selectedLead.phone}`],
+              ['Type',     userTypeLabel(selectedLead.user_type), null],
               ['Service',  serviceTypeLabel(selectedLead.service_type), null],
               ['Location', [selectedLead.service_details?.city, selectedLead.zip, selectedLead.state].filter(Boolean).join(' · '), null],
-              ['Estimate', selectedLead.estimated_price_low ? `${formatPrice(selectedLead.estimated_price_low)} – ${formatPrice(selectedLead.estimated_price_high)}` : '—', null],
+              ['Estimate', selectedLead.estimated_price_low ? formatPriceRange(selectedLead.estimated_price_low, selectedLead.estimated_price_high, selectedLead.service_type) : '—', null],
               ['Timeline', selectedLead.timeline || '—', null],
             ].filter(([, val]) => val && val !== '—' && val !== '').map(([label, val, href]) => (
               <div key={label} style={{ display: 'flex', gap: 8 }}>
@@ -524,12 +549,18 @@ export default function LeadsTab({ user }) {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => archiveLead(selectedLead.id)}
-                style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '9px 0', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
-              >
-                <Trash2 size={13} /> Move to Trash
-              </button>
+              <div style={{ display: 'flex' }}>
+                <button
+                  onClick={() => archiveLead(selectedLead.id)}
+                  title="Move to Trash"
+                  aria-label="Move to Trash"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 8, background: 'transparent', color: '#94a3b8', border: 'none', borderRadius: 7, cursor: 'pointer' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#dc2626'; e.currentTarget.style.background = '#fef2f2'; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.background = 'transparent'; }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             )}
           </div>
         </div>

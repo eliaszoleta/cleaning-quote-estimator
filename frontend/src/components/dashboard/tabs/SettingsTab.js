@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { AlertTriangle, User, CreditCard, KeyRound } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { AlertTriangle, User, KeyRound } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
-import SubscriptionTab from './SubscriptionTab';
 import APIKeysTab from './APIKeysTab';
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
@@ -9,18 +8,38 @@ const API_URL = process.env.REACT_APP_API_URL || '';
 
 const SECTIONS = [
   { id: 'account',      Icon: User,       label: 'Account' },
-  { id: 'subscription', Icon: CreditCard, label: 'Subscription' },
   { id: 'api',          Icon: KeyRound,   label: 'API Keys' },
 ];
 
-export default function SettingsTab({ user, config, refetchConfig, saveConfig, saving, subStatus, onSubRefresh, section: sectionProp, onSectionChange }) {
+export default function SettingsTab({ user, config, refetchConfig, saveConfig, saving, section: sectionProp, onSectionChange }) {
   // Falls back to its own state when no section/onSectionChange is passed
   // (defensive -- every current call site controls this from
-  // CompanyDashboard so deep links like ?tab=settings&section=subscription
+  // CompanyDashboard so deep links like ?tab=settings&section=api
   // land on the right pane, but this keeps the component usable standalone).
   const [sectionState, setSectionState] = useState('account');
   const section = sectionProp || sectionState;
   const setSection = onSectionChange || setSectionState;
+
+  // Collected once at signup (see AuthPage.js) but editable here after the
+  // fact -- these are plain config fields (config.phone/website), so a
+  // partial PUT via saveConfig({ phone, website }) merges in just these two
+  // without touching anything else (see PUT /api/company/:id's merge).
+  const [phone, setPhone] = useState(config?.phone || '');
+  const [website, setWebsite] = useState(config?.website || '');
+  const [contactSaving, setContactSaving] = useState(false);
+  const [contactSaved, setContactSaved] = useState(false);
+  useEffect(() => { setPhone(config?.phone || ''); }, [config?.phone]);
+  useEffect(() => { setWebsite(config?.website || ''); }, [config?.website]);
+
+  const handleSaveContact = async (e) => {
+    e.preventDefault();
+    setContactSaving(true);
+    setContactSaved(false);
+    await saveConfig({ phone: phone.trim(), website: website.trim() });
+    setContactSaving(false);
+    setContactSaved(true);
+    setTimeout(() => setContactSaved(false), 3000);
+  };
 
   const [pwNew, setPwNew] = useState('');
   const [pwConfirm, setPwConfirm] = useState('');
@@ -106,8 +125,8 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
         <p style={{ color: COLORS.body, fontSize: 14 }}>Manage your account settings.</p>
       </div>
 
-      {/* Section switcher -- Subscription and API Keys used to be their own
-          top-level sidebar items; folded in here as sub-sections instead. */}
+      {/* Section switcher -- API Keys used to be its own top-level sidebar
+          item; folded in here as a sub-section instead. */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 24, borderBottom: `1px solid ${COLORS.border}` }}>
         {SECTIONS.map(({ id, Icon, label }) => (
           <button
@@ -127,7 +146,6 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
         ))}
       </div>
 
-      {section === 'subscription' && <SubscriptionTab subStatus={subStatus} onSubRefresh={onSubRefresh} />}
       {section === 'api' && <APIKeysTab config={config} saveConfig={saveConfig} saving={saving} />}
 
       {section === 'account' && (
@@ -144,6 +162,42 @@ export default function SettingsTab({ user, config, refetchConfig, saveConfig, s
             style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, background: '#f8fafc', color: '#64748b', boxSizing: 'border-box' }}
           />
         </div>
+
+        <form onSubmit={handleSaveContact} style={{ marginBottom: 24, paddingBottom: 24, borderBottom: `1px solid ${COLORS.border}` }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', marginBottom: 12 }}>Contact Info</div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 4 }}>Phone number</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              placeholder="(555) 123-4567"
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, boxSizing: 'border-box' }}
+            />
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 4 }}>Website or Facebook page</label>
+            <input
+              type="text"
+              value={website}
+              onChange={e => setWebsite(e.target.value)}
+              placeholder="www.yourcompany.com or facebook.com/yourpage"
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, boxSizing: 'border-box' }}
+            />
+          </div>
+          {contactSaved && (
+            <div style={{ marginBottom: 12, fontSize: 13, padding: '8px 12px', borderRadius: 7, color: '#16a34a', background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+              Saved.
+            </div>
+          )}
+          <button
+            type="submit"
+            disabled={contactSaving}
+            style={{ padding: '8px 18px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: contactSaving ? 'not-allowed' : 'pointer', opacity: contactSaving ? 0.7 : 1 }}
+          >
+            {contactSaving ? 'Saving…' : 'Save Contact Info'}
+          </button>
+        </form>
 
         <form onSubmit={handleChangePassword}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', marginBottom: 12 }}>Change Password</div>

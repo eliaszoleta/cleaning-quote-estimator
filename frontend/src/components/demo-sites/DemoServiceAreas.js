@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import { useDemoSite } from './DemoSiteContext';
+import { areaSlugFor } from './demoSeoContent';
 
 export default function DemoServiceAreas() {
   const { site, openQuote } = useDemoSite();
@@ -21,12 +22,12 @@ export default function DemoServiceAreas() {
       <div style={{ padding: 'clamp(40px, 8vw, 72px) 20px', background: 'white' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: 16 }}>
           {site.serviceAreas.map(area => (
-            <div key={area} style={{ display: 'flex', alignItems: 'center', gap: 12, background: c.bgAlt, border: `1px solid ${c.border}`, borderRadius: 12, padding: '18px 20px' }}>
+            <a key={area} href={`/website-example/${site.slug}/service-areas/${areaSlugFor(area)}`} style={{ display: 'flex', alignItems: 'center', gap: 12, background: c.bgAlt, border: `1px solid ${c.border}`, borderRadius: 12, padding: '18px 20px', textDecoration: 'none' }}>
               <div style={{ width: 34, height: 34, borderRadius: 9, background: c.card, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <MapPin size={16} color={c.primary} />
               </div>
               <span style={{ fontWeight: 700, fontSize: 14.5, color: c.ink }}>{area}</span>
-            </div>
+            </a>
           ))}
         </div>
       </div>

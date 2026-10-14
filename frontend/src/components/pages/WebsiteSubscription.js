@@ -1,28 +1,59 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Globe, Search, PhoneMissed } from 'lucide-react';
+import { Globe, Search, PhoneMissed, Sparkles, ChevronDown } from 'lucide-react';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { postWebsiteRequest } from '../../utils/api';
+import { WEBSITE_PLAN_TIERS, getTierById } from '../../data/websitePricingTiers';
 
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
-const MONTHLY_PRICE = 249;
+const SETUP_FEE = 5;
+const FREE_MONTHS = 2;
+const LOWEST_PRICE = WEBSITE_PLAN_TIERS[0].price;
+const DEFAULT_TIER_ID = 'growth';
 
-// What the same stack costs bought piecemeal -- backs up the $249 price
-// instead of just asserting it's a good deal.
-const VALUE_BREAKDOWN = [
-  { label: 'Cleaning website builder / hosting', cost: '$20-40/mo' },
-  { label: 'AI chatbot software', cost: '$150-300/mo' },
-  { label: 'Text-message lead notifications', cost: '$50-100/mo' },
-  { label: 'Lead capture forms & CRM', cost: '$100+/mo' },
-];
+// What the same stack costs bought piecemeal, per tier -- backs up each
+// plan's price instead of just asserting it's a good deal. Only includes
+// the pieces that tier actually replaces (Starter doesn't claim to replace
+// chatbot software it doesn't include).
+const VALUE_BREAKDOWN_BY_TIER = {
+  starter: [
+    { label: 'Cleaning website builder / hosting', cost: '$20-40/mo' },
+    { label: 'Lead capture form & instant-alert tool', cost: '$30-60/mo' },
+  ],
+  growth: [
+    { label: 'Cleaning website builder / hosting', cost: '$20-40/mo' },
+    { label: 'AI chatbot software', cost: '$150-300/mo' },
+    { label: 'Lead capture form & instant-alert tool', cost: '$30-60/mo' },
+  ],
+  pro: [
+    { label: 'Cleaning website builder / hosting', cost: '$20-40/mo' },
+    { label: 'AI chatbot software', cost: '$150-300/mo' },
+    { label: 'Business phone line', cost: '$20-30/mo' },
+    { label: 'Text-message lead notifications & CRM', cost: '$50-100/mo' },
+  ],
+};
 
-// Same 9 services offered elsewhere on the site (ServiceSelect.js,
+// Shown as a 3-step money timeline on the pricing card instead of a bare
+// "$X/month" -- the offer only kicks in once a prospect has already seen
+// and approved their free sample build (see the apply-form copy further
+// down), so this describes what happens after that approval, not the
+// sample build itself. Takes the selected tier's price as an argument since
+// it's rebuilt per-render based on which plan is selected.
+function pricingTimeline(monthlyPrice) {
+  return [
+    { label: 'On Approval', amount: `$${SETUP_FEE}`, desc: 'One-time setup fee, charged the day you approve your build' },
+    { label: `Months 1-${FREE_MONTHS}`, amount: 'Free', desc: 'Your full plan, zero charge' },
+    { label: `Month ${FREE_MONTHS + 1}+`, amount: `$${monthlyPrice}/mo`, desc: 'Flat rate from here on, cancel anytime' },
+  ];
+}
+
+// Same 10 services offered elsewhere on the site (ServiceSelect.js,
 // ServicesTab.js) -- kept as plain labels here since this form is just
 // collecting what to put on the site, not tied to the calculator's
 // configKey/pricing logic.
 const SERVICES_OFFERED = [
-  'House Cleaning', 'Apartment Cleaning', 'Commercial Cleaning', 'Carpet Cleaning',
+  'House Cleaning', 'Apartment Cleaning', 'Commercial Cleaning', 'Carpet Cleaning', 'Upholstery Cleaning',
   'Air Duct Cleaning', 'Dryer Vent Cleaning', 'Tile & Grout Cleaning', 'Mold Remediation', 'Water Damage Restoration',
 ];
 
@@ -127,17 +158,17 @@ const COMPARISON = [
   {
     label: 'Updates after launch',
     them: 'Want a change later? That\'s usually a new invoice.',
-    us: 'Ongoing updates and maintenance are included in your monthly rate — no extra invoices.',
+    us: 'Priority support included — update text, info, or photos, or add pages, with no extra invoices.',
   },
   {
     label: 'Capturing leads',
     them: "Most sites are just a digital brochure — no way to catch a visitor who doesn't call.",
-    us: 'A chat widget captures visitor info the moment they land — running on AI by default, or answered manually if you\'d rather reply yourself.',
+    us: 'Every plan has a lead capture form that emails you instantly. Go Growth or Pro and add an AI chat widget that catches visitors who\'d rather ask a question than fill out a form.',
   },
   {
     label: 'Replying to leads on the go',
     them: "New lead notifications go to an inbox you check when you remember to.",
-    us: "A mobile app puts every website chat, quote request, and call in your pocket — see it, reply to it, right from your phone.",
+    us: "Quote-form leads land in your email on every plan. On Pro, a lead app puts every chat, text, and call in your pocket too — see it, reply to it, right from your phone.",
   },
 ];
 
@@ -158,10 +189,16 @@ export default function WebsiteSubscription() {
   const [showThankYou, setShowThankYou] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
+  const [selectedTierId, setSelectedTierId] = useState(DEFAULT_TIER_ID);
+  const selectedTier = getTierById(selectedTierId) || getTierById(DEFAULT_TIER_ID);
+  const [openFaqIndex, setOpenFaqIndex] = useState(-1);
   const [form, setForm] = useState({
     name: '', business: '', email: '', phone: '', servicesOffered: [], otherServices: '',
     businessAddress: '', serviceAreas: '',
     hasDomain: false, domain1: '', domain2: '', domain3: '', currentWebsite: '', facebookPage: '', message: '',
+    // Honeypot: real visitors never see or fill this field; bots that
+    // auto-fill every input on the page usually do. Checked server-side.
+    website2: '',
   });
 
   const inputStyle = { width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: 9, fontSize: 14, outline: 'none', boxSizing: 'border-box', color: '#0f172a', background: 'white' };
@@ -177,8 +214,16 @@ export default function WebsiteSubscription() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSending(true);
     setError('');
+    // Current website and Facebook page/profile aren't individually marked
+    // required (HTML5 required can't express "at least one of these two"),
+    // so this cross-field check is the only thing enforcing it -- either one
+    // satisfies the requirement, both is fine too, neither is not.
+    if (!form.currentWebsite.trim() && !form.facebookPage.trim()) {
+      setError('Please provide your current website or Facebook page/profile -- at least one is required.');
+      return;
+    }
+    setSending(true);
     try {
       await postWebsiteRequest({
         name: form.name,
@@ -196,6 +241,8 @@ export default function WebsiteSubscription() {
         currentWebsite: form.currentWebsite || '',
         facebookPage: form.facebookPage || '',
         message: form.message || '',
+        planTier: selectedTierId,
+        website2: form.website2,
       });
       setSent(true);
       setShowThankYou(true);
@@ -209,8 +256,8 @@ export default function WebsiteSubscription() {
   return (
     <>
       <Helmet>
-        <title>Cleaning Website + Lead App for Cleaning Companies | Clean Estimator</title>
-        <meta name="description" content={`Get a professional cleaning website built, hosted, and maintained for your cleaning business, with every lead landing in a mobile app you can reply to instantly — $${MONTHLY_PRICE}/month flat, no upfront cost.`} />
+        <title>Cleaning Website + Chatbot + Lead App for Cleaning Companies | Clean Estimator</title>
+        <meta name="description" content={`Get a professional cleaning website built free to preview. Approve it for just $${SETUP_FEE}, get ${FREE_MONTHS} months free, then from $${LOWEST_PRICE}/month — 3 plans, from a quote form with instant email alerts up to an AI chatbot and a full lead app.`} />
         <link rel="canonical" href="https://www.cleanestimator.com/website-for-cleaning-companies" />
       </Helmet>
 
@@ -229,7 +276,7 @@ export default function WebsiteSubscription() {
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 14 }}>
             <a href="#apply" className="ws-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
-              Get My Free Website Build <span className="ws-arrow"><IconArrow size={16} color="white" /></span>
+              Build My Free Sample Site <span className="ws-arrow"><IconArrow size={16} color="white" /></span>
             </a>
           </div>
           <p style={{ fontSize: 13, color: '#93c5fd', fontWeight: 600 }}>
@@ -327,17 +374,17 @@ export default function WebsiteSubscription() {
       <div style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'white' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>What's Included</h2>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>Every Plan Includes</h2>
+            <p style={{ fontSize: 15, color: '#64748b', maxWidth: 540, margin: '0 auto', lineHeight: 1.6 }}>The foundation on all 3 plans. The chatbot, phone number, and lead app are add-ons on Growth and Pro — see pricing below.</p>
           </div>
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(20px, 5vw, 32px)' }}>
-            <Check>A custom cleaning website built for your business — not a generic template</Check>
+            <Check>A custom cleaning website built for your business — designed to get you found on Google and bring in leads</Check>
             <Check>A domain name of your choice</Check>
             <Check>Fast, secure hosting, fully managed — nothing for you to set up</Check>
             <Check>Mobile-friendly design, since most of your visitors are on their phone</Check>
-            <Check>A website chat widget that can auto-reply with AI or be switched to manual so you respond yourself</Check>
             <Check>A built-in lead capture form so visitors can request a free estimate right from your site</Check>
-            <Check>A mobile app where every website chat and quote form lead lands — reply by text or call right from your phone</Check>
-            <Check>Ongoing updates and maintenance — no separate invoice every time something needs to change</Check>
+            <Check>Instant email alert every time that form is submitted — no lead sits unseen</Check>
+            <Check>Priority support for ongoing changes — update text, info, or photos, or add pages, included in your plan</Check>
             <Check>No long-term contract — cancel anytime</Check>
           </div>
         </div>
@@ -401,14 +448,14 @@ export default function WebsiteSubscription() {
                   <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', color: 'white', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>3</div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 16, color: 'white', marginBottom: 4 }}>Like it? Pick your domain and subscribe</div>
-                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Already own a domain? We'll use it. Starting fresh? We'll help you pick one. Billing only starts here.</div>
+                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Already own a domain? We'll use it. Starting fresh? We'll help you pick one. Just ${SETUP_FEE} here to approve — your first {FREE_MONTHS} months are free, and real billing doesn't start until month {FREE_MONTHS + 1}.</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
                   <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', color: 'white', fontWeight: 800, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>4</div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 16, color: 'white', marginBottom: 4 }}>Your site goes fully live</div>
-                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Live on your domain, with quote requests, chats, and calls all routing straight to your mobile app.</div>
+                    <div className="ws-step-desc" style={{ fontSize: 14, color: '#dbeafe', lineHeight: 1.65 }}>Live on your domain, with every quote form lead emailed to you instantly — plus chat replies and call routing to your lead app if you picked Growth or Pro.</div>
                   </div>
                 </div>
               </div>
@@ -417,75 +464,142 @@ export default function WebsiteSubscription() {
         </div>
       </div>
 
-      {/* Pricing -- a "ticket stub" card (price half torn from the details
-          half) instead of the plain centered price card used elsewhere, so
-          this reads as a distinct moment on the page rather than another
-          bordered box. */}
+      {/* Pricing -- 3 selectable tier cards (clicking one carries the
+          selection down into the timeline card, value breakdown, and the
+          apply form's own tier selector below) instead of one flat price. */}
       <div id="pricing" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: '#f8fafc' }}>
-        <div style={{ maxWidth: 440, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1040, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>Simple, Flat Pricing</h2>
-            <p style={{ fontSize: 15, color: '#64748b' }}>No setup fee. No surprise invoices. Cancel anytime.</p>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.4px', marginBottom: 12 }}>3 Plans, Zero Risk, 2 Months FREE</h2>
+            <p style={{ fontSize: 15, color: '#64748b' }}>We build your site first — if you like it, you can approve it to go live for just ${SETUP_FEE}. You get {FREE_MONTHS} months free on any plan, and your first real charge isn't until month {FREE_MONTHS + 1}.</p>
           </div>
-          <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', boxShadow: '0 14px 40px rgba(15,23,42,0.14)' }}>
-            <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', padding: 'clamp(24px, 6vw, 34px) clamp(24px, 6vw, 36px) 30px', textAlign: 'center' }}>
-              <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', color: '#bfdbfe', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 20, marginBottom: 16 }}>
-                Pay only after you approve
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 18, marginBottom: 32 }}>
+            {WEBSITE_PLAN_TIERS.map(tier => {
+              const active = tier.id === selectedTierId;
+              return (
+                <button
+                  key={tier.id}
+                  type="button"
+                  onClick={() => setSelectedTierId(tier.id)}
+                  style={{
+                    textAlign: 'left', cursor: 'pointer', position: 'relative',
+                    background: active ? 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)' : 'white',
+                    border: active ? '2px solid #1d4ed8' : '1.5px solid #e2e8f0',
+                    borderRadius: 18, padding: 'clamp(18px, 4vw, 26px)',
+                    boxShadow: active ? '0 14px 34px rgba(29,78,216,0.3)' : '0 2px 10px rgba(15,23,42,0.05)',
+                    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                  }}
+                >
+                  {tier.recommended && (
+                    <div style={{ position: 'absolute', top: -11, left: 20, background: active ? 'white' : PRIMARY_GRADIENT, color: active ? PRIMARY : 'white', fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '4px 11px', borderRadius: 20, boxShadow: '0 4px 10px rgba(0,0,0,0.15)' }}>
+                      Most Popular
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8, flexWrap: 'wrap' }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 800, color: active ? '#bfdbfe' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{tier.name}</div>
+                    <div style={{ fontSize: 10, fontWeight: 800, color: active ? '#86efac' : '#16a34a', background: active ? 'rgba(74,222,128,0.18)' : '#dcfce7', padding: '2px 8px', borderRadius: 20, whiteSpace: 'nowrap' }}>2 Months FREE</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 10 }}>
+                    <span style={{ fontSize: 'clamp(30px, 6vw, 38px)', fontWeight: 900, color: active ? 'white' : '#0f172a', letterSpacing: '-1px', lineHeight: 1 }}>${tier.price}</span>
+                    <span style={{ fontSize: 13.5, color: active ? '#bfdbfe' : '#64748b', fontWeight: 600 }}>/mo</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: active ? '#dbeafe' : '#64748b', lineHeight: 1.55, margin: '0 0 16px', minHeight: 40 }}>{tier.tagline}</p>
+                  {tier.includesLabel && (
+                    <div style={{ fontSize: 11.5, fontWeight: 700, color: active ? '#93c5fd' : PRIMARY, marginBottom: 8 }}>{tier.includesLabel}</div>
+                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {tier.addedFeatures.map(f => (
+                      <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                        <span style={{ marginTop: 1 }}><IconCheck size={14} color={active ? '#4ade80' : '#16a34a'} bg={active ? 'rgba(74,222,128,0.2)' : '#dcfce7'} /></span>
+                        <span style={{ fontSize: 12.5, color: active ? 'white' : '#374151', fontWeight: 500, lineHeight: 1.5 }}>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: 18, textAlign: 'center', padding: '9px 0', borderRadius: 9, fontSize: 12.5, fontWeight: 800, background: active ? 'rgba(255,255,255,0.15)' : '#f1f5f9', color: active ? 'white' : '#64748b' }}>
+                    {active ? 'Selected' : 'Select This Plan'}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Ticket stub for the selected plan -- price half torn from the
+              details half, so the chosen plan's timeline reads as a
+              distinct moment on the page rather than another bordered box. */}
+          <div style={{ maxWidth: 440, margin: '0 auto' }}>
+            <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', boxShadow: '0 14px 40px rgba(15,23,42,0.14)' }}>
+              <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)', padding: 'clamp(22px, 6vw, 30px) clamp(24px, 6vw, 36px) 26px' }}>
+                <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.15)', color: '#bfdbfe', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '4px 12px', borderRadius: 20 }}>
+                    <Sparkles size={12} /> {selectedTier.name} Plan &middot; {FREE_MONTHS} Months Free To Start
+                  </div>
+                </div>
+                <div>
+                  {pricingTimeline(selectedTier.price).map((step, i) => (
+                    <div key={step.label} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '11px 0', borderTop: i > 0 ? '1px solid rgba(255,255,255,0.15)' : 'none' }}>
+                      <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', color: 'white', fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13.5, fontWeight: 700, color: 'white' }}>{step.label}</div>
+                        <div style={{ fontSize: 11.5, color: '#bfdbfe' }}>{step.desc}</div>
+                      </div>
+                      <div style={{ fontSize: 17, fontWeight: 900, color: 'white', whiteSpace: 'nowrap' }}>{step.amount}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 5 }}>
-                <span style={{ fontSize: 'clamp(36px, 9vw, 52px)', fontWeight: 900, color: 'white', letterSpacing: '-1.5px', lineHeight: 1 }}>${MONTHLY_PRICE}</span>
-                <span style={{ fontSize: 15, color: '#bfdbfe', fontWeight: 500 }}>/month</span>
+
+              {/* Ticket-notch seam -- two circles matching the page background,
+                  half-overlapping the card edges at the fold. */}
+              <div style={{ position: 'relative', height: 0 }}>
+                <div style={{ position: 'absolute', top: -10, left: -10, width: 20, height: 20, borderRadius: '50%', background: '#f8fafc' }} />
+                <div style={{ position: 'absolute', top: -10, right: -10, width: 20, height: 20, borderRadius: '50%', background: '#f8fafc' }} />
+              </div>
+              <div style={{ borderTop: '2px dashed #cbd5e1' }} />
+
+              <div style={{ background: 'white', padding: 'clamp(22px, 5vw, 30px) clamp(24px, 6vw, 36px)', textAlign: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22, textAlign: 'left' }}>
+                  {selectedTier.features.map(item => (
+                    <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: 13, color: '#374151', fontWeight: 600 }}>
+                      <span style={{ marginTop: 1, flexShrink: 0 }}><IconCheck size={13} /></span>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <a
+                  href="#apply"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '14px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 15.5, boxShadow: '0 8px 24px rgba(29,78,216,0.35)' }}
+                >
+                  Build My Free Sample Site →
+                </a>
+                <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>Free to see. Nothing to pay until you approve it.</p>
               </div>
             </div>
 
-            {/* Ticket-notch seam -- two circles matching the page background,
-                half-overlapping the card edges at the fold. */}
-            <div style={{ position: 'relative', height: 0 }}>
-              <div style={{ position: 'absolute', top: -10, left: -10, width: 20, height: 20, borderRadius: '50%', background: '#f8fafc' }} />
-              <div style={{ position: 'absolute', top: -10, right: -10, width: 20, height: 20, borderRadius: '50%', background: '#f8fafc' }} />
-            </div>
-            <div style={{ borderTop: '2px dashed #cbd5e1' }} />
-
-            <div style={{ background: 'white', padding: 'clamp(22px, 5vw, 30px) clamp(24px, 6vw, 36px)', textAlign: 'center' }}>
-              <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, marginBottom: 22 }}>
-                {['Cleaning website + hosting', 'Lead capture forms', 'Website chat + mobile app', 'Ongoing updates', 'Cancel anytime'].map(item => (
-                  <span key={item} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', fontWeight: 600 }}>
-                    <IconCheck size={13} /> {item}
-                  </span>
+            {/* Value breakdown -- backs up the selected plan's price with
+                what the same pieces cost bought separately, instead of just
+                asserting it's a good deal. */}
+            <div style={{ marginTop: 22, background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: 'clamp(18px, 4vw, 24px)' }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Why ${selectedTier.price}/month is a deal</div>
+              <p style={{ fontSize: 12.5, color: '#64748b', margin: '0 0 14px', lineHeight: 1.6 }}>
+                Piece the {selectedTier.name} plan together yourself with separate tools and it adds up fast:
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+                {VALUE_BREAKDOWN_BY_TIER[selectedTierId].map(row => (
+                  <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151' }}>
+                    <span>{row.label}</span>
+                    <span style={{ color: '#94a3b8', fontWeight: 600 }}>{row.cost}</span>
+                  </div>
                 ))}
               </div>
-              <a
-                href="#apply"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '14px 30px', borderRadius: 10, textDecoration: 'none', fontWeight: 800, fontSize: 15.5, boxShadow: '0 8px 24px rgba(29,78,216,0.35)' }}
-              >
-                Get My Free Website Build →
-              </a>
-              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 14, marginBottom: 0 }}>You won't be charged until you've seen and approved your build.</p>
-            </div>
-          </div>
-
-          {/* Value breakdown -- backs up $249 with what the same pieces cost
-              bought separately, instead of just asserting it's a good deal. */}
-          <div style={{ marginTop: 22, background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, padding: 'clamp(18px, 4vw, 24px)' }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>Why ${MONTHLY_PRICE}/month is a deal</div>
-            <p style={{ fontSize: 12.5, color: '#64748b', margin: '0 0 14px', lineHeight: 1.6 }}>
-              Piece this together yourself with separate tools and it adds up fast:
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
-              {VALUE_BREAKDOWN.map(row => (
-                <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151' }}>
-                  <span>{row.label}</span>
-                  <span style={{ color: '#94a3b8', fontWeight: 600 }}>{row.cost}</span>
-                </div>
-              ))}
-            </div>
-            <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>Bought separately</span>
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#94a3b8', textDecoration: 'line-through' }}>$320-540+/mo</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 4 }}>
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#15803d' }}>With Clean Estimator, all included</span>
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: '#15803d' }}>${MONTHLY_PRICE}/mo</span>
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: '#15803d' }}>Your {FREE_MONTHS} free months are worth</span>
+                <span style={{ fontSize: 14.5, fontWeight: 800, color: '#15803d', whiteSpace: 'nowrap' }}>${selectedTier.price * FREE_MONTHS}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <span style={{ fontSize: 13.5, fontWeight: 800, color: '#15803d' }}>With Clean Estimator, all included</span>
+                <span style={{ fontSize: 13.5, fontWeight: 800, color: '#15803d' }}>${selectedTier.price}/mo</span>
+              </div>
             </div>
           </div>
         </div>
@@ -498,18 +612,34 @@ export default function WebsiteSubscription() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {[
               { q: 'Do I have to pay before I see anything?', a: "No. After you apply, we build your actual cleaning website first, so you can see exactly what you'd be getting. You only subscribe and start paying once you've reviewed it and you're happy with it." },
+              { q: "What's the difference between the 3 plans?", a: `Starter ($${getTierById('starter').price}/mo) gets you the website and a quote form that emails you instantly on every submission. Growth ($${getTierById('growth').price}/mo) adds an AI chatbot that can support visitors and emails you a summary of every conversation. Pro ($${getTierById('pro').price}/mo) adds a dedicated business phone number and a lead app where every chat, text, and inquiry lives — reply or call back right from it, and calls route straight there. You can pick any plan when you apply, and switch later.` },
               { q: 'Do I own the cleaning website?', a: "Your site is built and hosted as part of your active subscription — similar to how a lot of small business tools work. As long as your subscription is active, it's live and it's yours to use and point customers to. We'll walk through the specifics with you when you apply." },
-              { q: 'What happens if I cancel?', a: "Your cleaning website and chat widget come down when the subscription ends. There's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
-              { q: 'How does the chat widget work?', a: "By default it uses AI to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours. You can also switch it to manual anytime and answer visitors yourself. Either way, every conversation lands in your mobile app, the same place you get texts and calls for quote form leads, so you can reply right from your phone." },
+              { q: 'Can I make changes to my website after it\'s live?', a: "Yes. Update your text, business info, or photos, or ask us to add a new page or section — it's included in your plan, with priority support so changes don't sit in a queue for weeks. Just send us what you'd like changed and we'll take care of it." },
+              { q: 'What happens if I cancel?', a: "Your site (and the chatbot or lead app, if your plan included them) come down when the subscription ends — but if you'd rather manage things yourself after that, we'll help you move your website files to hosting of your choice. Just know the chatbot, lead app, and automatic quote-to-phone routing are part of the subscription, not the website files themselves, so recreating that on your own means piecing together separate hosting, chatbot software, and a CRM — the same cost breakdown we show above — plus someone to keep it all running if you're not planning to do that yourself. Most owners find it's simpler and cheaper to stay with us, but there's no long-term contract, so you're free to cancel anytime — we'd just rather talk first and see if something can be fixed." },
+              { q: 'How does the AI chatbot work?', a: "On the Growth and Pro plans, your site gets a chat widget that uses AI to answer visitor questions and collect their name, contact info, and what they need — even when you're on a job or it's after hours. On Growth, you get an email summarizing each conversation. On Pro, every conversation also lands in your lead app, the same place you get texts and calls, so you can reply right from your phone. The Starter plan doesn't include the chatbot — just the quote form with instant email alerts." },
               { q: 'Can I use a domain I already own?', a: "Yes. If you already have a domain, we'll use it. If not, we'll help you pick one and get it set up as part of onboarding." },
-              { q: 'Is there a setup fee?', a: 'No. It\'s one flat monthly rate — no setup fee, no separate build cost.' },
+              { q: 'Is there a setup fee?', a: `Just a $${SETUP_FEE} one-time setup fee once you approve your build — that's it, on any plan. Your first ${FREE_MONTHS} months are completely free, and you're only billed starting month ${FREE_MONTHS + 1} (${WEBSITE_PLAN_TIERS.map(t => `$${t.price}/mo on ${t.name}`).join(', ')}).` },
               { q: 'How long until my website build is ready?', a: "It depends on what your business needs. We'll give you a clear timeline once we understand your business and review your application. Your site goes fully live on your domain once you approve the build and subscribe." },
-            ].map((item, i) => (
-              <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: '18px 22px', marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)' }}>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 8 }}>{item.q}</div>
-                <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{item.a}</div>
-              </div>
-            ))}
+            ].map((item, i) => {
+              const open = openFaqIndex === i;
+              return (
+                <div key={i} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, marginBottom: 2, boxShadow: '0 1px 4px rgba(15,23,42,0.04)', overflow: 'hidden' }}>
+                  <button
+                    onClick={() => setOpenFaqIndex(open ? -1 : i)}
+                    aria-expanded={open}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '18px 22px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                  >
+                    <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{item.q}</span>
+                    <ChevronDown size={18} color="#94a3b8" style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+                  </button>
+                  {open && (
+                    <div style={{ padding: '0 22px 18px' }}>
+                      <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.65 }}>{item.a}</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -520,7 +650,7 @@ export default function WebsiteSubscription() {
       <div id="apply" style={{ padding: 'clamp(40px, 8vw, 80px) 20px', background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: 12 }}>Get My Free Website Build</h2>
+            <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: 12 }}>Get Your Free Sample Site</h2>
             <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.65, maxWidth: 480, margin: '0 auto' }}>Tell us a bit about your business and we'll build your website for you to review — no payment required until you approve it.</p>
           </div>
           {sent ? (
@@ -537,7 +667,8 @@ export default function WebsiteSubscription() {
                 'No payment today — just fill out the form',
                 'We review it and build your live website',
                 'You review the build before deciding anything',
-                'Only then do you pick a domain and subscribe',
+                `Like it? Approve it for just $${SETUP_FEE}`,
+                `Then get ${FREE_MONTHS} months free`,
               ].map((line, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
                   <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(96,165,250,0.2)', color: '#60a5fa', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
@@ -546,10 +677,22 @@ export default function WebsiteSubscription() {
               ))}
             </div>
             <form onSubmit={handleSubmit} style={{ flex: '2 1 380px', minWidth: 0, background: 'white', borderRadius: 16, padding: 'clamp(18px, 5vw, 40px)', boxShadow: '0 14px 40px rgba(0,0,0,0.25)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+              {/* Honeypot -- off-screen, not display:none (some bots skip
+                  display:none fields), never seen or reached by a real user. */}
+              <input
+                type="text"
+                name="website2"
+                value={form.website2}
+                onChange={e => setForm(f => ({ ...f, website2: e.target.value }))}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: 'absolute', left: '-9999px', top: 'auto', width: 1, height: 1, overflow: 'hidden' }}
+              />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: 14, marginBottom: 14 }}>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full Name *</label>
-                  <input required style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Jane Smith" />
+                  <input required style={inputStyle} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="King David" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Business Name *</label>
@@ -560,8 +703,8 @@ export default function WebsiteSubscription() {
                   <input required type="email" style={inputStyle} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="you@yourbusiness.com" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number</label>
-                  <input type="tel" style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number *</label>
+                  <input required type="tel" style={inputStyle} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: formatPhoneInput(e.target.value) }))} placeholder="(555) 000-0000" />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
@@ -593,13 +736,13 @@ export default function WebsiteSubscription() {
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cleaning Business Address</label>
-                  <input style={inputStyle} value={form.businessAddress} onChange={e => setForm(f => ({ ...f, businessAddress: e.target.value }))} placeholder="123 Main St, Austin, TX 78701" />
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cleaning Business Address *</label>
+                  <input required style={inputStyle} value={form.businessAddress} onChange={e => setForm(f => ({ ...f, businessAddress: e.target.value }))} placeholder="123 Main St, Austin, TX 78701" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Service Areas</label>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Service Areas *</label>
                   <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 8px' }}>Cities or areas you actually serve, so we can list them on your site.</p>
-                  <input style={inputStyle} value={form.serviceAreas} onChange={e => setForm(f => ({ ...f, serviceAreas: e.target.value }))} placeholder="e.g. Austin, Round Rock, Cedar Park" />
+                  <input required style={inputStyle} value={form.serviceAreas} onChange={e => setForm(f => ({ ...f, serviceAreas: e.target.value }))} placeholder="e.g. Austin, Round Rock, Cedar Park" />
                 </div>
 
                 <div style={{ gridColumn: '1 / -1' }}>
@@ -618,13 +761,16 @@ export default function WebsiteSubscription() {
                   )}
                 </div>
 
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: 12, color: '#94a3b8', margin: '0 0 2px' }}>At least one of the two below is required -- if you have a website, your Facebook page/profile is optional, and vice versa.</p>
+                </div>
                 <div>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Cleaning Website (if any)</label>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Cleaning Website</label>
                   <input style={inputStyle} value={form.currentWebsite} onChange={e => setForm(f => ({ ...f, currentWebsite: e.target.value }))} placeholder="e.g. sparklecleanco.com" />
                 </div>
                 <div>
-                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Facebook Page</label>
-                  <input style={inputStyle} value={form.facebookPage} onChange={e => setForm(f => ({ ...f, facebookPage: e.target.value }))} placeholder="https://facebook.com/..." />
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Facebook Page/Profile</label>
+                  <input style={inputStyle} value={form.facebookPage} onChange={e => setForm(f => ({ ...f, facebookPage: e.target.value }))} placeholder="https://facebook.com/yourpage or your profile URL" />
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tell Us About Your Business</label>

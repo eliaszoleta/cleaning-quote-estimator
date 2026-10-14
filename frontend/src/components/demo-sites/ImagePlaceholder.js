@@ -1,11 +1,22 @@
 import React from 'react';
 import { ImageIcon } from 'lucide-react';
 
-// Stands in for a real photo the demo sites don't have yet -- this
-// environment can't generate images. Swap it for a real <img> once photos
-// are uploaded (e.g. to GitHub) and pointed to; the `note` is exactly what
-// to generate or source for that slot.
-export default function ImagePlaceholder({ note, height = 320, radius = 16, accent = '#94a3b8' }) {
+// Stands in for a real photo a demo site slot doesn't have yet. Pass `src`
+// (and `alt`) once a real photo is available for that slot and this renders
+// it directly instead of the dashed placeholder box -- `note` then becomes
+// unused for that slot. Slots with no `src` still fall back to the
+// placeholder, with `note` describing exactly what to source for it.
+export default function ImagePlaceholder({ src, alt, note, height = 320, radius = 16, accent = '#94a3b8' }) {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={alt || note || ''}
+        loading="lazy"
+        style={{ width: '100%', height, borderRadius: radius, objectFit: 'cover', display: 'block' }}
+      />
+    );
+  }
   return (
     <div style={{
       width: '100%', height, borderRadius: radius,

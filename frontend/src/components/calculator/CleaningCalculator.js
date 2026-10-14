@@ -14,6 +14,7 @@ import HomeStep from './steps/HomeStep';
 import ApartmentStep from './steps/ApartmentStep';
 import CommercialStep from './steps/CommercialStep';
 import CarpetStep from './steps/CarpetStep';
+import UpholsteryStep from './steps/UpholsteryStep';
 import AirDuctStep from './steps/AirDuctStep';
 import DryerVentStep from './steps/DryerVentStep';
 import TileGroutStep from './steps/TileGroutStep';
@@ -21,12 +22,14 @@ import MoldStep from './steps/MoldStep';
 import WaterDamageStep from './steps/WaterDamageStep';
 import LeadCaptureStep from './steps/LeadCaptureStep';
 import ResultsScreen from './ResultsScreen';
+import EstimateSentScreen from './EstimateSentScreen';
 
 const SERVICE_STEPS = {
   home_residential: ['service', 'location', 'home', 'lead', 'results'],
   apartment: ['service', 'location', 'apartment', 'lead', 'results'],
   commercial: ['service', 'location', 'commercial', 'lead', 'results'],
   carpet: ['service', 'location', 'carpet', 'lead', 'results'],
+  upholstery: ['service', 'location', 'upholstery', 'lead', 'results'],
   air_duct: ['service', 'location', 'air_duct', 'lead', 'results'],
   dryer_vent: ['service', 'location', 'dryer_vent', 'lead', 'results'],
   tile_grout: ['service', 'location', 'tile_grout', 'lead', 'results'],
@@ -44,6 +47,7 @@ const SERVICE_CONFIG_KEYS = {
   apartment: 'apartment',
   commercial: 'commercial',
   carpet: 'carpet',
+  upholstery: 'upholstery',
   air_duct: 'airDuct',
   dryer_vent: 'dryerVent',
   tile_grout: 'tileGrout',
@@ -56,6 +60,7 @@ const DETAIL_STEP_COMPONENT = {
   apartment: ApartmentStep,
   commercial: CommercialStep,
   carpet: CarpetStep,
+  upholstery: UpholsteryStep,
   air_duct: AirDuctStep,
   dryer_vent: DryerVentStep,
   tile_grout: TileGroutStep,
@@ -63,11 +68,28 @@ const DETAIL_STEP_COMPONENT = {
   water_damage: WaterDamageStep,
 };
 
-const PROGRESS_LABELS = ['Service', 'Location', 'Details', 'Send', 'Results'];
+// Maps a step id to its progress-bar label -- indexed by step name rather
+// than position, so it stays correct whether or not 'lead' is actually
+// present in `steps` (see skipLeadCapture below). Every per-service detail
+// step (home/apartment/commercial/...) shares the 'Details' label.
+function labelForStep(step) {
+  if (step === 'service') return 'Service';
+  if (step === 'location') return 'Location';
+  if (step === 'lead') return 'Send';
+  if (step === 'results') return 'Results';
+  return 'Details';
+}
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null }) {
   const cardRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
+  // Measures the card's own rendered width, not window.innerWidth -- this
+  // renders both in a real <iframe width="100%"> embed (where window IS
+  // the iframe's own narrow viewport, so innerWidth happened to work) and
+  // directly in the dashboard's Branding tab preview (no iframe -- window
+  // is the whole desktop browser, so innerWidth stayed "desktop" no matter
+  // how narrow the actual preview panel was, giving it a different,
+  // uncapped-looking layout than the same widget gets on a real site).
+  const [isMobile, setIsMobile] = useState(false);
   const [serviceType, setServiceType] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? initialService : null);
   const [stepIndex, setStepIndex] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? 1 : 0);
   const [location, setLocation] = useState({ zip: '', state: '' });
@@ -76,14 +98,44 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // Set when the backend's daily public-estimate limit kicked in (see
+  // calculate.js -- only ever reachable on the public calculator). Flat
+  // limit tracked by IP, applies to every visitor regardless of how "I am
+  // a..." was answered. Shown as its own popup pitching the unlimited
+  // internal tool, not folded into the generic `error` banner.
+  const [limitReached, setLimitReached] = useState(false);
+  // Set when calculate.js's subscription-active check blocked the request
+  // (subscriptionInactive -- the account isn't active: trial never
+  // completed Checkout, or a real subscription lapsed/expired/past-due).
+  // Only ever shown as a popup when skipLeadCapture is set -- that's only
+  // ever true from RunEstimateTab.js, i.e. the account owner hitting this
+  // from their own Calculator Mode, not a stranger on the embedded widget.
+  const [subscriptionPaused, setSubscriptionPaused] = useState(false);
 
-  const steps = serviceType ? SERVICE_STEPS[serviceType] : ['service'];
+  // Skips the lead-capture step entirely when the company has it disabled
+  // (ServicesTab.js's "Enable Lead Capture" toggle) or the caller forces it
+  // off (skipLeadCapture -- the dashboard's own "Run an Estimate" tab,
+  // where there's no outside visitor to capture). Filtering `steps` itself
+  // here is what actually keeps the step unreachable -- a previous version
+  // only filtered a separate, display-only array used for the progress bar,
+  // so the real lead step still showed up in normal navigation regardless
+  // of either toggle.
+  const enableLead = !skipLeadCapture && companyConfig?.enableLeadCapture !== false;
+  const steps = serviceType
+    ? (enableLead ? SERVICE_STEPS[serviceType] : SERVICE_STEPS[serviceType].filter(s => s !== 'lead'))
+    : ['service'];
   const currentStep = steps[stepIndex];
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 640);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const el = cardRef.current;
+    if (!el) return;
+    const check = (width) => setIsMobile(width <= 640);
+    check(el.getBoundingClientRect().width);
+    const observer = new ResizeObserver(entries => {
+      check(entries[0].contentRect.width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   // Pre-select service from URL param (skipped if initialService already set it)
@@ -100,13 +152,23 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     }
   }, [initialService, companyConfig]);
 
-  // Scroll to card on step change, accounting for sticky navbar height
+  // Scroll to card on step change, accounting for sticky navbar height.
+  // When embedded, window here is the IFRAME's own window -- scrolling it
+  // does nothing a visitor can see, since the page that actually scrolls is
+  // the host site's parent window, which this iframe can't call
+  // window.scrollTo on directly (different origin). Posting a message
+  // instead, for the embed snippet's own listener (see EmbedTab.js) to act
+  // on against the real page.
   useEffect(() => {
     if (stepIndex === 0 || !cardRef.current) return;
+    if (embedded) {
+      window.parent?.postMessage({ type: 'cleancalc-scroll-to-top' }, '*');
+      return;
+    }
     const navbarHeight = 70;
     const top = cardRef.current.getBoundingClientRect().top + window.scrollY - navbarHeight;
     window.scrollTo({ top, behavior: 'smooth' });
-  }, [stepIndex]);
+  }, [stepIndex, embedded]);
 
   // Let a siteLanding page's own wrapper drop its fixed white/shadow card
   // once results are showing, since ResultsScreen renders its own full page
@@ -141,6 +203,8 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setServiceDetails({});
     setResult(null);
     setError(null);
+    setLimitReached(false);
+    setSubscriptionPaused(false);
     setStepIndex(1);
   };
 
@@ -149,14 +213,17 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     goNext();
   };
 
-  const handleDetailsNext = (details) => {
-    setServiceDetails(details);
-    goNext();
-  };
-
-  const handleLeadNext = async (lead) => {
+  // Shared by the normal (lead-capture) flow and the skip-lead flow below.
+  // Takes `detailsOverride` rather than always reading the `serviceDetails`
+  // state, because the skip-lead caller invokes this in the same tick as
+  // setServiceDetails(details) -- that state update hasn't committed yet,
+  // so reading `serviceDetails` here would still see the previous value.
+  const runCalculation = async (lead, detailsOverride) => {
+    const effectiveDetails = detailsOverride || serviceDetails;
     setLeadInfo(lead);
     setError(null);
+    setLimitReached(false);
+    setSubscriptionPaused(false);
     setLoading(true);
     try {
       // Same match ResultsScreen shows on-page (skipped when embedded, same
@@ -172,7 +239,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         // calculation engine actually uses), just stashed in
         // serviceDetails' existing free-form JSONB column as lead
         // context, no schema change needed.
-        serviceDetails: location.city ? { ...serviceDetails, city: location.city } : serviceDetails,
+        serviceDetails: location.city ? { ...effectiveDetails, city: location.city } : effectiveDetails,
         companyId: companyConfig?.companyId || null,
         leadInfo: lead?.email ? lead : null,
         partnerInfo: partnerMatch,
@@ -189,9 +256,33 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
       }
       goNext();
     } catch (err) {
-      setError(err.message || 'Calculation failed. Please try again.');
+      if (err.responseData?.limitReached) {
+        setLimitReached(true);
+      } else if (err.responseData?.subscriptionInactive && skipLeadCapture) {
+        // skipLeadCapture is only ever set by RunEstimateTab.js -- the
+        // account owner running their own calculator, not a stranger on
+        // the embedded widget -- so only they get the "please subscribe"
+        // popup. A visitor on the actual widget still just sees the plain,
+        // customer-safe inline error below.
+        setSubscriptionPaused(true);
+      } else {
+        setError(err.message || 'Calculation failed. Please try again.');
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLeadNext = (lead) => runCalculation(lead);
+
+  const handleDetailsNext = (details) => {
+    setServiceDetails(details);
+    if (enableLead) {
+      goNext();
+    } else {
+      // No lead step to trigger the calculation from in this flow --
+      // run it directly off the details just submitted.
+      runCalculation(null, details);
     }
   };
 
@@ -203,27 +294,45 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setLeadInfo(null);
     setResult(null);
     setError(null);
+    setLimitReached(false);
+    setSubscriptionPaused(false);
   };
 
   // Branding from companyConfig (or defaults)
   const primaryColor = companyConfig?.primaryColor || '#2563eb';
   const companyName = companyConfig?.companyName || null;
-  const enableLead = companyConfig?.enableLeadCapture !== false;
   const customQuestions = companyConfig?.customLeadQuestions || [];
 
-  // If lead capture disabled, skip lead step
-  const effectiveSteps = !enableLead
-    ? steps.filter(s => s !== 'lead')
-    : steps;
-
-  const progressStep = Math.min(stepIndex, 4);
+  const progressStep = Math.min(stepIndex, steps.length - 1);
 
   // Results page. On a siteLanding page (our own standalone calculator
   // pages) the wizard steps stay flush/embedded inside the page's own card,
   // but results should look exactly like the homepage's full results screen
   // (its own grey background, its own card, Share/Print/disclaimer outside
   // it) -- only a real third-party embed (EmbedWrapper) needs it flush too.
+  //
+  // On our own site (not a real third-party embed, and not the
+  // partner-recruitment demo page, which needs the real card to show
+  // prospects what it looks like) the full breakdown is never shown here --
+  // the backend already emails it the moment handleLeadNext's
+  // /api/calculate call returns, so showing it immediately on-screen too
+  // just made that email redundant and visitors never opened it. This way
+  // the email is the one place to see the numbers.
+  const showInstantResults = (embedded && !siteLanding) || !!demoPartner;
+
   if (currentStep === 'results' && result) {
+    if (!showInstantResults) {
+      return (
+        <div style={fontFamily ? { fontFamily: getFontStack(fontFamily) } : undefined}>
+          <EstimateSentScreen
+            name={leadInfo?.name}
+            email={leadInfo?.email}
+            serviceType={serviceType}
+            onReset={handleReset}
+          />
+        </div>
+      );
+    }
     return (
       <div style={fontFamily ? { fontFamily: getFontStack(fontFamily) } : undefined}>
         <ResultsScreen
@@ -233,6 +342,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           embedded={embedded && !siteLanding}
           onReset={handleReset}
           demoPartner={demoPartner}
+          onShareEmail={onShareEmail ? (email, clientName) => onShareEmail({ to: email, clientName, serviceType, zip: location.zip || null, state: location.state || null, serviceDetails }) : undefined}
         />
       </div>
     );
@@ -242,6 +352,85 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   return (
     <>
+      {/* Only ever set when calculate.js's public daily limit blocked the
+          request -- which only happens with no companyId, so this never
+          shows inside a company's own embedded widget. */}
+      {limitReached && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
+          onClick={() => setLimitReached(false)}
+        >
+          <div
+            style={{ background: 'white', borderRadius: 16, padding: '36px 32px', maxWidth: 420, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.35)', textAlign: 'center' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+              <AlertCircle size={26} color="#dc2626" strokeWidth={2} />
+            </div>
+            <h3 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Daily limit reached</h3>
+            <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.65, marginBottom: 22 }}>
+              This tool is limited to 2 free estimates a day. Want unlimited calculations for your business?
+            </p>
+            <div style={{ background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: 12, padding: '16px 18px', marginBottom: 20, textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <Zap size={15} color="#2563eb" />
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>Clean Estimator — Internal Pricing Tool</span>
+              </div>
+              <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.55, margin: 0 }}>
+                Unlimited calculations, instant results on screen — 30 days free.
+              </p>
+            </div>
+            <a
+              href="/estimator"
+              style={{ display: 'block', background: '#2563eb', color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15, marginBottom: 12 }}
+            >
+              See Clean Estimator →
+            </a>
+            <button
+              onClick={() => setLimitReached(false)}
+              style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: 13, cursor: 'pointer' }}
+            >
+              Maybe later
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Only shown to the account owner (skipLeadCapture -- see the
+          catch block above), never on the embedded widget a stranger
+          might be using. */}
+      {subscriptionPaused && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
+          onClick={() => setSubscriptionPaused(false)}
+        >
+          <div
+            style={{ background: 'white', borderRadius: 16, padding: '36px 32px', maxWidth: 420, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.35)', textAlign: 'center' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#fffbeb', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+              <AlertCircle size={26} color="#d97706" strokeWidth={2} />
+            </div>
+            <h3 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Calculator paused</h3>
+            <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.65, marginBottom: 22 }}>
+              Your trial has ended or your subscription needs attention, so your calculator is paused. Subscribe to turn it back on.
+            </p>
+            <a
+              href="/company?tab=subscription"
+              style={{ display: 'block', background: '#2563eb', color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15, marginBottom: 12 }}
+            >
+              Go to Subscription →
+            </a>
+            <button
+              onClick={() => setSubscriptionPaused(false)}
+              style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: 13, cursor: 'pointer' }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {!embedded && (
         <Helmet>
           <title>Free Cleaning Cost Calculator 2026 | Clean Estimator</title>
@@ -280,9 +469,19 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         )}
 
         <div style={{ padding: embedded ? 0 : '0 16px 28px' }}>
-        {/* Calculator card */}
+        {/* Calculator card. maxWidth only applies when NOT embedded (the
+            main site/dashboard, where nothing else constrains how wide this
+            could stretch on a big monitor) -- when embedded, the iframe's
+            own width IS the host site's deliberate choice (that's what a
+            real <iframe width="100%"> embed means), so capping it here too
+            fought that choice: a host giving the widget more than 720px of
+            room (a full-width content section, not the narrower sidebar-ish
+            embeds this cap was sized for) got a floating 720px form
+            centered in all that extra space instead of using it, which read
+            as one big card with oversized gutters since both are plain
+            white with nothing to visually tell them apart. */}
         <div ref={cardRef} style={{
-          maxWidth: 720,
+          maxWidth: embedded ? undefined : 720,
           margin: embedded ? '0 auto' : (currentStep === 'service' ? `${isMobile ? -44 : -72}px auto 0` : '14px auto 0'),
           position: 'relative',
           background: COLORS.surface,
@@ -295,19 +494,19 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           {currentStep !== 'service' && currentStep !== 'results' && (
             <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, padding: '16px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                {PROGRESS_LABELS.slice(0, effectiveSteps.length).map((label, i) => (
-                  <span key={label} style={{
+                {steps.map((step, i) => (
+                  <span key={step} style={{
                     fontSize: 12, fontWeight: 600,
                     color: i <= progressStep ? primaryColor : COLORS.muted,
                   }}>
-                    {label}
+                    {labelForStep(step)}
                   </span>
                 ))}
               </div>
               <div style={{ height: 4, background: COLORS.border, borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%',
-                  width: `${(progressStep / (effectiveSteps.length - 1)) * 100}%`,
+                  width: `${(progressStep / (steps.length - 1)) * 100}%`,
                   background: primaryColor,
                   borderRadius: 2,
                   transition: 'width 0.3s ease',
@@ -326,7 +525,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           {/* Steps */}
           <div style={{ padding: embedded ? '20px 16px' : isMobile ? '20px 16px' : '32px 40px' }}>
             {currentStep === 'service' && (
-              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} services={companyConfig?.services} />
+              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} />
             )}
             {currentStep === 'location' && (
               <LocationStep
@@ -366,7 +565,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', rowGap: 10, columnGap: 28, flexWrap: 'wrap' }}>
             {[
               { Icon: MapPin,    label: 'All 50 states',     color: '#059669' },
-              { Icon: BarChart3, label: '9 service types',   color: '#2563eb' },
+              { Icon: BarChart3, label: '10 service types',   color: '#2563eb' },
               { Icon: ShieldOff, label: 'No email required', color: '#7c3aed' },
               { Icon: Zap,       label: 'Instant results',   color: '#ea580c' },
             ].map(({ Icon, label, color }) => (

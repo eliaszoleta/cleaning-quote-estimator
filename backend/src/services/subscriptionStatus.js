@@ -1,6 +1,20 @@
 const TRIAL_DAYS = 30; // Legacy: for existing accounts that started a free trial without CC
 
-function computeSubscriptionStatus(config) {
+// Elias's own demo/testing account -- used to check real dashboard/widget
+// behavior while working on this app, so it should never show trial-expired
+// or paused states on its own account like a real subscriber's would.
+// Checked by email (passed in by each call site from req.user.email, or
+// from the admin company list's own already-looked-up email) rather than
+// company id, since that's the one piece of identity already on hand
+// everywhere computeSubscriptionStatus is called from an authenticated
+// route, with no extra Supabase lookup needed.
+const ALWAYS_ACTIVE_EMAIL = 'blueboyacc05@gmail.com';
+
+function computeSubscriptionStatus(config, email) {
+  if (email && email.toLowerCase() === ALWAYS_ACTIVE_EMAIL) {
+    return { active: true, status: 'active', cancelAtPeriodEnd: false, daysLeft: null, currentPeriodEnd: null, stripeCustomerId: null, stripeSubscriptionId: null };
+  }
+
   const sub = config.subscription || {};
   const trialStart = sub.trialStartedAt ? new Date(sub.trialStartedAt) : null;
 
@@ -39,17 +53,27 @@ function computeSubscriptionStatus(config) {
     return { active: false, status: sub.status || 'inactive', daysLeft: null, currentPeriodEnd: sub.currentPeriodEnd || null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: sub.stripeSubscriptionId };
   }
 
-  // trialStartedAt is the only trial mechanism now (30-day, no card) --
-  // company.js sets this on first login and no longer ever writes
-  // trialType:'stripe'. Checked ahead of that legacy flag on purpose: an
-  // account created under the old CC-required flow (trialType:'stripe',
-  // no trialStartedAt) that later got backfilled a trialStartedAt (e.g.
-  // via a one-off SQL fix) must not get stuck re-reading the stale
-  // trialType flag forever -- trialStartedAt being present always wins.
+  // trialStartedAt is a legacy, no-card trial -- nothing sets this anymore
+  // (getOrCreateCompanyConfig no longer auto-starts one on first dashboard
+  // load; every account now gets its 30-day trial through Stripe Checkout
+  // itself, see subscription.js's POST /checkout). Kept read-only here so
+  // any account that already has one from before that change keeps running
+  // out normally instead of being retroactively cut off. Checked ahead of
+  // the even older trialType legacy flag on purpose: an account that
+  // somehow has both must not get stuck re-reading the stale trialType flag
+  // forever -- trialStartedAt being present always wins.
   if (trialStart) {
     const daysElapsed = (Date.now() - trialStart.getTime()) / (1000 * 60 * 60 * 24);
     if (daysElapsed < TRIAL_DAYS) {
-      return { active: true, status: 'trialing', daysLeft: Math.ceil(TRIAL_DAYS - daysElapsed), currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
+      // active stays true -- the embedded public widget (calculate.js
+      // checks this same .active flag for both internal Calculator Mode and
+      // the live widget) keeps working normally for the rest of these real
+      // remaining days. needsCardForTrial is what CompanyDashboard.js checks
+      // separately to still hard-gate the dashboard itself behind "add a
+      // card to keep going" -- deliberately NOT the same flag calculate.js
+      // reads, so a company's already-live widget doesn't go dark just
+      // because they haven't logged back in and added a card yet.
+      return { active: true, status: 'trialing', needsCardForTrial: true, daysLeft: Math.ceil(TRIAL_DAYS - daysElapsed), currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
     }
     return { active: false, status: 'expired', daysLeft: 0, currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
   }

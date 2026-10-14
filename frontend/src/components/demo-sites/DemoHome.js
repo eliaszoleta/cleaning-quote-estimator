@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Sparkles, Home as HomeIcon, Truck, Repeat, Leaf, Star, ShieldCheck, BadgeCheck, ThumbsUp, ChevronDown, Check } from 'lucide-react';
 import { useDemoSite } from './DemoSiteContext';
 import { getFaqs } from './siteConfigs';
+import { serviceSlugFor } from './demoSeoContent';
 import ImagePlaceholder from './ImagePlaceholder';
 import HeroQuoteForm from './HeroQuoteForm';
+import DemoWorkGallery from './DemoWorkGallery';
 
 const SERVICE_ICONS = [Sparkles, HomeIcon, Truck, Repeat, Leaf];
 
@@ -106,13 +108,13 @@ export default function DemoHome() {
             {site.services.map((s, i) => {
               const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
               return (
-                <div key={s.title} style={{ background: c.card, borderRadius: 14, padding: 24, border: `1px solid ${c.border}` }}>
+                <a key={s.title} href={`/website-example/${site.slug}/services/${serviceSlugFor(s)}`} style={{ background: c.card, borderRadius: 14, padding: 24, border: `1px solid ${c.border}`, textDecoration: 'none', display: 'block' }}>
                   <div style={{ width: 40, height: 40, borderRadius: 10, background: c.bgAlt, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
                     <Icon size={18} color={c.primary} />
                   </div>
                   <div style={{ fontFamily: site.fontHeading, fontWeight: 700, fontSize: 15.5, color: c.ink, marginBottom: 6 }}>{s.title}</div>
                   <div style={{ fontSize: 13.5, color: c.textMuted, lineHeight: 1.6 }}>{s.desc}</div>
-                </div>
+                </a>
               );
             })}
           </div>
@@ -121,6 +123,10 @@ export default function DemoHome() {
           </div>
         </div>
       </div>
+
+      {/* Slide gallery -- real photos, auto-advancing, matching the "work in
+          action" gallery pattern the live client sites use. */}
+      <DemoWorkGallery />
 
       {/* Why us -- alternating image/text/checklist blocks, the kind of
           expertise + legitimacy signal a service business needs before a
@@ -152,9 +158,6 @@ export default function DemoHome() {
         </div>
       </div>
 
-      {/* Before / after results -- concrete proof of work, not just claims */}
-      <BeforeAfter site={site} />
-
       {/* FAQ -- answers the hesitations a first-time visitor has before
           they'll hand over their address and a key. */}
       <DemoFaq site={site} />
@@ -184,7 +187,7 @@ function WhyUsBlock({ site, block, index }) {
   const c = site.colors;
   const { openQuote } = useDemoSite();
   const imageFirst = index % 2 === 0;
-  const image = <ImagePlaceholder note={block.imageNote} height={340} accent={c.primary} />;
+  const image = <ImagePlaceholder src={block.image} alt={block.imageNote} note={block.imageNote} height={340} accent={c.primary} />;
   const text = (
     <div>
       <h3 style={{ fontFamily: site.fontHeading, fontWeight: 700, fontSize: 'clamp(22px, 4vw, 28px)', color: c.ink, marginBottom: 14, letterSpacing: '-0.3px' }}>{block.headline}</h3>
@@ -258,29 +261,6 @@ function ReviewStatBar({ site }) {
   );
 }
 
-function BeforeAfter({ site }) {
-  const c = site.colors;
-  return (
-    <div style={{ padding: 'clamp(44px, 8vw, 80px) 20px', background: 'white' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <h2 style={{ fontFamily: site.fontHeading, fontSize: 'clamp(22px, 4vw, 30px)', fontWeight: 700, color: c.ink, marginBottom: 10 }}>Our Results Speak for Themselves</h2>
-          <p style={{ fontSize: 14.5, color: c.textMuted, maxWidth: 520, margin: '0 auto' }}>A real before-and-after from a recent {site.city} job.</p>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: 16 }}>
-          <div>
-            <ImagePlaceholder note={`BEFORE: a visibly dirty or stained area (carpet, floor, or countertop) in a home, unedited, natural lighting.`} height={240} accent={c.primary} />
-            <div style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 700, color: c.textMuted, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 10 }}>Before</div>
-          </div>
-          <div>
-            <ImagePlaceholder note={`AFTER: the exact same area as the "before" photo, same framing and angle, now spotless.`} height={240} accent={c.primary} />
-            <div style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 700, color: c.primary, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 10 }}>After</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function DemoFaq({ site }) {
   const c = site.colors;

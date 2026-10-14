@@ -1,32 +1,52 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Zap, AlertTriangle, Globe, Paintbrush, Users, SlidersHorizontal, KeyRound, BarChart3, Phone, Infinity, Check, Loader2, Lock } from 'lucide-react';
-import { postCheckout, postPortal } from '../../../utils/api';
+import { CheckCircle2, Zap, AlertTriangle, Globe, UserPlus, SlidersHorizontal, KeyRound, Send, ClipboardList, Infinity, Loader2, Lock, X } from 'lucide-react';
+import { postCheckout, postPortal, postCompanyFeedback } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 
+// Options for the optional "before you go" feedback step -- see
+// 021_cancellation_feedback.sql for why this is asked up front rather than
+// captured reactively on actual cancellation (Stripe's hosted Billing
+// Portal is a black box this app can't tell "updated a card" apart from
+// "canceled" inside).
+const FEEDBACK_REASONS = [
+  'Just updating payment info',
+  'Too expensive',
+  'Not using it enough',
+  'Missing a feature I need',
+  'Switching to something else',
+  'Other',
+];
+
+// Mirrors CompanyLanding.js's PLAN_FEATURES -- one plan, pitched primarily
+// as an internal pricing tool, with the calculator widget for your
+// website included rather than a separate, pricier upsell.
 const FEATURES = [
-  { Icon: Globe,             text: 'Embeddable estimator widget on your website' },
-  { Icon: Paintbrush,        text: 'Custom branding — colors, logo, CTA text' },
-  { Icon: Users,             text: 'Lead capture & CRM dashboard' },
-  { Icon: SlidersHorizontal, text: 'Per-service enable/disable and markup control' },
-  { Icon: KeyRound,          text: 'API access for CRM integration' },
-  { Icon: BarChart3,         text: 'Lead analytics and CSV export' },
-  { Icon: Phone,             text: 'Priority support' },
-  { Icon: Infinity,          text: 'Unlimited estimator sessions per month' },
+  { Icon: Infinity,          text: 'Unlimited internal price calculations' },
+  { Icon: Lock,              text: 'Instant result on screen — never a public price range' },
+  { Icon: Send,              text: 'Email a result to a coworker in one click' },
+  { Icon: SlidersHorizontal, text: 'ZIP-code accurate pricing & per-service markup control' },
+  { Icon: ClipboardList,     text: 'All 10 service calculators' },
+  { Icon: Globe,             text: 'Calculator widget for your website, included whenever you want public lead capture' },
+  { Icon: UserPlus,          text: "Automatic lead capture + instant email alerts once it's on your site" },
+  { Icon: KeyRound,          text: 'API access for CRM sync' },
 ];
 
 export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState('');
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackReason, setFeedbackReason] = useState('');
+  const [feedbackNote, setFeedbackNote] = useState('');
 
-  const getToken = async () => {
+  const getSessionInfo = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    return session?.access_token;
+    return { token: session?.access_token, companyId: session?.user?.id };
   };
 
   const handleCheckout = async () => {
     setLoading('checkout'); setError('');
     try {
-      const token = await getToken();
+      const { token } = await getSessionInfo();
       const res = await postCheckout(token);
       window.location.href = res.url;
     } catch (err) {
@@ -38,13 +58,26 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   const handlePortal = async () => {
     setLoading('portal'); setError('');
     try {
-      const token = await getToken();
+      const { token } = await getSessionInfo();
       const res = await postPortal(token);
       window.location.href = res.url;
     } catch (err) {
       setError(err.message);
       setLoading(null);
     }
+  };
+
+  // Submits feedback (if any was given) then always proceeds to the portal
+  // either way -- a failed/empty feedback save should never block billing.
+  const handleFeedbackContinue = async () => {
+    setShowFeedback(false);
+    if (feedbackReason || feedbackNote.trim()) {
+      try {
+        const { token, companyId } = await getSessionInfo();
+        if (token && companyId) await postCompanyFeedback(token, companyId, { reason: feedbackReason, note: feedbackNote.trim() });
+      } catch {} // best-effort -- never blocks the portal redirect below
+    }
+    handlePortal();
   };
 
   const isActive = subStatus?.active;
@@ -63,8 +96,8 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   const sc = statusConfig[status] || { Icon: AlertTriangle, iconColor: '#94a3b8', bg: '#f8fafc', border: '#e2e8f0', title: 'No Active Plan' };
 
   const statusDetail = (() => {
-    if (status === 'requires_trial_setup') return 'Get 30 days free — no credit card required.';
-    if (status === 'trialing' && subStatus?.daysLeft > 0) return `${subStatus.daysLeft} days remaining in your free trial — no credit card on file, subscribe anytime to keep your widget running after it ends.`;
+    if (status === 'requires_trial_setup') return 'Activate your calculator to start your 30-day free trial.';
+    if (status === 'trialing' && subStatus?.daysLeft > 0) return `${subStatus.daysLeft} days remaining in your free trial — subscribe anytime to keep your widget running after it ends.`;
     if (status === 'trialing') return 'Your trial ends today. Subscribe now to keep your widget from pausing.';
     if (status === 'active' && subStatus?.currentPeriodEnd) return `Renews on ${new Date(subStatus.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`;
     if (status === 'active_canceling' && subStatus?.currentPeriodEnd) return `Active until ${new Date(subStatus.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. Will not renew.`;
@@ -74,6 +107,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
   })();
 
   return (
+    <>
     <div style={{ maxWidth: 600 }}>
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 2, letterSpacing: '-0.3px' }}>Subscription</h2>
@@ -106,7 +140,7 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
               </button>
             )}
             {(status === 'active' || status === 'active_canceling' || status === 'past_due') && (
-              <button onClick={handlePortal} disabled={loading === 'portal'}
+              <button onClick={() => setShowFeedback(true)} disabled={loading === 'portal'}
                 style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 22px', background: loading === 'portal' ? '#94a3b8' : '#0f172a', color: 'white', border: 'none', borderRadius: 7, fontWeight: 700, fontSize: 14, cursor: loading === 'portal' ? 'not-allowed' : 'pointer' }}>
                 {loading === 'portal' ? <><Loader2 size={14} className="spin" /> Loading…</> : 'Manage Billing →'}
               </button>
@@ -133,11 +167,76 @@ export default function SubscriptionTab({ subStatus, onSubRefresh }) {
       {/* Pricing */}
       <div style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)', border: '1px solid #bfdbfe', borderRadius: 7, padding: '20px 22px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginBottom: 4 }}>
-          <span style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>$159</span>
+          <span style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.5px' }}>$25</span>
           <span style={{ fontSize: 14, color: '#64748b', fontWeight: 500 }}>/month</span>
         </div>
         <div style={{ fontSize: 13, color: '#64748b', display: 'flex', alignItems: 'center', gap: 5 }}>Cancel anytime. &nbsp;·&nbsp; <Lock size={12} color="#64748b" /> Secure billing via Stripe</div>
       </div>
     </div>
+
+    {/* "Before you go" feedback -- asked right before the portal redirect,
+        since nothing on the other side of that redirect (Stripe's hosted
+        Billing Portal) can be customized or distinguished after the fact.
+        Entirely optional -- both buttons proceed to the portal either way. */}
+    {showFeedback && (
+      <div
+        style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
+        onClick={() => setShowFeedback(false)}
+      >
+        <div
+          style={{ background: 'white', borderRadius: 16, padding: '28px 26px', maxWidth: 420, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.35)' }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+            <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0 }}>Before you go</h3>
+            <button onClick={() => setShowFeedback(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: 4 }}>
+              <X size={18} />
+            </button>
+          </div>
+          <p style={{ color: '#64748b', fontSize: 13.5, lineHeight: 1.5, marginBottom: 16 }}>
+            Totally optional — what brings you to billing today? Helps us know what to fix.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 14 }}>
+            {FEEDBACK_REASONS.map(r => (
+              <button
+                key={r}
+                onClick={() => setFeedbackReason(r)}
+                style={{
+                  textAlign: 'left', padding: '9px 12px', borderRadius: 8, cursor: 'pointer',
+                  border: `1.5px solid ${feedbackReason === r ? '#2563eb' : '#e2e8f0'}`,
+                  background: feedbackReason === r ? '#eff6ff' : 'white',
+                  color: feedbackReason === r ? '#1d4ed8' : '#374151',
+                  fontWeight: feedbackReason === r ? 700 : 500, fontSize: 13.5,
+                }}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <textarea
+            value={feedbackNote}
+            onChange={e => setFeedbackNote(e.target.value)}
+            placeholder="Anything else? (optional)"
+            rows={2}
+            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1.5px solid #e2e8f0', fontSize: 13.5, fontFamily: 'inherit', resize: 'vertical', marginBottom: 18, boxSizing: 'border-box' }}
+          />
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={() => { setShowFeedback(false); handlePortal(); }}
+              style={{ flex: 1, background: 'none', border: '1.5px solid #e2e8f0', color: '#64748b', padding: '11px 0', borderRadius: 9, fontWeight: 600, fontSize: 13.5, cursor: 'pointer' }}
+            >
+              Skip
+            </button>
+            <button
+              onClick={handleFeedbackContinue}
+              style={{ flex: 1.4, background: '#2563eb', border: 'none', color: 'white', padding: '11px 0', borderRadius: 9, fontWeight: 700, fontSize: 13.5, cursor: 'pointer' }}
+            >
+              Continue to Billing →
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

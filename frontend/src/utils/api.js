@@ -69,6 +69,16 @@ export async function postPortal(token) {
   return apiFetch('/api/subscription/portal', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
 }
 
+// SubscriptionTab.js's optional "before you go" feedback, asked right
+// before handing off to postPortal above -- see 021_cancellation_feedback.sql
+// for why it's collected up front rather than reactively on actual
+// cancellation.
+export async function postCompanyFeedback(token, companyId, payload) {
+  return apiFetch(`/api/company/${companyId}/feedback`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload),
+  });
+}
+
 export async function verifyCheckout(token, sessionId) {
   return apiFetch('/api/subscription/verify-checkout', {
     method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ sessionId }),
@@ -110,6 +120,23 @@ export async function getCompanyLeads(token, includeDeleted = false) {
   return apiFetch(`/api/company-leads/company${includeDeleted ? '?deleted=true' : ''}`, { headers: { Authorization: `Bearer ${token}` } });
 }
 
+// Total + this-month count of this company's successful /api/calculate runs
+// (internal Calculator Mode and the embedded widget combined) -- see
+// leads.js's GET /company/estimate-runs for why this exists alongside the
+// leads count.
+export async function getCompanyEstimateRuns(token) {
+  return apiFetch('/api/company-leads/company/estimate-runs', { headers: { Authorization: `Bearer ${token}` } });
+}
+
+// "Run an Estimate" tab's "Share via email" action -- re-computes the
+// estimate server-side from the same inputs and emails it to `to`. No lead
+// is saved and no company-notification email fires.
+export async function postEstimateShare(token, payload) {
+  return apiFetch('/api/estimate-share', {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload),
+  });
+}
+
 export async function patchLead(token, leadId, updates) {
   return apiFetch(`/api/company-leads/company/${leadId}`, {
     method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(updates),
@@ -134,6 +161,15 @@ export async function getAdminCompanies(adminKey) {
 
 export async function getTrialEmailPreview(adminKey) {
   return apiFetch('/api/admin/companies/trial-email-preview', { headers: { 'x-admin-key': adminKey } });
+}
+
+// Permanent, immediate delete -- cancels their Stripe subscription, deletes
+// their leads/config/login. Unlike a company's own self-service DELETE
+// /api/company/account (a 30-day grace period), there's no undo here.
+export async function deleteAdminCompanyForever(adminKey, companyId) {
+  return apiFetch(`/api/admin/companies/${companyId}`, {
+    method: 'DELETE', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true }),
+  });
 }
 
 export async function sendTrialEmails(adminKey, companyIds) {
@@ -191,4 +227,193 @@ export async function patchAdminHomepageLead(adminKey, id, updates) {
 
 export async function deleteAdminHomepageLeadForever(adminKey, id) {
   return apiFetch(`/api/admin/homepage-leads/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
+}
+
+// AdminWebsiteRequests.js -- "Get a Website" applications, same adminKey
+// convention as the rest of the admin API.
+export async function getAdminWebsiteRequests(adminKey) {
+  return apiFetch('/api/admin/website-requests', { headers: { 'x-admin-key': adminKey } });
+}
+
+// Manual add (e.g. a client who reached out outside the public apply form)
+// -- deliberately skips both the internal "new application" notification
+// and the applicant's own "we got your request" confirmation email, since
+// neither fits an admin entering someone directly.
+export async function createAdminWebsiteRequest(adminKey, payload) {
+  return apiFetch('/api/admin/website-requests', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function patchAdminWebsiteRequest(adminKey, id, updates) {
+  return apiFetch(`/api/admin/website-requests/${id}`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(updates),
+  });
+}
+
+export async function cancelAdminWebsiteSubscription(adminKey, id) {
+  return apiFetch(`/api/admin/website-requests/${id}/cancel-subscription`, {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true }),
+  });
+}
+
+// Permanent, immediate delete -- cancels their Stripe subscription (if any)
+// and removes the request row. No undo, same as deleteAdminCompanyForever.
+export async function deleteAdminWebsiteRequestForever(adminKey, id) {
+  return apiFetch(`/api/admin/website-requests/${id}`, {
+    method: 'DELETE', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true }),
+  });
+}
+
+// WebsiteApproval.js -- public, token-gated (no adminKey/login; the random
+// token in the URL is the auth). Backs the prospect-facing approve-and-pay
+// flow for a "Get a Website" application.
+export async function getWebsiteRequestByToken(token) {
+  return apiFetch(`/api/website-request/by-token/${token}`);
+}
+
+export async function postWebsiteRequestCheckout(token) {
+  return apiFetch(`/api/website-request/by-token/${token}/checkout`, { method: 'POST' });
+}
+
+export async function postWebsiteRequestVerifySetup(token, sessionId) {
+  return apiFetch(`/api/website-request/by-token/${token}/verify-setup`, {
+    method: 'POST', body: JSON.stringify({ sessionId }),
+  });
+}
+
+// AdminEmailMarketing.js -- templates, audience preview, individual sends,
+// and campaigns. Same adminKey convention as the rest of the admin API.
+export async function getAdminEmailTemplates(adminKey) {
+  return apiFetch('/api/admin/email-marketing/templates', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function createAdminEmailTemplate(adminKey, payload) {
+  return apiFetch('/api/admin/email-marketing/templates', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function updateAdminEmailTemplate(adminKey, id, payload) {
+  return apiFetch(`/api/admin/email-marketing/templates/${id}`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteAdminEmailTemplate(adminKey, id) {
+  return apiFetch(`/api/admin/email-marketing/templates/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
+}
+
+export async function previewAdminEmailAudience(adminKey, audience) {
+  return apiFetch('/api/admin/email-marketing/audience/preview', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ audience }),
+  });
+}
+
+export async function sendAdminIndividualEmail(adminKey, payload) {
+  return apiFetch('/api/admin/email-marketing/send-individual', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function getAdminEmailCampaigns(adminKey) {
+  return apiFetch('/api/admin/email-marketing/campaigns', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function getAdminEmailCampaign(adminKey, id) {
+  return apiFetch(`/api/admin/email-marketing/campaigns/${id}`, { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function createAdminEmailCampaign(adminKey, payload) {
+  return apiFetch('/api/admin/email-marketing/campaigns', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function cancelAdminEmailCampaign(adminKey, id) {
+  return apiFetch(`/api/admin/email-marketing/campaigns/${id}/cancel`, {
+    method: 'POST', headers: { 'x-admin-key': adminKey },
+  });
+}
+
+// BookingPage.js -- the self-hosted Calendly replacement at /book-a-call.
+// Public, unauthenticated (a prospect picking a time, same as /api/calculate).
+export async function getBookingAvailability(date) {
+  return apiFetch(`/api/booking/availability?date=${encodeURIComponent(date)}`);
+}
+
+export async function createBooking(payload) {
+  return apiFetch('/api/booking/create', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+// CancelBookingPage.js -- /cancel-booking?token=..., same no-login,
+// token-is-the-auth pattern as getWebsiteRequestByToken above.
+export async function getBookingByToken(token) {
+  return apiFetch(`/api/booking/by-token/${token}`);
+}
+
+export async function cancelBooking(token) {
+  return apiFetch('/api/booking/cancel', { method: 'POST', body: JSON.stringify({ token }) });
+}
+
+// AdminBookings.js -- weekly-availability settings, bookings list, and the
+// Google Calendar connect/status/disconnect, same adminKey convention as
+// the rest of the admin API.
+export async function getAdminBookingSettings(adminKey) {
+  return apiFetch('/api/admin/booking/settings', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function updateAdminBookingSettings(adminKey, payload) {
+  return apiFetch('/api/admin/booking/settings', {
+    method: 'PUT', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function getAdminBookings(adminKey) {
+  return apiFetch('/api/admin/booking/bookings', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function cancelAdminBooking(adminKey, id) {
+  return apiFetch(`/api/admin/booking/bookings/${id}/cancel`, {
+    method: 'POST', headers: { 'x-admin-key': adminKey },
+  });
+}
+
+export async function getGoogleCalendarAuthUrl(adminKey) {
+  return apiFetch('/api/admin/google-calendar/auth-url', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function getGoogleCalendarStatus(adminKey) {
+  return apiFetch('/api/admin/google-calendar/status', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function disconnectGoogleCalendar(adminKey) {
+  return apiFetch('/api/admin/google-calendar/disconnect', { method: 'POST', headers: { 'x-admin-key': adminKey } });
+}
+
+// AdminChatbots.js -- CRUD for the Growth/Pro-tier chatbots (business
+// info/prompt, lead alert email, From name) plus each one's captured
+// leads, same adminKey convention as the rest of the admin API.
+export async function getAdminChatbots(adminKey) {
+  return apiFetch('/api/admin/chatbots', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function createAdminChatbot(adminKey, payload) {
+  return apiFetch('/api/admin/chatbots', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function updateAdminChatbot(adminKey, id, payload) {
+  return apiFetch(`/api/admin/chatbots/${id}`, {
+    method: 'PATCH', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteAdminChatbot(adminKey, id) {
+  return apiFetch(`/api/admin/chatbots/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
+}
+
+export async function getAdminChatbotLeads(adminKey, id) {
+  return apiFetch(`/api/admin/chatbots/${id}/leads`, { headers: { 'x-admin-key': adminKey } });
 }

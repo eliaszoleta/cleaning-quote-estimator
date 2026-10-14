@@ -12,6 +12,7 @@ import NoWebsiteBanner from '../ui/NoWebsiteBanner';
 const PRIMARY = '#2563eb';
 const PRIMARY_GRADIENT = '#1d4ed8';
 const WEB3FORMS_KEY = 'b0da3f48-9982-4a5a-9195-4200a80ba8c6';
+const DEMO_CALL_URL = '/book-a-call';
 
 // Same sample data /partner-demo uses -- a generic "SC" mark inlined as a
 // data URI so the hero mockup doesn't depend on an external image file.
@@ -285,12 +286,14 @@ export default function PartnerWithUs() {
         <meta name="description" content="Get your cleaning business recommended to thousands of homeowners actively searching for cleaning services in your city. Join Clean Estimator's partner network from $175/month per city (major metros are $350/month) — sitewide placement, multi-city support, and a free performance dashboard included." />
       </Helmet>
 
-      {/* Hero -- same treatment as the estimator sales page: a restrained
-          accent line + eyebrow instead of relying on size/weight alone, a
-          two-column layout, and a static "product shot" showing exactly
+      {/* Hero -- same treatment as the estimator sales page: a pill eyebrow
+          badge and a couple of soft glow blobs instead of a flat gradient,
+          a two-column layout, and a static "product shot" showing exactly
           what a visitor sees (their estimate, then the partner's listing
           recommended right below it) instead of only describing it. */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: 'clamp(72px, 10vw, 110px) 24px' }}>
+      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: 'clamp(72px, 10vw, 110px) 24px', position: 'relative', overflow: 'hidden' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: -100, right: '6%', width: 340, height: 340, borderRadius: '50%', background: 'radial-gradient(circle, rgba(96,165,250,0.18), transparent 70%)', pointerEvents: 'none' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', bottom: -120, left: '2%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.16), transparent 70%)', pointerEvents: 'none' }} />
         {/* minmax(min(380px, 100%), 1fr) instead of a bare minmax(380px, 1fr) --
             on phones narrower than ~428px, 380px + 48px of side padding no
             longer fits inside the viewport, and a plain fixed floor forces
@@ -298,14 +301,15 @@ export default function PartnerWithUs() {
             the difference, showing as a sliver of page background down the
             right edge. min(380px, 100%) caps the floor at whatever space is
             actually available instead. */}
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', gap: 56, alignItems: 'center' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))', gap: 56, alignItems: 'center', position: 'relative' }}>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(96,165,250,0.12)', color: '#93c5fd', padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', border: '1px solid rgba(96,165,250,0.3)', marginBottom: 18 }}>
+              <MapPin size={12} />
               Local partner program
-            </div>
+            </span>
             <h1 style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
               Get recommended to thousands of homeowners<br />
-              <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>ready to hire a cleaner</span>
+              <span style={{ color: '#60a5fa' }}>ready to hire a cleaner</span>
             </h1>
             <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 480, marginBottom: 14, lineHeight: 1.5 }}>
               Clean Estimator gets <span style={{ color: 'white', fontWeight: 400 }}>25&ndash;30K organic visits a month</span> from homeowners actively pricing out a cleaning job, not casual browsers.
@@ -321,6 +325,14 @@ export default function PartnerWithUs() {
                 See Live Demo
               </a>
             </div>
+            <a
+              href={DEMO_CALL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, color: '#93c5fd', textDecoration: 'none', fontWeight: 600, fontSize: 14 }}
+            >
+              Or book a free demo call <IconArrow size={14} />
+            </a>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center' }}>

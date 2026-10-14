@@ -11,9 +11,13 @@ const SIZES = [
   { id: '4br_plus', label: '4+ Bedrooms', sub: '1,600+ sq ft' },
 ];
 
+// ids must match CLEANING_TYPE_MULTIPLIERS' keys in backend/src/config/defaults.js
+// exactly -- this used to say 'deep_clean' here while the backend only ever had
+// a 'deep' key, so every Deep Clean quote silently fell through to the Standard
+// multiplier (1.0x instead of the correct 1.68-1.85x).
 const CLEANING_TYPES = [
   { id: 'standard', label: 'Standard Clean' },
-  { id: 'deep_clean', label: 'Deep Clean' },
+  { id: 'deep', label: 'Deep Clean' },
   { id: 'move_in_out', label: 'Move-In / Move-Out' },
 ];
 
@@ -24,17 +28,21 @@ const FREQUENCY = [
   { id: 'monthly', label: 'Monthly' },
 ];
 
+// ids must match HOME_EXTRAS' keys exactly (calculateApartment reuses the
+// same table as House Cleaning) -- 'windows_interior' and 'balcony' used to
+// not match the backend's 'interior_windows'/'balcony_patio' keys at all, so
+// those two add-ons silently cost $0 when selected.
 const EXTRAS = [
   { id: 'inside_fridge', label: 'Inside Fridge' },
   { id: 'inside_oven', label: 'Inside Oven' },
   { id: 'inside_cabinets', label: 'Inside Cabinets' },
   { id: 'laundry', label: 'Laundry' },
-  { id: 'windows_interior', label: 'Interior Windows' },
-  { id: 'balcony', label: 'Balcony / Patio' },
+  { id: 'interior_windows', label: 'Interior Windows' },
+  { id: 'balcony_patio', label: 'Balcony / Patio' },
 ];
 
 export default function ApartmentStep({ value, onBack, onNext, primaryColor, companyConfig }) {
-  // Only reflects a real, company-set discount (Discount tab) -- off by
+  // Only reflects a real, company-set discount (Services tab) -- off by
   // default, so a fresh account shows no "% off" tag on any frequency
   // until the company actually configures one.
   const frequencyDiscounts = companyConfig?.services?.apartment?.frequencyDiscounts || {};
@@ -50,7 +58,7 @@ export default function ApartmentStep({ value, onBack, onNext, primaryColor, com
   return (
     <StepWrapper title="Apartment details" subtitle="Get an accurate quote for your unit" onBack={onBack} onNext={() => onNext({ size, bathrooms, cleaningType, frequency, furnished, extras })} primaryColor={primaryColor}>
       <StepSection label="Apartment size">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+        <div className="calc-grid-2">
           {SIZES.map(o => (
             <StepOptionCard key={o.id} selected={size === o.id} onClick={() => setSize(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>{o.label}</div>

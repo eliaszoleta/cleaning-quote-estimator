@@ -52,6 +52,15 @@ img { max-width: 100%; height: auto; }
 }
 .spin { animation: spin 1s linear infinite; }
 
+/* ─── Attention pulse (e.g. header CTAs) ─────────────────────────────────── */
+@keyframes attention-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(96,165,250,0.55); }
+  70%  { box-shadow: 0 0 0 9px rgba(96,165,250,0); }
+  100% { box-shadow: 0 0 0 0 rgba(96,165,250,0); }
+}
+.pulse-cta { animation: attention-pulse 2.2s ease-out infinite; }
+.pulse-cta:hover { animation-play-state: paused; }
+
 /* ─── Layout ──────────────────────────────────────────────────────────────── */
 .app { display: flex; flex-direction: column; min-height: 100vh; }
 .app main { flex: 1; }
@@ -97,30 +106,35 @@ img { max-width: 100%; height: auto; }
 
 .dash-main { display: flex; min-height: calc(100vh - 60px); }
 
-/* Horizontal tab bar, sticky directly under the 60px top header -- was a
-   left sidebar; moved into the header so the page content gets the full
-   width instead of losing a fixed 216px column to navigation. */
 .dash-nav {
-  width: 100%; background: #ffffff; border-bottom: 1px solid var(--border);
-  padding: 8px 24px; display: flex; flex-direction: row; gap: 4px;
-  position: sticky; top: 60px; z-index: 99; overflow-x: auto; flex-wrap: nowrap;
+  width: 216px; background: #ffffff; border-right: 1px solid var(--border);
+  padding: 16px 10px; display: flex; flex-direction: column; gap: 2px;
+  position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .dash-nav-item {
-  display: flex; align-items: center; gap: 8px; padding: 9px 14px;
-  border-radius: 7px; border: none; background: none; cursor: pointer;
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  border-radius: 10px; border: none; background: none; cursor: pointer;
   font-size: 13.5px; font-weight: 500; color: var(--text-muted);
-  text-align: left; white-space: nowrap; flex-shrink: 0;
-  border-bottom: 2px solid transparent; transition: background 0.15s, color 0.15s, transform 0.1s;
+  text-align: left; width: 100%; transition: background 0.15s, color 0.15s, transform 0.1s;
 }
 .dash-nav-item:hover { background: #f1f5f9; color: var(--text); }
 .dash-nav-item:active { transform: scale(0.98); }
 .dash-nav-item.active {
-  color: var(--primary-dark); font-weight: 700; border-bottom-color: var(--primary-dark);
+  background: var(--primary-dark); color: white;
+  font-weight: 600; box-shadow: 0 2px 8px rgba(30,58,138,0.28);
 }
-.dash-nav-item.active svg { color: var(--primary-dark); }
+.dash-nav-item.active svg { color: white; }
 
-.dash-content { flex: 1; padding: 28px 32px; overflow-y: auto; }
+/* No overflow-y here on purpose -- this box's height always just grows to
+   fit its content (nothing above bounds it to the viewport), so it never
+   actually gets its own scrollbar; the window is the real scroller. But
+   simply having overflow-y:auto set still makes this the containing
+   scroll box for any position:sticky descendant (like BrandingTab's live
+   preview column), which broke sticky since this box's own scrollTop
+   never moves. */
+.dash-content { flex: 1; padding: 28px 32px; }
 
 /* ─── Settings Cards ──────────────────────────────────────────────────────── */
 .settings-grid { display: flex; flex-direction: column; gap: 20px; max-width: 760px; }
@@ -241,12 +255,22 @@ img { max-width: 100%; height: auto; }
 .justify-between { justify-content: space-between; }
 .flex-wrap { flex-wrap: wrap; }
 
+/* Shared outer wrapper for every /admin tab (AdminCompanies.js,
+   AdminWebsiteRequests.js, AdminBookings.js, etc.) -- all 7 previously
+   hardcoded the same '30px 32px' padding inline with no mobile override,
+   which on a narrow phone left barely any width for the stat tiles/cards
+   inside to lay out in, on top of the sidebar's own width problem (see
+   AdminDashboard.js). */
+.admin-page { padding: 30px 32px; }
+
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .dash-main { flex-direction: column; }
-  .dash-nav { padding: 8px 12px; }
+  .dash-nav { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; padding: 8px 12px; flex-wrap: nowrap; }
+  .dash-nav-item { width: auto; white-space: nowrap; flex-shrink: 0; }
   .dash-content { padding: 16px; }
   .appearance-layout { flex-direction: column; }
   .appearance-layout .settings-grid { flex: none; }
   .setting-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .admin-page { padding: 16px; }
 }

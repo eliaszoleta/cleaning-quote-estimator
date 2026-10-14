@@ -40,7 +40,7 @@ function saveLeadsFile(leads) {
 }
 
 // ─── saveLead (called from calculate route) ───────────────────────────────────
-async function saveLead({ companyId, name, email, phone, serviceType, zip, state, estimatedPriceLow, estimatedPriceHigh, timeline, preferredContact, serviceDetails, customAnswers }) {
+async function saveLead({ companyId, name, email, phone, serviceType, zip, state, estimatedPriceLow, estimatedPriceHigh, timeline, preferredContact, userType, serviceDetails, customAnswers }) {
   const lead = {
     id: uuidv4(),
     company_id: companyId || null,
@@ -54,6 +54,7 @@ async function saveLead({ companyId, name, email, phone, serviceType, zip, state
     estimated_price_high: estimatedPriceHigh || null,
     timeline: timeline || null,
     preferred_contact: preferredContact || null,
+    user_type: userType === 'homeowner' || userType === 'business' ? userType : null,
     service_details: serviceDetails || {},
     custom_answers: customAnswers || {},
     notes: null,
@@ -160,6 +161,39 @@ router.get('/company', async (req, res) => {
   } catch (err) {
     console.error('Company leads error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to load leads' });
+  }
+});
+
+// GET /api/company-leads/company/estimate-runs — total + this-month count of
+// this company's successful /api/calculate runs (internal Calculator Mode
+// and the embedded widget combined, see calculate.js's own insert into
+// company_estimate_runs). A company using Clean Estimator purely as an
+// internal pricing tool never shows up in the leads table at all (no email
+// captured, nothing to save) -- without this, OverviewTab had literally no
+// way to reflect that usage, so a trial that's actually being used heavily
+// still looked completely empty the whole time. limit=1 + Prefer:
+// count=exact keeps both queries cheap regardless of how large the real
+// count is -- PostgREST computes it server-side either way.
+router.get('/company/estimate-runs', async (req, res) => {
+  const companyId = req.user.id;
+  const EMPTY = { total: 0, thisMonth: 0 };
+  try {
+    if (!SERVICE_KEY() || !SUPABASE_URL) return res.json({ success: true, data: EMPTY });
+    const since = new Date(Date.now() - 30 * 86400000).toISOString();
+    const countHeaders = { ...dbHeaders(), Prefer: 'count=exact' };
+    const parseCount = (r) => {
+      const cr = r.headers['content-range']; // "0-0/137"
+      const n = cr ? cr.split('/')[1] : null;
+      return n && n !== '*' ? parseInt(n, 10) || 0 : 0;
+    };
+    const [totalRes, monthRes] = await Promise.all([
+      axios.get(`${SUPABASE_URL}/rest/v1/company_estimate_runs?select=id&company_id=eq.${encodeURIComponent(companyId)}&limit=1`, { headers: countHeaders }),
+      axios.get(`${SUPABASE_URL}/rest/v1/company_estimate_runs?select=id&company_id=eq.${encodeURIComponent(companyId)}&created_at=gte.${encodeURIComponent(since)}&limit=1`, { headers: countHeaders }),
+    ]);
+    res.json({ success: true, data: { total: parseCount(totalRes), thisMonth: parseCount(monthRes) } });
+  } catch (err) {
+    console.error('Company estimate-runs error:', err.message);
+    res.json({ success: true, data: EMPTY }); // fail open -- a usage stat failing shouldn't break the dashboard
   }
 });
 

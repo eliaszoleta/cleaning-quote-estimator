@@ -3,11 +3,13 @@ const router = express.Router();
 const { calculateCleaning } = require('../services/cleaningCalculation');
 const { STATE_PRICING_MULTIPLIERS, STATE_AVERAGE_HOME_CLEANING_COST, STATE_NAMES } = require('../config/defaults');
 const { getCompanyConfig } = require('../services/companyConfig');
+const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { saveLead } = require('./leads');
 const { sendEstimateEmail, sendPartnerLeadEmail, sendCompanyLeadEmail } = require('../services/email');
+const { resolveCityForZip } = require('../services/zipCity');
 
 const VALID_SERVICE_TYPES = [
-  'home_residential', 'apartment', 'commercial', 'carpet',
+  'home_residential', 'apartment', 'commercial', 'carpet', 'upholstery',
   'air_duct', 'dryer_vent', 'tile_grout', 'mold_remediation', 'water_damage',
 ];
 
@@ -17,6 +19,28 @@ function getSupabase() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
   return createClient(url, key, { auth: { persistSession: false } });
+}
+
+// This route has no authenticated req.user (companyId just arrives in the
+// body, from the public embed widget or the dashboard's own Calculator
+// Mode) -- so computeSubscriptionStatus's ALWAYS_ACTIVE_EMAIL bypass
+// (Elias's own demo/testing account) was always being checked against
+// `null` and never actually applying here, even though it correctly
+// applies on GET /api/subscription/status where req.user.email is
+// available. Same companyId-to-owner-email lookup trialScheduler.js
+// already uses, so that demo account's own calculator works regardless of
+// whether it's ever been through Checkout.
+async function getOwnerEmail(companyId) {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  try {
+    const { data, error } = await supabase.auth.admin.getUserById(companyId);
+    if (error) return null;
+    return data?.user?.email || null;
+  } catch (err) {
+    console.warn('getOwnerEmail failed:', err.message);
+    return null;
+  }
 }
 
 // req.body.partnerInfo is whatever the browser's own (client-side, anon-key)
@@ -59,6 +83,85 @@ async function logLeadEmailEvent(partnerId) {
   }
 }
 
+// ─── Public calculator daily limit ─────────────────────────────────────────
+// Flat limit: PUBLIC_DAILY_LIMIT free estimates per calendar day on the
+// free, unbranded calculator (homepage, state/city/service pages), tracked
+// by IP address only -- applies to every visitor, regardless of how
+// LeadCaptureStep's "I am a..." question was answered. The whole point of
+// the $25/mo Internal Estimator plan is unlimited calculations for a
+// cleaning business's own quoting; without some limit, a business could
+// just keep using the free consumer-facing tool instead of ever
+// subscribing.
+//
+// This used to be scoped to a self-reported "Cleaning business" answer
+// only, matched against ip/email/phone -- but that made the whole thing an
+// honor-system checkbox (answer "Homeowner" instead and the limit never
+// applied, same identifiers and all). Flat and IP-only is simpler and
+// closes that loophole; the tradeoff is a shared IP (an office, a NAT'd
+// household) hits the same cap together, which is an acceptable edge case
+// for a free tool protecting a $25/mo plan. Never applies when companyId
+// is set (a company's own embedded widget or their dashboard's Calculator
+// Mode -- both already gated on an active subscription above, not this).
+const PUBLIC_DAILY_LIMIT = 2;
+
+function startOfTodayISO() {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
+async function publicDailyLimitReached(ip) {
+  const supabase = getSupabase();
+  if (!supabase || !ip) return false; // no DB configured (local dev), or no identifier to check -- never block
+  const since = startOfTodayISO();
+  try {
+    const { count, error } = await supabase
+      .from('public_estimate_attempts')
+      .select('id', { count: 'exact', head: true })
+      .gte('created_at', since)
+      .eq('ip', ip);
+    // supabase-js doesn't throw on an API-level error (bad key, missing
+    // table, etc.) -- it resolves with { error, count: null } -- so this
+    // has to be checked explicitly or a real misconfiguration would
+    // silently read as "0 attempts so far" forever instead of ever
+    // surfacing in the logs.
+    if (error) { console.warn('publicDailyLimitReached query failed:', error.message); return false; }
+    return (count || 0) >= PUBLIC_DAILY_LIMIT;
+  } catch (err) {
+    console.warn('publicDailyLimitReached check failed:', err.message);
+    return false; // fail open -- a DB hiccup shouldn't block a real visitor
+  }
+}
+
+async function recordPublicEstimateAttempt(ip) {
+  const supabase = getSupabase();
+  if (!supabase || !ip) return;
+  try {
+    const { error } = await supabase.from('public_estimate_attempts').insert({ ip });
+    if (error) console.warn('recordPublicEstimateAttempt insert failed:', error.message);
+  } catch (err) {
+    console.warn('recordPublicEstimateAttempt failed:', err.message);
+  }
+}
+
+// Every successful companyId-scoped calculation -- internal Calculator Mode
+// and the embedded widget both set companyId, so this is a holistic "this
+// account used Clean Estimator" count, not just widget leads. Without this,
+// a company using the tool purely internally (the primary pitch -- see
+// CompanyLanding.js) left zero trace anywhere, so the dashboard had no way
+// to reflect real usage for exactly the use case it's sold on. Read back by
+// leads.js's GET /company/estimate-runs for OverviewTab's stat.
+async function recordCompanyEstimateRun(companyId, serviceType) {
+  const supabase = getSupabase();
+  if (!supabase || !companyId) return;
+  try {
+    const { error } = await supabase.from('company_estimate_runs').insert({ company_id: companyId, service_type: serviceType || null });
+    if (error) console.warn('recordCompanyEstimateRun insert failed:', error.message);
+  } catch (err) {
+    console.warn('recordCompanyEstimateRun failed:', err.message);
+  }
+}
+
 // POST /api/calculate
 router.post('/', async (req, res) => {
   const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo } = req.body;
@@ -74,8 +177,40 @@ router.post('/', async (req, res) => {
   try {
     // Load company config if companyId provided
     let companyConfig = {};
+    // Hoisted above the companyId block (not just declared inside it) so
+    // the lead-notification fallback further down can reuse this same
+    // lookup instead of hitting the Supabase admin API a second time.
+    let ownerEmail = null;
     if (companyId) {
       try { companyConfig = (await getCompanyConfig(companyId)) || {}; } catch {}
+      // Real enforcement, not just a dashboard banner: an account that
+      // hasn't completed Stripe Checkout (or whose subscription has since
+      // lapsed) never gets a working calculator -- neither the public
+      // embed widget nor the dashboard's own Calculator Mode, both of
+      // which route through this same endpoint with companyId set. Without
+      // this, removing the old no-card auto-trial (see
+      // companyConfig.js's getOrCreateCompanyConfig) would still leave an
+      // unactivated account free to calculate forever, just without the
+      // trial clock -- an even bigger loophole than the one it replaces.
+      ownerEmail = await getOwnerEmail(companyId);
+      if (!computeSubscriptionStatus(companyConfig, ownerEmail).active) {
+        // subscriptionInactive lets CleaningCalculator.js tell this apart
+        // from a generic error -- shown as a plain, customer-safe inline
+        // message on the embedded widget (a stranger visiting a company's
+        // site shouldn't see "please subscribe"), but as a clear "Calculator
+        // paused, please subscribe" popup when it's the account owner
+        // hitting this from their own dashboard's Calculator Mode.
+        return res.status(402).json({ success: false, subscriptionInactive: true, error: 'This estimator is temporarily unavailable. Please contact the business directly.' });
+      }
+    } else {
+      const ip = req.ip || req.socket?.remoteAddress || null;
+      if (await publicDailyLimitReached(ip)) {
+        return res.status(429).json({
+          success: false,
+          limitReached: true,
+          error: `This tool is limited to ${PUBLIC_DAILY_LIMIT} free estimates per day. Need unlimited estimates for your business? Clean Estimator is $25/month with a 30-day free trial.`,
+        });
+      }
     }
 
     const result = await calculateCleaning(
@@ -102,6 +237,7 @@ router.post('/', async (req, res) => {
           estimatedPriceHigh: result.totalHigh,
           timeline: leadInfo.timeline || null,
           preferredContact: leadInfo.preferredContact || null,
+          userType: leadInfo.userType || null,
           serviceDetails: serviceDetails || {},
           customAnswers: leadInfo.customAnswers || {},
         });
@@ -110,10 +246,14 @@ router.post('/', async (req, res) => {
       }
 
       // Reply-to on the visitor's estimate email, so hitting "Reply" reaches
-      // the company directly -- uses the company-chosen lead-notification
-      // address, never the Supabase Auth signup email (that's just a login
-      // credential, not something to expose to visitors or route mail to).
-      const leadNotificationEmail = companyConfig.leadNotificationEmail || null;
+      // the company directly. Prefers the company-chosen lead-notification
+      // address from Branding, but falls back to the owner's own signup
+      // email when that field was never set -- previously this fell
+      // straight to null with no fallback at all, which silently skipped
+      // the internal lead-alert email entirely (see sendCompanyLeadEmail
+      // below) and left the visitor's reply-to as the generic
+      // info@cleanestimator.com instead of reaching the business.
+      const leadNotificationEmail = companyConfig.leadNotificationEmail || ownerEmail || null;
 
       // Fire-and-forget: sendEstimateEmail never throws, so this never
       // blocks or breaks the response on email delivery. Passes the full
@@ -146,6 +286,13 @@ router.post('/', async (req, res) => {
               console.warn(`Partner lead email skipped: partner ${partnerIdForLead} not found, inactive, or missing business_email`);
               return;
             }
+            // Resolved here (not before res.json above) so a slow/failed ZIP
+            // lookup can never delay the visitor's own response -- this only
+            // affects the partner's email, sent well after the response
+            // already went out. Prefers an explicit serviceDetails.city (a
+            // scoped-widget visitor who was actually asked) over the ZIP
+            // guess, same priority as the admin homepage-leads panel.
+            const leadCity = serviceDetails?.city || await resolveCityForZip(zip);
             const sent = await sendPartnerLeadEmail({
               partnerEmail,
               leadName: leadInfo.name,
@@ -154,6 +301,7 @@ router.post('/', async (req, res) => {
               serviceType,
               priceLow: result.totalLow,
               priceHigh: result.totalHigh,
+              city: leadCity,
               state: result.state,
               zip: zip || null,
               timeline: leadInfo.timeline || null,
@@ -186,26 +334,46 @@ router.post('/', async (req, res) => {
       // leadNotificationEmail above -- same reasoning).
       if (companyId) {
         if (leadNotificationEmail) {
-          sendCompanyLeadEmail({
-            to: leadNotificationEmail,
-            companyName: companyConfig.companyName || 'Clean Estimator',
-            leadName: leadInfo.name,
-            leadEmail: leadInfo.email,
-            leadPhone: leadInfo.phone,
-            serviceType,
-            priceLow: result.totalLow,
-            priceHigh: result.totalHigh,
-            state: result.state,
-            zip: zip || null,
-            timeline: leadInfo.timeline || null,
-            adjustments: result.adjustments,
-            keyFactors: result.keyFactors,
-            serviceDetails: serviceDetails || {},
-          }).catch(err => console.error('Company lead email failed:', err.message));
+          // Same fire-and-forget/non-blocking city resolution as the
+          // partner email above -- wrapped in an async IIFE since this
+          // call site (unlike the partner one) isn't already inside an
+          // async function to await within.
+          (async () => {
+            const leadCity = serviceDetails?.city || await resolveCityForZip(zip);
+            await sendCompanyLeadEmail({
+              to: leadNotificationEmail,
+              companyName: companyConfig.companyName || 'Clean Estimator',
+              leadName: leadInfo.name,
+              leadEmail: leadInfo.email,
+              leadPhone: leadInfo.phone,
+              serviceType,
+              priceLow: result.totalLow,
+              priceHigh: result.totalHigh,
+              city: leadCity,
+              state: result.state,
+              zip: zip || null,
+              timeline: leadInfo.timeline || null,
+              adjustments: result.adjustments,
+              keyFactors: result.keyFactors,
+              serviceDetails: serviceDetails || {},
+            });
+          })().catch(err => console.error('Company lead email failed:', err.message));
         } else {
           console.warn(`Company lead email skipped: no leadNotificationEmail configured for company ${companyId}`);
         }
       }
+    }
+
+    // Only counts toward the daily cap once the calculation actually
+    // succeeded -- a request that errored out before this point never
+    // got a usable estimate, so it shouldn't cost the visitor one of
+    // their two free attempts. Recorded for every public attempt, by IP
+    // only -- see publicDailyLimitReached.
+    if (!companyId) {
+      const ip = req.ip || req.socket?.remoteAddress || null;
+      recordPublicEstimateAttempt(ip).catch(err => console.warn('recordPublicEstimateAttempt failed:', err.message));
+    } else {
+      recordCompanyEstimateRun(companyId, serviceType).catch(err => console.warn('recordCompanyEstimateRun failed:', err.message));
     }
 
     res.json({ success: true, data: result });

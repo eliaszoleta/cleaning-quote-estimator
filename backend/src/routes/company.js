@@ -60,6 +60,44 @@ router.post('/check-duplicate', async (req, res) => {
   }
 });
 
+// POST /api/company/check-email-exists — no auth. Supabase's own
+// signInWithPassword deliberately returns the same "Invalid login
+// credentials" error whether the email isn't registered or the password is
+// wrong (anti-enumeration by design), but AuthPage.js wants to tell those
+// two apart ("Account not found" vs "Wrong email or password") after a
+// failed login, so it calls this once the sign-in attempt itself has
+// already failed. Supabase-js has no admin.getUserByEmail, so this
+// paginates listUsers the same way admin.js's listCompaniesWithConfig does.
+router.post('/check-email-exists', async (req, res) => {
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  if (!email) return res.json({ success: true, exists: false });
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return res.json({ success: true, exists: false });
+    const sb = createClient(url, key, { auth: { persistSession: false } });
+
+    let page = 1;
+    let found = false;
+    // eslint-disable-next-line no-constant-condition
+    while (!found) {
+      const { data, error } = await sb.auth.admin.listUsers({ page, perPage: 1000 });
+      if (error) throw error;
+      if (data.users.some(u => (u.email || '').toLowerCase() === email)) { found = true; break; }
+      if (data.users.length < 1000) break;
+      page += 1;
+    }
+    res.json({ success: true, exists: found });
+  } catch (err) {
+    console.error('POST check-email-exists error:', err.message);
+    // Fail closed to "exists" -- worst case the error message stays generic
+    // ("wrong email or password") rather than wrongly claiming an account
+    // that actually exists was "not found".
+    res.json({ success: true, exists: true });
+  }
+});
+
 // GET /api/company/:id — get full config (auth required via middleware)
 router.get('/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
@@ -79,8 +117,9 @@ router.get('/:id', requireAuth, async (req, res) => {
     });
     console.log(`[GET config] user=${id} created=${created} | ${Object.entries(config.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') || 'none'}`);
     if (created) {
-      // Fire-and-forget: gets their embed code in front of them immediately
-      // rather than relying on them to find the Embed Widget tab themselves.
+      // Fire-and-forget: points them at Calculator Mode and gets their
+      // embed code in front of them immediately rather than relying on
+      // them to find the Branding tab themselves.
       sendCompanyWelcomeEmail({ to: req.user.email, companyId: id })
         .catch(err => console.error('Company welcome email failed:', err.message));
     }
@@ -127,6 +166,40 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
+// POST /api/company/:id/feedback — auth required. "Before you go" feedback
+// SubscriptionTab.js asks for right before handing off to Stripe's hosted
+// Billing Portal (see 021_cancellation_feedback.sql for why this is asked
+// up front rather than captured reactively on actual cancellation -- this
+// app has no way to tell from the portal itself whether they ended up
+// canceling or just updated a card). Both fields are optional; an empty
+// submission is simply not saved.
+router.post('/:id/feedback', requireAuth, async (req, res) => {
+  const { id } = req.params;
+  if (req.user.id !== id) return res.status(403).json({ success: false, error: 'Forbidden' });
+
+  const { reason, note } = req.body || {};
+  if (!reason && !note) return res.json({ success: true, skipped: true });
+
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return res.json({ success: true, skipped: true }); // no DB configured (local dev)
+    const supabase = createClient(url, key, { auth: { persistSession: false } });
+    const { error } = await supabase.from('cancellation_feedback').insert({
+      company_id: id,
+      reason: reason || null,
+      note: note || null,
+    });
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('POST company feedback error:', err.message);
+    // Fail open -- a feedback-save failure should never block the portal redirect.
+    res.json({ success: true, skipped: true });
+  }
+});
+
 // POST /api/company/:id/upload-logo — auth required. Takes a small image as
 // base64 JSON (not multipart -- avoids adding a multer dependency for what's
 // a rare, small upload, same reasoning as partnerCheckout.js's own
@@ -165,7 +238,11 @@ router.post('/:id/upload-logo', requireAuth, async (req, res) => {
     const { data } = supabase.storage.from(LOGO_BUCKET).getPublicUrl(path);
     res.json({ success: true, data: { url: data.publicUrl } });
   } catch (err) {
-    console.error('Company logo upload error:', err.message);
+    // Logged in full (not just err.message) since Supabase Storage errors
+    // -- e.g. "Bucket not found" when 010_company_logo_storage.sql hasn't
+    // actually been run against this project yet -- carry the useful part
+    // in fields .message alone drops.
+    console.error('Company logo upload error:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
     res.status(500).json({ success: false, error: 'Failed to upload logo. You can paste an image URL instead.' });
   }
 });
@@ -196,6 +273,16 @@ router.patch('/:id/services', requireAuth, async (req, res) => {
   }
 });
 
+// Elias's own demo/testing account (blueboyacc05@gmail.com) -- this route
+// has no req.user (it's the public, unauthenticated widget endpoint), so
+// there's no email to check the way computeSubscriptionStatus does
+// elsewhere; the company id from the URL is the one piece of identity
+// already on hand here with no extra Supabase lookup needed. Used to
+// always test against the real, live embedded widget while working on
+// this app, so it should never show the "Calculator Paused" state the way
+// a real subscriber's expired/deleted account would.
+const ALWAYS_ACTIVE_COMPANY_ID = '4ecae3b0-dfef-4c02-9498-02fc4994d45b';
+
 // GET /api/company/:id/public — branding only, no auth (for widget)
 router.get('/:id/public', async (req, res) => {
   try {
@@ -203,11 +290,12 @@ router.get('/:id/public', async (req, res) => {
     const sub = computeSubscriptionStatus(config);
     // Deletion was requested -- pause the widget for the whole grace period
     // even if the subscription itself is still active, since the owner
-    // asked for the account to go away.
-    const deletionPending = !!config.pendingDeletion;
+    // asked for the account to go away. Never true for the demo account
+    // above, same reasoning as the paused override below.
+    const deletionPending = !!config.pendingDeletion && req.params.id !== ALWAYS_ACTIVE_COMPANY_ID;
     const {
       companyName, logo, primaryColor, accentColor, fontFamily,
-      ctaHeadline, ctaSubtext, ctaPhone, ctaEmail,
+      ctaHeadline, ctaHeadlineEnabled, ctaSubtext, ctaPhone, ctaEmail,
       serviceStates, frameHeight, borderRadius, services,
     } = config;
     // Same no-store as the authed GET /:id -- a subscriber who just changed
@@ -219,9 +307,9 @@ router.get('/:id/public', async (req, res) => {
       success: true,
       data: {
         companyName, logo, primaryColor, accentColor, fontFamily,
-        ctaHeadline, ctaSubtext, ctaPhone, ctaEmail,
+        ctaHeadline, ctaHeadlineEnabled, ctaSubtext, ctaPhone, ctaEmail,
         serviceStates, serviceCities: normalizeServiceCities(config), frameHeight, borderRadius, services,
-        paused: !sub.active || deletionPending,
+        paused: req.params.id === ALWAYS_ACTIVE_COMPANY_ID ? false : (!sub.active || deletionPending),
         trialDaysLeft: sub.daysLeft,
       },
     });

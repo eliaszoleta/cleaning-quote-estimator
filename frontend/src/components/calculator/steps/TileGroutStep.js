@@ -26,18 +26,32 @@ export default function TileGroutStep({ value, onBack, onNext, primaryColor }) {
 
       <StepSection label="Tile material">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[['ceramic','Ceramic'],['porcelain','Porcelain'],['natural_stone','Natural Stone'],['travertine','Travertine'],['slate','Slate']].map(([id,label]) => (
+          {/* Travertine and slate used to be listed here as their own
+              chips, separate from "Natural Stone" -- but they ARE natural
+              stone, and the pricing engine (TILE_PRICE_PER_SQFT in
+              defaults.js) only ever had rates for ceramic/porcelain/
+              natural_stone/saltillo. Picking "Travertine" or "Slate" fell
+              through to the ceramic rate (the || fallback in
+              calculateTileGrout) while still showing the "+30-40% more"
+              warning below -- quoting the cheapest tier while telling the
+              customer it costs more. Collapsed into the one Natural Stone
+              option the backend actually prices correctly. */}
+          {[['ceramic','Ceramic'],['porcelain','Porcelain'],['natural_stone','Natural Stone']].map(([id,label]) => (
             <StepChip key={id} selected={tileType === id} onClick={() => setTileType(id)} primaryColor={primaryColor}>{label}</StepChip>
           ))}
         </div>
-        {(tileType === 'natural_stone' || tileType === 'travertine') && (
-          <p style={{ fontSize: 12, color: COLORS.warning, marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={12} /> Natural stone requires specialized cleaning products — costs 30–40% more than ceramic.</p>
+        {tileType === 'natural_stone' && (
+          <p style={{ fontSize: 12, color: COLORS.warning, marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={12} /> Natural stone (travertine, slate, marble, etc.) requires specialized cleaning products — costs 30–40% more than ceramic.</p>
         )}
       </StepSection>
 
       <StepSection label="Current condition">
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[['light','Lightly soiled'],['moderate','Moderately dirty'],['heavy','Heavy buildup'],['neglected','Years of neglect']].map(([id,label]) => (
+          {/* 'Years of neglect' used to send id 'neglected', but
+              TILE_CONDITION_MULTIPLIERS' top key is 'damaged' -- silently
+              applied the 'heavy' multiplier (1.32-1.42x) instead of the
+              correct, higher 'damaged' one (1.42-1.55x). */}
+          {[['light','Lightly soiled'],['moderate','Moderately dirty'],['heavy','Heavy buildup'],['damaged','Years of neglect']].map(([id,label]) => (
             <StepChip key={id} selected={condition === id} onClick={() => setCondition(id)} primaryColor={primaryColor}>{label}</StepChip>
           ))}
         </div>

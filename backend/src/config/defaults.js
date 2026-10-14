@@ -62,6 +62,7 @@ const DEFAULT_COMPANY_CONFIG = {
   accentColor: '#16a34a',
   fontFamily: 'Inter',
   ctaHeadline: 'Get Your Exact Quote Today',
+  ctaHeadlineEnabled: true,
   ctaSubtext: 'Our team is ready to provide a free, detailed estimate.',
   ctaPhone: '',
   ctaEmail: '',
@@ -110,6 +111,7 @@ const DEFAULT_COMPANY_CONFIG = {
       pricePerSqft: 0.08,
       minimumCharge: 200,
       markup: 1.0,
+      frequencyDiscounts: { weekly: 0, biweekly: 0, monthly: 0 },
     },
     carpet: {
       enabled: true,
@@ -145,6 +147,11 @@ const DEFAULT_COMPANY_CONFIG = {
       enabled: true,
       markup: 1.0,
     },
+    upholstery: {
+      enabled: true,
+      minimumCharge: 90,
+      markup: 1.0,
+    },
   },
 };
 
@@ -176,15 +183,22 @@ const CLEANING_TYPE_MULTIPLIERS = {
 };
 
 // Extra add-on costs (residential/apartment)
+// inside_cabinets and pet_hair are estimated/interpolated (not externally
+// sourced like the rest of this table) -- added after an audit found both
+// were selectable on HomeStep.js/ApartmentStep.js with no matching key here
+// at all, silently charging $0. Positioned relative to the nearest
+// comparable sourced line item rather than left unpriced.
 const HOME_EXTRAS = {
   inside_oven:      { low: 38, high: 50 },
   inside_fridge:    { low: 30, high: 42 },
+  inside_cabinets:  { low: 35, high: 46 }, // comparable scope to inside_oven/inside_fridge
   interior_windows: { low: 52, high: 65 },
   laundry:          { low: 34, high: 44 },
   dishes:           { low: 24, high: 32 },
   garage:           { low: 63, high: 80 },
   basement:         { low: 76, high: 96 },
   balcony_patio:    { low: 43, high: 56 },
+  pet_hair:         { low: 30, high: 40 }, // whole-home pass, comparable to inside_fridge tier
 };
 
 // Home condition multipliers
@@ -234,6 +248,18 @@ const COMMERCIAL_VISITS_PER_MONTH = {
 // Day porter monthly rate (loaded labor including benefits/overhead)
 const DAY_PORTER_DAILY_RATE = { low: 218, high: 265 };
 
+// Restroom cleaning per restroom, per visit -- ~10-15 min of fixture-level
+// work (toilets, sinks, mirrors, floors, restocking) at a loaded labor
+// rate in the same ballpark as DAY_PORTER_DAILY_RATE above (~$27-33/hr).
+// Charged on the ACTUAL restroom count the customer enters, every visit --
+// not a flat one-time add-on above some assumed "typical for this sqft"
+// baseline (see calculateCommercial's history: that baseline meant a
+// restroom count at or under it never affected the price or showed up in
+// the breakdown at all, even though the customer had explicitly entered
+// it, and even when it DID apply it was a flat amount that didn't scale
+// with how many times a month the building was actually cleaned).
+const COMMERCIAL_RESTROOM_PER_VISIT_RATE = { low: 4, high: 7 };
+
 // Carpet cleaning prices
 const CARPET_PRICE_PER_ROOM = { low: 44, high: 55 };
 const CARPET_PRICE_PER_SQFT = { low: 0.28, high: 0.35 };
@@ -261,6 +287,36 @@ const CARPET_ADDONS = {
 
 const CARPET_STAIRS_PER_FLIGHT = { low: 52, high: 68 }; // 13-15 steps × $3.50-$4.50/step
 
+// Upholstery cleaning -- priced per piece (not per sq ft/room like carpet),
+// since that's how the real market actually quotes furniture cleaning.
+// Source: Angi/HomeAdvisor furniture cleaning cost guide (national avg
+// ~$173, chairs $10-80, sectionals $100-300), cross-checked against
+// Thumbtack-sourced provider rate data for loveseats/sofas.
+const UPHOLSTERY_ITEM_PRICES = {
+  chair:     { low: 40,  high: 70  }, // armchair or recliner
+  loveseat:  { low: 75,  high: 110 },
+  sofa:      { low: 120, high: 175 }, // 3-seat sofa -- most common job
+  sectional: { low: 175, high: 280 },
+  ottoman:   { low: 20,  high: 35  },
+};
+
+const UPHOLSTERY_CONDITION_MULTIPLIERS = {
+  light:   { low: 1.0,  high: 1.0  },
+  moderate:{ low: 1.12, high: 1.18 },
+  heavy:   { low: 1.37, high: 1.45 },
+  pet:     { low: 1.65, high: 1.82 },
+};
+
+// HomeAdvisor: leather cleaning "often costs double" standard upholstery.
+const UPHOLSTERY_LEATHER_MULTIPLIER = { low: 1.80, high: 2.00 };
+
+const UPHOLSTERY_ADDONS = {
+  fabric_protector: { low: 15, high: 25 }, // per piece
+  deodorizer:        { low: 12, high: 20 }, // per piece
+};
+
+const UPHOLSTERY_MINIMUM = { low: 90, high: 120 };
+
 // Air duct cleaning
 const AIR_DUCT_BASE = { low: 330, high: 420 }; // up to ~12 vents residential
 const AIR_DUCT_PER_VENT = { low: 18, high: 23 };
@@ -285,11 +341,20 @@ const DRYER_VENT_LENGTH_ADDON = {
   very_long:  { low: 85, high: 115 },
 };
 
+// underground/periscope are estimated/interpolated (not externally sourced
+// like the rest of this table) -- added after an audit found both were
+// selectable on DryerVentStep.js with no matching key here at all, silently
+// treated as free (same as 'standard'). Positioned relative to the nearest
+// comparable sourced tier: underground requires trenching/excavation access
+// (harder than roof routing), periscope is specialized tight-space work
+// (between roof and underground).
 const DRYER_VENT_TYPE_ADDON = {
   standard:   { low: 0,  high: 0  },
   roof:       { low: 30, high: 48 },
   side_wall:  { low: 12, high: 22 },
   floor:      { low: 17, high: 28 },
+  underground:{ low: 55, high: 80 },
+  periscope:  { low: 40, high: 60 },
 };
 
 const DRYER_VENT_CLOG_ADDON = { low: 35, high: 55 };
@@ -429,6 +494,7 @@ module.exports = {
   COMMERCIAL_SERVICE_LEVELS,
   COMMERCIAL_VISITS_PER_MONTH,
   DAY_PORTER_DAILY_RATE,
+  COMMERCIAL_RESTROOM_PER_VISIT_RATE,
   CARPET_PRICE_PER_ROOM,
   CARPET_PRICE_PER_SQFT,
   CARPET_MINIMUM,
@@ -436,6 +502,11 @@ module.exports = {
   CARPET_METHOD_MULTIPLIERS,
   CARPET_ADDONS,
   CARPET_STAIRS_PER_FLIGHT,
+  UPHOLSTERY_ITEM_PRICES,
+  UPHOLSTERY_CONDITION_MULTIPLIERS,
+  UPHOLSTERY_LEATHER_MULTIPLIER,
+  UPHOLSTERY_ADDONS,
+  UPHOLSTERY_MINIMUM,
   AIR_DUCT_BASE,
   AIR_DUCT_PER_VENT,
   AIR_DUCT_PER_SYSTEM,

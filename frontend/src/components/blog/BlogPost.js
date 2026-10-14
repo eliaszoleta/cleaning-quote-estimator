@@ -16,7 +16,7 @@ function renderMarkdown(md) {
       const cells = row.split('|').filter(c => c.trim()).map(c => `<td style="padding:10px 14px;font-size:14px;border-bottom:1px solid #f1f5f9">${c.trim()}</td>`).join('');
       return `<tr>${cells}</tr>`;
     }).join('');
-    return `<div style="overflow-x:auto;margin:20px 0"><table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden"><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    return `<div class="pg-data-table-wrap" style="overflow-x:auto;margin:20px 0"><table class="pg-data-table" style="border-collapse:collapse;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden"><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
   });
 
   // Headers

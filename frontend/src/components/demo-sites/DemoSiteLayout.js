@@ -4,6 +4,7 @@ import { Phone, Mail, MapPin, Menu, X } from 'lucide-react';
 import DemoSiteContext from './DemoSiteContext';
 import QuotePopupModal from './QuotePopupModal';
 import DemoChatWidget from './DemoChatWidget';
+import { localBusinessJsonLd } from './demoSeo';
 
 const PAGES = [
   { key: 'home', label: 'Home', path: '' },
@@ -177,6 +178,7 @@ export default function DemoSiteLayout({ site, current, children }) {
         <title>{site.businessName} | {site.city}, {site.state}</title>
         <meta name="description" content={site.tagline} />
         <meta name="robots" content="noindex, follow" />
+        <script type="application/ld+json">{JSON.stringify(localBusinessJsonLd(site))}</script>
       </Helmet>
 
       {/* Sample banner -- always visible, always honest about what this is */}

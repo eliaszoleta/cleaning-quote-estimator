@@ -123,6 +123,13 @@ export default function Contact() {
               </p>
             </div>
 
+            <div style={{ padding: '18px 20px', background: 'white', borderRadius: 14, border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+              <p style={{ fontSize: 13, color: '#0f172a', fontWeight: 700, marginBottom: 6 }}>Our office</p>
+              <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.65, margin: 0 }}>
+                255 S Glendora Ave<br />Glendora, CA 91740
+              </p>
+            </div>
+
             <div style={{ padding: '18px 20px', background: '#eff6ff', borderRadius: 14, border: '1px solid #bfdbfe' }}>
               <p style={{ fontSize: 13, color: '#1d4ed8', fontWeight: 700, marginBottom: 6 }}>Looking for quick answers?</p>
               <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.65, margin: 0 }}>

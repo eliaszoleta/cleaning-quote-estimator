@@ -22,7 +22,12 @@ function fileToBase64(file) {
 // {data: {url}} -- defaults to the public, no-auth partner-checkout
 // endpoint (the first two callers' case); BrandingTab.js passes its own,
 // bound to the company's auth token and account id.
-export default function LogoField({ value, onChange, inputStyle, upload = uploadPartnerLogo }) {
+//
+// urlOnly skips the upload UI (and the upload prop) entirely, going
+// straight to a plain URL field -- BrandingTab.js passes this since its
+// upload endpoint doesn't work reliably; the other two callers are
+// untouched and keep the normal upload-first flow.
+export default function LogoField({ value, onChange, inputStyle, upload = uploadPartnerLogo, urlOnly = false }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -54,6 +59,29 @@ export default function LogoField({ value, onChange, inputStyle, upload = upload
       setUploading(false);
     }
   };
+
+  if (urlOnly) {
+    return (
+      <div>
+        <label style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: '#334155', marginBottom: 6 }}>Logo URL</label>
+        {value && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <img
+              src={value}
+              alt="Logo preview"
+              style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc' }}
+              onError={e => { e.target.style.visibility = 'hidden'; }}
+            />
+            <button type="button" onClick={() => onChange('')} style={{ ...linkButtonStyle, color: '#94a3b8' }}>Remove</button>
+          </div>
+        )}
+        <input style={inputStyle} value={value} onChange={e => onChange(e.target.value)} placeholder="https://yourbusiness.com/logo.png" />
+        <p style={{ fontSize: 11.5, color: '#94a3b8', margin: '6px 0 0' }}>
+          Paste a direct link to your logo image (PNG, JPEG, or WebP). Most website builders let you upload an image and copy its link.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
