@@ -44,6 +44,18 @@ export default function AdminWebsiteRequests({ adminKey }) {
   const [subscriptionIdInput, setSubscriptionIdInput] = useState('');
   const [linkingSub, setLinkingSub] = useState(false);
   const [linkError, setLinkError] = useState('');
+  // The list/detail split below used to render both panes side by side
+  // unconditionally -- the detail panel's fixed 360px width left almost no
+  // room for the list (or vice versa) on a phone, and nothing scrolled
+  // horizontally to compensate. On mobile, show one pane at a time: the
+  // list until a request is selected, then the detail panel full-width
+  // (its existing X button already calls setSelected(null) to go back).
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
   const [copied, setCopied] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [addForm, setAddForm] = useState(EMPTY_ADD_FORM);
@@ -269,7 +281,7 @@ export default function AdminWebsiteRequests({ adminKey }) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: theme.contentBg, padding: '30px 32px' }}>
+    <div className="admin-page" style={{ minHeight: '100vh', background: theme.contentBg }}>
       <div style={{ maxWidth: 1180, margin: '0 auto' }}>
         <PageHeader
           icon={Inbox}
@@ -327,9 +339,9 @@ export default function AdminWebsiteRequests({ adminKey }) {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 20, height: 'calc(100vh - 170px)' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 20, height: isMobile ? 'auto' : 'calc(100vh - 170px)' }}>
           {/* Request list */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <div style={{ flex: 1, display: isMobile && selected ? 'none' : 'flex', flexDirection: 'column', minWidth: 0 }}>
             <div style={{ marginBottom: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <h2 style={{ fontSize: 16, fontWeight: 800, color: theme.textPrimary, letterSpacing: '-0.2px' }}>Requests</h2>
@@ -416,7 +428,7 @@ export default function AdminWebsiteRequests({ adminKey }) {
 
           {/* Request detail panel */}
           {selected && (
-            <div style={{ ...cardStyle, width: 360, padding: '20px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 14, flexShrink: 0 }}>
+            <div style={{ ...cardStyle, width: isMobile ? '100%' : 360, padding: '20px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 14, flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
                   <div style={{ width: 38, height: 38, borderRadius: 11, background: avatarGradient(selected.business || selected.id), display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15, fontWeight: 700, color: 'white' }}>

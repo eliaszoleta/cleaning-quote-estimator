@@ -255,6 +255,14 @@ img { max-width: 100%; height: auto; }
 .justify-between { justify-content: space-between; }
 .flex-wrap { flex-wrap: wrap; }
 
+/* Shared outer wrapper for every /admin tab (AdminCompanies.js,
+   AdminWebsiteRequests.js, AdminBookings.js, etc.) -- all 7 previously
+   hardcoded the same '30px 32px' padding inline with no mobile override,
+   which on a narrow phone left barely any width for the stat tiles/cards
+   inside to lay out in, on top of the sidebar's own width problem (see
+   AdminDashboard.js). */
+.admin-page { padding: 30px 32px; }
+
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .dash-main { flex-direction: column; }
@@ -264,4 +272,5 @@ img { max-width: 100%; height: auto; }
   .appearance-layout { flex-direction: column; }
   .appearance-layout .settings-grid { flex: none; }
   .setting-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .admin-page { padding: 16px; }
 }

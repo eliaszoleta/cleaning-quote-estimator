@@ -182,7 +182,7 @@ export default function AdminBookings({ adminKey }) {
   const past = bookings.filter(b => b.status !== 'confirmed' || new Date(b.start_time) <= new Date());
 
   return (
-    <div style={{ minHeight: '100vh', background: theme.contentBg, padding: '30px 32px' }}>
+    <div className="admin-page" style={{ minHeight: '100vh', background: theme.contentBg }}>
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         <PageHeader
           icon={CalendarClock}

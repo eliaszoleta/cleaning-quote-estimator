@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Inbox, UserPlus, Building2, Handshake, Mail, LogOut, Sparkles, CalendarClock, Bot } from 'lucide-react';
 import { getAdminCompanies } from '../../utils/api';
 import { theme } from './adminTheme';
@@ -40,6 +40,18 @@ export default function AdminDashboard({ initialTab }) {
   const [loginError, setLoginError] = useState(null);
   const [loggingIn, setLoggingIn] = useState(false);
   const [activeTab, setActiveTab] = useState(() => (TABS.some(t => t.slug === initialTab) ? initialTab : TABS[0].slug));
+  // The sidebar below used to be a fixed 236px column regardless of viewport
+  // width -- on a ~400px phone that alone ate more than half the screen,
+  // squeezing every tab's content (stat tiles, cards, tables) into a sliver
+  // too narrow for its own labels to render without truncating. Collapses
+  // into a horizontally-scrollable top bar under 768px instead, same pattern
+  // CompanyDashboard.js already uses for its own nav.
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -125,25 +137,37 @@ export default function AdminDashboard({ initialTab }) {
   const Active = TABS.find(t => t.slug === activeTab) || TABS[0];
 
   return (
-    <div style={{ minHeight: '100vh', background: theme.contentBg, display: 'flex' }}>
+    <div style={{ minHeight: '100vh', background: theme.contentBg, display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
       <div style={{
-        width: SIDEBAR_WIDTH, flexShrink: 0, background: theme.sidebarBg,
-        display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh',
+        width: isMobile ? '100%' : SIDEBAR_WIDTH, flexShrink: 0, background: theme.sidebarBg,
+        display: 'flex', flexDirection: isMobile ? 'row' : 'column', alignItems: isMobile ? 'center' : 'stretch',
+        position: 'sticky', top: 0, height: isMobile ? 'auto' : '100vh', zIndex: 20,
       }}>
-        <div style={{ padding: '22px 20px 18px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ padding: isMobile ? '10px 8px' : '22px 20px 18px', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <div style={{
             width: 32, height: 32, borderRadius: 9, background: theme.accentGradient,
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: theme.shadowGlow,
           }}>
             <Sparkles size={16} color="white" strokeWidth={2.25} />
           </div>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: 14.5, color: 'white', letterSpacing: '-0.2px' }}>Admin</div>
-            <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Clean Estimator</div>
-          </div>
+          {!isMobile && (
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 14.5, color: 'white', letterSpacing: '-0.2px' }}>Admin</div>
+              <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Clean Estimator</div>
+            </div>
+          )}
         </div>
 
-        <nav style={{ flex: 1, padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {/* Horizontally-scrollable row of tabs on mobile, same idea as
+            CompanyDashboard.js's own .dash-nav -- a vertical list of 7 tabs
+            simply doesn't fit above the fold on a phone, and icon+label
+            chips that scroll sideways are a more familiar mobile pattern
+            than a hamburger menu for a bar this short. */}
+        <nav style={{
+          flex: 1, minWidth: 0, padding: isMobile ? '0 4px' : '8px 12px',
+          display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: 2,
+          overflowX: isMobile ? 'auto' : 'visible', WebkitOverflowScrolling: 'touch',
+        }}>
           {TABS.map(({ slug, label, Icon }) => {
             const active = activeTab === slug;
             return (
@@ -151,17 +175,18 @@ export default function AdminDashboard({ initialTab }) {
                 key={slug}
                 onClick={() => selectTab(slug)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 11, padding: '10px 13px', borderRadius: 10,
-                  border: 'none', cursor: 'pointer', fontSize: 13.5, fontWeight: 600, textAlign: 'left',
+                  display: 'flex', alignItems: 'center', gap: isMobile ? 7 : 11,
+                  padding: isMobile ? '8px 12px' : '10px 13px', borderRadius: 10,
+                  border: 'none', cursor: 'pointer', fontSize: isMobile ? 12.5 : 13.5, fontWeight: 600, textAlign: 'left',
                   background: active ? 'rgba(255,255,255,0.08)' : 'transparent',
                   color: active ? 'white' : 'rgba(255,255,255,0.55)',
                   transition: 'background 0.15s, color 0.15s',
-                  position: 'relative',
+                  position: 'relative', flexShrink: 0, whiteSpace: 'nowrap',
                 }}
                 onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}
               >
-                {active && (
+                {active && !isMobile && (
                   <span style={{ position: 'absolute', left: -12, top: '50%', transform: 'translateY(-50%)', width: 3, height: 18, borderRadius: 3, background: theme.accentGradient }} />
                 )}
                 <Icon size={16} strokeWidth={2} style={{ flexShrink: 0, color: active ? '#a5b4fc' : 'currentColor' }} />
@@ -171,16 +196,22 @@ export default function AdminDashboard({ initialTab }) {
           })}
         </nav>
 
-        <div style={{ padding: 14, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{
+          padding: isMobile ? '8px' : 14, flexShrink: 0,
+          borderTop: isMobile ? 'none' : '1px solid rgba(255,255,255,0.07)',
+          borderLeft: isMobile ? '1px solid rgba(255,255,255,0.08)' : 'none',
+        }}>
           <button
             onClick={handleLogout}
+            title="Log out"
             style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '9px 13px', borderRadius: 10,
+              width: isMobile ? 'auto' : '100%', display: 'flex', alignItems: 'center', gap: 10,
+              padding: isMobile ? '9px' : '9px 13px', borderRadius: 10,
               border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', cursor: 'pointer',
               fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,0.6)',
             }}
           >
-            <LogOut size={14} /> Log out
+            <LogOut size={14} /> {!isMobile && 'Log out'}
           </button>
         </div>
       </div>

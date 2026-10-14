@@ -142,7 +142,7 @@ export default function AdminPartners({ adminKey }) {
   const removeLocation = (index) => setForm(f => ({ ...f, locations: f.locations.filter((_, i) => i !== index) }));
 
   return (
-    <div style={{ minHeight: '100vh', background: theme.contentBg, padding: '30px 32px' }}>
+    <div className="admin-page" style={{ minHeight: '100vh', background: theme.contentBg }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <PageHeader
           icon={HeartHandshake}

@@ -33,7 +33,7 @@ export default function AdminEmailMarketing({ adminKey }) {
   useEffect(() => { if (adminKey) loadTemplates(); }, [adminKey, loadTemplates]);
 
   return (
-    <div style={{ minHeight: '100vh', background: theme.contentBg, padding: '30px 32px' }}>
+    <div className="admin-page" style={{ minHeight: '100vh', background: theme.contentBg }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <PageHeader
           icon={Mail}

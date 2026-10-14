@@ -175,7 +175,7 @@ export default function AdminCompanies({ adminKey }) {
   const selectStyle = { ...inputStyle, width: 'auto', cursor: 'pointer', color: theme.textSecondary };
 
   return (
-    <div style={{ minHeight: '100vh', background: theme.contentBg, padding: '30px 32px' }}>
+    <div className="admin-page" style={{ minHeight: '100vh', background: theme.contentBg }}>
       <div style={{ maxWidth: 1040, margin: '0 auto' }}>
         <PageHeader
           icon={Building2}

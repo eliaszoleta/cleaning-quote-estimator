@@ -37,6 +37,15 @@ export default function AdminChatbots({ adminKey }) {
   const [leads, setLeads] = useState([]);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const { confirm, dialog: confirmDialog } = useConfirm();
+  // Same mobile master-detail fix as AdminWebsiteRequests.js -- show one
+  // pane at a time on a phone instead of squeezing a fixed-400px detail
+  // panel and the list side by side.
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const loadChatbots = useCallback(async (key) => {
     setLoading(true);
@@ -164,7 +173,7 @@ export default function AdminChatbots({ adminKey }) {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: theme.contentBg, padding: '30px 32px' }}>
+    <div className="admin-page" style={{ minHeight: '100vh', background: theme.contentBg }}>
       <div style={{ maxWidth: 1180, margin: '0 auto' }}>
         <PageHeader
           icon={Bot}
@@ -218,9 +227,9 @@ export default function AdminChatbots({ adminKey }) {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 20, height: 'calc(100vh - 170px)' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 20, height: isMobile ? 'auto' : 'calc(100vh - 170px)' }}>
           {/* Chatbot list */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <div style={{ flex: 1, display: isMobile && selected ? 'none' : 'flex', flexDirection: 'column', minWidth: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <h2 style={{ fontSize: 16, fontWeight: 800, color: theme.textPrimary, letterSpacing: '-0.2px' }}>Chatbots ({chatbots.length})</h2>
               <button onClick={() => loadChatbots(adminKey)} style={secondaryBtnStyle}>
@@ -271,7 +280,7 @@ export default function AdminChatbots({ adminKey }) {
 
           {/* Chatbot detail panel */}
           {selected && (
-            <div style={{ ...cardStyle, width: 400, padding: '20px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 16, flexShrink: 0 }}>
+            <div style={{ ...cardStyle, width: isMobile ? '100%' : 400, padding: '20px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 16, flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
                   <div style={{ width: 38, height: 38, borderRadius: 11, background: avatarGradient(selected.business_name || selected.id), display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15, fontWeight: 700, color: 'white' }}>
