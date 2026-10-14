@@ -15,17 +15,16 @@ export default function Founder() {
         <link rel="canonical" href="https://www.cleanestimator.com/founder" />
       </Helmet>
 
-      {/* Centered hero (unlike About.js's left-aligned one) -- this page's
-          title/subtitle is short enough that left-aligning it inside the
-          760px column reads off-center against the full-width dark band,
-          especially next to the floating partner banner on the right. */}
-      <div className="page-hero-band" style={{ padding: 'clamp(18px, 5vw, 40px) 0 clamp(36px, 9vw, 96px)' }}>
+      {/* Same dark band / glow / left-aligned hero as About.js, for the
+          same reason it was built there: this page should read as part of
+          the same site, not a bespoke bio template. */}
+      <div className="page-hero-band" style={{ padding: 'clamp(18px, 5vw, 40px) 0' }}>
         <div className="page-hero-glow" aria-hidden="true" />
-        <div className="page-hero-inner" style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
+        <div className="page-hero-inner" style={{ maxWidth: 760, margin: '0 auto', padding: '0 20px', textAlign: 'left' }}>
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
             Meet the Founder
           </h1>
-          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640, margin: '0 auto' }}>
+          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640 }}>
             The person who built Clean Estimator, and why.
           </p>
         </div>
