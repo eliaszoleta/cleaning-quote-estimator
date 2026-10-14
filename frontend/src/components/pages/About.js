@@ -81,38 +81,39 @@ export default function About() {
           <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: 8, letterSpacing: '-0.01em' }}>
             About Clean Estimator
           </h1>
-          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640 }}>
+          <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640, marginBottom: 24 }}>
             Clean Estimator started as a quoting problem for cleaning businesses: slow, manual pricing loses leads to whoever calls the prospect back first. We built an instant, accurate quoting engine cleaning companies could put to work right away — and opened a free version so homeowners get the same price transparency before they ever pick up the phone.
           </p>
+
+          {/* Stats as frosted pills inside the hero itself, rather than a
+              disconnected hairline-divided row in the light body below --
+              reads as part of the same statement instead of a separate
+              afterthought section. */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            {STATS.map(s => (
+              <div key={s.label} style={{ display: 'flex', alignItems: 'baseline', gap: 6, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: RADIUS.pill, padding: '8px 16px' }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: 'white' }}>{s.number}</span>
+                <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>{s.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '28px 20px clamp(36px, 7vw, 80px)', position: 'relative' }}>
 
-        {/* Stats strip -- moved out of the hero band (blog's hero doesn't
-            carry one) into a plain hairline-divided row at the top of the
-            content area. */}
-        <div style={{ display: 'flex', flexWrap: 'nowrap', gap: 'clamp(14px, 5vw, 32px)', marginBottom: 48, paddingBottom: 28, borderBottom: `1px solid ${COLORS.border}` }}>
-          {STATS.map(s => (
-            <div key={s.label}>
-              <div style={{ fontSize: 'clamp(17px, 4.5vw, 22px)', fontWeight: 800, color: COLORS.ink, letterSpacing: '-0.01em' }}>{s.number}</div>
-              <div style={{ fontSize: 'clamp(9.5px, 2.4vw, 11.5px)', color: COLORS.muted, marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>{s.label}</div>
+        {/* Our mission -- a soft tinted card instead of a plain left-rule
+            paragraph, so it reads as a designed statement piece up top
+            rather than blending into the editorial prose below it. */}
+        <section style={{ marginBottom: 52 }}>
+          <div style={{ background: COLORS.primaryMuted, border: `1px solid ${COLORS.primaryMutedBorder}`, borderRadius: RADIUS.xl, padding: 'clamp(22px, 5vw, 30px) clamp(22px, 5vw, 34px)' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.primary, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+              Our Mission
             </div>
-          ))}
-        </div>
-
-        {/* Our mission -- an opening statement rather than a card, so the
-            page reads as an editorial piece first and a stack of feature
-            boxes second. Thin accent rule gives it structure without a
-            border/shadow/icon-badge treatment repeated seven more times
-            down the page. */}
-        <section style={{ marginBottom: 52, paddingLeft: 20, borderLeft: `3px solid ${COLORS.primary}` }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.primary, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>
-            Our Mission
+            <p style={{ fontSize: 'clamp(15px, 4vw, 21px)', color: COLORS.ink, lineHeight: 1.6, fontWeight: 500, margin: 0 }}>
+              Give cleaning businesses an instant, accurate quoting tool that turns website visitors into booked jobs instead of lost leads — and give homeowners that same price transparency, so every conversation starts with real numbers instead of a guessing game.
+            </p>
           </div>
-          <p style={{ fontSize: 'clamp(15px, 4vw, 21px)', color: COLORS.ink, lineHeight: 1.6, fontWeight: 500, margin: 0, maxWidth: 640 }}>
-            Give cleaning businesses an instant, accurate quoting tool that turns website visitors into booked jobs instead of lost leads — and give homeowners that same price transparency, so every conversation starts with real numbers instead of a guessing game.
-          </p>
         </section>
 
         {/* What we offer -- the actual product lineup, not just the public
