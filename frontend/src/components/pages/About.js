@@ -124,11 +124,11 @@ export default function About() {
         <section style={{ marginBottom: 52 }}>
           <h2 style={{ ...h2Style, marginBottom: 10 }}>What We Offer</h2>
           <p style={{ ...pStyle, marginBottom: 24, maxWidth: 640 }}>
-            Clean Estimator is three things working together: a white-labeled quoting widget cleaning companies embed on their own site to capture leads instantly, a local partner program that turns estimate requests into real jobs, and a free public calculator anyone can use to see typical pricing.
+            Clean Estimator is three things working together: an internal quoting tool cleaning companies use to run unlimited, accurate on-screen estimates for their own jobs — with a white-labeled calculator widget for their website included whenever they also want public lead capture — a local partner program that turns estimate requests into real jobs, and a free public calculator anyone can use to see typical pricing.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <ProductCard Icon={Code2} color="#0891b2" bg="#ecfeff" title="Embeddable Widget" href="/estimator" linkLabel="For companies">
-              Cleaning companies embed our calculator on their own site — their logo, their colors, the same accurate pricing they already use internally — to capture leads instead of losing visitors to a contact form.
+            <ProductCard Icon={Code2} color="#0891b2" bg="#ecfeff" title="Internal Estimator" href="/estimator" linkLabel="For companies">
+              Cleaning companies get unlimited, accurate on-screen estimates to quote jobs instantly — on the phone, during a walkthrough, or from the office — with a white-labeled widget for their own website included at no extra cost whenever they want public lead capture too.
             </ProductCard>
             <ProductCard Icon={Handshake} color="#db2777" bg="#fdf2f8" title="Local Partner Program" href="/partner-with-us" linkLabel="Get leads">
               We connect visitors who want a real quote with an exclusive local cleaning partner in their city — a warm, ready-to-call lead instead of a cold listing.
