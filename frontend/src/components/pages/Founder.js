@@ -53,16 +53,16 @@ export default function Founder() {
 
         <section style={{ marginBottom: 44 }}>
           <p style={pStyle}>
-            I built and run Clean Estimator myself — the pricing logic, the lead capture, the embeddable widget partner businesses put on their own sites, and the dashboard behind all of it.
+            Hi! I built and run Clean Estimator myself — the pricing logic, the lead capture, the embeddable widget partner businesses put on their own sites, and the dashboard behind all of it. Before I built Clean Estimator I was Marketing and Automation Specialist for cleaning companies for 3 years.
           </p>
           <p style={pStyle}>
             I build AI-driven automation systems that do real work — qualifying leads, answering questions, booking appointments, and running entire workflows without a person in the loop.
           </p>
           <p style={pStyle}>
-            My deepest expertise is Go High Level, where I've spent years building end-to-end marketing automation: workflows, pipelines, funnels, and campaigns for real businesses. Inside that, I build AI chatbots that run natively across websites, WhatsApp, Facebook Messenger, Instagram, and SMS, and voice AI agents that handle inbound calls and book calendar appointments automatically — either natively in GHL or through Retell AI wired up in n8n.
+            I've spent years building end-to-end marketing automation: workflows, pipelines, funnels, and campaigns for real businesses. I build AI chatbots for websites, WhatsApp, Facebook Messenger, Instagram, and SMS, and voice AI agents that handle inbound calls and book calendar appointments automatically.
           </p>
           <p style={pStyle}>
-            But GHL is a tool, not the ceiling. I'm self-trained, and I use Claude as a genuine build partner — I've used it to design, build, and launch full-stack web apps end to end: functionality, UI, copy, databases, dashboards, login portals, payment systems, and the automation layered on top. Clean Estimator is one of them.
+            I'm self-trained, and I use Claude as a genuine build partner — I've used it to design, build, and launch full-stack web apps end to end: functionality, UI, copy, databases, dashboards, login portals, payment systems, and the automation layered on top. Clean Estimator is one of them.
           </p>
           <p style={{ ...pStyle, marginBottom: 0 }}>
             I guess that makes me a vibe coder, lol — but the apps are real, live, and used by real people.
