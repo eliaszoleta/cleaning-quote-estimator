@@ -88,7 +88,17 @@ router.post('/checkout', async (req, res) => {
       customer: existingCustomerId || undefined,
       customer_email: existingCustomerId ? undefined : req.user.email,
       metadata: { companyId },
-      ...(trialPeriodDays ? { subscription_data: { trial_period_days: trialPeriodDays } } : {}),
+      ...(trialPeriodDays ? {
+        subscription_data: { trial_period_days: trialPeriodDays },
+        // Stripe's own hosted Checkout page already shows "30 days free"
+        // up top, but that's easy to skim past -- this adds an explicit
+        // "$0.00 due today" line right next to the submit button, which is
+        // the reassurance people expect from a trial checkout (and asked
+        // for here) before they'll hand over a card.
+        custom_text: {
+          submit: { message: `You won't be charged today. Your card is charged $25/month starting after your ${trialPeriodDays}-day free trial.` },
+        },
+      } : {}),
       success_url: `${FRONTEND_URL}/company?subscribed=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/company?tab=subscription`,
     });
