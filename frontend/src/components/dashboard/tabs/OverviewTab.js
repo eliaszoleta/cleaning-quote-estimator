@@ -6,6 +6,18 @@ import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from 
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
 export default function OverviewTab({ config, subStatus, user }) {
+  // Same isMobile pattern as CompanyDashboard.js/BrandingTab.js -- the stat
+  // grid below used to rely on CSS auto-fit alone (minmax(190px, 1fr)),
+  // which on a ~360-400px-wide phone only has room for one 190px+ column,
+  // stacking all 5 cards in a single column. Forcing an explicit 2-column
+  // grid under 768px fits 2 per row regardless of exact device width.
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const [leads, setLeads] = useState([]);
   const [loadingLeads, setLoadingLeads] = useState(true);
   // Total + this-month count of this company's successful /api/calculate
@@ -152,17 +164,17 @@ export default function OverviewTab({ config, subStatus, user }) {
       )}
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(190px, 1fr))', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
         {stats.map(({ label, value, Icon, color, bg }) => (
-          <div key={label} style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm, padding: '18px 20px', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+          <div key={label} style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm, padding: isMobile ? '14px 14px' : '18px 20px', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
             onMouseEnter={e => { e.currentTarget.style.boxShadow = SHADOWS.md; e.currentTarget.style.transform = 'translateY(-2px)'; }}
             onMouseLeave={e => { e.currentTarget.style.boxShadow = SHADOWS.sm; e.currentTarget.style.transform = 'none'; }}
           >
-            <div style={{ width: 38, height: 38, borderRadius: 7, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
-              <Icon size={18} strokeWidth={2.1} />
+            <div style={{ width: isMobile ? 32 : 38, height: isMobile ? 32 : 38, borderRadius: 7, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: isMobile ? 10 : 14 }}>
+              <Icon size={isMobile ? 16 : 18} strokeWidth={2.1} />
             </div>
-            <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.5px', lineHeight: 1, color: COLORS.ink, marginBottom: 8 }}>{value}</div>
-            <div style={{ fontSize: 12, color: COLORS.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+            <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 800, letterSpacing: '-0.5px', lineHeight: 1, color: COLORS.ink, marginBottom: 8 }}>{value}</div>
+            <div style={{ fontSize: 11.5, color: COLORS.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
           </div>
         ))}
       </div>
