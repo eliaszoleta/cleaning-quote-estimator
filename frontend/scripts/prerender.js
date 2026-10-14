@@ -575,27 +575,84 @@ ${bodyHtml}
 </html>`;
 }
 
+// This page is a deliberately different document from the live About.js
+// component a visitor sees (see CLAUDE.md note: prerendered HTML only has to
+// serve crawlers/first-paint, not match the hydrated page word-for-word).
+// Written to state plainly, in the first sentence, what Clean Estimator is,
+// who it's for, and what it offers -- the shape both Google's snippet
+// extraction and an LLM doing retrieval/citation actually need, rather than
+// the more conversational copy written for a human reading the real page.
 function renderAbout(assets) {
-  const seoTitle = 'About Clean Estimator | Free Cleaning Cost Estimator';
-  const seoDesc = 'Clean Estimator provides free, accurate cleaning cost estimates for homeowners and businesses across all 50 U.S. states.';
-  const sections = [
-    ['Our mission', 'Make cleaning service pricing transparent, accessible, and instant. We want every homeowner and business owner to walk into a cleaning consultation already knowing what to expect — so they can negotiate confidently and avoid overpaying.'],
-    ['How we calculate prices', 'Our pricing engine uses industry data, market research, and state-by-state cost-of-living adjustments to generate estimates. We regularly update our pricing models to reflect current market rates. Our estimates are deliberately presented as ranges because actual prices depend on factors only visible in person.'],
-    ['Who we serve', 'Clean Estimator serves two groups: (1) homeowners and property managers looking for fast, unbiased price guidance before calling cleaning companies, and (2) cleaning companies who want to embed our calculator on their own websites to capture leads with accurate, localized estimates.'],
-    ["Disclaimer", "Our estimates are starting points, not quotes. Actual cleaning service costs depend on the specific condition of the property, local market competition, the cleaning company's pricing, and many other factors. Always get multiple quotes from licensed, insured professionals before booking."],
+  const seoTitle = 'About Clean Estimator | Instant Quoting Platform for Cleaning Businesses';
+  const seoDesc = 'Clean Estimator is an instant quoting and lead-capture platform for cleaning businesses, plus a free public cleaning cost calculator for homeowners. Serving all 50 U.S. states.';
+
+  const offerings = [
+    ['Internal Estimator', 'The core product, built for cleaning companies. Unlimited, instant, accurate on-screen price estimates for a company\'s own staff to quote jobs — on a phone call, during a walkthrough, or from the office — instead of pricing from memory or a spreadsheet. $25/month with a 30-day free trial.'],
+    ['Embeddable Website Widget', 'Included with the Internal Estimator plan at no extra cost. A white-labeled, branded version of the same calculator that a cleaning company can embed directly on its own website to capture and qualify leads automatically, with instant email alerts on every submission.'],
+    ['Local Partner Program', 'Clean Estimator connects visitors who want a real quote with one exclusive local cleaning partner per city — a warm, ready-to-call lead for that partner instead of a cold directory listing.'],
+    ['Free Public Cost Calculator', 'A free, no-signup cleaning cost calculator available to any homeowner, property manager, or business at cleanestimator.com, covering all 10 supported service types with ZIP-code-accurate pricing.'],
   ];
+
+  const sections = [
+    ['Who Clean Estimator Is For', 'Clean Estimator is built primarily for cleaning businesses — independent cleaners, local cleaning companies, and commercial cleaning operators — who need to quote jobs faster and capture more leads than a manual, phone-based quoting process allows. It also serves homeowners and property managers who want fast, unbiased cleaning price guidance before calling a company.'],
+    ['How Pricing Estimates Are Calculated', 'The pricing engine behind every Clean Estimator estimate uses industry pricing data, market research, and state-by-state cost-of-living adjustments rather than a single flat national average. Inputs include square footage or room count, service type, cleaning frequency, and the current condition of the space. Estimates are presented as ranges, since final, on-site pricing depends on factors a calculator can\'t see.'],
+    ['Service Coverage', 'Clean Estimator generates estimates for 10 cleaning and restoration service types — standard house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, upholstery cleaning, air duct cleaning, dryer vent cleaning, tile & grout cleaning, mold remediation, and water damage restoration — with coverage across all 50 U.S. states.'],
+    ['Disclaimer', "Clean Estimator's estimates are starting points, not binding quotes. Actual cleaning service costs depend on the specific condition of the property, local market competition, an individual cleaning company's own pricing, and other factors only visible in person. Always get a confirmed quote from a licensed, insured professional before booking."],
+  ];
+
+  const faqs = [
+    { q: 'What is Clean Estimator?', a: 'Clean Estimator is a software platform that gives cleaning businesses an instant, accurate quoting tool for their own use, an embeddable lead-capture calculator widget for their website, and a free public cleaning cost calculator for homeowners.' },
+    { q: 'Who is Clean Estimator for?', a: "Clean Estimator's primary users are cleaning businesses — independent cleaners and local or commercial cleaning companies — who use it to quote jobs instantly instead of pricing manually. It also serves homeowners and property managers researching typical cleaning costs." },
+    { q: 'How much does Clean Estimator cost for a cleaning business?', a: "Clean Estimator's Internal Estimator plan for cleaning businesses is $25/month with a 30-day free trial, and includes unlimited quoting plus an embeddable website widget at no extra cost." },
+    { q: 'Is the Clean Estimator cleaning cost calculator free for homeowners?', a: 'Yes. The public cleaning cost calculator at cleanestimator.com is free to use for homeowners and property managers, with no signup or account required.' },
+    { q: 'Does Clean Estimator work in my state?', a: 'Yes. Clean Estimator provides ZIP-code and state-adjusted pricing estimates across all 50 U.S. states.' },
+  ];
+
+  const breadcrumb = breadcrumbSchema([
+    { name: 'Home', item: DOMAIN },
+    { name: 'About Clean Estimator', item: DOMAIN + '/about' },
+  ]);
+
   const body = `  <h1 style="font-size:40px;font-weight:900;color:#0f172a;margin-bottom:12px">About Clean Estimator</h1>
-  <p style="font-size:18px;color:#64748b;margin-bottom:40px;line-height:1.7">We built Clean Estimator to solve a frustrating problem: no one knows what cleaning actually costs until they've already called 3 companies and waited for callbacks.</p>
+  <p style="font-size:18px;color:#64748b;margin-bottom:12px;line-height:1.7">Clean Estimator is an instant quoting and lead-capture platform built for cleaning businesses, with a free public cleaning cost calculator also available to homeowners and property managers across all 50 U.S. states.</p>
+  <p style="font-size:15.5px;color:#64748b;margin-bottom:40px;line-height:1.7">Cleaning companies use it to quote jobs instantly instead of pricing manually by phone or memory, embed a branded version of the same calculator on their own website to capture leads automatically, and get connected with exclusive local lead flow through the Clean Estimator partner program.</p>
+
+  <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:16px">What Clean Estimator Offers</h2>
+  <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:40px">
+    ${offerings.map(([title, txt]) => `<div style="background:#f8fafc;border-radius:12px;padding:20px 24px;border:1px solid #e2e8f0">
+      <h3 style="font-size:16.5px;font-weight:700;color:#0f172a;margin-bottom:8px">${esc(title)}</h3>
+      <p style="font-size:14.5px;color:#374151;line-height:1.7">${esc(txt)}</p>
+    </div>`).join('\n    ')}
+  </div>
+
   <div style="display:flex;flex-direction:column;gap:24px">
     ${sections.map(([title, txt]) => `<div style="background:#f8fafc;border-radius:12px;padding:24px 28px;border:1px solid #e2e8f0">
       <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:10px">${esc(title)}</h2>
       <p style="font-size:15px;color:#374151;line-height:1.7">${esc(txt)}</p>
     </div>`).join('\n    ')}
   </div>
-  <div style="margin-top:40px;text-align:center">
-    <a href="/contact" style="background:${PRIMARY};color:white;padding:13px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px">Contact Us</a>
+
+  <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:40px 0 16px">Frequently Asked Questions</h2>
+  <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:40px">
+    ${faqs.map(({ q, a }) => `<div style="background:#f8fafc;border-radius:12px;padding:18px 22px;border:1px solid #e2e8f0">
+      <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px">${esc(q)}</h3>
+      <p style="font-size:14px;color:#374151;line-height:1.65;margin:0">${esc(a)}</p>
+    </div>`).join('\n    ')}
+  </div>
+
+  <div style="margin-top:8px;text-align:center">
+    <a href="/estimator" style="background:${PRIMARY};color:white;padding:13px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;margin-right:12px">For Cleaning Businesses</a>
+    <a href="/contact" style="background:white;color:${PRIMARY};border:1.5px solid ${PRIMARY};padding:11.5px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px">Contact Us</a>
   </div>`;
-  return renderStaticPage({ path: '/about', seoTitle, seoDesc, bodyHtml: body, assets });
+
+  return renderStaticPage({
+    path: '/about',
+    seoTitle,
+    seoDesc,
+    bodyHtml: body,
+    assets,
+    extraHead: `<script type="application/ld+json">${faqSchema(faqs)}</script><script type="application/ld+json">${breadcrumb}</script>`,
+  });
 }
 
 function renderCalculatorPage(assets) {
