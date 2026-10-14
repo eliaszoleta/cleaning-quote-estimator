@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Globe, Search, PhoneMissed, Sparkles, ChevronDown } from 'lucide-react';
+import { Globe, Search, PhoneMissed, Sparkles, ChevronDown, Smartphone, Bell } from 'lucide-react';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { postWebsiteRequest } from '../../utils/api';
 import { WEBSITE_PLAN_TIERS, getTierById } from '../../data/websitePricingTiers';
@@ -261,27 +261,101 @@ export default function WebsiteSubscription() {
         <link rel="canonical" href="https://www.cleanestimator.com/website-for-cleaning-companies" />
       </Helmet>
 
-      {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: 'clamp(40px, 9vw, 96px) 20px clamp(48px, 9vw, 110px)' }}>
-        <div style={{ maxWidth: 780, margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
-            Cleaning Website + Lead App
+      {/* Hero -- was a single centered text column on a flat gradient, which
+          read as dull for a page that's literally selling website design.
+          Now: glow blobs for depth, a two-column layout on desktop that
+          actually shows a (synthetic, no real screenshot needed) website
+          mockup instead of just describing one, and a floating "new lead"
+          chip overlapping its corner to make "every lead lands in your
+          pocket" something you see, not just read. */}
+      <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', color: 'white', padding: 'clamp(40px, 9vw, 88px) 20px clamp(48px, 9vw, 110px)' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: -120, right: '4%', width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(96,165,250,0.28) 0%, rgba(96,165,250,0) 70%)', pointerEvents: 'none' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', bottom: -140, left: '0%', width: 340, height: 340, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.22) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} />
+
+        <div className="ws-hero-grid" style={{ maxWidth: 1080, margin: '0 auto', position: 'relative', display: 'grid', gap: 48, alignItems: 'center' }}>
+          <div className="ws-hero-copy">
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 18 }}>
+              Cleaning Website + Lead App
+            </div>
+            <h1 style={{ fontSize: 'clamp(26px,4.2vw,42px)', fontWeight: 800, lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.5px' }}>
+              A Professional Cleaning Website,<br />Built and Hosted for You
+              <span style={{ display: 'block', marginTop: 10, backgroundImage: 'linear-gradient(90deg, #60a5fa, #93c5fd)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', fontSize: '0.64em', fontWeight: 700 }}>
+                With Every Lead Landing Right In Your Pocket
+              </span>
+            </h1>
+            <p style={{ fontSize: 15, color: '#94a3b8', maxWidth: 480, marginBottom: 28, lineHeight: 1.55 }}>
+              No cleaning website yet? We build it, host it, and connect every quote request, text, and call to a mobile app you carry with you — for one flat monthly rate, no big upfront cost.
+            </p>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 14 }}>
+              <a href="#apply" className="ws-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
+                Build My Free Sample Site <span className="ws-arrow"><IconArrow size={16} color="white" /></span>
+              </a>
+            </div>
+            <p style={{ fontSize: 13, color: '#93c5fd', fontWeight: 600 }}>
+              We build your site first — you don't pay until you've seen and approved it.
+            </p>
           </div>
-          <h1 style={{ fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 16, letterSpacing: '-0.5px' }}>
-            A Professional Cleaning Website, Built and Hosted for You —<br />
-            <span style={{ color: '#60a5fa', fontSize: '0.68em', fontWeight: 700 }}>With Every Lead Landing Right In Your Pocket</span>
-          </h1>
-          <p style={{ fontSize: 15, color: '#94a3b8', maxWidth: 540, margin: '0 auto 28px', lineHeight: 1.55 }}>
-            No cleaning website yet? We build it, host it, and connect every quote request, text, and call to a mobile app you carry with you — for one flat monthly rate, no big upfront cost.
-          </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 14 }}>
-            <a href="#apply" className="ws-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: PRIMARY_GRADIENT, color: 'white', padding: '15px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15.5, boxShadow: '0 10px 28px rgba(29,78,216,0.4)' }}>
-              Build My Free Sample Site <span className="ws-arrow"><IconArrow size={16} color="white" /></span>
-            </a>
+
+          <div className="ws-hero-visual" style={{ display: 'flex', justifyContent: 'center' }}>
+            <div className="ws-float" style={{ position: 'relative', width: '100%', maxWidth: 380 }}>
+              {/* Synthetic browser-chrome mockup -- no real screenshot
+                  needed, and it keeps the live demo link below (which
+                  already shows a real site) as the thing that actually
+                  earns the click. */}
+              <div style={{ background: 'white', borderRadius: 14, overflow: 'hidden', boxShadow: '0 30px 70px -18px rgba(2,6,23,0.55), 0 8px 24px rgba(2,6,23,0.3)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '10px 14px', background: '#f1f5f9', borderBottom: '1px solid #e2e8f0' }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fca5a5' }} />
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fde68a' }} />
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#bbf7d0' }} />
+                  <span style={{ marginLeft: 10, fontSize: 11, color: '#94a3b8', background: 'white', border: '1px solid #e2e8f0', borderRadius: 6, padding: '3px 10px' }}>yourcleaningco.com</span>
+                </div>
+                <div style={{ padding: '20px 20px 24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ width: 20, height: 20, borderRadius: 6, background: PRIMARY_GRADIENT, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Sparkles size={11} color="white" />
+                      </span>
+                      <span style={{ fontSize: 12.5, fontWeight: 800, color: '#0f172a' }}>Sparkle Clean Co.</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      {[34, 26, 40].map((w, i) => <span key={i} style={{ width: w, height: 6, borderRadius: 3, background: '#e2e8f0' }} />)}
+                    </div>
+                  </div>
+                  <div style={{ height: 9, width: '78%', borderRadius: 4, background: '#0f172a', marginBottom: 9 }} />
+                  <div style={{ height: 9, width: '55%', borderRadius: 4, background: '#0f172a', opacity: 0.85, marginBottom: 16 }} />
+                  <div style={{ height: 6, width: '92%', borderRadius: 3, background: '#e2e8f0', marginBottom: 7 }} />
+                  <div style={{ height: 6, width: '70%', borderRadius: 3, background: '#e2e8f0', marginBottom: 18 }} />
+                  <span style={{ display: 'inline-block', background: PRIMARY_GRADIENT, color: 'white', fontSize: 11.5, fontWeight: 700, padding: '8px 18px', borderRadius: 7 }}>Get a Free Quote</span>
+                </div>
+              </div>
+
+              {/* Floating "new lead" chip -- the visual payoff for the
+                  headline's "lands right in your pocket" line. */}
+              <div style={{
+                position: 'absolute', left: -14, bottom: -18, display: 'flex', alignItems: 'center', gap: 10,
+                background: 'white', borderRadius: 12, padding: '10px 15px 10px 11px',
+                boxShadow: '0 14px 32px -8px rgba(2,6,23,0.4)', border: '1px solid #f1f5f9', maxWidth: 230,
+              }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Bell size={14} color={PRIMARY} strokeWidth={2.3} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>New lead: Sarah M.</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10.5, color: '#94a3b8' }}>
+                    <span className="ws-pulse-dot" /> Deep clean request &middot; just now
+                  </div>
+                </div>
+              </div>
+
+              <div style={{
+                position: 'absolute', right: -16, top: -16, display: 'flex', alignItems: 'center', gap: 6,
+                background: '#0f172a', color: 'white', borderRadius: 999, padding: '7px 13px 7px 10px',
+                boxShadow: '0 10px 26px -6px rgba(2,6,23,0.5)', fontSize: 11, fontWeight: 700,
+              }}>
+                <Smartphone size={12} /> To your phone
+              </div>
+            </div>
           </div>
-          <p style={{ fontSize: 13, color: '#93c5fd', fontWeight: 600 }}>
-            We build your site first — you don't pay until you've seen and approved it.
-          </p>
         </div>
       </div>
 
@@ -291,8 +365,19 @@ export default function WebsiteSubscription() {
         .ws-btn-secondary:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); }
         .ws-arrow { display: inline-flex; transition: transform 0.15s ease; }
         .ws-btn-primary:hover .ws-arrow { transform: translateX(3px); }
+        .ws-hero-grid { grid-template-columns: minmax(280px, 1fr); justify-items: center; text-align: center; }
+        .ws-hero-copy { display: flex; flex-direction: column; align-items: center; }
+        @media (min-width: 860px) {
+          .ws-hero-grid { grid-template-columns: minmax(360px, 1fr) minmax(360px, 420px); justify-items: stretch; text-align: left; }
+          .ws-hero-copy { align-items: flex-start; }
+        }
+        @keyframes ws-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .ws-float { animation: ws-float 5.5s ease-in-out infinite; }
+        @keyframes ws-pulse-ring { 0% { transform: scale(0.9); opacity: 0.6; } 70%, 100% { transform: scale(2.2); opacity: 0; } }
+        .ws-pulse-dot { position: relative; width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+        .ws-pulse-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #22c55e; animation: ws-pulse-ring 1.8s ease-out infinite; }
         @media (prefers-reduced-motion: reduce) {
-          .ws-btn-primary, .ws-btn-secondary, .ws-arrow { transition: none; }
+          .ws-btn-primary, .ws-btn-secondary, .ws-arrow, .ws-float, .ws-pulse-dot::after { transition: none; animation: none; }
         }
         @media (min-width: 768px) {
           .ws-step-desc { text-align: justify; }
