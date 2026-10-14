@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import './CleaningCalculator.css';
-import { AlertCircle, MapPin, BarChart3, ShieldOff, Zap } from 'lucide-react';
+import { AlertCircle, MapPin, BarChart3, Zap } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import { trackMetaEvent } from '../../utils/metaPixel';
@@ -566,7 +566,6 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             {[
               { Icon: MapPin,    label: 'All 50 states',     color: '#059669' },
               { Icon: BarChart3, label: '10 service types',   color: '#2563eb' },
-              { Icon: ShieldOff, label: 'No email required', color: '#7c3aed' },
               { Icon: Zap,       label: 'Instant results',   color: '#ea580c' },
             ].map(({ Icon, label, color }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: COLORS.body, fontWeight: 500 }}>
