@@ -44,7 +44,7 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor, co
     <StepWrapper title="Commercial property details" subtitle="Prices quoted per month" onBack={onBack} onNext={() => onNext({ buildingType, sqft, restrooms, frequency, serviceLevel, dayPorter, afterHours })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       <StepSection label="Building type">
-        <div className="calc-grid-2">
+        <div className="calc-grid-size">
           {BUILDING_TYPES.map(t => (
             <StepOptionCard key={t.id} selected={buildingType === t.id} onClick={() => setBuildingType(t.id)} primaryColor={primaryColor}>
               <span style={{ fontWeight: 600, fontSize: 14, color: buildingType === t.id ? primaryColor : COLORS.ink }}>{t.label}</span>
