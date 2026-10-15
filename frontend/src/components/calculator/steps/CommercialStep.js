@@ -28,7 +28,7 @@ const SERVICE_LEVELS = [
   { id: 'premium', label: 'Premium', desc: '+ detailed, windows, floors' },
 ];
 
-export default function CommercialStep({ value, onBack, onNext, primaryColor, companyConfig }) {
+export default function CommercialStep({ value, onBack, onNext, primaryColor, companyConfig, isFinalStep, loading }) {
   // Only reflects a real, company-set discount (Services tab) -- off by
   // default, same as HomeStep.js/ApartmentStep.js's own frequencyDiscounts.
   const frequencyDiscounts = companyConfig?.services?.commercial?.frequencyDiscounts || {};
@@ -41,7 +41,7 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor, co
   const [afterHours, setAfterHours] = useState(value.afterHours || false);
 
   return (
-    <StepWrapper title="Commercial property details" subtitle="Prices quoted per month" onBack={onBack} onNext={() => onNext({ buildingType, sqft, restrooms, frequency, serviceLevel, dayPorter, afterHours })} primaryColor={primaryColor}>
+    <StepWrapper title="Commercial property details" subtitle="Prices quoted per month" onBack={onBack} onNext={() => onNext({ buildingType, sqft, restrooms, frequency, serviceLevel, dayPorter, afterHours })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       <StepSection label="Building type">
         <div className="calc-grid-2">

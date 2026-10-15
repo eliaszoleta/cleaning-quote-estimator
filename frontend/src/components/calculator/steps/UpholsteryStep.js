@@ -12,7 +12,7 @@ const ITEMS = [
   ['ottoman', 'Ottoman', ''],
 ];
 
-export default function UpholsteryStep({ value, onBack, onNext, primaryColor }) {
+export default function UpholsteryStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
   const [items, setItems] = useState(value.items || { sofa: 1, loveseat: 0, chair: 0, sectional: 0, ottoman: 0 });
   const [fabricType, setFabricType] = useState(value.fabricType || 'fabric');
   const [condition, setCondition] = useState(value.condition || 'moderate');
@@ -30,6 +30,8 @@ export default function UpholsteryStep({ value, onBack, onNext, primaryColor }) 
       onNext={() => onNext({ items, fabricType, condition, extras })}
       primaryColor={primaryColor}
       canNext={totalItems > 0}
+      nextLabel={isFinalStep ? 'See Estimate' : undefined}
+      loading={loading}
     >
       <StepSection label="What needs cleaning?">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

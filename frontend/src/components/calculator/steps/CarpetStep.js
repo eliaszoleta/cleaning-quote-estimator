@@ -3,7 +3,7 @@ import StepWrapper from './StepWrapper';
 import { StepSection, StepChip, StepOptionCard, StepPillToggle } from './StepUI';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
-export default function CarpetStep({ value, onBack, onNext, primaryColor }) {
+export default function CarpetStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
   const [mode, setMode] = useState(value.sqft ? 'sqft' : 'rooms');
   const [rooms, setRooms] = useState(value.rooms || 3);
   const [sqft, setSqft] = useState(value.sqft || 0);
@@ -15,7 +15,7 @@ export default function CarpetStep({ value, onBack, onNext, primaryColor }) {
   const toggleExtra = id => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
   return (
-    <StepWrapper title="Carpet cleaning details" onBack={onBack} onNext={() => onNext({ rooms: mode === 'rooms' ? rooms : 0, sqft: mode === 'sqft' ? sqft : null, condition, method, extras, stairs })} primaryColor={primaryColor}>
+    <StepWrapper title="Carpet cleaning details" onBack={onBack} onNext={() => onNext({ rooms: mode === 'rooms' ? rooms : 0, sqft: mode === 'sqft' ? sqft : null, condition, method, extras, stairs })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       <div style={{ display: 'flex', background: COLORS.surfaceMuted, borderRadius: RADIUS.sm, padding: 4, marginBottom: 24, width: 'fit-content' }}>
         {[['rooms','By Rooms'],['sqft','By Sq Ft']].map(([m,l]) => (

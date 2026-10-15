@@ -53,7 +53,7 @@ const EXTRAS = [
   { id: 'basement', label: 'Finished Basement' },
 ];
 
-export default function HomeStep({ value, onBack, onNext, primaryColor, companyConfig }) {
+export default function HomeStep({ value, onBack, onNext, primaryColor, companyConfig, isFinalStep, loading }) {
   // Only reflects a real, company-set discount (Services tab) -- off by
   // default, so a fresh account shows no "% off" tag on any frequency
   // until the company actually configures one.
@@ -77,6 +77,8 @@ export default function HomeStep({ value, onBack, onNext, primaryColor, companyC
       onBack={onBack}
       onNext={handleNext}
       primaryColor={primaryColor}
+      nextLabel={isFinalStep ? 'See Estimate' : undefined}
+      loading={loading}
     >
       {/* Home size */}
       <StepSection label="Home size">

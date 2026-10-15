@@ -4,7 +4,7 @@ import StepWrapper from './StepWrapper';
 import { StepSection, StepChip } from './StepUI';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
-export default function DryerVentStep({ value, onBack, onNext, primaryColor }) {
+export default function DryerVentStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
   const [propertyType, setPropertyType] = useState(value.propertyType || 'residential');
   const [dryerCount, setDryerCount] = useState(value.dryerCount || 1);
   const [ventLength, setVentLength] = useState(value.ventLength || 'medium');
@@ -13,7 +13,7 @@ export default function DryerVentStep({ value, onBack, onNext, primaryColor }) {
   const [multiUnit, setMultiUnit] = useState(value.multiUnit || false);
 
   return (
-    <StepWrapper title="Dryer vent cleaning details" subtitle="Clogged dryer vents are a top cause of house fires" onBack={onBack} onNext={() => onNext({ propertyType, dryerCount, ventLength, ventType, clogSuspected, multiUnit })} primaryColor={primaryColor}>
+    <StepWrapper title="Dryer vent cleaning details" subtitle="Clogged dryer vents are a top cause of house fires" onBack={onBack} onNext={() => onNext({ propertyType, dryerCount, ventLength, ventType, clogSuspected, multiUnit })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       <div style={{ background: COLORS.warningMuted, border: `1px solid ${COLORS.warningBorder}`, borderRadius: RADIUS.sm, padding: '12px 16px', marginBottom: 24 }}>
         <span style={{ fontWeight: 700, color: '#92400e', display: 'inline-flex', alignItems: 'center', gap: 5 }}><Flame size={14} color={COLORS.warning} /> Safety reminder:</span>

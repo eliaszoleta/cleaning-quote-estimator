@@ -4,7 +4,7 @@ import StepWrapper from './StepWrapper';
 import { StepSection, StepChip, StepPillToggle } from './StepUI';
 import { COLORS } from '../../../styles/theme';
 
-export default function TileGroutStep({ value, onBack, onNext, primaryColor }) {
+export default function TileGroutStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
   const [sqft, setSqft] = useState(value.sqft || 200);
   const [tileType, setTileType] = useState(value.tileType || 'ceramic');
   const [condition, setCondition] = useState(value.condition || 'moderate');
@@ -16,7 +16,7 @@ export default function TileGroutStep({ value, onBack, onNext, primaryColor }) {
   const toggleService = id => setServices(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
 
   return (
-    <StepWrapper title="Tile & grout cleaning details" onBack={onBack} onNext={() => onNext({ sqft, tileType, condition, services, soapScum, hardWater, caulkLinearFt })} primaryColor={primaryColor}>
+    <StepWrapper title="Tile & grout cleaning details" onBack={onBack} onNext={() => onNext({ sqft, tileType, condition, services, soapScum, hardWater, caulkLinearFt })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       <StepSection label={`Area to clean: ${sqft} sq ft`}>
         <input type="range" min={50} max={2000} step={25} value={sqft} onChange={e => setSqft(+e.target.value)} style={{ width: '100%', accentColor: primaryColor }} />

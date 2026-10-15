@@ -231,24 +231,34 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     setSubscriptionPaused(false);
     setLoading(true);
     try {
-      // Same match ResultsScreen shows on-page (skipped when embedded, same
-      // as ResultsScreen's own guard) -- forwarded so the estimate email can
-      // include the same recommended-partner card, not a separate lookup.
-      const partnerMatch = embedded ? null : await getCachedPartnerMatch();
-      const res = await postCalculate({
-        serviceType,
-        zip: location.zip || null,
-        state: location.state || null,
-        // city only ever comes from a company-scoped LocationStep (see
-        // serviceStates) -- doesn't affect pricing (state is what the
-        // calculation engine actually uses), just stashed in
-        // serviceDetails' existing free-form JSONB column as lead
-        // context, no schema change needed.
-        serviceDetails: location.city ? { ...effectiveDetails, city: location.city } : effectiveDetails,
-        companyId: companyConfig?.companyId || null,
-        leadInfo: lead?.email ? lead : null,
-        partnerInfo: partnerMatch,
-      });
+      // Minimum 1.8s so the spinner reads as "actually calculating" even
+      // when the API responds instantly -- raced against the real call via
+      // Promise.all, so a genuinely slow request never gets slowed down
+      // further (Promise.all waits for the longer of the two, not the sum).
+      const [, res] = await Promise.all([
+        new Promise(resolve => setTimeout(resolve, 1800)),
+        (async () => {
+          // Same match ResultsScreen shows on-page (skipped when embedded,
+          // same as ResultsScreen's own guard) -- forwarded so the estimate
+          // email can include the same recommended-partner card, not a
+          // separate lookup.
+          const partnerMatch = embedded ? null : await getCachedPartnerMatch();
+          return postCalculate({
+            serviceType,
+            zip: location.zip || null,
+            state: location.state || null,
+            // city only ever comes from a company-scoped LocationStep (see
+            // serviceStates) -- doesn't affect pricing (state is what the
+            // calculation engine actually uses), just stashed in
+            // serviceDetails' existing free-form JSONB column as lead
+            // context, no schema change needed.
+            serviceDetails: location.city ? { ...effectiveDetails, city: location.city } : effectiveDetails,
+            companyId: companyConfig?.companyId || null,
+            leadInfo: lead?.email ? lead : null,
+            partnerInfo: partnerMatch,
+          });
+        })(),
+      ]);
       setResult(res.data);
       // No-ops when a pixel isn't initialized (embed routes, ad blockers, no
       // pixel ID configured) -- safe to call unconditionally rather than
@@ -550,6 +560,8 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 primaryColor={primaryColor}
                 location={location}
                 companyConfig={companyConfig}
+                isFinalStep={!enableLead}
+                loading={!enableLead && loading}
               />
             )}
             {currentStep === 'lead' && (

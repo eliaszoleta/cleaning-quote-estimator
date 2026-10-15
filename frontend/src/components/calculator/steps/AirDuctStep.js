@@ -4,7 +4,7 @@ import StepWrapper from './StepWrapper';
 import { StepSection, StepChip, StepPillToggle } from './StepUI';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
-export default function AirDuctStep({ value, onBack, onNext, primaryColor }) {
+export default function AirDuctStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
   const [propertyType, setPropertyType] = useState(value.propertyType || 'residential');
   const [sqft, setSqft] = useState(value.sqft || 1800);
   const [ventCount, setVentCount] = useState(value.ventCount || '10_20');
@@ -15,7 +15,7 @@ export default function AirDuctStep({ value, onBack, onNext, primaryColor }) {
   const toggleExtra = id => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
   return (
-    <StepWrapper title="Air duct cleaning details" subtitle="Regular duct cleaning improves air quality and HVAC efficiency" onBack={onBack} onNext={() => onNext({ propertyType, sqft, ventCount, systemCount, extras, moldSuspected })} primaryColor={primaryColor}>
+    <StepWrapper title="Air duct cleaning details" subtitle="Regular duct cleaning improves air quality and HVAC efficiency" onBack={onBack} onNext={() => onNext({ propertyType, sqft, ventCount, systemCount, extras, moldSuspected })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       <StepSection label="Property type">
         <div style={{ display: 'flex', gap: 8 }}>
