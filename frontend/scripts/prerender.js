@@ -192,7 +192,7 @@ function renderMarkdown(md, { sponsored = false } = {}) {
 
 function renderBlogPost(post, cat, assets) {
   const dateISO  = post.dateISO || (post.date ? new Date(post.date).toISOString() : new Date().toISOString());
-  const seoTitle = post.title + ' | Clean Estimator';
+  const seoTitle = (post.metaTitle || post.title) + ' | Clean Estimator';
   const catLabel = (cat && cat.label) || post.categoryLabel || post.category;
   const contentHtml = renderMarkdown(post.content, { sponsored: post.sponsored });
 

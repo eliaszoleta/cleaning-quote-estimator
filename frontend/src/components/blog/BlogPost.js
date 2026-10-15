@@ -81,7 +81,7 @@ export default function BlogPost({ slug }) {
   const suggestions = [...related, ...others].slice(0, 3);
 
   const canonicalUrl = `https://www.cleanestimator.com/blog/${slug}`;
-  const seoTitle = `${post.title} | Clean Estimator`;
+  const seoTitle = `${post.metaTitle || post.title} | Clean Estimator`;
   const dateISO = post.dateISO || (post.date ? new Date(post.date).toISOString() : new Date().toISOString());
 
   const schema = {
