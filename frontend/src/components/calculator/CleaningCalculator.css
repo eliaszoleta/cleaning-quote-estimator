@@ -100,3 +100,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Home/apartment size pickers: short two-line labels ("1,500 – 2,000 sq
+   ft" / "Average home") read fine wrapped at half-width, so unlike
+   .calc-grid-2 above this stays 2 columns even on a narrow phone instead
+   of stacking into a single tall list with a wall of empty space on the
+   right of every card. */
+.calc-grid-size {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}

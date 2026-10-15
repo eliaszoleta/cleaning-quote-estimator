@@ -82,7 +82,7 @@ export default function HomeStep({ value, onBack, onNext, primaryColor, companyC
     >
       {/* Home size */}
       <StepSection label="Home size">
-        <div className="calc-grid-2">
+        <div className="calc-grid-size">
           {SQFT_OPTIONS.map(o => (
             <StepOptionCard key={o.id} selected={sqftTier === o.id} onClick={() => setSqftTier(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 600, fontSize: 14 }}>{o.label}</div>

@@ -58,7 +58,7 @@ export default function ApartmentStep({ value, onBack, onNext, primaryColor, com
   return (
     <StepWrapper title="Apartment details" subtitle="Get an accurate quote for your unit" onBack={onBack} onNext={() => onNext({ size, bathrooms, cleaningType, frequency, furnished, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
       <StepSection label="Apartment size">
-        <div className="calc-grid-2">
+        <div className="calc-grid-size">
           {SIZES.map(o => (
             <StepOptionCard key={o.id} selected={size === o.id} onClick={() => setSize(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>{o.label}</div>
