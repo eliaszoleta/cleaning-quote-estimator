@@ -15,13 +15,17 @@ function IconBadge({ Icon, color, bg }) {
   );
 }
 
-// Horizontal icon-left / content-right layout -- once the card stretches
-// full width (stacked instead of a 3-column grid), a vertical icon-on-top
-// layout leaves the text narrow and stranded on the left with empty space
-// on the right. This lets the title/paragraph use the full card width.
+// Horizontal icon-left / content-right layout on wider screens -- the card
+// is always a single full-width column (never part of a multi-column grid,
+// see the flex-column wrapper below), so a vertical icon-on-top layout
+// would leave a lot of empty horizontal space next to a short title there.
+// But that same horizontal layout squeezes the paragraph into a narrow
+// column on a phone-width card, with empty space under the icon instead --
+// so below 480px this flips to stacked icon-on-top, where the paragraph can
+// actually use the card's full width.
 function ProductCard({ Icon, color, bg, title, children, href, linkLabel }) {
   return (
-    <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start', padding: '22px 24px', background: COLORS.surface, borderRadius: RADIUS.md, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm }}>
+    <div className="about-product-card" style={{ padding: '22px 24px', background: COLORS.surface, borderRadius: RADIUS.md, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm }}>
       <IconBadge Icon={Icon} color={color} bg={bg} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <h3 style={{ fontSize: 15.5, fontWeight: 800, color: COLORS.ink, margin: '0 0 6px' }}>{title}</h3>
@@ -152,6 +156,12 @@ export default function About() {
           <p style={{ ...pStyle, marginBottom: 24, maxWidth: 640 }}>
             Clean Estimator is three things working together: an internal quoting tool cleaning companies use to run unlimited, accurate on-screen estimates for their own jobs — with a white-labeled calculator widget for their website included whenever they also want public lead capture — a local partner program that turns estimate requests into real jobs, and a free public calculator anyone can use to see typical pricing.
           </p>
+          <style>{`
+            .about-product-card { display: flex; gap: 18px; align-items: flex-start; }
+            @media (max-width: 480px) {
+              .about-product-card { flex-direction: column; gap: 12px; }
+            }
+          `}</style>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <ProductCard Icon={Code2} color="#0891b2" bg="#ecfeff" title="Internal Estimator" href="/estimator" linkLabel="For companies">
               Cleaning companies get unlimited, accurate on-screen estimates to quote jobs instantly — on the phone, during a walkthrough, or from the office — with a white-labeled widget for their own website included at no extra cost whenever they want public lead capture too.
