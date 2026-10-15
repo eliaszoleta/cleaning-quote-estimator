@@ -31,6 +31,31 @@
 
 html { font-size: 16px; }
 
+/* 'Poppins Fallback' below the body rule names this but never defined it --
+   so on a first paint before the Poppins webfont (loaded via Google Fonts,
+   font-display:swap) finishes downloading, every browser actually fell
+   through straight to plain Arial. Arial runs visibly narrower per
+   character than Poppins, so text that fits one line in Poppins wrapped
+   onto 2-3 lines in Arial -- then reflowed (text rewrapping, cards
+   shifting) the moment Poppins swapped in a beat later. Most noticeable on
+   a slow connection, where that "beat later" is long enough to see.
+   Defining it for real as a local, zero-latency Arial with its line
+   metrics (ascent/descent/line-gap) and horizontal width (size-adjust)
+   overridden to match Poppins' own closes that gap: the fallback now
+   occupies the same space Poppins will, so the swap no longer reflows
+   anything. Percentages computed from Poppins' and Liberation Sans'
+   (Arial's metric-compatible open-source twin) real font tables via the
+   `fontaine` library's own algorithm, not guessed.
+   https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/size-adjust */
+@font-face {
+  font-family: 'Poppins Fallback';
+  src: local('Arial');
+  ascent-override: 105%;
+  descent-override: 35%;
+  line-gap-override: 10%;
+  size-adjust: 112.16%;
+}
+
 input, select, textarea, button { font-family: inherit; }
 
 body {
