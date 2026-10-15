@@ -8298,10 +8298,10 @@ We reviewed 8 cleaning staff management tools and ranked them by scheduling, tim
 
 **Quick answer:**
 
-- **Best overall:** [Connecteam](https://connecteam.com/), for distributed cleaning teams that need scheduling, GPS time tracking, checklists, proof of work, and communication in one mobile app.
-- **Best for janitorial quality control:** [Swept](https://sweptworks.com/) for client-ready inspections, and [CleanGuru](https://www.cleanguru.com/) for checklists, inspections, and follow-up work tickets.
-- **Best for customer job operations:** [Jobber](https://www.getjobber.com/) for recurring residential cleanings, and [Housecall Pro](https://www.housecallpro.com/) for mobile dispatch, job time, and travel-time visibility.
-- **Best for schedule-first oversight:** [Deputy](https://www.deputy.com/) for location-based schedules and timesheet approval, [Homebase](https://www.joinhomebase.com/) for small location-based teams, and [When I Work](https://wheniwork.com/) for recurring shifts and open-shift coverage.
+- **Best overall:** Connecteam, for distributed cleaning teams that need scheduling, GPS time tracking, checklists, proof of work, and communication in one mobile app.
+- **Best for janitorial quality control:** Swept for client-ready inspections, and CleanGuru for checklists, inspections, and follow-up work tickets.
+- **Best for customer job operations:** Jobber for recurring residential cleanings, and Housecall Pro for mobile dispatch, job time, and travel-time visibility.
+- **Best for schedule-first oversight:** Deputy for location-based schedules and timesheet approval, Homebase for small location-based teams, and When I Work for recurring shifts and open-shift coverage.
 
 ## How we picked these tools
 
