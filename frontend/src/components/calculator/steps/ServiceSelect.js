@@ -78,7 +78,20 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
 
   useEffect(() => {
     const el = wrapRef.current;
-    if (!el || !embedded || isMobile) return;
+    // Resets back to 0 (not just skips re-measuring) whenever mobile --
+    // CleaningCalculator's own isMobile detection runs in a useEffect of
+    // its own, a render cycle after this component's first mount, so
+    // isMobile briefly reads false on that very first render and this
+    // effect's ResizeObserver fires once for real, capturing whatever
+    // width existed in that split second. Without the reset below,
+    // isMobile flipping true right after left that one stale measurement
+    // sitting in state forever -- capping contentMaxWidth (and the whole
+    // heading+subtext+grid block) at a narrow desktop-sized width on every
+    // subsequent mobile render for the rest of the session, which is
+    // exactly what made the service list look too narrow only on a fresh
+    // page load, correcting itself the moment this component happened to
+    // unmount and remount (e.g. navigating away a step and back).
+    if (!el || !embedded || isMobile) { setGridWidth(0); return; }
     const check = (width) => setGridWidth(width);
     check(el.getBoundingClientRect().width);
     const observer = new ResizeObserver(entries => check(entries[0].contentRect.width));

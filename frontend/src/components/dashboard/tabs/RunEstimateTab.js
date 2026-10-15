@@ -44,7 +44,7 @@ export default function RunEstimateTab({ config, user }) {
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: 'clamp(24px, 5vw, 64px) clamp(8px, 3vw, 20px)' }}>
+    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: 'clamp(24px, 5vw, 64px) clamp(6px, 2.5vw, 16px)' }}>
       <div style={{ width: '100%', maxWidth: 720, background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
         <CleaningCalculator
           companyConfig={companyConfig}
