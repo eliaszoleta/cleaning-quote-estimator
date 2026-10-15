@@ -954,6 +954,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/8-best-tools-to-manage-cleaning-staff-in-2026</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- Cleaning services (auto-generated from services.js) -->
   <url>

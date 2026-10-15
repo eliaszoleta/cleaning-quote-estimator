@@ -131,7 +131,7 @@ function staticHeader() {
 
 // ─── 5. Markdown renderer (mirrors BlogPost.js renderMarkdown) ───────────────
 
-function renderMarkdown(md) {
+function renderMarkdown(md, { sponsored = false } = {}) {
   if (!md) return '';
   let html = md.trim();
 
@@ -160,7 +160,8 @@ function renderMarkdown(md) {
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
   // Links
-  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:' + PRIMARY + ';font-weight:500">$1</a>');
+  const linkAttrs = sponsored ? ' target="_blank" rel="sponsored noopener"' : '';
+  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2"' + linkAttrs + ' style="color:' + PRIMARY + ';font-weight:500">$1</a>');
 
   // Unordered lists
   html = html.replace(/((?:^- .+\n?)+)/gm, (block) => {
@@ -193,7 +194,7 @@ function renderBlogPost(post, cat, assets) {
   const dateISO  = post.dateISO || (post.date ? new Date(post.date).toISOString() : new Date().toISOString());
   const seoTitle = post.title + ' | Clean Estimator';
   const catLabel = (cat && cat.label) || post.categoryLabel || post.category;
-  const contentHtml = renderMarkdown(post.content);
+  const contentHtml = renderMarkdown(post.content, { sponsored: post.sponsored });
 
   const articleSchemaStr = JSON.stringify({
     '@context': 'https://schema.org',

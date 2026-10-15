@@ -4,8 +4,14 @@ import { FileQuestion, Lightbulb, ArrowRight } from 'lucide-react';
 import { getPostBySlug, BLOG_POSTS } from '../../data/blogPosts';
 import '../pages/PageHero.css';
 
-// Simple markdown-to-HTML renderer (tables, headers, bold, lists, links)
-function renderMarkdown(md) {
+// Simple markdown-to-HTML renderer (tables, headers, bold, lists, links).
+// sponsored posts (paid guest contributions) pass every link through as
+// target="_blank" rel="sponsored noopener" -- every link in this kind of
+// post goes to the contributor's own site or a review/citation source, none
+// of them cleanestimator.com, so this is safe to apply post-wide rather
+// than needing per-link markup, and keeps regular posts' links (which
+// stay in-tab, no rel attribute) completely unaffected.
+function renderMarkdown(md, { sponsored = false } = {}) {
   if (!md) return '';
   let html = md.trim();
 
@@ -33,7 +39,8 @@ function renderMarkdown(md) {
   html = html.replace(/^([✅⚠️🚩❌✓])\s+(.+)$/gm, '<div style="display:flex;gap:8px;margin-bottom:8px"><span>$1</span><span>$2</span></div>');
 
   // Links
-  html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#1d4ed8;font-weight:500">$1</a>');
+  const linkAttrs = sponsored ? ' target="_blank" rel="sponsored noopener"' : '';
+  html = html.replace(/\[(.+?)\]\((.+?)\)/g, `<a href="$2"${linkAttrs} style="color:#1d4ed8;font-weight:500">$1</a>`);
 
   // Unordered lists
   html = html.replace(/((?:^- .+\n?)+)/gm, (block) => {
@@ -185,7 +192,7 @@ export default function BlogPost({ slug }) {
           </div>
 
           {/* Content */}
-          <div style={{ lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} />
+          <div style={{ lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content, { sponsored: post.sponsored }) }} />
         </div>
 
         {/* Bottom CTA */}
