@@ -507,7 +507,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         }}>
           {/* Progress bar */}
           {currentStep !== 'service' && currentStep !== 'results' && (
-            <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, padding: '16px 24px' }}>
+            <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, padding: embedded || isMobile ? '16px 12px' : '16px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 {steps.map((step, i) => (
                   <span key={step} style={{
@@ -532,7 +532,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
           {/* Error */}
           {error && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: COLORS.dangerMuted, borderBottom: `1px solid ${COLORS.dangerBorder}`, padding: '11px 24px', color: COLORS.danger, fontSize: 13.5 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: COLORS.dangerMuted, borderBottom: `1px solid ${COLORS.dangerBorder}`, padding: embedded || isMobile ? '11px 12px' : '11px 24px', color: COLORS.danger, fontSize: 13.5 }}>
               <AlertCircle size={15} /> {error}
             </div>
           )}
