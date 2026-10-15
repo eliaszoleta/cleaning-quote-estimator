@@ -56,6 +56,87 @@ html { font-size: 16px; }
   size-adjust: 112.16%;
 }
 
+/* Same fix, same reason, for every Google Fonts choice in the widget's
+   Branding tab (utils/fonts.js) -- including Inter, the default every new
+   company's calculator actually loads. CleaningCalculator.js applies
+   whichever of these a company picked as a font-family override local to
+   the calculator/widget, lazy-loading it the same no-fallback way, so this
+   same reflow happened there independent of (and invisible to) the fix
+   above -- the one case report that turned out to be about, since nothing
+   else on the site uses a per-company font. */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  ascent-override: 96.88%;
+  descent-override: 24.12%;
+  line-gap-override: 0%;
+  size-adjust: 107.12%;
+}
+@font-face {
+  font-family: 'Roboto Fallback';
+  src: local('Arial');
+  ascent-override: 92.77%;
+  descent-override: 24.41%;
+  line-gap-override: 0%;
+  size-adjust: 99.78%;
+}
+@font-face {
+  font-family: 'Open Sans Fallback';
+  src: local('Arial');
+  ascent-override: 106.88%;
+  descent-override: 29.30%;
+  line-gap-override: 0%;
+  size-adjust: 105.15%;
+}
+@font-face {
+  font-family: 'Lato Fallback';
+  src: local('Arial');
+  ascent-override: 98.70%;
+  descent-override: 21.30%;
+  line-gap-override: 0%;
+  size-adjust: 97.69%;
+}
+@font-face {
+  font-family: 'Montserrat Fallback';
+  src: local('Arial');
+  ascent-override: 96.80%;
+  descent-override: 25.10%;
+  line-gap-override: 0%;
+  size-adjust: 112.83%;
+}
+@font-face {
+  font-family: 'Nunito Fallback';
+  src: local('Arial');
+  ascent-override: 101.10%;
+  descent-override: 35.30%;
+  line-gap-override: 0%;
+  size-adjust: 101.39%;
+}
+@font-face {
+  font-family: 'Work Sans Fallback';
+  src: local('Arial');
+  ascent-override: 93.00%;
+  descent-override: 24.30%;
+  line-gap-override: 0%;
+  size-adjust: 111.93%;
+}
+@font-face {
+  font-family: 'Raleway Fallback';
+  src: local('Arial');
+  ascent-override: 94.00%;
+  descent-override: 23.40%;
+  line-gap-override: 0%;
+  size-adjust: 103.86%;
+}
+@font-face {
+  font-family: 'Source Sans 3 Fallback';
+  src: local('Arial');
+  ascent-override: 102.40%;
+  descent-override: 40.00%;
+  line-gap-override: 0%;
+  size-adjust: 93.76%;
+}
+
 input, select, textarea, button { font-family: inherit; }
 
 body {
