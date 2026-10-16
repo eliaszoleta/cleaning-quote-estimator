@@ -105,7 +105,7 @@ Use [our free calculator](/?service=home_residential) to get a ZIP-code specific
     categoryLabel: 'Carpet Cleaning',
     date: '2026-08-27',
     readTime: '7 min',
-    excerpt: 'Carpet cleaning costs $44–$100 per room depending on how soiled it is, with a $90–$110 whole-home minimum. A typical 5-room home runs $220–$275 for routine cleaning. Here\'s a real cost breakdown by condition, plus what pet stains, rugs, and stairs add.',
+    excerpt: 'Carpet cleaning costs $48–$113 per room depending on how soiled it is, with a $90–$110 whole-home minimum. A typical 5-room home runs $240–$310 for routine cleaning. Here\'s a real cost breakdown by condition, plus what pet stains, rugs, and stairs add.',
     content: `
 ## How Much Does Carpet Cleaning Cost?
 
@@ -113,18 +113,18 @@ Carpet cleaning is almost always priced per room rather than by square footage �
 
 | Condition | Cost Per Room | What It Looks Like |
 |---|---|---|
-| Light (routine maintenance) | $44–$55 | Regular upkeep, no visible staining |
-| Moderate soiling | $49–$65 | High-traffic areas, some visible dirt |
-| Heavy soiling | $60–$80 | Significant buildup, overdue cleaning |
-| Pet stains / odor | $73–$100 | Needs enzyme treatment and extra extraction passes |
+| Light (routine maintenance) | $48–$62 | Regular upkeep, no visible staining |
+| Moderate soiling | $54–$73 | High-traffic areas, some visible dirt |
+| Heavy soiling | $66–$90 | Significant buildup, overdue cleaning |
+| Pet stains / odor | $79–$113 | Needs enzyme treatment and extra extraction passes |
 
 Every job also carries a **$90–$110 whole-home minimum**, so if you're only getting one small room done, expect to pay the minimum rather than the per-room rate.
 
 ## What a Real Carpet Cleaning Estimate Looks Like
 
-For a typical 5-room home getting a routine, light-soiling clean, you're looking at **$220–$275** — that's the per-room rate times five rooms, no surprises. If two of those rooms have pet stains instead of light soiling, swap those two rooms to the $73–$100 range and the total climbs closer to $320–$375.
+For a typical 5-room home getting a routine, light-soiling clean, you're looking at **$240–$310** — that's the per-room rate times five rooms, no surprises. If two of those rooms have pet stains instead of light soiling, swap those two rooms to the $79–$113 range and the total climbs closer to $302–$412.
 
-If you're converting to a per-square-foot number for comparison shopping: a typical bedroom or living room runs roughly 150–200 sq ft, which puts light-soiling carpet cleaning at roughly **$0.25–$0.35 per square foot** once you back into it. Most professional cleaners, including ours, don't quote per square foot for this reason — it hides how much labor actually goes into edges, furniture, and corners.
+If you're converting to a per-square-foot number for comparison shopping: a typical bedroom or living room runs roughly 150–200 sq ft, which puts light-soiling carpet cleaning at roughly **$0.24–$0.41 per square foot** once you back into it. Most professional cleaners, including ours, don't quote per square foot for this reason — it hides how much labor actually goes into edges, furniture, and corners.
 
 ## Steam Cleaning vs. Dry Cleaning
 
@@ -159,13 +159,13 @@ Vacuum thoroughly before your appointment — it clears surface debris so the te
 ## FAQ
 
 **How much does carpet cleaning cost?**
-Carpet cleaning costs $44–$55 per room for routine, lightly soiled carpet, with a $90–$110 whole-home minimum. A typical 5-room home runs about $220–$275 for a light cleaning.
+Carpet cleaning costs $48–$62 per room for routine, lightly soiled carpet, with a $90–$110 whole-home minimum. A typical 5-room home runs about $240–$310 for a light cleaning.
 
 **What's a fair carpet cleaning cost estimate for pet stains?**
-Pet-stained or heavily odorous carpet runs $73–$100 per room — about 65–82% more than routine cleaning — because it requires enzyme treatment and extra extraction passes the odor won't come out with a standard clean.
+Pet-stained or heavily odorous carpet runs $79–$113 per room — about 65–82% more than routine cleaning — because it requires enzyme treatment and extra extraction passes the odor won't come out with a standard clean.
 
 **Is carpet cleaning priced per room or per square foot?**
-Most companies, including ours, price per room rather than per square foot, since labor time depends more on furniture and edge work than raw floor area. If you need a rough per-square-foot comparison, light cleaning works out to roughly $0.25–$0.35/sq ft for an average-sized room.
+Most companies, including ours, price per room rather than per square foot, since labor time depends more on furniture and edge work than raw floor area. If you need a rough per-square-foot comparison, light cleaning works out to roughly $0.24–$0.41/sq ft for an average-sized room.
 
 **How much more does dry carpet cleaning cost than steam cleaning?**
 Dry cleaning costs about 10–13% more than steam cleaning, but dries in 1–2 hours instead of 6–12 — worth it if you need the room usable the same day.
@@ -7168,7 +7168,7 @@ The right chemical sequence — not just "more cleaner" — is what actually pro
 
 ## What Professional Carpet Cleaning Costs
 
-For comparison, professional carpet cleaning runs **$44–$55 per room** for light/routine soiling, with a **$90–$110 whole-home minimum**. A typical 5-room home runs roughly **$220–$275** for routine cleaning.
+For comparison, professional carpet cleaning runs **$48–$62 per room** for light/routine soiling, with a **$90–$110 whole-home minimum**. A typical 5-room home runs roughly **$240–$310** for routine cleaning.
 
 ## Why the Gap Isn't Just About Price
 
@@ -7182,7 +7182,7 @@ Rental carpet cleaners have meaningfully less suction power than truck-mounted p
 
 | | DIY (Rental) | Professional |
 |---|---|---|
-| Cost (5-room home) | $45–$110 | $220–$275 |
+| Cost (5-room home) | $45–$110 | $240–$310 |
 | Suction power | Limited | Significantly higher (truck-mounted) |
 | Dry time | 18–24+ hours | 6–12 hours |
 | Pet odor removal | Limited | Full enzyme treatment available |
