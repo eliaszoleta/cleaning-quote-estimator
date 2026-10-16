@@ -50,8 +50,8 @@ export default function WaterDamageStep({ value, onBack, onNext, primaryColor, i
         <div className="calc-grid-3">
           {[
             ['clean','Category 1: Clean Water','Pipe burst, appliance supply line'],
-            ['gray','Category 2: Gray Water','Washing machine, dishwasher overflow (+30%)'],
-            ['black','Category 3: Black Water','Sewage, flooding (+70–90%)'],
+            ['gray','Category 2: Gray Water','Washing machine, dishwasher overflow (+35–50%)'],
+            ['black','Category 3: Black Water','Sewage, flooding (+85–110%)'],
           ].map(([id,label,desc]) => (
             <StepOptionCard key={id} selected={waterCategory === id} onClick={() => setWaterCategory(id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 13, color: waterCategory === id ? primaryColor : COLORS.ink }}>{label}</div>

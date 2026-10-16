@@ -2,11 +2,45 @@
 // All pricing based on research from HomeAdvisor, Angi, Thumbtack, HomeGuide,
 // and BLS wage data for SOC 37-0000 (Building and Grounds Cleaning and Maintenance)
 // Updated: 2025
+//
+// Re-audited Oct 2026 against current market data (live web search) and the
+// authoritative BLS Occupational Outlook Handbook figure for SOC 37-2011
+// (Janitors & Building Cleaners): national median hourly wage rose from
+// $13.98 (May 2020) to $17.27 (May 2024) to $17.71 (May 2025) -- a real,
+// government-sourced ~4.85%/year compounding trend, used below wherever a
+// table needed a documented inflation/drift correction. Several per-service
+// "2026 cost guide" sites turned up in that search are unsourced,
+// templated SEO content-farm pages (same handful of domains repeating
+// near-identical tables across unrelated topics) and were explicitly
+// NOT used as a basis for any number below -- only sources that could be
+// cross-checked for internal consistency (e.g. Housecall Pro's published
+// figures citing real Angi/HomeAdvisor/Thumbtack listing data, BnBCalc's
+// cited 2025/2026 STR host-pricing tables) were given any weight. Tables
+// below that already checked out against this pass were left unchanged
+// rather than nudged for the sake of nudging.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STATE PRICING MULTIPLIERS
 // Based on BLS state-level wage data + COL indices + market competition
 // National average = 1.00 (represented by states like OH, IN, MO)
+//
+// Re-verification attempted Oct 2026: live search surfaced an authoritative,
+// government-sourced figure for the NATIONAL baseline -- BLS's own
+// Occupational Outlook Handbook for SOC 37-2011 (Janitors & Building
+// Cleaners) -- but not a usable primary source for all 51 STATE-level
+// figures (search snippets only surfaced a handful of individual states
+// clearly, several from third-party aggregators that didn't agree with
+// each other). What a search CAN reasonably confirm: the relative ranking
+// here (CA/NY/DC/HI/MA/WA/AK as the most expensive markets, MS/AR/WV/KY/AL
+// as the least) matches well-established, slow-moving US regional
+// cost-of-living geography that is very unlikely to have meaningfully
+// shifted in ~2 years -- so the RELATIVE multipliers below are left as-is.
+// What the national ANCHOR point needed was a correction -- see
+// STATE_LABOR_RATES immediately below, which this table's multipliers were
+// originally hand-derived from. A genuine state-by-state re-derivation
+// would need the actual BLS OEWS "create customized tables" dataset or API,
+// not search snippets -- flagged here as a real limitation of this pass,
+// not silently skipped.
 // ─────────────────────────────────────────────────────────────────────────────
 const STATE_PRICING_MULTIPLIERS = {
   AL: 0.82, AK: 1.38, AZ: 1.08, AR: 0.80, CA: 1.40, CO: 1.22, CT: 1.28,
@@ -19,16 +53,28 @@ const STATE_PRICING_MULTIPLIERS = {
   WI: 1.00, WY: 0.95,
 };
 
-// BLS average hourly wages for cleaning workers by state (SOC 37-0000, 2024 data)
+// BLS average hourly wages for cleaning workers by state (SOC 37-0000, 2024 data).
+// Reference/documentation only -- not read by any calculate* function; this
+// table exists to show the basis STATE_PRICING_MULTIPLIERS above was
+// hand-derived from.
+// Re-scaled Oct 2026: this table's own implied national average (~$15.20,
+// the simple mean across all 51 entries) was running meaningfully below the
+// real, authoritative BLS national MEDIAN for the exact year it claims --
+// $17.27/hr for May 2024, rising to $17.71/hr for May 2025 (BLS
+// Occupational Outlook Handbook, SOC 37-2011). Every entry below was scaled
+// up proportionally (×1.165) to align with the current $17.71 figure,
+// preserving each state's relative position -- not re-researched
+// individually (see the state-multiplier comment above for why that would
+// need the real BLS OEWS dataset, not search snippets).
 const STATE_LABOR_RATES = {
-  AL: 12.80, AK: 18.50, AZ: 15.20, AR: 12.50, CA: 19.80, CO: 17.40, CT: 18.20,
-  DE: 15.80, DC: 20.50, FL: 14.90, GA: 13.80, HI: 19.20, ID: 13.90, IL: 16.50,
-  IN: 13.40, IA: 13.20, KS: 12.90, KY: 12.60, LA: 12.80, ME: 14.80, MD: 17.20,
-  MA: 18.80, MI: 14.20, MN: 16.40, MS: 11.80, MO: 13.20, MT: 14.20, NE: 13.50,
-  NV: 15.60, NH: 16.80, NJ: 18.20, NM: 13.20, NY: 20.10, NC: 13.60, ND: 13.80,
-  OH: 13.80, OK: 12.60, OR: 17.20, PA: 15.40, RI: 16.80, SC: 12.90, SD: 13.20,
-  TN: 12.80, TX: 14.80, UT: 14.80, VT: 16.40, VA: 16.20, WA: 18.90, WV: 11.90,
-  WI: 14.40, WY: 13.80,
+  AL: 14.91, AK: 21.55, AZ: 17.71, AR: 14.56, CA: 23.07, CO: 20.27, CT: 21.21,
+  DE: 18.41, DC: 23.89, FL: 17.36, GA: 16.08, HI: 22.37, ID: 16.20, IL: 19.22,
+  IN: 15.61, IA: 15.38, KS: 15.03, KY: 14.68, LA: 14.91, ME: 17.24, MD: 20.04,
+  MA: 21.90, MI: 16.55, MN: 19.11, MS: 13.75, MO: 15.38, MT: 16.55, NE: 15.73,
+  NV: 18.18, NH: 19.57, NJ: 21.21, NM: 15.38, NY: 23.42, NC: 15.85, ND: 16.08,
+  OH: 16.08, OK: 14.68, OR: 20.04, PA: 17.94, RI: 19.57, SC: 15.03, SD: 15.38,
+  TN: 14.91, TX: 17.24, UT: 17.24, VT: 19.11, VA: 18.88, WA: 22.02, WV: 13.86,
+  WI: 16.78, WY: 16.08,
 };
 
 // Market maturity: competitive markets have more providers → more price pressure
@@ -173,6 +219,10 @@ const DEFAULT_COMPANY_CONFIG = {
 
 // Home / Residential Cleaning base prices by sq footage tier
 // Source: HomeAdvisor 2024, Angi 2024
+// Cross-checked Oct 2026: Angi's own cited March-2026 customer data puts a
+// standard residential visit at $118-$238, typically ~$176 -- the 1500-2000
+// sq ft tier below (the most common home size, see typicalTierIndex in
+// frontend/src/data/services.js) midpoints at $178. Left unchanged.
 const HOME_SQFT_BASE_PRICES = {
   'under_1000': { low: 90,  high: 115 },
   '1000_1500':  { low: 122, high: 152 },
@@ -223,17 +273,28 @@ const CONDITION_MULTIPLIERS = {
   needs_attention: { low: 1.22, high: 1.28 },
 };
 
-// Apartment size base prices (slightly lower than residential)
+// Apartment size base prices (slightly lower than residential).
+// Previously had no independent source at all -- just "slightly lower than
+// residential," never checked against real apartment-cleaning market data.
+// Source: cross-referenced Oct 2026 against several current apartment-
+// cleaning cost guides (national one-time-clean averages clustering around
+// $120-$180 for a 1-2BR, $170-$260 for 2BR) -- nudged up ~5% from the prior
+// figures to track closer to those averages instead of only HOME_SQFT_BASE_PRICES
+// minus a guessed margin.
 const APARTMENT_SIZE_PRICES = {
-  studio:     { low: 85,  high: 108 },
-  '1br':      { low: 107, high: 133 },
-  '2br':      { low: 140, high: 175 },
-  '3br':      { low: 175, high: 215 },
-  '4br_plus': { low: 210, high: 258 },
+  studio:     { low: 89,  high: 113 },
+  '1br':      { low: 112, high: 140 },
+  '2br':      { low: 147, high: 184 },
+  '3br':      { low: 184, high: 226 },
+  '4br_plus': { low: 221, high: 271 },
 };
 
 // Commercial cleaning prices per sq ft per visit
 // Source: ISSA (International Sanitary Supply Association), BuildingOperationsManagement
+// Cross-checked Oct 2026: current per-visit commercial janitorial guides
+// cluster around $0.07-$0.20/sq ft standard recurring service, with medical
+// running meaningfully higher ($0.20-$0.60/sq ft) -- every tier below
+// already falls inside its matching real-world band. Left unchanged.
 const COMMERCIAL_SQFT_RATES = {
   office:    { low: 0.088, high: 0.107 },
   retail:    { low: 0.09,  high: 0.11  },
@@ -286,8 +347,13 @@ const DAY_PORTER_DAILY_RATE = { low: 218, high: 265 };
 const COMMERCIAL_RESTROOM_PER_VISIT_RATE = { low: 4, high: 7 };
 
 // Carpet cleaning prices
-const CARPET_PRICE_PER_ROOM = { low: 44, high: 55 };
-const CARPET_PRICE_PER_SQFT = { low: 0.28, high: 0.35 };
+// Previously had no cited source at all. Source: cross-referenced Oct 2026
+// against Housecall Pro's published per-room pricing data ($25-$75/room,
+// drawn from real Angi/HomeAdvisor/Thumbtack listings) -- the prior figures
+// sat in the lower-middle of that real range, nudged up modestly to track
+// closer to its center.
+const CARPET_PRICE_PER_ROOM = { low: 48, high: 62 };
+const CARPET_PRICE_PER_SQFT = { low: 0.30, high: 0.38 };
 
 const CARPET_CONDITION_MULTIPLIERS = {
   light:   { low: 1.0,  high: 1.0  },
@@ -316,11 +382,18 @@ const CARPET_STAIRS_PER_FLIGHT = { low: 52, high: 68 }; // 13-15 steps × $3.50-
 // Source: Angi/HomeAdvisor furniture cleaning cost guide (national avg
 // ~$173, chairs $10-80, sectionals $100-300), cross-checked against
 // Thumbtack-sourced provider rate data for loveseats/sofas.
+// Cross-checked Oct 2026: chair ($40-90) and loveseat ($70-120) both still
+// land inside this table's existing figures. Sofa did not -- four
+// independent current guides all put a 3-seat sofa's average noticeably
+// above this table's prior $175 high end (commonly $180-240 average,
+// $120-250+ range), so sofa (and sectional, scaled proportionally with it)
+// were nudged up; chair/loveseat/ottoman were left as-is since they already
+// checked out.
 const UPHOLSTERY_ITEM_PRICES = {
   chair:     { low: 40,  high: 70  }, // armchair or recliner
   loveseat:  { low: 75,  high: 110 },
-  sofa:      { low: 120, high: 175 }, // 3-seat sofa -- most common job
-  sectional: { low: 175, high: 280 },
+  sofa:      { low: 130, high: 195 }, // 3-seat sofa -- most common job
+  sectional: { low: 195, high: 310 },
   ottoman:   { low: 20,  high: 35  },
 };
 
@@ -340,6 +413,9 @@ const UPHOLSTERY_ADDONS = {
 };
 
 // Air duct cleaning
+// Cross-checked Oct 2026: HomeAdvisor's own current figure averages $388
+// (range $271-$508); Thumbtack reports most homeowners paying ~$374. Both
+// sit right inside this base tier. Left unchanged.
 const AIR_DUCT_BASE = { low: 330, high: 420 }; // up to ~12 vents residential
 const AIR_DUCT_PER_VENT = { low: 18, high: 23 };
 const AIR_DUCT_PER_SYSTEM = { low: 65, high: 85 };
@@ -354,7 +430,16 @@ const AIR_DUCT_ADDONS = {
 };
 
 // Dryer vent cleaning
-const DRYER_VENT_BASE = { low: 105, high: 138 };
+// Previously had no cited source at all. Source: cross-referenced Oct 2026
+// against several current guides for a standard, short/ground-level wall
+// vent (this table's base tier, before the length/type addons below) --
+// multiple independent sources put that job at $128-$270 (avg ~$188),
+// $85-$250 (median $149), and specifically $130-$150 for "straightforward
+// wall vent." The prior figures sat below all of these -- bumped up to
+// track the more specific, directly-comparable "standard wall vent" figure
+// rather than the broader averages (which likely already blend in
+// length/complexity surcharges this table prices separately below).
+const DRYER_VENT_BASE = { low: 118, high: 155 };
 
 const DRYER_VENT_LENGTH_ADDON = {
   short:      { low: 0,  high: 0   },
@@ -383,6 +468,12 @@ const DRYER_VENT_CLOG_ADDON = { low: 35, high: 55 };
 const DRYER_VENT_COMMERCIAL_RATE = { low: 72, high: 100 }; // per machine
 
 // Tile & Grout cleaning
+// Previously had no cited source at all. Source: cross-referenced Oct 2026
+// against several current guides, most consistently landing around
+// $0.75-$3/sq ft for standard cleaning (HomeWyse's pure-labor figure runs
+// $0.79-$0.99/sq ft). The ceramic tier below (the cheapest, most common
+// material) already sits right around that labor-only figure, so left
+// unchanged.
 const TILE_PRICE_PER_SQFT = {
   ceramic:    { low: 0.92, high: 1.22 },
   porcelain:  { low: 1.05, high: 1.40 },
@@ -409,6 +500,12 @@ const TILE_SERVICE_ADDONS = {
 // Ranges are tightened around each tier's typical job cost (~1.3-1.5x spread, matching
 // the other services below) — remaining uncertainty is resolved by the mold-type
 // and moisture-source multipliers instead of being baked into one wide tier range.
+// Cross-checked Oct 2026: current guides quote $2-$15/sq ft depending on
+// project scale, but every source buckets "small/medium/large" by different
+// sq-ft ranges than this table does, making a direct per-tier comparison
+// unreliable. The size-anchored figures that ARE comparable check out --
+// e.g. a ~450 sq ft mid-size job at $3,000-$6,000 brackets this table's
+// "large" (100-300 sq ft) tier of $4,300-$5,800. Left unchanged.
 const MOLD_PRICE_RANGES = {
   small:     { low: 750,  high: 1050  },  // <10 sq ft
   medium:    { low: 1950, high: 2700  },  // 10–100 sq ft
@@ -449,6 +546,9 @@ const MOLD_COMMERCIAL_MULTIPLIER = { low: 1.3, high: 1.5 };
 // slider) instead of a single flat range, so the estimate reflects the actual job size.
 // Tightened to a ~1.3x per-sqft spread — matching the other services — since sq ft and
 // category already do the job of separating cheap jobs from expensive ones.
+// Cross-checked Oct 2026: current restoration-industry guides put Category 1
+// (clean water) at $3-$4/sq ft -- this base rate already matches. Left unchanged
+// (see WATER_CATEGORY_MULTIPLIERS below for the gray/black-water correction).
 const WATER_EXTRACTION_DRYING_PER_SQFT = { low: 2.90, high: 3.90 }; // 3–5 day extraction + drying
 const WATER_EXTRACTION_DRYING_MINIMUM = { low: 550, high: 750 };   // small-loss minimum charge
 
@@ -461,12 +561,18 @@ const WATER_CONTENTS_PACKOUT_ADDON = { low: 280, high: 380 };    // furniture/co
 const WATER_FULL_RESTORATION_PER_SQFT = { low: 9, high: 15 };
 const WATER_FULL_RESTORATION_MINIMUM = { low: 2200, high: 3300 };
 
-// Matches the "+30%" (gray) / "+60–100%" (black) shown in the calculator UI, narrowed to
-// a tight band around each since category is already a strong, known signal.
+// Cross-checked Oct 2026 against current restoration-industry per-sq-ft
+// guides: gray water runs $4-$6.50/sq ft and black water runs $7-$7.50+/sq
+// ft, against this table's clean-water base of $2.90-$3.90/sq ft. The prior
+// multipliers (gray +27-33%, black +70-90%) implied an effective gray rate
+// of only $3.68-$5.19/sq ft and black rate of $4.93-$7.41/sq ft -- both
+// running low, especially black water's floor. Raised so the effective
+// per-sq-ft rate for each category lines up with the real range instead of
+// just its low end.
 const WATER_CATEGORY_MULTIPLIERS = {
   clean:  { low: 1.0,  high: 1.0  },
-  gray:   { low: 1.27, high: 1.33 },
-  black:  { low: 1.7,  high: 1.9  },
+  gray:   { low: 1.35, high: 1.5  },
+  black:  { low: 1.85, high: 2.1  },
 };
 
 // Airbnb / vacation rental turnover cleaning pricing
@@ -476,9 +582,15 @@ const WATER_CATEGORY_MULTIPLIERS = {
 // a turnover always includes a full top-to-bottom reset (not just
 // surface cleaning) on a fixed guest-checkout deadline, which linen
 // changing and restocking (below) add to, not replace.
+// Cross-checked Oct 2026 against two independent current host-pricing
+// tables (BnBCalc's cited 2026 median-fee data, Hostfully) -- both put
+// studio/1BR and 2BR meaningfully lower than the prior figures here
+// (studio/1BR ~$65-$95, 2BR ~$95-$145), while 3BR and 4BR+ already matched
+// well. Lowered the two smaller tiers to track the real host-reported
+// median; left 3BR/4BR+ unchanged.
 const AIRBNB_SIZE_PRICES = {
-  studio_1br: { low: 95,  high: 120 },
-  '2br':      { low: 125, high: 155 },
+  studio_1br: { low: 80,  high: 110 },
+  '2br':      { low: 105, high: 145 },
   '3br':      { low: 160, high: 195 },
   '4br_plus': { low: 195, high: 240 },
 };
@@ -501,6 +613,13 @@ const AIRBNB_ADDONS = {
 // actually runs (previously only reachable as a House Cleaning
 // "cleaning type" option using this exact multiplier -- same pricing,
 // now its own standalone service instead of a buried sub-option).
+// This multiplier itself was never independently sourced -- just carried
+// over unchanged from the old House Cleaning sub-option. Cross-checked
+// Oct 2026: HomeAdvisor's current residential total-project figure (as
+// cited by a cost guide) runs $274-$708, most homeowners paying ~$477.
+// At this multiplier, the most common 1500-2000 sq ft tier computes to
+// $344-$465 -- landing almost exactly on that real "most pay ~$477"
+// figure. Left unchanged.
 const POST_CONSTRUCTION_BASE_MULTIPLIER = { low: 2.18, high: 2.35 };
 
 // A touch-up/renovation leaves far less dust and debris behind than a
@@ -533,15 +652,28 @@ const STATE_NAMES = {
 };
 
 // Average home cleaning costs by state (for SEO content tables)
+// Previously hand-set with no cited source, and never actually consistent
+// with what the calculator itself quotes for a "typical" home -- e.g. this
+// table said CA's average was $200, but the default/typical selections
+// (1500-2000 sq ft, 3 bed, 2 bath -- see HomeStep.js's own defaults) run
+// through calculateHomeResidential for CA actually price at $312-$368
+// (midpoint $340), a ~40% gap between what the SEO state pages promised
+// and what the live calculator delivered. Found during the Oct 2026
+// pricing audit. Regenerated directly from the same inputs the calculator
+// actually defaults to -- HOME_SQFT_BASE_PRICES' 1500-2000 tier + the
+// 3-bedroom/2-bathroom addons (midpoint $243 at the national baseline) x
+// STATE_PRICING_MULTIPLIERS -- verified against a live calculateCleaning()
+// call (OH and CA both matched exactly) so this table can't silently drift
+// out of sync with real quotes again.
 const STATE_AVERAGE_HOME_CLEANING_COST = {
-  AL: 115, AK: 195, AZ: 155, AR: 110, CA: 200, CO: 175, CT: 185,
-  DE: 160, DC: 210, FL: 150, GA: 135, HI: 215, ID: 140, IL: 170,
-  IN: 130, IA: 130, KS: 125, KY: 118, LA: 122, ME: 150, MD: 178,
-  MA: 195, MI: 138, MN: 165, MS: 108, MO: 130, MT: 142, NE: 132,
-  NV: 158, NH: 168, NJ: 188, NM: 125, NY: 205, NC: 133, ND: 136,
-  OH: 136, OK: 122, OR: 172, PA: 155, RI: 172, SC: 124, SD: 125,
-  TN: 124, TX: 150, UT: 150, VT: 163, VA: 165, WA: 190, WV: 108,
-  WI: 142, WY: 135,
+  AL: 199, AK: 335, AZ: 262, AR: 194, CA: 340, CO: 296, CT: 311,
+  DE: 272, DC: 352, FL: 255, GA: 231, HI: 365, ID: 238, IL: 287,
+  IN: 224, IA: 219, KS: 214, KY: 202, LA: 207, ME: 255, MD: 304,
+  MA: 328, MI: 236, MN: 279, MS: 190, MO: 219, MT: 243, NE: 224,
+  NV: 267, NH: 287, NJ: 316, NM: 214, NY: 345, NC: 226, ND: 231,
+  OH: 231, OK: 207, OR: 292, PA: 262, RI: 292, SC: 211, SD: 214,
+  TN: 211, TX: 255, UT: 255, VT: 279, VA: 279, WA: 321, WV: 190,
+  WI: 243, WY: 231,
 };
 
 module.exports = {
