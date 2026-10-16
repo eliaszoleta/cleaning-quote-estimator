@@ -85,6 +85,23 @@ function loadFaqsData() {
   return fn();
 }
 
+// Loaded once at module scope so every static page/section below can derive
+// an accurate service count and name list instead of a hand-typed number --
+// several pages here said "9" or "10" services well after the real count
+// had grown to 12, and some enumerated lists were missing services (most
+// recently Upholstery, Airbnb, and Post-Construction) entirely, because
+// this prerendered content is a separate static copy from the live
+// SEOContent.js component and nothing kept the two in sync automatically.
+const ALL_SERVICES = loadServicesData().getAllServices();
+const SERVICE_COUNT = ALL_SERVICES.length;
+const SERVICE_NAMES = ALL_SERVICES.map(s => s.name);
+
+function joinServiceNames(names) {
+  if (names.length <= 1) return names.join('');
+  if (names.length === 2) return names.join(' and ');
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+}
+
 // ─── 2. Extract CSS/JS asset tags from the built index.html ─────────────────
 
 function getAssetTags() {
@@ -596,13 +613,13 @@ function renderAbout(assets) {
     ['Internal Estimator', 'The core product, built for cleaning companies. Unlimited, instant, accurate on-screen price estimates for a company\'s own staff to quote jobs — on a phone call, during a walkthrough, or from the office — instead of pricing from memory or a spreadsheet. $25/month with a 30-day free trial.'],
     ['Embeddable Website Widget', 'Included with the Internal Estimator plan at no extra cost. A white-labeled, branded version of the same calculator that a cleaning company can embed directly on its own website to capture and qualify leads automatically, with instant email alerts on every submission.'],
     ['Local Partner Program', 'Clean Estimator connects visitors who want a real quote with one exclusive local cleaning partner per city — a warm, ready-to-call lead for that partner instead of a cold directory listing.'],
-    ['Free Public Cost Calculator', 'A free, no-signup cleaning cost calculator available to any homeowner, property manager, or business at cleanestimator.com, covering all 10 supported service types with ZIP-code-accurate pricing.'],
+    ['Free Public Cost Calculator', `A free, no-signup cleaning cost calculator available to any homeowner, property manager, or business at cleanestimator.com, covering all ${SERVICE_COUNT} supported service types with ZIP-code-accurate pricing.`],
   ];
 
   const sections = [
     ['Who Clean Estimator Is For', 'Clean Estimator is built primarily for cleaning businesses — independent cleaners, local cleaning companies, and commercial cleaning operators — who need to quote jobs faster and capture more leads than a manual, phone-based quoting process allows. It also serves homeowners and property managers who want fast, unbiased cleaning price guidance before calling a company.'],
     ['How Pricing Estimates Are Calculated', 'The pricing engine behind every Clean Estimator estimate uses industry pricing data, market research, and state-by-state cost-of-living adjustments rather than a single flat national average. Inputs include square footage or room count, service type, cleaning frequency, and the current condition of the space. Estimates are presented as ranges, since final, on-site pricing depends on factors a calculator can\'t see.'],
-    ['Service Coverage', 'Clean Estimator generates estimates for 10 cleaning and restoration service types — standard house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, upholstery cleaning, air duct cleaning, dryer vent cleaning, tile & grout cleaning, mold remediation, and water damage restoration — with coverage across all 50 U.S. states.'],
+    ['Service Coverage', `Clean Estimator generates estimates for ${SERVICE_COUNT} cleaning and restoration service types — ${joinServiceNames(SERVICE_NAMES)} — with coverage across all 50 U.S. states.`],
     ['Disclaimer', "Clean Estimator's estimates are starting points, not binding quotes. Actual cleaning service costs depend on the specific condition of the property, local market competition, an individual cleaning company's own pricing, and other factors only visible in person. Always get a confirmed quote from a licensed, insured professional before booking."],
   ];
 
@@ -668,7 +685,7 @@ function renderCalculatorPage(assets) {
   const whyPoints = [
     ['ZIP-Code Accurate', 'Every price this cleaning cost calculator returns is adjusted for your local labor rates and cost of living, not a flat national guess.'],
     ['Instant Results', "Answer a few quick questions and get your estimate in under 60 seconds — no waiting for a callback from a cleaning company."],
-    ['9 Service Types Covered', 'From standard house cleaning to mold remediation and water damage restoration, this calculator covers the full range of cleaning and restoration services.'],
+    [`${SERVICE_COUNT} Service Types Covered`, 'From standard house cleaning to mold remediation and water damage restoration, this calculator covers the full range of cleaning and restoration services.'],
     ['100% Free, No Signup', 'Use the cleaning cost calculator as many times as you want. No account, no credit card, and no obligation to book.'],
   ];
 
@@ -676,12 +693,12 @@ function renderCalculatorPage(assets) {
     { q: 'Is this cleaning cost calculator really free?', a: 'Yes. Our cleaning cost calculator is completely free to use, with no signup, no account, and no hidden fees. You can run as many estimates as you need.' },
     { q: 'How accurate is the cleaning cost calculator?', a: 'The calculator uses real market pricing data with state-by-state cost-of-living adjustments, so your estimate reflects typical local pricing. Final prices from an actual cleaning company can vary based on the specific condition of your home and other in-person factors, so treat the result as a reliable starting range rather than a binding quote.' },
     { q: 'What information do I need to use the cleaning cost calculator?', a: 'Just your ZIP code, the type of cleaning service you need, and a few basic details about your space (like square footage or number of rooms). No email or phone number is required to see your price range.' },
-    { q: 'Does the cleaning cost calculator work for businesses too?', a: 'Yes. In addition to house and apartment cleaning, the calculator includes commercial cleaning, carpet cleaning, air duct cleaning, dryer vent cleaning, tile & grout cleaning, mold remediation, and water damage restoration — for both residential and commercial properties.' },
+    { q: 'Does the cleaning cost calculator work for businesses too?', a: 'Yes. In addition to house and apartment cleaning, the calculator includes commercial cleaning, carpet cleaning, air duct cleaning, dryer vent cleaning, tile & grout cleaning, mold remediation, water damage restoration, and more — for both residential and commercial properties.' },
     { q: 'Can I embed this cleaning cost calculator on my own website?', a: 'Yes — cleaning companies can embed a white-labeled version of this calculator on their own site to capture leads with accurate, localized estimates. Visit our estimator page for details.' },
   ];
 
   const body = `  <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:14px;text-align:center">Cleaning Cost Calculator</h1>
-  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">This free cleaning cost calculator gives you an instant, ZIP-code specific price for house cleaning, carpet cleaning, commercial cleaning, and 6 other services. Built as a standalone cleaning calculator you can bookmark and reuse — no signup, no phone calls, just enter your details and get a real cleaning estimator price range in under 60 seconds.</p>
+  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">This free cleaning cost calculator gives you an instant, ZIP-code specific price for house cleaning, carpet cleaning, commercial cleaning, and ${SERVICE_COUNT - 3} other services. Built as a standalone cleaning calculator you can bookmark and reuse — no signup, no phone calls, just enter your details and get a real cleaning estimator price range in under 60 seconds.</p>
   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:32px;margin-bottom:40px;text-align:center">
     <p style="font-size:14px;color:#94a3b8;margin:0">Loading your free cleaning cost calculator&hellip; please enable JavaScript to use the interactive calculator.</p>
   </div>
@@ -732,7 +749,7 @@ function renderEstimatorPage(assets) {
 
   const whyPoints = [
     ['Real Market Pricing', 'This cleaning cost estimator pulls from actual state-by-state pricing data, not a generic industry average.'],
-    ['Covers Every Room & Service', 'Estimate house cleaning, apartment cleaning, commercial spaces, carpets, air ducts, dryer vents, tile & grout, mold remediation, and water damage restoration.'],
+    ['Covers Every Room & Service', 'Estimate house cleaning, apartment cleaning, commercial spaces, carpets, air ducts, dryer vents, tile & grout, mold remediation, water damage restoration, and more.'],
     ['No Waiting on Quotes', 'Skip the back-and-forth with cleaning companies — get your price estimate the moment you finish answering a few questions.'],
     ['Always Free', "There's no cost to use this estimator, no account required, and no limit on how many times you can run it."],
   ];
@@ -746,7 +763,7 @@ function renderEstimatorPage(assets) {
   ];
 
   const body = `  <h1 style="font-size:clamp(28px,5vw,42px);font-weight:900;color:#0f172a;line-height:1.15;margin-bottom:14px;text-align:center">Cleaning Cost Estimator</h1>
-  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and 6 other services &mdash; enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation.</p>
+  <p style="font-size:17px;color:#64748b;max-width:640px;margin:0 auto 32px;line-height:1.7;text-align:center">Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and ${SERVICE_COUNT - 3} other services &mdash; enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation.</p>
   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:32px;margin-bottom:40px;text-align:center">
     <p style="font-size:14px;color:#94a3b8;margin:0">Loading your free cleaning cost estimator&hellip; please enable JavaScript to use the interactive calculator.</p>
   </div>
@@ -1586,11 +1603,14 @@ function injectHomepage(posts, categories) {
     ['Apartment Cleaning', ['Unit size: studio up to 4+ bedrooms', 'Number of bathrooms', 'Cleaning type: standard, deep, or move-in/move-out', 'Frequency, and whether the unit is furnished or vacant (vacant runs 10–15% less)', 'Add-ons: inside oven/fridge/cabinets, laundry, interior windows, balcony/patio']],
     ['Commercial Cleaning', ['Building type: office, retail, medical/dental, restaurant, warehouse, school, gym, or church', 'Square footage and number of restrooms', 'Cleaning frequency: daily, weekly, biweekly, or monthly', 'Service level: basic, standard, or premium', 'Optional day porter or after-hours service (+15%)']],
     ['Carpet Cleaning', ['Room count or total square footage', 'Soil level: light, moderate, heavy, or pet stains/odors', 'Cleaning method: steam, dry cleaning, or encapsulation', 'Number of stairs', 'Add-ons: area rugs, Scotchgard protection, deodorizer, pet odor treatment']],
+    ['Upholstery Cleaning', ['Which pieces: sofa, loveseat, chair/recliner, sectional, or ottoman (each priced separately)', 'Fabric type: fabric or leather (leather runs about double)', 'Soil level: light, moderate, heavy, or pet stains/odors', 'Add-ons: fabric protector, deodorizer']],
     ['Air Duct Cleaning', ['Residential (vent count and HVAC system count) or commercial (square footage)', 'Add-ons: UV sanitizing, dryer vent bundle, coil cleaning, filter replacement', 'Suspected mold in the ductwork (+40–50%, requires inspection)']],
     ['Dryer Vent Cleaning', ['Residential (vent length and routing) or commercial (number of dryers)', 'Vent length: short, medium, long, or very long', 'Routing: through wall, through roof, underground, or periscope/tight space', 'Suspected clog (+$50–$100), and bulk discounts for 10+ dryers']],
     ['Tile & Grout Cleaning', ['Area size in square feet', 'Tile material: ceramic, porcelain, natural stone, travertine, or slate (natural stone costs 30–40% more)', 'Current condition, plus soap scum or hard water buildup', 'Services needed: deep clean, grout sealing, grout recoloring, caulk replacement']],
     ['Mold Remediation', ['Affected area: under 10 sq ft up to 300+ sq ft', 'Locations affected: bathroom, basement, attic, crawl space, HVAC/ductwork, walls, kitchen, garage', 'Whether the moisture source has already been fixed', 'Residential or commercial property (+30–50%)', 'Optional air quality testing and post-remediation clearance testing']],
     ['Water Damage Restoration', ['How long ago the damage occurred — urgency affects response', 'Cause: burst pipe, appliance leak, toilet overflow, roof leak, flooding, or sewage backup', 'Water category: clean, gray (+30%), or black water (+60–100%)', 'Affected square footage and which floors/areas are affected', 'Damage severity: wet carpets, soaked walls, or structural damage']],
+    ['Airbnb / Vacation Rental Cleaning', ['Unit size: studio/1 bedroom up to 4+ bedrooms', 'Number of bathrooms', 'Turnaround: standard (scheduled between guest stays) or same-day rush (+30–40%)', 'Frequency: one-time, weekly, biweekly, or monthly (recurring-host discounts)', 'Add-ons: linens & laundry, restocking supplies, periodic deep-clean turnover']],
+    ['Post-Construction Cleaning', ['Home/unit size — 6 tiers from under 1,000 sq ft to 3,000+ sq ft', 'Scope: light touch-up, moderate renovation (+8–18%), or new construction/major renovation (+15–30%)', 'Add-ons: window cleaning, debris haul-away, vent/duct dust removal']],
   ];
   const serviceFactorCards = SERVICE_PRICE_FACTORS.map(([name, factors]) => `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px 20px">
           <h3 style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:8px">${esc(name)}</h3>
@@ -1610,7 +1630,7 @@ function injectHomepage(posts, categories) {
     <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px;text-align:center">
       <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:12px">Get a FREE Cleaning Cost Estimate Online</h2>
       <p style="font-size:14.5px;color:#64748b;line-height:1.7;max-width:640px;margin:0 auto 12px">No phone calls, no waiting on a callback — just a real cleaning cost estimate online, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.</p>
-      <p style="font-size:14.5px;color:#64748b;line-height:1.7;max-width:640px;margin:0 auto 12px">It works the same way across all 10 services — house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, upholstery cleaning, air duct cleaning, dryer vent cleaning, tile &amp; grout cleaning, mold remediation, and water damage restoration — each with its own scope questions, not a one-size-fits-all form.</p>
+      <p style="font-size:14.5px;color:#64748b;line-height:1.7;max-width:640px;margin:0 auto 12px">It works the same way across all ${SERVICE_COUNT} services — ${esc(joinServiceNames(SERVICE_NAMES))} — each with its own scope questions, not a one-size-fits-all form.</p>
       <p style="font-size:14.5px;color:#64748b;line-height:1.7;max-width:640px;margin:0 auto">It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.</p>
     </div>
     <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:36px 40px;margin-bottom:40px">
@@ -1623,11 +1643,11 @@ function injectHomepage(posts, categories) {
         <li><strong>Mold Remediation:</strong> $750–$1,050 for a small spot under 10 sq ft, up to $8,500–$13,000+ for 300+ sq ft.</li>
       </ul>
       <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:8px;text-align:center">Key Pricing Factors</h2>
-      <p style="text-align:center;color:#64748b;font-size:13.5px;max-width:600px;margin:0 auto 14px;line-height:1.7">Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 10 services, not just house cleaning.</p>
+      <p style="text-align:center;color:#64748b;font-size:13.5px;max-width:600px;margin:0 auto 14px;line-height:1.7">Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all ${SERVICE_COUNT} services, not just house cleaning.</p>
       <ul style="margin:0;padding-left:20px;color:#374151;font-size:14.5px;line-height:1.9">
         <li><strong>Square Footage:</strong> Base price scales with home or space size — larger square footage means a higher price.</li>
         <li><strong>Room Count:</strong> Extra bedrooms and bathrooms add roughly $15–$25 each on top of the base price.</li>
-        <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our 10 services asks its own scope questions. See the full breakdown by service below.</li>
+        <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our ${SERVICE_COUNT} services asks its own scope questions. See the full breakdown by service below.</li>
         <li><strong>Cleaning Frequency:</strong> Weekly service saves 20%, biweekly 15%, and monthly 10% off the one-time rate.</li>
         <li><strong>Add-Ons:</strong> Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and similar extras are priced separately.</li>
       </ul>

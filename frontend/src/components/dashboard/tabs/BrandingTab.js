@@ -119,7 +119,7 @@ export default function BrandingTab({ config, update, autoSave, onSave, saving, 
     ctaPhone: form.ctaPhone,
     ctaEmail: form.ctaEmail,
     fontFamily: form.fontFamily,
-    // Left out entirely before -- the preview always showed all 12 services
+    // Left out entirely before -- the preview always showed every service
     // regardless of what was toggled off in the Services tab, since
     // ServiceSelect.js treats a missing `services` object as "show
     // everything." config.services is kept live by the shared `update()`

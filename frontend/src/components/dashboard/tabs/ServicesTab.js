@@ -19,6 +19,11 @@ const SERVICES = [
   { id: 'postConstruction', label: 'Post-Construction', Icon: Construction  },
 ];
 
+// Exported so other dashboard tabs referencing "how many services we offer"
+// (e.g. HelpTab.js) derive it from this real list instead of a typed-out
+// number that goes stale the next time a service is added here.
+export const SERVICES_COUNT = SERVICES.length;
+
 const DEFAULT_SVC = { enabled: true, markup: 1.0, minimumCharge: null };
 
 // Recurring-frequency discounts only apply to the two services visitors

@@ -2,7 +2,12 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ShieldAlert, MessageCircle, Sparkles, Code2, Handshake, Lightbulb } from 'lucide-react';
 import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
+import { getAllServices } from '../../data/services';
 import './PageHero.css';
+
+// Derived from the real service list, not typed out as a number -- a
+// hardcoded count goes stale the moment a new service is added.
+const SERVICE_COUNT = getAllServices().length;
 
 const h2Style = { fontSize: 22, fontWeight: 800, color: COLORS.ink, letterSpacing: '-0.01em' };
 const pStyle = { fontSize: 14.5, color: '#334155', lineHeight: 1.65, margin: 0 };
@@ -180,7 +185,7 @@ export default function About() {
           <h2 style={{ ...h2Style, marginBottom: 24 }}>How It Works</h2>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <Step number={1} title="Pick a service">
-              House cleaning, carpet cleaning, commercial cleaning, mold remediation, and more — 12 services in total, each with its own quick questions.
+              House cleaning, carpet cleaning, commercial cleaning, mold remediation, and more — {SERVICE_COUNT} services in total, each with its own quick questions.
             </Step>
             <Step number={2} title="Answer a few quick questions">
               Home size, condition, how often you want service, and your state — that's it. No phone calls, no waiting on a callback.

@@ -3,6 +3,7 @@ import {
   HelpCircle, Calculator, SlidersHorizontal, MapPin, Map, ToggleRight,
   Paintbrush, Code2, ChevronDown, Layers, Database, Percent,
 } from 'lucide-react';
+import { SERVICES_COUNT } from './ServicesTab';
 
 const cardStyle = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, padding: '20px 22px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' };
 const sectionTitle = { display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 12 };
@@ -234,7 +235,7 @@ export default function HelpTab() {
           Choosing what you offer (Services tab)
         </div>
         <p style={pStyle}>
-          Each of the 12 services has its own on/off switch, markup, and minimum charge — set them independently. Turn off anything you don't actually do; visitors will never see it as an option.
+          Each of the {SERVICES_COUNT} services has its own on/off switch, markup, and minimum charge — set them independently. Turn off anything you don't actually do; visitors will never see it as an option.
         </p>
       </div>
 

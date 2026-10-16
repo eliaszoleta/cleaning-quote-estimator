@@ -25,7 +25,7 @@ export default function RunEstimateTab({ config, user }) {
   // Widget Mode's public-facing restrictions (which services the embedded
   // widget shows, which states/cities it's scoped to), purely a client-side
   // display filter the backend never enforces. Calculator Mode is an
-  // internal tool for pricing ANY job, so it always offers all 12 services
+  // internal tool for pricing ANY job, so it always offers every service
   // and all 50 states regardless of what Widget Mode is configured to show
   // visitors.
   const companyConfig = {

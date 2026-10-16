@@ -168,7 +168,7 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
         // services were enabled -- an uneven "3 then 3" split instead of a
         // clean 2-per-row grid. Only companies' embedded widget ever has a
         // subset of services enabled in the first place -- the main
-        // cleanestimator.com calculator always shows all 10, so it keeps the
+        // cleanestimator.com calculator always shows the full service list, so it keeps the
         // original, unbounded 195px/1fr instead of being changed for a
         // problem it can't actually hit.
         //
