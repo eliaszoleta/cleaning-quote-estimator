@@ -35,21 +35,29 @@ export default function PricingUpdateNotice() {
   };
 
   return (
-    <div
-      role="status"
-      style={{
-        display: 'flex', alignItems: 'flex-start', gap: 12,
-        background: COLORS.successMuted, border: `1px solid ${COLORS.successBorder}`,
-        borderRadius: RADIUS.md, padding: '14px 16px', marginBottom: 18,
-        maxWidth: 720, marginLeft: 'auto', marginRight: 'auto',
-      }}
-    >
+    <div className="pricing-update-notice" role="status">
+      {/* Media query (not a JS isMobile check) so this stays correct at any
+          resize without needing the width observer CleaningCalculator.js uses
+          for its own layout -- this component has no such plumbing today. */}
+      <style>{`
+        .pricing-update-notice {
+          display: flex; align-items: flex-start; gap: 12px;
+          background: ${COLORS.successMuted}; border: 1px solid ${COLORS.successBorder};
+          border-radius: ${RADIUS.md}px; padding: 14px 16px; margin-bottom: 18px;
+          max-width: 720px; margin-left: auto; margin-right: auto;
+        }
+        .pricing-update-notice .punc-title { font-weight: 700; font-size: 13.5px; color: #14532d; margin-bottom: 2px; }
+        .pricing-update-notice .punc-body { font-size: 12.5px; color: #166534; line-height: 1.5; margin: 0; }
+        @media (max-width: 640px) {
+          .pricing-update-notice { align-items: center; gap: 8px; padding: 7px 10px; margin-bottom: 12px; }
+          .pricing-update-notice .punc-title { font-size: 11.5px; margin-bottom: 0; }
+          .pricing-update-notice .punc-body { display: none; }
+        }
+      `}</style>
       <CheckCircle2 size={17} color={COLORS.success} style={{ flexShrink: 0, marginTop: 1 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 700, fontSize: 13.5, color: '#14532d', marginBottom: 2 }}>
-          Pricing data refreshed — October 2026
-        </div>
-        <p style={{ fontSize: 12.5, color: '#166534', lineHeight: 1.5, margin: 0 }}>
+        <div className="punc-title">Pricing data refreshed — October 2026</div>
+        <p className="punc-body">
           Every rate below was cross-checked this month against current HomeAdvisor, Angi, Thumbtack, and BLS labor data, state by state — the same database every Clean Estimator subscriber's quotes run on.
         </p>
       </div>
