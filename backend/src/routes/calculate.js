@@ -105,6 +105,29 @@ async function logLeadEmailEvent(partnerId) {
 // Mode -- both already gated on an active subscription above, not this).
 const PUBLIC_DAILY_LIMIT = 2;
 
+// req.ip (via Express's trust-proxy hop count, set to 1 in index.js) isn't
+// reliable for this app's actual path: the frontend's Vercel rewrite
+// proxies /api/* to this Railway service, which is a SECOND hop on top of
+// Railway's own ingress proxy -- but trust-proxy=1 only trusts one hop, so
+// req.ip ends up reading the wrong entry out of X-Forwarded-For (an edge
+// node's address rather than the visitor's), and since Vercel's edge has
+// many nodes with no session affinity, that value can differ between
+// requests from the exact same visitor. That silently defeated the
+// public-daily-limit check below -- every attempt looked like it came
+// from a "new" IP with zero prior attempts, so it never actually blocked
+// anyone. Reading X-Forwarded-For directly and taking its first entry
+// (the original client, which every hop after it only ever appends to,
+// never rewrites) sidesteps the hop-count guesswork entirely, regardless
+// of how many proxies sit in front of this service.
+function getClientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) {
+    const first = xff.split(',')[0].trim();
+    if (first) return first;
+  }
+  return req.ip || req.socket?.remoteAddress || null;
+}
+
 // Was two separate round trips -- a SELECT count to check the limit, then
 // (after the whole calculation ran) a plain INSERT to record the attempt --
 // with nothing synchronizing them. Two requests from the same visitor
@@ -194,7 +217,7 @@ router.post('/', async (req, res) => {
         return res.status(402).json({ success: false, subscriptionInactive: true, error: 'This estimator is temporarily unavailable. Please contact the business directly.' });
       }
     } else {
-      const ip = req.ip || req.socket?.remoteAddress || null;
+      const ip = getClientIp(req);
       // Checks the limit and records this attempt in one atomic DB call --
       // see tryRecordPublicEstimateAttempt's own comment for why this isn't
       // two separate steps anymore. Deliberately runs (and counts) before
