@@ -48,7 +48,7 @@ function pricingTimeline(monthlyPrice) {
   ];
 }
 
-// Same 10 services offered elsewhere on the site (ServiceSelect.js,
+// Same 12 services offered elsewhere on the site (ServiceSelect.js,
 // ServicesTab.js) -- kept as plain labels here since this form is just
 // collecting what to put on the site, not tied to the calculator's
 // configKey/pricing logic.

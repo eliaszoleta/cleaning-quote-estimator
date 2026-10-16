@@ -224,7 +224,7 @@ export default function SEOContent() {
     <>
       <Helmet>
         <title>Free Cleaning Cost Calculator 2026 | Clean Estimator</title>
-        <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $90–$338, carpet cleaning $44–$100/room, air duct from $330, commercial, mold remediation & more. No signup needed." />
+        <meta name="description" content="Free cleaning cost calculator for 2026. Get instant ZIP-code specific estimates: house cleaning $90–$338, carpet cleaning $48–$113/room, air duct from $330, commercial, mold remediation & more. No signup needed." />
         <meta name="keywords" content="cleaning cost calculator, cleaning cost estimator, house cleaning cost calculator, how much does cleaning cost, cleaning estimate, cleaning cost estimate online, carpet cleaning cost, air duct cleaning cost, commercial cleaning rates, mold remediation cost, cleaning price calculator, free cleaning estimate" />
         <link rel="canonical" href="https://www.cleanestimator.com/" />
         <meta property="og:site_name" content="Clean Estimator" />
@@ -270,7 +270,7 @@ export default function SEOContent() {
               No phone calls, no waiting on a callback — just a real cleaning cost estimate online from a dedicated <a href="/cleaning-cost-estimator" style={{ color: '#2563eb', fontWeight: 600 }}>cleaning cost estimator</a>, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.
             </p>
             <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
-              It works the same way across all 10 services — house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, upholstery cleaning, air duct cleaning, dryer vent cleaning, tile &amp; grout cleaning, mold remediation, and water damage restoration — each with its own scope questions, not a one-size-fits-all form.
+              It works the same way across all 12 services — house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, upholstery cleaning, air duct cleaning, dryer vent cleaning, tile &amp; grout cleaning, mold remediation, water damage restoration, Airbnb/vacation rental cleaning, and post-construction cleanup — each with its own scope questions, not a one-size-fits-all form.
             </p>
             <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto' }}>
               It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.
@@ -284,18 +284,18 @@ export default function SEOContent() {
             <li><strong>Standard House Cleaning:</strong> $90–$338 per visit depending on home size — $158–$198 is typical for the most common 1,500–2,000 sq ft home.</li>
             <li><strong>Deep Cleaning:</strong> 68–85% more than a standard clean; move-in/move-out cleans run 88–105% more.</li>
             <li><strong>Commercial Cleaning:</strong> $0.052–$0.185 per square foot per visit, depending on building type.</li>
-            <li><strong>Carpet Cleaning:</strong> $44–$100 per room, with a $90–$110 whole-home minimum.</li>
+            <li><strong>Carpet Cleaning:</strong> $48–$113 per room, with a $90 whole-home minimum.</li>
             <li><strong>Mold Remediation:</strong> $750–$1,050 for a small spot under 10 sq ft, up to $8,500–$13,000+ for 300+ sq ft.</li>
           </ul>
 
           <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 700, color: '#0f172a', marginBottom: 10, textAlign: 'center' }}>Key Pricing Factors</h2>
           <p style={{ textAlign: 'center', color: '#64748b', fontSize: 14.5, maxWidth: 620, margin: '0 auto 18px', lineHeight: 1.7 }}>
-            Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 10 services, not just house cleaning.
+            Every price on this cleaning cost estimator depends on size, scope, and frequency — and that's true for all 12 services, not just house cleaning.
           </p>
           <ul style={{ margin: '0 0 24px', paddingLeft: 20, color: '#374151', fontSize: 15, lineHeight: 1.9 }}>
             <li><strong>Square Footage:</strong> Base price scales with home or space size — larger square footage means a higher price.</li>
             <li><strong>Room Count:</strong> Extra bedrooms and bathrooms add roughly $15–$25 each on top of the base price.</li>
-            <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our 10 services asks its own scope questions. See the full breakdown by service below.</li>
+            <li><strong>Service Scope:</strong> Not just for house cleaning — every one of our 12 services asks its own scope questions. See the full breakdown by service below.</li>
             <li><strong>Cleaning Frequency:</strong> Weekly service saves 20%, biweekly 15%, and monthly 10% off the one-time rate.</li>
             <li><strong>Add-Ons:</strong> Inside oven ($38–$50), inside fridge ($30–$42), interior windows ($52–$65), and similar extras are priced separately.</li>
           </ul>

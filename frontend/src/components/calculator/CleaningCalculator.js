@@ -608,7 +608,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', rowGap: 10, columnGap: 28, flexWrap: 'wrap' }}>
             {[
               { Icon: MapPin,    label: 'All 50 states',     color: '#059669' },
-              { Icon: BarChart3, label: '10 service types',   color: '#2563eb' },
+              { Icon: BarChart3, label: '12 service types',   color: '#2563eb' },
               { Icon: Zap,       label: 'Instant results',   color: '#ea580c' },
             ].map(({ Icon, label, color }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: COLORS.body, fontWeight: 500 }}>

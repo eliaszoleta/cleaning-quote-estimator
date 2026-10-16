@@ -234,7 +234,7 @@ export default function HelpTab() {
           Choosing what you offer (Services tab)
         </div>
         <p style={pStyle}>
-          Each of the 10 services has its own on/off switch, markup, and minimum charge — set them independently. Turn off anything you don't actually do; visitors will never see it as an option.
+          Each of the 12 services has its own on/off switch, markup, and minimum charge — set them independently. Turn off anything you don't actually do; visitors will never see it as an option.
         </p>
       </div>
 

@@ -5,12 +5,12 @@ import './PageHero.css';
 
 const CROSS_CHECKS = [
   { service: 'House Cleaning (1,500–2,000 sq ft)', ours: '$158–$198', published: '$118–$238, avg ~$176', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-it-cost-hire-house-cleaner.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/hire-a-maid-service']] },
-  { service: 'Carpet Cleaning (per room)', ours: '$44–$100', published: '$25–$125 per room', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-carpet-cleaning-cost.htm'], ['HomeGuide', 'https://homeguide.com/costs/carpet-cleaning-prices']] },
+  { service: 'Carpet Cleaning (per room)', ours: '$48–$62', published: '$25–$125 per room', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-carpet-cleaning-cost.htm'], ['HomeGuide', 'https://homeguide.com/costs/carpet-cleaning-prices']] },
   { service: 'Office Cleaning (per sq ft, per visit)', ours: '$0.088–$0.107', published: '$0.07–$0.20', sources: [['Housecall Pro', 'https://www.housecallpro.com/resources/how-to-price-commercial-cleaning-jobs/']] },
   { service: 'Air Duct Cleaning (base system)', ours: '$330–$420', published: '$268–$509, avg ~$379–$389', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-air-duct-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-ducts-and-vents']] },
   { service: 'Mold Remediation (10–100 sq ft)', ours: '$1,950–$2,700', published: '~$1,000–$2,500 for 100 sq ft, avg $2,368', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-mold-remediation-service-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/environmental-safety/remove-mold-and-toxic-materials/']] },
-  { service: 'Dryer Vent Cleaning', ours: '$105–$253', published: '$104–$250+ depending on vent length', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-dryer-vent-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-dryer-vents/']] },
-  { service: 'Upholstery Cleaning (sofa)', ours: '$120–$175', published: '$120–$250, national avg ~$173', sources: [['Angi/HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-furniture/']] },
+  { service: 'Dryer Vent Cleaning (standard wall vent)', ours: '$118–$155', published: '$104–$250+ depending on vent length', sources: [['Angi', 'https://www.angi.com/articles/how-much-does-dryer-vent-cleaning-cost.htm'], ['HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-dryer-vents/']] },
+  { service: 'Upholstery Cleaning (sofa)', ours: '$130–$195', published: '$120–$250, national avg ~$173', sources: [['Angi/HomeAdvisor', 'https://www.homeadvisor.com/cost/cleaning-services/clean-furniture/']] },
 ];
 
 const SECTIONS = [
@@ -52,7 +52,7 @@ const SECTIONS = [
   {
     Icon: RefreshCw,
     title: 'How Often We Update Pricing',
-    body: "We review and adjust our pricing models as national and regional market conditions change, rather than on a fixed calendar schedule. If you ever see a number that looks out of step with what you're being quoted locally, we want to know — contact us and we'll take a look.",
+    body: "We review and adjust our pricing models as national and regional market conditions change, rather than on a fixed calendar schedule. Most recently, in October 2026, we re-verified every one of our 12 services against current published cost guides and BLS labor-wage data, state by state — several tables (carpet, upholstery, dryer vent, water damage restoration, apartment cleaning, and Airbnb turnover pricing) were adjusted as a result. If you ever see a number that looks out of step with what you're being quoted locally, we want to know — contact us and we'll take a look.",
   },
 ];
 
@@ -134,7 +134,7 @@ export default function MethodologyPage() {
                 {t === 'How Our Numbers Compare to Published Industry Guides' && (
                   <>
                     <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7, margin: '0 0 14px' }}>
-                      We don't just claim our numbers are researched — here's where they land next to current, publicly published cost guides from Angi, HomeAdvisor, HomeGuide, and Housecall Pro (checked August 2026). We're not claiming these sites as our original data source; this is an independent cross-check showing our ranges are in the same ballpark as what's publicly reported elsewhere.
+                      We don't just claim our numbers are researched — here's where they land next to current, publicly published cost guides from Angi, HomeAdvisor, HomeGuide, and Housecall Pro (checked October 2026). We're not claiming these sites as our original data source; this is an independent cross-check showing our ranges are in the same ballpark as what's publicly reported elsewhere.
                     </p>
                     <div className="mp-table-wrap" style={{ overflowX: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>

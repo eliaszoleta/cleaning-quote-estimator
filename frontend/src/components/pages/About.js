@@ -170,7 +170,7 @@ export default function About() {
               We connect visitors who want a real quote with an exclusive local cleaning partner in their city — a warm, ready-to-call lead instead of a cold listing.
             </ProductCard>
             <ProductCard Icon={Sparkles} color="#d97706" bg="#fffbeb" title="Free Cost Calculator" href="/cleaning-cost-calculator" linkLabel="Try it">
-              Instant price ranges for house cleaning, carpet cleaning, commercial cleaning, and 7 other services — no signup, no phone calls.
+              Instant price ranges for house cleaning, carpet cleaning, commercial cleaning, and 9 other services — no signup, no phone calls.
             </ProductCard>
           </div>
         </section>
@@ -180,7 +180,7 @@ export default function About() {
           <h2 style={{ ...h2Style, marginBottom: 24 }}>How It Works</h2>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <Step number={1} title="Pick a service">
-              House cleaning, carpet cleaning, commercial cleaning, mold remediation, and more — 10 services in total, each with its own quick questions.
+              House cleaning, carpet cleaning, commercial cleaning, mold remediation, and more — 12 services in total, each with its own quick questions.
             </Step>
             <Step number={2} title="Answer a few quick questions">
               Home size, condition, how often you want service, and your state — that's it. No phone calls, no waiting on a callback.

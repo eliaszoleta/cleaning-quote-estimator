@@ -22,7 +22,7 @@ function pickSquareColumns(n, maxCols) {
     const rows = Math.ceil(n / c);
     const squareness = Math.abs(c - rows);
     const emptyCells = c * rows - n;
-    // squareness and emptyCells (both single digits for up to 10 services)
+    // squareness and emptyCells (both single digits for up to 12 services)
     // dominate c in this weighting, so the comparison is effectively
     // squareness first, emptyCells second, and highest c last as the
     // tiebreak when both of those are equal.

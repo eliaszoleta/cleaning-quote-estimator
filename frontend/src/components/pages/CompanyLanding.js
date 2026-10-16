@@ -20,7 +20,7 @@ const FEATURES = [
   { Icon: Send,          color: '#0d9488', bg: '#f0fdfa', title: 'Email a result to a coworker',    desc: 'One click sends a specific estimate to a teammate\'s inbox — no shared logins needed.' },
   { Icon: MapPin,        color: '#059669', bg: '#ecfdf5', title: 'ZIP-code accurate pricing',       desc: 'State-specific pricing multipliers ensure your quotes reflect your local market.' },
   { Icon: Settings,      color: '#ea580c', bg: '#fff7ed', title: 'Per-service markup control',      desc: 'Location-accurate base price plus optional per-service markup control so you can match your own cost and margin.' },
-  { Icon: ClipboardList, color: '#2563eb', bg: '#fdf4ff', title: 'All 10 service calculators',       desc: 'Regular cleaning, deep clean, move-out, Airbnb turnover, post-construction, and more.' },
+  { Icon: ClipboardList, color: '#2563eb', bg: '#fdf4ff', title: 'All 12 service calculators',       desc: 'Regular cleaning, deep clean, move-out, Airbnb turnover, post-construction, and more.' },
   { Icon: Code2,         color: '#0891b2', bg: '#ecfeff', title: 'Calculator widget for your website', desc: 'Want public lead capture too? The same plan includes an embeddable, white-label calculator widget for your site — no upgrade required.' },
 ];
 
@@ -51,7 +51,7 @@ const PLAN_FEATURES = [
   'Instant result on screen — never a public price range',
   'Email a result to a coworker in one click',
   'ZIP-code accurate pricing & per-service markup control',
-  'All 10 service calculators',
+  'All 12 service calculators',
   'Calculator widget for your website, included whenever you want public lead capture',
   'Automatic lead capture + instant email alerts once it\'s on your site',
   'API access for CRM sync',
@@ -79,7 +79,7 @@ function Arrow({ size }) {
   return <span className="ce-arrow"><ArrowRight size={size} /></span>;
 }
 
-// Real results across a few of the 10 service types -- shows the range of
+// Real results across a few of the 12 service types -- shows the range of
 // what the engine actually prices, not just the one "pick a service" step
 // a single static screenshot used to freeze on.
 const HERO_GALLERY = [
