@@ -227,6 +227,62 @@ module.exports = [
 </div>`,
   },
   {
+    key: 'legacy_trial_expired_winback',
+    name: 'Legacy trial expired (win-back)',
+    subject: "Your Clean Estimator trial ended — everything's still here",
+    variables: [
+      { name: 'companyName', example: 'Sparkle Clean Co' },
+      { name: 'serviceListText', example: 'house cleaning, apartment, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, water damage, Airbnb turnover, and post-construction' },
+    ],
+    text: [
+      'Hi {{companyName}},',
+      '',
+      "Your Clean Estimator trial ended, but your account isn't gone -- everything's exactly where you left it.",
+      '',
+      "A quick reminder of what you get back: instant, on-screen pricing across every service we offer -- {{serviceListText}} -- so you're never quoting a job from memory or a spreadsheet.",
+      '',
+      "We've also just finished re-verifying every pricing table against current published cost data, state by state, so the numbers you'd be quoting are as accurate as they've ever been.",
+      '',
+      'Restart my subscription:',
+      'https://www.cleanestimator.com/company',
+      '',
+      "It's $25/month, same plan as before -- no setup, no new onboarding. Answer a few quick questions about a job and get a real number in seconds, not minutes of guesswork.",
+      '',
+      "If something didn't work for you the first time, just reply and tell us -- we'd genuinely like to know.",
+      '',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your Clean Estimator trial ended, but your account isn't gone — everything's exactly where you left it.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    A quick reminder of what you get back: instant, on-screen pricing across every service we offer — {{serviceListText}} — so you're never quoting a job from memory or a spreadsheet.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    We've also just finished re-verifying every pricing table against current published cost data, state by state, so the numbers you'd be quoting are as accurate as they've ever been.
+  </p>
+
+  <p style="margin:0 0 20px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Restart my subscription →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    It's $25/month, same plan as before — no setup, no new onboarding. Answer a few quick questions about a job and get a real number in seconds, not minutes of guesswork.
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    If something didn't work for you the first time, just reply and tell us — we'd genuinely like to know.
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
+  {
     key: 'payment_failed',
     name: 'Payment failed',
     subject: "Your Clean Estimator payment didn't go through",

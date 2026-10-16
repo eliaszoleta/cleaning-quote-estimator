@@ -1,5 +1,5 @@
 const { listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, getCompanyConfig, saveCompanyConfig } = require('./companyConfig');
-const { sendTrialCheckin1Email, sendActivationReminderEmail } = require('./email');
+const { sendTrialCheckin1Email, sendActivationReminderEmail, sendLegacyTrialExpiredEmail } = require('./email');
 const { computeSubscriptionStatus } = require('./subscriptionStatus');
 
 const TRIAL_DAYS = 30;
@@ -29,11 +29,17 @@ async function getOwnerEmail(companyId) {
 // Checks every company's free-trial state and sends the single day-7
 // check-in exactly once per company (deduped via trialCheckin1EmailSentAt
 // on config.subscription). The day-14/21 check-ins, the day-28 "ending
-// soon" reminder, the legacy "trial ended / widget paused" email, and the
-// "trial converted to paid" confirmation were all dropped -- with a card
-// required up front, "subscribe before it ends" nagging doesn't apply
-// anymore; payment_failed and subscription_canceled (subscription.js's
-// webhook handlers) cover the cases that actually need a reply.
+// soon" reminder, and the "trial converted to paid" confirmation stay
+// dropped -- with a card required up front, "subscribe before it ends"
+// nagging doesn't apply anymore, and an account that auto-converts to a
+// paid charge stays active and needs no "your trial ended" email at all;
+// payment_failed and subscription_canceled (subscription.js's webhook
+// handlers) cover the cases that actually need a reply there. The legacy
+// "trial ended / widget paused" email WAS dropped along with those, but
+// that reasoning never actually covered legacy no-card trials -- they
+// don't auto-convert to anything, they just stop working with no Stripe
+// webhook to notice it. See checkLegacyTrialExpired below, which restores
+// that one case specifically.
 //
 // Two trial models coexist here:
 // - Current accounts: a real Stripe-managed trial (card collected at
@@ -133,4 +139,52 @@ async function checkActivationReminders() {
   }
 }
 
-module.exports = { checkTrialReminders, checkActivationReminders };
+// Checks every legacy no-card trial (trialStartedAt set, never touched
+// Stripe) and sends a one-time win-back email once it's genuinely expired
+// -- 30 days elapsed with no card ever added, the same threshold
+// subscriptionStatus.js's computeSubscriptionStatus uses to return
+// status: 'expired' / active: false for this case. Deliberately does NOT
+// touch Stripe-trial accounts at all: those either convert to a paid
+// charge (stays active, no email needed) or get canceled/fail payment
+// (already covered by subscription.js's webhook handlers). There is no
+// webhook that could ever notice a legacy no-card trial running out --
+// Stripe never knew the account existed -- so this has to be found by
+// scanning, same as checkTrialReminders above. Deduped via
+// legacyTrialExpiredEmailSentAt on config.subscription, sent once.
+async function checkLegacyTrialExpired() {
+  let rows;
+  try {
+    rows = await listAllCompanyConfigs();
+  } catch (err) {
+    console.error('checkLegacyTrialExpired: failed to list company configs:', err.message);
+    return;
+  }
+
+  for (const { companyId, config } of rows) {
+    const sub = config?.subscription || {};
+    const companyName = config.companyName || 'there';
+
+    const isLegacyTrial = !!sub.trialStartedAt && !sub.stripeSubscriptionId;
+    if (!isLegacyTrial) continue;
+    if (sub.legacyTrialExpiredEmailSentAt) continue;
+
+    const daysElapsed = (Date.now() - new Date(sub.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24);
+    if (daysElapsed < TRIAL_DAYS) continue;
+
+    try {
+      const email = await getOwnerEmail(companyId);
+      if (!email) continue;
+      if (await sendLegacyTrialExpiredEmail({ to: email, companyName })) {
+        const fresh = (await getCompanyConfig(companyId)) || config;
+        await saveCompanyConfig(companyId, {
+          ...fresh,
+          subscription: { ...fresh.subscription, legacyTrialExpiredEmailSentAt: new Date().toISOString() },
+        });
+      }
+    } catch (err) {
+      console.error(`checkLegacyTrialExpired: failed for company ${companyId}:`, err.message);
+    }
+  }
+}
+
+module.exports = { checkTrialReminders, checkActivationReminders, checkLegacyTrialExpired };

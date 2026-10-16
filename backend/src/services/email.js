@@ -53,6 +53,32 @@ const SERVICE_LABELS = {
 // full descriptive text -- this only swaps what goes in the subject line.
 const SUBJECT_SERVICE_LABELS = { ...SERVICE_LABELS, airbnb: 'Vacation Rental Cleaning' };
 
+// Natural-reading short names for the "we cover these services" sentence in
+// the legacy-trial win-back email (see sendLegacyTrialExpiredEmail below).
+// Derived from SERVICE_LABELS above -- the single source of truth for which
+// services exist -- instead of a second hand-typed list, so a future 13th
+// service only needs adding there (as every other service-aware email
+// already requires) to show up here too, the same stale-count problem that
+// already bit the homepage copy once. Most labels read fine with just the
+// " Cleaning" suffix dropped and lowercased; the few that don't get a named
+// override instead of a mechanical rule that can't guess good phrasing.
+const SERVICE_LIST_OVERRIDES = {
+  home_residential: 'house cleaning',
+  water_damage: 'water damage',
+  airbnb: 'Airbnb turnover',
+};
+function joinWithOxfordComma(items) {
+  if (items.length <= 1) return items.join('');
+  if (items.length === 2) return items.join(' and ');
+  return `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`;
+}
+function buildServiceListSentence() {
+  const names = Object.entries(SERVICE_LABELS).map(
+    ([key, label]) => SERVICE_LIST_OVERRIDES[key] || label.replace(/ Cleaning$/i, '').toLowerCase()
+  );
+  return joinWithOxfordComma(names);
+}
+
 function fmtMoney(n) {
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }
@@ -879,6 +905,26 @@ async function sendSubscriptionCanceledEmail({ to, companyName }) {
   return sent;
 }
 
+// Sent once, from trialScheduler.js's checkLegacyTrialExpired, to legacy
+// no-card trial accounts once subscriptionStatus.js actually reports them
+// as status: 'expired' (30 days elapsed, trialStartedAt set, never touched
+// Stripe -- so there's no webhook that could ever fire for this case; it
+// has to be found by scanning). Deliberately NOT sent to accounts that
+// auto-converted to a paid Stripe charge -- those stay active and must
+// never see "your trial expired" messaging. Deduped via
+// config.subscription.legacyTrialExpiredEmailSentAt. Content lives in the
+// editable email_templates table (key: 'legacy_trial_expired_winback').
+async function sendLegacyTrialExpiredEmail({ to, companyName }) {
+  const { sent } = await sendTemplatedEmail({
+    template: 'legacy_trial_expired_winback',
+    to,
+    toName: companyName,
+    vars: { companyName, serviceListText: buildServiceListSentence() },
+    recipientType: 'company',
+  });
+  return sent;
+}
+
 // ─── Account deletion (30-day grace period) ────────────────────────────────
 
 function formatDate(iso) {
@@ -1219,6 +1265,7 @@ module.exports = {
   sendCompanyWelcomeEmail,
   sendPaymentFailedEmail,
   sendSubscriptionCanceledEmail,
+  sendLegacyTrialExpiredEmail,
   sendTrialCheckin1Email,
   sendActivationReminderEmail,
   sendAccountDeletionScheduledEmail,

@@ -22,7 +22,7 @@ const chatWidgetRouter = require('./routes/chatWidget');
 const adminChatbotsRouter = require('./routes/adminChatbots');
 const { checkDueReminders } = require('./services/bookingReminderScheduler');
 const { requireAuth } = require('./middleware/auth');
-const { checkTrialReminders, checkActivationReminders } = require('./services/trialScheduler');
+const { checkTrialReminders, checkActivationReminders, checkLegacyTrialExpired } = require('./services/trialScheduler');
 const { checkPendingDeletions } = require('./services/deletionScheduler');
 const { cleanupPublicEstimateAttempts } = require('./services/publicAttemptsCleanup');
 const { ensureSeeded: ensureEmailTemplatesSeeded } = require('./services/emailTemplates');
@@ -406,11 +406,13 @@ app.listen(PORT, () => {
   // dependency or requiring a separate scheduled service to be configured.
   checkTrialReminders().catch(err => console.error('checkTrialReminders (startup run) failed:', err.message));
   checkActivationReminders().catch(err => console.error('checkActivationReminders (startup run) failed:', err.message));
+  checkLegacyTrialExpired().catch(err => console.error('checkLegacyTrialExpired (startup run) failed:', err.message));
   checkPendingDeletions().catch(err => console.error('checkPendingDeletions (startup run) failed:', err.message));
   cleanupPublicEstimateAttempts().catch(err => console.error('cleanupPublicEstimateAttempts (startup run) failed:', err.message));
   setInterval(() => {
     checkTrialReminders().catch(err => console.error('checkTrialReminders failed:', err.message));
     checkActivationReminders().catch(err => console.error('checkActivationReminders failed:', err.message));
+    checkLegacyTrialExpired().catch(err => console.error('checkLegacyTrialExpired failed:', err.message));
     checkPendingDeletions().catch(err => console.error('checkPendingDeletions failed:', err.message));
     cleanupPublicEstimateAttempts().catch(err => console.error('cleanupPublicEstimateAttempts failed:', err.message));
   }, 60 * 60 * 1000);
