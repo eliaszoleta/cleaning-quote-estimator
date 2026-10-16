@@ -18,6 +18,7 @@ const SQFT_OPTIONS = [
 // ids must match POST_CONSTRUCTION_TYPE_MULTIPLIERS' keys exactly.
 const CONSTRUCTION_TYPES = [
   { id: 'light', label: 'Light Renovation / Touch-Up', desc: 'Painting, flooring, a single room or two' },
+  { id: 'moderate', label: 'Moderate Renovation', desc: 'Multiple rooms, a kitchen or bath remodel' },
   { id: 'full', label: 'New Construction / Major Renovation', desc: 'Whole-home build or gut renovation' },
 ];
 
@@ -49,7 +50,7 @@ export default function PostConstructionStep({ value, onBack, onNext, primaryCol
       </StepSection>
 
       <StepSection label="Scope of work">
-        <div className="calc-grid-2">
+        <div className="calc-grid-3">
           {CONSTRUCTION_TYPES.map(o => (
             <StepOptionCard key={o.id} selected={constructionType === o.id} onClick={() => setConstructionType(o.id)} primaryColor={primaryColor}>
               <div style={{ fontWeight: 700, fontSize: 14 }}>{o.label}</div>
@@ -57,7 +58,7 @@ export default function PostConstructionStep({ value, onBack, onNext, primaryCol
             </StepOptionCard>
           ))}
         </div>
-        <p style={{ fontSize: 12, color: COLORS.muted, marginTop: 6 }}>New construction / major renovation jobs typically cost 15–30% more than light touch-ups.</p>
+        <p style={{ fontSize: 12, color: COLORS.muted, marginTop: 6 }}>Moderate renovations typically cost 8–18% more than a light touch-up; new construction or a major renovation runs 15–30% more.</p>
       </StepSection>
 
       <StepSection label="Add-ons">

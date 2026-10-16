@@ -155,7 +155,10 @@ const errors = [];
 // ── Mold ──────────────────────────────────────────────────────────────
 {
   const src = read('MoldStep.js');
-  checkIds(idsFromInlineTupleLine(src, "['small','Small'"), [DEFAULTS.MOLD_PRICE_RANGES], 'MoldStep affectedSize', errors);
+  // affectedSize was a 4-tier bucket picker (checked against MOLD_PRICE_RANGES);
+  // replaced Oct 2026 with a real sq-ft slider (see MOLD_SQFT_PRICE_CURVE /
+  // interpolateMoldPriceRange in defaults.js), which has no discrete ids to
+  // check against a key table the way the other option-card steps do.
   checkIds(idsFromInlineTupleLine(src, "[['not_sure','Not Sure']"), [DEFAULTS.MOLD_TYPE_MULTIPLIERS], 'MoldStep moldType', errors);
   checkIds(idsFromInlineTupleLine(src, "[['yes','Yes"), [DEFAULTS.MOLD_SOURCE_FIXED_MULTIPLIERS], 'MoldStep sourceFixed', errors);
 }

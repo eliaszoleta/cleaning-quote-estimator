@@ -2,7 +2,7 @@
 // Pricing mirrors backend/src/config/defaults.js (HOME_SQFT_BASE_PRICES,
 // APARTMENT_SIZE_PRICES, COMMERCIAL_SQFT_RATES, CARPET_PRICE_PER_ROOM,
 // UPHOLSTERY_ITEM_PRICES, AIR_DUCT_BASE, DRYER_VENT_BASE, TILE_PRICE_PER_SQFT,
-// MOLD_PRICE_RANGES, WATER_EXTRACTION_DRYING_PER_SQFT). Update both files together if pricing
+// MOLD_SQFT_PRICE_CURVE, WATER_EXTRACTION_DRYING_PER_SQFT). Update both files together if pricing
 // data changes. `id` matches the calculator's SERVICE_STEPS key
 // (frontend/src/components/calculator/CleaningCalculator.js) so a service
 // page's CTA can deep-link straight into that flow via /?service=<id>.
@@ -368,7 +368,7 @@ const SERVICES = [
     shortLabel: 'Post-Construction Cleaning',
     tagline: 'Cleanup after renovation or new construction — dust, debris, and paint splatter removal, priced by square footage and scope.',
     seoTitle: 'Post-Construction Cleaning Cost 2026: Price by Home Size | Clean Estimator',
-    metaDescription: 'Post-construction cleaning costs $196–$794 depending on home size and scope, from a light renovation touch-up to a full new-build cleanup. See 2026 pricing and common add-ons.',
+    metaDescription: 'Post-construction cleaning costs $196–$794 depending on home size and scope, from a light touch-up to a full new-build cleanup. See 2026 pricing and common add-ons.',
     unitType: 'flat',
     unit: 'one-time cleanup',
     typicalTierIndex: 2,
@@ -382,13 +382,13 @@ const SERVICES = [
     ],
     bullets: [
       'Priced on the same sqft base as house cleaning, with a 2.18–2.35x multiplier for the extra dust, debris, and detail work',
-      'New construction / major renovation scope costs 15–30% more than a light renovation touch-up',
+      'Scope matters: a moderate renovation (multiple rooms, a kitchen or bath remodel) costs 8–18% more than a light touch-up, and new construction or a major/gut renovation costs 15–30% more',
       'Window cleaning ($60–$90) removes paint overspray and construction film from glass',
       'Debris haul-away ($120–$200) and vent/duct dust removal ($45–$70) are common add-ons after a build',
     ],
     faqs: [
       { q: 'How much does post-construction cleaning cost?', a: 'For a 1,500–2,000 sq ft home — the most common size — post-construction cleanup costs $344–$465. Smaller spaces under 1,000 sq ft run $196–$270, while homes over 3,000 sq ft run $593–$794.' },
-      { q: 'What\'s the difference between light and full post-construction cleanup?', a: 'Light covers a touch-up renovation or one or two rooms. Full covers new construction or a major/gut renovation, and costs 15–30% more due to the greater volume of dust and debris.' },
+      { q: 'What\'s the difference between light, moderate, and full post-construction cleanup?', a: 'Light covers a touch-up renovation or one or two rooms. Moderate covers a multi-room renovation like a kitchen or bath remodel, and costs 8–18% more. Full covers new construction or a major/gut renovation, and costs 15–30% more — both reflecting the greater volume of dust and debris.' },
       { q: 'Does post-construction cleaning remove paint splatter from windows?', a: 'The window cleaning add-on ($60–$90) specifically removes paint overspray and construction film/stickers from glass — a standard clean doesn\'t include this level of detail.' },
       { q: 'Will the cleaning crew haul away construction debris?', a: 'Only if you add debris haul-away ($120–$200) — a standard post-construction clean focuses on dust and surface cleanup, not removing leftover building materials.' },
     ],

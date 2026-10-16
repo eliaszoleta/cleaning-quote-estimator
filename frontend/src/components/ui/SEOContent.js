@@ -163,7 +163,7 @@ const SERVICE_PRICE_FACTORS = {
   ],
   post_construction: [
     'Home/unit size — 6 tiers from under 1,000 sq ft to 3,000+ sq ft',
-    'Scope: light renovation/touch-up, or new construction/major renovation (+15–30%)',
+    'Scope: light touch-up, moderate renovation (+8–18%), or new construction/major renovation (+15–30%)',
     'Add-ons: window cleaning, debris haul-away, vent/duct dust removal',
   ],
 };

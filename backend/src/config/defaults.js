@@ -495,23 +495,56 @@ const TILE_SERVICE_ADDONS = {
   tile_repair:       { perSqft: { low: 6, high: 13 } },
 };
 
-// Mold remediation price ranges by affected area
-// Source: EPA mold remediation guidelines, NORMI certified remediators
-// Ranges are tightened around each tier's typical job cost (~1.3-1.5x spread, matching
-// the other services below) — remaining uncertainty is resolved by the mold-type
-// and moisture-source multipliers instead of being baked into one wide tier range.
-// Cross-checked Oct 2026: current guides quote $2-$15/sq ft depending on
-// project scale, but every source buckets "small/medium/large" by different
-// sq-ft ranges than this table does, making a direct per-tier comparison
-// unreliable. The size-anchored figures that ARE comparable check out --
-// e.g. a ~450 sq ft mid-size job at $3,000-$6,000 brackets this table's
-// "large" (100-300 sq ft) tier of $4,300-$5,800. Left unchanged.
-const MOLD_PRICE_RANGES = {
-  small:     { low: 750,  high: 1050  },  // <10 sq ft
-  medium:    { low: 1950, high: 2700  },  // 10–100 sq ft
-  large:     { low: 4300, high: 5800  },  // 100–300 sq ft
-  extensive: { low: 8500, high: 13000 },  // 300+ sq ft — widest tier since "300+" is open-ended
-};
+// Mold remediation pricing, by actual affected square footage.
+// Source: EPA mold remediation guidelines, NORMI certified remediators.
+// Re-audited Oct 2026 after a user flagged a real, excessive estimate
+// spread: the old table ($750-$1,050 / $1,950-$2,700 / $4,300-$5,800 /
+// $8,500-$13,000+) bucketed jobs into just 4 flat-price tiers, and the
+// "Medium" tier alone covered 10-100 sq ft -- a 10x size range charged the
+// identical flat price regardless of whether the real job was 12 sq ft or
+// 95 sq ft. Replaced with MOLD_SQFT_PRICE_CURVE below: the same 4 dollar
+// figures, now anchored to a specific representative sq-ft point each
+// (rather than a tier label) and interpolated continuously in between, so
+// the sq-ft slider in the calculator actually changes the price instead of
+// the job just falling into one of 4 giant buckets. The dollar figures
+// themselves are unchanged from the prior, already-audited table -- this
+// only changes HOW they're looked up, not what they say -- except
+// "extensive" (previously anchored nowhere, since "300+ sq ft" is
+// open-ended): anchored here at 700 sq ft, which lands its implied
+// per-sq-ft rate (~$15/sq ft) right at the top of the $2-$15/sq ft range
+// current guides cite for large-scale jobs -- a reasonable, but not
+// independently re-sourced, choice of "typical" job size for that tier.
+const MOLD_SQFT_PRICE_CURVE = [
+  { sqft: 5,   low: 750,   high: 1050  },  // was "Small", <10 sq ft
+  { sqft: 50,  low: 1950,  high: 2700  },  // was "Medium", 10–100 sq ft
+  { sqft: 200, low: 4300,  high: 5800  },  // was "Large", 100–300 sq ft
+  { sqft: 700, low: 8500,  high: 13000 },  // was "Extensive", 300+ sq ft
+];
+
+// Interpolates (or, beyond the first/last anchor, extrapolates) a
+// low/high price for any actual sq-ft value, log-log-linear between the
+// nearest two anchor points in MOLD_SQFT_PRICE_CURVE above -- i.e. it
+// assumes the $/sq ft rate declines at a constant proportional rate
+// between anchors (consistent with real remediation economics: fixed
+// setup/PPE/disposal costs dominate a tiny job, and are amortized away on
+// a larger one), rather than jumping discontinuously at old tier
+// boundaries. Returns the exact originally-audited dollar figures at each
+// of the 4 anchor points themselves (sqft=5/50/200/700), so this is a
+// strictly more granular read of the same underlying data, not new data.
+function interpolateMoldPriceRange(sqft) {
+  const pts = MOLD_SQFT_PRICE_CURVE;
+  const s = Math.max(1, sqft);
+  const lnS = Math.log(s);
+  let i = 0;
+  while (i < pts.length - 2 && s > pts[i + 1].sqft) i++;
+  const p0 = pts[i], p1 = pts[i + 1];
+  const t = (lnS - Math.log(p0.sqft)) / (Math.log(p1.sqft) - Math.log(p0.sqft));
+  const lerp = (a, b) => a + (b - a) * t;
+  return {
+    low: Math.round(Math.exp(lerp(Math.log(p0.low), Math.log(p1.low)))),
+    high: Math.round(Math.exp(lerp(Math.log(p0.high), Math.log(p1.high)))),
+  };
+}
 
 // Known mold type narrows (and shifts) the estimate instead of leaving the full tier
 // width — "not sure" keeps the tier's full uncertainty since containment/PPE needs are
@@ -625,9 +658,19 @@ const POST_CONSTRUCTION_BASE_MULTIPLIER = { low: 2.18, high: 2.35 };
 // A touch-up/renovation leaves far less dust and debris behind than a
 // full new-build or gut renovation -- "full" scope costs meaningfully
 // more on top of the base multiplier above, not a separate base price.
+// Added Oct 2026: a "moderate" middle tier, since only having light/full
+// meant a multi-room kitchen-and-bath remodel (clearly more cleanup than a
+// single-room touch-up, clearly less than a whole-home gut) had to be
+// rounded into whichever endpoint it was closer to, understating or
+// overstating the job. Like POST_CONSTRUCTION_BASE_MULTIPLIER above,
+// "full" was never independently sourced -- this interpolates between the
+// two existing endpoints rather than introducing a new, separately-cited
+// data point, so treat it as a reasonable midpoint estimate, not a
+// researched figure in its own right.
 const POST_CONSTRUCTION_TYPE_MULTIPLIERS = {
-  light: { low: 1.0,  high: 1.0  },
-  full:  { low: 1.15, high: 1.3  },
+  light:    { low: 1.0,  high: 1.0  },
+  moderate: { low: 1.08, high: 1.18 },
+  full:     { low: 1.15, high: 1.3  },
 };
 
 const POST_CONSTRUCTION_ADDONS = {
@@ -718,7 +761,8 @@ module.exports = {
   TILE_PRICE_PER_SQFT,
   TILE_CONDITION_MULTIPLIERS,
   TILE_SERVICE_ADDONS,
-  MOLD_PRICE_RANGES,
+  MOLD_SQFT_PRICE_CURVE,
+  interpolateMoldPriceRange,
   MOLD_TYPE_MULTIPLIERS,
   MOLD_SOURCE_FIXED_MULTIPLIERS,
   MOLD_ADDONS,

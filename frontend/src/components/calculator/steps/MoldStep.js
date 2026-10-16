@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import StepWrapper from './StepWrapper';
-import { StepSection, StepChip, StepOptionCard, StepPillToggle } from './StepUI';
+import { StepSection, StepChip, StepPillToggle } from './StepUI';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
 const LOCATIONS = [
@@ -16,7 +16,7 @@ const LOCATIONS = [
 ];
 
 export default function MoldStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
-  const [affectedSize, setAffectedSize] = useState(value.affectedSize || 'medium');
+  const [sqft, setSqft] = useState(value.sqft || 50);
   const [locations, setLocations] = useState(value.locations || ['bathroom']);
   const [moldType, setMoldType] = useState(value.moldType || 'not_sure');
   const [sourceFixed, setSourceFixed] = useState(value.sourceFixed || 'not_sure');
@@ -28,27 +28,20 @@ export default function MoldStep({ value, onBack, onNext, primaryColor, isFinalS
   const toggleExtra = id => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
   return (
-    <StepWrapper title="Mold remediation details" subtitle="These are preliminary estimates — a professional inspection is required" onBack={onBack} onNext={() => onNext({ affectedSize, locations, moldType, sourceFixed, testingNeeded, propertyType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
+    <StepWrapper title="Mold remediation details" subtitle="These are preliminary estimates — a professional inspection is required" onBack={onBack} onNext={() => onNext({ sqft, locations, moldType, sourceFixed, testingNeeded, propertyType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       <div style={{ background: COLORS.dangerMuted, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: RADIUS.sm, padding: '12px 16px', marginBottom: 24 }}>
         <span style={{ fontWeight: 700, color: '#991b1b', display: 'inline-flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={14} /> Important:</span>
         <span style={{ color: '#7f1d1d', fontSize: 14, marginLeft: 6 }}>Mold remediation always requires an in-person inspection by a licensed contractor. These estimates are very rough ballparks only.</span>
       </div>
 
-      <StepSection label="Estimated affected area">
-        <div className="calc-grid-2">
-          {[
-            ['small','Small','< 10 sq ft (e.g. corner of shower)'],
-            ['medium','Medium','10–100 sq ft (e.g. bathroom wall)'],
-            ['large','Large','100–300 sq ft (e.g. basement)'],
-            ['extensive','Extensive','300+ sq ft (major contamination)'],
-          ].map(([id,label,desc]) => (
-            <StepOptionCard key={id} selected={affectedSize === id} onClick={() => setAffectedSize(id)} primaryColor={primaryColor}>
-              <div style={{ fontWeight: 700, fontSize: 14, color: affectedSize === id ? primaryColor : COLORS.ink }}>{label}</div>
-              <div style={{ fontSize: 12, color: COLORS.body, marginTop: 4 }}>{desc}</div>
-            </StepOptionCard>
-          ))}
-        </div>
+      {/* A sq-ft slider, not the old 4-tier bucket picker -- "Medium" used
+          to cover 10-100 sq ft (a 10x range) at one flat price regardless
+          of whether the real job was 12 or 95 sq ft. The price now scales
+          continuously with the actual area entered here. */}
+      <StepSection label={`Estimated affected area: ~${sqft.toLocaleString()} sq ft`}>
+        <input type="range" min={5} max={1000} step={5} value={sqft} onChange={e => setSqft(+e.target.value)} style={{ width: '100%', accentColor: primaryColor }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: COLORS.muted, marginTop: 4 }}><span>5 sq ft (corner of shower)</span><span>1,000+ sq ft (major contamination)</span></div>
       </StepSection>
 
       <StepSection label="Location(s) affected (select all that apply)">

@@ -128,13 +128,6 @@ const TILE_CONDITION_LABELS = {
   damaged: 'Years of neglect',
 };
 
-const MOLD_AFFECTED_SIZE_LABELS = {
-  small: 'Small',
-  medium: 'Medium',
-  large: 'Large',
-  extensive: 'Extensive',
-};
-
 const MOLD_TYPE_LABELS = {
   not_sure: 'Not Sure',
   black_mold: 'Black Mold (Stachybotrys)',
@@ -186,6 +179,7 @@ const AIRBNB_TURNAROUND_LABELS = {
 // PostConstructionStep.js
 const POST_CONSTRUCTION_TYPE_LABELS = {
   light: 'Light Renovation / Touch-Up',
+  moderate: 'Moderate Renovation',
   full: 'New Construction / Major Renovation',
 };
 
@@ -207,7 +201,6 @@ module.exports = {
   DRYER_VENT_TYPE_LABELS,
   TILE_TYPE_LABELS,
   TILE_CONDITION_LABELS,
-  MOLD_AFFECTED_SIZE_LABELS,
   MOLD_TYPE_LABELS,
   WATER_CATEGORY_LABELS,
   WATER_CAUSE_LABELS,

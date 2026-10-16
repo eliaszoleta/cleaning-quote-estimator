@@ -37,7 +37,7 @@ const {
   TILE_PRICE_PER_SQFT,
   TILE_CONDITION_MULTIPLIERS,
   TILE_SERVICE_ADDONS,
-  MOLD_PRICE_RANGES,
+  interpolateMoldPriceRange,
   MOLD_TYPE_MULTIPLIERS,
   MOLD_SOURCE_FIXED_MULTIPLIERS,
   MOLD_ADDONS,
@@ -64,7 +64,7 @@ const {
   APARTMENT_SIZE_LABELS, COMMERCIAL_BUILDING_TYPE_LABELS, COMMERCIAL_SERVICE_LEVEL_LABELS,
   SOILING_CONDITION_LABELS, CARPET_METHOD_LABELS, UPHOLSTERY_FABRIC_LABELS,
   AIR_DUCT_VENT_COUNT_LABELS, DRYER_VENT_LENGTH_LABELS, DRYER_VENT_TYPE_LABELS,
-  TILE_TYPE_LABELS, TILE_CONDITION_LABELS, MOLD_AFFECTED_SIZE_LABELS, MOLD_TYPE_LABELS,
+  TILE_TYPE_LABELS, TILE_CONDITION_LABELS, MOLD_TYPE_LABELS,
   WATER_CATEGORY_LABELS, WATER_CAUSE_LABELS, WATER_DAMAGE_CLASS_LABELS, WATER_WHEN_HAPPENED_LABELS,
   AIRBNB_SIZE_LABELS, AIRBNB_TURNAROUND_LABELS, POST_CONSTRUCTION_TYPE_LABELS,
 } = require('../config/optionLabels');
@@ -869,9 +869,16 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
   };
 }
 
+// Legacy bucket names -> their representative sq ft, for a saved estimate
+// (or external integration) still sending the old affectedSize field
+// instead of a real sqft number -- MoldStep.js itself now only ever sends
+// sqft (see its own comment for why).
+const MOLD_LEGACY_SIZE_TO_SQFT = { small: 5, medium: 50, large: 200, extensive: 700 };
+
 function calculateMold(details, stateMultiplier, companyConfig) {
+  const legacySqft = details.affectedSize ? MOLD_LEGACY_SIZE_TO_SQFT[details.affectedSize] : undefined;
   const {
-    affectedSize = 'medium',
+    sqft = legacySqft ?? 50,
     locations = ['bathroom'],
     moldType = 'not_sure',
     sourceFixed = 'not_sure',
@@ -884,7 +891,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
   const markup = cfg.markup || 1.0;
   const minCharge = cfg.minimumCharge || 0;
 
-  const baseTier = MOLD_PRICE_RANGES[affectedSize] || MOLD_PRICE_RANGES.medium;
+  const baseTier = interpolateMoldPriceRange(sqft);
   const typeMult = MOLD_TYPE_MULTIPLIERS[moldType] || MOLD_TYPE_MULTIPLIERS.not_sure;
   const sourceMult = MOLD_SOURCE_FIXED_MULTIPLIERS[sourceFixed] || MOLD_SOURCE_FIXED_MULTIPLIERS.not_sure;
 
@@ -901,7 +908,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     range = { low: Math.round(range.low * MOLD_COMMERCIAL_MULTIPLIER.low), high: Math.round(range.high * MOLD_COMMERCIAL_MULTIPLIER.high) };
   }
 
-  const adjustments = [{ label: `${labelFor(MOLD_AFFECTED_SIZE_LABELS, affectedSize)} mold area remediation`, low: range.low, high: range.high }];
+  const adjustments = [{ label: `${sqft} sq ft mold area remediation`, low: range.low, high: range.high }];
 
   if (locations.includes('hvac_ductwork')) {
     const adj = applyMultiplier(MOLD_ADDONS.hvac_cleaning, stateMultiplier * markup);
@@ -937,7 +944,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     recurringMonthlyHigh: null,
     recurringAnnualSavings: null,
     keyFactors: [
-      { label: 'Affected area', impact: labelFor(MOLD_AFFECTED_SIZE_LABELS, affectedSize) },
+      { label: 'Affected area', impact: `${sqft} sq ft` },
       { label: 'Property type', impact: humanize(propertyType) },
       { label: 'Mold type', impact: labelFor(MOLD_TYPE_LABELS, moldType) },
       { label: 'Moisture source', impact: sourceFixed === 'yes' ? 'Fixed' : sourceFixed === 'not_fixed' ? 'Still leaking' : 'Unknown' },
