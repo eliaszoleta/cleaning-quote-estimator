@@ -107,13 +107,28 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   // in the dashboard's Services tab).
   const visibleServices = SERVICES.filter(s => services?.[s.configKey]?.enabled !== false);
 
+  // The fixed-tile "squared" layout below exists for a real third-party
+  // embed, whose container width a company's host site controls and could
+  // be any arbitrary (often narrow) value -- picking an explicit column
+  // count there avoids a ragged, half-empty last row. But two of our own
+  // surfaces also render with embedded=true purely to get THOSE other
+  // behaviors (instant on-screen results, no iframe-postMessage scrolling)
+  // -- the dashboard's "Run an Estimate" tool (RunEstimateTab.js) and the
+  // Branding tab's live preview -- and both are comfortably wide, predictable
+  // surfaces, not odd-width embeds. Forcing the narrow-embed tile math on
+  // them anyway picked only 2 columns at ~700px wide, fewer than the public
+  // site's plain auto-fill grid manages in less space. Past this width, just
+  // use the same dense grid the public site uses instead of the squared one.
+  const WIDE_EMBED_MIN_WIDTH = 500;
+  const useSquaredGrid = embedded && !(gridWidth > 0 && gridWidth >= WIDE_EMBED_MIN_WIDTH);
+
   // widthCols is how many columns the measured width can fit at all; the
   // actual column count used is whichever of 1..widthCols lays out this
   // many cards closest to a square block (see pickSquareColumns) -- maxing
   // out columns just because the width allows it left an orphan card alone
   // in a half-empty last row whenever the enabled count didn't divide
   // evenly into the max, instead of a tidier, more compact square.
-  const widthCols = gridWidth > 0 ? Math.max(1, Math.floor((gridWidth + GRID_GAP) / (TILE_MIN + GRID_GAP))) : null;
+  const widthCols = useSquaredGrid && gridWidth > 0 ? Math.max(1, Math.floor((gridWidth + GRID_GAP) / (TILE_MIN + GRID_GAP))) : null;
   const gridCols = widthCols ? pickSquareColumns(Math.max(visibleServices.length, 1), widthCols) : null;
   // The actual rendered width of a gridCols-column grid once its tracks
   // settle at their max (300px) -- capped at gridWidth itself in case
@@ -172,7 +187,7 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
         // conservative for that one frame, never wrong in a visible way.
         gridTemplateColumns: isMobile
           ? 'repeat(2, 1fr)'
-          : embedded ? `repeat(${gridCols || 'auto-fit'}, minmax(${TILE_MIN}px, ${TILE_MAX}px))` : 'repeat(auto-fill, minmax(195px, 1fr))',
+          : useSquaredGrid ? `repeat(${gridCols || 'auto-fit'}, minmax(${TILE_MIN}px, ${TILE_MAX}px))` : 'repeat(auto-fill, minmax(195px, 1fr))',
         gap: isMobile ? 8 : 10,
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (
