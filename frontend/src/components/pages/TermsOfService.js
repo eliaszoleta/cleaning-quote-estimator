@@ -11,7 +11,7 @@ export default function TermsOfService() {
       <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(28px, 7vw, 56px) 20px 10px' }}>
           <h1 style={{ fontSize: 'clamp(26px, 6vw, 36px)', fontWeight: 900, color: '#0f172a', marginBottom: 8, letterSpacing: '-0.01em' }}>Terms of Service</h1>
-          <p style={{ color: '#64748b' }}>Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          <p style={{ color: '#64748b' }}>Last updated: October 12, 2026</p>
         </div>
         <div style={{ maxWidth: 760, margin: '0 auto', padding: '20px 20px clamp(40px, 8vw, 64px)', lineHeight: 1.65, display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
