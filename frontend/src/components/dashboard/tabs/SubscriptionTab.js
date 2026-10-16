@@ -28,7 +28,7 @@ const FEATURES = [
   { Icon: ClipboardList,     text: 'All 12 service calculators' },
   { Icon: Globe,             text: 'Calculator widget for your website, included whenever you want public lead capture' },
   { Icon: UserPlus,          text: "Automatic lead capture + instant email alerts once it's on your site" },
-  { Icon: KeyRound,          text: 'API access for CRM sync' },
+  { Icon: KeyRound,          text: 'API access, so you can connect it to other tools you already use' },
 ];
 
 export default function SubscriptionTab({ subStatus, onSubRefresh }) {
