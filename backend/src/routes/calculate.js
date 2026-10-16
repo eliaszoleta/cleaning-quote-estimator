@@ -104,43 +104,33 @@ async function logLeadEmailEvent(partnerId) {
 // Mode -- both already gated on an active subscription above, not this).
 const PUBLIC_DAILY_LIMIT = 2;
 
-function startOfTodayISO() {
-  const d = new Date();
-  d.setUTCHours(0, 0, 0, 0);
-  return d.toISOString();
-}
-
-async function publicDailyLimitReached(ip) {
+// Was two separate round trips -- a SELECT count to check the limit, then
+// (after the whole calculation ran) a plain INSERT to record the attempt --
+// with nothing synchronizing them. Two requests from the same visitor
+// fired close together (just normal rapid "New Estimate" clicking, no
+// special timing needed) could each run their SELECT before either INSERT
+// had landed, so both saw the same under-the-limit count and passed --
+// in practice letting a visitor through for 3+ "free" estimates against a
+// limit of 2. record_public_estimate_attempt (see migration 025) does the
+// check and the insert in one atomic DB call, serialized per-IP via an
+// advisory lock, so this can't happen anymore. Returns true if this
+// attempt was allowed (and is now recorded), false if the limit was
+// already hit.
+async function tryRecordPublicEstimateAttempt(ip) {
   const supabase = getSupabase();
-  if (!supabase || !ip) return false; // no DB configured (local dev), or no identifier to check -- never block
-  const since = startOfTodayISO();
+  if (!supabase || !ip) return true; // no DB configured (local dev), or no identifier to check -- never block
   try {
-    const { count, error } = await supabase
-      .from('public_estimate_attempts')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', since)
-      .eq('ip', ip);
-    // supabase-js doesn't throw on an API-level error (bad key, missing
-    // table, etc.) -- it resolves with { error, count: null } -- so this
-    // has to be checked explicitly or a real misconfiguration would
-    // silently read as "0 attempts so far" forever instead of ever
+    const { data, error } = await supabase.rpc('record_public_estimate_attempt', { p_ip: ip, p_limit: PUBLIC_DAILY_LIMIT });
+    // supabase-js doesn't throw on an API-level error (bad key, function
+    // not migrated yet, etc.) -- it resolves with { error, data: null } --
+    // so this has to be checked explicitly or a real misconfiguration
+    // would silently read as "always allowed" forever instead of ever
     // surfacing in the logs.
-    if (error) { console.warn('publicDailyLimitReached query failed:', error.message); return false; }
-    return (count || 0) >= PUBLIC_DAILY_LIMIT;
+    if (error) { console.warn('tryRecordPublicEstimateAttempt failed:', error.message); return true; }
+    return data !== false;
   } catch (err) {
-    console.warn('publicDailyLimitReached check failed:', err.message);
-    return false; // fail open -- a DB hiccup shouldn't block a real visitor
-  }
-}
-
-async function recordPublicEstimateAttempt(ip) {
-  const supabase = getSupabase();
-  if (!supabase || !ip) return;
-  try {
-    const { error } = await supabase.from('public_estimate_attempts').insert({ ip });
-    if (error) console.warn('recordPublicEstimateAttempt insert failed:', error.message);
-  } catch (err) {
-    console.warn('recordPublicEstimateAttempt failed:', err.message);
+    console.warn('tryRecordPublicEstimateAttempt failed:', err.message);
+    return true; // fail open -- a DB hiccup shouldn't block a real visitor
   }
 }
 
@@ -204,7 +194,16 @@ router.post('/', async (req, res) => {
       }
     } else {
       const ip = req.ip || req.socket?.remoteAddress || null;
-      if (await publicDailyLimitReached(ip)) {
+      // Checks the limit and records this attempt in one atomic DB call --
+      // see tryRecordPublicEstimateAttempt's own comment for why this isn't
+      // two separate steps anymore. Deliberately runs (and counts) before
+      // calculateCleaning rather than after it succeeds, unlike the old
+      // record-on-success design: that ordering is what let the race happen
+      // in the first place, and a genuine calculateCleaning failure after a
+      // valid, already-validated serviceType/zip/state is rare enough that
+      // costing a visitor one of their two attempts on it is an acceptable
+      // tradeoff for actually closing the loophole.
+      if (!(await tryRecordPublicEstimateAttempt(ip))) {
         return res.status(429).json({
           success: false,
           limitReached: true,
@@ -364,15 +363,11 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // Only counts toward the daily cap once the calculation actually
-    // succeeded -- a request that errored out before this point never
-    // got a usable estimate, so it shouldn't cost the visitor one of
-    // their two free attempts. Recorded for every public attempt, by IP
-    // only -- see publicDailyLimitReached.
-    if (!companyId) {
-      const ip = req.ip || req.socket?.remoteAddress || null;
-      recordPublicEstimateAttempt(ip).catch(err => console.warn('recordPublicEstimateAttempt failed:', err.message));
-    } else {
+    // The public daily limit was already checked and recorded in one
+    // atomic call above (tryRecordPublicEstimateAttempt). Company-side
+    // usage tracking (for the dashboard's own stats, not an enforced
+    // limit) happens here at the end instead.
+    if (companyId) {
       recordCompanyEstimateRun(companyId, serviceType).catch(err => console.warn('recordCompanyEstimateRun failed:', err.message));
     }
 
