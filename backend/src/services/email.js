@@ -44,6 +44,15 @@ const SERVICE_LABELS = {
   post_construction: 'Post-Construction Cleaning',
 };
 
+// Subject lines only -- every other service's SERVICE_LABELS entry is plain
+// "[X] Cleaning" wording, but airbnb's is 'Airbnb/Vacation Rental Cleaning':
+// a trademarked travel brand name plus "Vacation Rental", both strong
+// signal words Gmail's classifier associates with the Promotions/Travel
+// category (that's reportedly why these were the only estimate emails a
+// user saw land there instead of the inbox). The body/UI label stays the
+// full descriptive text -- this only swaps what goes in the subject line.
+const SUBJECT_SERVICE_LABELS = { ...SERVICE_LABELS, airbnb: 'Vacation Rental Cleaning' };
+
 function fmtMoney(n) {
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }
@@ -353,8 +362,8 @@ async function sendEstimateEmail({ to, name, clientName, serviceType, result, co
         // names whose estimate this is, so a teammate scanning their inbox
         // doesn't have to open the email to find out.
         subject: clientName
-          ? `${SERVICE_LABELS[serviceType] || 'Cleaning'} estimate for ${clientName}`
-          : `Your ${SERVICE_LABELS[serviceType] || 'cleaning'} estimate is ready`,
+          ? `${SUBJECT_SERVICE_LABELS[serviceType] || 'Cleaning'} estimate for ${clientName}`
+          : `Your ${SUBJECT_SERVICE_LABELS[serviceType] || 'cleaning'} estimate is ready`,
         html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner }),
         text: buildText({ name, clientName, serviceType, result, companyConfig, partner }),
       },
@@ -549,7 +558,7 @@ async function sendPartnerLeadEmail({ partnerEmail, leadName, leadEmail, leadPho
         // Lets the partner just hit "reply" in their inbox to reach the
         // lead directly, without ever needing to copy the contact info out.
         reply_to: leadEmail || undefined,
-        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead in your area — ${fmtSubjectTimestamp()}`,
+        subject: `New ${SUBJECT_SERVICE_LABELS[serviceType] || 'cleaning'} lead in your area — ${fmtSubjectTimestamp()}`,
         html: buildPartnerLeadHtml(args),
         text: buildPartnerLeadText(args),
       },
@@ -718,7 +727,7 @@ async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, lead
         from: `Clean Estimator <${fromAddress}>`,
         to: [to],
         reply_to: leadEmail || undefined,
-        subject: `New ${SERVICE_LABELS[serviceType] || 'cleaning'} lead on your estimator — ${fmtSubjectTimestamp()}`,
+        subject: `New ${SUBJECT_SERVICE_LABELS[serviceType] || 'cleaning'} lead on your estimator — ${fmtSubjectTimestamp()}`,
         html: buildCompanyLeadHtml(args),
         text: buildCompanyLeadText(args),
       },
