@@ -8566,6 +8566,942 @@ Jobber is the best fit here because its recurring jobs can carry instructions an
 Start with the real monthly cost for your team size, not just the advertised entry price. Then check whether the plan includes the GPS rules, task lists, time tracking, inspections, or payroll connection your cleaners actually need.
     `,
   },
+  {
+    slug: 'airbnb-cleaning-checklist',
+    title: 'The Airbnb Turnover Cleaning Checklist Every Host Needs',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-16',
+    readTime: '7 min',
+    excerpt: 'A complete room-by-room Airbnb turnover cleaning checklist, from stripping beds to resetting staging for photos — so every guest walks into a listing that looks exactly like the pictures.',
+    faqs: [
+      { q: 'How long should an Airbnb turnover clean take?', a: 'A standard 2-bedroom turnover typically takes 2–3 hours for one cleaner, or 1–1.5 hours for a two-person team. Larger units or heavier guest wear can push that higher.' },
+      { q: 'Do turnover cleaners do laundry?', a: 'Most include stripping and remaking beds with fresh linens, but washing/drying the used linens is sometimes a separate step or add-on depending on the cleaner — confirm this upfront.' },
+      { q: 'What should I restock between every guest?', a: 'Toilet paper, hand soap, dish soap, paper towels, coffee/tea, and trash bags at minimum. Many hosts also restock a starter amount of shampoo/conditioner and laundry pods.' },
+    ],
+    content: `
+## Why a Checklist Matters More for Turnovers Than Regular Cleaning
+
+A missed detail in a regular house clean gets caught next visit. A missed detail in an Airbnb turnover gets caught by a paying guest, often documented in a review. Every surface, every room, every reset item needs to happen the same way, every time — which is exactly what a checklist is for.
+
+## Kitchen
+
+- Wash, dry, and put away all dishes (don't leave anything in the dishwasher)
+- Wipe down counters, stovetop, and backsplash
+- Clean inside the microwave
+- Empty and wipe down the refrigerator of any food left behind
+- Take out trash and recycling, replace liners
+- Restock dish soap, sponge, paper towels, trash bags
+- Check for and report any damaged or missing kitchenware
+
+## Bathrooms
+
+- Scrub toilet, sink, tub/shower, and all fixtures
+- Clean mirrors and glass
+- Mop floor
+- Replace all towels with fresh, unused ones
+- Restock toilet paper (leave extra rolls), hand soap, and any provided toiletries
+- Empty trash
+
+## Bedrooms
+
+- Strip all bedding and remake with fresh, clean linens
+- Fluff and arrange pillows to match listing photos
+- Dust surfaces, nightstands, and headboard
+- Vacuum under the bed if accessible
+- Check closets and drawers for items left behind by the previous guest
+
+## Living Areas
+
+- Vacuum and/or mop all flooring
+- Dust all surfaces, shelves, and electronics
+- Fluff and arrange couch cushions and throw pillows
+- Wipe down remote controls, light switches, and door handles
+- Check behind/under furniture for trash or left-behind items
+
+## Final Walkthrough — The Step Most Turnovers Skip
+
+Before leaving, walk the entire unit as if you were the arriving guest:
+
+1. Does every room match the listing photos?
+2. Are all lights working and curtains/blinds set the way they appear in photos?
+3. Is the thermostat set to a comfortable temperature?
+4. Are welcome materials (wifi password, house manual, local guide) in place?
+5. Is the door locked and access set up correctly for the next guest (lockbox code, smart lock, etc.)?
+
+## Guest Damage and Missing Items
+
+Part of a turnover clean is also a light inspection — note anything broken, stained, or missing so you can address it with the previous guest through your platform's resolution process before the next guest arrives and the issue becomes "yours."
+
+## Keep This Consistent, Every Turn
+
+The hosts with the best reviews aren't the ones with the nicest listings — they're the ones where every single turnover looks identical, whether it's guest #4 or guest #400. [Get a free turnover cleaning estimate](/?service=airbnb) for your exact unit size and turnaround time, or read our [full guide to Airbnb cleaning costs](/blog/airbnb-cleaning-cost).
+    `,
+  },
+  {
+    slug: 'how-to-find-an-airbnb-turnover-cleaner',
+    title: 'How to Find a Reliable Airbnb Turnover Cleaner',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-16',
+    readTime: '6 min',
+    excerpt: 'Not every house cleaner can handle turnover work on a tight, guest-driven schedule. Here\'s what to look for, what to ask, and red flags to avoid when hiring an Airbnb turnover cleaner.',
+    content: `
+## Turnover Cleaning Is a Different Job Than House Cleaning
+
+A regular house cleaner works on a flexible schedule set by the homeowner. A turnover cleaner works against a hard deadline set by someone else's travel plans, with zero tolerance for running late — a guest standing outside a still-dirty unit is a different kind of problem than a cleaner showing up an hour behind on a routine visit.
+
+## What to Look for in a Turnover Cleaner
+
+**Experience with short-term rentals specifically.** Ask directly: "Do you currently clean other Airbnb or vacation rental properties?" A cleaner who only does traditional house cleaning may not be used to the speed, consistency, and reset-to-photo-match standard turnovers require.
+
+**Reliable availability, including weekends.** Most checkouts happen on weekends. If a cleaner can't commit to weekend availability, they're not a fit for a property with regular turnover.
+
+**A real process, not just "I'll clean it well."** Ask if they use a checklist. A cleaner with a written, repeatable process is far more likely to deliver consistent results than one relying on memory alone.
+
+**Flexibility for last-minute changes.** Guest cancellations, early checkouts, and new same-day bookings happen. A cleaner (or cleaning company) with backup staff or a flexible schedule handles these far better than a solo cleaner already booked elsewhere.
+
+**Damage reporting, not just cleaning.** A good turnover cleaner tells you about a stain, a broken item, or something missing — not just cleans around it.
+
+## Where to Find One
+
+- **Dedicated turnover cleaning services** that specifically advertise short-term rental cleaning — search "Airbnb cleaning service [your city]"
+- **Host communities** — local Airbnb host Facebook groups and forums are full of host-to-host referrals for cleaners who are already proven reliable
+- **Property management companies** — if you don't want to manage cleaning yourself, many short-term rental property managers include turnover cleaning in their service
+- **General cleaning companies that explicitly offer turnover service** — [many cleaning businesses now price Airbnb turnovers as a distinct service](/?service=airbnb) rather than folding it into a standard house cleaning quote
+
+## Questions to Ask Before Hiring
+
+1. What's your availability on weekends and holidays?
+2. How much notice do you need for a same-day or last-minute turn?
+3. Do you supply your own cleaning products, or do I need to stock them?
+4. Do you handle linens and laundry, or is that separate?
+5. What's your process if something's damaged or missing?
+6. What's your backup plan if you're sick or unavailable on short notice?
+
+## Red Flags
+
+- No clear pricing — turnover cleaning should be a predictable flat rate per unit size, not a vague hourly estimate
+- Unwilling to commit to a specific time window on checkout day
+- No way to reach them quickly if a same-day issue comes up
+- Reluctant to provide references from other hosts
+
+## What You'll Pay
+
+Turnover cleaning runs **$85–$240** for a standard next-day turn depending on unit size, with same-day rush turns running **30–40% more**. [See a full cost breakdown by unit size](/blog/airbnb-cleaning-cost) or get an instant estimate for your property.
+
+[Get a free estimate for your listing](/?service=airbnb) →
+    `,
+  },
+  {
+    slug: 'same-day-airbnb-turnover-cleaning-guide',
+    title: 'Same-Day Airbnb Turnover Cleaning: How It Works and What It Costs',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-16',
+    readTime: '6 min',
+    excerpt: 'Checkout at 11am, check-in at 3pm — same-day turnovers are the tightest, highest-stakes clean in short-term rental hosting. Here\'s how to make them work and what the rush premium actually costs.',
+    content: `
+## What Makes a Same-Day Turn Different
+
+A standard turnover has overnight (or longer) breathing room between guests — the cleaner has the rest of the day, or even the next day, to get the unit ready. A same-day turn compresses that into a few hours: guest A checks out at 11am, guest B checks in at 3pm, and the entire reset has to happen inside that four-hour window, on a schedule the cleaner doesn't control and can't move.
+
+## Why Same-Day Turns Cost More
+
+A standard 2-bedroom turnover runs **$105–$145**. The same unit on a same-day rush runs **$137–$203** — a **30–40% premium**. That premium reflects real cost to the cleaner, not just inconvenience pricing:
+
+- **The job has to happen on a fixed, narrow window** — the cleaner can't shift it to a slower part of their day the way they could with a flexible-timing standard turn
+- **It often requires being on standby**, holding that slot open and unable to book another job in the same window in case the checkout runs late
+- **There's no buffer if something goes wrong** — a stain that needs extra attention, or guests who leave later than planned, turn an already-tight job into a genuinely rushed one
+
+## How to Make Same-Day Turns Work Reliably
+
+1. **Build in a confirmed checkout time with your guest**, not just a checkout window — "out by 11:00am" is enforceable in a way "checkout is in the morning" isn't
+2. **Use a lockbox or smart lock** so the cleaner can access the unit the moment the prior guest leaves, without waiting on you to coordinate a handoff
+3. **Give your cleaner the exact check-in time for the next guest**, not just "same day" — a 3pm check-in and a 7pm check-in are very different levels of urgency for the same clean
+4. **Keep a backup cleaner's number on hand** — even the most reliable turnover cleaner occasionally gets sick or double-booked, and same-day turns have zero room for "we'll get to it tomorrow"
+5. **Stock extra linens and supplies on-site** so a delayed guest checkout doesn't also mean waiting on a supply run
+
+## Should You Avoid Same-Day Bookings Entirely?
+
+Some hosts build a mandatory one-night gap between bookings specifically to avoid same-day turn pressure and its added cost. This trades a small amount of occupancy for a lower cleaning cost and a lot less operational risk — worth considering if your calendar allows it and your market doesn't specifically reward same-day availability.
+
+If same-day turns are a regular part of your booking pattern, though, a dedicated, reliable turnover cleaner (or a cleaning company with multiple staff who can cover a tight window) is worth the premium over the risk of a late or rushed clean.
+
+## Full Same-Day Pricing by Unit Size
+
+| Unit Size | Standard Turn | Same-Day Rush (+30–40%) |
+|---|---|---|
+| Studio / 1 bedroom | $85–$110 | $104–$154 |
+| 2 bedroom | $105–$145 | $137–$203 |
+| 3 bedroom | $160–$195 | $208–$273 |
+| 4+ bedroom | $195–$240 | $254–$336 |
+
+[Get an instant estimate](/?service=airbnb) for your unit, standard or same-day →
+    `,
+  },
+  {
+    slug: 'how-much-to-charge-guests-cleaning-fee-airbnb',
+    title: 'How Much Should You Charge Guests for Your Airbnb Cleaning Fee?',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-16',
+    readTime: '6 min',
+    excerpt: 'Set the cleaning fee too low and you eat the cost every stay. Set it too high and it hurts your booking rate. Here\'s how to price your Airbnb cleaning fee against your real turnover cost.',
+    content: `
+## Start With Your Actual Turnover Cost
+
+The cleaning fee you charge guests should cover what turnover cleaning actually costs you — not an arbitrary round number. Actual turnover cleaning costs by unit size:
+
+| Unit Size | Typical Turnover Cost |
+|---|---|
+| Studio / 1 bedroom | $85–$110 |
+| 2 bedroom | $105–$145 |
+| 3 bedroom | $160–$195 |
+| 4+ bedroom | $195–$240 |
+
+If you're charging guests a flat $75 cleaning fee on a 2-bedroom listing that actually costs $105–$145 to turn over, you're subsidizing every single stay out of your own margin.
+
+## Should the Fee Exactly Match the Cleaning Cost?
+
+Most hosts set the cleaning fee to cover the full cleaning cost, sometimes with a small buffer (5–10%) to cover incidentals the cleaner doesn't always itemize — a few extra linens, basic restocking, minor touch-ups beyond the standard scope. Charging meaningfully more than the real cost to pad revenue is where guests start noticing and reviews start mentioning it.
+
+## Add-Ons That Belong in the Fee (Or Don't)
+
+Some turnover costs are easy to overlook when setting your fee:
+
+- **Linens & laundry** (+$20–$30): if your cleaner handles wash/change of all bedding and towels, this should be built into the fee
+- **Restocking supplies** (+$12–$18): toiletries, coffee, paper products — a real recurring cost, not a one-time setup expense
+- **Periodic deep-clean turnovers** (+$45–$65): if you budget for a deeper clean every several turns, averaging that cost into your regular fee (rather than a surprise higher charge on that one stay) keeps pricing predictable for guests
+
+## Same-Day Bookings and the Cleaning Fee
+
+If your listing allows same-day check-ins after a same-day checkout, you're paying a 30–40% rush premium on that turn — but most platforms don't support a variable cleaning fee that changes based on booking gap. Two common approaches:
+
+1. **Set the fee to cover the standard rate** and absorb the occasional same-day premium as a cost of allowing flexible bookings
+2. **Build the same-day premium into your base cleaning fee across all bookings**, effectively spreading the cost of same-day flexibility across every guest rather than isolating it to the stays that trigger it
+
+## What Guests Actually Compare
+
+Guests rarely object to a cleaning fee that's proportionate to the unit size and clearly justified by what they get (a genuinely spotless, fully-reset space). What drives complaints is a cleaning fee that feels disconnected from the unit — a high fee on a studio, or a fee that doesn't match the condition guests actually find on arrival.
+
+## Bottom Line
+
+Price your cleaning fee to your real, size-specific turnover cost plus any add-ons you consistently provide — not a flat number copied from another listing. [Get your exact cost with our Airbnb cleaning calculator](/?service=airbnb) so your fee is based on your actual unit, not a guess.
+    `,
+  },
+  {
+    slug: 'diy-vs-professional-airbnb-cleaning',
+    title: 'DIY vs. Professional Airbnb Cleaning: Which Is Right for Your Listing?',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-16',
+    readTime: '6 min',
+    excerpt: 'Cleaning your own listing saves $105–$145 per turn, but costs real time and puts your reviews on the line every stay. Here\'s how to decide which makes sense for your situation.',
+    content: `
+## The Real Trade-Off
+
+Cleaning your own Airbnb saves the $85–$240 per-turn cost of a professional turnover clean. What it costs you instead is time (2–3 hours per turnover, on someone else's schedule, every single booking), consistency, and the ability to scale past a handful of bookings a month.
+
+## When DIY Cleaning Makes Sense
+
+- **You live near the property** and can realistically get there within the checkout-to-checkin window, every time
+- **Your booking volume is low** (a few turns a month), so the time cost stays manageable
+- **You're testing whether hosting is worth it** before investing in a cleaning service for a property you might not keep
+- **You want full, hands-on control** over presentation and are comfortable with that being your job indefinitely
+
+## When Professional Cleaning Makes Sense
+
+- **You don't live near the property**, or hosting a second (or third) listing in a different location
+- **Your booking calendar has same-day turns**, which require being available on short notice, every time, with zero flexibility
+- **You're scaling past 1–2 listings** — cleaning multiple properties yourself stops being realistic fast
+- **Consistency matters to your reviews** — a professional with a checklist delivers the same result every time; DIY cleaning quality tends to slip when you're tired, busy, or rushed
+
+## The Hidden Cost of DIY: Guest Experience Risk
+
+A missed detail in your own living room is invisible. The same missed detail in a listing becomes a 3-star review with "cleanliness" called out by name — and on most platforms, cleanliness ratings directly affect your search ranking. One bad review from a rushed self-clean can cost more in lost future bookings than months of professional cleaning fees.
+
+## A Middle Ground: Hybrid Approach
+
+Many hosts clean routine turns themselves and bring in a professional for:
+- Periodic deep cleans (quarterly or every several turns) to catch what routine cleaning misses
+- Same-day turns specifically, where the time pressure is highest
+- Any stretch where they're traveling or otherwise unavailable
+
+## Running the Numbers
+
+A 2-bedroom unit at $125 average turnover cost, booked 12 times a month: professional cleaning runs **~$1,500/month**. If your own time is worth more than that spread across the ~30 hours of cleaning that represents, professional cleaning is the better financial decision, not just the more convenient one — and that's before counting the review-quality risk of self-cleaning when you're tired or rushed.
+
+[Get your exact turnover cost](/?service=airbnb) to run this math for your own listing.
+    `,
+  },
+  {
+    slug: 'how-to-start-an-airbnb-turnover-cleaning-business',
+    title: 'How to Start an Airbnb Turnover Cleaning Business',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-16',
+    readTime: '9 min',
+    excerpt: 'Short-term rental turnover cleaning is one of the fastest-growing niches in the cleaning industry — higher per-visit pricing than standard house cleaning, with built-in recurring volume. Here\'s how to start.',
+    content: `
+## Why Turnover Cleaning Is a Strong Niche to Start In
+
+Airbnb and vacation rental turnover cleaning pays more per visit than standard residential cleaning for comparable square footage — a 2-bedroom turnover runs **$105–$145** versus a comparable apartment clean, because the scope (full reset, every surface, guest-ready presentation) is closer to a move-out clean than a routine visit. It also comes with built-in recurring volume: a single host with one active listing can generate 8–15+ cleanings a month, far more frequent than a typical residential client's weekly or biweekly schedule.
+
+## What's Different About This Niche
+
+- **Deadlines are fixed and non-negotiable.** A guest checking in at 3pm isn't a soft deadline — it's the entire job.
+- **Weekend and holiday availability is mandatory.** Most checkouts cluster on weekends; a turnover cleaner who isn't available then isn't competitive in this niche.
+- **The scope is closer to move-out cleaning than routine cleaning.** Full linen changes, restocking, and a presentation-level reset every single visit, not just surface cleaning.
+- **Hosts need reliability over price.** A host whose cleaner no-shows has a guest standing outside a dirty unit — most hosts will pay a premium for a cleaner they can trust completely over the cheapest option.
+
+## Getting Your First Clients
+
+1. **Join local host communities.** Airbnb/VRBO host Facebook groups and local short-term rental associations are the single best source of first clients — hosts specifically ask for cleaner referrals in these groups constantly.
+2. **List yourself directly with Airbnb's co-host/cleaner network** where available in your market.
+3. **Reach out to local property managers.** Short-term rental property management companies often outsource cleaning and need reliable vendors for multiple properties at once — one contract can replace a dozen individual host relationships.
+4. **Build a simple before/after photo portfolio** from your first few jobs — turnover-specific photos (staged beds, reset bathrooms) convince hosts faster than generic cleaning photos.
+5. **Offer a trial clean at your standard rate**, not a discount — undercutting your price to win a first job signals you'll be a budget option, which attracts the wrong kind of client for this niche.
+
+## What to Charge
+
+Base your pricing on the same size-tiered structure the market uses — [studio/1BR runs $85–$110, 2BR runs $105–$145, 3BR runs $160–$195, 4BR+ runs $195–$240](/blog/airbnb-cleaning-cost) for a standard next-day turn, with a 30–40% premium for same-day rush turns. Price linens/laundry, restocking, and periodic deep cleans as separate line-item add-ons rather than folding them into a single number — hosts managing multiple properties specifically compare add-on pricing when picking a cleaner.
+
+## Staffing for Reliability
+
+The single biggest differentiator in this niche is never missing a turn. That means:
+- Cross-training at least one backup cleaner who can cover if your primary cleaner is sick
+- Building a small buffer into your own schedule rather than booking every single slot back-to-back
+- Having a clear, fast communication channel (text, not email) for last-minute schedule changes hosts need to relay quickly
+
+## Scaling Beyond Solo
+
+Once you're past 15–20 regular turnovers a week, the math usually favors hiring a second cleaner over turning down new hosts — the recurring nature of this work means a new host relationship is worth far more over a year than a single job, so protecting your capacity to say yes to new hosts pays for itself.
+
+## Pricing It Consistently as You Grow
+
+As soon as more than one person is quoting jobs, pricing consistency becomes the thing that makes or breaks a scaling turnover cleaning business — one estimator quoting a 2BR at $110 and another quoting the same unit at $140 erodes trust fast in a tight host community where people compare notes. [Clean Estimator](/estimator) runs this exact size-based, add-on-aware pricing formula automatically across your whole team, so every quote — Airbnb turnovers included — comes out the same number regardless of who's answering the phone.
+
+[Start your free 30-day trial →](/estimator)
+    `,
+  },
+  {
+    slug: 'how-to-price-airbnb-turnover-cleaning-jobs',
+    title: 'How to Price Airbnb Turnover Cleaning Jobs (The Formula Turnover Cleaners Use)',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-16',
+    readTime: '7 min',
+    excerpt: 'Turnover cleaning prices on a different formula than standard house cleaning — unit size, turnaround urgency, and guest-facing add-ons, not square footage alone. Here\'s the real math.',
+    content: `
+## Why Turnover Pricing Isn't Just House Cleaning Pricing
+
+A lot of cleaning businesses make the mistake of pricing Airbnb turnovers the same way they price a standard house cleaning — by square footage and condition. Turnover jobs run a different formula, because the thing driving cost isn't how dirty the unit is (it's usually not that dirty), it's the full reset-to-guest-ready standard and the fixed deadline every single visit requires.
+
+## The Formula
+
+### 1. Base Rate by Unit Size
+
+Unlike a standard house clean priced per square foot, turnover cleaning is typically quoted flat, by bedroom count:
+
+| Unit Size | Base Turnover Rate |
+|---|---|
+| Studio / 1 bedroom | $85–$110 |
+| 2 bedroom | $105–$145 |
+| 3 bedroom | $160–$195 |
+| 4+ bedroom | $195–$240 |
+
+### 2. Bathroom Count Add-On
+
+Extra bathrooms add real time (full scrub, fresh towels, restocked supplies per bathroom) beyond what bedroom count alone captures — most turnover cleaners add a flat amount per bathroom above a baseline included in the base rate.
+
+### 3. Turnaround Urgency Multiplier
+
+This is the biggest differentiator from standard cleaning pricing. A same-day turn (checkout and check-in the same day) should carry a **30–40% premium** over a standard next-day turn — it compresses the job into a fixed window and often requires holding that slot open rather than booking flexibly around it.
+
+### 4. Add-Ons, Priced Separately
+
+- Linens & laundry: +$20–$30
+- Restocking supplies: +$12–$18
+- Periodic deep-clean turnover: +$45–$65
+
+Price these as distinct line items, not folded into the base rate — hosts managing several properties specifically compare add-on pricing across cleaners, and bundling makes your pricing harder to compare (and easier to underquote by accident).
+
+### 5. Recurring Volume Discount (Optional)
+
+Hosts with consistent turnover volume (weekly, biweekly, or guaranteed monthly minimums) are a different category of client than a one-time job — some turnover cleaners offer a modest discount (commonly 5–15%) for guaranteed recurring volume, since predictable scheduling has real value to the cleaner too.
+
+## A Worked Example
+
+A 2-bedroom unit, 1 bathroom (included in base), same-day rush, with linens & laundry add-on:
+
+| Step | Calculation | Running Total |
+|---|---|---|
+| Base rate (2BR) | | $125 (midpoint) |
+| Same-day rush (+35%, midpoint) | $125 × 1.35 | $169 |
+| Linens & laundry add-on | + $25 | $194 |
+| **Final price** | | **~$194** |
+
+## Why Consistency Matters More Here Than in Other Niches
+
+Turnover cleaning clients — hosts — talk to each other constantly, in local host groups and forums. Inconsistent pricing between estimators gets noticed and discussed fast in a way it rarely does for one-off residential clients. [Clean Estimator](/estimator) prices Airbnb turnovers on exactly this formula — size, bathrooms, turnaround, add-ons — automatically, so every quote from every member of your team lands on the same number.
+
+[Start your free trial →](/estimator)
+    `,
+  },
+  {
+    slug: 'how-to-get-airbnb-turnover-cleaning-clients',
+    title: 'How to Get Airbnb Turnover Cleaning Clients',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-16',
+    readTime: '7 min',
+    excerpt: 'Short-term rental hosts don\'t shop for cleaners the way homeowners do. Here\'s where they actually look, and how to get in front of them before your competitors do.',
+    content: `
+## Hosts Find Cleaners Differently Than Homeowners Do
+
+A homeowner looking for a house cleaner usually searches Google or asks a neighbor. A short-term rental host is far more likely to ask in a dedicated host community, where cleaner recommendations get shared constantly and reputation travels fast. Winning this niche means showing up in those specific channels, not just general cleaning-service marketing.
+
+## Where to Find Host Clients
+
+**Local host Facebook groups and forums.** Search "[your city] Airbnb hosts" or "[your city] short-term rental hosts" — these groups exist in nearly every market with meaningful STR activity, and cleaner recommendations are one of the most common post types.
+
+**Property management companies.** Many STR property managers outsource cleaning rather than staffing it in-house. One property management contract can mean 10–30+ units' worth of recurring turnover work from a single relationship — worth pursuing directly even if it takes longer to close than an individual host.
+
+**Co-hosting and vacation rental management platforms.** Some platforms maintain vetted vendor networks for cleaners in specific markets — getting listed is often free and puts you in front of hosts actively looking.
+
+**Direct outreach to hosts with active listings in your area.** Listing sites show approximate location; a short, specific message offering turnover cleaning (not a generic cleaning pitch) to hosts with multiple reviews (meaning they're actively hosting, not just testing the platform) can convert well.
+
+**Word of mouth within the host community itself.** This niche runs on trust more than most — one host who vouches for you in their group is worth more than any ad, because hosts specifically trust other hosts' cleaner recommendations over anonymous reviews.
+
+## What to Lead With
+
+Hosts care about three things more than almost anything else when picking a turnover cleaner:
+
+1. **Reliability** — will you show up, every time, on a schedule you don't control
+2. **Weekend/holiday availability** — most checkouts happen then
+3. **Consistency** — the same quality result on turn #50 as turn #1
+
+Lead your pitch with these, not your general cleaning credentials — "I specialize in Airbnb turnovers, I'm available every weekend, and I follow a checklist on every visit" converts better with this audience than a general cleaning-service pitch ever will.
+
+## Converting a First Job Into Recurring Volume
+
+Unlike a one-time residential clean, a single successful turnover usually leads directly to recurring, ongoing work — hosts need every checkout cleaned, not just occasionally. Make the first job count:
+
+- Send before/after photos unprompted — hosts can't see their own unit between guests and appreciate the visibility
+- Flag anything damaged or missing immediately, building trust that you're looking out for their listing, not just cleaning it
+- Confirm you're available for their regular turnover schedule before the first job even ends, so there's no gap for them to consider another cleaner
+
+## Pricing That Doesn't Scare Hosts Off (Or Underprice You)
+
+Quote using the real size-based market rate — [studio/1BR $85–$110, 2BR $105–$145, 3BR $160–$195, 4BR+ $195–$240](/blog/airbnb-cleaning-cost) — not a guess. [Clean Estimator](/estimator) prices turnovers on this exact formula automatically, so every quote you send is consistent and defensible.
+
+[Start your free trial →](/estimator)
+    `,
+  },
+  {
+    slug: 'working-with-property-managers-turnover-cleaning',
+    title: 'How to Land Property Management Contracts for Turnover Cleaning',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-16',
+    readTime: '7 min',
+    excerpt: 'One property management contract can replace a dozen individual host relationships. Here\'s how to pitch, price, and deliver for a short-term rental property manager.',
+    content: `
+## Why Property Managers Are a Different, Bigger Opportunity
+
+An individual host might have one or two listings. A short-term rental property management company might manage 20, 50, or hundreds of units across a market — and nearly all of them outsource cleaning rather than staffing it directly. One signed contract with a property manager can replace the effort of winning a dozen individual host relationships, with far more predictable, scalable volume.
+
+## What Property Managers Actually Need
+
+Unlike an individual host who cares most about trust and consistency on their one unit, a property manager needs:
+
+- **Capacity** — the ability to handle multiple turnovers on the same day, across different properties, often clustered on weekends
+- **Systematic reporting** — damage reports, missing items, and maintenance issues flagged consistently across every property, not just verbally mentioned
+- **Volume-based pricing** — a per-unit rate that reflects the predictability and scale of guaranteed recurring work, not a one-off job rate
+- **A single point of contact and clear SLAs** — property managers need to know exactly when cleanings will be done and who to call if something goes wrong
+
+## How to Pitch a Property Manager
+
+1. **Lead with capacity, not price.** Property managers are more worried about a cleaner who can't scale with them than about saving a few dollars per unit — demonstrate you (or your team) can handle their current unit count and have room to grow with them.
+2. **Offer a structured trial period** — propose cleaning a small subset of their properties for 30–60 days before asking for the full portfolio, so they can evaluate reliability with limited risk.
+3. **Bring a reporting process**, even a simple one — a standardized photo + checklist report per cleaning, sent automatically, shows you understand this is a business relationship, not a one-off job.
+4. **Ask about their current pain points directly** — most property managers switch cleaning vendors because of reliability issues, not price. Understanding what went wrong with their last cleaner tells you exactly what to emphasize.
+
+## Pricing for Volume
+
+Property managers will expect a volume discount relative to individual host rates — reasonable, given the guaranteed recurring scale. A common structure:
+
+- Standard per-unit turnover rate based on [size tier](/blog/airbnb-cleaning-cost), with a modest volume discount (commonly 10–15%) built in for guaranteed minimum monthly volume
+- Same-day rush premiums still apply — don't discount away the real cost of urgent turns, even in a volume contract
+- A clear add-on price list (linens, restocking, deep cleans) so the property manager can budget predictably across their whole portfolio
+
+## Staffing to Actually Deliver
+
+Winning the contract is the easy part — delivering on weekend-heavy, multi-property volume without missed turns is what keeps it. Before pitching a property manager, make sure you genuinely have (or can quickly build) the staffing capacity to cover their unit count on their schedule, especially weekends and holidays when the bulk of checkouts cluster. One missed turn in a portfolio relationship risks the entire contract, not just one client's trust.
+
+## Keeping Pricing Consistent Across a Larger Portfolio
+
+Once you're quoting and servicing dozens of units across one property manager relationship, pricing has to stay consistent and auditable — a property manager comparing your invoice against their own per-unit budget will notice inconsistency fast. [Clean Estimator](/estimator) handles exactly this: consistent, size-based, add-on-aware pricing across every unit and every job, with the same formula applied every time.
+
+[Start your free trial →](/estimator)
+    `,
+  },
+  {
+    slug: 'post-construction-cleaning-checklist',
+    title: 'The Post-Construction Cleaning Checklist: Room-by-Room',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
+    date: '2026-10-16',
+    readTime: '7 min',
+    excerpt: 'A complete room-by-room checklist for post-construction cleanup, from protective film removal to the final dust pass — so nothing gets missed before move-in.',
+    content: `
+## Why This Isn't a Regular Cleaning Checklist
+
+Drywall dust gets into places a regular cleaning checklist never accounts for — inside cabinets that were closed during work, on top of door frames, inside light fixtures, settled into carpet fibers. A post-construction clean needs its own checklist, room by room, built around where construction dust and residue actually end up.
+
+## Whole-House, First Pass
+
+- Remove all protective film from windows, counters, and fixtures
+- Remove painter's tape and any stickers/labels left on fixtures or appliances
+- Dust all surfaces top to bottom — ceiling fans, light fixtures, crown molding, before working down to counters and floors
+- Wipe down all walls, baseboards, and door frames
+
+## Kitchen
+
+- Detail clean inside and outside every cabinet and drawer (construction dust settles inside even closed cabinets)
+- Wipe down all appliances, inside and out
+- Clean countertops and backsplash, checking for paint overspray or adhesive residue
+- Clean sink and fixtures
+- Sweep/vacuum then mop flooring
+
+## Bathrooms
+
+- Remove any protective film from tub, shower, and fixtures
+- Scrub tile, grout, tub, and shower to remove construction dust and residue
+- Clean toilet, sink, and all fixtures
+- Wipe down mirrors and glass
+- Mop flooring
+
+## Bedrooms and Living Areas
+
+- Dust all surfaces, including inside closets
+- Vacuum carpet thoroughly (construction dust settles deep into fibers — a single vacuum pass often isn't enough)
+- Clean hard flooring (sweep/vacuum, then mop)
+- Clean windows inside, removing any construction dust or film residue
+- Wipe down all light switches, outlets, and door handles
+
+## Windows and Glass
+
+- Remove protective film and any adhesive residue
+- Clean paint overspray from glass — this often requires a razor blade technique, not just glass cleaner
+- Clean window tracks and sills, where dust and debris collect heavily
+
+## HVAC and Vents
+
+- Wipe down all visible vent covers and returns
+- Note: a full HVAC duct cleaning is usually a separate service (not included in standard post-construction cleanup) — strongly recommended after any drywall work before running the system
+
+## Final Walkthrough
+
+1. Check every room for remaining dust on high surfaces (tops of door frames, ceiling fan blades, shelving)
+2. Check inside all cabinets and closets, not just visible surfaces
+3. Confirm no leftover stickers, tape, or protective film anywhere
+4. Check corners and under any fixed furniture for swept-but-not-removed debris
+
+## What's an Add-On, Not Standard
+
+Three things commonly get treated as separate add-ons rather than included by default — confirm these with your cleaner upfront:
+
+- **Window cleaning** (paint overspray/construction film removal): $60–$90
+- **Debris haul-away** (leftover materials, not dust/residue): $120–$200
+- **HVAC vent/duct dust removal**: $45–$70
+
+[Get a free post-construction cleaning estimate](/?service=post_construction) for your exact home size and renovation scope.
+    `,
+  },
+  {
+    slug: 'post-construction-cleaning-timeline-how-long-does-it-take',
+    title: 'How Long Does Post-Construction Cleaning Take?',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
+    date: '2026-10-16',
+    readTime: '5 min',
+    excerpt: 'A post-construction clean takes longer than a regular house cleaning — here\'s what actually determines the timeline, and how to schedule it around your move-in date.',
+    content: `
+## Quick Answer
+
+A post-construction clean typically takes **4–10 hours for a single cleaner**, or **2–5 hours for a multi-person crew**, depending on home size and renovation scope. A light touch-up on a small home can wrap up in half a day; a full new-construction cleanup on a large home can take a full day or more, sometimes across two visits.
+
+## What Actually Drives the Timeline
+
+### Home Size
+
+| Home Size | Approximate Crew Time (2-person team) |
+|---|---|
+| Under 1,000 sq ft | 2–3 hours |
+| 1,000–1,500 sq ft | 2.5–4 hours |
+| 1,500–2,000 sq ft | 3–5 hours |
+| 2,000–2,500 sq ft | 4–6 hours |
+| 2,500–3,000 sq ft | 5–7 hours |
+| Over 3,000 sq ft | 6–9+ hours |
+
+### Scope of Work
+
+A **light touch-up** (one or two rooms painted or updated) takes meaningfully less time than a **full new construction or gut renovation cleanup**, where dust has settled into every single room rather than just one or two — not just because there's more square footage to cover, but because every surface in every room needs the full detail treatment, not just the renovated area.
+
+### How Much Construction Dust Has Settled
+
+New construction and gut renovations generate significantly more fine drywall dust than a touch-up job, and that dust doesn't stay where the work happened — it migrates throughout the house via airflow and foot traffic, meaning rooms untouched by the renovation itself still need a full dust-removal pass.
+
+### Whether It's a Single Visit or Two-Pass Clean
+
+Larger or heavily-dusted jobs sometimes need a "rough clean" pass (removing bulk debris and settled dust) followed by a "final clean" pass closer to move-in, once remaining construction activity (final touch-ups, trim work) has wrapped up. This adds calendar time even though the total labor hours are similar to a single comprehensive visit.
+
+## When to Schedule It
+
+Schedule post-construction cleaning **after all construction work is fully complete** — including final touch-ups, trim, and paint — not before. Cleaning too early means redoing work once remaining construction dust settles again. Most homeowners schedule the clean 1–3 days before move-in, giving enough buffer to address anything missed on the final walkthrough.
+
+## Can You Speed It Up?
+
+A multi-person crew cuts total time significantly versus a single cleaner working alone — for larger post-construction jobs, this is usually worth the typically modest cost difference, especially if you're on a tight move-in timeline. Ask your cleaning company whether they staff multi-person crews for post-construction jobs specifically.
+
+[Get a free estimate](/?service=post_construction) and ask about crew size and timeline for your project.
+    `,
+  },
+  {
+    slug: 'diy-vs-professional-post-construction-cleaning',
+    title: 'DIY vs. Professional Post-Construction Cleaning: What You\'re Actually Taking On',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
+    date: '2026-10-16',
+    readTime: '6 min',
+    excerpt: 'Post-construction cleanup looks like a bigger version of regular cleaning, but drywall dust, equipment needs, and sheer time requirements make it a harder DIY job than it looks. Here\'s the honest trade-off.',
+    content: `
+## It Looks Like Regular Cleaning, Scaled Up — It Isn't
+
+The instinct is to treat post-construction cleanup as "a really thorough regular clean." The reality is closer to a specialized job: fine drywall dust behaves differently than normal household dirt, standard vacuums aren't built to handle the volume, and the detail work (paint overspray removal, inside every cabinet, construction film on glass) takes real technique most homeowners haven't done before.
+
+## What DIY Actually Requires
+
+**Equipment you probably don't have.** A standard household vacuum will clog on drywall dust fast, and some aren't rated to handle fine particulate at all. Doing this properly requires a shop vac or HEPA-filtered vacuum — a real equipment cost if you don't already own one.
+
+**More time than you'd estimate.** A professional crew takes 2–5 hours for an average home; most homeowners doing this themselves for the first time, without the right equipment or technique, should expect significantly longer — often a full weekend for anything beyond a small touch-up.
+
+**Technique for things like paint overspray.** Removing dried paint overspray from glass without scratching it, or cleaning construction adhesive residue without damaging a finish, isn't intuitive — professional cleaners use specific techniques and products for exactly this.
+
+**A plan for where the dust goes.** Without proper technique (dusting top-down, HEPA filtration, controlled airflow), DIY cleaning can redistribute drywall dust rather than actually removing it — leaving it to resettle in rooms you already finished.
+
+## When DIY Genuinely Makes Sense
+
+- **A very light touch-up** — one room painted, no structural work — is realistic to handle yourself with basic supplies and a few hours
+- **You already own a shop vac or HEPA vacuum** from other home projects
+- **You're not on a tight move-in timeline** and can spread the work over several sessions
+
+## When Professional Cleaning Is Worth It
+
+- **Any full renovation or new construction** — the dust volume alone makes this a different scale of job
+- **You're on a move-in deadline** — professionals with the right equipment and a multi-person crew finish dramatically faster
+- **You want it done once, correctly** — redoing a missed spot after furniture is already moved in is far more disruptive than catching it before move-in
+
+## The Real Cost Comparison
+
+Professional post-construction cleaning for a typical 1,500–2,000 sq ft home runs **$344–$465** for a light scope, up to **$396–$605** for a full renovation/new-construction scope. Weigh that against: equipment cost if you don't already own a HEPA vacuum, the real hours involved (often a full weekend, not an afternoon), and the risk of needing to redo sections once dust resettles.
+
+[Get an exact estimate](/?service=post_construction) for your home size and renovation scope before deciding.
+    `,
+  },
+  {
+    slug: 'when-to-schedule-post-construction-cleaning',
+    title: 'When Should You Schedule Post-Construction Cleaning?',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
+    date: '2026-10-16',
+    readTime: '5 min',
+    excerpt: 'Schedule it too early and you\'ll redo it. Schedule it too late and you\'re moving into a dusty house. Here\'s the right order of operations.',
+    content: `
+## The Short Answer
+
+Schedule post-construction cleaning **after all construction work is completely finished** — including final paint touch-ups and trim work — and ideally **1–3 days before move-in**. Cleaning before construction fully wraps almost always means redoing sections once the final work kicks dust back up.
+
+## Why Timing Gets Messed Up So Often
+
+Construction timelines slip constantly, and "almost done" often means another week of trim work, touch-up paint, or punch-list items — each of which generates more dust. Homeowners who schedule cleaning based on the original contractor timeline (rather than confirmed actual completion) frequently end up paying for a clean that gets undone by the last few days of work.
+
+## The Right Order of Operations
+
+1. **All structural, electrical, plumbing, and drywall work complete**
+2. **All painting complete**, including touch-ups
+3. **Flooring installed and any flooring-related dust generation finished**
+4. **Final trim and fixture installation complete**
+5. **Then** — post-construction cleaning
+6. **Move-in**
+
+## Should You Do a "Rough Clean" During Construction?
+
+For longer projects, a rough clean partway through (removing bulk debris, sweeping up major dust accumulation) can make the space more workable for remaining trades and reduce how much settled dust the final clean has to tackle. This isn't a substitute for the final clean — it's a separate, earlier pass that makes the final clean faster and more effective, not a way to skip it.
+
+## How Much Buffer to Build In
+
+Don't schedule your post-construction clean for the exact day construction is "supposed to" finish. Build in a few days of buffer between the contractor's projected completion and your cleaning appointment — construction project timelines slip more often than not, and a cleaning crew showing up to a space that's not actually finished means either rescheduling or cleaning around work that's still happening (which produces a worse result and often costs more).
+
+## What If You're on a Tight Move-In Deadline?
+
+If your move-in date is fixed and can't move, communicate that clearly to both your contractor and your cleaning company. Some post-construction cleaning companies can offer expedited scheduling or a larger crew to compress the timeline — worth asking about directly rather than assuming it's not possible.
+
+[Get a free estimate](/?service=post_construction) and talk to us about timing around your project's completion date.
+    `,
+  },
+  {
+    slug: 'post-construction-cleaning-equipment-tools-guide',
+    title: 'The Equipment Professional Post-Construction Cleaners Use (And Why It Matters)',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
+    date: '2026-10-16',
+    readTime: '6 min',
+    excerpt: 'Standard cleaning equipment isn\'t built for construction dust. Here\'s what professional post-construction cleaners actually use, and why it makes a real difference in the result.',
+    content: `
+## Why Regular Cleaning Equipment Falls Short Here
+
+Fine drywall dust is small enough to clog a standard household vacuum's filter quickly and pass straight through a non-HEPA filter back into the air — meaning a regular vacuum can actually make airborne dust worse, not better, on a construction cleanup job. Professional post-construction cleaning relies on different equipment specifically because of this.
+
+## HEPA-Filtered Vacuums
+
+The single most important piece of equipment for this job. A HEPA (High-Efficiency Particulate Air) filter captures fine particulate — including drywall dust — that a standard vacuum filter lets straight through. This matters for air quality during and immediately after the clean, not just for picking up visible debris.
+
+## Shop Vacuums for Bulk Debris
+
+Before fine dusting, bulk construction debris (small offcuts, packaging, loose material) needs to be removed with a wet/dry shop vac rated for the volume — standard household vacuums aren't built for this kind of debris load.
+
+## Microfiber Cloths and Dusters, Top-Down
+
+Microfiber traps fine dust rather than just pushing it around the way a standard cloth or feather duster does. Professional post-construction cleaning works systematically top-down (ceiling fixtures, then walls, then surfaces, then floors last) so dust being removed from higher surfaces doesn't resettle on areas already cleaned.
+
+## Specialized Products for Paint and Adhesive Removal
+
+Dried paint overspray on glass or fixtures, and adhesive residue from protective film or tape, both require products formulated specifically to dissolve or lift that residue without damaging the underlying surface (especially glass, which scratches easily with the wrong technique).
+
+## Extension Dusters for High Surfaces
+
+Construction dust settles on ceiling fans, crown molding, and the tops of door frames and cabinets — areas a standard-length duster can't reach without a ladder for every single spot. Extension dusters let a crew cover high surfaces efficiently across a whole house.
+
+## Air Scrubbers (For Larger Jobs)
+
+On larger renovation or new-construction jobs, some professional crews use portable air scrubbers — units that actively filter airborne dust out of a room's air — running during and after the physical cleaning to pull out what's still suspended in the air, not just what's settled on surfaces.
+
+## Why This Matters for Your Decision
+
+This is a big part of why professional post-construction cleaning costs more than a standard clean — it's not just more hours of the same work, it's different, more specialized equipment doing a job regular cleaning tools genuinely aren't built for. If you're weighing [DIY against hiring a professional](/blog/diy-vs-professional-post-construction-cleaning), equipment access is one of the clearest dividing lines.
+
+[Get a free estimate](/?service=post_construction) from cleaners equipped for this specific job.
+    `,
+  },
+  {
+    slug: 'how-to-start-a-post-construction-cleaning-business',
+    title: 'How to Start a Post-Construction Cleaning Business',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
+    date: '2026-10-16',
+    readTime: '9 min',
+    excerpt: 'Post-construction cleanup pays 2.2–2.35x a standard house cleaning rate and connects you directly to contractors who generate repeat, high-volume work. Here\'s how to start.',
+    content: `
+## Why Post-Construction Cleanup Is a Strong Niche
+
+Post-construction cleaning commands a meaningfully higher rate than standard residential cleaning for the same square footage — roughly **2.18–2.35x** a comparable house cleaning base rate, reflecting the specialized equipment, extra time, and detail work construction debris and fine drywall dust actually require. It also connects you to a different client base than typical residential cleaning: general contractors, builders, and renovation companies who generate repeat, high-volume referral work if you deliver reliably.
+
+## What's Different About This Work
+
+- **It requires different equipment** — HEPA-filtered vacuums, shop vacs for bulk debris, and products specifically for paint overspray and adhesive removal. Standard residential cleaning supplies aren't enough.
+- **The physical job is more demanding** — more debris, more detail work (inside every cabinet, every window), and often larger properties than a typical residential clean.
+- **Timelines are driven by construction schedules, not client convenience** — contractors need the clean done in a specific window between "construction finished" and "move-in" or "final walkthrough," and that window can be unpredictable as project timelines shift.
+- **One relationship (a contractor or builder) generates many jobs**, unlike most residential clients who are a single recurring relationship at best.
+
+## Getting Your First Clients
+
+1. **Reach out directly to local general contractors and custom home builders.** They need this service for literally every project they complete — a reliable relationship with even one or two active contractors can fill your schedule.
+2. **Connect with real estate agents who handle new-construction or major-renovation listings.** They often need a trusted post-construction cleaner recommendation for clients.
+3. **Network with renovation and remodeling companies**, not just ground-up builders — kitchen/bath remodelers and whole-home renovation companies need this service just as often as new-construction builders.
+4. **Build a before/after photo portfolio specifically from construction cleanup jobs** — dusty, debris-filled "before" photos next to a spotless "after" are some of the most persuasive marketing material in this niche.
+5. **Offer a trial job at full rate to a contractor's current project**, not a discounted rate — a contractor choosing a cleaner for their next ten projects cares more about reliability and quality than shaving a few dollars off one invoice.
+
+## What to Charge
+
+Base pricing on the same sq-ft-tiered structure the market actually uses: a [light touch-up on a 1,500–2,000 sq ft home runs $344–$465, scaling up to $396–$605 for a full new-construction scope](/blog/post-construction-cleaning-cost-guide), with larger or smaller homes scaling proportionally. Price window cleaning, debris haul-away, and HVAC vent dust removal as separate add-ons — contractors managing multiple projects specifically compare add-on pricing when picking a vendor to standardize on.
+
+## Equipment You'll Need to Invest In
+
+Unlike standard residential cleaning, this niche requires real equipment investment upfront: at minimum a HEPA-filtered vacuum, a shop vac for bulk debris, extension dusters for high surfaces, and specialized paint-overspray/adhesive-removal products. Factor this into your pricing and your initial capital needs — undercharging because you're comparing yourself to standard house cleaning rates will leave you underwater on equipment costs.
+
+## Scheduling Around Construction Timelines
+
+Construction project timelines slip constantly, which means your scheduling needs more flexibility than standard residential cleaning — build buffer into how far out you confirm firm appointment windows, and communicate clearly with contractors about how much notice you need for a confirmed completion date.
+
+## Pricing Consistently as You Scale
+
+As you take on more contractor relationships and more crew members quoting jobs, consistent pricing matters just as much here as in any other service — a contractor comparing invoices across projects will notice if quotes vary without a clear reason. [Clean Estimator](/estimator) prices post-construction cleanup on this exact sq-ft-and-scope formula automatically, across your whole team.
+
+[Start your free 30-day trial →](/estimator)
+    `,
+  },
+  {
+    slug: 'how-to-price-post-construction-cleaning-jobs',
+    title: 'How to Price Post-Construction Cleaning Jobs (The Formula Cleaning Businesses Use)',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
+    date: '2026-10-16',
+    readTime: '7 min',
+    excerpt: 'Post-construction cleanup prices on square footage plus a scope multiplier — not a flat per-project rate. Here\'s the real formula, with worked numbers.',
+    content: `
+## Why a Flat Per-Project Rate Doesn't Work
+
+Quoting post-construction cleanup as a flat number per job ("$400 for the cleanup") ignores the two things that actually drive cost: the size of the space and how much dust/debris the specific scope of work generated. A light touch-up on a 3,000 sq ft home can cost less to clean than a full gut renovation on a 1,500 sq ft home. Pricing needs to reflect both variables, not just one guess per job.
+
+## The Formula
+
+### 1. Start With the Same Sq-Ft Base as House Cleaning
+
+Post-construction cleanup scales off the same square-footage base pricing structure as a standard house clean — it's the same underlying "bigger house, more surface area, more time" logic.
+
+### 2. Apply the Construction Multiplier
+
+Construction cleanup takes meaningfully longer per square foot than routine cleaning — dust in every crevice, paint overspray, protective film removal, detail work regular cleaning doesn't require. A multiplier in the **2.18–2.35x** range over the standard house-cleaning base rate reflects this extra time and specialized equipment.
+
+### 3. Adjust for Scope
+
+- **Light touch-up** (painting, flooring, one or two rooms): base multiplier, no further adjustment
+- **Moderate renovation** (multiple rooms, a kitchen or bath remodel): **+8–18%** over the light-scope price
+- **Full / new construction** (whole-home build or gut renovation): **+15–30%** over the light-scope price, reflecting dust and debris throughout the entire home rather than isolated rooms
+
+### 4. Add Line-Item Add-Ons
+
+- Window cleaning (paint overspray/construction film removal): $60–$90
+- Debris haul-away: $120–$200
+- HVAC vent/duct dust removal: $45–$70
+
+### 5. Apply a Minimum Charge
+
+Set a floor — commonly around $200 — so even a very small post-construction job covers your actual cost to bring the specialized equipment and crew out at all.
+
+## A Worked Example
+
+A 1,500–2,000 sq ft home, moderate renovation (kitchen and bath remodel), with debris haul-away:
+
+| Step | Calculation | Running Total |
+|---|---|---|
+| Sq-ft base (house cleaning rate) | ~$158 (midpoint) | $158 |
+| Construction multiplier (2.18–2.35x, midpoint ~2.27) | $158 × 2.27 | $358 |
+| Moderate scope adjustment (+13%, midpoint) | $358 × 1.13 | $405 |
+| Debris haul-away add-on | + $160 (midpoint) | $565 |
+| **Final estimate** | | **~$565** |
+
+## Full Pricing Reference by Size and Scope
+
+| Home Size | Light | Moderate | Full |
+|---|---|---|---|
+| Under 1,000 sq ft | $200–$270 | $212–$319 | $225–$351 |
+| 1,000–1,500 sq ft | $266–$357 | $287–$421 | $306–$464 |
+| 1,500–2,000 sq ft | $344–$465 | $372–$549 | $396–$605 |
+| 2,000–2,500 sq ft | $425–$576 | $459–$680 | $489–$749 |
+| 2,500–3,000 sq ft | $497–$663 | $537–$782 | $572–$862 |
+| Over 3,000 sq ft | $593–$794 | $640–$937 | $682–$1,032 |
+
+## Why Consistency Matters Here Specifically
+
+Contractors who hire you repeatedly, across multiple projects, will notice if your pricing logic isn't consistent project to project — eroding the trust that gets you their next referral. [Clean Estimator](/estimator) runs this exact sq-ft-and-scope formula automatically, across every estimator on your team, so every post-construction quote is consistent and defensible.
+
+[Start your free trial →](/estimator)
+    `,
+  },
+  {
+    slug: 'working-with-general-contractors-post-construction-cleaning',
+    title: 'How to Land Recurring Contracts with General Contractors for Post-Construction Cleanup',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
+    date: '2026-10-16',
+    readTime: '7 min',
+    excerpt: 'A single general contractor relationship can mean dozens of cleanup jobs a year. Here\'s how to pitch, price, and deliver in a way that earns repeat business.',
+    content: `
+## Why General Contractors Are Worth Pursuing Directly
+
+A homeowner doing a one-time renovation needs post-construction cleaning once. A general contractor needs it on every single project they complete — which, for an active builder, can mean dozens of jobs a year from one relationship. Winning a contractor's trust as their go-to cleanup vendor is one of the highest-leverage moves available in this niche.
+
+## What Contractors Actually Care About
+
+Unlike a homeowner who's primarily evaluating price and a good first impression, a contractor evaluating a cleanup vendor is thinking about:
+
+- **Reliability on their timeline, not yours.** Construction schedules shift constantly; a cleaner who can't adapt to a moved completion date becomes a liability on every project.
+- **Consistent quality across every job**, since their own reputation with the homeowner depends partly on how the house looks at final walkthrough.
+- **Clear, simple invoicing** they can pass through to their own client or absorb into their project costs without back-and-forth.
+- **Someone who understands the construction process**, not just cleaning — knowing not to show up before trim work is actually finished, for example.
+
+## How to Approach a Contractor
+
+1. **Introduce yourself directly, in person if possible**, at a job site near completion — contractors are far more responsive to a concrete, relevant pitch at the right moment than a cold call out of context.
+2. **Offer to do one job at your standard rate** to demonstrate quality and reliability before asking for an ongoing relationship.
+3. **Make scheduling easy** — a simple way for them to request a cleanup (text, a shared calendar link, whatever's lowest-friction for them) matters more than you'd expect; contractors are busy and will default to whoever's easiest to book.
+4. **Follow up after the first job** with before/after photos and a quick check-in — this reinforces quality and keeps you top of mind for their next project.
+
+## Pricing for a Contractor Relationship
+
+Contractors managing multiple simultaneous projects value predictable, consistent pricing they can factor into every project's budget — quote using the [real sq-ft-and-scope formula](/blog/how-to-price-post-construction-cleaning-jobs) rather than negotiating a new number every time. Some cleaning businesses offer a modest volume discount for contractors who commit to using them exclusively across their active projects — reasonable given the guaranteed recurring volume, as long as it doesn't undercut your actual cost to deliver.
+
+## Delivering Consistently Is the Real Differentiator
+
+Most contractors have been burned by an unreliable cleanup vendor before — a no-show before a client walkthrough, inconsistent quality, or a missed deadline that held up their own handoff. Simply being reliable, every single time, is often enough to become a contractor's default vendor, because the bar set by prior experience is frequently lower than you'd expect.
+
+## Scaling the Relationship
+
+Once a contractor trusts you on one project type, ask directly whether they'd want you as their standard vendor across all their projects — many contractors haven't formalized this and will say yes if asked, rather than continuing to shop around project by project.
+
+[Clean Estimator](/estimator) keeps your pricing consistent across every contractor relationship and every project, so your quotes stay defensible as this part of your business grows.
+
+[Start your free trial →](/estimator)
+    `,
+  },
+  {
+    slug: 'post-construction-cleaning-business-insurance-safety',
+    title: 'Insurance and Safety Requirements for a Post-Construction Cleaning Business',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
+    date: '2026-10-16',
+    readTime: '6 min',
+    excerpt: 'Construction sites carry real risks regular house cleaning doesn\'t — here\'s what insurance, safety equipment, and precautions a post-construction cleaning business actually needs.',
+    content: `
+## Why This Niche Has Different Requirements Than Standard Cleaning
+
+A construction or renovation site — even one that's structurally "finished" and ready for final cleanup — carries risks a furnished, occupied home doesn't: exposed fasteners, uneven surfaces, leftover materials, fine particulate dust, and sometimes still-active trades working nearby. A post-construction cleaning business needs to account for this, both for worker safety and for liability.
+
+## Insurance to Have in Place
+
+**General liability insurance** is standard for any cleaning business, but post-construction work specifically increases the importance of adequate coverage — the property itself often carries more value (new construction, major renovations) and the physical risks on-site are higher than a typical occupied home.
+
+**Workers' compensation**, if you have employees, matters more here than in standard residential cleaning given the higher physical risk profile of a construction site — trip hazards, exposed materials, and heavier physical labor (debris removal, extended reaching/ladder work for high-surface dusting).
+
+**Check whether your policy specifically covers construction-site work**, not just standard residential/commercial cleaning — some general cleaning business policies have exclusions or require an endorsement for work on active or recently-active construction sites. Confirm this explicitly with your insurance provider rather than assuming standard coverage applies.
+
+## Safety Equipment and Precautions
+
+- **N95 or better respiratory protection** for staff working around fine drywall dust, especially on larger jobs or new construction with heavy dust volume
+- **Safety glasses** when removing paint overspray or working near any remaining construction debris
+- **Work gloves** for handling debris and materials that may have exposed edges or fasteners
+- **Sturdy, closed-toe footwear** — a non-negotiable on any job site with potential debris on the floor
+- **Confirm the site is cleared of active hazards before your crew arrives** — exposed wiring, unsecured materials, or ongoing trade work should be resolved before cleaning begins, not worked around
+
+## Confirming the Site Is Ready
+
+Before sending a crew, confirm directly with the contractor or homeowner that all construction work is genuinely complete — not just "almost done." Arriving to a site where trades are still actively working exposes your crew to hazards you haven't planned for and wastes a trip if the space isn't actually ready for cleaning.
+
+## Contracts and Liability Clarity
+
+For contractor relationships especially, have clear terms in place about liability — who's responsible if a safety hazard on-site (not caused by your crew) leads to an injury, and what the expectation is if your crew arrives and the site isn't actually ready for cleaning. This is worth a conversation with an insurance professional or attorney familiar with contractor relationships in your state, not something to leave as an unwritten assumption.
+
+## Don't Let This Scare You Off the Niche
+
+None of this is a reason to avoid post-construction cleaning as a service line — it's simply a different risk profile than standard residential cleaning, and one that's manageable with the right insurance and basic safety precautions in place. The pricing premium this niche commands (roughly 2.2–2.35x a standard cleaning rate) reflects exactly this kind of added complexity.
+
+[Learn how to price post-construction jobs correctly](/blog/how-to-price-post-construction-cleaning-jobs), or [start your free trial of Clean Estimator](/estimator) to price this service consistently as you add it to your offerings.
+    `,
+  },
 ];
 
 export const CATEGORIES = [
