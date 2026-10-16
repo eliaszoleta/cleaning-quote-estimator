@@ -1081,7 +1081,7 @@ Restoration companies classify water damage by contamination level:
 
 **Category 3 (Black water)**: Sewage, flooding from rivers or storm surge, standing water that has begun to grow bacteria. Most expensive — requires full biohazard protocols.
 
-Expect Category 2 to cost **20–40% more** and Category 3 to cost **60–100% more** than Category 1 for the same square footage.
+Expect Category 2 to cost **35–50% more** and Category 3 to cost **85–110% more** than Category 1 for the same square footage.
 
 ## How Long the Water Sat Matters Enormously
 
@@ -2102,7 +2102,7 @@ Nevada runs about **10% above the national average** for house cleaning, and Las
 | 2,500–3,000 sq ft | $251–$310 |
 | Over 3,000 sq ft | $299–$372 |
 
-If you're renting rather than owning — and a huge share of the Las Vegas Valley does — a 2-bedroom apartment runs **$154–$193** per visit, in line with the size and turnover common in the Strip-adjacent and Henderson apartment corridors.
+If you're renting rather than owning — and a huge share of the Las Vegas Valley does — a 2-bedroom apartment runs **$162–$202** per visit, in line with the size and turnover common in the Strip-adjacent and Henderson apartment corridors.
 
 ## Why Las Vegas Runs Above the National Average
 
@@ -2246,7 +2246,7 @@ Restaurant and food-service cleaning runs $0.132–$0.163 per square foot per vi
     categoryLabel: 'Restoration',
     date: '2026-08-27',
     readTime: '6 min',
-    excerpt: 'Water damage restoration in Las Vegas costs $3.19–$8.15 per sq ft depending on contamination category — for a 500 sq ft area, that\'s $1,595–$4,076. Here\'s Las Vegas Valley pricing by water type, and why acting fast matters most in a desert climate.',
+    excerpt: 'Water damage restoration in Las Vegas costs $3.19–$9.01 per sq ft depending on contamination category — for a 500 sq ft area, that\'s $1,595–$4,505. Here\'s Las Vegas Valley pricing by water type, and why acting fast matters most in a desert climate.',
     content: `
 ## How Much Does Water Damage Restoration Cost in Las Vegas?
 
@@ -2255,10 +2255,10 @@ Nevada runs about 10% above the national average for water damage restoration, p
 | Water Category | Cost Per Sq Ft | Source |
 |---|---|---|
 | Clean Water (Category 1) | $3.19–$4.29 | Supply line or appliance leak — no contamination |
-| Gray Water (Category 2) | $4.05–$5.71 | Washing machine or dishwasher overflow |
-| Black Water (Category 3) | $5.42–$8.15 | Sewage or flooding — highest contamination risk |
+| Gray Water (Category 2) | $4.31–$6.44 | Washing machine or dishwasher overflow |
+| Black Water (Category 3) | $5.91–$9.01 | Sewage or flooding — highest contamination risk |
 
-For a 500 sq ft affected area — a common size for a burst pipe or appliance failure — that works out to **$1,595–$2,145** for clean water, **$2,024–$2,855** for gray water, and **$2,712–$4,076** for black water, which requires the extra containment and disinfection protocols contaminated water demands.
+For a 500 sq ft affected area — a common size for a burst pipe or appliance failure — that works out to **$1,595–$2,145** for clean water, **$2,155–$3,220** for gray water, and **$2,955–$4,505** for black water, which requires the extra containment and disinfection protocols contaminated water demands.
 
 ## Why Las Vegas Homes Aren't as Safe from Water Damage as You'd Think
 
@@ -2275,7 +2275,7 @@ Sudden water damage from a burst pipe or failed appliance is typically covered b
 ## FAQ
 
 **How much does water damage restoration cost in Las Vegas?**
-For a 500 sq ft area, clean water extraction and drying costs $1,595–$2,145. Gray water costs $2,024–$2,855, and black water (sewage or flooding) costs $2,712–$4,076.
+For a 500 sq ft area, clean water extraction and drying costs $1,595–$2,145. Gray water costs $2,155–$3,220, and black water (sewage or flooding) costs $2,955–$4,505.
 
 **Does Las Vegas really get enough water damage to worry about?**
 Yes — monsoon season (July-September) brings sudden, heavy rain that overwhelms roofs and drainage, and indoor plumbing failures happen year-round regardless of the dry climate outside.
@@ -2341,7 +2341,7 @@ Yes — commercial properties run 30–50% more than residential due to larger s
     categoryLabel: 'Restoration',
     date: '2026-08-27',
     readTime: '6 min',
-    excerpt: 'Flood damage cleanup in Las Vegas is typically priced as Category 3 (black water) restoration — $5.42–$8.15 per sq ft, or $2,712–$4,076 for a 500 sq ft area. Here\'s what monsoon flash flooding actually costs to clean up, and how insurance handles it.',
+    excerpt: 'Flood damage cleanup in Las Vegas is typically priced as Category 3 (black water) restoration — $5.91–$9.01 per sq ft, or $2,955–$4,505 for a 500 sq ft area. Here\'s what monsoon flash flooding actually costs to clean up, and how insurance handles it.',
     content: `
 ## Flooding Is a Real Las Vegas Valley Risk
 
@@ -2353,9 +2353,9 @@ Floodwater is classified as Category 3 (black water) contamination, since it typ
 
 | Scope | Cost Per Sq Ft |
 |---|---|
-| Black water extraction and drying (flooding) | $5.42–$8.15 |
+| Black water extraction and drying (flooding) | $5.91–$9.01 |
 
-For a 500 sq ft affected area, that's **$2,712–$4,076** for extraction and drying alone — not including any structural repairs, drywall replacement, or flooring that floodwater contamination requires removing rather than just drying.
+For a 500 sq ft affected area, that's **$2,955–$4,505** for extraction and drying alone — not including any structural repairs, drywall replacement, or flooring that floodwater contamination requires removing rather than just drying.
 
 ## Why Flood Cleanup Costs More Than a Clean Water Leak
 
@@ -2368,7 +2368,7 @@ This is the part that catches people off guard: standard homeowner's insurance d
 ## FAQ
 
 **How much does flood damage cleanup cost in Las Vegas?**
-For a 500 sq ft affected area, flood damage cleanup (Category 3 black water) costs $2,712–$4,076 for extraction and drying, before any structural repairs.
+For a 500 sq ft affected area, flood damage cleanup (Category 3 black water) costs $2,955–$4,505 for extraction and drying, before any structural repairs.
 
 **Does Las Vegas actually flood?**
 Yes — the desert terrain doesn't absorb heavy monsoon rain well, and the Las Vegas Valley has flash flooding significant enough to have its own dedicated flood control district.
@@ -3555,7 +3555,7 @@ Yes — a business with strong retention needs fewer new clients each month just
     categoryLabel: 'Apartment Cleaning',
     date: '2026-09-04',
     readTime: '6 min',
-    excerpt: 'Apartment cleaning costs $85–$258 per visit depending on unit size, from studios to 4+ bedrooms. Here\'s real 2026 pricing by unit size, plus what changes the cost.',
+    excerpt: 'Apartment cleaning costs $89–$271 per visit depending on unit size, from studios to 4+ bedrooms. Here\'s real 2026 pricing by unit size, plus what changes the cost.',
     content: `
 ## Apartment Cleaning Cost by Unit Size
 
@@ -3563,13 +3563,13 @@ Apartment cleaning is typically priced by unit size rather than square footage, 
 
 | Unit Size | Cost Per Visit |
 |---|---|
-| Studio | $85–$108 |
-| 1 Bedroom | $107–$133 |
-| 2 Bedroom (Most Common) | $140–$175 |
-| 3 Bedroom | $175–$215 |
-| 4+ Bedroom | $210–$258 |
+| Studio | $89–$113 |
+| 1 Bedroom | $112–$140 |
+| 2 Bedroom (Most Common) | $147–$184 |
+| 3 Bedroom | $184–$226 |
+| 4+ Bedroom | $221–$271 |
 
-A 2-bedroom apartment — the most common size nationally — runs **$140–$175** for a standard clean.
+A 2-bedroom apartment — the most common size nationally — runs **$147–$184** for a standard clean.
 
 ## What Changes the Price
 
@@ -3585,7 +3585,7 @@ Apartment cleaning tends to run a bit cheaper per square foot than a comparable 
 ## FAQ
 
 **How much does it cost to clean a 2-bedroom apartment?**
-$140–$175 per visit for a standard clean — the most common apartment size and price point.
+$147–$184 per visit for a standard clean — the most common apartment size and price point.
 
 **Is it cheaper to clean a vacant apartment?**
 Yes, vacant and unfurnished units typically cost 10–15% less since there's no furniture to clean around.
@@ -3610,7 +3610,7 @@ Generally yes, per comparable size — apartments are more compact, so cleaners 
     content: `
 ## Why Move-Out Cleaning Costs More
 
-A standard clean maintains a space you already live in. A move-out clean has to bring every surface back to a "move-in ready" standard for the next tenant — inside every cabinet, appliance, closet, and fixture — which is why it typically costs **88–105% more** than routine service. For a 2-bedroom apartment (normally $140–$175), expect **$260–$360** for a full move-out clean.
+A standard clean maintains a space you already live in. A move-out clean has to bring every surface back to a "move-in ready" standard for the next tenant — inside every cabinet, appliance, closet, and fixture — which is why it typically costs **88–105% more** than routine service. For a 2-bedroom apartment (normally $147–$184), expect **$276–$377** for a full move-out clean.
 
 ## The Complete Move-Out Cleaning Checklist
 
@@ -3652,7 +3652,7 @@ Doing it yourself saves the cost of the clean itself but takes real time — rea
 ## FAQ
 
 **How much does move-out apartment cleaning cost?**
-88–105% more than a standard clean. A 2-bedroom apartment runs roughly $260–$360 for a full move-out clean, compared to $140–$175 for routine service.
+88–105% more than a standard clean. A 2-bedroom apartment runs roughly $276–$377 for a full move-out clean, compared to $147–$184 for routine service.
 
 **What's included in a move-out cleaning that isn't in a regular clean?**
 Inside cabinets, inside appliances (fridge, oven, microwave), closets, window tracks, and light fixtures — areas a routine clean typically skips since they don't need attention every visit.
@@ -5045,7 +5045,7 @@ Asks a few questions (service, size, location) and shows a real price range imme
 
 If your site only has a contact form today, adding an instant quote calculator is usually the single highest-impact change you can make — it doesn't replace the form, it upgrades it, since a good calculator collects the same contact details a form would, just with a real price shown first. Booking widgets and live chat are worth layering in later, once you're consistently getting quote requests and need to help visitors take the next step faster.
 
-[Clean Estimator](/estimator) covers all 10 major cleaning service types with one embeddable calculator, branded to your business, with lead alerts and a dashboard built in — a 30-day free trial to start.
+[Clean Estimator](/estimator) covers all 12 major cleaning service types with one embeddable calculator, branded to your business, with lead alerts and a dashboard built in — a 30-day free trial to start.
 
 ## FAQ
 
@@ -5099,7 +5099,7 @@ Getting an estimate calculator running on your site doesn't require a developer:
 - Copy the embed code into your website
 - Leads start flowing into your dashboard (and your inbox) automatically
 
-[Clean Estimator](/estimator) covers house cleaning, apartments, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, and water damage — all 10 in one calculator, with a 30-day free trial.
+[Clean Estimator](/estimator) covers house cleaning, apartments, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, water damage, airbnb/vacation rental, and post-construction — all 12 in one calculator, with a 30-day free trial.
 
 ## FAQ
 
@@ -6887,7 +6887,7 @@ A scaled-down apartment cleaning kit (see our [full equipment guide](/blog/apart
 
 ## Professional Apartment Cleaning Cost
 
-For comparison, professional apartment cleaning runs **$85–$258 per visit** depending on unit size — a studio on the low end, a 4+ bedroom unit on the high end, with a 2-bedroom (the most common size) averaging **$140–$175**.
+For comparison, professional apartment cleaning runs **$89–$271 per visit** depending on unit size — a studio on the low end, a 4+ bedroom unit on the high end, with a 2-bedroom (the most common size) averaging **$147–$184**.
 
 ## The Real Comparison
 
@@ -8059,8 +8059,8 @@ Priced per square foot by water category, for a 500 sq ft affected area:
 | Category | Cost |
 |---|---|
 | Clean water | $1,450–$1,950 |
-| Gray water | $1,840–$2,595 |
-| Black water | $2,465–$3,705 |
+| Gray water | $1,960–$2,925 |
+| Black water | $2,685–$4,095 |
 
 ## Why DIY Drying Often Isn't Actually Enough
 
@@ -8167,11 +8167,11 @@ Run this by hand for every job, every service type, every estimator on your team
 
 - **It doesn't scale past one person.** The formula only stays consistent if everyone on your team applies it the same way, every time — which rarely survives contact with a busy schedule and multiple estimators.
 - **Location data goes stale.** Cost-of-living and local market rates shift; a spreadsheet built a year ago is quietly wrong today.
-- **Ten service types means ten formulas.** Carpet, upholstery, mold remediation, and water damage all price completely differently — maintaining all of them by hand is realistic for one service, not ten.
+- **Twelve service types means twelve formulas.** Carpet, upholstery, mold remediation, and water damage all price completely differently — maintaining all of them by hand is realistic for one service, not twelve.
 
 ## The Faster Way: A Calculator Built on This Exact Formula
 
-[Clean Estimator](/estimator) runs this formula — base rate, condition, ZIP-code-accurate location multiplier, add-ons, and your own minimum charge — automatically, across all 10 service types, so every estimator on your team gets the same number for the same job. You set your own markup per service; the calculator handles the rest and gives you the number on screen in seconds, not a public price your customer sees before you've talked to them.
+[Clean Estimator](/estimator) runs this formula — base rate, condition, ZIP-code-accurate location multiplier, add-ons, and your own minimum charge — automatically, across all 12 service types, so every estimator on your team gets the same number for the same job. You set your own markup per service; the calculator handles the rest and gives you the number on screen in seconds, not a public price your customer sees before you've talked to them.
 
 ## FAQ
 
@@ -8182,7 +8182,7 @@ Use a consistent formula — base rate by service type, adjusted for condition, 
 Usually because the pricing logic lives in each estimator's head instead of a shared formula — different people weigh condition, size, and add-ons differently without realizing it.
 
 **Is there a free way to calculate cleaning estimates?**
-[Clean Estimator](/estimator) offers a 30-day free trial with unlimited estimates across all 10 service types, so you can test the formula against your own jobs before committing.
+[Clean Estimator](/estimator) offers a 30-day free trial with unlimited estimates across all 12 service types, so you can test the formula against your own jobs before committing.
 
 **Do I need to already know my pricing to use an estimate calculator?**
 No — you set your own markup and minimum charges on top of researched, location-adjusted base pricing, so you're not starting from a blank spreadsheet.
@@ -8201,7 +8201,7 @@ No — you set your own markup and minimum charges on top of researched, locatio
     content: `
 ## The Short Answer
 
-For a cleaning business pricing jobs across multiple service types, locations, or estimators, a dedicated cleaning estimate calculator is worth it once gut-feel pricing or a spreadsheet starts producing inconsistent quotes. [Clean Estimator](/estimator) is built specifically for this: location-accurate pricing across all 10 cleaning service types, your own markup on top to match your margins, and an instant on-screen number for $25/month with a 30-day free trial.
+For a cleaning business pricing jobs across multiple service types, locations, or estimators, a dedicated cleaning estimate calculator is worth it once gut-feel pricing or a spreadsheet starts producing inconsistent quotes. [Clean Estimator](/estimator) is built specifically for this: location-accurate pricing across all 12 cleaning service types, your own markup on top to match your margins, and an instant on-screen number for $25/month with a 30-day free trial.
 
 ## How Cleaning Businesses Actually Price Jobs
 
@@ -8239,7 +8239,7 @@ Some estimate tools are built primarily as a public, embeddable widget that show
 | Email a result to a coworker | One click sends a specific estimate to a teammate's inbox, no shared logins |
 | ZIP-code accurate pricing | State-specific pricing multipliers so quotes reflect your actual local market |
 | Per-service markup control | A separate multiplier on top of the location-adjusted base price, so you can match your own costs and margin — applies everywhere, not just the public widget |
-| All 10 service calculators | House cleaning, apartments, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, water damage |
+| All 12 service calculators | House cleaning, apartments, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, water damage, airbnb/vacation rental, post-construction |
 | Calculator widget for your website | Included on the same plan if you also want public lead capture — no separate upgrade |
 | API access | Sync estimates with your CRM |
 
@@ -8266,7 +8266,7 @@ Clean Estimator is $25/month flat, with unlimited estimates and no per-lead char
 Yes — Clean Estimator runs internally by default, so you get the instant number on your own screen and decide whether or not to ever show pricing publicly. The public calculator widget is available on the same plan but is optional, not required.
 
 **Does one calculator work for all cleaning service types, or do I need separate tools?**
-A calculator built specifically for cleaning businesses should cover your full service mix in one tool — Clean Estimator covers all 10 common cleaning service types (including carpet, upholstery, and restoration services) rather than just standard house cleaning.
+A calculator built specifically for cleaning businesses should cover your full service mix in one tool — Clean Estimator covers all 12 common cleaning service types (including carpet, upholstery, and restoration services) rather than just standard house cleaning.
 
 **Is there a free trial for cleaning estimate software?**
 Yes — Clean Estimator offers a 30-day free trial with unlimited estimates before you're charged anything.
