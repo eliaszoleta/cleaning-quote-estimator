@@ -118,46 +118,6 @@ function buildKeyFactors(keyFactors) {
   return `<p style="font-size:13px;color:#666666;margin:12px 0 0;">${line}</p>`;
 }
 
-// Mirrors ResultsScreen's own urgency-colored "Important Notice"/"Heads Up"
-// box -- every service's calculateCleaning() result carries a disclaimer +
-// urgencyLevel (water damage, mold, dryer vents, etc. set a real one;
-// everything else is null/'normal' and this renders nothing), so wiring it
-// in here covers every service that has or will ever get one, not just
-// today's set. A real safety/insurance/scope notice like this is the kind
-// of color-accented box a transactional email can carry without risking
-// the Promotions-tab problem noted at the top of this file -- that's about
-// marketing-template chrome (gradients, big CTA blocks), not a plain
-// bordered alert box with specific, actionable text.
-function buildDisclaimerBox(disclaimer, urgencyLevel) {
-  if (!disclaimer) return '';
-  const critical = urgencyLevel === 'critical';
-  const bg = critical ? '#fef2f2' : '#fffbeb';
-  const border = critical ? '#fecaca' : '#fde68a';
-  const titleColor = critical ? '#dc2626' : '#d97706';
-  const textColor = critical ? '#7f1d1d' : '#78350f';
-  const title = critical ? 'Important Notice' : 'Heads Up';
-  return `
-    <div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:13px 16px;margin:0 0 20px;">
-      <div style="font-weight:700;color:${titleColor};margin:0 0 4px;font-size:13px;">⚠ ${title}</div>
-      <p style="font-size:13px;color:${textColor};line-height:1.6;margin:0;">${disclaimer}</p>
-    </div>`;
-}
-
-// Mirrors ResultsScreen's own blue "{state} market" note -- always the same
-// fixed blue regardless of the company's brand color, same as on screen
-// (that note is about the state's pricing data, not company branding).
-function buildStateMarketNote(stateName, stateMultiplier) {
-  if (!stateName || stateMultiplier == null) return '';
-  let note;
-  if (stateMultiplier > 1.05) note = `Prices in ${stateName} run ${Math.round((stateMultiplier - 1) * 100)}% above the national average due to higher cost of living and labor.`;
-  else if (stateMultiplier < 0.95) note = `Prices in ${stateName} run ${Math.round((1 - stateMultiplier) * 100)}% below the national average, making this a lower-cost market.`;
-  else note = `${stateName} is close to the national average for cleaning service costs.`;
-  return `
-    <div style="background:#eff6ff;border-radius:10px;padding:13px 16px;margin:0 0 20px;font-size:13px;color:#1d4ed8;line-height:1.6;">
-      <strong>${stateName} market:</strong> ${note}
-    </div>`;
-}
-
 // Same match shown on-screen (PartnerCard.js) when the visitor's location
 // matches an active partner -- passed through from the frontend's own
 // match so the email never disagrees with what the results page showed.
@@ -212,9 +172,8 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
 // with bulk/marketing mail, on top of the styling itself.
 function buildText({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
-    totalLow, totalHigh, stateName, city, stateMultiplier, unit,
+    totalLow, totalHigh, stateName, city, unit,
     adjustments = [], recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
-    disclaimer, urgencyLevel,
   } = result;
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
 
@@ -242,27 +201,11 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     lines.push(`Recurring: ${fmtMoney(recurringMonthlyLow)} - ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` (save ~${fmtMoney(recurringAnnualSavings)}/year)` : ''}`);
   }
 
-  // Same urgency-flagged disclaimer the on-screen "Important Notice"/"Heads
-  // Up" box shows (water damage, mold, dryer vents, etc.) -- see
-  // buildDisclaimerBox's own comment on why this belongs in the email too.
-  if (disclaimer) {
-    lines.push('', urgencyLevel === 'critical' ? 'IMPORTANT NOTICE:' : 'HEADS UP:', disclaimer);
-  }
-
   lines.push('', 'Price breakdown:');
   adjustments.filter(a => !a.separate).forEach(a => {
     lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
   });
   lines.push(`  Estimated total: ${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)}`);
-
-  // Same state-pricing note ResultsScreen's blue "{state} market" box shows.
-  if (stateName && stateMultiplier != null) {
-    let marketNote;
-    if (stateMultiplier > 1.05) marketNote = `Prices in ${stateName} run ${Math.round((stateMultiplier - 1) * 100)}% above the national average due to higher cost of living and labor.`;
-    else if (stateMultiplier < 0.95) marketNote = `Prices in ${stateName} run ${Math.round((1 - stateMultiplier) * 100)}% below the national average, making this a lower-cost market.`;
-    else marketNote = `${stateName} is close to the national average for cleaning service costs.`;
-    lines.push('', `${stateName} market: ${marketNote}`);
-  }
 
   if (partner) {
     lines.push('', 'Recommended cleaner near you:', partner.business_name);
@@ -289,8 +232,8 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
 
 function buildHtml({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
-    totalLow, totalHigh, stateName, city, stateMultiplier, unit,
-    adjustments = [], keyFactors = [], disclaimer, urgencyLevel,
+    totalLow, totalHigh, stateName, city, unit,
+    adjustments = [], keyFactors = [],
     recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
   } = result;
   // Same city-resolution ResultsScreen.js's eyebrow badge now shows --
@@ -346,10 +289,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span></p>
   ${recurringLine}
 
-  <div style="margin-top:24px;">
-    ${buildDisclaimerBox(disclaimer, urgencyLevel)}
-    <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 8px;">Price breakdown</p>
-  </div>
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 8px;">Price breakdown</p>
   <div style="border:1px solid #e0e0e0;border-radius:10px;overflow:hidden;">
     <table style="width:100%;border-collapse:collapse;">
       ${buildEstimateBreakdownRows(adjustments)}
@@ -360,8 +300,6 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
     </table>
   </div>
   ${buildKeyFactors(keyFactors)}
-
-  <div style="margin-top:20px;">${buildStateMarketNote(stateName, stateMultiplier)}</div>
 
   ${bottomHtml}
 
