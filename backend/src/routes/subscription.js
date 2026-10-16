@@ -260,8 +260,8 @@ async function handleStripeEvent(event) {
             const statusLine = subObj?.status === 'trialing'
               ? undefined // use sendCompanyWelcomeEmail's default "trial started" line
               : wasCanceled
-              ? "Welcome back! Your subscription has been reactivated, and your card was charged $25 for this month."
-              : "Your account is now active — your card was charged $25 for your first month.";
+              ? "Welcome back! Your subscription has been reactivated and your account is active again."
+              : "Your account is now active and ready to use.";
             const sent = await sendCompanyWelcomeEmail({ to: email, companyId, statusLine });
             if (sent) {
               const fresh = (await getCompanyConfig(companyId)) || config;
