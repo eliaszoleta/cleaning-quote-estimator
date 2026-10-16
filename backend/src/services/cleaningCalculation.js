@@ -16,7 +16,7 @@ const {
   DAY_PORTER_DAILY_RATE,
   COMMERCIAL_RESTROOM_PER_VISIT_RATE,
   COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS,
-  COMMERCIAL_ONE_TIME_RESTROOM_RATE,
+  COMMERCIAL_ONE_TIME_RESTROOM_BASE_RATE,
   COMMERCIAL_ONE_TIME_MINIMUM_CHARGE,
   CARPET_PRICE_PER_ROOM,
   CARPET_PRICE_PER_SQFT,
@@ -493,8 +493,8 @@ function calculateCommercialOneTime(details, stateMultiplier, companyConfig) {
   const sqftTotalLow = Math.round(sqft * sqftRate.low * conditionMult.low * stateMultiplier * markup);
   const sqftTotalHigh = Math.round(sqft * sqftRate.high * conditionMult.high * stateMultiplier * markup);
 
-  const restroomTotalLow = Math.round(restrooms * COMMERCIAL_ONE_TIME_RESTROOM_RATE.low * stateMultiplier * markup);
-  const restroomTotalHigh = Math.round(restrooms * COMMERCIAL_ONE_TIME_RESTROOM_RATE.high * stateMultiplier * markup);
+  const restroomTotalLow = Math.round(restrooms * COMMERCIAL_ONE_TIME_RESTROOM_BASE_RATE.low * conditionMult.low * stateMultiplier * markup);
+  const restroomTotalHigh = Math.round(restrooms * COMMERCIAL_ONE_TIME_RESTROOM_BASE_RATE.high * conditionMult.high * stateMultiplier * markup);
 
   const adjustments = [
     { label: `${labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType)} @ ${sqft.toLocaleString()} sq ft (${labelFor(COMMERCIAL_ONE_TIME_CONDITION_LABELS, condition)})`, low: sqftTotalLow, high: sqftTotalHigh },

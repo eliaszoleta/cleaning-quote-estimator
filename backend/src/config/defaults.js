@@ -277,10 +277,16 @@ const HOME_EXTRAS = {
 // Per-bed laundry (wash, dry, remake) -- replaces the old flat HOME_EXTRAS
 // 'laundry' line above, which charged the same amount whether a customer
 // needed 1 bed's linens done or 5 (a real request: "laundry for 4 beds" on
-// a 5-bedroom home, only some of which need it). Calibrated so a typical
-// 2-3 bed selection lands close to the old flat $34-44 line it replaces,
-// scaling proportionally beyond that instead of staying flat.
-const LAUNDRY_PER_BED_RATE = { low: 14, high: 18 };
+// a 5-bedroom home, only some of which need it).
+// Originally estimated at $14-18/bed (back-calculated to roughly match the
+// old flat $34-44 line at 2-3 beds, not independently sourced) -- re-
+// researched Nov 2026 against real per-bed bed-linen add-on pricing
+// (Jobber $10-40, HomeGuide ~$10, Molly Maid $5-10, Pro Housekeepers
+// $20-35 for full strip-and-make, FieldCamp $4-10 for a quick swap).
+// Sources cluster around $10-20/bed for a full wash/dry/remake, not just a
+// linen swap, so set directly to that cluster rather than the earlier
+// back-calculated figure.
+const LAUNDRY_PER_BED_RATE = { low: 12, high: 20 };
 
 // Home condition multipliers
 const CONDITION_MULTIPLIERS = {
@@ -392,13 +398,25 @@ const COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS = {
   severe:   { low: 2.5, high: 3.3 }, // vacant 1+ years / heavily neglected -- grease, buildup, pest signs
 };
 
-// Restrooms on a one-time job are priced flat per restroom, not per visit --
-// a restroom that's sat unused and uncleaned for a long stretch needs a full
+// Restrooms on a one-time job are priced per restroom, scaled by the SAME
+// condition multiplier as the sq-ft portion above (not per visit -- a
+// restroom that's sat unused and uncleaned for a long stretch needs a full
 // descale/degrease/disinfect pass in one visit, not the routine per-visit
-// touch-up COMMERCIAL_RESTROOM_PER_VISIT_RATE represents. Estimated/interpolated
-// from that per-visit rate at a "many visits' worth of neglect in one pass"
-// multiple -- not independently sourced.
-const COMMERCIAL_ONE_TIME_RESTROOM_RATE = { low: 25, high: 40 };
+// touch-up COMMERCIAL_RESTROOM_PER_VISIT_RATE represents).
+// Originally estimated at a flat $25-40 (interpolated from the per-visit
+// rate, not sourced) -- re-researched Nov 2026 and found that was too low:
+// routine restroom cleaning runs $20-60/restroom (CleanQuote, other
+// guides), but every tier of this job is already a deep clean by
+// definition, and a real DEEP clean runs far above routine -- LatestCost's
+// 2026 guide gives $100 (low) / $200 (mid) / $400 (high) per restroom, and
+// Housecall Pro notes one-time/specialty restroom jobs price "toward the
+// higher end or above" routine rates. This base, run through the same
+// condition multiplier as the sq-ft line, lands light-tier restrooms near
+// Housecall's one-time/specialty guidance (~$53-81) and moderate/severe
+// tiers inside LatestCost's deep-clean range without reaching its $400
+// ceiling, which reads as an outlier/biohazard-level figure beyond this
+// service's normal scope.
+const COMMERCIAL_ONE_TIME_RESTROOM_BASE_RATE = { low: 35, high: 45 };
 
 // The $200/mo recurring floor above exists to cover showing up for a small
 // monthly contract -- it's not a sane floor for a multi-day, multi-person
@@ -799,7 +817,7 @@ module.exports = {
   DAY_PORTER_DAILY_RATE,
   COMMERCIAL_RESTROOM_PER_VISIT_RATE,
   COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS,
-  COMMERCIAL_ONE_TIME_RESTROOM_RATE,
+  COMMERCIAL_ONE_TIME_RESTROOM_BASE_RATE,
   COMMERCIAL_ONE_TIME_MINIMUM_CHARGE,
   CARPET_PRICE_PER_ROOM,
   CARPET_PRICE_PER_SQFT,
