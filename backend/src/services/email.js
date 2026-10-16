@@ -79,7 +79,11 @@ function fmtAdjustment(adj) {
 
 // Mirrors ResultsScreen's own "Price breakdown" table -- same rows,
 // same total, so the email matches what was actually shown on-screen
-// instead of just repeating the headline range.
+// instead of just repeating the headline range. Used by the internal
+// lead-notification emails (sendPartnerLeadEmail, sendCompanyLeadEmail),
+// which keep their plain, undecorated style -- see buildEstimateBreakdownRows
+// below for the more visually-styled version used in the actual
+// customer-facing estimate email.
 function buildBreakdownRows(adjustments) {
   return adjustments
     .filter(a => !a.separate)
@@ -87,6 +91,23 @@ function buildBreakdownRows(adjustments) {
       <tr>
         <td style="padding:5px 0;color:#333333;font-size:14px;text-transform:capitalize;">${a.label}</td>
         <td style="padding:5px 0;text-align:right;font-size:14px;color:#333333;white-space:nowrap;">${fmtAdjustment(a)}</td>
+      </tr>`)
+    .join('');
+}
+
+// Same rows as buildBreakdownRows, but zebra-striped with dividers between
+// rows -- the bordered-card look ResultsScreen's own "Price breakdown"
+// table has on screen. Only used in buildHtml (sendEstimateEmail, the
+// email actually handed to the person who got the estimate) -- the
+// internal lead-notification templates above intentionally keep the
+// plainer buildBreakdownRows look.
+function buildEstimateBreakdownRows(adjustments) {
+  const rows = adjustments.filter(a => !a.separate);
+  return rows
+    .map((a, i) => `
+      <tr style="background:${i % 2 === 0 ? '#ffffff' : '#fafafa'};">
+        <td style="padding:10px 12px;color:#333333;font-size:13.5px;text-transform:capitalize;${i < rows.length - 1 ? 'border-bottom:1px solid #e0e0e0;' : ''}">${a.label}</td>
+        <td style="padding:10px 12px;text-align:right;font-size:13.5px;color:#333333;white-space:nowrap;${i < rows.length - 1 ? 'border-bottom:1px solid #e0e0e0;' : ''}">${fmtAdjustment(a)}</td>
       </tr>`)
     .join('');
 }
@@ -218,6 +239,11 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
   const brandName = companyConfig?.companyName || 'Clean Estimator';
   const firstName = (name || '').trim().split(' ')[0] || 'there';
+  // Same default ResultsScreen.js falls back to when a company hasn't set
+  // their own brand color -- so an email from the main cleanestimator.com
+  // site (no companyConfig) still gets the same blue accent the on-screen
+  // results page uses, not an uncolored default.
+  const primaryColor = companyConfig?.primaryColor || '#2563eb';
 
   // Same "Email to Coworker" case as buildText's clientName line above --
   // shown as its own standout line rather than folded into the greeting,
@@ -226,8 +252,12 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
     ? `<p style="font-size:13px;color:#666666;margin:0 0 16px;">Client: <strong style="color:#111111;">${clientName}</strong></p>`
     : '';
 
+  // Tinted pill (not a full-bleed color block) echoing the on-screen
+  // "Recurring" badge -- color accent without the solid gradient banner
+  // that's the actual thing known to push a transactional email into
+  // Gmail's Promotions tab (see the file-top comment).
   const recurringLine = (recurringMonthlyLow && unit !== 'per_month')
-    ? `<p style="font-size:13px;color:#666666;margin:4px 0 0;">Recurring: ${fmtMoney(recurringMonthlyLow)} – ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` · Save ~${fmtMoney(recurringAnnualSavings)}/year` : ''}</p>`
+    ? `<p style="margin:14px 0 0;"><span style="display:inline-block;background:${primaryColor}17;color:${primaryColor};padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:700;">Recurring: ${fmtMoney(recurringMonthlyLow)} – ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` · Save ~${fmtMoney(recurringAnnualSavings)}/year` : ''}</span></p>`
     : '';
 
   const bottomHtml = partner
@@ -252,17 +282,19 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${stateName ? ` for ${stateName}` : ''}:</p>
 
-  <p style="font-size:24px;font-weight:700;margin:10px 0 0;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span></p>
+  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span></p>
   ${recurringLine}
 
-  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Price breakdown</p>
-  <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;">
-    ${buildBreakdownRows(adjustments)}
-    <tr>
-      <td style="padding:8px 0 0;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
-      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)}</td>
-    </tr>
-  </table>
+  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 8px;">Price breakdown</p>
+  <div style="border:1px solid #e0e0e0;border-radius:10px;overflow:hidden;">
+    <table style="width:100%;border-collapse:collapse;">
+      ${buildEstimateBreakdownRows(adjustments)}
+      <tr style="background:${primaryColor}0d;">
+        <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
+        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)}</td>
+      </tr>
+    </table>
+  </div>
   ${buildKeyFactors(keyFactors)}
 
   ${bottomHtml}
