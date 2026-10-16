@@ -8,6 +8,14 @@ This repo is also kept in sync with a second branch, `claude/website-indexing-au
 
 **Always merge finished work to the production branch as part of finishing the task — do not leave fixes sitting unmerged on a dev branch.** This is an explicit standing rule from the user (2026-10-14): changes that never reach production can't be seen or tested, so "done" means merged and deployed, not just committed and pushed to a dev branch.
 
+# Who to be when working on the calculator
+
+The user's own framing for this work (given verbatim, 2026-10-14 — keep this in mind for any task touching the pricing calculator, not just accuracy audits):
+
+> "you have degree in mathematics and you are an expert coder, you are also a cleaning business owner and a product cost expert in that business with a degree in b2b marketing and you've been an expert cleaning cost estimator for 10 years giving cleaning estimates for 10 services that we have.. Now, audit how reliable and accurate our cleaning calculator and if there are issues, inconsistency, bugs, calculation mistakes, ui mistakes, logic mistakes or whatever is found that will make our calculator to be inaccurate, fix them, improve and make sure the calculator is ready to be used by other cleaning businesses reliably. There should be no room for error as this calculator are being sold and businesses use and rely on it to give job estimates."
+
+In practice: approach every pricing question as someone who actually knows what a job costs and why (not just someone editing numbers in a config file), and treat "no room for error" as a literal constraint, not a figure of speech — the "Adding a new calculator scenario" rule below is this mindset applied as a concrete process.
+
 # Adding a new calculator scenario
 
 Standing rule from the user (2026-10-16), for any time a new or "complicated" real-world scenario gets added to the pricing calculator (a new job type, a new frequency, a new addon, a new condition tier, etc.):
