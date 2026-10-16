@@ -183,7 +183,7 @@ No — carpeted stairs are priced separately, typically $52–$68 per flight of 
     categoryLabel: 'Upholstery Cleaning',
     date: '2026-10-29',
     readTime: '7 min',
-    excerpt: 'Upholstery cleaning is priced per piece, not per square foot — a chair runs $40–$70, a sofa $120–$175, and a full sectional $175–$280. Here\'s a real cost breakdown by furniture type, fabric, and soil level.',
+    excerpt: 'Upholstery cleaning is priced per piece, not per square foot — a chair runs $40–$70, a sofa $130–$195, and a full sectional $195–$310. Here\'s a real cost breakdown by furniture type, fabric, and soil level.',
     content: `
 ## The Short Answer
 
@@ -196,8 +196,8 @@ Unlike carpet or tile cleaning, upholstery cleaning is priced **per piece of fur
 | Ottoman | $20–$35 | Smallest, fastest job |
 | Chair / Recliner | $40–$70 | Single armchair or recliner |
 | Loveseat | $75–$110 | 2-seat couch |
-| Sofa | $120–$175 | 3-seat couch — the most commonly booked job |
-| Sectional | $175–$280 | L-shaped or multi-piece |
+| Sofa | $130–$195 | 3-seat couch — the most commonly booked job |
+| Sectional | $195–$310 | L-shaped or multi-piece |
 
 Most companies also charge a **$90–$120 minimum** per visit, so a single ottoman alone will usually still run close to that minimum rather than the $20–$35 piece price in isolation.
 
@@ -227,9 +227,9 @@ Most companies clean several pieces in one visit (a sofa plus two chairs, for ex
 
 A typical living room job — one sofa, two chairs, fabric, moderately soiled — runs:
 
-- Sofa: $134–$207 (moderate soiling applied)
+- Sofa: $146–$230 (moderate soiling applied)
 - 2 Chairs: $90–$165 combined
-- **Total: roughly $224–$372**
+- **Total: roughly $236–$395**
 
 ## How Often Should You Clean Upholstery?
 
@@ -2615,7 +2615,7 @@ The EPA recommends every 3–5 years generally; given the heavier AC use here, l
     categoryLabel: 'Dryer Vent Cleaning',
     date: '2026-08-27',
     readTime: '5 min',
-    excerpt: 'Dryer vent cleaning in Las Vegas costs $116–$278 depending on vent length and complexity. Here\'s real Las Vegas pricing, and why lint buildup is a genuine fire risk worth taking seriously every year.',
+    excerpt: 'Dryer vent cleaning in Las Vegas costs $130–$297 depending on vent length and complexity. Here\'s real Las Vegas pricing, and why lint buildup is a genuine fire risk worth taking seriously every year.',
     content: `
 ## How Much Does Dryer Vent Cleaning Cost in Las Vegas?
 
@@ -2623,10 +2623,10 @@ Nevada runs about 10% above the national average:
 
 | Vent Length/Complexity | Cost in Las Vegas |
 |---|---|
-| Standard / short run | $116–$152 |
-| Medium-length run | $140–$194 |
-| Long run (multi-story or multiple bends) | $168–$229 |
-| Very long / complex (roof-terminated) | $209–$278 |
+| Standard / short run | $130–$171 |
+| Medium-length run | $154–$212 |
+| Long run (multi-story or multiple bends) | $183–$248 |
+| Very long / complex (roof-terminated) | $223–$297 |
 
 Roof-terminated vents — common on the single-story homes throughout much of the Valley where the dryer vents straight up rather than out a side wall — tend to fall into the longer, more complex pricing tiers.
 
@@ -2637,7 +2637,7 @@ The U.S. Fire Administration links clogged dryer vents to roughly 2,900 home fir
 ## FAQ
 
 **How much does dryer vent cleaning cost in Las Vegas?**
-A standard, short vent run costs $116–$152. Longer or more complex runs, including roof-terminated vents, cost $168–$278.
+A standard, short vent run costs $130–$171. Longer or more complex runs, including roof-terminated vents, cost $183–$297.
 
 **Is dryer vent cleaning really necessary in a dry climate?**
 Yes — lint buildup is a mechanical fire risk that has nothing to do with outside humidity. The U.S. Fire Administration links clogged vents to roughly 2,900 home fires annually nationwide.
@@ -3808,7 +3808,7 @@ No — a single appointment typically covers all systems in the home, it just ta
       { q: "Can the same company do both air duct and dryer vent cleaning?", a: "Yes, most duct cleaning companies also offer dryer vent cleaning, often at a bundled discount if done in the same visit." },
       { q: "Which one is more urgent if I can only afford one right now?", a: "Dryer vent cleaning, if it's been over a year — it's the one with a real fire-safety stake, while air duct cleaning is more about comfort and air quality and can typically wait." },
       { q: "Does cleaning my air ducts also clean the dryer vent line?", a: "No. They're completely separate duct systems with no shared ductwork, so cleaning one has zero effect on the other." },
-      { q: "Is dryer vent cleaning cheaper than air duct cleaning?", a: "Yes, significantly — dryer vent cleaning runs $105–$253 depending on vent length, versus $330–$420+ for a standard air duct system, since it's a single line rather than a whole distribution network." },
+      { q: "Is dryer vent cleaning cheaper than air duct cleaning?", a: "Yes, significantly — dryer vent cleaning runs $118–$270 depending on vent length, versus $330–$420+ for a standard air duct system, since it's a single line rather than a whole distribution network." },
     ],
     content: `
 ## Quick Answer
@@ -3822,7 +3822,7 @@ No — a single appointment typically covers all systems in the home, it just ta
 | What it cleans | HVAC supply/return ductwork | Single vent from dryer to exterior |
 | Main reason to do it | Dust, allergens, HVAC efficiency | Fire prevention, dryer efficiency |
 | Recommended frequency | Every 3–5 years (as needed) | At least once a year |
-| Typical cost | $330–$420+ per system | $105–$253 depending on length |
+| Typical cost | $330–$420+ per system | $118–$270 depending on length |
 | Typical time | 2–4 hours | 30–60 minutes |
 | Risk if skipped | Reduced air quality, higher energy bills | House fire, dryer damage |
 
@@ -3860,7 +3860,7 @@ Dryer vent cleaning, if it's been over a year — it's the one with a real fire-
 No. They're completely separate duct systems with no shared ductwork, so cleaning one has zero effect on the other.
 
 **Is dryer vent cleaning cheaper than air duct cleaning?**
-Yes, significantly — dryer vent cleaning runs $105–$253 depending on vent length, versus $330–$420+ for a standard air duct system, since it's a single line rather than a whole distribution network.
+Yes, significantly — dryer vent cleaning runs $118–$270 depending on vent length, versus $330–$420+ for a standard air duct system, since it's a single line rather than a whole distribution network.
 
 [Get an air duct cleaning estimate](/?service=air_duct) or [a dryer vent cleaning estimate](/?service=dryer_vent) — both ZIP-code accurate and free.
     `,
@@ -4322,7 +4322,7 @@ Risk increases substantially — heavily compacted lint restricts airflow more s
     content: `
 ## Quick Answer
 
-Dryer vent cleaning costs **$105–$138** for a standard, short vent run and up to **$190–$253** for a very long or complex run. The price scales with vent length, number of bends, and where the vent terminates — not a flat per-visit rate.
+Dryer vent cleaning costs **$118–$155** for a standard, short vent run and up to **$203–$270** for a very long or complex run. The price scales with vent length, number of bends, and where the vent terminates — not a flat per-visit rate.
 
 ## Why Vent Length Drives the Price
 
@@ -4332,10 +4332,10 @@ A dryer vent cleaning isn't priced like a flat-fee service because the actual wo
 
 | Vent Type | Typical Cost | What It Looks Like |
 |---|---|---|
-| Standard / Short Run | $105–$138 | Typical single-story home, side-wall vent, minimal bends |
-| Medium-Length Run | $127–$176 | Longer run, or one additional bend beyond a basic setup |
-| Long Run | $153–$208 | Multi-story home, or a run with multiple bends |
-| Very Long / Complex Run | $190–$253 | Roof-terminated vent, or heavily routed line through several turns |
+| Standard / Short Run | $118–$155 | Typical single-story home, side-wall vent, minimal bends |
+| Medium-Length Run | $140–$193 | Longer run, or one additional bend beyond a basic setup |
+| Long Run | $166–$225 | Multi-story home, or a run with multiple bends |
+| Very Long / Complex Run | $203–$270 | Roof-terminated vent, or heavily routed line through several turns |
 
 ## Factors That Push You Into a Higher Tier
 
@@ -6418,7 +6418,7 @@ The single most common reason a pet odor comes back after cleaning is that only 
 
 ## What It Costs
 
-Pet stain/odor treatment is priced as a condition multiplier on top of the base per-piece price — for example, a $120–$175 fabric sofa with pet staining runs roughly **$198–$256** once the pet-stain adjustment is applied. [Get an exact quote](/upholstery-cleaning-cost-calculator) for your specific pieces and condition — our calculator has "Pet stains/odors" as one of the condition options so the price reflects your actual situation, not a generic estimate.
+Pet stain/odor treatment is priced as a condition multiplier on top of the base per-piece price — for example, a $130–$195 fabric sofa with pet staining runs roughly **$215–$355** once the pet-stain adjustment is applied. [Get an exact quote](/upholstery-cleaning-cost-calculator) for your specific pieces and condition — our calculator has "Pet stains/odors" as one of the condition options so the price reflects your actual situation, not a generic estimate.
     `,
   },
   {
@@ -6428,7 +6428,7 @@ Pet stain/odor treatment is priced as a condition multiplier on top of the base 
     categoryLabel: 'Upholstery Cleaning',
     date: '2026-11-01',
     readTime: '6 min',
-    excerpt: 'Renting a portable extractor runs $30–$60 a day plus solution — professional cleaning runs $40–$280 depending on the piece. Here\'s when the DIY route genuinely saves money, and when it doesn\'t.',
+    excerpt: 'Renting a portable extractor runs $30–$60 a day plus solution — professional cleaning runs $40–$310 depending on the piece. Here\'s when the DIY route genuinely saves money, and when it doesn\'t.',
     content: `
 ## The Real DIY Cost
 
@@ -6441,7 +6441,7 @@ Upholstery cleaning machines aren't sold cheap the way a basic carpet spot-clean
 | Fabric protector (if applying yourself) | $10–$20 |
 | **Total DIY cost for one visit** | **$55–$105** |
 
-Compare that to a professional visit for a sofa and two chairs — roughly **$224–$372** for three pieces, fabric, moderate soiling — and the math starts to depend heavily on how much furniture you're actually cleaning.
+Compare that to a professional visit for a sofa and two chairs — roughly **$236–$395** for three pieces, fabric, moderate soiling — and the math starts to depend heavily on how much furniture you're actually cleaning.
 
 ## When DIY Actually Makes Sense
 
@@ -6461,7 +6461,7 @@ Compare that to a professional visit for a sofa and two chairs — roughly **$22
 
 | Factor | DIY | Professional |
 |---|---|---|
-| Cost for 1–2 pieces | $55–$105 (rental) | $40–$175 per piece |
+| Cost for 1–2 pieces | $55–$105 (rental) | $40–$195 per piece |
 | Cost for 4+ pieces | $55–$105 (rental) | Often $300+ |
 | Pet odor removal | Limited (no true enzyme tools) | Full enzyme treatment available |
 | Leather | Not recommended without experience | Specialized products, lower risk |
@@ -6615,7 +6615,7 @@ Fabric upholstery is typically damp to the touch for **2–6 hours** after clean
 
 ## What a Fair Price Looks Like
 
-Based on national averages, a fair price for a standard job is **$40–$70 per chair**, **$120–$175 for a sofa**, and **$175–$280 for a sectional**, with leather running roughly double and pet stains adding 65–82%. If a quote is dramatically outside these ranges in either direction, it's worth asking what's different about the job.
+Based on national averages, a fair price for a standard job is **$40–$70 per chair**, **$130–$195 for a sofa**, and **$195–$310 for a sectional**, with leather running roughly double and pet stains adding 65–82%. If a quote is dramatically outside these ranges in either direction, it's worth asking what's different about the job.
 
 [Get an exact, ZIP-code accurate quote](/upholstery-cleaning-cost-calculator) for your specific pieces before you book.
     `,
@@ -7435,7 +7435,7 @@ This is one of the few home maintenance items where the safety stakes are genuin
     categoryLabel: 'Dryer Vent Cleaning',
     date: '2026-11-22',
     readTime: '5 min',
-    excerpt: 'A basic DIY rod kit costs $20–$40 — professional cleaning runs $105–$253 depending on vent length. Here\'s when the DIY route is genuinely safe and effective, and when the fire-safety stakes make a professional worth it.',
+    excerpt: 'A basic DIY rod kit costs $20–$40 — professional cleaning runs $118–$270 depending on vent length. Here\'s when the DIY route is genuinely safe and effective, and when the fire-safety stakes make a professional worth it.',
     content: `
 ## DIY Equipment Cost
 
@@ -7447,13 +7447,13 @@ This is one of the few home maintenance items where the safety stakes are genuin
 
 ## Professional Cleaning Cost
 
-Professional dryer vent cleaning runs **$105–$138** for a standard, short vent run, up to **$190–$253** for very long or complex runs (roof-terminated, multiple bends).
+Professional dryer vent cleaning runs **$118–$155** for a standard, short vent run, up to **$203–$270** for very long or complex runs (roof-terminated, multiple bends).
 
 ## The Real Comparison
 
 | | DIY | Professional |
 |---|---|---|
-| Cost | $20–$190 (mostly one-time equipment) | $105–$253 per visit |
+| Cost | $20–$190 (mostly one-time equipment) | $118–$270 per visit |
 | Effectiveness on short, straight runs | Good | Good |
 | Effectiveness on long/complex runs | Limited | Thorough — rotary equipment reaches full length |
 | Fire-risk verification | Visual only | Full-length inspection, often with camera confirmation |
@@ -7593,8 +7593,8 @@ Professional cleaning is priced **per piece**, not as a flat whole-furniture cha
 |---|---|
 | Chair/Recliner | $40–$70 |
 | Loveseat | $75–$110 |
-| Sofa (most common) | $120–$175 |
-| Sectional | $175–$280 |
+| Sofa (most common) | $130–$195 |
+| Sectional | $195–$310 |
 | Ottoman | $20–$35 |
 
 Leather pieces run roughly 1.8–2.0x these fabric prices due to specialized products and conditioning.
@@ -7610,7 +7610,7 @@ Leather pieces run roughly 1.8–2.0x these fabric prices due to specialized pro
 
 | | DIY (Rental) | Professional |
 |---|---|---|
-| Cost for one sofa | $47–$85 | $120–$175 |
+| Cost for one sofa | $47–$85 | $130–$195 |
 | Suction/extraction power | Limited (handheld) | Higher (professional-grade) |
 | Pet odor treatment | Not included | Enzyme treatment available |
 | Leather-safe | No (fabric-only formulas) | Yes (dedicated leather products) |
