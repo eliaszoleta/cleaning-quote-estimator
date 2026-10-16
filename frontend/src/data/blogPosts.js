@@ -737,58 +737,48 @@ No — most general cleaning companies won't handle regulated medical waste or s
   {
     slug: 'post-construction-cleaning-cost-guide',
     title: 'Post-Construction Cleaning Costs: What to Budget in 2026',
-    category: 'commercial',
-    categoryLabel: 'Commercial Cleaning',
+    category: 'post-construction',
+    categoryLabel: 'Post-Construction Cleaning',
     date: '2026-02-24',
     readTime: '6 min',
-    excerpt: 'Post-construction cleaning costs $0.10–$0.50 per square foot, or $500–$5,000+ for most projects. Learn what\'s included at each phase and how to hire the right crew.',
+    excerpt: 'Post-construction cleaning costs $200–$980 for most homes depending on size and scope, with a typical 1,500–2,000 sq ft home running $327–$575. Learn what\'s included and how scope affects your price.',
     content: `
 ## Post-Construction Cleaning Cost Overview
 
 Post-construction cleaning (also called "construction cleanup" or "final clean") is specialized work — it's not just vacuuming. Construction debris, drywall dust, paint overspray, adhesive residue, and protective film removal require different skills and equipment than regular cleaning.
 
-**Average cost**: $0.10–$0.50 per square foot, depending on phase and scope
+Pricing scales with two things: the **size of the space** and the **scope of work** — a light touch-up after painting costs meaningfully less than cleanup after a full gut renovation or new build, even at the same square footage.
 
-| Project Type | Typical Cost |
-|---|---|
-| New home (rough clean) | $0.10–$0.20/sq ft |
-| New home (final clean) | $0.20–$0.35/sq ft |
-| Commercial office renovation | $0.25–$0.45/sq ft |
-| Retail buildout | $0.30–$0.50/sq ft |
-| Full commercial construction | $0.35–$0.60/sq ft |
+| Home Size | Light Touch-Up | Moderate Renovation | Full/New Construction |
+|---|---|---|---|
+| Under 1,000 sq ft | $200–$257 | $201–$303 | $214–$334 |
+| 1,000–1,500 sq ft | $253–$339 | $273–$400 | $291–$441 |
+| 1,500–2,000 sq ft (most common) | $327–$442 | $353–$522 | $376–$575 |
+| 2,000–2,500 sq ft | $404–$547 | $436–$645 | $465–$711 |
+| 2,500–3,000 sq ft | $472–$630 | $510–$743 | $543–$819 |
+| Over 3,000 sq ft | $563–$754 | $608–$890 | $647–$980 |
 
-For a **3,000 sq ft new construction home**, expect to pay **$600–$1,050** for a final clean.
+For the most common home size (1,500–2,000 sq ft), expect **$327–$442** for a light touch-up and **$376–$575** for a full new-construction or gut-renovation cleanup — with a moderate, multi-room renovation landing in between.
 
-## The Three Phases of Construction Cleanup
+## Light, Moderate, or Full — Which Scope Do You Need?
 
-### Phase 1: Rough Clean (During Construction)
-Done after major trades are complete but before finish work. Removes:
-- Large debris, scrap lumber, packaging materials
-- Excess drywall compound
-- Construction adhesive drips
+- **Light touch-up** — painting, flooring, or one or two rooms updated. The least dust and debris.
+- **Moderate renovation** — a multi-room project, like a kitchen and bathroom remodel together. Runs about 8–18% more than a light touch-up.
+- **Full / new construction** — a whole-home build or gut renovation. Runs about 15–30% more than a light touch-up, since dust and debris have settled into every room, not just one or two.
 
-Cost: $0.05–$0.15/sq ft
+## What's Included in a Post-Construction Clean
 
-### Phase 2: Final Clean (Before Move-In or Opening)
-The most thorough phase, done after all finish work is complete:
+A full post-construction clean covers:
 - Remove protective film from windows, appliances, and fixtures
 - Clean all windows inside and out
-- Remove paint overspray from hardware and glass
+- Remove paint overspray and construction film/stickers from hardware and glass
 - Detail clean all cabinets, drawers, and shelving
 - Clean all light fixtures
 - Scrub all flooring (vacuum, mop, or both depending on material)
 - Wipe down all surfaces including walls, baseboards, and door frames
 - Clean all bathrooms and kitchen to move-in standard
 
-Cost: $0.20–$0.40/sq ft
-
-### Phase 3: Touch-Up Clean (Day Before Opening/Move-In)
-A final walkthrough clean after trades have done any punch-list repairs:
-- Re-wipe surfaces disturbed by punch-list work
-- Clean any construction fingerprints from windows or fixtures
-- Final floor clean
-
-Cost: $0.05–$0.15/sq ft
+Window cleaning, debris haul-away, and HVAC vent/duct dust removal are usually priced as add-ons rather than included by default — ask upfront if you need them, since these three items account for most of the variation between quotes at the same home size.
 
 ## What Sets Good Post-Construction Cleaners Apart
 
@@ -805,7 +795,7 @@ Drywall dust is the most persistent issue in new construction. It's so fine it f
 - Replacing HVAC filters after construction cleanup
 - Running the system on "fan only" with fresh filters to pull out remaining airborne dust
 
-[Get a post-construction cleaning quote](/?service=commercial) →
+[Get a post-construction cleaning quote](/?service=post_construction) →
     `,
   },
   {
@@ -1702,15 +1692,15 @@ Most people assume companies are always better and more reliable than independen
   {
     slug: 'airbnb-cleaning-cost',
     title: 'How Much Does Airbnb Cleaning Cost in 2026? Turnover Pricing Guide',
-    category: 'house-cleaning',
-    categoryLabel: 'House Cleaning',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
     date: '2026-08-15',
     readTime: '7 min',
-    excerpt: 'Airbnb and vacation rental turnover cleaning costs $75–$250 per stay depending on unit size, with most hosts paying $110–$180 for a standard turnover. Here\'s how turnover pricing works and how to budget for it.',
+    excerpt: 'Airbnb and vacation rental turnover cleaning costs $85–$319 per stay depending on unit size and turnaround time, with most hosts paying $100–$138 for a standard 2-bedroom turnover. Here\'s how turnover pricing works and how to budget for it.',
     content: `
 ## The Short Answer
 
-A standard Airbnb or short-term rental turnover clean costs **$75–$250**, with most 1–2 bedroom listings landing around **$110–$180** per turnover. Larger homes, same-day turns, and add-ons like linen laundering push the price toward the top of that range.
+A standard Airbnb or short-term rental turnover clean costs **$85–$228** for a standard next-day turn, with most 2-bedroom listings landing around **$100–$138** per turnover. Larger homes and same-day turns push the price toward the top of that range — a rushed same-day turn on a large listing can run **$240–$320**.
 
 ## Turnover Cleaning Cost by Unit Size
 
@@ -1718,10 +1708,10 @@ Turnover cleans follow roughly the same size-based pricing as a standard apartme
 
 | Listing Size | Typical Turnover Cost |
 |---|---|
-| Studio / 1 bedroom | $75–$135 |
-| 2 bedroom | $110–$180 |
-| 3 bedroom | $150–$230 |
-| 4+ bedroom / large home | $200–$350+ |
+| Studio / 1 bedroom | $85–$105 |
+| 2 bedroom | $100–$138 |
+| 3 bedroom | $152–$185 |
+| 4+ bedroom / large home | $185–$228 |
 
 These are per-turn prices, not hourly rates — most cleaners and turnover services quote a flat fee per stay so hosts can predict costs across bookings.
 
@@ -1740,7 +1730,7 @@ This closer to our **move-in/move-out** cleaning tier than a standard recurring 
 
 ## Same-Day Turn Premium
 
-If your booking calendar requires a same-day turnaround (guest checks out at 11am, next guest checks in at 3pm), expect to pay a **15–30% premium** over a standard next-day turnover. Same-day turns require the cleaner to prioritize your property over others in their schedule, and there's no buffer if something goes wrong.
+If your booking calendar requires a same-day turnaround (guest checks out at 11am, next guest checks in at 3pm), expect to pay a **30–40% premium** over a standard next-day turnover. Same-day turns require the cleaner to prioritize your property over others in their schedule, and there's no buffer if something goes wrong.
 
 ## What's Usually NOT Included
 
@@ -1761,7 +1751,7 @@ Most turnover cleaning quotes exclude these — ask upfront if you need them:
 
 ## Bottom Line
 
-Budget $110–$180 for a typical 1–2 bedroom turnover, more for larger units or same-day turns. [Use our free calculator](/?service=home_residential) to get a baseline estimate for your unit's size, then add 10–20% for turnover-specific tasks like linens and restocking.
+Budget $100–$138 for a typical 2-bedroom turnover, more for larger units or same-day turns. [Use our free Airbnb cleaning calculator](/?service=airbnb) to get an estimate for your exact unit size, turnaround time, and add-ons like linens or restocking.
     `,
   },
   {
@@ -8588,6 +8578,8 @@ export const CATEGORIES = [
   { id: 'dryer-vent', label: 'Dryer Vent Cleaning', icon: '🔥' },
   { id: 'tile-grout', label: 'Tile & Grout', icon: '🧽' },
   { id: 'restoration', label: 'Mold & Water Damage', icon: '⚠️' },
+  { id: 'airbnb', label: 'Airbnb & Vacation Rental Cleaning', icon: '🔑' },
+  { id: 'post-construction', label: 'Post-Construction Cleaning', icon: '🧱' },
   { id: 'grow-your-business', label: 'Grow Your Business', icon: '📈' },
   { id: 'starting-out', label: 'Starting Your Business', icon: '🚀' },
 ];
