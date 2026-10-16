@@ -90,4 +90,4 @@ function computeSubscriptionStatus(config, email) {
   return { active: false, status: 'requires_trial_setup', daysLeft: 7, currentPeriodEnd: null, stripeCustomerId: null, stripeSubscriptionId: null };
 }
 
-module.exports = { computeSubscriptionStatus };
+module.exports = { computeSubscriptionStatus, ALWAYS_ACTIVE_EMAIL };

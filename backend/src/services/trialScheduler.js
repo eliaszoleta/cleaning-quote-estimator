@@ -1,6 +1,6 @@
 const { listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, getCompanyConfig, saveCompanyConfig } = require('./companyConfig');
 const { sendTrialCheckin1Email, sendActivationReminderEmail, sendLegacyTrialExpiredEmail } = require('./email');
-const { computeSubscriptionStatus } = require('./subscriptionStatus');
+const { computeSubscriptionStatus, ALWAYS_ACTIVE_EMAIL } = require('./subscriptionStatus');
 
 const TRIAL_DAYS = 30;
 const ACTIVATION_REMINDER_DELAY_HOURS = 12;
@@ -83,7 +83,7 @@ async function checkTrialReminders() {
 
     try {
       const email = await getOwnerEmail(companyId);
-      if (!email) continue;
+      if (!email || email.toLowerCase() === ALWAYS_ACTIVE_EMAIL) continue;
       if (await sendTrialCheckin1Email({ to: email, companyName })) {
         const fresh = (await getCompanyConfig(companyId)) || config;
         await saveCompanyConfig(companyId, {
@@ -140,40 +140,47 @@ async function checkActivationReminders() {
 }
 
 // Checks every legacy no-card trial (trialStartedAt set, never touched
-// Stripe) and sends a one-time win-back email once it's genuinely expired
-// -- 30 days elapsed with no card ever added, the same threshold
-// subscriptionStatus.js's computeSubscriptionStatus uses to return
-// status: 'expired' / active: false for this case. Deliberately does NOT
-// touch Stripe-trial accounts at all: those either convert to a paid
-// charge (stays active, no email needed) or get canceled/fail payment
-// (already covered by subscription.js's webhook handlers). There is no
-// webhook that could ever notice a legacy no-card trial running out --
-// Stripe never knew the account existed -- so this has to be found by
-// scanning, same as checkTrialReminders above. Deduped via
-// legacyTrialExpiredEmailSentAt on config.subscription, sent once.
+// Stripe) and sends a one-time win-back email once computeSubscriptionStatus
+// -- the single real source of truth for this, in subscriptionStatus.js --
+// actually reports it as status: 'expired'. Deliberately delegates to that
+// function instead of re-deriving "30 days elapsed" locally: an earlier
+// version of this check did its own day-count math and, because of that
+// duplication, missed computeSubscriptionStatus's ALWAYS_ACTIVE_EMAIL
+// override (the owner's own demo/testing account, which must never be
+// told its trial expired) -- it sent that account a real win-back email
+// in production. Calling the real function instead of copying its logic
+// means every exception it already knows about is automatically respected
+// here too, with no way for the two to drift apart again. Needs each
+// account's owner email up front to pass into computeSubscriptionStatus
+// (that's the second argument it checks against ALWAYS_ACTIVE_EMAIL),
+// hence the owner-info-joined list rather than listAllCompanyConfigs, same
+// as checkActivationReminders above. Does NOT touch Stripe-trial accounts
+// at all: those either convert to a paid charge (stays active, no email
+// needed) or get canceled/fail payment (already covered by subscription.js's
+// webhook handlers). There is no webhook that could ever notice a legacy
+// no-card trial running out -- Stripe never knew the account existed -- so
+// this has to be found by scanning, same as checkTrialReminders above.
+// Deduped via legacyTrialExpiredEmailSentAt on config.subscription, sent
+// once.
 async function checkLegacyTrialExpired() {
   let rows;
   try {
-    rows = await listAllCompanyConfigs();
+    rows = await listAllCompanyConfigsWithOwnerInfo();
   } catch (err) {
     console.error('checkLegacyTrialExpired: failed to list company configs:', err.message);
     return;
   }
 
-  for (const { companyId, config } of rows) {
+  for (const { companyId, config, email } of rows) {
     const sub = config?.subscription || {};
     const companyName = config.companyName || 'there';
 
-    const isLegacyTrial = !!sub.trialStartedAt && !sub.stripeSubscriptionId;
-    if (!isLegacyTrial) continue;
+    if (!sub.trialStartedAt || sub.stripeSubscriptionId) continue;
     if (sub.legacyTrialExpiredEmailSentAt) continue;
-
-    const daysElapsed = (Date.now() - new Date(sub.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24);
-    if (daysElapsed < TRIAL_DAYS) continue;
+    if (!email || email.toLowerCase() === ALWAYS_ACTIVE_EMAIL) continue;
+    if (computeSubscriptionStatus(config, email).status !== 'expired') continue;
 
     try {
-      const email = await getOwnerEmail(companyId);
-      if (!email) continue;
       if (await sendLegacyTrialExpiredEmail({ to: email, companyName })) {
         const fresh = (await getCompanyConfig(companyId)) || config;
         await saveCompanyConfig(companyId, {
