@@ -14,6 +14,9 @@ const {
   COMMERCIAL_VISITS_PER_MONTH,
   DAY_PORTER_DAILY_RATE,
   COMMERCIAL_RESTROOM_PER_VISIT_RATE,
+  COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS,
+  COMMERCIAL_ONE_TIME_RESTROOM_RATE,
+  COMMERCIAL_ONE_TIME_MINIMUM_CHARGE,
   CARPET_PRICE_PER_ROOM,
   CARPET_PRICE_PER_SQFT,
   CARPET_CONDITION_MULTIPLIERS,
@@ -62,6 +65,7 @@ const {
   humanize, labelFor,
   SQFT_TIER_LABELS, CLEANING_TYPE_LABELS, FREQUENCY_LABELS, HOME_CONDITION_LABELS,
   APARTMENT_SIZE_LABELS, COMMERCIAL_BUILDING_TYPE_LABELS, COMMERCIAL_SERVICE_LEVEL_LABELS,
+  COMMERCIAL_JOB_TYPE_LABELS, COMMERCIAL_ONE_TIME_CONDITION_LABELS,
   SOILING_CONDITION_LABELS, CARPET_METHOD_LABELS, UPHOLSTERY_FABRIC_LABELS,
   AIR_DUCT_VENT_COUNT_LABELS, DRYER_VENT_LENGTH_LABELS, DRYER_VENT_TYPE_LABELS,
   TILE_TYPE_LABELS, TILE_CONDITION_LABELS, MOLD_TYPE_LABELS,
@@ -321,7 +325,22 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
   };
 }
 
+// Dispatches between the two structurally different commercial job types --
+// an ongoing janitorial contract (recurring) vs. a one-off deep clean or
+// restoration of a vacant/neglected space (one_time). They were previously
+// forced through the same recurring "visits/month" formula, which had no
+// way to represent a one-time job at all: picking the lowest frequency
+// ("Monthly") just priced it as a single routine visit to an occupied
+// space, not a one-off restoration clean. See COMMERCIAL_ONE_TIME_* in
+// defaults.js for the pricing rationale.
 function calculateCommercial(details, stateMultiplier, companyConfig) {
+  const jobType = details.jobType === 'one_time' ? 'one_time' : 'recurring';
+  return jobType === 'one_time'
+    ? calculateCommercialOneTime(details, stateMultiplier, companyConfig)
+    : calculateCommercialRecurring(details, stateMultiplier, companyConfig);
+}
+
+function calculateCommercialRecurring(details, stateMultiplier, companyConfig) {
   const {
     buildingType = 'office',
     sqft = 2000,
@@ -425,6 +444,7 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
     recurringMonthlyHigh: finalHigh,
     recurringAnnualSavings: annualSavings,
     keyFactors: [
+      { label: 'Job type', impact: labelFor(COMMERCIAL_JOB_TYPE_LABELS, 'recurring') },
       { label: 'Building type', impact: labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType) },
       { label: 'Square footage', impact: sqft.toLocaleString() + ' sq ft' },
       { label: 'Restrooms', impact: String(restrooms) },
@@ -432,6 +452,69 @@ function calculateCommercial(details, stateMultiplier, companyConfig) {
       { label: 'Frequency', impact: labelFor(FREQUENCY_LABELS, frequency) },
     ],
     disclaimer: null,
+    urgencyLevel: 'normal',
+  };
+}
+
+// One-time deep clean / restoration of a commercial space -- e.g. a vacant
+// restaurant sitting empty for years after an eviction, with grease-caked
+// equipment and no routine upkeep, needing a one-off multi-day clean before
+// a new tenant moves in. Flat, single-job pricing (like Post-Construction
+// and Airbnb), not a recurring monthly contract: no visits/month, no
+// day-porter staffing, no after-hours surcharge -- those are all ongoing-
+// service concepts that don't apply to a one-off job.
+function calculateCommercialOneTime(details, stateMultiplier, companyConfig) {
+  const {
+    buildingType = 'office',
+    sqft = 2000,
+    restrooms = 2,
+    condition = 'moderate',
+  } = details;
+
+  const cfg = companyConfig?.services?.commercial || {};
+  const markup = cfg.markup || 1.0;
+  const minCharge = cfg.minimumChargeOneTime || COMMERCIAL_ONE_TIME_MINIMUM_CHARGE;
+
+  const sqftRate = COMMERCIAL_SQFT_RATES[buildingType] || COMMERCIAL_SQFT_RATES.office;
+  const conditionMult = COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS[condition] || COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS.moderate;
+
+  const sqftTotalLow = Math.round(sqft * sqftRate.low * conditionMult.low * stateMultiplier * markup);
+  const sqftTotalHigh = Math.round(sqft * sqftRate.high * conditionMult.high * stateMultiplier * markup);
+
+  const restroomTotalLow = Math.round(restrooms * COMMERCIAL_ONE_TIME_RESTROOM_RATE.low * stateMultiplier * markup);
+  const restroomTotalHigh = Math.round(restrooms * COMMERCIAL_ONE_TIME_RESTROOM_RATE.high * stateMultiplier * markup);
+
+  const adjustments = [
+    { label: `${labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType)} @ ${sqft.toLocaleString()} sq ft (${labelFor(COMMERCIAL_ONE_TIME_CONDITION_LABELS, condition)})`, low: sqftTotalLow, high: sqftTotalHigh },
+    { label: `${restrooms} restroom${restrooms === 1 ? '' : 's'} (one-time deep clean)`, low: restroomTotalLow, high: restroomTotalHigh },
+  ];
+
+  const range = applyMinCharge(
+    { low: sqftTotalLow + restroomTotalLow, high: sqftTotalHigh + restroomTotalHigh },
+    minCharge,
+    adjustments,
+  );
+
+  reconcileAdjustments(adjustments, range.low, range.high);
+
+  return {
+    serviceType: 'commercial',
+    totalLow: range.low,
+    totalHigh: range.high,
+    basePrice: (sqftTotalLow + sqftTotalHigh) / 2,
+    adjustments,
+    unit: 'flat',
+    recurringMonthlyLow: null,
+    recurringMonthlyHigh: null,
+    recurringAnnualSavings: null,
+    keyFactors: [
+      { label: 'Job type', impact: labelFor(COMMERCIAL_JOB_TYPE_LABELS, 'one_time') },
+      { label: 'Building type', impact: labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType) },
+      { label: 'Square footage', impact: sqft.toLocaleString() + ' sq ft' },
+      { label: 'Restrooms', impact: String(restrooms) },
+      { label: 'Condition', impact: labelFor(COMMERCIAL_ONE_TIME_CONDITION_LABELS, condition) },
+    ],
+    disclaimer: 'One-time deep cleans and restoration jobs vary significantly based on the exact condition found on-site -- this estimate is a starting point, not a substitute for an in-person walkthrough, especially for heavily neglected or long-vacant spaces.',
     urgencyLevel: 'normal',
   };
 }

@@ -75,6 +75,17 @@ const COMMERCIAL_SERVICE_LEVEL_LABELS = {
   premium: 'Premium',
 };
 
+const COMMERCIAL_JOB_TYPE_LABELS = {
+  recurring: 'Recurring Service',
+  one_time: 'One-Time Deep Clean / Restoration',
+};
+
+const COMMERCIAL_ONE_TIME_CONDITION_LABELS = {
+  light: 'Occupied — Needs a Deep Clean',
+  moderate: 'Vacant, Lightly Neglected',
+  severe: 'Vacant, Heavily Neglected',
+};
+
 // CarpetStep.js condition, reused as-is by UpholsteryStep.js
 const SOILING_CONDITION_LABELS = {
   light: 'Light soiling',
@@ -193,6 +204,8 @@ module.exports = {
   APARTMENT_SIZE_LABELS,
   COMMERCIAL_BUILDING_TYPE_LABELS,
   COMMERCIAL_SERVICE_LEVEL_LABELS,
+  COMMERCIAL_JOB_TYPE_LABELS,
+  COMMERCIAL_ONE_TIME_CONDITION_LABELS,
   SOILING_CONDITION_LABELS,
   CARPET_METHOD_LABELS,
   UPHOLSTERY_FABRIC_LABELS,

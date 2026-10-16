@@ -346,6 +346,42 @@ const DAY_PORTER_DAILY_RATE = { low: 218, high: 265 };
 // with how many times a month the building was actually cleaned).
 const COMMERCIAL_RESTROOM_PER_VISIT_RATE = { low: 4, high: 7 };
 
+// One-time commercial deep clean / restoration pricing -- a separate model
+// from the recurring janitorial-contract pricing above (COMMERCIAL_VISITS_PER_MONTH
+// x per-visit rate). Added Oct 2026 after a real request (a vacant restaurant,
+// evicted tenant, years unmaintained, grease-caked equipment, needing a one-off
+// multi-day restoration clean) had no way to be quoted accurately -- forcing it
+// through "Monthly" priced it as a single routine janitorial visit to an
+// occupied space, wildly underquoting the actual labor. Multiplies the SAME
+// COMMERCIAL_SQFT_RATES used for recurring service rather than a separate rate
+// table, so building-type differences (a restaurant still costs more per sq ft
+// than an office) still apply to a one-time job.
+// Cross-checked Oct 2026 against published one-time-deep-clean-vs-recurring
+// comparisons (Nilfisk, Housecall Pro, HomeAdvisor: a one-time deep clean runs
+// roughly 1.5-2x a recurring per-visit rate) and a restaurant-specific guide
+// citing $0.15-$0.50/sq ft for quarterly/deep restaurant cleans against
+// $0.06-$0.20/sq ft routine. A long-vacant, heavily neglected space is
+// effectively restoration work, not a deep clean of an otherwise-maintained
+// space, so it's priced at the top of that range and above.
+const COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS = {
+  light:    { low: 1.5, high: 1.8 }, // occupied space, just needs a thorough one-time deep clean
+  moderate: { low: 2.0, high: 2.5 }, // vacant under ~1 year, visible buildup but no severe neglect
+  severe:   { low: 2.5, high: 3.3 }, // vacant 1+ years / heavily neglected -- grease, buildup, pest signs
+};
+
+// Restrooms on a one-time job are priced flat per restroom, not per visit --
+// a restroom that's sat unused and uncleaned for a long stretch needs a full
+// descale/degrease/disinfect pass in one visit, not the routine per-visit
+// touch-up COMMERCIAL_RESTROOM_PER_VISIT_RATE represents. Estimated/interpolated
+// from that per-visit rate at a "many visits' worth of neglect in one pass"
+// multiple -- not independently sourced.
+const COMMERCIAL_ONE_TIME_RESTROOM_RATE = { low: 25, high: 40 };
+
+// The $200/mo recurring floor above exists to cover showing up for a small
+// monthly contract -- it's not a sane floor for a multi-day, multi-person
+// restoration crew job, so one-time jobs get their own, higher minimum.
+const COMMERCIAL_ONE_TIME_MINIMUM_CHARGE = 400;
+
 // Carpet cleaning prices
 // Previously had no cited source at all. Source: cross-referenced Oct 2026
 // against Housecall Pro's published per-room pricing data ($25-$75/room,
@@ -738,6 +774,9 @@ module.exports = {
   COMMERCIAL_VISITS_PER_MONTH,
   DAY_PORTER_DAILY_RATE,
   COMMERCIAL_RESTROOM_PER_VISIT_RATE,
+  COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS,
+  COMMERCIAL_ONE_TIME_RESTROOM_RATE,
+  COMMERCIAL_ONE_TIME_MINIMUM_CHARGE,
   CARPET_PRICE_PER_ROOM,
   CARPET_PRICE_PER_SQFT,
   CARPET_CONDITION_MULTIPLIERS,

@@ -113,6 +113,7 @@ const errors = [];
   const buildingTypes = idsFromObjectConst(src, 'BUILDING_TYPES').filter(id => id !== 'church');
   checkIds(buildingTypes, [DEFAULTS.COMMERCIAL_SQFT_RATES], 'CommercialStep buildingType', errors);
   checkIds(idsFromObjectConst(src, 'FREQUENCIES'), [DEFAULTS.COMMERCIAL_VISITS_PER_MONTH], 'CommercialStep frequency', errors);
+  checkIds(idsFromObjectConst(src, 'ONE_TIME_CONDITIONS'), [DEFAULTS.COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS], 'CommercialStep condition', errors);
   checkIds(idsFromObjectConst(src, 'SERVICE_LEVELS'), [DEFAULTS.COMMERCIAL_SERVICE_LEVELS], 'CommercialStep serviceLevel', errors);
 }
 
