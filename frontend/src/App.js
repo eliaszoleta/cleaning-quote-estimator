@@ -6,6 +6,7 @@ import { postCheckout } from './utils/api';
 import Header from './components/ui/Header';
 import Footer from './components/ui/Footer';
 import ServiceCalculatorPage, { calculatorSlugFor } from './components/pages/ServiceCalculatorPage';
+import PricingUpdateNotice from './components/calculator/PricingUpdateNotice';
 import { getAllServices } from './data/services';
 import { initMetaPixel } from './utils/metaPixel';
 import { initNextdoorPixel } from './utils/nextdoorPixel';
@@ -454,6 +455,7 @@ export default function App() {
       <div className="app">
         <Header />
         <main>
+          <PricingUpdateNotice />
           <Suspense fallback={<PageFallback />}>
             <CleaningCalculator />
             <SEOContent />
