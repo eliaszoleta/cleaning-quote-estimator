@@ -98,6 +98,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // how narrow the actual preview panel was, giving it a different,
   // uncapped-looking layout than the same widget gets on a real site).
   const [isMobile, setIsMobile] = useState(false);
+  // Measured alongside isMobile, off the same ResizeObserver -- used below
+  // to tell a genuinely narrow third-party embed (which still wants the
+  // card's tighter padding) apart from our own wide embedded surfaces
+  // (Calculator Mode, the Branding preview) that only pass embedded=true
+  // for its OTHER behaviors (instant results, no iframe-postMessage
+  // scrolling) and should otherwise look as roomy as the public site.
+  const [cardWidth, setCardWidth] = useState(0);
   const [serviceType, setServiceType] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? initialService : null);
   const [stepIndex, setStepIndex] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? 1 : 0);
   const [location, setLocation] = useState({ zip: '', state: '' });
@@ -137,7 +144,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   useEffect(() => {
     const el = cardRef.current;
     if (!el) return;
-    const check = (width) => setIsMobile(width <= 640);
+    const check = (width) => { setIsMobile(width <= 640); setCardWidth(width); };
     check(el.getBoundingClientRect().width);
     const observer = new ResizeObserver(entries => {
       check(entries[0].contentRect.width);
@@ -145,6 +152,15 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  // True for every non-embedded page (unchanged) AND for an embedded
+  // context wide enough that it isn't actually a cramped third-party
+  // widget -- see ServiceSelect.js's identical WIDE_EMBED_MIN_WIDTH cutoff
+  // for the matching service-grid fix this pairs with. cardWidth is 0
+  // before the ResizeObserver's first measurement, which correctly falls
+  // through to the narrower, pre-existing embedded padding for that one
+  // frame rather than flashing wide then narrow.
+  const isWideEmbedded = embedded && cardWidth >= 500;
 
   // Pre-select service from URL param (skipped if initialService already set it)
   // -- gated on the service actually being enabled, so a disabled service
@@ -491,7 +507,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           </div>
         )}
 
-        <div style={{ padding: embedded ? 0 : '0 16px 28px' }}>
+        <div style={{ padding: embedded && !isWideEmbedded ? 0 : '0 16px 28px' }}>
         {/* Calculator card. maxWidth only applies when NOT embedded (the
             main site/dashboard, where nothing else constrains how wide this
             could stretch on a big monitor) -- when embedded, the iframe's
@@ -515,7 +531,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         }}>
           {/* Progress bar */}
           {currentStep !== 'service' && currentStep !== 'results' && (
-            <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, padding: embedded || isMobile ? '16px 12px' : '16px 24px' }}>
+            <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, padding: (embedded && !isWideEmbedded) || isMobile ? '16px 12px' : '16px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 {steps.map((step, i) => (
                   <span key={step} style={{
@@ -540,13 +556,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
           {/* Error */}
           {error && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: COLORS.dangerMuted, borderBottom: `1px solid ${COLORS.dangerBorder}`, padding: embedded || isMobile ? '11px 12px' : '11px 24px', color: COLORS.danger, fontSize: 13.5 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: COLORS.dangerMuted, borderBottom: `1px solid ${COLORS.dangerBorder}`, padding: (embedded && !isWideEmbedded) || isMobile ? '11px 12px' : '11px 24px', color: COLORS.danger, fontSize: 13.5 }}>
               <AlertCircle size={15} /> {error}
             </div>
           )}
 
           {/* Steps */}
-          <div style={{ padding: embedded ? '20px 12px' : isMobile ? '20px 12px' : '32px 40px' }}>
+          <div style={{ padding: isMobile ? '20px 12px' : embedded && !isWideEmbedded ? '20px 12px' : '32px 40px' }}>
             {currentStep === 'service' && (
               <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} />
             )}
