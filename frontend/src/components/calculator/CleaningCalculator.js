@@ -20,6 +20,8 @@ import DryerVentStep from './steps/DryerVentStep';
 import TileGroutStep from './steps/TileGroutStep';
 import MoldStep from './steps/MoldStep';
 import WaterDamageStep from './steps/WaterDamageStep';
+import AirbnbStep from './steps/AirbnbStep';
+import PostConstructionStep from './steps/PostConstructionStep';
 import LeadCaptureStep from './steps/LeadCaptureStep';
 import ResultsScreen from './ResultsScreen';
 import EstimateSentScreen from './EstimateSentScreen';
@@ -35,6 +37,8 @@ const SERVICE_STEPS = {
   tile_grout: ['service', 'location', 'tile_grout', 'lead', 'results'],
   mold_remediation: ['service', 'location', 'mold', 'lead', 'results'],
   water_damage: ['service', 'location', 'water_damage', 'lead', 'results'],
+  airbnb: ['service', 'location', 'airbnb', 'lead', 'results'],
+  post_construction: ['service', 'location', 'post_construction', 'lead', 'results'],
 };
 
 // Maps a serviceType (snake_case, as used above and by /api/calculate) to
@@ -53,6 +57,8 @@ const SERVICE_CONFIG_KEYS = {
   tile_grout: 'tileGrout',
   mold_remediation: 'moldRemediation',
   water_damage: 'waterDamage',
+  airbnb: 'airbnb',
+  post_construction: 'postConstruction',
 };
 
 const DETAIL_STEP_COMPONENT = {
@@ -66,6 +72,8 @@ const DETAIL_STEP_COMPONENT = {
   tile_grout: TileGroutStep,
   mold: MoldStep,
   water_damage: WaterDamageStep,
+  airbnb: AirbnbStep,
+  post_construction: PostConstructionStep,
 };
 
 // Maps a step id to its progress-bar label -- indexed by step name rather

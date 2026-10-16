@@ -53,6 +53,12 @@ const {
   WATER_FULL_RESTORATION_PER_SQFT,
   WATER_FULL_RESTORATION_MINIMUM,
   WATER_CATEGORY_MULTIPLIERS,
+  AIRBNB_SIZE_PRICES,
+  AIRBNB_SAME_DAY_RUSH_MULTIPLIER,
+  AIRBNB_ADDONS,
+  POST_CONSTRUCTION_BASE_MULTIPLIER,
+  POST_CONSTRUCTION_TYPE_MULTIPLIERS,
+  POST_CONSTRUCTION_ADDONS,
   STATE_NAMES,
 } = require('../config/defaults');
 const {
@@ -63,6 +69,7 @@ const {
   AIR_DUCT_VENT_COUNT_LABELS, DRYER_VENT_LENGTH_LABELS, DRYER_VENT_TYPE_LABELS,
   TILE_TYPE_LABELS, TILE_CONDITION_LABELS, MOLD_AFFECTED_SIZE_LABELS, MOLD_TYPE_LABELS,
   WATER_CATEGORY_LABELS, WATER_CAUSE_LABELS, WATER_DAMAGE_CLASS_LABELS, WATER_WHEN_HAPPENED_LABELS,
+  AIRBNB_SIZE_LABELS, AIRBNB_TURNAROUND_LABELS, POST_CONSTRUCTION_TYPE_LABELS,
 } = require('../config/optionLabels');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1045,6 +1052,152 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
   };
 }
 
+function calculateAirbnb(details, stateMultiplier, companyConfig) {
+  const {
+    size = '2br',
+    bathrooms = '1',
+    turnaround = 'standard',
+    frequency = 'one_time',
+    extras = [],
+  } = details;
+
+  const cfg = companyConfig?.services?.airbnb || {};
+  const markup = cfg.markup || 1.0;
+  const minCharge = cfg.minimumCharge || 85;
+
+  const base = AIRBNB_SIZE_PRICES[size] || AIRBNB_SIZE_PRICES['2br'];
+  const baAddon = BATHROOM_ADDON[bathrooms] || 0;
+
+  let range = { low: base.low + baAddon, high: base.high + baAddon };
+  range = applyMultiplier(range, stateMultiplier * markup);
+
+  const baseAdj = applyMultiplier(base, stateMultiplier * markup);
+  const adjustments = [{ label: `${labelFor(AIRBNB_SIZE_LABELS, size)} turnover`, low: baseAdj.low, high: baseAdj.high }];
+  if (baAddon > 0) {
+    const adj = applyMultiplier({ low: baAddon, high: baAddon }, stateMultiplier * markup);
+    adjustments.push({ label: `${bathrooms} bathrooms`, low: adj.low, high: adj.high });
+  }
+
+  // Same-day rush multiplier
+  if (turnaround !== 'standard') {
+    const turnMult = AIRBNB_SAME_DAY_RUSH_MULTIPLIER;
+    const before = { ...range };
+    range = { low: Math.round(range.low * turnMult.low), high: Math.round(range.high * turnMult.high) };
+    adjustments.push({ label: labelFor(AIRBNB_TURNAROUND_LABELS, turnaround), low: range.low - before.low, high: range.high - before.high });
+  }
+
+  for (const extra of extras) {
+    const addon = AIRBNB_ADDONS[extra];
+    if (addon) {
+      const adj = applyMultiplier(addon, stateMultiplier * markup);
+      range = addRange(range, adj);
+      adjustments.push({ label: extra.replace(/_/g, ' '), low: adj.low, high: adj.high });
+    }
+  }
+
+  range = applyMinCharge(range, minCharge, adjustments);
+
+  // Frequency discount -- hosts booking recurring turnover cleanings
+  // (weekly/biweekly/monthly volume) get the same opt-in discount
+  // mechanism as every other recurring service.
+  const discount = cfg.frequencyDiscounts?.[frequency] || 0;
+  let recurringLow = null, recurringHigh = null, annualSavings = null;
+  if (frequency !== 'one_time' && discount > 0) {
+    recurringLow = Math.round(range.low * (1 - discount));
+    recurringHigh = Math.round(range.high * (1 - discount));
+    const visitsPerYear = { weekly: 52, biweekly: 26, monthly: 12 }[frequency] || 12;
+    annualSavings = Math.round(((range.low + range.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
+    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: -Math.round(range.low * discount), high: -Math.round(range.high * discount) });
+  }
+
+  const finalLow = recurringLow || range.low;
+  const finalHigh = recurringHigh || range.high;
+  reconcileAdjustments(adjustments, finalLow, finalHigh);
+
+  return {
+    serviceType: 'airbnb',
+    totalLow: finalLow,
+    totalHigh: finalHigh,
+    basePrice: (base.low + base.high) / 2,
+    adjustments,
+    unit: 'flat',
+    recurringMonthlyLow: recurringLow,
+    recurringMonthlyHigh: recurringHigh,
+    recurringAnnualSavings: annualSavings,
+    keyFactors: [
+      { label: 'Unit size', impact: labelFor(AIRBNB_SIZE_LABELS, size) },
+      { label: 'Bathrooms', impact: String(bathrooms) },
+      { label: 'Turnaround', impact: labelFor(AIRBNB_TURNAROUND_LABELS, turnaround) },
+      { label: 'Frequency', impact: labelFor(FREQUENCY_LABELS, frequency) },
+    ],
+    disclaimer: null,
+    urgencyLevel: 'normal',
+  };
+}
+
+function calculatePostConstruction(details, stateMultiplier, companyConfig) {
+  const {
+    sqftTier = '1500_2000',
+    constructionType = 'light',
+    extras = [],
+  } = details;
+
+  const cfg = companyConfig?.services?.postConstruction || {};
+  const markup = cfg.markup || 1.0;
+  const minCharge = cfg.minimumCharge || 200;
+
+  const base = HOME_SQFT_BASE_PRICES[sqftTier] || HOME_SQFT_BASE_PRICES['1500_2000'];
+
+  // Post-construction cleanup costs far more per sqft than a standard
+  // clean -- paint splatter, dust in every crevice, construction film on
+  // fixtures -- hence the flat multiplier on top of the same sqft base
+  // price House Cleaning uses, rather than a separate price table.
+  const basePCRange = {
+    low: Math.round(base.low * POST_CONSTRUCTION_BASE_MULTIPLIER.low),
+    high: Math.round(base.high * POST_CONSTRUCTION_BASE_MULTIPLIER.high),
+  };
+  let range = applyMultiplier(basePCRange, stateMultiplier * markup);
+  const adjustments = [{ label: `Base price (${labelFor(SQFT_TIER_LABELS, sqftTier)})`, low: range.low, high: range.high }];
+
+  // Construction type multiplier
+  if (constructionType !== 'light') {
+    const typeMult = POST_CONSTRUCTION_TYPE_MULTIPLIERS[constructionType] || POST_CONSTRUCTION_TYPE_MULTIPLIERS.light;
+    const before = { ...range };
+    range = { low: Math.round(range.low * typeMult.low), high: Math.round(range.high * typeMult.high) };
+    adjustments.push({ label: `${labelFor(POST_CONSTRUCTION_TYPE_LABELS, constructionType)} multiplier`, low: range.low - before.low, high: range.high - before.high });
+  }
+
+  for (const extra of extras) {
+    const addon = POST_CONSTRUCTION_ADDONS[extra];
+    if (addon) {
+      const adj = applyMultiplier(addon, stateMultiplier * markup);
+      range = addRange(range, adj);
+      adjustments.push({ label: extra.replace(/_/g, ' '), low: adj.low, high: adj.high });
+    }
+  }
+
+  range = applyMinCharge(range, minCharge, adjustments);
+  reconcileAdjustments(adjustments, range.low, range.high);
+
+  return {
+    serviceType: 'post_construction',
+    totalLow: range.low,
+    totalHigh: range.high,
+    basePrice: (base.low + base.high) / 2,
+    adjustments,
+    unit: 'flat',
+    recurringMonthlyLow: null,
+    recurringMonthlyHigh: null,
+    recurringAnnualSavings: null,
+    keyFactors: [
+      { label: 'Home size', impact: labelFor(SQFT_TIER_LABELS, sqftTier) },
+      { label: 'Scope', impact: labelFor(POST_CONSTRUCTION_TYPE_LABELS, constructionType) },
+    ],
+    disclaimer: null,
+    urgencyLevel: 'normal',
+  };
+}
+
 // ─── Main Entry Point ─────────────────────────────────────────────────────────
 
 async function calculateCleaning(inputs, companyConfig = {}) {
@@ -1087,6 +1240,8 @@ async function calculateCleaning(inputs, companyConfig = {}) {
     case 'tile_grout':        result = calculateTileGrout(serviceDetails, stateMultiplier, companyConfig); break;
     case 'mold_remediation':  result = calculateMold(serviceDetails, stateMultiplier, companyConfig); break;
     case 'water_damage':      result = calculateWaterDamage(serviceDetails, stateMultiplier, companyConfig); break;
+    case 'airbnb':            result = calculateAirbnb(serviceDetails, stateMultiplier, companyConfig); break;
+    case 'post_construction': result = calculatePostConstruction(serviceDetails, stateMultiplier, companyConfig); break;
     default:
       throw new Error(`Unknown service type: ${serviceType}`);
   }

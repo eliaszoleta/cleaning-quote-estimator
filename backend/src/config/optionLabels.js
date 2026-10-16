@@ -34,7 +34,6 @@ const CLEANING_TYPE_LABELS = {
   standard: 'Standard Clean',
   deep: 'Deep Clean',
   move_in_out: 'Move-In / Move-Out',
-  post_construction: 'Post-Construction',
 };
 
 const FREQUENCY_LABELS = {
@@ -171,6 +170,25 @@ const WATER_WHEN_HAPPENED_LABELS = {
   week_plus: 'Over a week ago',
 };
 
+// AirbnbStep.js
+const AIRBNB_SIZE_LABELS = {
+  studio_1br: 'Studio / 1 Bedroom',
+  '2br': '2 Bedrooms',
+  '3br': '3 Bedrooms',
+  '4br_plus': '4+ Bedrooms',
+};
+
+const AIRBNB_TURNAROUND_LABELS = {
+  standard: 'Standard Turnover',
+  same_day_rush: 'Same-Day Rush',
+};
+
+// PostConstructionStep.js
+const POST_CONSTRUCTION_TYPE_LABELS = {
+  light: 'Light Renovation / Touch-Up',
+  full: 'New Construction / Major Renovation',
+};
+
 module.exports = {
   humanize,
   labelFor,
@@ -193,6 +211,9 @@ module.exports = {
   MOLD_TYPE_LABELS,
   WATER_CATEGORY_LABELS,
   WATER_CAUSE_LABELS,
+  AIRBNB_SIZE_LABELS,
+  AIRBNB_TURNAROUND_LABELS,
+  POST_CONSTRUCTION_TYPE_LABELS,
   WATER_DAMAGE_CLASS_LABELS,
   WATER_WHEN_HAPPENED_LABELS,
 };

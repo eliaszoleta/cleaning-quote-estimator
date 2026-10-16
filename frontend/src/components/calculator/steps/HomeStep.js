@@ -25,7 +25,6 @@ const CLEANING_TYPES = [
   { id: 'standard', label: 'Standard Clean', desc: 'Dusting, vacuuming, mopping, bathrooms, kitchen' },
   { id: 'deep', label: 'Deep Clean', desc: 'Everything in standard + inside appliances, baseboards, detailed scrubbing' },
   { id: 'move_in_out', label: 'Move-In / Move-Out', desc: 'Full top-to-bottom clean for vacant home' },
-  { id: 'post_construction', label: 'Post-Construction', desc: 'Debris removal, dust, paint splatter cleanup' },
 ];
 
 const FREQUENCY = [

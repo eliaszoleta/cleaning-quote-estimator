@@ -11,6 +11,7 @@ const { resolveCityForZip } = require('../services/zipCity');
 const VALID_SERVICE_TYPES = [
   'home_residential', 'apartment', 'commercial', 'carpet', 'upholstery',
   'air_duct', 'dryer_vent', 'tile_grout', 'mold_remediation', 'water_damage',
+  'airbnb', 'post_construction',
 ];
 
 function getSupabase() {

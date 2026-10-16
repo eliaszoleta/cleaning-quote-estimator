@@ -152,6 +152,17 @@ const DEFAULT_COMPANY_CONFIG = {
       minimumCharge: 90,
       markup: 1.0,
     },
+    airbnb: {
+      enabled: true,
+      minimumCharge: 85,
+      markup: 1.0,
+      frequencyDiscounts: { weekly: 0, biweekly: 0, monthly: 0 },
+    },
+    postConstruction: {
+      enabled: true,
+      minimumCharge: 200,
+      markup: 1.0,
+    },
   },
 };
 
@@ -175,11 +186,14 @@ const BEDROOM_ADDON = { 1: 0, 2: 15, 3: 30, 4: 50, '5+': 75 };
 const BATHROOM_ADDON = { 1: 0, '1.5': 20, 2: 35, '2.5': 50, 3: 65, '3+': 90 };
 
 // Cleaning type multipliers
+// post_construction used to live here as a House Cleaning "cleaning type"
+// option -- now its own standalone service (see POST_CONSTRUCTION_BASE_MULTIPLIER
+// below), using this exact same 2.18-2.35x value so pricing didn't change,
+// just where the service lives.
 const CLEANING_TYPE_MULTIPLIERS = {
   standard:         { low: 1.0,  high: 1.0  },
   deep:             { low: 1.68, high: 1.85 },
   move_in_out:      { low: 1.88, high: 2.05 },
-  post_construction:{ low: 2.18, high: 2.35 },
 };
 
 // Extra add-on costs (residential/apartment)
@@ -449,6 +463,54 @@ const WATER_CATEGORY_MULTIPLIERS = {
   black:  { low: 1.7,  high: 1.9  },
 };
 
+// Airbnb / vacation rental turnover cleaning pricing
+// Source: average short-term-rental cleaning fees reported by hosts
+// (AirDNA, Hospitable, host community pricing surveys). Priced higher
+// than a comparable long-term apartment clean (APARTMENT_SIZE_PRICES) --
+// a turnover always includes a full top-to-bottom reset (not just
+// surface cleaning) on a fixed guest-checkout deadline, which linen
+// changing and restocking (below) add to, not replace.
+const AIRBNB_SIZE_PRICES = {
+  studio_1br: { low: 95,  high: 120 },
+  '2br':      { low: 125, high: 155 },
+  '3br':      { low: 160, high: 195 },
+  '4br_plus': { low: 195, high: 240 },
+};
+
+// A guest checking out same-day as the next check-in (vs. the usual
+// overnight-or-longer gap between bookings) compresses the whole job
+// into a few hours and often means paying a cleaner to be on standby --
+// reflected here as a surcharge, not a flat fee, so it scales with job size.
+const AIRBNB_SAME_DAY_RUSH_MULTIPLIER = { low: 1.3, high: 1.4 };
+
+const AIRBNB_ADDONS = {
+  linens_laundry:      { low: 20, high: 30 }, // wash & change all bed/bath linens
+  restocking_supplies: { low: 12, high: 18 }, // toiletries, coffee, paper products
+  deep_clean_turnover: { low: 45, high: 65 }, // periodic deeper reset (baseboards, inside microwave, etc.)
+};
+
+// Post-construction cleanup pricing
+// Base scales off the same HOME_SQFT_BASE_PRICES tiers as a standard
+// house clean, at the ~2.2-2.35x multiplier construction/debris cleanup
+// actually runs (previously only reachable as a House Cleaning
+// "cleaning type" option using this exact multiplier -- same pricing,
+// now its own standalone service instead of a buried sub-option).
+const POST_CONSTRUCTION_BASE_MULTIPLIER = { low: 2.18, high: 2.35 };
+
+// A touch-up/renovation leaves far less dust and debris behind than a
+// full new-build or gut renovation -- "full" scope costs meaningfully
+// more on top of the base multiplier above, not a separate base price.
+const POST_CONSTRUCTION_TYPE_MULTIPLIERS = {
+  light: { low: 1.0,  high: 1.0  },
+  full:  { low: 1.15, high: 1.3  },
+};
+
+const POST_CONSTRUCTION_ADDONS = {
+  window_cleaning:    { low: 60,  high: 90  }, // paint overspray / construction film removal
+  debris_haulaway:    { low: 120, high: 200 },
+  vent_dust_removal:  { low: 45,  high: 70  }, // HVAC vents/returns full of drywall dust
+};
+
 // State name lookup
 const STATE_NAMES = {
   AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
@@ -534,4 +596,10 @@ module.exports = {
   WATER_FULL_RESTORATION_PER_SQFT,
   WATER_FULL_RESTORATION_MINIMUM,
   WATER_CATEGORY_MULTIPLIERS,
+  AIRBNB_SIZE_PRICES,
+  AIRBNB_SAME_DAY_RUSH_MULTIPLIER,
+  AIRBNB_ADDONS,
+  POST_CONSTRUCTION_BASE_MULTIPLIER,
+  POST_CONSTRUCTION_TYPE_MULTIPLIERS,
+  POST_CONSTRUCTION_ADDONS,
 };

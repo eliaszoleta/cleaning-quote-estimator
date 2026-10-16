@@ -40,6 +40,8 @@ const SERVICE_LABELS = {
   tile_grout: 'Tile & Grout Cleaning',
   mold_remediation: 'Mold Remediation',
   water_damage: 'Water Damage Restoration',
+  airbnb: 'Airbnb/Vacation Rental Cleaning',
+  post_construction: 'Post-Construction Cleaning',
 };
 
 function fmtMoney(n) {

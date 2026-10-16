@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X } from 'lucide-react';
+import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X, KeyRound, HardHat } from 'lucide-react';
 import { getAllStates } from '../../../data/statePricing';
 
 const ALL_STATES = getAllStates();
@@ -15,6 +15,8 @@ const SERVICES = [
   { id: 'tileGrout',       label: 'Tile & Grout',        Icon: Grid3x3       },
   { id: 'moldRemediation', label: 'Mold Remediation',    Icon: AlertTriangle },
   { id: 'waterDamage',     label: 'Water Damage',        Icon: Droplets      },
+  { id: 'airbnb',          label: 'Airbnb Hosts & Vacation Rentals', Icon: KeyRound },
+  { id: 'postConstruction', label: 'Post-Construction', Icon: HardHat       },
 ];
 
 const DEFAULT_SVC = { enabled: true, markup: 1.0, minimumCharge: null };
@@ -27,6 +29,7 @@ const DISCOUNT_SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning',      Icon: Home      },
   { id: 'apartment',       label: 'Apartment Cleaning',  Icon: Building2 },
   { id: 'commercial',      label: 'Commercial Cleaning', Icon: Building  },
+  { id: 'airbnb',          label: 'Airbnb Hosts & Vacation Rentals', Icon: KeyRound },
 ];
 const DISCOUNT_FREQUENCIES = [
   { id: 'weekly',   label: 'Weekly'    },
