@@ -295,7 +295,7 @@ export default function CompanyLanding() {
                 </span>
               </div>
               <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Start quoting in minutes</h2>
-              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer required — run your first estimate right after signup, then customize your branding and embed the widget on your site whenever you want, all in under 30 minutes.</p>
+              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer required — run your first estimate right after signup, then customize your branding and embed the widget on your site whenever you want.</p>
               <div className="ce-steps-grid">
                 {STEPS.map((s, i) => (
                   <React.Fragment key={s.n}>
