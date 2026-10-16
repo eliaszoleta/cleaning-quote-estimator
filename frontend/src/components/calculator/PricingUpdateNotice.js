@@ -49,12 +49,14 @@ export default function PricingUpdateNotice() {
         .pricing-update-notice .punc-title { font-weight: 700; font-size: 13.5px; color: #14532d; margin-bottom: 2px; }
         .pricing-update-notice .punc-body { font-size: 12.5px; color: #166534; line-height: 1.5; margin: 0; }
         @media (max-width: 640px) {
-          .pricing-update-notice { align-items: center; gap: 8px; padding: 7px 10px; margin-bottom: 12px; }
-          .pricing-update-notice .punc-title { font-size: 11.5px; margin-bottom: 0; }
-          .pricing-update-notice .punc-body { display: none; }
+          .pricing-update-notice { gap: 7px; padding: 8px 8px; margin-bottom: 12px; }
+          .pricing-update-notice .punc-icon { width: 14px; height: 14px; }
+          .pricing-update-notice .punc-title { font-size: 11.5px; margin-bottom: 1px; }
+          .pricing-update-notice .punc-body { font-size: 10.5px; line-height: 1.35; }
+          .pricing-update-notice .punc-dismiss { padding: 0; }
         }
       `}</style>
-      <CheckCircle2 size={17} color={COLORS.success} style={{ flexShrink: 0, marginTop: 1 }} />
+      <CheckCircle2 size={17} color={COLORS.success} className="punc-icon" style={{ flexShrink: 0, marginTop: 1 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="punc-title">Pricing data refreshed — October 2026</div>
         <p className="punc-body">
@@ -64,6 +66,7 @@ export default function PricingUpdateNotice() {
       <button
         onClick={dismiss}
         aria-label="Dismiss"
+        className="punc-dismiss"
         style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#166534', padding: 2, flexShrink: 0, display: 'flex', opacity: 0.7 }}
         onMouseEnter={e => { e.currentTarget.style.opacity = 1; }}
         onMouseLeave={e => { e.currentTarget.style.opacity = 0.7; }}
