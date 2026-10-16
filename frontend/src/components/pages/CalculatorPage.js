@@ -102,8 +102,13 @@ export default function CalculatorPage() {
       />
 
       <div className="page-hero-content">
-        {!showingResults && <PricingUpdateNotice />}
+        {/* Rendered INSIDE the sunk card, not as a sibling before it --
+            .calc-card-sink pulls this card up with a negative top margin to
+            overlap the dark hero band above, so a banner placed before it in
+            normal flow gets visually covered by the card sliding up over it.
+            Keeping it inside means it moves with the card instead. */}
         <div className={showingResults ? undefined : 'calc-card-sink'} style={showingResults ? undefined : { maxWidth: 720, position: 'relative', background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          {!showingResults && <div style={{ padding: '16px 16px 0' }}><PricingUpdateNotice /></div>}
           <CleaningCalculator embedded siteLanding onShowResults={setShowingResults} />
         </div>
 
