@@ -212,7 +212,7 @@ export default function BuyCityPlacement() {
 
             <div style={{ marginBottom: 14 }}>
               <label style={labelStyle}>Business name *</label>
-              <input style={inputStyle} value={form.business_name} onChange={setField('business_name')} placeholder="Sparkle Clean Co." required />
+              <input style={inputStyle} value={form.business_name} onChange={setField('business_name')} placeholder="Maple Street Cleaning Co." required />
             </div>
             <div style={{ marginBottom: 14 }}>
               <label style={labelStyle}>Business email *</label>

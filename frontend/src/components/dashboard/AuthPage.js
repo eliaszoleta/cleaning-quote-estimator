@@ -359,7 +359,7 @@ export default function AuthPage({ onAuth }) {
             <div>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Company name</label>
               <input type="text" required value={company} onChange={e => setCompany(e.target.value)}
-                placeholder="Sparkle Clean Co." style={inputStyle}
+                placeholder="Maple Street Cleaning Co." style={inputStyle}
                 onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
                 onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
             </div>

@@ -233,7 +233,7 @@ export default function ClientDashboard({ user, onLogout }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
                 <div>
                   <label style={labelStyle}>Business Name</label>
-                  <input style={inputStyle} value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Sparkle Clean Co." />
+                  <input style={inputStyle} value={form.business_name} onChange={e => setForm(f => ({ ...f, business_name: e.target.value }))} placeholder="Maple Street Cleaning Co." />
                 </div>
                 <div>
                   <label style={labelStyle}>Business Email</label>
