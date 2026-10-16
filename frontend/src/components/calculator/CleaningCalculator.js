@@ -25,6 +25,7 @@ import PostConstructionStep from './steps/PostConstructionStep';
 import LeadCaptureStep from './steps/LeadCaptureStep';
 import ResultsScreen from './ResultsScreen';
 import EstimateSentScreen from './EstimateSentScreen';
+import PricingUpdateNotice from './PricingUpdateNotice';
 
 const SERVICE_STEPS = {
   home_residential: ['service', 'location', 'home', 'lead', 'results'],
@@ -563,6 +564,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
           {/* Steps */}
           <div style={{ padding: isMobile ? '20px 12px' : embedded && !isWideEmbedded ? '20px 12px' : '32px 40px' }}>
+            {!embedded && currentStep === 'service' && <PricingUpdateNotice />}
             {currentStep === 'service' && (
               <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} />
             )}
