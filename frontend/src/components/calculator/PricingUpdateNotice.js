@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle2, X } from 'lucide-react';
 import { COLORS, RADIUS } from '../../styles/theme';
 
-// Only ever shown on our own public-facing calculator pages (homepage,
-// /cleaning-cost-calculator) -- never inside CleaningCalculator itself,
-// since that same component also renders as a real third-party embed on a
-// company's own site (EmbedWrapper.js) and inside the dashboard's internal
-// "Run an Estimate" tool, neither of which should surface this kind of
-// meta-commentary about cleanestimator.com's own data quality to someone
-// else's customers or to a paying company's staff.
+// Shown on our own public-facing calculator pages (homepage,
+// /cleaning-cost-calculator) and in the dashboard's internal "Run an
+// Estimate" tool (our own paying subscribers' staff -- see the
+// skipLeadCapture-gated render in CleaningCalculator.js) -- but never on a
+// real third-party embed of CleaningCalculator (EmbedWrapper.js) or
+// BrandingTab.js's live preview of one, since this message is meta-
+// commentary about cleanestimator.com's own data quality that would be
+// confusing or off-brand shown to someone else's customers.
 //
 // Dismissible per-visitor (localStorage) AND hard-expires on its own after
 // EXPIRES_AT, so a "we just refreshed our pricing" claim can't quietly go

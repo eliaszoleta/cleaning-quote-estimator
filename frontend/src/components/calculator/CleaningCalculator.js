@@ -564,7 +564,15 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
           {/* Steps */}
           <div style={{ padding: isMobile ? '20px 12px' : embedded && !isWideEmbedded ? '20px 12px' : '32px 40px' }}>
-            {!embedded && currentStep === 'service' && <PricingUpdateNotice />}
+            {/* skipLeadCapture is only ever set by RunEstimateTab.js (see its
+                own comment) -- that's the dashboard's internal "Run an
+                Estimate" tool for our own paying subscribers, so it's fine to
+                show them the same refreshed-pricing reassurance as our public
+                site. The other embedded=true callers (EmbedWrapper.js's real
+                third-party embeds, BrandingTab.js's live preview) stay
+                excluded -- this message is about cleanestimator.com's own
+                data quality and would be confusing on someone else's site. */}
+            {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice />}
             {currentStep === 'service' && (
               <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} />
             )}
