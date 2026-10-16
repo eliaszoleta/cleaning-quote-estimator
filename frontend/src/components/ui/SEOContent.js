@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles } from 'lucide-react';
+import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles, KeyRound, HardHat } from 'lucide-react';
 import { getAllFaqs } from '../../data/faqs';
 import { getAllServices, typicalCost } from '../../data/services';
 import { getFeaturedStates } from '../../data/statePricing';
@@ -27,6 +27,8 @@ const ICONS = {
   tile_grout: Grid3x3,
   mold_remediation: AlertTriangle,
   water_damage: Droplets,
+  airbnb: KeyRound,
+  post_construction: HardHat,
 };
 const COLORS = {
   home_residential: { color: '#2563eb', bg: '#eff6ff' },
@@ -39,6 +41,8 @@ const COLORS = {
   tile_grout: { color: '#0d9488', bg: '#f0fdfa' },
   mold_remediation: { color: '#d97706', bg: '#fffbeb' },
   water_damage: { color: '#0284c7', bg: '#f0f9ff' },
+  airbnb: { color: '#9333ea', bg: '#faf5ff' },
+  post_construction: { color: '#78716c', bg: '#fafaf9' },
 };
 const TIER_NOTE = {
   high: 'Higher cost of living drives premium pricing',
@@ -149,6 +153,18 @@ const SERVICE_PRICE_FACTORS = {
     'Water category: clean, gray (+30%), or black water (+60–100%)',
     'Affected square footage and which floors/areas are affected',
     'Damage severity: wet carpets, soaked walls, or structural damage',
+  ],
+  airbnb: [
+    'Unit size: studio/1 bedroom up to 4+ bedrooms',
+    'Number of bathrooms',
+    'Turnaround: standard (scheduled between guest stays) or same-day rush (+30–40%)',
+    'Frequency: one-time, weekly, biweekly, or monthly (recurring-host discounts)',
+    'Add-ons: linens & laundry, restocking supplies, periodic deep-clean turnover',
+  ],
+  post_construction: [
+    'Home/unit size — 6 tiers from under 1,000 sq ft to 3,000+ sq ft',
+    'Scope: light renovation/touch-up, or new construction/major renovation (+15–30%)',
+    'Add-ons: window cleaning, debris haul-away, vent/duct dust removal',
   ],
 };
 
