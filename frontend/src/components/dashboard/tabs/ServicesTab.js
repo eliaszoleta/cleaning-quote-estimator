@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X, KeyRound, HardHat } from 'lucide-react';
+import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X, KeyRound, Construction } from 'lucide-react';
 import { getAllStates } from '../../../data/statePricing';
 
 const ALL_STATES = getAllStates();
@@ -16,7 +16,7 @@ const SERVICES = [
   { id: 'moldRemediation', label: 'Mold Remediation',    Icon: AlertTriangle },
   { id: 'waterDamage',     label: 'Water Damage',        Icon: Droplets      },
   { id: 'airbnb',          label: 'Airbnb Hosts & Vacation Rentals', Icon: KeyRound },
-  { id: 'postConstruction', label: 'Post-Construction', Icon: HardHat       },
+  { id: 'postConstruction', label: 'Post-Construction', Icon: Construction  },
 ];
 
 const DEFAULT_SVC = { enabled: true, markup: 1.0, minimumCharge: null };

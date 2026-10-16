@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles, KeyRound, HardHat } from 'lucide-react';
+import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles, KeyRound, Construction } from 'lucide-react';
 import { getAllFaqs } from '../../data/faqs';
 import { getAllServices, typicalCost } from '../../data/services';
 import { getFeaturedStates } from '../../data/statePricing';
@@ -28,7 +28,7 @@ const ICONS = {
   mold_remediation: AlertTriangle,
   water_damage: Droplets,
   airbnb: KeyRound,
-  post_construction: HardHat,
+  post_construction: Construction,
 };
 const COLORS = {
   home_residential: { color: '#2563eb', bg: '#eff6ff' },
