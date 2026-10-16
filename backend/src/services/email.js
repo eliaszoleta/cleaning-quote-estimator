@@ -172,9 +172,10 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
 // with bulk/marketing mail, on top of the styling itself.
 function buildText({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
-    totalLow, totalHigh, stateName, unit,
+    totalLow, totalHigh, stateName, city, unit,
     adjustments = [], recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
   } = result;
+  const locationLabel = city ? `${city}, ${stateName}` : stateName;
 
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
   const brandName = companyConfig?.companyName || 'Clean Estimator';
@@ -191,7 +192,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   if (clientName) lines.push(`Client: ${clientName}`, '');
 
   lines.push(
-    `Here's your ${serviceLabel.toLowerCase()} estimate${stateName ? ` for ${stateName}` : ''}:`,
+    `Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:`,
     '',
     `${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
   );
@@ -231,10 +232,13 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
 
 function buildHtml({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
-    totalLow, totalHigh, stateName, unit,
+    totalLow, totalHigh, stateName, city, unit,
     adjustments = [], keyFactors = [],
     recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
   } = result;
+  // Same city-resolution ResultsScreen.js's eyebrow badge now shows --
+  // see cleaningCalculation.js's own resolveCityForZip call.
+  const locationLabel = city ? `${city}, ${stateName}` : stateName;
 
   const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
   const brandName = companyConfig?.companyName || 'Clean Estimator';
@@ -280,7 +284,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   <p style="font-size:14px;margin:0 0 ${clientLine ? 4 : 20}px;">Hi ${firstName},</p>
   ${clientLine}
 
-  <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${stateName ? ` for ${stateName}` : ''}:</p>
+  <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:</p>
 
   <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span></p>
   ${recurringLine}

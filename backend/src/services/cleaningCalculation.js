@@ -1,4 +1,5 @@
 const { stateForZip } = require('../data/zipStateRanges');
+const { resolveCityForZip } = require('./zipCity');
 const {
   STATE_PRICING_MULTIPLIERS,
   HOME_SQFT_BASE_PRICES,
@@ -1063,6 +1064,17 @@ async function calculateCleaning(inputs, companyConfig = {}) {
   const stateMultiplier = getStateMultiplier(resolvedState);
   const stateName = STATE_NAMES[resolvedState] || resolvedState;
 
+  // Same resolution order (explicit serviceDetails.city, then a ZIP
+  // lookup) the lead-notification emails already use (see zipCity.js) --
+  // now surfaced on the estimate itself (ResultsScreen.js, the estimate
+  // email) instead of only ever reaching an internal lead record. Awaited
+  // here rather than fired in the background: this result is what the
+  // visitor sees immediately, so the city has to be in hand before it's
+  // returned. resolveCityForZip caches per ZIP for the life of the
+  // process, so this only costs a real network round-trip the first time
+  // any given ZIP is seen.
+  const city = serviceDetails.city || (zip ? await resolveCityForZip(zip) : null);
+
   let result;
   switch (serviceType) {
     case 'home_residential':  result = calculateHomeResidential(serviceDetails, stateMultiplier, companyConfig); break;
@@ -1084,6 +1096,7 @@ async function calculateCleaning(inputs, companyConfig = {}) {
     state: resolvedState,
     stateName,
     stateMultiplier,
+    city,
   };
 }
 

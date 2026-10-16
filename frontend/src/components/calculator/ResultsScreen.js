@@ -73,7 +73,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
   const showPartnerCard = !!demoPartner || (!!partner && !embedded);
 
   const {
-    totalLow, totalHigh, stateName, stateMultiplier,
+    totalLow, totalHigh, stateName, stateMultiplier, city,
     recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
     adjustments = [], keyFactors = [], disclaimer, urgencyLevel,
     serviceType, unit,
@@ -130,7 +130,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
               <div style={{ position: 'absolute', top: -100, right: -60, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
               <div style={{ position: 'relative' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, opacity: 0.85, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                  <CheckCircle2 size={14} /> {serviceTypeLabel(serviceType)} Estimate · {stateName}
+                  <CheckCircle2 size={14} /> {serviceTypeLabel(serviceType)} Estimate · {city ? `${city}, ${stateName}` : stateName}
                 </div>
                 {/* A lower clamp() floor (was 34px) plus nowrap -- on a narrow
                     phone a longer range like "$1,345 - $1,632" at 34px had no
