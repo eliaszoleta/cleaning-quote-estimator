@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, X } from 'lucide-react';
+import { CheckCircle2, X } from 'lucide-react';
 import { COLORS, RADIUS } from '../../styles/theme';
 
 // Only ever shown on our own public-facing calculator pages (homepage,
@@ -44,7 +44,7 @@ export default function PricingUpdateNotice() {
         maxWidth: 720, marginLeft: 'auto', marginRight: 'auto',
       }}
     >
-      <Sparkles size={17} color={COLORS.success} style={{ flexShrink: 0, marginTop: 1 }} />
+      <CheckCircle2 size={17} color={COLORS.success} style={{ flexShrink: 0, marginTop: 1 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 700, fontSize: 13.5, color: '#14532d', marginBottom: 2 }}>
           Pricing data refreshed — October 2026
