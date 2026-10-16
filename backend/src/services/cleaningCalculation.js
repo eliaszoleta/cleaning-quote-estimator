@@ -7,6 +7,7 @@ const {
   BATHROOM_ADDON,
   CLEANING_TYPE_MULTIPLIERS,
   HOME_EXTRAS,
+  LAUNDRY_PER_BED_RATE,
   CONDITION_MULTIPLIERS,
   APARTMENT_SIZE_PRICES,
   COMMERCIAL_SQFT_RATES,
@@ -136,6 +137,7 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
     frequency = 'one_time',
     extras = [],
     condition = 'good',
+    laundryBeds = 0,
   } = details;
 
   const cfg = companyConfig?.services?.homeResidential || {};
@@ -183,6 +185,16 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
     }
   }
 
+  // Laundry, scaled by how many beds actually need it -- e.g. 4 of a
+  // 5-bedroom home's beds, not the whole house -- rather than the old flat
+  // HOME_EXTRAS 'laundry' line, which charged the same whether it was 1 bed
+  // or 5. See LAUNDRY_PER_BED_RATE in defaults.js.
+  if (laundryBeds > 0) {
+    const adj = applyMultiplier({ low: laundryBeds * LAUNDRY_PER_BED_RATE.low, high: laundryBeds * LAUNDRY_PER_BED_RATE.high }, stateMultiplier * markup);
+    range = addRange(range, adj);
+    adjustments.push({ label: `Laundry — ${laundryBeds} bed${laundryBeds === 1 ? '' : 's'} (wash, dry, remake)`, low: adj.low, high: adj.high });
+  }
+
   // Condition
   const condMult = CONDITION_MULTIPLIERS[condition] || CONDITION_MULTIPLIERS.good;
   if (condition !== 'good') {
@@ -201,7 +213,7 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
   if (frequency !== 'one_time' && discount > 0) {
     recurringLow = Math.round(range.low * (1 - discount));
     recurringHigh = Math.round(range.high * (1 - discount));
-    const visitsPerYear = { weekly: 52, biweekly: 26, monthly: 12 }[frequency] || 12;
+    const visitsPerYear = { weekly: 52, biweekly: 26, triweekly: 17, monthly: 12 }[frequency] || 12;
     annualSavings = Math.round(((range.low + range.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
     adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: -Math.round(range.low * discount), high: -Math.round(range.high * discount) });
   }

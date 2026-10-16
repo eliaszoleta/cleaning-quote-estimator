@@ -29,8 +29,14 @@ const ONE_TIME_CONDITIONS = [
   { id: 'severe', label: 'Vacant, Heavily Neglected', desc: 'Empty 1+ years, heavy grease/buildup, restoration-level' },
 ];
 
+// three_per_week and twice_weekly fill the gap that used to exist between
+// Weekly and Daily -- previously the only step up from once a week was all
+// the way to 5x/week, with nothing in between for spaces (like gyms) that
+// need more than weekly but not daily attention.
 const FREQUENCIES = [
   { id: 'daily', label: 'Daily (5×/wk)' },
+  { id: 'three_per_week', label: '3× a Week' },
+  { id: 'twice_weekly', label: 'Twice a Week' },
   { id: 'weekly', label: 'Weekly' },
   { id: 'biweekly', label: 'Bi-Weekly' },
   { id: 'monthly', label: 'Monthly' },

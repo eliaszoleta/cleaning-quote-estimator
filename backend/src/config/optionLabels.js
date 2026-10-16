@@ -39,8 +39,11 @@ const CLEANING_TYPE_LABELS = {
 const FREQUENCY_LABELS = {
   one_time: 'One-Time',
   daily: 'Daily (5x/wk)',
+  three_per_week: '3x a Week',
+  twice_weekly: 'Twice a Week',
   weekly: 'Weekly',
   biweekly: 'Bi-Weekly',
+  triweekly: 'Every 3 Weeks',
   monthly: 'Monthly',
 };
 

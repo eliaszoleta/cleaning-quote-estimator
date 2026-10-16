@@ -31,6 +31,7 @@ const FREQUENCY = [
   { id: 'one_time', label: 'One-Time' },
   { id: 'weekly', label: 'Weekly' },
   { id: 'biweekly', label: 'Bi-Weekly' },
+  { id: 'triweekly', label: 'Every 3 Weeks' },
   { id: 'monthly', label: 'Monthly' },
 ];
 
@@ -40,11 +41,14 @@ const FREQUENCY = [
 // silently cost $0 when selected (the addon loop just skips an unknown key
 // rather than erroring). 'inside_cabinets' and 'pet_hair' had no backend
 // price at all until now -- added to HOME_EXTRAS alongside this fix.
+// 'laundry' used to be a flat toggle here (same price whether it was 1
+// bed's linens or 5) -- removed in favor of the dedicated bed-count
+// control below, which prices "laundry for 4 beds" the way it's actually
+// requested in practice, not as an all-or-nothing whole-home add-on.
 const EXTRAS = [
   { id: 'inside_fridge', label: 'Inside Fridge' },
   { id: 'inside_oven', label: 'Inside Oven' },
   { id: 'inside_cabinets', label: 'Inside Cabinets' },
-  { id: 'laundry', label: 'Laundry (wash & fold)' },
   { id: 'interior_windows', label: 'Interior Windows' },
   { id: 'garage', label: 'Garage' },
   { id: 'balcony_patio', label: 'Patio / Deck' },
@@ -64,10 +68,11 @@ export default function HomeStep({ value, onBack, onNext, primaryColor, companyC
   const [frequency, setFrequency] = useState(value.frequency || 'one_time');
   const [extras, setExtras] = useState(value.extras || []);
   const [condition, setCondition] = useState(value.condition || 'good');
+  const [laundryBeds, setLaundryBeds] = useState(value.laundryBeds || 0);
 
   const toggleExtra = (id) => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
-  const handleNext = () => onNext({ sqftTier, bedrooms, bathrooms, cleaningType, frequency, extras, condition });
+  const handleNext = () => onNext({ sqftTier, bedrooms, bathrooms, cleaningType, frequency, extras, condition, laundryBeds });
 
   return (
     <StepWrapper
@@ -165,7 +170,18 @@ export default function HomeStep({ value, onBack, onNext, primaryColor, companyC
           {EXTRAS.map(ex => (
             <StepPillToggle key={ex.id} selected={extras.includes(ex.id)} onClick={() => toggleExtra(ex.id)} primaryColor={primaryColor}>{ex.label}</StepPillToggle>
           ))}
+          <StepPillToggle selected={laundryBeds > 0} onClick={() => setLaundryBeds(laundryBeds > 0 ? 0 : 1)} primaryColor={primaryColor}>Laundry (wash, dry, remake)</StepPillToggle>
         </div>
+        {laundryBeds > 0 && (
+          <div style={{ marginTop: 10 }}>
+            <label style={{ fontSize: 13, color: COLORS.body, fontWeight: 600 }}>Beds needing laundry: {laundryBeds}</label>
+            <input type="range" min={1} max={8} step={1} value={laundryBeds} onChange={e => setLaundryBeds(+e.target.value)}
+              style={{ width: '100%', accentColor: primaryColor, marginTop: 4 }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: COLORS.muted, marginTop: 4 }}>
+              <span>1 bed</span><span>8 beds</span>
+            </div>
+          </div>
+        )}
       </StepSection>
     </StepWrapper>
   );

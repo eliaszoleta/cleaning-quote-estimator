@@ -258,6 +258,14 @@ const HOME_EXTRAS = {
   inside_fridge:    { low: 30, high: 42 },
   inside_cabinets:  { low: 35, high: 46 }, // comparable scope to inside_oven/inside_fridge
   interior_windows: { low: 52, high: 65 },
+  // 'laundry' kept as a legacy flat line -- HomeStep.js no longer offers it
+  // as of Oct 2026 (replaced by LAUNDRY_PER_BED_RATE below, which scales
+  // with how many beds actually need laundry instead of charging the same
+  // flat amount whether it's 1 bed or 5). Still priced here, not removed,
+  // so a stored lead from before the change (e.g. re-priced live by the
+  // "Email to Coworker" feature, which re-runs calculateCleaning() from the
+  // original saved inputs) doesn't silently drop to $0 for an extra the
+  // customer actually selected and was quoted for.
   laundry:          { low: 34, high: 44 },
   dishes:           { low: 24, high: 32 },
   garage:           { low: 63, high: 80 },
@@ -265,6 +273,14 @@ const HOME_EXTRAS = {
   balcony_patio:    { low: 43, high: 56 },
   pet_hair:         { low: 30, high: 40 }, // whole-home pass, comparable to inside_fridge tier
 };
+
+// Per-bed laundry (wash, dry, remake) -- replaces the old flat HOME_EXTRAS
+// 'laundry' line above, which charged the same amount whether a customer
+// needed 1 bed's linens done or 5 (a real request: "laundry for 4 beds" on
+// a 5-bedroom home, only some of which need it). Calibrated so a typical
+// 2-3 bed selection lands close to the old flat $34-44 line it replaces,
+// scaling proportionally beyond that instead of staying flat.
+const LAUNDRY_PER_BED_RATE = { low: 14, high: 18 };
 
 // Home condition multipliers
 const CONDITION_MULTIPLIERS = {
@@ -323,9 +339,16 @@ const COMMERCIAL_SERVICE_LEVELS = {
 };
 
 // Commercial frequency (visits per month)
+// twice_weekly added Oct 2026 -- the jump from "Weekly" straight to "Daily"
+// left one of the most common commercial cadences (2x/week -- a step up
+// from weekly for spaces like gyms with heavier daily wear) completely
+// unselectable. three_per_week already existed here but, until the same
+// date, had no matching option in CommercialStep.js's FREQUENCIES array --
+// a real key with no way to ever reach it from the UI.
 const COMMERCIAL_VISITS_PER_MONTH = {
   daily:    20,
   three_per_week: 13,
+  twice_weekly: 9,
   weekly:   4,
   biweekly: 2,
   monthly:  1,
@@ -767,6 +790,7 @@ module.exports = {
   BATHROOM_ADDON,
   CLEANING_TYPE_MULTIPLIERS,
   HOME_EXTRAS,
+  LAUNDRY_PER_BED_RATE,
   CONDITION_MULTIPLIERS,
   APARTMENT_SIZE_PRICES,
   COMMERCIAL_SQFT_RATES,
