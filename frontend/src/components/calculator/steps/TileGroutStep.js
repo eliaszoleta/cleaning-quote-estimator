@@ -41,7 +41,7 @@ export default function TileGroutStep({ value, onBack, onNext, primaryColor, isF
           ))}
         </div>
         {tileType === 'natural_stone' && (
-          <p style={{ fontSize: 12, color: COLORS.warning, marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={12} /> Natural stone (travertine, slate, marble, etc.) requires specialized cleaning products — costs 30–40% more than ceramic.</p>
+          <p style={{ fontSize: 12, color: COLORS.warning, marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={12} /> Natural stone (travertine, slate, marble, etc.) requires specialized cleaning products — costs roughly 65–70% more than ceramic.</p>
         )}
       </StepSection>
 

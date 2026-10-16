@@ -175,7 +175,7 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
 function buildText({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
     totalLow, totalHigh, stateName, city, unit,
-    adjustments = [], recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
+    adjustments = [], recurringAnnualSavings,
   } = result;
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
 
@@ -199,8 +199,12 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     `${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
   );
 
-  if (recurringMonthlyLow && unit !== 'per_month') {
-    lines.push(`Recurring: ${fmtMoney(recurringMonthlyLow)} - ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` (save ~${fmtMoney(recurringAnnualSavings)}/year)` : ''}`);
+  // totalLow/High above are already the discounted recurring price when a
+  // discount applies (see ResultsScreen.js's matching comment) -- restating
+  // recurringMonthlyLow/High here would just repeat the same two numbers
+  // under a different label. Annual savings is the one genuinely new figure.
+  if (recurringAnnualSavings && unit !== 'per_month') {
+    lines.push(`Recurring discount applied (save ~${fmtMoney(recurringAnnualSavings)}/year)`);
   }
 
   lines.push('', 'Price breakdown:');
@@ -236,7 +240,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   const {
     totalLow, totalHigh, stateName, city, unit,
     adjustments = [], keyFactors = [],
-    recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
+    recurringAnnualSavings,
   } = result;
   // Same city-resolution ResultsScreen.js's eyebrow badge now shows --
   // see cleaningCalculation.js's own resolveCityForZip call.
@@ -262,8 +266,13 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   // "Recurring" badge -- color accent without the solid gradient banner
   // that's the actual thing known to push a transactional email into
   // Gmail's Promotions tab (see the file-top comment).
-  const recurringLine = (recurringMonthlyLow && unit !== 'per_month')
-    ? `<p style="margin:14px 0 0;"><span style="display:inline-block;background:${primaryColor}17;color:${primaryColor};padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:700;">Recurring: ${fmtMoney(recurringMonthlyLow)} – ${fmtMoney(recurringMonthlyHigh)}/visit${recurringAnnualSavings ? ` · Save ~${fmtMoney(recurringAnnualSavings)}/year` : ''}</span></p>`
+  // totalLow/High above are already the discounted recurring price when a
+  // discount applies -- restating recurringMonthlyLow/High here would just
+  // repeat the same two numbers under a different label (see
+  // ResultsScreen.js's matching comment). Annual savings is the one
+  // genuinely new figure this pill adds.
+  const recurringLine = (recurringAnnualSavings && unit !== 'per_month')
+    ? `<p style="margin:14px 0 0;"><span style="display:inline-block;background:${primaryColor}17;color:${primaryColor};padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:700;">✓ Recurring discount applied · Save ~${fmtMoney(recurringAnnualSavings)}/year</span></p>`
     : '';
 
   const bottomHtml = partner

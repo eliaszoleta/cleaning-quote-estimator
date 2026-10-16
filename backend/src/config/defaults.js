@@ -88,10 +88,19 @@ const DEFAULT_COMPANY_CONFIG = {
     cancelAtPeriodEnd: false,
   },
   apiKey: null,
+  // Per-service overrides a company can actually set (Services tab): enabled,
+  // minimumCharge, markup, and frequencyDiscounts (where recurring service
+  // applies) -- every calculate* function in cleaningCalculation.js only
+  // ever reads those four keys off companyConfig.services.<key>. The real
+  // per-unit prices (HOME_SQFT_BASE_PRICES, CARPET_PRICE_PER_ROOM,
+  // TILE_PRICE_PER_SQFT, etc.) live in the module-level pricing tables
+  // below instead, not here -- this previously also carried a
+  // basePricePerSqft/pricePerSqft/pricePerRoom/pricePerVent/basePrice field
+  // per service that looked like a per-company price override but was
+  // never read anywhere, a vestige of an older flat-rate pricing model.
   services: {
     homeResidential: {
       enabled: true,
-      basePricePerSqft: 0.10,
       minimumCharge: 100,
       markup: 1.0,
       // Off by default (see DiscountTab.js) -- no recurring-frequency
@@ -101,41 +110,33 @@ const DEFAULT_COMPANY_CONFIG = {
     },
     apartment: {
       enabled: true,
-      basePricePerSqft: 0.09,
       minimumCharge: 85,
       markup: 1.0,
       frequencyDiscounts: { weekly: 0, biweekly: 0, monthly: 0 },
     },
     commercial: {
       enabled: true,
-      pricePerSqft: 0.08,
       minimumCharge: 200,
       markup: 1.0,
       frequencyDiscounts: { weekly: 0, biweekly: 0, monthly: 0 },
     },
     carpet: {
       enabled: true,
-      pricePerRoom: 45,
-      pricePerSqft: 0.30,
       minimumCharge: 90,
       markup: 1.0,
     },
     airDuct: {
       enabled: true,
-      basePrice: 380,
-      pricePerVent: 20,
       minimumCharge: 300,
       markup: 1.0,
     },
     dryerVent: {
       enabled: true,
-      basePrice: 120,
       minimumCharge: 80,
       markup: 1.0,
     },
     tileGrout: {
       enabled: true,
-      pricePerSqft: 1.50,
       minimumCharge: 175,
       markup: 1.0,
     },
@@ -241,6 +242,16 @@ const COMMERCIAL_SQFT_RATES = {
   warehouse: { low: 0.052, high: 0.065 },
   school:    { low: 0.095, high: 0.118 },
   gym:       { low: 0.104, high: 0.128 },
+  // CommercialStep.js has offered "Church / Event Space" as a building
+  // type since this table was first written, with no matching key here --
+  // every church/event-space quote was silently priced at the office
+  // rate. Positioned between retail and school: a large, mostly-open
+  // worship hall brings the per-sqft rate down (like a warehouse), but
+  // fellowship-hall kitchens, nurseries, and heavier restroom use than a
+  // typical office push it back up -- net, in the same ballpark as a
+  // school (classrooms + cafeteria + gym, the closest comparable
+  // multi-purpose public building already in this table).
+  church:    { low: 0.085, high: 0.115 },
 };
 
 // Service level multipliers for commercial
@@ -277,7 +288,6 @@ const COMMERCIAL_RESTROOM_PER_VISIT_RATE = { low: 4, high: 7 };
 // Carpet cleaning prices
 const CARPET_PRICE_PER_ROOM = { low: 44, high: 55 };
 const CARPET_PRICE_PER_SQFT = { low: 0.28, high: 0.35 };
-const CARPET_MINIMUM = { low: 90, high: 110 };
 
 const CARPET_CONDITION_MULTIPLIERS = {
   light:   { low: 1.0,  high: 1.0  },
@@ -328,8 +338,6 @@ const UPHOLSTERY_ADDONS = {
   fabric_protector: { low: 15, high: 25 }, // per piece
   deodorizer:        { low: 12, high: 20 }, // per piece
 };
-
-const UPHOLSTERY_MINIMUM = { low: 90, high: 120 };
 
 // Air duct cleaning
 const AIR_DUCT_BASE = { low: 330, high: 420 }; // up to ~12 vents residential
@@ -395,8 +403,6 @@ const TILE_SERVICE_ADDONS = {
   caulk_replacement: { perLinFt: { low: 3.5, high: 7 } },
   tile_repair:       { perSqft: { low: 6, high: 13 } },
 };
-
-const TILE_MINIMUM = { low: 150, high: 200 };
 
 // Mold remediation price ranges by affected area
 // Source: EPA mold remediation guidelines, NORMI certified remediators
@@ -559,7 +565,6 @@ module.exports = {
   COMMERCIAL_RESTROOM_PER_VISIT_RATE,
   CARPET_PRICE_PER_ROOM,
   CARPET_PRICE_PER_SQFT,
-  CARPET_MINIMUM,
   CARPET_CONDITION_MULTIPLIERS,
   CARPET_METHOD_MULTIPLIERS,
   CARPET_ADDONS,
@@ -568,7 +573,6 @@ module.exports = {
   UPHOLSTERY_CONDITION_MULTIPLIERS,
   UPHOLSTERY_LEATHER_MULTIPLIER,
   UPHOLSTERY_ADDONS,
-  UPHOLSTERY_MINIMUM,
   AIR_DUCT_BASE,
   AIR_DUCT_PER_VENT,
   AIR_DUCT_PER_SYSTEM,
@@ -582,7 +586,6 @@ module.exports = {
   TILE_PRICE_PER_SQFT,
   TILE_CONDITION_MULTIPLIERS,
   TILE_SERVICE_ADDONS,
-  TILE_MINIMUM,
   MOLD_PRICE_RANGES,
   MOLD_TYPE_MULTIPLIERS,
   MOLD_SOURCE_FIXED_MULTIPLIERS,

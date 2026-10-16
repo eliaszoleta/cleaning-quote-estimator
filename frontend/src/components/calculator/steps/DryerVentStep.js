@@ -67,7 +67,7 @@ export default function DryerVentStep({ value, onBack, onNext, primaryColor, isF
             <span style={{ display: 'flex' }}>{clogSuspected ? <AlertTriangle size={17} color={COLORS.danger} /> : <Square size={17} color={COLORS.muted} />}</span>
             Yes — dryer takes more than one cycle or I smell burning
           </div>
-          <div style={{ fontSize: 12, color: COLORS.body, marginTop: 6, paddingLeft: 30 }}>Confirmed clogs require additional clearing work (+$50–$100).</div>
+          <div style={{ fontSize: 12, color: COLORS.body, marginTop: 6, paddingLeft: 30 }}>Confirmed clogs require additional clearing work (+$35–$55).</div>
         </button>
       </StepSection>
     </StepWrapper>

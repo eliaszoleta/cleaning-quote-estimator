@@ -37,6 +37,8 @@ export function serviceTypeLabel(type) {
     tile_grout: 'Tile & Grout',
     mold_remediation: 'Mold Remediation',
     water_damage: 'Water Damage',
+    airbnb: 'Airbnb/Vacation Rental Cleaning',
+    post_construction: 'Post-Construction Cleaning',
   };
   return map[type] || type;
 }

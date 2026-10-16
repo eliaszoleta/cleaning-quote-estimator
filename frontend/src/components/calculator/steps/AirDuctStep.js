@@ -68,7 +68,7 @@ export default function AirDuctStep({ value, onBack, onNext, primaryColor, isFin
             I suspect mold or musty odors in my ductwork
           </div>
           <div style={{ fontSize: 12, color: COLORS.body, marginTop: 6, paddingLeft: 30 }}>
-            Mold in ductwork requires specialized treatment (+40–50%). An inspection is required before remediation.
+            Mold in ductwork requires specialized treatment (+43–47%). An inspection is required before remediation.
           </div>
         </button>
       </StepSection>

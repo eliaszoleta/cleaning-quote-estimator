@@ -74,7 +74,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
   const {
     totalLow, totalHigh, stateName, stateMultiplier, city,
-    recurringMonthlyLow, recurringMonthlyHigh, recurringAnnualSavings,
+    recurringAnnualSavings,
     adjustments = [], keyFactors = [], disclaimer, urgencyLevel,
     serviceType, unit,
   } = result;
@@ -145,10 +145,22 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                   {isHighState && ` · ${stateName} is a higher-cost market`}
                   {isLowState && ` · ${stateName} is a lower-cost market`}
                 </div>
-                {recurringMonthlyLow && unit !== 'per_month' && (
+                {/* recurringMonthlyLow/High are ALWAYS the exact same numbers as
+                    totalLow/High above when a discount applies -- the
+                    calculation already folds the discount into the main
+                    total (see calculateHomeResidential etc.'s finalLow =
+                    recurringLow || range.low). Repeating those same two
+                    dollar amounts a second time under a "Recurring" label
+                    read as a duplicate/glitch rather than new information.
+                    The itemized breakdown below already shows the discount
+                    as its own line item with real dollar amounts -- this
+                    badge just confirms it applied and adds the one genuinely
+                    new number (annual savings), instead of restating the
+                    headline. */}
+                {recurringAnnualSavings && unit !== 'per_month' && (
                   <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '10px 14px', display: 'inline-block' }}>
-                    <span style={{ fontWeight: 700, fontSize: 13.5 }}>Recurring: {formatPrice(recurringMonthlyLow)} – {formatPrice(recurringMonthlyHigh)}/visit</span>
-                    {recurringAnnualSavings && <span style={{ opacity: 0.9, fontSize: 13 }}> · Save ~{formatPrice(recurringAnnualSavings)}/year</span>}
+                    <span style={{ fontWeight: 700, fontSize: 13.5 }}>✓ Recurring discount applied</span>
+                    <span style={{ opacity: 0.9, fontSize: 13 }}> · Save ~{formatPrice(recurringAnnualSavings)}/year</span>
                   </div>
                 )}
               </div>

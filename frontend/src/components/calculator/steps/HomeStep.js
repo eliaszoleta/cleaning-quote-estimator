@@ -155,7 +155,7 @@ export default function HomeStep({ value, onBack, onNext, primaryColor, companyC
           ))}
         </div>
         <p style={{ fontSize: 12, color: COLORS.muted, marginTop: 6 }}>
-          Neglected homes with heavy buildup may cost 25–50% more.
+          Neglected homes with heavy buildup may cost 22–28% more.
         </p>
       </StepSection>
 
