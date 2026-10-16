@@ -142,6 +142,18 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     : ['service'];
   const currentStep = steps[stepIndex];
 
+  // Re-runs on every currentStep change, not just on mount -- the results
+  // step (below) returns an entirely different tree with no cardRef div at
+  // all, so cardRef's node gets unmounted while viewing results and a brand
+  // new one is created when "New Estimate" returns to the service step. An
+  // empty dependency array here would attach the observer once to the
+  // FIRST card div and never again: when that div is removed, its
+  // ResizeObserver fires a final callback reporting a collapsed 0-width
+  // rect, latching isMobile true forever (the new card div after reset is
+  // never measured at all) -- exactly what made "New Estimate" randomly
+  // drop the service grid down to a cramped 2-column mobile layout even on
+  // a wide desktop card. Re-running per step keeps the observer attached to
+  // whatever the real, current card node is.
   useEffect(() => {
     const el = cardRef.current;
     if (!el) return;
@@ -152,7 +164,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [currentStep]);
 
   // True for every non-embedded page (unchanged) AND for an embedded
   // context wide enough that it isn't actually a cramped third-party
