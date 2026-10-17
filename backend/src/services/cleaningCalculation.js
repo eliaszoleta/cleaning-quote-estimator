@@ -807,17 +807,31 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
   }
 
   range = applyMultiplier(range, stateMultiplier * markup);
+  // Tracks the same running total as `range`, minus Dryer Vent Combo (see
+  // why below) -- this, not `range`, is what the mold-suspected surcharge
+  // is computed against.
+  let surchargeBase = { ...range };
 
   for (const extra of extras) {
     if (AIR_DUCT_ADDONS[extra]) {
       const adj = applyMultiplier(AIR_DUCT_ADDONS[extra], stateMultiplier * markup);
       range = addRange(range, adj);
       adjustments.push({ label: extra.replace(/_/g, ' '), low: adj.low, high: adj.high });
+      // Dryer Vent Combo is a physically separate duct system (the clothes
+      // dryer's own exhaust, not the HVAC return/supply ducts the mold
+      // checkbox below is asking about) -- it isn't implicated by mold
+      // suspected in the ductwork, so it's deliberately excluded from
+      // surchargeBase. Coil Cleaning and UV Sanitizing stay in: the
+      // evaporator coil is a classic mold/mildew site (cold + condensation,
+      // often a bigger source of a musty smell than the ducts themselves),
+      // and UV Sanitizing is itself a mold/microbial treatment, not an
+      // unrelated add-on.
+      if (extra !== 'dryer_vent_combo') surchargeBase = addRange(surchargeBase, adj);
     }
   }
 
   if (moldSuspected) {
-    const moldSurcharge = { low: Math.round(range.low * 0.43), high: Math.round(range.high * 0.47) };
+    const moldSurcharge = { low: Math.round(surchargeBase.low * 0.43), high: Math.round(surchargeBase.high * 0.47) };
     range = addRange(range, moldSurcharge);
     adjustments.push({ label: 'Mold suspected surcharge (+43–47%)', low: moldSurcharge.low, high: moldSurcharge.high });
   }
