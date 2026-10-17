@@ -208,11 +208,11 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                       anchor on" rather than implying the tool knows more
                       about this specific job than the range already shows. */}
                   {suggestedPrice != null && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '10px 12px', borderTop: `1px dashed ${COLORS.borderSubtle}` }}>
-                      <span style={{ fontSize: 12.5, color: COLORS.muted }}>
-                        Suggested price <span style={{ opacity: 0.8 }}>(midpoint of the range above)</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '11px 12px', background: `${primaryColor}0d`, borderTop: `1px solid ${primaryColor}28` }}>
+                      <span style={{ fontSize: 12.5, color: COLORS.body, fontWeight: 600 }}>
+                        Suggested price <span style={{ fontWeight: 400, opacity: 0.75 }}>(midpoint of the range above)</span>
                       </span>
-                      <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 700, fontSize: 14, color: COLORS.ink }}>
+                      <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: primaryColor }}>
                         {formatPrice(suggestedPrice)}{unit === 'per_month' ? '/mo' : ''}
                       </span>
                     </div>

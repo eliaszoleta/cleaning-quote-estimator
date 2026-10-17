@@ -347,9 +347,9 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
         <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)}</td>
       </tr>
       ${suggestedPrice != null ? `
-      <tr>
-        <td style="padding:9px 12px;font-size:12px;color:#666666;border-top:1px dashed #e0e0e0;">Suggested price <span style="opacity:0.8;">(midpoint of the range above)</span></td>
-        <td style="padding:9px 12px;text-align:right;font-weight:700;font-size:13px;color:#111111;border-top:1px dashed #e0e0e0;white-space:nowrap;">${fmtMoney(suggestedPrice)}${unit === 'per_month' ? '/mo' : ''}</td>
+      <tr style="background:${primaryColor}0d;">
+        <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Suggested price <span style="font-weight:400;opacity:0.75;">(midpoint of the range above)</span></td>
+        <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice)}${unit === 'per_month' ? '/mo' : ''}</td>
       </tr>` : ''}
     </table>
   </div>
