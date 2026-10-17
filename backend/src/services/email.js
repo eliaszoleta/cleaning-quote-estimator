@@ -79,8 +79,12 @@ function buildServiceListSentence() {
   return joinWithOxfordComma(names);
 }
 
-function fmtMoney(n) {
-  return `$${Math.round(n).toLocaleString('en-US')}`;
+// symbol defaults to '$' so every existing call site (every one of them,
+// pre-Canada-pilot) renders byte-identical to before this parameter
+// existed. A CA company's result carries currencySymbol: 'C$' (see
+// calculateCleaning's return in cleaningCalculation.js).
+function fmtMoney(n, symbol = '$') {
+  return `${symbol}${Math.round(n).toLocaleString('en-US')}`;
 }
 
 // Normalizes any phone string to (XXX) XXX-XXXX for display in an email,
@@ -108,10 +112,10 @@ function fmtSubjectTimestamp() {
   return new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' });
 }
 
-function fmtAdjustment(adj) {
+function fmtAdjustment(adj, symbol = '$') {
   if (adj.low === 0 && adj.high === 0) return 'Included';
-  if (adj.low < 0 || adj.high < 0) return `−${fmtMoney(Math.abs(adj.low))} – −${fmtMoney(Math.abs(adj.high))}`;
-  return `${fmtMoney(adj.low)} – ${fmtMoney(adj.high)}`;
+  if (adj.low < 0 || adj.high < 0) return `−${fmtMoney(Math.abs(adj.low), symbol)} – −${fmtMoney(Math.abs(adj.high), symbol)}`;
+  return `${fmtMoney(adj.low, symbol)} – ${fmtMoney(adj.high, symbol)}`;
 }
 
 // Mirrors ResultsScreen's own "Price breakdown" table -- same rows,
@@ -138,13 +142,13 @@ function buildBreakdownRows(adjustments) {
 // email actually handed to the person who got the estimate) -- the
 // internal lead-notification templates above intentionally keep the
 // plainer buildBreakdownRows look.
-function buildEstimateBreakdownRows(adjustments) {
+function buildEstimateBreakdownRows(adjustments, symbol = '$') {
   const rows = adjustments.filter(a => !a.separate);
   return rows
     .map((a, i) => `
       <tr style="background:${i % 2 === 0 ? '#ffffff' : '#fafafa'};">
         <td style="padding:10px 12px;color:#333333;font-size:13.5px;text-transform:capitalize;${i < rows.length - 1 ? 'border-bottom:1px solid #e0e0e0;' : ''}">${a.label}</td>
-        <td style="padding:10px 12px;text-align:right;font-size:13.5px;color:#333333;white-space:nowrap;${i < rows.length - 1 ? 'border-bottom:1px solid #e0e0e0;' : ''}">${fmtAdjustment(a)}</td>
+        <td style="padding:10px 12px;text-align:right;font-size:13.5px;color:#333333;white-space:nowrap;${i < rows.length - 1 ? 'border-bottom:1px solid #e0e0e0;' : ''}">${fmtAdjustment(a, symbol)}</td>
       </tr>`)
     .join('');
 }
@@ -210,7 +214,7 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
 function buildText({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
-    adjustments = [], recurringAnnualSavings,
+    adjustments = [], recurringAnnualSavings, currencySymbol = '$',
   } = result;
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
 
@@ -231,7 +235,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   lines.push(
     `Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:`,
     '',
-    `${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
+    `${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
   );
 
   // totalLow/High above are already the discounted recurring price when a
@@ -239,16 +243,16 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   // recurringMonthlyLow/High here would just repeat the same two numbers
   // under a different label. Annual savings is the one genuinely new figure.
   if (recurringAnnualSavings && unit !== 'per_month') {
-    lines.push(`Recurring discount applied (save ~${fmtMoney(recurringAnnualSavings)}/year)`);
+    lines.push(`Recurring discount applied (save ~${fmtMoney(recurringAnnualSavings, currencySymbol)}/year)`);
   }
 
   lines.push('', 'Price breakdown:');
   adjustments.filter(a => !a.separate).forEach(a => {
-    lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
+    lines.push(`  ${a.label}: ${fmtAdjustment(a, currencySymbol)}`);
   });
-  lines.push(`  Estimated total: ${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)}`);
+  lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
   if (suggestedPrice != null) {
-    lines.push(`  Suggested price (midpoint of the range above): ${fmtMoney(suggestedPrice)}${unit === 'per_month' ? '/mo' : ''}`);
+    lines.push(`  Suggested price (midpoint of the range above): ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
   }
 
   if (partner) {
@@ -278,7 +282,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   const {
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], keyFactors = [],
-    recurringAnnualSavings,
+    recurringAnnualSavings, currencySymbol = '$',
   } = result;
   // Same city-resolution ResultsScreen.js's eyebrow badge now shows --
   // see cleaningCalculation.js's own resolveCityForZip call.
@@ -310,7 +314,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   // ResultsScreen.js's matching comment). Annual savings is the one
   // genuinely new figure this pill adds.
   const recurringLine = (recurringAnnualSavings && unit !== 'per_month')
-    ? `<p style="margin:14px 0 0;"><span style="display:inline-block;background:${primaryColor}17;color:${primaryColor};padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:700;">✓ Recurring discount applied · Save ~${fmtMoney(recurringAnnualSavings)}/year</span></p>`
+    ? `<p style="margin:14px 0 0;"><span style="display:inline-block;background:${primaryColor}17;color:${primaryColor};padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:700;">✓ Recurring discount applied · Save ~${fmtMoney(recurringAnnualSavings, currencySymbol)}/year</span></p>`
     : '';
 
   const bottomHtml = partner
@@ -335,21 +339,21 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:</p>
 
-  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span></p>
+  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span></p>
   ${recurringLine}
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 8px;">Price breakdown</p>
   <div style="border:1px solid #e0e0e0;border-radius:10px;overflow:hidden;">
     <table style="width:100%;border-collapse:collapse;">
-      ${buildEstimateBreakdownRows(adjustments)}
+      ${buildEstimateBreakdownRows(adjustments, currencySymbol)}
       <tr style="background:${primaryColor}0d;">
         <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
-        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)}</td>
+        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}</td>
       </tr>
       ${suggestedPrice != null ? `
       <tr style="background:${primaryColor}0d;">
         <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Suggested price <span style="font-weight:400;opacity:0.75;">(midpoint of the range above)</span></td>
-        <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice)}${unit === 'per_month' ? '/mo' : ''}</td>
+        <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
       </tr>` : ''}
     </table>
   </div>

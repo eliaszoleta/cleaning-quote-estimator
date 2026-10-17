@@ -118,11 +118,20 @@ const DEFAULT_COMPANY_CONFIG = {
   leadNotificationEmail: '',
   frameHeight: '700px',
   borderRadius: '12px',
+  // Which country this company operates in -- set once in Settings
+  // (ServicesTab.js), not asked of the visitor on every calculator run
+  // (one business serves one market). Defaults 'US' so every account that
+  // existed before the Canada pilot keeps behaving exactly as it already
+  // did -- getRegionMultiplier/getRegionName in cleaningCalculation.js
+  // both treat a missing country as 'US'. serviceStates/serviceCities
+  // below hold state codes for a 'US' company or province codes for a
+  // 'CA' one -- same fields, interpretation depends on this flag.
+  country: 'US',
   serviceStates: [],
-  // Map of state code -> city names, e.g. { TX: ['Austin','Houston'], OK: ['Tulsa'] }
-  // -- keyed by state so a company serving multiple states gets each
-  // state's own city list in the widget instead of one pool shared/mixed
-  // across every state they operate in.
+  // Map of state/province code -> city names, e.g. { TX: ['Austin','Houston'], OK: ['Tulsa'] }
+  // -- keyed by region so a company serving multiple states/provinces gets
+  // each region's own city list in the widget instead of one pool
+  // shared/mixed across every region they operate in.
   serviceCities: {},
   customSteps: [],
   subscription: {
@@ -838,12 +847,70 @@ const STATE_AVERAGE_HOME_CLEANING_COST = {
   WI: 243, WY: 231,
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CANADA -- pilot country #2 (added Oct 2026). Same wage-ratio-to-multiplier
+// method as the US table above, so a Canadian company's quotes carry the
+// same kind of regional cost signal a US company's do, just anchored to
+// Canada's own labour data instead of converting US figures through an
+// exchange rate (FX swings would otherwise silently drift every quote).
+//
+// CANADA_PROVINCE_LABOR_RATES: median hourly wage for NOC 65310 (Light Duty
+// Cleaners), Government of Canada Job Bank wage reports, updated Nov 19
+// 2025 -- the Canadian counterpart to BLS OEWS used for the US table above,
+// same "government wage survey by region" methodology. National median
+// $19.74/hr (low $15.50, high $25.00). NT (Northwest Territories) had no
+// published figure in this pass -- ESTIMATED by interpolating between its
+// two northern-territory neighbors (YT/NU below), not independently
+// sourced; flagged here rather than presented as researched, per the
+// "research real pricing, flag what can't be sourced" rule.
+const CANADA_PROVINCE_LABOR_RATES = {
+  AB: 18.20, BC: 20.00, MB: 17.00, NB: 17.50, NL: 19.00, NS: 17.05,
+  NT: 23.82, NU: 23.00, ON: 19.00, PE: 18.00, QC: 20.47, SK: 18.00, YT: 24.64,
+};
+const CANADA_LABOR_RATE_NATIONAL_MEDIAN = 19.74;
+
+// CANADA_PROVINCE_PRICING_MULTIPLIERS: each province's labor rate relative
+// to Canada's own national median, then scaled by a cross-country anchor
+// factor (Canada's national median wage ÷ the US's, both already-cited
+// government figures in their own currency -- NOT a currency-exchange
+// conversion) so the result multiplies directly onto this file's existing
+// USD-calibrated per-service base prices to produce a CAD-denominated
+// quote. 19.74 / 17.71 = 1.1146. Relative COL/competition judgment (the
+// kind layered into the US table beyond pure wage ratio) was NOT added here
+// for the pilot -- these are wage-ratio-only, a narrower but fully-sourced
+// starting point; revisit if Canadian COL data becomes available.
+const CANADA_PROVINCE_PRICING_MULTIPLIERS = {
+  AB: 1.03, BC: 1.13, MB: 0.96, NB: 0.99, NL: 1.07, NS: 0.96,
+  NT: 1.34, NU: 1.30, ON: 1.07, PE: 1.02, QC: 1.16, SK: 1.02, YT: 1.39,
+};
+
+const CANADA_PROVINCE_NAMES = {
+  AB: 'Alberta', BC: 'British Columbia', MB: 'Manitoba', NB: 'New Brunswick',
+  NL: 'Newfoundland and Labrador', NS: 'Nova Scotia', NT: 'Northwest Territories',
+  NU: 'Nunavut', ON: 'Ontario', PE: 'Prince Edward Island', QC: 'Quebec',
+  SK: 'Saskatchewan', YT: 'Yukon',
+};
+
+// Per-country currency display. US stays on a bare "$" (unchanged, so every
+// existing US quote renders byte-identical to before this feature existed);
+// Canada uses "C$" rather than a bare "$" specifically so a CAD quote is
+// never mistaken for the USD figure right next to it in a shared admin view
+// (dashboard listing both a US and a Canadian company's leads side by side).
+const COUNTRIES = {
+  US: { name: 'United States', currencyCode: 'USD', currencySymbol: '$' },
+  CA: { name: 'Canada', currencyCode: 'CAD', currencySymbol: 'C$' },
+};
+
 module.exports = {
   STATE_PRICING_MULTIPLIERS,
   STATE_LABOR_RATES,
   STATE_MARKET_MATURITY,
   STATE_NAMES,
   STATE_AVERAGE_HOME_CLEANING_COST,
+  CANADA_PROVINCE_LABOR_RATES,
+  CANADA_PROVINCE_PRICING_MULTIPLIERS,
+  CANADA_PROVINCE_NAMES,
+  COUNTRIES,
   DEFAULT_COMPANY_CONFIG,
   HOME_SQFT_BASE_PRICES,
   BEDROOM_ADDON,

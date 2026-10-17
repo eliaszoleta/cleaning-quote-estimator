@@ -76,7 +76,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
     totalLow, totalHigh, suggestedPrice, stateName, stateMultiplier, city,
     recurringAnnualSavings,
     adjustments = [], keyFactors = [], disclaimer, urgencyLevel,
-    serviceType, unit,
+    serviceType, unit, currencySymbol = '$',
   } = result;
 
   const primaryColor = companyConfig?.primaryColor || '#2563eb';
@@ -112,7 +112,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
       {!embedded && (
         <Helmet>
           <title>{serviceTypeLabel(serviceType)} Cost Estimate — {stateName} | Clean Estimator</title>
-          <meta name="description" content={`Your estimated cost for ${serviceTypeLabel(serviceType).toLowerCase()} in ${stateName}: ${formatPriceRange(totalLow, totalHigh)}.`} />
+          <meta name="description" content={`Your estimated cost for ${serviceTypeLabel(serviceType).toLowerCase()} in ${stateName}: ${formatPriceRange(totalLow, totalHigh, serviceType, currencySymbol)}.`} />
         </Helmet>
       )}
 
@@ -138,7 +138,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                     lets it keep shrinking down to a size that still fits in
                     one line instead. */}
                 <div style={{ fontSize: 'clamp(26px, 8vw, 52px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 8, letterSpacing: '-1px', whiteSpace: 'nowrap' }}>
-                  {formatPrice(totalLow)} – {formatPrice(totalHigh)}
+                  {formatPrice(totalLow, currencySymbol)} – {formatPrice(totalHigh, currencySymbol)}
                 </div>
                 <div style={{ fontSize: 13.5, opacity: 0.85 }}>
                   {unit === 'per_month' ? 'per month' : 'per visit'}
@@ -160,7 +160,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 {recurringAnnualSavings && unit !== 'per_month' && (
                   <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '10px 14px', display: 'inline-block' }}>
                     <span style={{ fontWeight: 700, fontSize: 13.5 }}>✓ Recurring discount applied</span>
-                    <span style={{ opacity: 0.9, fontSize: 13 }}> · Save ~{formatPrice(recurringAnnualSavings)}/year</span>
+                    <span style={{ opacity: 0.9, fontSize: 13 }}> · Save ~{formatPrice(recurringAnnualSavings, currencySymbol)}/year</span>
                   </div>
                 )}
               </div>
@@ -193,14 +193,14 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                       <span style={{ flex: 1, minWidth: 0, color: COLORS.ink, textTransform: 'capitalize' }}>{adj.label}</span>
                       <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 600, color: (adj.low < 0 || adj.high < 0) ? COLORS.success : COLORS.ink }}>
                         {adj.low < 0
-                          ? `−${formatPrice(Math.abs(adj.low))} – −${formatPrice(Math.abs(adj.high))}`
-                          : (adj.low === 0 && adj.high === 0 ? 'Included' : formatPriceRange(adj.low, adj.high))}
+                          ? `−${formatPrice(Math.abs(adj.low), currencySymbol)} – −${formatPrice(Math.abs(adj.high), currencySymbol)}`
+                          : (adj.low === 0 && adj.high === 0 ? 'Included' : formatPriceRange(adj.low, adj.high, null, currencySymbol))}
                       </span>
                     </div>
                   ))}
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '13px 12px', background: COLORS.surfaceMuted, borderTop: `1.5px solid ${COLORS.border}`, fontWeight: 700, fontSize: 15 }}>
                     <span>Estimated total</span>
-                    <span style={{ flexShrink: 0, whiteSpace: 'nowrap', color: primaryColor }}>{formatPriceRange(totalLow, totalHigh)}</span>
+                    <span style={{ flexShrink: 0, whiteSpace: 'nowrap', color: primaryColor }}>{formatPriceRange(totalLow, totalHigh, null, currencySymbol)}</span>
                   </div>
                   {/* Plain midpoint of the range above, not a smarter
                       per-job recommendation -- labeled and subtitled to say
@@ -213,7 +213,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                         Suggested price <span style={{ fontWeight: 400, opacity: 0.75 }}>(midpoint of the range above)</span>
                       </span>
                       <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: primaryColor }}>
-                        {formatPrice(suggestedPrice)}{unit === 'per_month' ? '/mo' : ''}
+                        {formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}
                       </span>
                     </div>
                   )}
@@ -221,7 +221,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 {adjustments.filter(adj => adj.separate).map((adj, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', marginTop: 10, background: COLORS.warningMuted, border: `1px dashed ${COLORS.warningBorder}`, borderRadius: RADIUS.md, fontSize: 13 }}>
                     <span style={{ color: '#78350f' }}>{adj.label}</span>
-                    <span style={{ fontWeight: 600, color: '#78350f', whiteSpace: 'nowrap', marginLeft: 12 }}>{formatPriceRange(adj.low, adj.high)}</span>
+                    <span style={{ fontWeight: 600, color: '#78350f', whiteSpace: 'nowrap', marginLeft: 12 }}>{formatPriceRange(adj.low, adj.high, null, currencySymbol)}</span>
                   </div>
                 ))}
               </div>

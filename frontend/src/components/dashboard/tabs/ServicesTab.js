@@ -4,6 +4,20 @@ import { getAllStates } from '../../../data/statePricing';
 
 const ALL_STATES = getAllStates();
 
+// Canada pilot (Oct 2026) -- just the code/name this tab's region picker
+// actually needs, not the SEO cost-range data ALL_STATES carries (that
+// belongs to the marketing site's per-state pages, out of scope here).
+// Codes/names must match CANADA_PROVINCE_NAMES' keys in
+// backend/src/config/defaults.js exactly.
+const CA_PROVINCES = [
+  { code: 'AB', name: 'Alberta' }, { code: 'BC', name: 'British Columbia' },
+  { code: 'MB', name: 'Manitoba' }, { code: 'NB', name: 'New Brunswick' },
+  { code: 'NL', name: 'Newfoundland and Labrador' }, { code: 'NS', name: 'Nova Scotia' },
+  { code: 'NT', name: 'Northwest Territories' }, { code: 'NU', name: 'Nunavut' },
+  { code: 'ON', name: 'Ontario' }, { code: 'PE', name: 'Prince Edward Island' },
+  { code: 'QC', name: 'Quebec' }, { code: 'SK', name: 'Saskatchewan' }, { code: 'YT', name: 'Yukon' },
+];
+
 const SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning',      Icon: Home          },
   { id: 'apartment',       label: 'Apartment Cleaning',  Icon: Building2     },
@@ -47,8 +61,16 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
   const [services, setServices] = useState({});
   const [enableLeadCapture, setEnableLeadCapture] = useState(true);
   const [customQuestions, setCustomQuestions] = useState([]);
+  const [country, setCountry] = useState('US');
   const [serviceStates, setServiceStates] = useState([]);
   const [stateSearch, setStateSearch] = useState('');
+  // Region list/labels switch on country -- a 'CA' company's serviceStates
+  // field holds province codes instead of state codes (same storage field,
+  // see DEFAULT_COMPANY_CONFIG's comment in defaults.js), so every lookup
+  // below needs to resolve against whichever list actually matches what's
+  // stored.
+  const regionList = country === 'CA' ? CA_PROVINCES : ALL_STATES;
+  const regionWord = country === 'CA' ? 'province' : 'state';
   // { [stateCode]: string[] } -- keyed by state so a company serving
   // multiple states gets each state's own city list, instead of every
   // state's cities showing up mixed together in one shared dropdown no
@@ -63,6 +85,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
       setServices(config.services || {});
       setEnableLeadCapture(config.enableLeadCapture !== false);
       setCustomQuestions(config.customLeadQuestions || []);
+      setCountry(config.country || 'US');
       setServiceStates(config.serviceStates || []);
       setServiceCities(config.serviceCities || {});
     }
@@ -74,6 +97,21 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
   // leaving them staged behind Save Changes was exactly the "did my change
   // actually take effect on the widget?" confusion the toggle autosave
   // already fixed once.
+  // Switching country invalidates any already-selected states/provinces and
+  // cities (e.g. 'TX' isn't a real pick once this company is Canadian) --
+  // clearing them here rather than leaving stale codes from the old
+  // country sitting in config, silently matching nothing in the new
+  // region list.
+  const changeCountry = (next) => {
+    if (next === country) return;
+    setCountry(next);
+    setServiceStates([]);
+    setServiceCities({});
+    const patch = { country: next, serviceStates: [], serviceCities: {} };
+    if (autoSave) autoSave(patch);
+    else if (update) update(patch);
+  };
+
   const toggleState = (code) => {
     const removing = serviceStates.includes(code);
     setServiceStates(prev => {
@@ -220,6 +258,33 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
         <p style={{ color: '#64748b', fontSize: 14 }}>Everything on this page saves automatically as you go — no need to click Save.</p>
       </div>
 
+      {/* Country -- set once, not asked of visitors on the calculator
+          itself (see LocationStep.js). Changing it clears Service Area
+          below since a state code and a province code aren't the same
+          namespace. */}
+      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+        <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14 }}>
+            <MapPin size={15} color="#2563eb" /> Country
+          </div>
+          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
+            Which country do you operate in? This sets your calculator's region list, pricing data, and currency.
+          </div>
+        </div>
+        <div style={{ padding: '14px 18px', display: 'flex', gap: 8 }}>
+          {[['US', 'United States'], ['CA', 'Canada']].map(([code, label]) => (
+            <button
+              key={code}
+              type="button"
+              onClick={() => changeCountry(code)}
+              style={{ padding: '9px 18px', borderRadius: 7, border: `1.5px solid ${country === code ? '#2563eb' : '#e2e8f0'}`, background: country === code ? '#eff6ff' : 'white', color: country === code ? '#1d4ed8' : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13.5 }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Service area */}
       <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
         <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
@@ -227,14 +292,14 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
             <MapPin size={15} color="#2563eb" /> Service Area
           </div>
           <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
-            Which state(s) do you actually operate in? Leave empty to serve all 50 states with the standard state picker. Pick one state and your widget skips the state question entirely and just asks visitors for their city instead — pick a few and it shows only those states, not the full US list.
+            Which {regionWord}(s) do you actually operate in? Leave empty to serve all {regionList.length} {country === 'CA' ? 'provinces/territories' : 'states'} with the standard picker. Pick one {regionWord} and your widget skips the {regionWord} question entirely and just asks visitors for their city instead — pick a few and it shows only those {regionWord}s, not the full list.
           </div>
         </div>
         <div style={{ padding: '14px 18px' }}>
           {serviceStates.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
               {serviceStates.map(code => {
-                const s = ALL_STATES.find(st => st.code === code);
+                const s = regionList.find(st => st.code === code);
                 return (
                   <span key={code} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: 20, padding: '4px 6px 4px 12px', fontSize: 12.5, fontWeight: 600 }}>
                     {s?.name || code}
@@ -248,13 +313,13 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
           )}
           <input
             style={{ ...inp, width: '100%', boxSizing: 'border-box', marginBottom: 10 }}
-            placeholder="Search states to add..."
+            placeholder={`Search ${regionWord}s to add...`}
             value={stateSearch}
             onChange={e => setStateSearch(e.target.value)}
           />
           {stateSearch.trim() && (
             <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: 7 }}>
-              {ALL_STATES.filter(s =>
+              {regionList.filter(s =>
                 !serviceStates.includes(s.code) &&
                 (s.name.toLowerCase().includes(stateSearch.trim().toLowerCase()) || s.code.toLowerCase() === stateSearch.trim().toLowerCase())
               ).slice(0, 8).map(s => (
@@ -284,12 +349,12 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
           <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>Cities/Towns You Serve <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: 12 }}>(optional)</span></div>
             <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
-              List the specific cities/towns you cover in each state and your widget shows visitors a dropdown of just those instead of a free-text box. Leave a state's list empty and visitors can type any city for it.
+              List the specific cities/towns you cover in each {regionWord} and your widget shows visitors a dropdown of just those instead of a free-text box. Leave a {regionWord}'s list empty and visitors can type any city for it.
             </div>
           </div>
           <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 18 }}>
             {serviceStates.map(code => {
-              const stateName = ALL_STATES.find(s => s.code === code)?.name || code;
+              const stateName = regionList.find(s => s.code === code)?.name || code;
               const cities = serviceCities[code] || [];
               const search = citySearch[code] || '';
               return (

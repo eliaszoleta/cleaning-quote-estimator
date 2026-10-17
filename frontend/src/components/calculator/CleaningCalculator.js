@@ -596,6 +596,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 primaryColor={primaryColor}
                 serviceStates={companyConfig?.serviceStates || []}
                 serviceCities={companyConfig?.serviceCities || {}}
+                country={companyConfig?.country || 'US'}
               />
             )}
             {DetailComponent && (

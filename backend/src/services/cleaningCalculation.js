@@ -1,7 +1,11 @@
 const { stateForZip } = require('../data/zipStateRanges');
+const { provinceForPostal } = require('../data/postalProvinceRanges');
 const { resolveCityForZip } = require('./zipCity');
 const {
   STATE_PRICING_MULTIPLIERS,
+  CANADA_PROVINCE_PRICING_MULTIPLIERS,
+  CANADA_PROVINCE_NAMES,
+  COUNTRIES,
   HOME_SQFT_BASE_PRICES,
   BEDROOM_ADDON,
   BATHROOM_ADDON,
@@ -98,6 +102,22 @@ function applyMinCharge(range, minCharge, adjustments) {
 
 function getStateMultiplier(state) {
   return STATE_PRICING_MULTIPLIERS[state] || 1.0;
+}
+
+// Country-aware region multiplier -- getStateMultiplier above is untouched
+// (still the only path for a US company, byte-identical to before this
+// function existed) so this is purely additive. A country other than 'US'
+// looks up its own region table instead; an unrecognized region in any
+// country still falls back to 1.0, same "unknown region, no adjustment"
+// behavior getStateMultiplier already had.
+function getRegionMultiplier(country, region) {
+  if (country === 'CA') return CANADA_PROVINCE_PRICING_MULTIPLIERS[region] || 1.0;
+  return getStateMultiplier(region);
+}
+
+function getRegionName(country, region) {
+  if (country === 'CA') return CANADA_PROVINCE_NAMES[region] || region;
+  return STATE_NAMES[region] || region;
 }
 
 // Every adjustment line is rounded to a whole dollar independently of the
@@ -1312,19 +1332,29 @@ function calculatePostConstruction(details, stateMultiplier, companyConfig) {
 async function calculateCleaning(inputs, companyConfig = {}) {
   const { serviceType, zip, state: providedState, serviceDetails = {} } = inputs;
 
-  // Resolve state -- an explicitly provided state is authoritative and
-  // never overridden by a ZIP lookup, even when a ZIP was also given (the
-  // location step now only ever collects ZIP as an optional field once a
-  // state is already selected, validated client-side against that same
-  // state -- see frontend/src/data/zipStateRanges.js). ZIP-based
-  // resolution only runs as a fallback when no state was provided at all
-  // (a caller bypassing the normal flow, e.g. a direct API integration);
-  // an unresolved ZIP then leaves the state genuinely unknown (null)
-  // rather than guessing a real, price-affecting state.
-  const resolvedState = providedState || (zip ? stateForZip(zip) : null);
+  // Country comes from the company's own config, never the request body --
+  // a company only ever operates in one country (set once in Settings, see
+  // ServicesTab.js), so there's no "pick your country" step for the
+  // visitor to get wrong. Defaults to 'US', so a company that's never
+  // touched this setting (every existing company, pre-Canada-pilot) resolves
+  // exactly as before.
+  const country = companyConfig.country || 'US';
 
-  const stateMultiplier = getStateMultiplier(resolvedState);
-  const stateName = STATE_NAMES[resolvedState] || resolvedState;
+  // Resolve state/province -- an explicitly provided region is authoritative
+  // and never overridden by a ZIP/postal lookup, even when one was also
+  // given (the location step now only ever collects ZIP/postal as an
+  // optional field once a state/province is already selected, validated
+  // client-side against that same region -- see
+  // frontend/src/data/zipStateRanges.js and postalProvinceRanges.js).
+  // ZIP/postal-based resolution only runs as a fallback when no region was
+  // provided at all (a caller bypassing the normal flow, e.g. a direct API
+  // integration); an unresolved ZIP/postal then leaves the region genuinely
+  // unknown (null) rather than guessing a real, price-affecting region.
+  const resolvedState = providedState || (zip ? (country === 'CA' ? provinceForPostal(zip) : stateForZip(zip)) : null);
+
+  const stateMultiplier = getRegionMultiplier(country, resolvedState);
+  const stateName = getRegionName(country, resolvedState);
+  const currency = COUNTRIES[country] || COUNTRIES.US;
 
   // Same resolution order (explicit serviceDetails.city, then a ZIP
   // lookup) the lead-notification emails already use (see zipCity.js) --
@@ -1375,6 +1405,13 @@ async function calculateCleaning(inputs, companyConfig = {}) {
     stateName,
     stateMultiplier,
     city,
+    // Additive fields for the Canada pilot -- a US company (country
+    // defaults 'US' above) gets country: 'US', currencyCode: 'USD',
+    // currencySymbol: '$' here, identical to what every existing caller
+    // already assumes when these fields are simply absent/undefined.
+    country,
+    currencyCode: currency.currencyCode,
+    currencySymbol: currency.currencySymbol,
   };
 }
 

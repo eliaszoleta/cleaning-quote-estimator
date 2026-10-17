@@ -1,6 +1,11 @@
-export function formatPrice(n) {
+// symbol defaults to '$' so every existing call site (every one of them,
+// pre-Canada-pilot) renders byte-identical to before this parameter
+// existed. A CA company's result carries currencySymbol: 'C$' (see
+// calculateCleaning's return in cleaningCalculation.js) -- callers that
+// have that value in scope pass it through explicitly.
+export function formatPrice(n, symbol = '$') {
   if (n == null) return '—';
-  return '$' + Math.round(n).toLocaleString();
+  return symbol + Math.round(n).toLocaleString();
 }
 
 // Commercial cleaning is the one service quoted as a recurring monthly
@@ -9,10 +14,10 @@ export function formatPrice(n) {
 // price -- every lead-list view that shows a bare price range needs this
 // same "/mo" suffix on a commercial lead, or it reads as a one-time quote
 // several times smaller than the home-cleaning lead next to it.
-export function formatPriceRange(low, high, serviceType) {
+export function formatPriceRange(low, high, serviceType, symbol = '$') {
   if (low == null || high == null) return '—';
   const suffix = serviceType === 'commercial' ? '/mo' : '';
-  return `${formatPrice(low)} – ${formatPrice(high)}${suffix}`;
+  return `${formatPrice(low, symbol)} – ${formatPrice(high, symbol)}${suffix}`;
 }
 
 export function formatDate(iso) {
