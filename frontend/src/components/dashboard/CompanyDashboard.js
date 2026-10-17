@@ -226,10 +226,12 @@ export default function CompanyDashboard({ user, onLogout }) {
     // haven't rolled out everywhere yet -- so redirect those here instead
     // of silently dropping them now that 'subscription' isn't in NAV.
     if (tab === 'subscription') { tab = 'settings'; section = 'subscription'; }
+    let landedOnDeepLink = false;
     if (tab && NAV.find(n => n.id === tab)) {
       setViewMode('widget');
       setActiveTab(tab);
       if (tab === 'settings' && section) setSettingsSection(section);
+      landedOnDeepLink = true;
     }
 
     const sessionId = params.get('session_id');
@@ -239,6 +241,22 @@ export default function CompanyDashboard({ user, onLogout }) {
       setActiveTab('settings');
       setSettingsSection('subscription');
       verifyCheckoutSession(sessionId);
+      landedOnDeepLink = true;
+    }
+
+    // A ?tab=... link (from a lifecycle email, a bookmark, Stripe's
+    // cancel/return URL) is meant to land you on that tab ONCE -- it
+    // wasn't meant to become the dashboard's new permanent address. Left
+    // in place, the address bar (and any bookmark/home-screen shortcut
+    // made from it) keeps that query string, so every later reload or
+    // fresh login replays the same "jump into Widget Mode on this tab"
+    // effect forever, instead of landing on Calculator Mode -- the actual
+    // default -- the way a plain /company visit does. Scrubbing the query
+    // string right after honoring it once means only the deep link itself
+    // forces Widget Mode; reloading afterward (today, tomorrow, from a
+    // saved shortcut) falls through to the real default.
+    if (landedOnDeepLink) {
+      window.history.replaceState({}, '', window.location.pathname);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -269,7 +287,11 @@ export default function CompanyDashboard({ user, onLogout }) {
       if (!token) return;
       const res = await verifyCheckout(token, sessionId);
       setSubStatus(res.data);
-      window.history.replaceState({}, '', '/company?tab=settings&section=subscription');
+      // URL cleanup (dropping session_id/subscribed, and not re-adding
+      // ?tab=settings&section=subscription) already happened synchronously
+      // right after this was kicked off -- see the mount effect's own
+      // replaceState and comment for why a deep link shouldn't become the
+      // page's new permanent address.
     } catch (err) {
       console.warn('Checkout verification failed:', err.message);
     }
