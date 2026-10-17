@@ -439,9 +439,17 @@ async function sendEstimateEmail({ to, name, clientName, serviceType, result, co
         // see estimateShare.js) replaces the generic subject with one that
         // names whose estimate this is, so a teammate scanning their inbox
         // doesn't have to open the email to find out.
-        subject: clientName
-          ? `${getSubjectServiceLabel(serviceType, result.country) || 'Cleaning'} estimate for ${clientName}`
-          : `Your ${getSubjectServiceLabel(serviceType, result.country) || 'cleaning'} estimate is ready`,
+        //
+        // UK flat cleaning (apartment service, GB country) is rephrased on
+        // request to "Your flat cleaning estimate is ready, <name>" instead
+        // of the general "<Service> estimate for <name>" pattern -- scoped
+        // to this one service+country combo only; every other
+        // service/country keeps the existing phrasing below.
+        subject: (serviceType === 'apartment' && result.country === 'GB')
+          ? `Your ${getSubjectServiceLabel(serviceType, result.country) || 'flat cleaning'} estimate is ready${clientName ? `, ${clientName}` : ''}`
+          : clientName
+            ? `${getSubjectServiceLabel(serviceType, result.country) || 'Cleaning'} estimate for ${clientName}`
+            : `Your ${getSubjectServiceLabel(serviceType, result.country) || 'cleaning'} estimate is ready`,
         html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner }),
         text: buildText({ name, clientName, serviceType, result, companyConfig, partner }),
       },
