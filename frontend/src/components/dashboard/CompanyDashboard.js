@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
   UserPlus, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle,
-  Globe, X, CalendarClock, Zap,
+  Globe, X, CalendarClock, Zap, ChevronDown,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout, postCheckout, postPortal } from '../../utils/api';
@@ -387,14 +387,21 @@ export default function CompanyDashboard({ user, onLogout }) {
             setting. Auto-saves on change, same immediate-persist treatment
             as Service Area -- a setting this consequential shouldn't need a
             separate Save Changes click to actually take effect. */}
-        <div style={{ flexShrink: 0 }}>
+        <div style={{ flexShrink: 0, position: 'relative', display: 'flex' }}>
+          {/* appearance:none above strips the native dropdown arrow with
+              nothing replacing it, so this read as a plain static badge
+              (like the Save/Saved indicator) rather than something
+              clickable. A chevron, overlaid and pointer-events:none so
+              clicks still reach the <select> underneath it, restores that
+              "this opens a menu" affordance without giving up the custom
+              pill styling. */}
           <select
             value={localConfig?.country || 'US'}
             onChange={e => autoSave({ country: e.target.value, serviceStates: [], serviceCities: [] })}
             title="Country"
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
-              padding: isMobile ? '6px 6px' : '6px 10px 6px 8px', borderRadius: 20,
+              padding: isMobile ? '6px 20px 6px 6px' : '6px 24px 6px 8px', borderRadius: 20,
               background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)',
               color: 'white', fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
               cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
@@ -405,6 +412,10 @@ export default function CompanyDashboard({ user, onLogout }) {
             <option value="GB" style={{ color: '#111827' }}>🇬🇧 United Kingdom</option>
             <option value="AU" style={{ color: '#111827' }}>🇦🇺 Australia</option>
           </select>
+          <ChevronDown
+            size={13}
+            style={{ position: 'absolute', right: isMobile ? 5 : 8, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.65)', pointerEvents: 'none' }}
+          />
         </div>
 
         {/* Right: badge, save, user -- Schedule a Walkthrough, the Saved
