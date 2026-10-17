@@ -89,11 +89,24 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor, co
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         <StepSection label={`Square footage: ${sqft.toLocaleString()}`}>
-          <input type="range" min={500} max={50000} step={500} value={sqft} onChange={e => setSqft(+e.target.value)}
+          {/* A drag slider spanning 500-50,000 physically can't land on
+              every value even at step={1} -- that's 49,500 positions
+              squeezed into a few hundred pixels, so the thumb still jumps
+              in rough increments no matter how fine the step is. Paired
+              with a typeable exact value instead (same pattern CarpetStep.js
+              already uses for its own sqft field) -- commercial customers
+              usually know their exact square footage from a lease or floor
+              plan, and at this service's $/sq ft rate times daily visits, a
+              slider-forced ±250 sq ft rounding was enough to swing a
+              monthly recurring quote by real money. */}
+          <input type="range" min={500} max={50000} step={100} value={sqft} onChange={e => setSqft(+e.target.value)}
             style={{ width: '100%', accentColor: primaryColor }} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: COLORS.muted, marginTop: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: COLORS.muted, marginTop: 4, marginBottom: 10 }}>
             <span>500 sq ft</span><span>50,000 sq ft</span>
           </div>
+          <input type="number" min={500} max={50000} value={sqft} onChange={e => setSqft(Math.max(0, +e.target.value))}
+            placeholder="Exact sq ft"
+            style={{ width: '100%', padding: '10px 14px', border: `2px solid ${COLORS.border}`, borderRadius: RADIUS.sm, fontSize: 15, outline: 'none' }} />
         </StepSection>
         <StepSection label={`Restrooms: ${restrooms}`}>
           <input type="range" min={1} max={20} step={1} value={restrooms} onChange={e => setRestrooms(+e.target.value)}
