@@ -834,12 +834,12 @@ async function sendCompanyWelcomeEmail({ to, companyId, subject, statusLine }) {
 // accounts show up in the admin Companies list as "Not started". Deduped
 // via activationReminderEmailSentAt on config.subscription. Content lives
 // in the editable email_templates table (key: 'activation_reminder').
-async function sendActivationReminderEmail({ to, companyName }) {
+async function sendActivationReminderEmail({ to, companyName, signedUpAt }) {
   const { sent } = await sendTemplatedEmail({
     template: 'activation_reminder',
     to,
     toName: companyName,
-    vars: { companyName },
+    vars: { companyName, signupDate: signedUpAt ? formatDate(signedUpAt) : 'recently' },
     recipientType: 'company',
   });
   return sent;

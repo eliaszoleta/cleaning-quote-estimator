@@ -142,23 +142,32 @@ module.exports = [
   {
     key: 'activation_reminder',
     name: 'Activation reminder — checkout never finished',
-    subject: 'Still want to try Clean Estimator?',
-    variables: [{ name: 'companyName', example: 'Sparkle Clean Co' }],
+    // Rewritten after both prior versions ("You're one step away..." and
+    // "Still want to try...?") landed in Gmail's Promotions tab -- same
+    // lesson already proven on website_request_received (see email.js's
+    // top-of-file comment): a colored CTA button and a question-y,
+    // "come back" subject line read as a marketing nudge to Gmail's
+    // classifier. Dropped the button for a plain inline link, dropped the
+    // hook-style subject for a flat status statement, and added a real,
+    // specific reference (the actual signup date) instead of generic
+    // "no rush" filler -- the same two levers (personalized reference +
+    // toned-down copy) that moved that other template to Primary.
+    subject: 'Your Clean Estimator account setup is incomplete',
+    variables: [
+      { name: 'companyName', example: 'Sparkle Clean Co' },
+      { name: 'signupDate', example: 'October 14, 2026' },
+    ],
     text: [
       'Hi {{companyName}},',
       '',
-      "Looks like you started setting up a Clean Estimator account but didn't quite finish — no rush, just didn't want you to miss out on the free trial.",
+      "Your Clean Estimator account was created on {{signupDate}}, but checkout was never finished, so your 30-day trial hasn't started and your calculator isn't active.",
       '',
-      "Once it's set up, you get unlimited, instant, accurate price estimates for every job you quote — plus a free embeddable calculator widget for your own website if you want leads coming in from there too.",
-      '',
-      "Pick up right where you left off whenever you're ready, it only takes a minute.",
-      '',
-      'Finish setting up my account:',
+      'Finish account setup:',
       'https://www.cleanestimator.com/company',
       '',
-      "Your 30-day trial doesn't start until you do, so nothing's running out in the meantime.",
+      "Once it's done, you'll have unlimited price estimates for every job you quote, plus an embeddable calculator widget for your own website if you want it.",
       '',
-      "If you ran into an issue or just changed your mind, just reply and let me know -- happy to help.",
+      "Reply to this email if anything got in the way -- happy to help.",
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -167,27 +176,19 @@ module.exports = [
   <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Looks like you started setting up a Clean Estimator account but didn't quite finish — no rush, just didn't want you to miss out on the free trial.
+    Your Clean Estimator account was created on {{signupDate}}, but checkout was never finished, so your 30-day trial hasn't started and your calculator isn't active.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Once it's set up, you get unlimited, instant, accurate price estimates for every job you quote — plus a free embeddable calculator widget for your own website if you want leads coming in from there too.
+    Finish account setup: <a href="https://www.cleanestimator.com/company" style="color:#2563eb;">cleanestimator.com/company</a>
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Pick up right where you left off whenever you're ready, it only takes a minute.
-  </p>
-
-  <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Finish setting up my account →</a>
-  </p>
-
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your 30-day trial doesn't start until you do, so nothing's running out in the meantime.
+    Once it's done, you'll have unlimited price estimates for every job you quote, plus an embeddable calculator widget for your own website if you want it.
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    If you ran into an issue or just changed your mind, just reply and let me know — happy to help.
+    Reply to this email if anything got in the way — happy to help.
   </p>
   ${FOOTER_HTML}
 </div>`,

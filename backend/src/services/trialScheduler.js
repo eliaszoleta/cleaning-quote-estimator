@@ -126,7 +126,7 @@ async function checkActivationReminders() {
 
     try {
       const companyName = config.companyName || 'there';
-      if (await sendActivationReminderEmail({ to: email, companyName })) {
+      if (await sendActivationReminderEmail({ to: email, companyName, signedUpAt })) {
         const fresh = (await getCompanyConfig(companyId)) || config;
         await saveCompanyConfig(companyId, {
           ...fresh,
