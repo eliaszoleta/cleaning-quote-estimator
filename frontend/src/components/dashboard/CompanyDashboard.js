@@ -302,7 +302,11 @@ export default function CompanyDashboard({ user, onLogout }) {
 
   const TABS = {
     overview:     <OverviewTab {...tabProps} />,
-    help:         <HelpTab />,
+    // config (not localConfig's remount-key siblings) is enough here --
+    // HelpTab has no internal state tied to country, it's a pure function
+    // of the country prop, so it re-renders correctly on every prop change
+    // without needing a remount.
+    help:         <HelpTab config={localConfig} />,
     branding:     <BrandingTab config={localConfig} update={update} autoSave={autoSave} onSave={handleGlobalSave} saving={saving} saved={saved} user={user} />,
     // Keyed on country so switching it from the header's dropdown (see
     // above) always remounts this tab fresh -- ServicesTab's own region
