@@ -565,10 +565,49 @@ const TILE_CONDITION_MULTIPLIERS = {
   damaged: { low: 1.42, high: 1.55 },
 };
 
+// Re-audited Nov 2026 after a user flagged an unusually wide low-high spread
+// on a real tile & grout lead and asked whether that was a calculation bug.
+// It wasn't (the formula checked out exactly) -- but the exercise surfaced
+// that grout_sealing and caulk_replacement had never been independently
+// sourced at all, while grout_recoloring and tile_repair had.
+//
+// grout_sealing: previously $0.55-$0.88/sq ft with no citation -- below
+// every source checked. Re-anchored to Homewyse (May 2026), the single most
+// authoritative figure found and the best baseline per that same research
+// pass, at $1.35-$2.46/sq ft. Deliberately NOT blended with the several
+// lower, inconsistent SEO-content-site figures also found ($0.25-$2.50/sq
+// ft, mutually contradictory) -- anchoring to one good source beats
+// averaging in noisy ones, same approach TILE_PRICE_PER_SQFT above already
+// uses. This is a genuinely wide range on its own (82% spread) even from
+// just that one source -- professional grout sealing really does vary that
+// much job to job (product grade, how much grout there actually is, how
+// much prep it needs), so tightening it further would mean being more
+// confident than the real market actually is. calculateTileGrout in
+// cleaningCalculation.js now also scales this rate by the same
+// TILE_CONDITION_MULTIPLIERS the base cleaning already uses (previously
+// flat regardless of condition) -- sealing neglected grout genuinely needs
+// more prep than sealing already-clean grout, and the condition is already
+// collected from the customer, so this uses data already on hand rather
+// than adding a new question.
+//
+// caulk_replacement: previously $3.50-$7/linear ft with no citation --
+// above HomeAdvisor's and Angi's professional per-linear-foot rate
+// ($1.25-$4), the two sources that research pass flagged as the most
+// dependable (in contrast to several conflicting, lower-quality guides).
+// Re-anchored to that range, floor nudged up slightly from their $1.25
+// since a bare reseal-only minimum undersells the fuller scope this
+// slider's up-to-100-linear-ft range implies.
+//
+// grout_recoloring ($1.65-$2.55) and tile_repair ($6-$13) were re-checked
+// in the same pass and left unchanged: grout_recoloring already sits
+// comfortably inside the one solid citation found (pigmented-sealant
+// recoloring, $1.50-$4.00/sq ft), and tile_repair isn't reachable from the
+// UI at all (TileGroutStep.js has no control that ever sends it as a
+// selected service) -- not urgent to re-source pricing nobody can trigger.
 const TILE_SERVICE_ADDONS = {
-  grout_sealing:     { perSqft: { low: 0.55, high: 0.88 } },
+  grout_sealing:     { perSqft: { low: 1.35, high: 2.46 } },
   grout_recoloring:  { perSqft: { low: 1.65, high: 2.55 } },
-  caulk_replacement: { perLinFt: { low: 3.5, high: 7 } },
+  caulk_replacement: { perLinFt: { low: 1.5,  high: 4.0  } },
   tile_repair:       { perSqft: { low: 6, high: 13 } },
 };
 

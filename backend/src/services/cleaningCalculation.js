@@ -926,7 +926,15 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
   }
 
   if (services.includes('grout_sealing')) {
-    const adj = { low: Math.round(sqft * TILE_SERVICE_ADDONS.grout_sealing.perSqft.low * stateMultiplier * markup), high: Math.round(sqft * TILE_SERVICE_ADDONS.grout_sealing.perSqft.high * stateMultiplier * markup) };
+    // Scaled by the same condMult as the base cleaning above (previously
+    // flat regardless of condition) -- sealing grout that needs real prep
+    // work first (heavy buildup, years of neglect) genuinely costs more
+    // than sealing already-clean grout, and condition is already collected
+    // from the customer for the base price, so this reuses that answer
+    // rather than asking a new question. See TILE_SERVICE_ADDONS in
+    // defaults.js for why this rate itself is a wide range even before
+    // that scaling -- that's real market variance, not double-counting.
+    const adj = { low: Math.round(sqft * TILE_SERVICE_ADDONS.grout_sealing.perSqft.low * condMult.low * stateMultiplier * markup), high: Math.round(sqft * TILE_SERVICE_ADDONS.grout_sealing.perSqft.high * condMult.high * stateMultiplier * markup) };
     range = addRange(range, adj);
     adjustments.push({ label: 'Grout sealing', low: adj.low, high: adj.high });
   }
