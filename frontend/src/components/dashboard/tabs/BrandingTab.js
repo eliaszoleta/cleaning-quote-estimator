@@ -106,6 +106,12 @@ export default function BrandingTab({ config, update, autoSave, onSave, saving, 
   };
 
   const previewConfig = {
+    // Missing entirely before -- CleaningCalculator falls back to 'US'
+    // whenever companyConfig.country is undefined, so a GB/CA/AU company's
+    // own Live Preview silently showed the US calculator (US states,
+    // "Mold Remediation" not "Mould Removal", "$" not their real currency)
+    // no matter what they'd actually set their account to.
+    country: config?.country,
     companyName: form.companyName,
     primaryColor: form.primaryColor,
     accentColor: form.accentColor,
