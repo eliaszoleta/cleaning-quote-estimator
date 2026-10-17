@@ -4,7 +4,10 @@ import StepWrapper from './StepWrapper';
 import { StepSection, StepChip, StepOptionCard, StepPillToggle } from './StepUI';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
-export default function WaterDamageStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
+export default function WaterDamageStep({ value, onBack, onNext, primaryColor, country, isFinalStep, loading }) {
+  // UK/AU use "mould", not "mold" -- see formatters.js's serviceTypeLabel
+  // comment for the sourcing.
+  const useMould = country === 'GB' || country === 'AU';
   const [cause, setCause] = useState(value.cause || 'pipe_burst');
   const [sqft, setSqft] = useState(value.sqft || 500);
   const [areas, setAreas] = useState(value.areas || ['first_floor']);
@@ -19,7 +22,7 @@ export default function WaterDamageStep({ value, onBack, onNext, primaryColor, i
   const isUrgent = ['today','24_48h'].includes(whenHappened);
 
   return (
-    <StepWrapper title="Water damage details" subtitle="Act fast — mold can begin in 24–48 hours" onBack={onBack} onNext={() => onNext({ cause, sqft, areas, waterCategory, whenHappened, damageClass, hasInsurance, contentsDamaged })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
+    <StepWrapper title="Water damage details" subtitle={`Act fast — ${useMould ? 'mould' : 'mold'} can begin in 24–48 hours`} onBack={onBack} onNext={() => onNext({ cause, sqft, areas, waterCategory, whenHappened, damageClass, hasInsurance, contentsDamaged })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       {isUrgent && (
         <div style={{ background: COLORS.dangerMuted, border: `2px solid #fca5a5`, borderRadius: RADIUS.sm, padding: '12px 16px', marginBottom: 24 }}>

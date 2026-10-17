@@ -16,6 +16,12 @@ const LOCATIONS = [
 ];
 
 export default function MoldStep({ value, onBack, onNext, primaryColor, country, isFinalStep, loading }) {
+  // UK/AU use "mould", not "mold" -- see formatters.js's serviceTypeLabel
+  // comment for the sourcing. Covers every "mold" mention in this step's
+  // own body copy (banner, section label, mold-type options, moisture
+  // warning), not just the step title the service-name override already
+  // handled.
+  const useMould = country === 'GB' || country === 'AU';
   const [sqft, setSqft] = useState(value.sqft || 50);
   const [locations, setLocations] = useState(value.locations || ['bathroom']);
   const [moldType, setMoldType] = useState(value.moldType || 'not_sure');
@@ -28,11 +34,11 @@ export default function MoldStep({ value, onBack, onNext, primaryColor, country,
   const toggleExtra = id => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
   return (
-    <StepWrapper title={(country === 'GB' || country === 'AU') ? 'Mould removal details' : 'Mold remediation details'} subtitle="These are preliminary estimates — a professional inspection is required" onBack={onBack} onNext={() => onNext({ sqft, locations, moldType, sourceFixed, testingNeeded, propertyType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
+    <StepWrapper title={useMould ? 'Mould removal details' : 'Mold remediation details'} subtitle="These are preliminary estimates — a professional inspection is required" onBack={onBack} onNext={() => onNext({ sqft, locations, moldType, sourceFixed, testingNeeded, propertyType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       <div style={{ background: COLORS.dangerMuted, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: RADIUS.sm, padding: '12px 16px', marginBottom: 24 }}>
         <span style={{ fontWeight: 700, color: '#991b1b', display: 'inline-flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={14} /> Important:</span>
-        <span style={{ color: '#7f1d1d', fontSize: 14, marginLeft: 6 }}>Mold remediation always requires an in-person inspection by a licensed contractor. These estimates are very rough ballparks only.</span>
+        <span style={{ color: '#7f1d1d', fontSize: 14, marginLeft: 6 }}>{useMould ? 'Mould removal' : 'Mold remediation'} always requires an in-person inspection by a licensed contractor. These estimates are very rough ballparks only.</span>
       </div>
 
       {/* A sq-ft slider, not the old 4-tier bucket picker -- "Medium" used
@@ -52,9 +58,12 @@ export default function MoldStep({ value, onBack, onNext, primaryColor, country,
         </div>
       </StepSection>
 
-      <StepSection label="Mold type (if known)">
+      <StepSection label={useMould ? 'Mould type (if known)' : 'Mold type (if known)'}>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[['not_sure','Not Sure'],['black_mold','Black Mold (Stachybotrys)'],['white_mold','White Mold'],['green_mold','Green / Common Mold']].map(([id,label]) => (
+          {(useMould
+            ? [['not_sure','Not Sure'],['black_mold','Black Mould (Stachybotrys)'],['white_mold','White Mould'],['green_mold','Green / Common Mould']]
+            : [['not_sure','Not Sure'],['black_mold','Black Mold (Stachybotrys)'],['white_mold','White Mold'],['green_mold','Green / Common Mold']]
+          ).map(([id,label]) => (
             <StepChip key={id} selected={moldType === id} onClick={() => setMoldType(id)} primaryColor={primaryColor}>{label}</StepChip>
           ))}
         </div>
@@ -66,7 +75,7 @@ export default function MoldStep({ value, onBack, onNext, primaryColor, country,
             <StepChip key={id} selected={sourceFixed === id} onClick={() => setSourceFixed(id)} primaryColor={primaryColor}>{label}</StepChip>
           ))}
         </div>
-        {sourceFixed === 'not_fixed' && <p style={{ fontSize: 12, color: COLORS.danger, marginTop: 8, display: 'flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={12} /> The moisture source MUST be fixed before remediation — otherwise mold will return within weeks.</p>}
+        {sourceFixed === 'not_fixed' && <p style={{ fontSize: 12, color: COLORS.danger, marginTop: 8, display: 'flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={12} /> The moisture source MUST be fixed before remediation — otherwise {useMould ? 'mould' : 'mold'} will return within weeks.</p>}
       </StepSection>
 
       <StepSection label="Property type">

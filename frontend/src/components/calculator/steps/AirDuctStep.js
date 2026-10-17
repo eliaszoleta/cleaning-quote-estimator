@@ -4,7 +4,13 @@ import StepWrapper from './StepWrapper';
 import { StepSection, StepChip, StepPillToggle } from './StepUI';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
-export default function AirDuctStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
+export default function AirDuctStep({ value, onBack, onNext, primaryColor, country, isFinalStep, loading }) {
+  // UK/AU use "mould", not "mold" -- see formatters.js's serviceTypeLabel
+  // comment for the sourcing on this spelling. This step's own "Mold
+  // concern" section talks about mold/mould generically (not the
+  // Mold Remediation service's name), so it needs the same swap even
+  // though it isn't covered by that service-label override.
+  const useMould = country === 'GB' || country === 'AU';
   const [propertyType, setPropertyType] = useState(value.propertyType || 'residential');
   const [sqft, setSqft] = useState(value.sqft || 1800);
   const [ventCount, setVentCount] = useState(value.ventCount || '10_20');
@@ -61,14 +67,14 @@ export default function AirDuctStep({ value, onBack, onNext, primaryColor, isFin
         </div>
       </StepSection>
 
-      <StepSection label="Mold concern">
+      <StepSection label={useMould ? 'Mould concern' : 'Mold concern'}>
         <button onClick={() => setMoldSuspected(!moldSuspected)} style={{ padding: '14px 20px', borderRadius: RADIUS.md, border: `2px solid ${moldSuspected ? COLORS.danger : COLORS.border}`, background: moldSuspected ? COLORS.dangerMuted : COLORS.surface, cursor: 'pointer', textAlign: 'left', width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700, color: moldSuspected ? COLORS.danger : COLORS.ink }}>
             <span style={{ display: 'flex' }}>{moldSuspected ? <AlertTriangle size={18} color={COLORS.danger} /> : <Square size={18} color={COLORS.muted} />}</span>
-            I suspect mold or musty odors in my ductwork
+            I suspect {useMould ? 'mould' : 'mold'} or musty odors in my ductwork
           </div>
           <div style={{ fontSize: 12, color: COLORS.body, marginTop: 6, paddingLeft: 30 }}>
-            Mold in ductwork requires specialized treatment (+43–47%). An inspection is required before remediation.
+            {useMould ? 'Mould' : 'Mold'} in ductwork requires specialized treatment (+43–47%). An inspection is required before remediation.
           </div>
         </button>
       </StepSection>

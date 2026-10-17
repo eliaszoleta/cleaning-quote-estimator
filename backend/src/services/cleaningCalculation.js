@@ -795,6 +795,11 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
   const cfg = companyConfig?.services?.airDuct || {};
   const markup = cfg.markup || 1.0;
   const minCharge = cfg.minimumCharge || 300;
+  // UK/AU use "mould", not "mold" -- see calculateEstimate's own `country`
+  // derivation (companyConfig.country) and email.js's SERVICE_LABELS for
+  // the established precedent on this spelling swap.
+  const country = companyConfig?.country || 'US';
+  const useMould = country === 'GB' || country === 'AU';
 
   // Each line below shows its actual, state/markup-adjusted dollar
   // contribution -- previously the extra-vents and extra-systems addons
@@ -858,7 +863,7 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
   if (moldSuspected) {
     const moldSurcharge = { low: Math.round(surchargeBase.low * 0.43), high: Math.round(surchargeBase.high * 0.47) };
     range = addRange(range, moldSurcharge);
-    adjustments.push({ label: 'Mold suspected surcharge (+43–47%)', low: moldSurcharge.low, high: moldSurcharge.high });
+    adjustments.push({ label: `${useMould ? 'Mould' : 'Mold'} suspected surcharge (+43–47%)`, low: moldSurcharge.low, high: moldSurcharge.high });
   }
 
   range = applyMinCharge(range, minCharge, adjustments);
@@ -884,9 +889,9 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
         { label: 'Vent count', impact: labelFor(AIR_DUCT_VENT_COUNT_LABELS, ventCount) },
         { label: 'HVAC systems', impact: String(systemCount) },
       ]),
-      { label: 'Mold concern', impact: moldSuspected ? 'Yes (+surcharge)' : 'No' },
+      { label: useMould ? 'Mould concern' : 'Mold concern', impact: moldSuspected ? 'Yes (+surcharge)' : 'No' },
     ],
-    disclaimer: moldSuspected ? 'Mold in ductwork requires professional inspection before remediation. Final pricing depends on extent of mold growth.' : null,
+    disclaimer: moldSuspected ? `${useMould ? 'Mould' : 'Mold'} in ductwork requires professional inspection before remediation. Final pricing depends on extent of ${useMould ? 'mould' : 'mold'} growth.` : null,
     urgencyLevel: moldSuspected ? 'high' : 'normal',
   };
 }
@@ -1088,6 +1093,9 @@ function calculateMold(details, stateMultiplier, companyConfig) {
   const cfg = companyConfig?.services?.moldRemediation || {};
   const markup = cfg.markup || 1.0;
   const minCharge = cfg.minimumCharge || 0;
+  // UK/AU use "mould", not "mold" -- same convention as calculateAirDuct above.
+  const country = companyConfig?.country || 'US';
+  const useMould = country === 'GB' || country === 'AU';
 
   const baseTier = interpolateMoldPriceRange(sqft);
   const typeMult = MOLD_TYPE_MULTIPLIERS[moldType] || MOLD_TYPE_MULTIPLIERS.not_sure;
@@ -1106,7 +1114,7 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     range = { low: Math.round(range.low * MOLD_COMMERCIAL_MULTIPLIER.low), high: Math.round(range.high * MOLD_COMMERCIAL_MULTIPLIER.high) };
   }
 
-  const adjustments = [{ label: `${sqft} sq ft mold area remediation`, low: range.low, high: range.high }];
+  const adjustments = [{ label: `${sqft} sq ft ${useMould ? 'mould' : 'mold'} area remediation`, low: range.low, high: range.high }];
 
   if (locations.includes('hvac_ductwork')) {
     const adj = applyMultiplier(MOLD_ADDONS.hvac_cleaning, stateMultiplier * markup);
@@ -1144,11 +1152,14 @@ function calculateMold(details, stateMultiplier, companyConfig) {
     keyFactors: [
       { label: 'Affected area', impact: `${sqft} sq ft` },
       { label: 'Property type', impact: humanize(propertyType) },
-      { label: 'Mold type', impact: labelFor(MOLD_TYPE_LABELS, moldType) },
+      // labelFor() has no country param, so the mold->mould swap for the
+      // resolved label text is done here via a post-process replace, same
+      // as the label key passed to the keyFactor itself.
+      { label: useMould ? 'Mould type' : 'Mold type', impact: useMould ? labelFor(MOLD_TYPE_LABELS, moldType).replace(/Mold/g, 'Mould') : labelFor(MOLD_TYPE_LABELS, moldType) },
       { label: 'Moisture source', impact: sourceFixed === 'yes' ? 'Fixed' : sourceFixed === 'not_fixed' ? 'Still leaking' : 'Unknown' },
       { label: 'Locations', impact: locations.join(', ') },
     ],
-    disclaimer: `IMPORTANT: These are preliminary estimates only. Mold remediation pricing requires an in-person inspection by a licensed remediation contractor. Final costs depend on the extent of contamination, building materials, and local regulations.${sourceWarning ? ' The moisture source must be identified and fixed BEFORE remediation, or mold will return.' : ''}`,
+    disclaimer: `IMPORTANT: These are preliminary estimates only. ${useMould ? 'Mould removal' : 'Mold remediation'} pricing requires an in-person inspection by a licensed remediation contractor. Final costs depend on the extent of contamination, building materials, and local regulations.${sourceWarning ? ` The moisture source must be identified and fixed BEFORE remediation, or ${useMould ? 'mould' : 'mold'} will return.` : ''}`,
     urgencyLevel: 'critical',
   };
 }
@@ -1168,6 +1179,9 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
   const cfg = companyConfig?.services?.waterDamage || {};
   const markup = cfg.markup || 1.0;
   const minCharge = cfg.minimumCharge || 0;
+  // UK/AU use "mould", not "mold" -- same convention as calculateAirDuct/calculateMold above.
+  const country = companyConfig?.country || 'US';
+  const useMould = country === 'GB' || country === 'AU';
 
   const catMult = WATER_CATEGORY_MULTIPLIERS[waterCategory] || WATER_CATEGORY_MULTIPLIERS.clean;
 
@@ -1204,7 +1218,7 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
   if (moldRisk) {
     const adj = applyMultiplier({ ...WATER_MOLD_PREVENTION_ADDON }, stateMultiplier * markup);
     range = addRange(range, adj);
-    adjustments.push({ label: 'Mold prevention treatment (required)', low: adj.low, high: adj.high });
+    adjustments.push({ label: `${useMould ? 'Mould' : 'Mold'} prevention treatment (required)`, low: adj.low, high: adj.high });
   }
 
   if (contentsDamaged) {
@@ -1218,8 +1232,8 @@ function calculateWaterDamage(details, stateMultiplier, companyConfig) {
   }
 
   const urgencyMsg = whenHappened === 'today' || whenHappened === '24_48h'
-    ? 'Act now — mold can begin growing within 24–48 hours of water damage.'
-    : 'Mold growth is likely after this time period. Remediation may be required in addition to restoration.';
+    ? `Act now — ${useMould ? 'mould' : 'mold'} can begin growing within 24–48 hours of water damage.`
+    : `${useMould ? 'Mould' : 'Mold'} growth is likely after this time period. Remediation may be required in addition to restoration.`;
 
   // For large or multi-area losses, show a separate (not summed into the total above)
   // full-restoration ballpark, scaled per sq ft rather than one flat $2k–$25k range.
