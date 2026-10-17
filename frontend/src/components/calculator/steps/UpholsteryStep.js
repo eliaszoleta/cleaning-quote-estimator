@@ -12,13 +12,24 @@ const ITEMS = [
   ['ottoman', 'Ottoman', ''],
 ];
 
+const FABRIC_OPTIONS = [['fabric', 'Fabric'], ['leather', 'Leather']];
+
 export default function UpholsteryStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
   const [items, setItems] = useState(value.items || { sofa: 1, loveseat: 0, chair: 0, sectional: 0, ottoman: 0 });
-  const [fabricType, setFabricType] = useState(value.fabricType || 'fabric');
+  // Per-item fabric, not one job-wide switch -- a leather recliner next to
+  // a fabric sofa is a normal household, not an edge case, and leather
+  // runs 1.80-2.00x fabric (see cleaningCalculation.js's calculateUpholstery),
+  // so collapsing that into a single toggle was a real accuracy gap, not
+  // just a UI simplification. Defaults every item to 'fabric', the same
+  // default the old single job-wide fabricType used.
+  const [itemFabricType, setItemFabricType] = useState(
+    value.itemFabricType || { sofa: 'fabric', loveseat: 'fabric', chair: 'fabric', sectional: 'fabric', ottoman: 'fabric' }
+  );
   const [condition, setCondition] = useState(value.condition || 'moderate');
   const [extras, setExtras] = useState(value.extras || []);
 
   const setQty = (id, delta) => setItems(prev => ({ ...prev, [id]: Math.max(0, Math.min(10, (prev[id] || 0) + delta)) }));
+  const setItemFabric = (id, fabric) => setItemFabricType(prev => ({ ...prev, [id]: fabric }));
   const toggleExtra = id => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
   const totalItems = Object.values(items).reduce((s, n) => s + (n || 0), 0);
@@ -27,7 +38,7 @@ export default function UpholsteryStep({ value, onBack, onNext, primaryColor, is
     <StepWrapper
       title="Upholstery cleaning details"
       onBack={onBack}
-      onNext={() => onNext({ items, fabricType, condition, extras })}
+      onNext={() => onNext({ items, fabricType: 'fabric', itemFabricType, condition, extras })}
       primaryColor={primaryColor}
       canNext={totalItems > 0}
       nextLabel={isFinalStep ? 'See Estimate' : undefined}
@@ -36,43 +47,61 @@ export default function UpholsteryStep({ value, onBack, onNext, primaryColor, is
       <StepSection label="What needs cleaning?">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {ITEMS.map(([id, label, desc]) => (
-            <div key={id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 14px', border: `1.5px solid ${COLORS.border}`, borderRadius: RADIUS.sm, background: items[id] > 0 ? `${primaryColor}0d` : COLORS.surface }}>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 14, color: COLORS.ink }}>{label}</div>
-                {desc && <div style={{ fontSize: 11.5, color: COLORS.muted }}>{desc}</div>}
+            <div key={id} style={{ padding: '10px 14px', border: `1.5px solid ${COLORS.border}`, borderRadius: RADIUS.sm, background: items[id] > 0 ? `${primaryColor}0d` : COLORS.surface }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: COLORS.ink }}>{label}</div>
+                  {desc && <div style={{ fontSize: 11.5, color: COLORS.muted }}>{desc}</div>}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                  <button
+                    type="button"
+                    onClick={() => setQty(id, -1)}
+                    disabled={!items[id]}
+                    aria-label={`Fewer ${label}`}
+                    style={{ width: 28, height: 28, borderRadius: '50%', border: `1.5px solid ${COLORS.border}`, background: COLORS.surface, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: items[id] ? 'pointer' : 'not-allowed', opacity: items[id] ? 1 : 0.4, color: COLORS.body }}
+                  >
+                    <Minus size={13} />
+                  </button>
+                  <span style={{ minWidth: 18, textAlign: 'center', fontWeight: 700, fontSize: 15, color: COLORS.ink }}>{items[id] || 0}</span>
+                  <button
+                    type="button"
+                    onClick={() => setQty(id, 1)}
+                    aria-label={`More ${label}`}
+                    style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: primaryColor, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}
+                  >
+                    <Plus size={13} />
+                  </button>
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                <button
-                  type="button"
-                  onClick={() => setQty(id, -1)}
-                  disabled={!items[id]}
-                  aria-label={`Fewer ${label}`}
-                  style={{ width: 28, height: 28, borderRadius: '50%', border: `1.5px solid ${COLORS.border}`, background: COLORS.surface, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: items[id] ? 'pointer' : 'not-allowed', opacity: items[id] ? 1 : 0.4, color: COLORS.body }}
-                >
-                  <Minus size={13} />
-                </button>
-                <span style={{ minWidth: 18, textAlign: 'center', fontWeight: 700, fontSize: 15, color: COLORS.ink }}>{items[id] || 0}</span>
-                <button
-                  type="button"
-                  onClick={() => setQty(id, 1)}
-                  aria-label={`More ${label}`}
-                  style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: primaryColor, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white' }}
-                >
-                  <Plus size={13} />
-                </button>
-              </div>
+              {items[id] > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, paddingTop: 10, borderTop: `1px solid ${COLORS.border}` }}>
+                  <span style={{ fontSize: 11.5, color: COLORS.muted, marginRight: 2 }}>Fabric:</span>
+                  {FABRIC_OPTIONS.map(([fid, flabel]) => {
+                    const selected = (itemFabricType[id] || 'fabric') === fid;
+                    return (
+                      <button
+                        key={fid}
+                        type="button"
+                        onClick={() => setItemFabric(id, fid)}
+                        style={{
+                          padding: '4px 11px', borderRadius: RADIUS.sm,
+                          border: `1.5px solid ${selected ? primaryColor : COLORS.border}`,
+                          background: selected ? primaryColor : COLORS.surface,
+                          color: selected ? '#ffffff' : COLORS.body,
+                          cursor: 'pointer', fontWeight: 600, fontSize: 12,
+                        }}
+                      >
+                        {flabel}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ))}
         </div>
         {totalItems === 0 && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 8 }}>Add at least one item to continue.</p>}
-      </StepSection>
-
-      <StepSection label="Fabric type">
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {[['fabric', 'Fabric'], ['leather', 'Leather']].map(([id, label]) => (
-            <StepChip key={id} selected={fabricType === id} onClick={() => setFabricType(id)} primaryColor={primaryColor}>{label}</StepChip>
-          ))}
-        </div>
       </StepSection>
 
       <StepSection label="Condition">

@@ -678,6 +678,17 @@ function calculateUpholstery(details, stateMultiplier, companyConfig) {
   const {
     items = {},
     fabricType = 'fabric',
+    // Per-item fabric override -- { [itemId]: 'fabric' | 'leather' }. Added
+    // after a real accuracy gap was caught: fabricType used to be a single
+    // job-wide switch applied to every item line, so a household with a
+    // leather recliner next to a fabric sofa had no way to be priced
+    // accurately (leather runs 1.80-2.00x fabric -- picking one fabric type
+    // for the whole job either overcharges the fabric pieces by up to ~2x
+    // or undercharges the leather pieces by about half). Any item NOT in
+    // this map falls back to the job-wide fabricType above, so an old
+    // request that never sends itemFabricType at all (every request before
+    // this existed) prices byte-identical to before.
+    itemFabricType = {},
     condition = 'moderate',
     extras = [],
   } = details;
@@ -688,11 +699,12 @@ function calculateUpholstery(details, stateMultiplier, companyConfig) {
   const effMult = stateMultiplier * markup;
 
   const condMult = UPHOLSTERY_CONDITION_MULTIPLIERS[condition] || UPHOLSTERY_CONDITION_MULTIPLIERS.moderate;
-  const leatherMult = fabricType === 'leather' ? UPHOLSTERY_LEATHER_MULTIPLIER : { low: 1, high: 1 };
+  const leatherMultFor = (itemId) => (itemFabricType[itemId] || fabricType) === 'leather' ? UPHOLSTERY_LEATHER_MULTIPLIER : { low: 1, high: 1 };
 
   let range = { low: 0, high: 0 };
   const adjustments = [];
   let totalItems = 0;
+  const effectiveFabrics = new Set();
 
   // Each item type is its own line (not collapsed into one "upholstery"
   // total like carpet's per-room price) since a visitor cleaning a sofa
@@ -702,13 +714,20 @@ function calculateUpholstery(details, stateMultiplier, companyConfig) {
     const qty = Math.max(0, Math.round(items[itemId] || 0));
     if (qty <= 0) continue;
     totalItems += qty;
+    const itemFabric = itemFabricType[itemId] || fabricType;
+    effectiveFabrics.add(itemFabric);
+    const leatherMult = leatherMultFor(itemId);
     const lineRange = applyMultiplier({
       low: base.low * condMult.low * leatherMult.low * qty,
       high: base.high * condMult.high * leatherMult.high * qty,
     }, effMult);
     range = addRange(range, lineRange);
     const label = UPHOLSTERY_ITEM_LABELS[itemId];
-    adjustments.push({ label: `${qty} ${label}${qty > 1 ? 's' : ''}`, low: lineRange.low, high: lineRange.high });
+    // Only the line itself needs the "(Leather)" qualifier when fabric
+    // varies by item -- labeling every line would be noise when (as in
+    // every pre-existing request) the whole job is one fabric type.
+    const fabricSuffix = itemFabric === 'leather' ? ' (Leather)' : '';
+    adjustments.push({ label: `${qty} ${label}${qty > 1 ? 's' : ''}${fabricSuffix}`, low: lineRange.low, high: lineRange.high });
   }
 
   // No pieces selected (shouldn't happen -- the step defaults to 1 sofa --
@@ -717,6 +736,8 @@ function calculateUpholstery(details, stateMultiplier, companyConfig) {
   if (totalItems === 0) {
     totalItems = 1;
     const base = UPHOLSTERY_ITEM_PRICES.sofa;
+    const leatherMult = leatherMultFor('sofa');
+    effectiveFabrics.add(itemFabricType.sofa || fabricType);
     const lineRange = applyMultiplier({
       low: base.low * condMult.low * leatherMult.low,
       high: base.high * condMult.high * leatherMult.high,
@@ -749,7 +770,11 @@ function calculateUpholstery(details, stateMultiplier, companyConfig) {
     recurringAnnualSavings: null,
     keyFactors: [
       { label: 'Pieces', impact: `${totalItems} item${totalItems > 1 ? 's' : ''}` },
-      { label: 'Fabric', impact: labelFor(UPHOLSTERY_FABRIC_LABELS, fabricType) },
+      // Mixed fabric only shows up once more than one distinct effective
+      // fabric type is actually in play across the selected items -- the
+      // common case (one fabric type for the whole job, every request
+      // before itemFabricType existed) still reads exactly as before.
+      { label: 'Fabric', impact: effectiveFabrics.size > 1 ? 'Mixed (see breakdown)' : labelFor(UPHOLSTERY_FABRIC_LABELS, [...effectiveFabrics][0] || fabricType) },
       { label: 'Condition', impact: labelFor(SOILING_CONDITION_LABELS, condition) },
     ],
     disclaimer: null,
