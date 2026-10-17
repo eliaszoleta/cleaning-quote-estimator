@@ -22,6 +22,31 @@ function loadBlogData() {
   return fn();
 }
 
+// UK/Canada/Australia pilot blogs -- each a standalone data file exporting
+// POSTS/CATEGORIES in the exact same shape as blogPosts.js, parsed the same
+// way loadBlogData() parses the US file. Missing a country file (e.g. not
+// written yet) is tolerated -- that country's blog section is simply
+// skipped for this build rather than failing the whole prerender.
+const COUNTRY_BLOG_META = {
+  uk: { basePath: '/blog/uk', siteName: 'Clean Estimator UK', heroTitle: 'UK Cleaning Cost Guides', heroSubtitle: 'Expert guides to flat, house and commercial cleaning prices across the UK.' },
+  ca: { basePath: '/blog/ca', siteName: 'Clean Estimator Canada', heroTitle: 'Canada Cleaning Cost Guides', heroSubtitle: 'Expert guides to house and commercial cleaning prices across Canada.' },
+  au: { basePath: '/blog/au', siteName: 'Clean Estimator Australia', heroTitle: 'Australia Cleaning Cost Guides', heroSubtitle: 'Expert guides to house, unit and commercial cleaning prices across Australia.' },
+};
+
+function loadCountryBlogData(key) {
+  const filePath = path.join(SRC, `data/intl/blogPosts${key.toUpperCase()}.js`);
+  if (!fs.existsSync(filePath)) return null;
+  const raw = fs.readFileSync(filePath, 'utf8');
+  const src = raw
+    .replace(/^export const /gm, 'const ')
+    .replace(/^export function /gm, 'function ')
+    .replace(/^export \{[^}]*\};\s*$/gm, '');
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(src + '\nreturn { POSTS, CATEGORIES };');
+  const { POSTS, CATEGORIES } = fn();
+  return { ...COUNTRY_BLOG_META[key], key, posts: POSTS, categories: CATEGORIES };
+}
+
 function loadServicesData() {
   const raw = fs.readFileSync(path.join(SRC, 'data/services.js'), 'utf8');
   const src = raw
@@ -207,11 +232,13 @@ function renderMarkdown(md, { sponsored = false } = {}) {
 
 // ─── 6. Blog post renderer ───────────────────────────────────────────────────
 
-function renderBlogPost(post, cat, assets) {
+function renderBlogPost(post, cat, assets, opts = {}) {
+  const { basePath = '/blog', siteName = 'Clean Estimator' } = opts;
   const dateISO  = post.dateISO || (post.date ? new Date(post.date).toISOString() : new Date().toISOString());
-  const seoTitle = (post.metaTitle || post.title) + ' | Clean Estimator';
+  const seoTitle = (post.metaTitle || post.title) + ' | ' + siteName;
   const catLabel = (cat && cat.label) || post.categoryLabel || post.category;
   const contentHtml = renderMarkdown(post.content, { sponsored: post.sponsored });
+  const postUrl = DOMAIN + basePath + '/' + post.slug;
 
   const articleSchemaStr = JSON.stringify({
     '@context': 'https://schema.org',
@@ -221,8 +248,8 @@ function renderBlogPost(post, cat, assets) {
     datePublished: dateISO,
     dateModified: dateISO,
     image: DOMAIN + '/og-image.svg',
-    url: DOMAIN + '/blog/' + post.slug,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': DOMAIN + '/blog/' + post.slug },
+    url: postUrl,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
     author: { '@type': 'Organization', name: 'Clean Estimator', url: DOMAIN },
     publisher: {
       '@type': 'Organization',
@@ -237,9 +264,9 @@ function renderBlogPost(post, cat, assets) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: DOMAIN },
-      { '@type': 'ListItem', position: 2, name: 'Blog', item: DOMAIN + '/blog' },
-      { '@type': 'ListItem', position: 3, name: catLabel, item: DOMAIN + '/blog/category/' + post.category },
-      { '@type': 'ListItem', position: 4, name: post.title, item: DOMAIN + '/blog/' + post.slug },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: DOMAIN + basePath },
+      { '@type': 'ListItem', position: 3, name: catLabel, item: DOMAIN + basePath + '/category/' + post.category },
+      { '@type': 'ListItem', position: 4, name: post.title, item: postUrl },
     ],
   });
 
@@ -260,7 +287,7 @@ function renderBlogPost(post, cat, assets) {
   <title>${esc(seoTitle)}</title>
   <meta name="description" content="${esc(post.excerpt)}">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <link rel="canonical" href="${DOMAIN}/blog/${post.slug}">
+  <link rel="canonical" href="${postUrl}">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -269,10 +296,10 @@ function renderBlogPost(post, cat, assets) {
   <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <meta property="og:site_name" content="Clean Estimator">
+  <meta property="og:site_name" content="${esc(siteName)}">
   <meta property="og:title" content="${esc(seoTitle)}">
   <meta property="og:description" content="${esc(post.excerpt)}">
-  <meta property="og:url" content="${DOMAIN}/blog/${post.slug}">
+  <meta property="og:url" content="${postUrl}">
   <meta property="og:type" content="article">
   <meta property="og:image" content="${DOMAIN}/og-image.svg">
   <meta property="og:image:alt" content="Clean Estimator — Free Cleaning Cost Estimator">
@@ -292,12 +319,12 @@ function renderBlogPost(post, cat, assets) {
 <div id="root">${staticHeader()}<div style="max-width:760px;margin:0 auto;padding:60px 24px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
   <div style="font-size:13px;color:#94a3b8;margin-bottom:24px">
     <a href="/" style="color:#94a3b8">Home</a> ›
-    <a href="/blog" style="color:#94a3b8">Blog</a> ›
-    <a href="/blog/category/${post.category}" style="color:#94a3b8">${esc(catLabel)}</a>
+    <a href="${basePath}" style="color:#94a3b8">Blog</a> ›
+    <a href="${basePath}/category/${post.category}" style="color:#94a3b8">${esc(catLabel)}</a>
   </div>
   <div style="margin-bottom:40px">
     <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap">
-      <a href="/blog/category/${post.category}" style="color:${PRIMARY};font-size:13px;font-weight:700;text-decoration:none">${esc(catLabel)}</a>
+      <a href="${basePath}/category/${post.category}" style="color:${PRIMARY};font-size:13px;font-weight:700;text-decoration:none">${esc(catLabel)}</a>
       <span style="color:#cbd5e1;font-size:13px">·</span>
       <span style="color:#94a3b8;font-size:13px">${esc(post.readTime || '')} read</span>
     </div>
@@ -311,7 +338,7 @@ function renderBlogPost(post, cat, assets) {
   <div style="line-height:1.8">${contentHtml}</div>
   <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;padding:32px 36px;margin-top:48px;color:white;text-align:center">
     <h3 style="font-size:22px;font-weight:800;margin-bottom:10px">Get a Free Local Estimate</h3>
-    <p style="color:#94a3b8;margin-bottom:20px;font-size:15px">Our calculator gives ZIP-code specific prices across all 50 states. Free and instant.</p>
+    <p style="color:#94a3b8;margin-bottom:20px;font-size:15px">${basePath === '/blog' ? 'Our calculator gives ZIP-code specific prices across all 50 states. Free and instant.' : 'Our calculator gives location-specific prices in seconds. Free and instant.'}</p>
     <a href="/" style="background:${PRIMARY};color:white;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px">Calculate My Cost &#8594;</a>
   </div>
 </div>${staticFooter()}</div>
@@ -322,12 +349,15 @@ function renderBlogPost(post, cat, assets) {
 
 // ─── 7. Blog index renderer ──────────────────────────────────────────────────
 
-function renderBlogIndex(posts, categories, assets) {
+function renderBlogIndex(posts, categories, assets, opts = {}) {
+  const { basePath = '/blog', siteName = 'Clean Estimator', heroTitle = 'Cleaning Cost Guides', heroSubtitle = 'Expert guides to help you understand cleaning service pricing and make informed decisions.' } = opts;
+  const pageTitle = `${heroTitle} &amp; Tips | ${siteName} Blog`;
+  const pageDesc = heroSubtitle;
   const featured = posts[0];
   const rest = posts.slice(1);
 
   const catPills = categories.map(c =>
-    '<a href="/blog/category/' + c.id + '" style="padding:8px 16px;border-radius:20px;background:#f1f5f9;color:#374151;text-decoration:none;font-size:14px;font-weight:600">' + esc(c.label) + '</a>'
+    '<a href="' + basePath + '/category/' + c.id + '" style="padding:8px 16px;border-radius:20px;background:#f1f5f9;color:#374151;text-decoration:none;font-size:14px;font-weight:600">' + esc(c.label) + '</a>'
   ).join('\n    ');
 
   const postCard = (post, isFeatured) => {
@@ -341,7 +371,7 @@ function renderBlogIndex(posts, categories, assets) {
     const excerptSize = isFeatured ? '16px' : '14px';
     const linkSize = isFeatured ? '15px' : '14px';
     const linkText = isFeatured ? 'Read the full guide &#8594;' : 'Read more &#8594;';
-    return '<a href="/blog/' + post.slug + '" style="display:block;text-decoration:none;' + bgStyle + '">' +
+    return '<a href="' + basePath + '/' + post.slug + '" style="display:block;text-decoration:none;' + bgStyle + '">' +
       '<div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em">' + esc(catLabel) + ' &middot; ' + esc(post.readTime || '') + ' read</div>' +
       '<' + hTag + ' style="font-size:' + fontSize + ';font-weight:' + fontWeight + ';color:#0f172a;margin-bottom:10px;line-height:1.3">' + esc(post.title) + '</' + hTag + '>' +
       '<p style="font-size:' + excerptSize + ';color:#475569;line-height:1.6;margin-bottom:16px">' + esc(post.excerpt) + '</p>' +
@@ -352,9 +382,9 @@ function renderBlogIndex(posts, categories, assets) {
   const blogSchemaStr = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Blog',
-    name: 'Clean Estimator Cleaning Cost Blog',
-    description: 'Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses.',
-    url: DOMAIN + '/blog',
+    name: `${siteName} Cleaning Cost Blog`,
+    description: pageDesc,
+    url: DOMAIN + basePath,
     publisher: { '@type': 'Organization', name: 'Clean Estimator', url: DOMAIN },
   });
 
@@ -363,10 +393,10 @@ function renderBlogIndex(posts, categories, assets) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cleaning Cost Guides &amp; Tips | Clean Estimator Blog</title>
-  <meta name="description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses.">
+  <title>${pageTitle}</title>
+  <meta name="description" content="${esc(pageDesc)}">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <link rel="canonical" href="${DOMAIN}/blog">
+  <link rel="canonical" href="${DOMAIN}${basePath}">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -375,15 +405,15 @@ function renderBlogIndex(posts, categories, assets) {
   <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <meta property="og:title" content="Cleaning Cost Guides &amp; Tips | Clean Estimator Blog">
-  <meta property="og:description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses.">
+  <meta property="og:title" content="${pageTitle}">
+  <meta property="og:description" content="${esc(pageDesc)}">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="${DOMAIN}/blog">
+  <meta property="og:url" content="${DOMAIN}${basePath}">
   <meta property="og:image" content="${DOMAIN}/og-image.svg">
-  <meta property="og:site_name" content="Clean Estimator">
+  <meta property="og:site_name" content="${esc(siteName)}">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Cleaning Cost Guides &amp; Tips | Clean Estimator Blog">
-  <meta name="twitter:description" content="Expert guides on cleaning service costs, tips for hiring cleaners, and restoration advice for homeowners and businesses.">
+  <meta name="twitter:title" content="${pageTitle}">
+  <meta name="twitter:description" content="${esc(pageDesc)}">
   <meta name="twitter:image" content="${DOMAIN}/og-image.svg">
   <script type="application/ld+json">${blogSchemaStr}</script>
   ${assets.cssLinks}
@@ -392,10 +422,10 @@ function renderBlogIndex(posts, categories, assets) {
 <div id="root">
 ${staticHeader()}
 <div style="max-width:1100px;margin:0 auto;padding:60px 24px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
-  <h1 style="font-size:40px;font-weight:900;color:#0f172a;margin-bottom:8px">Cleaning Cost Guides</h1>
-  <p style="font-size:18px;color:#64748b;margin-bottom:40px">Expert guides to help you understand cleaning service pricing and make informed decisions.</p>
+  <h1 style="font-size:40px;font-weight:900;color:#0f172a;margin-bottom:8px">${esc(heroTitle)}</h1>
+  <p style="font-size:18px;color:#64748b;margin-bottom:40px">${esc(heroSubtitle)}</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px">
-    <a href="/blog" style="padding:8px 16px;border-radius:20px;background:#0f172a;color:white;text-decoration:none;font-size:14px;font-weight:600">All Posts</a>
+    <a href="${basePath}" style="padding:8px 16px;border-radius:20px;background:#0f172a;color:white;text-decoration:none;font-size:14px;font-weight:600">All Posts</a>
     ${catPills}
   </div>
   ${featured ? postCard(featured, true) : ''}
@@ -405,7 +435,7 @@ ${staticHeader()}
   <div style="margin-top:60px;background:#f0f7ff;border:1px solid #bfdbfe;border-radius:14px;padding:32px 36px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
     <div>
       <div style="font-weight:800;font-size:20px;color:#0f172a;margin-bottom:6px">Ready to get an estimate?</div>
-      <p style="color:#374151;font-size:15px">Use our free calculator to get a ZIP-code specific price for any cleaning service.</p>
+      <p style="color:#374151;font-size:15px">Use our free calculator to get a ${basePath === '/blog' ? 'ZIP-code' : 'location'} specific price for any cleaning service.</p>
     </div>
     <a href="/" style="background:${PRIMARY};color:white;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;flex-shrink:0">Free Calculator &#8594;</a>
   </div>
@@ -419,23 +449,24 @@ ${staticFooter()}
 
 // ─── 8. Category page renderer ───────────────────────────────────────────────
 
-function renderCategoryPage(cat, posts, assets) {
+function renderCategoryPage(cat, posts, assets, opts = {}) {
+  const { basePath = '/blog', siteName = 'Clean Estimator' } = opts;
   const catPosts = posts.filter(p => p.category === cat.id);
-  const seoTitle = cat.label + ' Cost Guide 2026 | Clean Estimator';
-  const seoDesc  = 'Expert cost guides for ' + cat.label.toLowerCase() + ' services. Get free ZIP-code specific estimates for your area.';
+  const seoTitle = cat.label + ' Cost Guide 2026 | ' + siteName;
+  const seoDesc  = 'Expert cost guides for ' + cat.label.toLowerCase() + ' services. Get free, location-specific estimates for your area.';
 
   const breadcrumbSchemaStr = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: DOMAIN },
-      { '@type': 'ListItem', position: 2, name: 'Blog', item: DOMAIN + '/blog' },
-      { '@type': 'ListItem', position: 3, name: cat.label, item: DOMAIN + '/blog/category/' + cat.id },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: DOMAIN + basePath },
+      { '@type': 'ListItem', position: 3, name: cat.label, item: DOMAIN + basePath + '/category/' + cat.id },
     ],
   });
 
   const postRows = catPosts.map(post =>
-    '<a href="/blog/' + post.slug + '" style="display:block;background:white;border:1px solid #e2e8f0;border-radius:12px;padding:22px 26px;text-decoration:none;margin-bottom:16px">' +
+    '<a href="' + basePath + '/' + post.slug + '" style="display:block;background:white;border:1px solid #e2e8f0;border-radius:12px;padding:22px 26px;text-decoration:none;margin-bottom:16px">' +
     '<div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em">' + esc(cat.label) + ' &middot; ' + esc(post.readTime || '') + ' read</div>' +
     '<h2 style="font-size:17px;font-weight:700;color:#0f172a;margin-bottom:6px;line-height:1.4">' + esc(post.title) + '</h2>' +
     '<p style="font-size:13.5px;color:#64748b;line-height:1.6;margin-bottom:10px">' + esc(post.excerpt) + '</p>' +
@@ -451,7 +482,7 @@ function renderCategoryPage(cat, posts, assets) {
   <title>${esc(seoTitle)}</title>
   <meta name="description" content="${esc(seoDesc)}">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <link rel="canonical" href="${DOMAIN}/blog/category/${cat.id}">
+  <link rel="canonical" href="${DOMAIN}${basePath}/category/${cat.id}">
   <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <link rel="icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -462,9 +493,9 @@ function renderCategoryPage(cat, posts, assets) {
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta property="og:title" content="${esc(seoTitle)}">
   <meta property="og:description" content="${esc(seoDesc)}">
-  <meta property="og:url" content="${DOMAIN}/blog/category/${cat.id}">
+  <meta property="og:url" content="${DOMAIN}${basePath}/category/${cat.id}">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Clean Estimator">
+  <meta property="og:site_name" content="${esc(siteName)}">
   <meta property="og:image" content="${DOMAIN}/og-image.svg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${esc(seoTitle)}">
@@ -478,13 +509,13 @@ function renderCategoryPage(cat, posts, assets) {
 ${staticHeader()}
 <div style="background:#f8fafc;min-height:100vh;padding:48px 24px 64px;font-family:'Poppins','Poppins Fallback',Arial,sans-serif">
   <div style="max-width:900px;margin:0 auto">
-    <a href="/blog" style="font-size:13px;color:#64748b;text-decoration:none;display:inline-block;margin-bottom:28px">&#8592; All Guides</a>
+    <a href="${basePath}" style="font-size:13px;color:#64748b;text-decoration:none;display:inline-block;margin-bottom:28px">&#8592; All Guides</a>
     <h1 style="font-size:clamp(24px,4vw,34px);font-weight:800;color:#0f172a;margin-bottom:8px">${esc(cat.label)}</h1>
     <p style="font-size:16px;color:#64748b;margin-bottom:40px">${esc(seoDesc)}</p>
     ${postRows || '<p style="color:#64748b">No articles yet.</p>'}
     <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;padding:32px 36px;margin-top:48px;color:white;text-align:center">
       <h3 style="font-size:20px;font-weight:800;margin-bottom:10px">Get a Free Local Estimate</h3>
-      <p style="color:#94a3b8;margin-bottom:20px;font-size:15px">Free calculator &mdash; instant ZIP-code specific estimates across all 50 states.</p>
+      <p style="color:#94a3b8;margin-bottom:20px;font-size:15px">Free calculator &mdash; instant, location-specific estimates.</p>
       <a href="/" style="background:${PRIMARY};color:white;padding:13px 28px;border-radius:9px;text-decoration:none;font-weight:700;font-size:15px">Get My Free Estimate &#8594;</a>
     </div>
   </div>
@@ -1791,6 +1822,28 @@ function main() {
     const cat = CATEGORIES.find(c => c.id === post.category);
     writeFile('blog/' + post.slug, renderBlogPost(post, cat, assets));
     count++;
+  }
+
+  // UK/Canada/Australia pilot blogs -- fully separate post/category lists
+  // from the US ones above, written under their own /blog/{key} prefix.
+  for (const key of Object.keys(COUNTRY_BLOG_META)) {
+    const countryBlog = loadCountryBlogData(key);
+    if (!countryBlog) continue;
+    const opts = { basePath: countryBlog.basePath, siteName: countryBlog.siteName, heroTitle: countryBlog.heroTitle, heroSubtitle: countryBlog.heroSubtitle };
+
+    writeFile(`blog/${key}`, renderBlogIndex(countryBlog.posts, countryBlog.categories, assets, opts));
+    count++;
+
+    for (const cat of countryBlog.categories) {
+      writeFile(`blog/${key}/category/${cat.id}`, renderCategoryPage(cat, countryBlog.posts, assets, opts));
+      count++;
+    }
+
+    for (const post of countryBlog.posts) {
+      const cat = countryBlog.categories.find(c => c.id === post.category);
+      writeFile(`blog/${key}/${post.slug}`, renderBlogPost(post, cat, assets, opts));
+      count++;
+    }
   }
 
   writeFile('about', renderAbout(assets));

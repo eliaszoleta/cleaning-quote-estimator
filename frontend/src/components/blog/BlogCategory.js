@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Home, SprayCan, Building2, ShieldAlert, Rocket, ArrowRight, ArrowLeft } from 'lucide-react';
 import { getPostsByCategory, CATEGORIES, BLOG_POSTS } from '../../data/blogPosts';
+import { getCountryBlog } from '../../data/intl/blogRegistry';
 import '../pages/PageHero.css';
 
 const CATEGORY_ICONS = {
@@ -36,43 +37,50 @@ function CategoryPill({ id, label, href }) {
   );
 }
 
-export default function BlogCategory({ category }) {
-  const cat = CATEGORIES.find(c => c.id === category);
-  const posts = cat ? getPostsByCategory(category) : BLOG_POSTS;
+export default function BlogCategory({ category, country }) {
+  const countryBlog = country ? getCountryBlog(country) : null;
+  const basePath = countryBlog ? countryBlog.basePath : '/blog';
+  const siteName = countryBlog ? countryBlog.siteName : 'Clean Estimator';
+  const CATS = countryBlog ? countryBlog.categories : CATEGORIES;
+  const ALL_POSTS = countryBlog ? countryBlog.posts : BLOG_POSTS;
+
+  const cat = CATS.find(c => c.id === category);
+  const posts = cat ? (countryBlog ? ALL_POSTS.filter(p => p.category === category) : getPostsByCategory(category)) : ALL_POSTS;
   const title = cat ? cat.label : 'All Posts';
   const meta = CATEGORY_ICONS[category];
   const HeaderIcon = meta?.Icon;
+  const canonicalUrl = `https://www.cleanestimator.com${basePath}/category/${category}`;
 
   return (
     <>
       <Helmet>
-        <title>{title} Guides | Clean Estimator Blog</title>
+        <title>{title} Guides | {siteName} Blog</title>
         <meta name="description" content={`Expert guides on ${title.toLowerCase()} costs, tips, and best practices. Browse ${posts.length} articles.`} />
-        <link rel="canonical" href={`https://www.cleanestimator.com/blog/category/${category}`} />
-        <meta property="og:title" content={`${title} Guides | Clean Estimator Blog`} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={`${title} Guides | ${siteName} Blog`} />
         <meta property="og:description" content={`Expert guides on ${title.toLowerCase()} costs, tips, and best practices.`} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={`https://www.cleanestimator.com/blog/category/${category}`} />
+        <meta property="og:url" content={canonicalUrl} />
         <meta property="og:image" content="https://www.cleanestimator.com/og-image.png" />
-        <meta property="og:site_name" content="Clean Estimator" />
+        <meta property="og:site_name" content={siteName} />
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content={`${title} Guides | Clean Estimator Blog`} />
+        <meta name="twitter:title" content={`${title} Guides | ${siteName} Blog`} />
         <meta name="twitter:description" content={`Expert guides on ${title.toLowerCase()} costs, tips, and best practices.`} />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.cleanestimator.com" },
-            { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.cleanestimator.com/blog" },
-            { "@type": "ListItem", "position": 3, "name": title, "item": `https://www.cleanestimator.com/blog/category/${category}` }
+            { "@type": "ListItem", "position": 2, "name": "Blog", "item": `https://www.cleanestimator.com${basePath}` },
+            { "@type": "ListItem", "position": 3, "name": title, "item": canonicalUrl }
           ]
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          "name": `${title} — Clean Estimator Blog`,
+          "name": `${title} — ${siteName} Blog`,
           "description": `Expert guides on ${title.toLowerCase()} costs, tips, and best practices.`,
-          "url": `https://www.cleanestimator.com/blog/category/${category}`,
+          "url": canonicalUrl,
           "publisher": { "@type": "Organization", "name": "Clean Estimator", "url": "https://www.cleanestimator.com" }
         })}</script>
       </Helmet>
@@ -80,7 +88,7 @@ export default function BlogCategory({ category }) {
         <div className="page-hero-glow" aria-hidden="true" />
         <div className="page-hero-inner" style={{ maxWidth: 1000, textAlign: 'left' }}>
           <div style={{ marginBottom: 'clamp(10px, 3vw, 16px)' }}>
-            <a href="/blog" style={{ color: '#93c5fd', fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5, textDecoration: 'none' }}><ArrowLeft size={14} strokeWidth={2.5} /> All posts</a>
+            <a href={basePath} style={{ color: '#93c5fd', fontWeight: 600, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 5, textDecoration: 'none' }}><ArrowLeft size={14} strokeWidth={2.5} /> All posts</a>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
             {HeaderIcon && (
@@ -97,8 +105,8 @@ export default function BlogCategory({ category }) {
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '28px 20px clamp(14px, 7vw, 60px)' }}>
         {/* Other categories */}
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 'clamp(20px, 5vw, 36px)' }}>
-          {CATEGORIES.filter(c => c.id !== category).map(c => (
-            <CategoryPill key={c.id} id={c.id} label={c.label} href={`/blog/category/${c.id}`} />
+          {CATS.filter(c => c.id !== category).map(c => (
+            <CategoryPill key={c.id} id={c.id} label={c.label} href={`${basePath}/category/${c.id}`} />
           ))}
         </div>
 
@@ -107,7 +115,7 @@ export default function BlogCategory({ category }) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {posts.map(post => (
-              <a key={post.slug} href={`/blog/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(16px, 4.5vw, 24px) clamp(16px, 5vw, 28px)', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)' }}
+              <a key={post.slug} href={`${basePath}/${post.slug}`} style={{ display: 'block', background: 'white', border: '1px solid #e2e8f0', borderRadius: 16, padding: 'clamp(16px, 4.5vw, 24px) clamp(16px, 5vw, 28px)', textDecoration: 'none', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#bfdbfe'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(15,23,42,0.04), 0 10px 26px rgba(30,64,175,0.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.05)'; e.currentTarget.style.transform = 'none'; }}
               >

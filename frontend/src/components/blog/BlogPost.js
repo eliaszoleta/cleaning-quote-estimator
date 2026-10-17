@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FileQuestion, Lightbulb, ArrowRight } from 'lucide-react';
 import { getPostBySlug, BLOG_POSTS } from '../../data/blogPosts';
+import { getCountryBlog } from '../../data/intl/blogRegistry';
 import '../pages/PageHero.css';
 
 // Simple markdown-to-HTML renderer (tables, headers, bold, lists, links).
@@ -63,8 +64,12 @@ function renderMarkdown(md, { sponsored = false } = {}) {
   return html;
 }
 
-export default function BlogPost({ slug }) {
-  const post = getPostBySlug(slug);
+export default function BlogPost({ slug, country }) {
+  const countryBlog = country ? getCountryBlog(country) : null;
+  const basePath = countryBlog ? countryBlog.basePath : '/blog';
+  const siteName = countryBlog ? countryBlog.siteName : 'Clean Estimator';
+  const ALL_POSTS = countryBlog ? countryBlog.posts : BLOG_POSTS;
+  const post = countryBlog ? (ALL_POSTS.find(p => p.slug === slug) || null) : getPostBySlug(slug);
 
   if (!post) return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
@@ -72,16 +77,16 @@ export default function BlogPost({ slug }) {
         <FileQuestion size={30} strokeWidth={1.75} />
       </div>
       <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>Post not found</h1>
-      <a href="/blog" style={{ color: '#1d4ed8', fontWeight: 600 }}>← Back to blog</a>
+      <a href={basePath} style={{ color: '#1d4ed8', fontWeight: 600 }}>← Back to blog</a>
     </div>
   );
 
-  const related = BLOG_POSTS.filter(p => p.slug !== slug && p.category === post.category).slice(0, 2);
-  const others = BLOG_POSTS.filter(p => p.slug !== slug && p.category !== post.category).slice(0, 2);
+  const related = ALL_POSTS.filter(p => p.slug !== slug && p.category === post.category).slice(0, 2);
+  const others = ALL_POSTS.filter(p => p.slug !== slug && p.category !== post.category).slice(0, 2);
   const suggestions = [...related, ...others].slice(0, 3);
 
-  const canonicalUrl = `https://www.cleanestimator.com/blog/${slug}`;
-  const seoTitle = `${post.metaTitle || post.title} | Clean Estimator`;
+  const canonicalUrl = `https://www.cleanestimator.com${basePath}/${slug}`;
+  const seoTitle = `${post.metaTitle || post.title} | ${siteName}`;
   const dateISO = post.dateISO || (post.date ? new Date(post.date).toISOString() : new Date().toISOString());
 
   const schema = {
@@ -113,8 +118,8 @@ export default function BlogPost({ slug }) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.cleanestimator.com' },
-      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://www.cleanestimator.com/blog' },
-      { '@type': 'ListItem', position: 3, name: post.categoryLabel || post.category, item: `https://www.cleanestimator.com/blog/category/${post.category}` },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `https://www.cleanestimator.com${basePath}` },
+      { '@type': 'ListItem', position: 3, name: post.categoryLabel || post.category, item: `https://www.cleanestimator.com${basePath}/category/${post.category}` },
       { '@type': 'ListItem', position: 4, name: post.title, item: canonicalUrl },
     ],
   };
@@ -163,8 +168,8 @@ export default function BlogPost({ slug }) {
         <div className="page-hero-glow" aria-hidden="true" />
         <div className="page-hero-inner" style={{ maxWidth: 880, textAlign: 'left' }}>
           <div className="page-hero-breadcrumb">
-            <a href="/">Home</a><span>›</span><a href="/blog">Blog</a><span>›</span>
-            <a href={`/blog/category/${post.category}`}>{post.categoryLabel}</a>
+            <a href="/">Home</a><span>›</span><a href={basePath}>Blog</a><span>›</span>
+            <a href={`${basePath}/category/${post.category}`}>{post.categoryLabel}</a>
           </div>
           <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
             <span style={{ color: '#93c5fd', fontSize: 13, fontWeight: 700 }}>{post.categoryLabel}</span>
@@ -198,7 +203,7 @@ export default function BlogPost({ slug }) {
         {/* Bottom CTA */}
         <div style={{ background: 'linear-gradient(135deg, #0b1220, #1e293b)', borderRadius: 18, padding: 'clamp(24px, 6vw, 36px) clamp(20px, 5vw, 40px)', marginTop: 48, color: 'white', textAlign: 'center', boxShadow: '0 12px 32px rgba(15,23,42,0.24)' }}>
           <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Get a Free Local Estimate</h3>
-          <p style={{ color: '#94a3b8', marginBottom: 20, fontSize: 15 }}>Our calculator gives ZIP-code specific prices across all 50 states. Free and instant.</p>
+          <p style={{ color: '#94a3b8', marginBottom: 20, fontSize: 15 }}>{countryBlog ? 'Our calculator gives location-specific prices in seconds. Free and instant.' : 'Our calculator gives ZIP-code specific prices across all 50 states. Free and instant.'}</p>
           <a href="/" style={{ background: '#1d4ed8', color: 'white', padding: '14px 32px', borderRadius: 11, textDecoration: 'none', fontWeight: 700, fontSize: 16, boxShadow: '0 4px 16px rgba(37,99,235,0.3)' }}>Calculate My Cost →</a>
         </div>
 
@@ -208,7 +213,7 @@ export default function BlogPost({ slug }) {
             <h3 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 20 }}>Related Guides</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16 }}>
               {suggestions.map(p => (
-                <a key={p.slug} href={`/blog/${p.slug}`} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '20px', textDecoration: 'none', transition: 'all 0.2s' }}
+                <a key={p.slug} href={`${basePath}/${p.slug}`} style={{ display: 'block', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: '20px', textDecoration: 'none', transition: 'all 0.2s' }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = '#bfdbfe'; e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(30,64,175,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
                 >

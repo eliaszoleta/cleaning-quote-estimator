@@ -30,6 +30,25 @@ const posts = slugMatches.map((m, i) => ({
 const categoryMatches = [...postsFile.matchAll(/(?<!\w)category:\s*['"]([^'"]+)['"]/g)];
 const categorySlugs = [...new Set(categoryMatches.map(m => m[1]))];
 
+// ── UK/Canada/Australia pilot blogs (each a standalone data file under
+// src/data/intl/, same POSTS/CATEGORIES shape as blogPosts.js) -- parsed the
+// same regex-over-text way as the US file above, scoped to /blog/{key}/...
+// URLs. A country file that hasn't been written yet is skipped rather than
+// failing the whole sitemap build.
+const countryBlogs = ['uk', 'ca', 'au'].map(key => {
+  const filePath = path.join(__dirname, `../src/data/intl/blogPosts${key.toUpperCase()}.js`);
+  if (!fs.existsSync(filePath)) return null;
+  const fileText = fs.readFileSync(filePath, 'utf8');
+  const slugs = [...fileText.matchAll(/(?<!\w)slug:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+  const dates = [...fileText.matchAll(/(?<!\w)date:\s*['"]([^'"]+)['"]/g)];
+  const cats = [...new Set([...fileText.matchAll(/(?<!\w)category:\s*['"]([^'"]+)['"]/g)].map(m => m[1]))];
+  return {
+    key,
+    posts: slugs.map((slug, i) => ({ slug, date: dates[i]?.[1] || TODAY })),
+    categorySlugs: cats,
+  };
+}).filter(Boolean);
+
 // ── Parse services.js and statePricing.js as text ──────────────────────────
 
 const servicesFile = fs.readFileSync(
@@ -116,6 +135,17 @@ const xml = [
     urlEntry({ loc: `${SITE_URL}/blog/${p.slug}`, lastmod: p.date, changefreq: 'monthly', priority: '0.8' })
   ),
   '',
+  '  <!-- UK/Canada/Australia pilot blogs (auto-generated from src/data/intl/) -->',
+  ...countryBlogs.flatMap(cb => [
+    urlEntry({ loc: `${SITE_URL}/blog/${cb.key}`, lastmod: TODAY, changefreq: 'weekly', priority: '0.8' }),
+    ...cb.categorySlugs.map(slug =>
+      urlEntry({ loc: `${SITE_URL}/blog/${cb.key}/category/${slug}`, lastmod: TODAY, changefreq: 'weekly', priority: '0.6' })
+    ),
+    ...cb.posts.map(p =>
+      urlEntry({ loc: `${SITE_URL}/blog/${cb.key}/${p.slug}`, lastmod: p.date, changefreq: 'monthly', priority: '0.7' })
+    ),
+  ]),
+  '',
   '  <!-- Cleaning services (auto-generated from services.js) -->',
   ...serviceSlugs.map(slug =>
     urlEntry({ loc: `${SITE_URL}/cleaning-services/${slug}`, lastmod: TODAY, changefreq: 'monthly', priority: '0.9' })
@@ -148,4 +178,5 @@ const xml = [
 const outPath = path.join(__dirname, '../public/sitemap.xml');
 fs.writeFileSync(outPath, xml, 'utf8');
 
-console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories, ${serviceSlugs.length} services, ${serviceSlugs.length} service calculators, ${stateSlugs.length} states, ${citySlugs.length} cities, ${stateSlugs.length} start-a-cleaning-business states`);
+const countryBlogPostCount = countryBlogs.reduce((sum, cb) => sum + cb.posts.length, 0);
+console.log(`✓ sitemap.xml — ${posts.length} posts, ${categorySlugs.length} categories, ${serviceSlugs.length} services, ${serviceSlugs.length} service calculators, ${stateSlugs.length} states, ${citySlugs.length} cities, ${stateSlugs.length} start-a-cleaning-business states, ${countryBlogs.length} country blogs (${countryBlogPostCount} posts)`);

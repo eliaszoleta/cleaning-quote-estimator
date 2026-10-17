@@ -131,8 +131,30 @@ const isServiceCalculatorPage = getAllServices().some(s => pathname === '/' + ca
 
 const embedCompanyId = isEmbed ? searchParams.get('company') : null;
 
+// UK/Canada/Australia each get their own fully separate blog section
+// (/blog/uk, /blog/ca, /blog/au) rather than a country field mixed into the
+// one US list at /blog -- see blogRegistry.js's comment on why that
+// separation is deliberate. These country prefixes must be checked BEFORE
+// the generic '/blog/category/' and '/blog/' fallbacks below, since e.g.
+// '/blog/uk' and '/blog/uk/category/carpet' both start with '/blog/' too
+// and would otherwise be swallowed by the US BlogPost/BlogCategory routes
+// (treating "uk" as a post slug).
+const COUNTRY_BLOG_KEYS = ['uk', 'ca', 'au'];
+
 function BlogRouter() {
   if (pathname === '/blog') return <BlogIndex />;
+
+  for (const key of COUNTRY_BLOG_KEYS) {
+    const base = `/blog/${key}`;
+    if (pathname === base) return <BlogIndex country={key} />;
+    if (pathname.startsWith(`${base}/category/`)) {
+      return <BlogCategory country={key} category={pathname.replace(`${base}/category/`, '')} />;
+    }
+    if (pathname.startsWith(`${base}/`)) {
+      return <BlogPost country={key} slug={pathname.replace(`${base}/`, '')} />;
+    }
+  }
+
   if (pathname.startsWith('/blog/category/')) {
     return <BlogCategory category={pathname.replace('/blog/category/', '')} />;
   }
