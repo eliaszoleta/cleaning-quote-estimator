@@ -18,6 +18,13 @@ const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { getTemplateById, sendTemplatedEmail } = require('../services/emailTemplates');
+
+// Same formatting as email.js's own formatDate -- duplicated rather than
+// exported/imported since it's a one-liner and email.js doesn't currently
+// export anything.
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
 const DEFAULTS = require('../services/emailTemplateDefaults');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -323,7 +330,15 @@ router.post('/send-individual', async (req, res) => {
       const { data: userData } = await sb.auth.admin.getUserById(recipientRef);
       toEmail = userData?.user?.email || null;
       toName = cfgRow.config?.companyName || '';
-      resolvedVars = { name: toName || 'there', companyName: toName, email: toEmail, ...resolvedVars };
+      // signupDateSuffix: same real Supabase Auth created_at timestamp
+      // sendActivationReminderEmail uses (see email.js), not a guess --
+      // this is what was missing here before, which is exactly how a
+      // manual/individual send of activation_reminder could go out with a
+      // blank {{signupDateSuffix}} even though the automated path never
+      // can (it skips the send entirely if signedUpAt is missing).
+      const signedUpAt = userData?.user?.created_at || null;
+      const signupDateSuffix = signedUpAt ? ` on ${formatDate(signedUpAt)}` : '';
+      resolvedVars = { name: toName || 'there', companyName: toName, email: toEmail, signupDateSuffix, ...resolvedVars };
     } else if (recipientType === 'partner' && recipientRef) {
       const { data: partner, error } = await sb.from('partners').select('*').eq('id', recipientRef).maybeSingle();
       if (error) throw error;

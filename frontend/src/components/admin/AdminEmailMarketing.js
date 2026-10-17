@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Mail, Plus, Trash2, Eye, Send, X, RefreshCw, Calendar, Ban, ArrowLeft } from 'lucide-react';
+import { Mail, Plus, Trash2, Eye, Send, X, RefreshCw, Calendar, Ban, ArrowLeft, Search } from 'lucide-react';
 import {
   getAdminEmailTemplates, createAdminEmailTemplate, updateAdminEmailTemplate, deleteAdminEmailTemplate,
   resyncAdminEmailTemplateDefault,
   previewAdminEmailAudience, sendAdminIndividualEmail,
   getAdminEmailCampaigns, getAdminEmailCampaign, createAdminEmailCampaign, cancelAdminEmailCampaign,
+  getAdminHomepageLeads, getAdminCompanies, getAdminPartners,
 } from '../../utils/api';
 import { theme, cardStyle, inputStyle, labelStyle, secondaryBtnStyle, primaryBtnStyle, dangerBtnStyle, pill, PageHeader } from './adminTheme';
 
@@ -287,6 +288,55 @@ function ComposePanel({ adminKey, templates }) {
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState(null);
 
+  // Recipient picker -- 'custom' keeps the old freeform To/Name entry;
+  // 'lead'/'company'/'partner' sends recipientType+recipientRef instead, so
+  // the backend looks the real record up server-side and auto-fills merge
+  // fields (name, companyName, email, and for companies, signupDateSuffix)
+  // from the actual stored data instead of whatever an admin hand-types --
+  // exactly the gap that let activation_reminder go out once with a blank
+  // signup date (a manual send with nothing typed into that merge field).
+  const [recipientMode, setRecipientMode] = useState('custom');
+  const [recipientLists, setRecipientLists] = useState({ lead: null, company: null, partner: null });
+  const [recipientListLoading, setRecipientListLoading] = useState(false);
+  const [recipientQuery, setRecipientQuery] = useState('');
+  const [selectedRecipient, setSelectedRecipient] = useState(null);
+
+  const loadRecipientList = useCallback(async (mode) => {
+    if (mode === 'custom' || recipientLists[mode]) return;
+    setRecipientListLoading(true);
+    try {
+      let rows = [];
+      if (mode === 'lead') {
+        const res = await getAdminHomepageLeads(adminKey);
+        rows = (res.data || []).map(l => ({ id: l.id, name: l.name || '(no name)', email: l.email, detail: l.service_type ? l.service_type.replace(/_/g, ' ') : '' }));
+      } else if (mode === 'company') {
+        const res = await getAdminCompanies(adminKey);
+        rows = (res.data || []).map(c => ({ id: c.companyId, name: c.companyName, email: c.email, detail: c.signedUpAt ? `signed up ${new Date(c.signedUpAt).toLocaleDateString()}` : '' }));
+      } else if (mode === 'partner') {
+        const res = await getAdminPartners(adminKey);
+        rows = (res.data?.partners || []).map(p => ({ id: p.id, name: p.business_name, email: p.business_email, detail: '' }));
+      }
+      setRecipientLists(prev => ({ ...prev, [mode]: rows }));
+    } catch (err) {
+      console.error(`Failed to load ${mode} list:`, err.message);
+      setRecipientLists(prev => ({ ...prev, [mode]: [] }));
+    } finally {
+      setRecipientListLoading(false);
+    }
+  }, [adminKey, recipientLists]);
+
+  const switchRecipientMode = (mode) => {
+    setRecipientMode(mode);
+    setSelectedRecipient(null);
+    setRecipientQuery('');
+    if (mode !== 'custom') loadRecipientList(mode);
+  };
+
+  const currentList = recipientLists[recipientMode] || [];
+  const filteredRecipients = recipientQuery.trim()
+    ? currentList.filter(r => `${r.name} ${r.email}`.toLowerCase().includes(recipientQuery.trim().toLowerCase()))
+    : currentList;
+
   // Bulk
   const [sources, setSources] = useState({ leads: true, companies: false, partners: false });
   const [leadScope, setLeadScope] = useState('all');
@@ -300,7 +350,10 @@ function ComposePanel({ adminKey, templates }) {
   const [creating, setCreating] = useState(false);
   const [createResult, setCreateResult] = useState(null);
 
-  useEffect(() => { setVarValues({}); setSendResult(null); setPreview(null); setCreateResult(null); }, [templateId]);
+  useEffect(() => {
+    setVarValues({}); setSendResult(null); setPreview(null); setCreateResult(null);
+    setRecipientMode('custom'); setSelectedRecipient(null); setRecipientQuery('');
+  }, [templateId]);
 
   const buildAudience = () => ({
     sources: Object.entries(sources).filter(([, v]) => v).map(([k]) => k),
@@ -323,15 +376,20 @@ function ComposePanel({ adminKey, templates }) {
     setSending(true);
     setSendResult(null);
     try {
-      await sendAdminIndividualEmail(adminKey, { templateId, to: { email: toEmail, name: toName }, vars: varValues });
-      setSendResult({ ok: true, msg: `Sent to ${toEmail}` });
-      setToEmail(''); setToName('');
+      const payload = recipientMode !== 'custom' && selectedRecipient
+        ? { templateId, recipientType: recipientMode, recipientRef: selectedRecipient.id, vars: varValues }
+        : { templateId, to: { email: toEmail, name: toName }, vars: varValues };
+      await sendAdminIndividualEmail(adminKey, payload);
+      setSendResult({ ok: true, msg: `Sent to ${recipientMode !== 'custom' ? selectedRecipient.email : toEmail}` });
+      setToEmail(''); setToName(''); setSelectedRecipient(null); setRecipientQuery('');
     } catch (err) {
       setSendResult({ ok: false, msg: err.message || 'Send failed' });
     } finally {
       setSending(false);
     }
   };
+
+  const canSendIndividual = recipientMode === 'custom' ? !!toEmail : !!selectedRecipient;
 
   const createCampaign = async () => {
     setCreating(true);
@@ -376,19 +434,76 @@ function ComposePanel({ adminKey, templates }) {
           <p style={{ fontSize: 13, color: theme.textMuted }}>Pick a template above to continue.</p>
         ) : mode === 'individual' ? (
           <div>
-            <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>To (email)</label>
-                <input style={inputStyle} value={toEmail} onChange={e => setToEmail(e.target.value)} placeholder="jane@example.com — copy from the Leads/Companies/Partners tabs" />
-              </div>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Name (optional)</label>
-                <input style={inputStyle} value={toName} onChange={e => setToName(e.target.value)} />
+            <div style={{ marginBottom: 12 }}>
+              <label style={labelStyle}>Recipient</label>
+              <div style={{ display: 'flex', gap: 4, background: 'rgba(15,23,42,0.05)', borderRadius: 9, padding: 3, width: 'fit-content' }}>
+                {[['custom', 'Custom'], ['lead', 'Lead'], ['company', 'Company'], ['partner', 'Partner']].map(([v, label]) => (
+                  <button key={v} onClick={() => switchRecipientMode(v)} style={{
+                    padding: '6px 12px', borderRadius: 7, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 12,
+                    background: recipientMode === v ? theme.cardBg : 'transparent', color: recipientMode === v ? theme.textPrimary : theme.textMuted,
+                    boxShadow: recipientMode === v ? theme.shadowSm : 'none',
+                  }}>{label}</button>
+                ))}
               </div>
             </div>
+
+            {recipientMode === 'custom' ? (
+              <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={labelStyle}>To (email)</label>
+                  <input style={inputStyle} value={toEmail} onChange={e => setToEmail(e.target.value)} placeholder="jane@example.com" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={labelStyle}>Name (optional)</label>
+                  <input style={inputStyle} value={toName} onChange={e => setToName(e.target.value)} />
+                </div>
+              </div>
+            ) : selectedRecipient ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: theme.contentBg, border: `1px solid ${theme.borderSoft}`, borderRadius: theme.radiusMd, padding: '10px 12px', marginBottom: 12 }}>
+                <div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: theme.textPrimary }}>{selectedRecipient.name || '(no name)'}</div>
+                  <div style={{ fontSize: 12.5, color: theme.textMuted }}>{selectedRecipient.email}{selectedRecipient.detail ? ` · ${selectedRecipient.detail}` : ''}</div>
+                </div>
+                <button onClick={() => setSelectedRecipient(null)} style={{ ...secondaryBtnStyle, padding: '6px 10px' }}><X size={13} /></button>
+              </div>
+            ) : (
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ position: 'relative' }}>
+                  <Search size={14} style={{ position: 'absolute', left: 10, top: 11, color: theme.textMuted }} />
+                  <input
+                    style={{ ...inputStyle, paddingLeft: 30 }}
+                    value={recipientQuery}
+                    onChange={e => setRecipientQuery(e.target.value)}
+                    placeholder={`Search ${recipientMode}s by name or email…`}
+                  />
+                </div>
+                <div style={{ maxHeight: 220, overflowY: 'auto', border: `1px solid ${theme.borderSoft}`, borderRadius: theme.radiusMd, marginTop: 6 }}>
+                  {recipientListLoading ? (
+                    <div style={{ padding: 14, fontSize: 13, color: theme.textMuted }}>Loading…</div>
+                  ) : filteredRecipients.length === 0 ? (
+                    <div style={{ padding: 14, fontSize: 13, color: theme.textMuted }}>No {recipientMode}s found.</div>
+                  ) : filteredRecipients.slice(0, 50).map(r => (
+                    <button
+                      key={r.id}
+                      onClick={() => setSelectedRecipient(r)}
+                      style={{
+                        display: 'block', width: '100%', textAlign: 'left', padding: '9px 12px', border: 'none',
+                        borderBottom: `1px solid ${theme.borderSoft}`, background: 'transparent', cursor: 'pointer',
+                      }}
+                    >
+                      <div style={{ fontSize: 13, fontWeight: 700, color: theme.textPrimary }}>{r.name || '(no name)'}</div>
+                      <div style={{ fontSize: 12, color: theme.textMuted }}>{r.email}{r.detail ? ` · ${r.detail}` : ''}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {(template.variables || []).length > 0 && (
               <div style={{ marginBottom: 14 }}>
-                <label style={labelStyle}>Merge fields</label>
+                <label style={labelStyle}>
+                  Merge fields{recipientMode !== 'custom' ? ' (optional — auto-filled from the selected recipient unless overridden here)' : ''}
+                </label>
                 {template.variables.map(v => (
                   <div key={v.name} style={{ marginBottom: 7 }}>
                     <input
@@ -401,7 +516,7 @@ function ComposePanel({ adminKey, templates }) {
                 ))}
               </div>
             )}
-            <button onClick={sendIndividual} disabled={sending || !toEmail} style={{ ...primaryBtnStyle, opacity: sending ? 0.7 : 1 }}>
+            <button onClick={sendIndividual} disabled={sending || !canSendIndividual} style={{ ...primaryBtnStyle, opacity: sending ? 0.7 : 1 }}>
               <Send size={14} /> {sending ? 'Sending…' : 'Send now'}
             </button>
             {sendResult && <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, color: sendResult.ok ? '#16a34a' : '#dc2626' }}>{sendResult.msg}</div>}
