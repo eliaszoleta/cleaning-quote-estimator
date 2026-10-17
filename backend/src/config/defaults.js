@@ -870,19 +870,92 @@ const CANADA_PROVINCE_LABOR_RATES = {
 const CANADA_LABOR_RATE_NATIONAL_MEDIAN = 19.74;
 
 // CANADA_PROVINCE_PRICING_MULTIPLIERS: each province's labor rate relative
-// to Canada's own national median, then scaled by a cross-country anchor
-// factor (Canada's national median wage ÷ the US's, both already-cited
-// government figures in their own currency -- NOT a currency-exchange
-// conversion) so the result multiplies directly onto this file's existing
-// USD-calibrated per-service base prices to produce a CAD-denominated
-// quote. 19.74 / 17.71 = 1.1146. Relative COL/competition judgment (the
-// kind layered into the US table beyond pure wage ratio) was NOT added here
-// for the pilot -- these are wage-ratio-only, a narrower but fully-sourced
-// starting point; revisit if Canadian COL data becomes available.
+// to Canada's OWN national median only (no cross-country anchor baked in
+// here anymore -- see CANADA_SERVICE_FACTORS below for why that moved).
+// This is the within-Canada regional variance signal, the direct Canadian
+// counterpart to STATE_PRICING_MULTIPLIERS above. Relative COL/competition
+// judgment (the kind layered into the US table beyond pure wage ratio) was
+// NOT added here for the pilot -- these are wage-ratio-only, a narrower but
+// fully-sourced starting point; revisit if Canadian COL data becomes
+// available.
 const CANADA_PROVINCE_PRICING_MULTIPLIERS = {
-  AB: 1.03, BC: 1.13, MB: 0.96, NB: 0.99, NL: 1.07, NS: 0.96,
-  NT: 1.34, NU: 1.30, ON: 1.07, PE: 1.02, QC: 1.16, SK: 1.02, YT: 1.39,
+  AB: 0.92, BC: 1.01, MB: 0.86, NB: 0.89, NL: 0.96, NS: 0.86,
+  NT: 1.21, NU: 1.17, ON: 0.96, PE: 0.91, QC: 1.04, SK: 0.91, YT: 1.25,
 };
+
+// CANADA_SERVICE_FACTORS -- per-service CAD-vs-USD cost factor, applied on
+// top of the province-relative multiplier above. This replaces an earlier
+// version of this file that used ONE blanket cross-country factor (Canada's
+// national median wage ÷ the US's, 19.74/17.71 = 1.1146) for all 12
+// services -- a reasonable starting assumption, but an assumption, not a
+// researched one. Per-service web research (Oct 2026: HomeStars, Hellamaid,
+// Thumbtack, RenoQuotes, Central Alberta DKI restoration, Job Bank Canada)
+// found that for several services the real Canadian CAD market rate sits
+// much closer to the raw US baseline dollar figure than that 1.11 wage
+// ratio alone would predict -- retail cleaning prices don't move 1:1 with a
+// wage index, and CAD/USD purchasing-power differences partly offset
+// Canada's nominally higher median cleaning wage. Where research gave a
+// clear, comparable anchor, the factor below reflects it; where Canadian
+// data was absent, self-contradictory, or a single vendor's one-city
+// marketing page (not trustworthy as a national figure), the service is
+// left OUT of this table on purpose and falls back to
+// CANADA_GENERAL_SERVICE_FACTOR -- an explicit "not independently sourced"
+// flag per the standing research rule, not a silent guess:
+//
+//   home_residential: US baseline (1500-2000 sqft, 3bed/2bath, standard,
+//     national-avg state) = $223-263, mid $243. HomeStars Canada cites a
+//     national average home cleaning of $230 (range $160-$320), mid $240 --
+//     a near-exact match to the raw USD figure. Factor: 1.00.
+//   commercial: US baseline (2,000 sqft office, weekly recurring) =
+//     $876-1,128/mo. HomeStars Canada's $0.10-0.25/sqft recurring rate
+//     (treated as per-visit, consistent with its own separate $2,000-5,000+
+//     /mo large-office figures) implies ~$866-2,165/mo at weekly frequency
+//     -- the US baseline falls inside that band. Factor: 1.00.
+//   air_duct: US baseline (11-20 vents, 1 system, residential) = $420-535,
+//     mid $478. HomeStars Canada's national average duct cleaning is $500
+//     ($375-650) -- a close match. Factor: 1.00.
+//   dryer_vent: US baseline (standard, under 15ft) = $140-193, mid $167.
+//     HomeStars Canada states $150-200 CAD directly for a standalone visit,
+//     mid $175 -- a close match. Factor: 1.00.
+//   water_damage: US baseline (500 sqft, clean water, wet carpets) =
+//     $1,450-1,950, implying ~$3.40/sqft. Central Alberta DKI, a real
+//     Canadian restoration contractor, cites a $3-7.50/sqft industry
+//     average -- the US baseline lands right at the low end of that actual
+//     Canadian range. Factor: 1.00.
+//
+// Left on the general fallback (CANADA_GENERAL_SERVICE_FACTOR), each for a
+// specific reason found during this research pass, not by default:
+//   apartment: Canada figures ranged from matching the general fallback to
+//     ~1.4x above it depending on source (Toronto vendor pages vs a
+//     Canada-wide one-time-clean figure) -- too inconsistent to pick a
+//     single tightened value over the wage-based estimate.
+//   carpet, upholstery, tile_grout: search results explicitly flagged as
+//     thin or not Canada-specific (tile/grout: "Canadian coverage is thin";
+//     upholstery: "no reliable, current Canadian price list"; carpet: only
+//     a single small-bedroom figure, no larger-room data).
+//   mold_remediation: HomeStars' direct $10-30/sqft figure and RenoQuotes'
+//     job-size-tier figures ($2,500-5,500 for a 10-100 sqft job) implied
+//     noticeably different numbers depending on which was used -- both are
+//     contractor/marketing sources, not government data, so neither was
+//     trusted enough to override the wage-based estimate.
+//   airbnb: the only Canada-specific figures found were a single Toronto
+//     vendor's marketing page (Hellamaid), ~2.3x the general fallback --
+//     plausible for Toronto specifically (one of Canada's highest-cost
+//     cities, already partly captured by ON's own province multiplier
+//     above) but not trustworthy as a Canada-wide factor from one city's
+//     one vendor.
+//   post_construction: per-sqft Canadian figures ($0.15-0.30/sqft "final
+//     clean") actually landed close to what the general fallback already
+//     predicts, so the fallback was left as-is rather than replaced with a
+//     number that says the same thing less precisely.
+const CANADA_SERVICE_FACTORS = {
+  home_residential: 1.00,
+  commercial: 1.00,
+  air_duct: 1.00,
+  dryer_vent: 1.00,
+  water_damage: 1.00,
+};
+const CANADA_GENERAL_SERVICE_FACTOR = 1.1146;
 
 const CANADA_PROVINCE_NAMES = {
   AB: 'Alberta', BC: 'British Columbia', MB: 'Manitoba', NB: 'New Brunswick',
@@ -909,6 +982,8 @@ module.exports = {
   STATE_AVERAGE_HOME_CLEANING_COST,
   CANADA_PROVINCE_LABOR_RATES,
   CANADA_PROVINCE_PRICING_MULTIPLIERS,
+  CANADA_SERVICE_FACTORS,
+  CANADA_GENERAL_SERVICE_FACTOR,
   CANADA_PROVINCE_NAMES,
   COUNTRIES,
   DEFAULT_COMPANY_CONFIG,

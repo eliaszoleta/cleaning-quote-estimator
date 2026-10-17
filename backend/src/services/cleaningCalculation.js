@@ -4,6 +4,8 @@ const { resolveCityForZip } = require('./zipCity');
 const {
   STATE_PRICING_MULTIPLIERS,
   CANADA_PROVINCE_PRICING_MULTIPLIERS,
+  CANADA_SERVICE_FACTORS,
+  CANADA_GENERAL_SERVICE_FACTOR,
   CANADA_PROVINCE_NAMES,
   COUNTRIES,
   HOME_SQFT_BASE_PRICES,
@@ -110,8 +112,20 @@ function getStateMultiplier(state) {
 // looks up its own region table instead; an unrecognized region in any
 // country still falls back to 1.0, same "unknown region, no adjustment"
 // behavior getStateMultiplier already had.
-function getRegionMultiplier(country, region) {
-  if (country === 'CA') return CANADA_PROVINCE_PRICING_MULTIPLIERS[region] || 1.0;
+//
+// For CA, the province table is now relative-within-Canada ONLY (see its
+// own comment in defaults.js) -- the cross-country CAD-vs-USD factor is a
+// SEPARATE, per-service number (CANADA_SERVICE_FACTORS), since research
+// found that factor genuinely differs by service rather than being one
+// constant applicable to all 12. serviceType is required for CA so the
+// right per-service factor (or the general fallback, for a service with no
+// distinct researched figure) gets multiplied in; it's unused for US.
+function getRegionMultiplier(country, region, serviceType) {
+  if (country === 'CA') {
+    const serviceFactor = CANADA_SERVICE_FACTORS[serviceType] ?? CANADA_GENERAL_SERVICE_FACTOR;
+    const provinceRelative = CANADA_PROVINCE_PRICING_MULTIPLIERS[region] || 1.0;
+    return serviceFactor * provinceRelative;
+  }
   return getStateMultiplier(region);
 }
 
@@ -1352,7 +1366,7 @@ async function calculateCleaning(inputs, companyConfig = {}) {
   // unknown (null) rather than guessing a real, price-affecting region.
   const resolvedState = providedState || (zip ? (country === 'CA' ? provinceForPostal(zip) : stateForZip(zip)) : null);
 
-  const stateMultiplier = getRegionMultiplier(country, resolvedState);
+  const stateMultiplier = getRegionMultiplier(country, resolvedState, serviceType);
   const stateName = getRegionName(country, resolvedState);
   const currency = COUNTRIES[country] || COUNTRIES.US;
 
