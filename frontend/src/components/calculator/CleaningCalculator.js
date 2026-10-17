@@ -364,15 +364,18 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // actually pastes onto their own site). Showing it on-screen too just made
   // that email redundant and visitors never opened it.
   //
-  // Two call sites deliberately opt back in via the instantResults prop,
-  // since there's no real lead/email to wait on in either case: BrandingTab.js's
-  // Live Preview (a company configuring their widget, not a customer --
-  // there's no lead email to send a preview to) and RunEstimateTab.js's
-  // "Run an Estimate" tool (the account owner quoting a job themselves,
-  // often standing in front of that customer, who needs the number
-  // immediately rather than waiting on an email). demoPartner (the
-  // partner-recruitment demo page) also always shows it, to let a prospect
-  // see what the widget actually looks like.
+  // Only RunEstimateTab.js's "Run an Estimate" tool deliberately opts back
+  // in via the instantResults prop -- skipLeadCapture means there's no
+  // lead-capture step and no estimate email at all there, just the account
+  // owner quoting a job themselves (often standing in front of that
+  // customer, who needs the number immediately). BrandingTab.js's Live
+  // Preview does NOT opt in: it passes a real companyId (so a company
+  // testing their own widget goes through the actual lead-capture +
+  // estimate-email flow, the same as a real visitor would on
+  // EmbedWrapper.js), so it should behave identically to the real embed --
+  // email only, no on-screen breakdown. demoPartner (the partner-
+  // recruitment demo page) always shows it, to let a prospect see what the
+  // widget actually looks like without needing to complete a fake lead form.
   const showInstantResults = instantResults || !!demoPartner;
 
   if (currentStep === 'results' && result) {
