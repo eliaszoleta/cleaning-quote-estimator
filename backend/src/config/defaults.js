@@ -572,23 +572,26 @@ const TILE_CONDITION_MULTIPLIERS = {
 // sourced at all, while grout_recoloring and tile_repair had.
 //
 // grout_sealing: previously $0.55-$0.88/sq ft with no citation -- below
-// every source checked. Re-anchored to Homewyse (May 2026), the single most
-// authoritative figure found and the best baseline per that same research
-// pass, at $1.35-$2.46/sq ft. Deliberately NOT blended with the several
-// lower, inconsistent SEO-content-site figures also found ($0.25-$2.50/sq
-// ft, mutually contradictory) -- anchoring to one good source beats
-// averaging in noisy ones, same approach TILE_PRICE_PER_SQFT above already
-// uses. This is a genuinely wide range on its own (82% spread) even from
-// just that one source -- professional grout sealing really does vary that
-// much job to job (product grade, how much grout there actually is, how
-// much prep it needs), so tightening it further would mean being more
-// confident than the real market actually is. calculateTileGrout in
-// cleaningCalculation.js now also scales this rate by the same
-// TILE_CONDITION_MULTIPLIERS the base cleaning already uses (previously
-// flat regardless of condition) -- sealing neglected grout genuinely needs
-// more prep than sealing already-clean grout, and the condition is already
-// collected from the customer, so this uses data already on hand rather
-// than adding a new question.
+// every source checked. First-pass fix re-anchored directly to Homewyse's
+// full $1.35-$2.46/sq ft national-average figure, but that was wrong in a
+// different way: an 82% spread that wide isn't actionable for a business
+// owner trying to actually quote a job from it, and it was also double
+// counting -- Homewyse's national figure already bakes in the same
+// geographic variance this calculator separately applies via stateMultiplier,
+// and (once condition-scaling was added, see below) the same condition
+// variance condMult separately applies too. Stacking the full raw national
+// spread on top of both of those re-counts uncertainty the formula already
+// accounts for elsewhere. Settled on $1.65-$2.15/sq ft instead -- centered
+// on Homewyse's own ~$1.90 midpoint, tightened to a ~30% band matching the
+// typical-case convention every other per-sq-ft rate in this file already
+// follows (COMMERCIAL_SQFT_RATES.office: 22% spread; TILE_PRICE_PER_SQFT
+// ceramic: 33%), not the full breadth of "anything charged for this
+// anywhere in the US." calculateTileGrout in cleaningCalculation.js scales
+// this rate by the same TILE_CONDITION_MULTIPLIERS the base cleaning
+// already uses (previously flat regardless of condition) -- sealing
+// neglected grout genuinely needs more prep than sealing already-clean
+// grout, and the condition is already collected from the customer, so this
+// uses data already on hand rather than adding a new question.
 //
 // caulk_replacement: previously $3.50-$7/linear ft with no citation --
 // above HomeAdvisor's and Angi's professional per-linear-foot rate
@@ -605,7 +608,7 @@ const TILE_CONDITION_MULTIPLIERS = {
 // UI at all (TileGroutStep.js has no control that ever sends it as a
 // selected service) -- not urgent to re-source pricing nobody can trigger.
 const TILE_SERVICE_ADDONS = {
-  grout_sealing:     { perSqft: { low: 1.35, high: 2.46 } },
+  grout_sealing:     { perSqft: { low: 1.65, high: 2.15 } },
   grout_recoloring:  { perSqft: { low: 1.65, high: 2.55 } },
   caulk_replacement: { perLinFt: { low: 1.5,  high: 4.0  } },
   tile_repair:       { perSqft: { low: 6, high: 13 } },
