@@ -149,6 +149,8 @@ module.exports = [
       '',
       "Looks like you started setting up a Clean Estimator account but didn't quite finish — no rush, just didn't want you to miss out on the free trial.",
       '',
+      "Once it's set up, you get instant, accurate price estimates for every job you quote — plus a free embeddable calculator widget for your own website if you want leads coming in from there too.",
+      '',
       "Pick up right where you left off whenever you're ready, it only takes a minute.",
       '',
       'Finish setting up my account:',
@@ -166,6 +168,10 @@ module.exports = [
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
     Looks like you started setting up a Clean Estimator account but didn't quite finish — no rush, just didn't want you to miss out on the free trial.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Once it's set up, you get instant, accurate price estimates for every job you quote — plus a free embeddable calculator widget for your own website if you want leads coming in from there too.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
