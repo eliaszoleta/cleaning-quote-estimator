@@ -18,11 +18,12 @@ function getStripe() {
 // GET /api/subscription/status
 router.get('/status', async (req, res) => {
   try {
-    const { config, created } = await getOrCreateCompanyConfig(req.user.id);
-    if (created) {
-      sendCompanyWelcomeEmail({ to: req.user.email, companyId: req.user.id })
-        .catch(err => console.error('Company welcome email failed:', err.message));
-    }
+    const { config } = await getOrCreateCompanyConfig(req.user.id);
+    // Deliberately does NOT send the welcome email here -- see the matching
+    // comment in company.js's GET /:id. This route's own `created` flag
+    // only means "the row didn't exist before this call", not "Stripe
+    // Checkout was completed"; the webhook's checkout.session.completed
+    // handler below is the only place that fires this email now.
     res.json({ success: true, data: computeSubscriptionStatus(config, req.user.email) });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to get subscription status' });

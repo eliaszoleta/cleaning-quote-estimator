@@ -151,38 +151,74 @@ function BlogRouter() {
 // normal dashboard (via onDone) if creating the checkout session fails,
 // rather than stranding a just-confirmed account on an error -- same
 // fallback AuthPage.js uses.
+//
+// Deliberately does NOT auto-redirect to Checkout on mount anymore -- it
+// used to, but that gave someone who just clicked a "confirm your email"
+// link no time to even read "last step" before being bounced to Stripe,
+// and anyone who then backed out/closed that tab was left on a page that
+// looked unfinished with no way back to it. Now it waits for an explicit
+// click before creating the checkout session and redirecting.
 function ActivateAfterConfirm({ onDone }) {
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token;
-        if (!token) { onDone(); return; }
-        const res = await postCheckout(token);
-        if (!cancelled) window.location.href = res.url;
-      } catch (err) {
-        if (!cancelled) onDone();
-      }
-    })();
-    return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  const handleActivate = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) { onDone(); return; }
+      const res = await postCheckout(token);
+      window.location.href = res.url;
+    } catch (err) {
+      setLoading(false);
+      setError(true);
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: -160, right: -100, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
       <div style={{ background: 'white', borderRadius: 22, padding: '52px 44px', maxWidth: 420, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)', textAlign: 'center' }}>
         <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
-          <Loader2 size={32} color="#2563eb" strokeWidth={1.8} className="spin" />
+          {loading ? <Loader2 size={32} color="#2563eb" strokeWidth={1.8} className="spin" /> : <Zap size={30} color="#2563eb" strokeWidth={1.8} />}
         </div>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.3px' }}>Last step — activate your calculator</h2>
         <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7 }}>
-          Email confirmed. We're taking you to a secure checkout page to activate Clean Estimator.
+          Email confirmed. When you're ready, we'll take you to a secure checkout page to activate Clean Estimator.
         </p>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: '#2563eb', padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, marginTop: 14 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: '#2563eb', padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, margin: '14px 0 22px' }}>
           <Zap size={13} /> 30 days free, then $25/month
         </div>
+        {error && (
+          <p style={{ color: '#dc2626', fontSize: 13, marginBottom: 14 }}>
+            Something went wrong starting checkout. Please try again.
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={handleActivate}
+          disabled={loading}
+          style={{
+            width: '100%',
+            background: loading ? '#93c5fd' : '#2563eb',
+            color: 'white',
+            border: 'none',
+            borderRadius: 12,
+            padding: '14px 20px',
+            fontSize: 15,
+            fontWeight: 700,
+            cursor: loading ? 'default' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+          }}
+        >
+          {loading ? <Loader2 size={16} className="spin" /> : null}
+          {loading ? 'Taking you to checkout…' : 'Activate my calculator'}
+        </button>
       </div>
     </div>
   );

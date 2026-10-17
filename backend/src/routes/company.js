@@ -3,7 +3,7 @@ const router = express.Router();
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, findDuplicateCompany } = require('../services/companyConfig');
-const { sendCompanyWelcomeEmail, sendAccountDeletionScheduledEmail } = require('../services/email');
+const { sendAccountDeletionScheduledEmail } = require('../services/email');
 const { requireAuth } = require('../middleware/auth');
 
 // Same upload-to-Supabase-Storage pattern as partnerCheckout.js's
@@ -117,13 +117,18 @@ router.get('/:id', requireAuth, async (req, res) => {
       website: req.user.metadata?.website,
     });
     console.log(`[GET config] user=${id} created=${created} | ${Object.entries(config.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') || 'none'}`);
-    if (created) {
-      // Fire-and-forget: points them at Calculator Mode and gets their
-      // embed code in front of them immediately rather than relying on
-      // them to find the Branding tab themselves.
-      sendCompanyWelcomeEmail({ to: req.user.email, companyId: id })
-        .catch(err => console.error('Company welcome email failed:', err.message));
-    }
+    // Deliberately does NOT send the welcome email here, even though this
+    // IS the account's first-ever row (created === true). This fires on
+    // the dashboard's own config fetch, which has no idea whether Stripe
+    // Checkout was ever actually completed -- a user who confirms their
+    // email, gets redirected toward Checkout, then closes/abandons that
+    // tab still lands back here (e.g. re-visiting the old confirmation
+    // link, or any other GET /company?tab=... deep link) and would get a
+    // "your account is ready" email despite never activating anything.
+    // The only trustworthy signal that an account is actually active is
+    // Stripe's own checkout.session.completed webhook -- see
+    // subscription.js's handleStripeEvent, which is the sole place this
+    // email is sent from now.
     res.set('Cache-Control', 'no-store');
     // created: true only on the account's very first GET, when this row
     // didn't exist yet -- lets the dashboard show a first-time welcome
