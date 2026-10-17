@@ -304,6 +304,17 @@ export async function deleteAdminEmailTemplate(adminKey, id) {
   return apiFetch(`/api/admin/email-marketing/templates/${id}`, { method: 'DELETE', headers: { 'x-admin-key': adminKey } });
 }
 
+// Overwrites a lifecycle template's content with the current hardcoded copy
+// from the backend's emailTemplateDefaults.js -- the one-click fix for when
+// that file is edited for an already-seeded template (ensureSeeded only
+// ever inserts a lifecycle row once, so a later code change to an existing
+// template otherwise never reaches the DB row that actually sends).
+export async function resyncAdminEmailTemplateDefault(adminKey, id) {
+  return apiFetch(`/api/admin/email-marketing/templates/${id}/resync-default`, {
+    method: 'POST', headers: { 'x-admin-key': adminKey },
+  });
+}
+
 export async function previewAdminEmailAudience(adminKey, audience) {
   return apiFetch('/api/admin/email-marketing/audience/preview', {
     method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ audience }),

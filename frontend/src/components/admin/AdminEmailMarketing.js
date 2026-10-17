@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Mail, Plus, Trash2, Eye, Send, X, RefreshCw, Calendar, Ban, ArrowLeft } from 'lucide-react';
 import {
   getAdminEmailTemplates, createAdminEmailTemplate, updateAdminEmailTemplate, deleteAdminEmailTemplate,
+  resyncAdminEmailTemplateDefault,
   previewAdminEmailAudience, sendAdminIndividualEmail,
   getAdminEmailCampaigns, getAdminEmailCampaign, createAdminEmailCampaign, cancelAdminEmailCampaign,
 } from '../../utils/api';
@@ -76,6 +77,7 @@ function TemplatesPanel({ adminKey, templates, loading, reload }) {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState('');
   const [showPreview, setShowPreview] = useState(false);
+  const [resyncing, setResyncing] = useState(false);
 
   const selected = templates.find(t => t.id === selectedId) || null;
 
@@ -114,6 +116,27 @@ function TemplatesPanel({ adminKey, templates, loading, reload }) {
       setSaveMsg(err.message || 'Failed to save');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Overwrites this lifecycle template's content with whatever's currently
+  // hardcoded in the backend's emailTemplateDefaults.js. Needed because a
+  // code change to an already-seeded template never reaches this row on its
+  // own -- ensureSeeded() only inserts it once, by design, so a later admin
+  // edit here doesn't get silently clobbered on the next deploy. The
+  // tradeoff: a code-side copy change needs this explicit click too.
+  const resyncFromDefault = async () => {
+    if (!selected || !window.confirm(`Overwrite "${selected.name}" with the current code default? Any edits made here will be lost.`)) return;
+    setResyncing(true);
+    setSaveMsg('');
+    try {
+      await resyncAdminEmailTemplateDefault(adminKey, selected.id);
+      await reload();
+      setSaveMsg('Resynced from code');
+    } catch (err) {
+      setSaveMsg(err.message || 'Failed to resync');
+    } finally {
+      setResyncing(false);
     }
   };
 
@@ -177,6 +200,11 @@ function TemplatesPanel({ adminKey, templates, loading, reload }) {
               {!creating && selected.key && <div style={{ fontSize: 11.5, color: theme.textMuted, marginTop: 2 }}>key: {selected.key} — triggered automatically by the app, editable but not deletable</div>}
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
+              {!creating && selected?.key && (
+                <button onClick={resyncFromDefault} disabled={resyncing} style={{ ...secondaryBtnStyle, opacity: resyncing ? 0.7 : 1 }} title="Overwrite with the current hardcoded copy from emailTemplateDefaults.js">
+                  <RefreshCw size={13} /> {resyncing ? 'Resyncing…' : 'Resync from code'}
+                </button>
+              )}
               <button onClick={() => setShowPreview(p => !p)} style={secondaryBtnStyle}><Eye size={13} /> {showPreview ? 'Edit' : 'Preview'}</button>
               {!creating && !selected.key && <button onClick={remove} style={dangerBtnStyle}><Trash2 size={13} /></button>}
             </div>

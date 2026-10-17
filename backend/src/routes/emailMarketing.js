@@ -18,6 +18,7 @@ const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { getTemplateById, sendTemplatedEmail } = require('../services/emailTemplates');
+const DEFAULTS = require('../services/emailTemplateDefaults');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SERVICE_KEY = () => process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -108,6 +109,46 @@ router.patch('/templates/:id', async (req, res) => {
   } catch (err) {
     console.error('Update email template error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to update template' });
+  }
+});
+
+// POST /api/admin/email-marketing/templates/:id/resync-default — overwrites
+// a lifecycle template's subject/body/variables with the current hardcoded
+// copy from emailTemplateDefaults.js. Exists because ensureSeeded() (see
+// emailTemplates.js) only ever inserts a lifecycle template's row ONCE, via
+// upsert(..., { ignoreDuplicates: true }) -- deliberately so a later admin
+// edit made in this dashboard is never silently clobbered on the next
+// deploy. The flip side: a code change to an *existing* template's copy in
+// emailTemplateDefaults.js has zero effect on what actually sends, forever,
+// until someone manually pushes it into the DB row -- bit us once already
+// (activation_reminder kept sending its old "add a card" copy for several
+// deploys after the code was changed). This is that manual push, done in
+// one click from the dashboard instead of hand-copying HTML into a textarea.
+router.post('/templates/:id/resync-default', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+  try {
+    const { data: row, error: fetchErr } = await sb.from('email_templates').select('id, key').eq('id', req.params.id).maybeSingle();
+    if (fetchErr) throw fetchErr;
+    if (!row) return res.status(404).json({ success: false, error: 'Template not found' });
+    if (!row.key) return res.status(400).json({ success: false, error: 'Not a lifecycle template — no code default to resync from' });
+
+    const def = DEFAULTS.find(d => d.key === row.key);
+    if (!def) return res.status(404).json({ success: false, error: `No code default found for key "${row.key}"` });
+
+    const { data, error } = await sb.from('email_templates').update({
+      name: def.name,
+      subject: def.subject,
+      html_body: def.html,
+      text_body: def.text,
+      variables: def.variables,
+      updated_at: new Date().toISOString(),
+    }).eq('id', req.params.id).select('*').maybeSingle();
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('Resync template default error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to resync template' });
   }
 });
 
