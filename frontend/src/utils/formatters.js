@@ -42,9 +42,22 @@ const UK_SERVICE_LABEL_OVERRIDES = {
   post_construction: 'After Builders Clean',
 };
 
+// Australia pilot (Nov 2026) -- "unit" is the classic Australian term for
+// apartment (vs. the UK's "flat"); mould spelling and "after builders
+// clean" are shared with the UK (both confirmed as real AU trade terms
+// too, e.g. Clean Group Sydney's own "After Builders Cleaning" pricing
+// page), so those two reuse the same override text.
+const AU_SERVICE_LABEL_OVERRIDES = {
+  apartment: 'Unit Cleaning',
+  mold_remediation: 'Mould Removal',
+  post_construction: 'After Builders Clean',
+};
+
+const COUNTRY_SERVICE_LABEL_OVERRIDES = { GB: UK_SERVICE_LABEL_OVERRIDES, AU: AU_SERVICE_LABEL_OVERRIDES };
+
 // country defaults undefined so every existing call site (every one of
 // them, pre-UK-pilot) renders byte-identical to before this parameter
-// existed -- only 'GB' triggers an override.
+// existed -- only a recognized non-US country triggers an override.
 export function serviceTypeLabel(type, country) {
   const map = {
     home_residential: 'House Cleaning',
@@ -60,7 +73,8 @@ export function serviceTypeLabel(type, country) {
     airbnb: 'Airbnb/Vacation Rental Cleaning',
     post_construction: 'Post-Construction Cleaning',
   };
-  if (country === 'GB' && UK_SERVICE_LABEL_OVERRIDES[type]) return UK_SERVICE_LABEL_OVERRIDES[type];
+  const overrides = COUNTRY_SERVICE_LABEL_OVERRIDES[country];
+  if (overrides && overrides[type]) return overrides[type];
   return map[type] || type;
 }
 

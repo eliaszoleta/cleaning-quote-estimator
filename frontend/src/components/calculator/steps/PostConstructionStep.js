@@ -37,7 +37,7 @@ export default function PostConstructionStep({ value, onBack, onNext, primaryCol
   const toggleExtra = id => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
   return (
-    <StepWrapper title={country === 'GB' ? 'After builders clean details' : 'Post-construction cleanup details'} subtitle="Get a quote for cleanup after renovation or new construction" onBack={onBack} onNext={() => onNext({ sqftTier, constructionType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
+    <StepWrapper title={(country === 'GB' || country === 'AU') ? 'After builders clean details' : 'Post-construction cleanup details'} subtitle="Get a quote for cleanup after renovation or new construction" onBack={onBack} onNext={() => onNext({ sqftTier, constructionType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
       <StepSection label="Home / unit size">
         <div className="calc-grid-size">
           {SQFT_OPTIONS.map(o => (

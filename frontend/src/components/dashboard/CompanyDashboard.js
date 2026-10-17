@@ -403,6 +403,7 @@ export default function CompanyDashboard({ user, onLogout }) {
             <option value="US" style={{ color: '#111827' }}>🇺🇸 United States</option>
             <option value="CA" style={{ color: '#111827' }}>🇨🇦 Canada</option>
             <option value="GB" style={{ color: '#111827' }}>🇬🇧 United Kingdom</option>
+            <option value="AU" style={{ color: '#111827' }}>🇦🇺 Australia</option>
           </select>
         </div>
 

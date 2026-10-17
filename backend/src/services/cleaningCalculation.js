@@ -1,6 +1,7 @@
 const { stateForZip } = require('../data/zipStateRanges');
 const { provinceForPostal } = require('../data/postalProvinceRanges');
 const { regionForPostcode } = require('../data/postcodeRegionRanges');
+const { stateForPostcode } = require('../data/postcodeStateRanges');
 const { resolveCityForZip } = require('./zipCity');
 const {
   STATE_PRICING_MULTIPLIERS,
@@ -12,6 +13,10 @@ const {
   UK_REGION_NAMES,
   UK_SERVICE_FACTORS,
   UK_GENERAL_SERVICE_FACTOR,
+  AU_REGION_MULTIPLIERS,
+  AU_REGION_NAMES,
+  AU_SERVICE_FACTORS,
+  AU_GENERAL_SERVICE_FACTOR,
   COUNTRIES,
   HOME_SQFT_BASE_PRICES,
   BEDROOM_ADDON,
@@ -136,12 +141,18 @@ function getRegionMultiplier(country, region, serviceType) {
     const regionRelative = UK_REGION_MULTIPLIERS[region] || 1.0;
     return serviceFactor * regionRelative;
   }
+  if (country === 'AU') {
+    const serviceFactor = AU_SERVICE_FACTORS[serviceType] ?? AU_GENERAL_SERVICE_FACTOR;
+    const regionRelative = AU_REGION_MULTIPLIERS[region] || 1.0;
+    return serviceFactor * regionRelative;
+  }
   return getStateMultiplier(region);
 }
 
 function getRegionName(country, region) {
   if (country === 'CA') return CANADA_PROVINCE_NAMES[region] || region;
   if (country === 'GB') return UK_REGION_NAMES[region] || region;
+  if (country === 'AU') return AU_REGION_NAMES[region] || region;
   return STATE_NAMES[region] || region;
 }
 
@@ -1376,7 +1387,7 @@ async function calculateCleaning(inputs, companyConfig = {}) {
   // normal flow, e.g. a direct API integration); an unresolved ZIP/postal
   // then leaves the region genuinely unknown (null) rather than guessing a
   // real, price-affecting region.
-  const RESOLVE_REGION_FOR_POSTAL = { CA: provinceForPostal, GB: regionForPostcode };
+  const RESOLVE_REGION_FOR_POSTAL = { CA: provinceForPostal, GB: regionForPostcode, AU: stateForPostcode };
   const resolvePostal = RESOLVE_REGION_FOR_POSTAL[country] || stateForZip;
   const resolvedState = providedState || (zip ? resolvePostal(zip) : null);
 

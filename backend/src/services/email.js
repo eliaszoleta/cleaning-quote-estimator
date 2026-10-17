@@ -63,12 +63,21 @@ const UK_SERVICE_LABEL_OVERRIDES = {
   mold_remediation: 'Mould Removal',
   post_construction: 'After Builders Clean',
 };
+// Australia pilot (Nov 2026) -- see formatters.js's matching comment.
+const AU_SERVICE_LABEL_OVERRIDES = {
+  apartment: 'Unit Cleaning',
+  mold_remediation: 'Mould Removal',
+  post_construction: 'After Builders Clean',
+};
+const COUNTRY_SERVICE_LABEL_OVERRIDES = { GB: UK_SERVICE_LABEL_OVERRIDES, AU: AU_SERVICE_LABEL_OVERRIDES };
 function getServiceLabel(serviceType, country) {
-  if (country === 'GB' && UK_SERVICE_LABEL_OVERRIDES[serviceType]) return UK_SERVICE_LABEL_OVERRIDES[serviceType];
+  const overrides = COUNTRY_SERVICE_LABEL_OVERRIDES[country];
+  if (overrides && overrides[serviceType]) return overrides[serviceType];
   return SERVICE_LABELS[serviceType] || serviceType;
 }
 function getSubjectServiceLabel(serviceType, country) {
-  if (country === 'GB' && UK_SERVICE_LABEL_OVERRIDES[serviceType]) return UK_SERVICE_LABEL_OVERRIDES[serviceType];
+  const overrides = COUNTRY_SERVICE_LABEL_OVERRIDES[country];
+  if (overrides && overrides[serviceType]) return overrides[serviceType];
   return SUBJECT_SERVICE_LABELS[serviceType] || serviceType;
 }
 
@@ -274,9 +283,14 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     lines.push(`  Suggested price (midpoint of the range above): ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
   }
   // Plain flag, not a computed line -- see cleaningCalculation.js's
-  // comment for why this stayed lightweight for Canada.
+  // comment for why this stayed lightweight for Canada, and defaults.js's
+  // currency-display comment for why Australia gets the same treatment
+  // (also a low, broadly-applicable GST registration threshold) while the
+  // UK deliberately doesn't.
   if (country === 'CA') {
     lines.push('', '+ applicable taxes (GST/HST, varies by province)');
+  } else if (country === 'AU') {
+    lines.push('', '+ applicable taxes (GST)');
   }
 
   if (partner) {
@@ -363,7 +377,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:</p>
 
-  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span>${country === 'CA' ? ' <span style="font-size:13px;font-weight:700;color:#666666;">+ tax</span>' : ''}</p>
+  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span>${(country === 'CA' || country === 'AU') ? ' <span style="font-size:13px;font-weight:700;color:#666666;">+ tax</span>' : ''}</p>
   ${recurringLine}
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 8px;">Price breakdown</p>
@@ -382,6 +396,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
     </table>
   </div>
   ${country === 'CA' ? '<p style="font-size:11.5px;color:#999999;margin:8px 0 0;">+ applicable taxes (GST/HST, varies by province)</p>' : ''}
+  ${country === 'AU' ? '<p style="font-size:11.5px;color:#999999;margin:8px 0 0;">+ applicable taxes (GST)</p>' : ''}
   ${buildKeyFactors(keyFactors)}
 
   ${bottomHtml}

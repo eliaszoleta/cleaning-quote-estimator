@@ -29,10 +29,19 @@ const GB_REGIONS = [
   { code: 'NORTHERN_IRELAND', name: 'Northern Ireland' }, { code: 'NORTH_EAST', name: 'North East England' },
 ];
 
+// Australia pilot (Nov 2026) -- codes/names must match AU_REGION_NAMES'
+// keys in backend/src/config/defaults.js exactly.
+const AU_STATES = [
+  { code: 'NSW', name: 'New South Wales' }, { code: 'VIC', name: 'Victoria' },
+  { code: 'QLD', name: 'Queensland' }, { code: 'WA', name: 'Western Australia' },
+  { code: 'SA', name: 'South Australia' }, { code: 'TAS', name: 'Tasmania' },
+  { code: 'ACT', name: 'Australian Capital Territory' }, { code: 'NT', name: 'Northern Territory' },
+];
+
 // Keyed lookup so adding a future country is one more entry here instead of
 // another ternary branch everywhere regionList/regionWord get used.
-const REGION_LISTS = { US: ALL_STATES, CA: CA_PROVINCES, GB: GB_REGIONS };
-const REGION_WORDS = { US: 'state', CA: 'province', GB: 'region' };
+const REGION_LISTS = { US: ALL_STATES, CA: CA_PROVINCES, GB: GB_REGIONS, AU: AU_STATES };
+const REGION_WORDS = { US: 'state', CA: 'province', GB: 'region', AU: 'state' };
 
 const SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning',      Icon: Home          },
@@ -49,14 +58,15 @@ const SERVICES = [
   { id: 'postConstruction', label: 'Post-Construction', Icon: Construction  },
 ];
 
-// UK pilot (Oct 2026) -- real UK trade terminology, not a translation (see
-// serviceTypeLabel's matching comment in utils/formatters.js for the
-// sourcing). Keyed by this file's own camelCase ids, not the snake_case
-// service-type keys formatters.js uses.
-const UK_LABEL_OVERRIDES = {
-  apartment: 'Flat Cleaning',
-  moldRemediation: 'Mould Removal',
-  postConstruction: 'After Builders Clean',
+// UK pilot (Oct 2026) / Australia pilot (Nov 2026) -- real local trade
+// terminology, not a translation (see serviceTypeLabel's matching comment
+// in utils/formatters.js for the sourcing). Keyed by this file's own
+// camelCase ids, not the snake_case service-type keys formatters.js uses.
+// "Unit" is the classic Australian term for apartment (vs. the UK's
+// "Flat") -- mould/after-builders terminology is shared between AU and GB.
+const LABEL_OVERRIDES = {
+  GB: { apartment: 'Flat Cleaning', moldRemediation: 'Mould Removal', postConstruction: 'After Builders Clean' },
+  AU: { apartment: 'Unit Cleaning', moldRemediation: 'Mould Removal', postConstruction: 'After Builders Clean' },
 };
 
 // Exported so other dashboard tabs referencing "how many services we offer"
@@ -402,7 +412,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
 
         <div style={{ padding: '6px 8px' }}>
           {SERVICES.map(({ id, label: defaultLabel, Icon }) => {
-            const label = (country === 'GB' && UK_LABEL_OVERRIDES[id]) || defaultLabel;
+            const label = LABEL_OVERRIDES[country]?.[id] || defaultLabel;
             const s = getSvc(id);
             return (
               <div
@@ -491,7 +501,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
         </div>
         <div style={{ padding: '6px 8px' }}>
           {DISCOUNT_SERVICES.map(({ id, label: defaultLabel, Icon }) => {
-            const label = (country === 'GB' && UK_LABEL_OVERRIDES[id]) || defaultLabel;
+            const label = LABEL_OVERRIDES[country]?.[id] || defaultLabel;
             const d = getDiscounts(id);
             return (
               <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 7, marginBottom: 3, flexWrap: 'wrap' }}>

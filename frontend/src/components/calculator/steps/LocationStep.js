@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin } from 'lucide-react';
 import { stateForZip } from '../../../data/zipStateRanges';
 import { provinceForPostal } from '../../../data/postalProvinceRanges';
 import { regionForPostcode } from '../../../data/postcodeRegionRanges';
+import { stateForPostcode } from '../../../data/postcodeStateRanges';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
 const US_STATES = [
@@ -35,6 +36,13 @@ const GB_REGIONS = [
   ['SOUTH_WEST','South West England'],['NORTH_WEST','North West England'],['WEST_MIDLANDS','West Midlands'],
   ['EAST_MIDLANDS','East Midlands'],['SCOTLAND','Scotland'],['YORKSHIRE','Yorkshire and the Humber'],
   ['WALES','Wales'],['NORTHERN_IRELAND','Northern Ireland'],['NORTH_EAST','North East England'],
+];
+
+// Australia pilot (Nov 2026) -- codes/names must match AU_REGION_NAMES'
+// keys in backend/src/config/defaults.js exactly (the 8 states/territories).
+const AU_STATES = [
+  ['NSW','New South Wales'],['VIC','Victoria'],['QLD','Queensland'],['WA','Western Australia'],
+  ['SA','South Australia'],['TAS','Tasmania'],['ACT','Australian Capital Territory'],['NT','Northern Territory'],
 ];
 
 // Canadian postal codes are "A1A 1A1" -- letter/digit/letter, space,
@@ -80,6 +88,13 @@ const COUNTRY_CONFIG = {
     formatPostal: formatGbPostcode,
     isPostalComplete: zip => zip.replace(/\s/g, '').length >= 5,
     resolveRegionForPostal: regionForPostcode,
+  },
+  AU: {
+    regions: AU_STATES, regionWord: 'State', postalLabel: 'Postcode',
+    postalPlaceholder: 'e.g. 2000', postalInputMode: 'numeric', postalMaxLength: 4,
+    formatPostal: v => v.replace(/\D/g, '').slice(0, 4),
+    isPostalComplete: zip => zip.length === 4,
+    resolveRegionForPostal: stateForPostcode,
   },
 };
 

@@ -1125,9 +1125,10 @@ const UK_GENERAL_SERVICE_FACTOR = 0.70;
 
 // Per-country currency display. US stays on a bare "$" (unchanged, so every
 // existing US quote renders byte-identical to before this feature existed);
-// Canada uses "C$" and the UK uses "£" so a quote in either currency is
-// never mistaken for USD right next to it in a shared admin view (dashboard
-// listing companies from more than one country side by side).
+// Canada uses "C$", the UK uses "£", and Australia uses "A$" (not a bare
+// "$" -- AU and US/CA quotes could otherwise sit side by side in a shared
+// admin view and be mistaken for the same currency) so a quote is never
+// confused for USD right next to it.
 //
 // No VAT note is shown for UK quotes, unlike the Canada GST/HST note --
 // UK VAT registration is threshold-based (£90,000 taxable turnover,
@@ -1136,10 +1137,167 @@ const UK_GENERAL_SERVICE_FACTOR = 0.70;
 // cleaning businesses (this product's actual customer base) who aren't
 // VAT-registered at all -- unlike Canada's GST, which applies far more
 // broadly regardless of business size.
+//
+// Australia DOES get a plain tax note, like Canada -- the ATO's GST
+// registration threshold is $75,000 AUD annual turnover (Oct 2026), lower
+// in proportion to typical small-business revenue than the UK's £90,000
+// (and GST itself is a flat, nationwide 10% with no state-by-state variant,
+// unlike Canada's GST/HST/PST patchwork), so most ongoing cleaning
+// businesses -- this product's real customer base -- cross it and must
+// register. ResultsScreen.js and the estimate email show a plain "+
+// applicable taxes (GST)" note for an AU company, same lightweight
+// treatment as Canada, no computed rate.
+
+// AUSTRALIA -- pilot country #4 (added Nov 2026). Same two-part method as
+// Canada/UK: a region-relative multiplier (within-AU variance) x a
+// per-service country factor (AUD-vs-USD cost factor), rather than one
+// blanket number applied to all 12 services.
+//
+// AU_REGION_MULTIPLIERS: the 8 states/territories, relative to the
+// national average. WA, ACT and TAS are sourced from a secondary digest of
+// ABS Average Weekly Earnings 2025 H2 data (WA $2,304/wk, ACT $2,285/wk,
+// TAS $1,890/wk, vs the ABS-confirmed May 2026 national full-time average
+// of $2,083.70/wk) -- this pass could not pull the full state table
+// directly from the ABS 6302.0 release itself, so these three are flagged
+// as a secondary source, not a primary ABS citation like UK's ONS figures.
+// NSW, VIC, QLD, SA are ESTIMATED from well-known, slow-moving regional
+// patterns (Sydney/Melbourne cost-of-living and professional pay running
+// above the national average per a 2026 Robert Half salary guide; Adelaide
+// explicitly below it in the same guide; Queensland recently had the
+// fastest wage GROWTH but not necessarily the highest LEVEL). NT is a
+// deliberate middle-of-the-road judgment call, not a confident estimate --
+// it shows conflicting signals (high nominal wages from remote-area
+// loadings, but the LOWEST disposable income of any state/territory per
+// Finder's Nov 2024 analysis, i.e. a high cost-of-living eating into that
+// wage premium) and splitting the difference at the national average felt
+// more honest than picking a direction on weak information.
+const AU_REGION_MULTIPLIERS = {
+  WA: 1.11,   // sourced (secondary ABS digest, 2025 H2)
+  ACT: 1.10,  // sourced (secondary ABS digest, 2025 H2)
+  NSW: 1.05,  // estimated
+  VIC: 1.04,  // estimated
+  NT: 1.00,   // judgment call -- see comment above
+  QLD: 0.97,  // estimated
+  SA: 0.90,   // estimated
+  TAS: 0.91,  // sourced (secondary ABS digest, 2025 H2)
+};
+
+const AU_REGION_NAMES = {
+  NSW: 'New South Wales', VIC: 'Victoria', QLD: 'Queensland', WA: 'Western Australia',
+  SA: 'South Australia', TAS: 'Tasmania', ACT: 'Australian Capital Territory', NT: 'Northern Territory',
+};
+
+// AU_SERVICE_FACTORS -- per-service AUD-vs-USD cost factor, same role as
+// CANADA_SERVICE_FACTORS/UK_SERVICE_FACTORS above.
+// AU_GENERAL_SERVICE_FACTOR (1.53) comes from comparing nominal nationwide
+// cleaner wages: Australia's Cleaning Services Award (MA000022) Level 1
+// full-time minimum, $27.08/hr effective 1 July 2026 (cross-checked against
+// a separate guide's $28.35/hr "average Australian house cleaner" figure --
+// close enough to the award rate to confirm cleaning runs near the award
+// floor there, the same pattern already seen in the US/UK wage figures)
+// against the US BLS figure ($17.71/hr): 27.08 / 17.71 = 1.529, rounded
+// 1.53. Unlike the UK (where cleaning wages run nominally lower than the
+// US, scaling GBP prices DOWN), Australia's award-driven wage floor is
+// nominally well above the US figure despite AUD/USD being roughly at
+// parity by exchange rate, so AUD prices scale UP from the raw USD figure
+// -- the opposite direction from the UK, for the same reason Canada's
+// factor is also slightly above 1.0, just a larger effect here.
+//
+// Per-service research (Nov 2026: Airtasker, MyBuilder-style AU guides,
+// Clean Group, Rakidzich, Yellow Pages, HomeStars Sydney, FairWorkMate)
+// found the same pattern already seen in Canada/UK: commoditized,
+// marketplace-driven jobs price well BELOW what the wage ratio alone
+// predicts, while a couple of services land close to 1:1 nominal parity
+// with the US rather than scaled up:
+//   carpet: AU steam-clean per-room average $35 national (range $25-50),
+//     corroborated by 3 independent city breakdowns (Sydney avg $40,
+//     Melbourne avg $37, Adelaide avg $32) vs US baseline CARPET_PRICE_PER_ROOM
+//     mid $55 -> 0.64-0.66, used 0.65.
+//   upholstery: AU 3-seat sofa $90-180 (Clean Group Sydney, mid $135) and
+//     $92-230 (an independent AU cost guide, "most around $150") vs US
+//     baseline UPHOLSTERY_ITEM_PRICES.sofa mid $162.50 -> ~0.83-0.92, used
+//     0.85.
+//   air_duct: single source (HomeStars Sydney, whole-home $300-500, mid
+//     $400) vs US baseline mid $478 -> 0.84, used 0.80 (rounded down
+//     slightly for the single-source caveat, consistent with how a
+//     single-source UK figure was treated before it got a second source).
+//   dryer_vent: same single HomeStars Sydney page gives $100-175, mid
+//     $137.50, vs US baseline DRYER_VENT_BASE mid $136.50 -> 1.01, used
+//     1.00. Flagged single-source, but notably a near-exact match.
+//   airbnb: Rakidzich (an AU short-term-rental operator, 2026), the one AU
+//     source with the SAME size brackets as this table (studio_1br/2br/
+//     3br/4br_plus) -- studio_1br $70-100, 2br $100-150, 3br $150-220,
+//     4-5br $220-300 -- vs the matching US tiers, giving per-tier ratios of
+//     0.89/1.00/1.04/1.20 (avg 1.03). Used 1.00: a same-bracket comparison
+//     this clean is the strongest single piece of AU evidence gathered,
+//     and it says AU airbnb turnover pricing is close to 1:1 nominal parity
+//     with the US, not scaled by the general wage ratio.
+//   apartment: Yellow Pages' "unit or studio, REGULAR clean" 2-bed figure
+//     ($80-150, mid $115) vs US baseline APARTMENT_SIZE_PRICES['2br'] mid
+//     $165.50 -> 0.69, used 0.70. Deliberately NOT used: AU "bond clean"
+//     (end-of-lease) 2-bed figures, which run far higher ($250-575 across
+//     4 city/national guides, mid ~$370-400, implying a 2.2-2.4x ratio) --
+//     same situation as the UK's apartment factor, a bond/end-of-lease
+//     clean is a distinct, higher-stakes job tied to a rental deposit, not
+//     the routine recurring clean this service actually represents.
+//   commercial: single source (Clean Group, AU commercial hourly $30-60/hr,
+//     mid $45) vs the same US consensus used for the UK commercial
+//     re-research (Jobber/Housecall Pro $30-75/hr, mid $52.50) -> 0.86,
+//     used 0.85. Flagged single-source -- weaker evidence than the UK
+//     commercial re-research's 4 corroborating sources. A separate AU
+//     "$2-4 per sqm per clean" figure was found and deliberately NOT used,
+//     for the same reason a UK per-sqft figure was discarded: it implies a
+//     per-sqft rate roughly 3x the US baseline, the opposite direction from
+//     every other signal, and is very likely either a one-off/initial-clean
+//     rate (not a recurring contract rate) or a sqm/sqft mislabel.
+// Left on the fallback (1.53), explicitly flagged rather than guessed:
+//   home_residential: no dedicated AU figure needed -- the general factor
+//     IS essentially the home-cleaning benchmark by construction, same as
+//     Canada/UK.
+//   tile_grout: AU per-sqm figures ranged $3-11/sqm depending on source and
+//     job-based figures ranged $139-747 for what should be a comparable
+//     job -- too wide and self-contradictory to responsibly pick a number.
+//   mold_remediation: flagged as a REAL gap, not just a formality. AU
+//     consumer-marketplace figures (Airtasker avg $300/room; Oneflare
+//     $45-90/sqm, implying ~$200-400 for a comparable room) run
+//     dramatically BELOW what 1.53x the US baseline would predict (~$3,557
+//     for a comparable medium room) -- roughly a 7-10x gap, far beyond the
+//     carpet/upholstery-style discount pattern. Most likely explanation:
+//     these AU marketplace listings price a basic mould wipe-down/clean,
+//     not the full certified-remediation protocol (containment, HEPA
+//     filtration, moisture testing) this calculator's US mold_remediation
+//     service models -- a probable job-scope mismatch, not a true price
+//     difference. Deliberately left unresolved rather than guessing a
+//     softened number: worth flagging to the user for a decision (research
+//     AU remediation-specific contractors, or decide the AU "mold
+//     remediation" service should mean something lighter-scope) before
+//     shipping a number either way.
+//   water_damage: only one AU figure found (a single Melbourne
+//     contractor's own carpet-restoration estimate, not an independent
+//     industry average like Canada's DKI citation), and it didn't state a
+//     sqft/sqm scope, so it can't be normalized against the US baseline
+//     with any confidence.
+//   post_construction: AU sources disagreed by nearly an order of
+//     magnitude depending on pricing basis -- a Perth per-sqm figure
+//     ($8-15/sqm) implies roughly $1,300-2,440 for a mid-size home, a
+//     Sydney job-level guide implies ~$300-1,000, and a Melbourne guide
+//     implies just $144-180. Too inconsistent to pick a number over the
+//     fallback.
+const AU_SERVICE_FACTORS = {
+  carpet: 0.65,
+  upholstery: 0.85,
+  air_duct: 0.80,
+  dryer_vent: 1.00,
+  airbnb: 1.00,
+  apartment: 0.70,
+  commercial: 0.85,
+};
+const AU_GENERAL_SERVICE_FACTOR = 1.53;
 const COUNTRIES = {
   US: { name: 'United States', currencyCode: 'USD', currencySymbol: '$' },
   CA: { name: 'Canada', currencyCode: 'CAD', currencySymbol: 'C$' },
   GB: { name: 'United Kingdom', currencyCode: 'GBP', currencySymbol: '£' },
+  AU: { name: 'Australia', currencyCode: 'AUD', currencySymbol: 'A$' },
 };
 
 module.exports = {
@@ -1157,6 +1315,10 @@ module.exports = {
   UK_REGION_NAMES,
   UK_SERVICE_FACTORS,
   UK_GENERAL_SERVICE_FACTOR,
+  AU_REGION_MULTIPLIERS,
+  AU_REGION_NAMES,
+  AU_SERVICE_FACTORS,
+  AU_GENERAL_SERVICE_FACTOR,
   COUNTRIES,
   DEFAULT_COMPANY_CONFIG,
   HOME_SQFT_BASE_PRICES,

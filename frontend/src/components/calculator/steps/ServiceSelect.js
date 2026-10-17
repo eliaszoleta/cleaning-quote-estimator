@@ -67,6 +67,15 @@ const UK_LABEL_OVERRIDES = {
   post_construction: 'After Builders Clean',
 };
 
+// Australia pilot (Nov 2026) -- see formatters.js's matching comment.
+const AU_LABEL_OVERRIDES = {
+  apartment: 'Unit Cleaning',
+  mold_remediation: 'Mould Removal',
+  post_construction: 'After Builders Clean',
+};
+
+const COUNTRY_LABEL_OVERRIDES = { GB: UK_LABEL_OVERRIDES, AU: AU_LABEL_OVERRIDES };
+
 // isMobile comes from CleaningCalculator's own ResizeObserver on the card
 // element (not window.innerWidth) -- this step used to measure the window
 // itself, which is correct inside a real <iframe> embed (the iframe has
@@ -115,9 +124,10 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   // explicit entry both default to shown -- only an explicit enabled:false
   // hides it, matching the same default used everywhere else (DEFAULT_SVC
   // in the dashboard's Services tab).
+  const labelOverrides = COUNTRY_LABEL_OVERRIDES[country];
   const visibleServices = SERVICES
     .filter(s => services?.[s.configKey]?.enabled !== false)
-    .map(s => (country === 'GB' && UK_LABEL_OVERRIDES[s.id]) ? { ...s, label: UK_LABEL_OVERRIDES[s.id] } : s);
+    .map(s => (labelOverrides && labelOverrides[s.id]) ? { ...s, label: labelOverrides[s.id] } : s);
 
   // The fixed-tile "squared" layout below exists for a real third-party
   // embed, whose container width a company's host site controls and could

@@ -81,7 +81,12 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
   // GST/HST applies to cleaning services in Canada, but this deliberately
   // doesn't compute a per-province amount -- see cleaningCalculation.js's
   // comment on why. Just a plain heads-up for a CA company's quote.
-  const showTaxNote = country === 'CA';
+  // Australia gets the same plain note (also a low, broadly-applicable GST
+  // registration threshold -- see defaults.js); the UK deliberately does
+  // not, since UK VAT registration is threshold-based and most small
+  // cleaning businesses fall under it.
+  const showTaxNote = country === 'CA' || country === 'AU';
+  const taxNoteText = country === 'AU' ? '+ applicable taxes (GST)' : '+ applicable taxes (GST/HST, varies by province)';
 
   const primaryColor = companyConfig?.primaryColor || '#2563eb';
   const ctaPhone = companyConfig?.ctaPhone || null;
@@ -230,7 +235,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                       lightweight instead of a computed per-province amount. */}
                   {showTaxNote && (
                     <div style={{ padding: '8px 12px', fontSize: 11.5, color: COLORS.muted, borderTop: `1px solid ${COLORS.borderSubtle}` }}>
-                      + applicable taxes (GST/HST, varies by province)
+                      {taxNoteText}
                     </div>
                   )}
                 </div>

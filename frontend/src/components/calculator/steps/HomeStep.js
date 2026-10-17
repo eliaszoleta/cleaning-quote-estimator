@@ -17,6 +17,22 @@ const SQFT_OPTIONS = [
   { id: 'over_3000', label: 'Over 3,000 sq ft', sub: 'Large home / estate' },
 ];
 
+// Australia pilot (Nov 2026) -- AU real estate is fully metric (property
+// size is always advertised in sqm, unlike the UK where sqft is still
+// common in estate-agent listings), so "1,500 - 2,000 sq ft" would read as
+// genuinely unfamiliar to an AU visitor, not just a minor unit mismatch.
+// Display-only: same ids, same HOME_SQFT_BASE_PRICES tiers/pricing behind
+// them, just the label text an AU company's visitors see (1 sqft = 0.0929
+// sqm, rounded to whole sqm).
+const SQFT_OPTIONS_AU_LABELS = {
+  under_1000: 'Under 93 sqm',
+  '1000_1500': '93 – 139 sqm',
+  '1500_2000': '139 – 186 sqm',
+  '2000_2500': '186 – 232 sqm',
+  '2500_3000': '232 – 279 sqm',
+  over_3000: 'Over 279 sqm',
+};
+
 // ids must match CLEANING_TYPE_MULTIPLIERS' keys in backend/src/config/defaults.js
 // exactly -- this used to say 'deep_clean' here while the backend only ever had
 // a 'deep' key, so every Deep Clean quote silently fell through to the Standard
@@ -56,7 +72,7 @@ const EXTRAS = [
   { id: 'basement', label: 'Finished Basement' },
 ];
 
-export default function HomeStep({ value, onBack, onNext, primaryColor, companyConfig, isFinalStep, loading }) {
+export default function HomeStep({ value, onBack, onNext, primaryColor, companyConfig, country, isFinalStep, loading }) {
   // Only reflects a real, company-set discount (Services tab) -- off by
   // default, so a fresh account shows no "% off" tag on any frequency
   // until the company actually configures one.
@@ -89,7 +105,7 @@ export default function HomeStep({ value, onBack, onNext, primaryColor, companyC
         <div className="calc-grid-size">
           {SQFT_OPTIONS.map(o => (
             <StepOptionCard key={o.id} selected={sqftTier === o.id} onClick={() => setSqftTier(o.id)} primaryColor={primaryColor}>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>{o.label}</div>
+              <div style={{ fontWeight: 600, fontSize: 14 }}>{country === 'AU' ? SQFT_OPTIONS_AU_LABELS[o.id] : o.label}</div>
               <div style={{ fontSize: 12, color: COLORS.body }}>{o.sub}</div>
             </StepOptionCard>
           ))}
