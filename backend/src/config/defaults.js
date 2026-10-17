@@ -1072,23 +1072,54 @@ const UK_REGION_NAMES = {
 //     service tied to deposit disputes and letting-agent requirements, not
 //     a routine recurring clean. Used 1.20.
 // Left on the fallback: home_residential (UK deep-clean rate implies ~0.74,
-// close enough to 0.70 not to need its own number), commercial (UK sources
-// contradicted each other too much -- plausible figures for the same
-// hypothetical office ranged from under half the fallback to well above
-// it, depending on which published rate was used), dryer_vent (no
+// close enough to 0.70 not to need its own number), dryer_vent (no
 // UK-specific pricing found at all -- UK tumble dryers are predominantly
 // vent-less condenser/heat-pump types, a much smaller market than in the
 // US), water_damage (UK stage-cost estimate implies ~0.75, close to 0.70),
 // post_construction (UK after-builders rate implies ~0.69, essentially
 // exactly 0.70).
+//
+// commercial and air_duct re-researched Nov 2026 (both were previously
+// flagged as too contradictory to source -- commercial sat on the 0.70
+// fallback, air_duct used a straight 2-source split):
+//   commercial: UK firms almost universally quote per CLEANER-HOUR, not
+//     per sqft (unlike the US table, which is sqft-based) -- a wider,
+//     fresher search surfaced 4 independent 2026 UK guides agreeing in a
+//     tight band: LWR Group £15-25/hr contract, MyJobQuote "most quotes
+//     £18-25/hr", ACS Office Cleaning £20-30/hr UK average (mid ~£20-25
+//     across all three). Checked against a real, itemized UK quote (LWR's
+//     120 sqm/5-evenings-a-week/1.5hr-per-visit example, ~£550-700/mo):
+//     that total backs out almost exactly to ~£20/hr x the stated hours,
+//     confirming the hourly figures are the real anchor, not a marketing
+//     exaggeration. US-side comparable: Jobber (2025 Thumbtack/HomeAdvisor
+//     data) $20-80/hr, Housecall Pro $30-75/hr for standard recurring
+//     office cleaning -- consensus core range $30-75/hr, mid ~$52.50.
+//     £22 (UK mid) / $52.50 (US mid) = 0.42. A separate UK "£0.15-0.30 per
+//     sq ft" figure was found and deliberately NOT used -- it's very
+//     likely a sqm figure mislabeled as sqft by the source site (UK trade
+//     content is metric-native, and the number backed out of the real LWR
+//     quote above, ~£0.02-0.025/sqft, is roughly 10x smaller, exactly the
+//     sqm-to-sqft conversion factor). Used 0.40, rounded slightly below
+//     the computed 0.42 since the per-hour data, while consistent, is
+//     still guide-level rather than a direct contractor quote.
+//   air_duct: additional 2026 UK sources now triangulate the prior
+//     estimate rather than just repeating it -- MyBuilder (avg £250),
+//     Airtasker UK duct-cleaning page (median £150), a second Airtasker UK
+//     cost page (range £50-250, implied mid ~£150) -- 2 of 3 cluster near
+//     £150 against US baseline mid $478 (0.31), with MyBuilder's £250
+//     average as the outlier (0.52). Weighted toward the larger, more
+//     consistent cluster: (0.31 x 2 + 0.52 x 1) / 3 = 0.38, rounded to
+//     0.40 -- a modest revision down from the previous 0.45, which was a
+//     straight unweighted split of only 2 disagreeing sources.
 const UK_SERVICE_FACTORS = {
   carpet: 0.50,
   upholstery: 0.40,
-  air_duct: 0.45,
+  air_duct: 0.40,
   tile_grout: 0.35,
   mold_remediation: 0.35,
   airbnb: 0.40,
   apartment: 1.20,
+  commercial: 0.40,
 };
 const UK_GENERAL_SERVICE_FACTOR = 0.70;
 
