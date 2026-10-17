@@ -835,11 +835,19 @@ async function sendCompanyWelcomeEmail({ to, companyId, subject, statusLine }) {
 // via activationReminderEmailSentAt on config.subscription. Content lives
 // in the editable email_templates table (key: 'activation_reminder').
 async function sendActivationReminderEmail({ to, companyName, signedUpAt }) {
+  // signupDateSuffix carries its own leading " on <date>" (or '' if there's
+  // no date) rather than a bare date -- so the sentence it's spliced into
+  // stays grammatically correct even with nothing filled in, which matters
+  // because a manual send from the admin dashboard's Compose/Send tab goes
+  // straight through sendTemplatedEmail with whatever merge-field value was
+  // typed (or left blank) there, bypassing this function's own fallback
+  // entirely. A bare {{signupDate}} token with no admin-side default once
+  // rendered as "...was created on , but checkout..." in exactly that path.
   const { sent } = await sendTemplatedEmail({
     template: 'activation_reminder',
     to,
     toName: companyName,
-    vars: { companyName, signupDate: signedUpAt ? formatDate(signedUpAt) : 'recently' },
+    vars: { companyName, signupDateSuffix: signedUpAt ? ` on ${formatDate(signedUpAt)}` : '' },
     recipientType: 'company',
   });
   return sent;

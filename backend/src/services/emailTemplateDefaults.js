@@ -153,14 +153,20 @@ module.exports = [
     // "no rush" filler -- the same two levers (personalized reference +
     // toned-down copy) that moved that other template to Primary.
     subject: 'Your Clean Estimator account setup is incomplete',
+    // signupDateSuffix carries its own leading " on <date>" (or '' with no
+    // date) rather than a bare date, so a blank merge field -- e.g. a
+    // manual send from the admin dashboard's Compose/Send tab with nothing
+    // typed into it -- still reads as a complete sentence instead of
+    // "...was created on , but checkout..." (what actually shipped once,
+    // from exactly that path, before this was caught).
     variables: [
       { name: 'companyName', example: 'Sparkle Clean Co' },
-      { name: 'signupDate', example: 'October 14, 2026' },
+      { name: 'signupDateSuffix', example: ' on October 14, 2026' },
     ],
     text: [
       'Hi {{companyName}},',
       '',
-      "Your Clean Estimator account was created on {{signupDate}}, but checkout was never finished, so your 30-day trial hasn't started and your calculator isn't active.",
+      "You started setting up a Clean Estimator account{{signupDateSuffix}}, but checkout was never finished, so your 30-day trial hasn't started and your calculator isn't active.",
       '',
       'Finish account setup:',
       'https://www.cleanestimator.com/company',
@@ -176,7 +182,7 @@ module.exports = [
   <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your Clean Estimator account was created on {{signupDate}}, but checkout was never finished, so your 30-day trial hasn't started and your calculator isn't active.
+    You started setting up a Clean Estimator account{{signupDateSuffix}}, but checkout was never finished, so your 30-day trial hasn't started and your calculator isn't active.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
