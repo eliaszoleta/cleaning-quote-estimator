@@ -2,6 +2,36 @@ import { useState, useEffect, useCallback } from 'react';
 import { getCompanyConfig, putCompanyConfig, patchCompanyServices } from '../utils/api';
 import { supabase } from '../lib/supabase';
 
+// Reported bug (Oct 2026): the dashboard's very first load would sometimes
+// show "Invalid or expired session" -- mobile only, never desktop. Root
+// cause: supabase.auth.getSession() returns whatever's in local storage,
+// including a token that's technically still "current" there but has
+// actually gone stale -- most commonly because the tab sat backgrounded
+// long enough that Supabase's own background auto-refresh timer, which
+// relies on setTimeout, got throttled. Mobile browsers throttle
+// backgrounded-tab timers far more aggressively than desktop (which mostly
+// doesn't throttle a tab that's merely not focused), so a session that
+// would have quietly refreshed itself on desktop instead goes stale on
+// mobile, and the backend correctly 401s the stale token it's handed. One
+// forced refreshSession() + retry self-heals exactly that case -- the
+// backend's rejection was correct, the token really was stale, but the
+// user shouldn't see an error for something a silent retry fixes.
+async function authedCall(apiCall) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  if (!token) throw new Error('Not authenticated');
+  try {
+    return await apiCall(token);
+  } catch (err) {
+    const looksLikeStaleSession = /session|unauthorized|401/i.test(err.message || '');
+    if (!looksLikeStaleSession) throw err;
+    const { data: refreshed } = await supabase.auth.refreshSession();
+    const freshToken = refreshed?.session?.access_token;
+    if (!freshToken) throw err;
+    return apiCall(freshToken);
+  }
+}
+
 export function useCompanyConfig(userId) {
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,10 +49,7 @@ export function useCompanyConfig(userId) {
     setLoading(true);
     setError(null);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) throw new Error('Not authenticated');
-      const res = await getCompanyConfig(token, userId);
+      const res = await authedCall(token => getCompanyConfig(token, userId));
       setConfig(res.data);
       if (res.created) setJustCreated(true);
     } catch (err) {
@@ -40,10 +67,7 @@ export function useCompanyConfig(userId) {
     setSaved(false);
     setError(null);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) throw new Error('Not authenticated');
-      const res = await putCompanyConfig(token, userId, updates);
+      const res = await authedCall(token => putCompanyConfig(token, userId, updates));
       setConfig(res.data);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -67,10 +91,7 @@ export function useCompanyConfig(userId) {
     setSaved(false);
     setError(null);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) throw new Error('Not authenticated');
-      const res = await patchCompanyServices(token, userId, services);
+      const res = await authedCall(token => patchCompanyServices(token, userId, services));
       setConfig(res.data);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
