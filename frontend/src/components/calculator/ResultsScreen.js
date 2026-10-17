@@ -133,21 +133,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
       <div ref={rootRef} style={{ padding: embedded ? '0 0 24px' : '40px 16px', background: embedded ? 'white' : COLORS.surfaceMuted, minHeight: embedded ? 'auto' : '100vh' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
-          {/* The rounding here was always applied uniformly on all 4 corners
-              (borderRadius is a single value, not per-corner) -- what read as
-              "top rounded, bottom square" in embedded mode was the rounding
-              being genuinely invisible at the bottom, not actually missing:
-              embedded drops both the border AND the shadow (so the widget
-              doesn't look boxed-in sitting inside someone else's page), and
-              the card's white background is identical to the page behind it
-              there, so the top's curve only ever showed because the green
-              header color contrasts against white -- the bottom, white
-              meeting white with nothing between them, had no edge to reveal
-              it was rounded at all. A soft shadow (not the standalone mode's
-              full SHADOWS.lg -- still deliberately no visible border line)
-              gives the white edge something to show against on every side,
-              not just where the header happens to provide contrast. */}
-          <div style={{ background: COLORS.surface, borderRadius: RADIUS.xl, overflow: 'hidden', boxShadow: embedded ? SHADOWS.sm : SHADOWS.lg, border: embedded ? 'none' : `1px solid ${COLORS.border}`, marginBottom: 20 }}>
+          <div style={{ background: COLORS.surface, borderRadius: RADIUS.xl, overflow: 'hidden', boxShadow: embedded ? 'none' : SHADOWS.lg, border: embedded ? 'none' : `1px solid ${COLORS.border}`, marginBottom: 20 }}>
 
             <div style={{ background: headerBg, padding: 'clamp(28px, 6vw, 40px) 32px', color: 'white', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: -100, right: -60, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
