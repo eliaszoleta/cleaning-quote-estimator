@@ -494,8 +494,19 @@ export default function CompanyDashboard({ user, onLogout }) {
 
       {viewMode === 'calculator' ? (
         /* Calculator Mode -- no sidebar, no tabs, nothing but the
-           calculator itself, same as the public site. */
-        <RunEstimateTab config={config} user={user} />
+           calculator itself, same as the public site. Keyed on country and
+           fed localConfig (not the hook's own config), same fix as
+           ServicesTab above and for the same reason: CleaningCalculator's
+           own step/selection/result state only ever initializes once per
+           mount, so without a fresh mount here, switching the header's
+           country dropdown left this tab showing the PREVIOUS country's
+           already-computed result (wrong currency, wrong region) with
+           nothing on screen indicating the country actually changed.
+           localConfig over config because it updates optimistically the
+           instant the dropdown changes, not after the save round-trip
+           resolves -- the same immediacy the dropdown itself needs to feel
+           like it actually did something. */
+        <RunEstimateTab key={localConfig?.country || 'US'} config={localConfig} user={user} />
       ) : (
       /* Nav -- left sidebar, sticky under the header. */
       <div className="dash-main">
