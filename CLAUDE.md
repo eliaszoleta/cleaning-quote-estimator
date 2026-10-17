@@ -26,3 +26,15 @@ Standing rule from the user (2026-10-16), for any time a new or "complicated" re
 2. **Verify the change doesn't alter any other calculation.** Before considering the work done, confirm the new logic is strictly additive — only reachable when the new option is actually selected — and that every existing default/typical path produces byte-identical output to before. The reliable way to do this: extract the pre-change version of the touched backend files (e.g. `git archive <last-good-commit> backend | tar -x -C <scratch-dir>`) and run the same set of representative requests (covering all 12 services, not just the one touched) through both the old and new code, diffing totals and line-item adjustments — not just spot-checking the new scenario in isolation.
 
 Both steps are required, not optional extras — this calculator is sold to and relied on by real cleaning businesses to quote real jobs, so an unresearched number or an unverified regression is a real-world accuracy failure, not just a code smell.
+
+# Adding a new country
+
+Standing rule from the user (2026-10-17): pricing (region multipliers, per-service factors, currency) is only part of what changes when the calculator expands into a new country. Every time a new country is added, proactively audit — without waiting to be asked — whether any of the following also need localizing for that country's actual cleaning industry, applying the same "expert cleaning cost estimator" persona from the section above to each one:
+
+- **Units of measurement** — sqft vs. sqm, imperial vs. metric room/area sizing, temperature, etc.
+- **Terminology and trade naming** — a service, condition tier, or team-size label that's spelled fine but isn't what that country's cleaning industry actually calls it (the UK pilot's Flat Cleaning / Mould Removal / After Builders Clean vs. the US's Apartment / Mold Remediation / Post-Construction is the reference example).
+- **Team/crew conventions** — if a country's industry norm is structured differently (e.g. different typical crew sizes, different standard visit lengths) in a way that would make a question or its answer options misleading.
+- **Tax/legal disclosure norms** — whether that country's sales-tax-equivalent (GST/HST, VAT, etc.) needs any note on quotes, and if so how (see the Canada GST/HST note vs. the UK's deliberate no-VAT-note decision for the reasoning each time — this can and should land differently per country).
+- **Anything else locale-specific** that would make a question, unit, or term inaccurate or confusing to a business or customer actually operating in that country, even if it wasn't explicitly listed here.
+
+If an audit finds something worth changing, apply the same rigor as the "Adding a new calculator scenario" rule above — research it, don't guess, and verify it doesn't regress any other country's output. If something is genuinely ambiguous or a judgment call (as the VAT-note decision was), it's fine to make the call and explain the reasoning, but flag it clearly rather than silently deciding. This is a standing checklist for every future country, not a one-off for Canada/UK.
