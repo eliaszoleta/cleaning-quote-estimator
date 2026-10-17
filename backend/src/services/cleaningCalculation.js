@@ -7,6 +7,7 @@ const {
   CANADA_SERVICE_FACTORS,
   CANADA_GENERAL_SERVICE_FACTOR,
   CANADA_PROVINCE_NAMES,
+  CANADA_PROVINCE_TAX_RATES,
   COUNTRIES,
   HOME_SQFT_BASE_PRICES,
   BEDROOM_ADDON,
@@ -1412,6 +1413,21 @@ async function calculateCleaning(inputs, companyConfig = {}) {
   // range already shown, not a smarter recommendation underneath it.
   const suggestedPrice = Math.round((result.totalLow + result.totalHigh) / 2);
 
+  // GST/HST(/PST/QST) -- Canadian quotes conventionally show this as its
+  // own line (subtotal -> tax -> total), unlike the US side of this
+  // calculator, which never shows a tax line at all (sales tax on cleaning
+  // labor is too inconsistent across US states to generalize). totalLow/
+  // totalHigh/suggestedPrice above are left untouched as the pre-tax
+  // subtotal -- this only ever ADDS fields, for CA only, so a US result
+  // (or a CA result for some future caller that doesn't read these new
+  // fields) is completely unaffected. See CANADA_PROVINCE_TAX_RATES' own
+  // comment in defaults.js for what's solidly confirmed (federal GST, the
+  // 5 HST provinces) vs. estimated (whether PST/QST applies to cleaning
+  // specifically in BC/MB/SK/QC).
+  const taxInfo = country === 'CA' ? CANADA_PROVINCE_TAX_RATES[resolvedState] : null;
+  const taxLow = taxInfo ? Math.round(result.totalLow * taxInfo.rate) : null;
+  const taxHigh = taxInfo ? Math.round(result.totalHigh * taxInfo.rate) : null;
+
   return {
     ...result,
     suggestedPrice,
@@ -1426,6 +1442,14 @@ async function calculateCleaning(inputs, companyConfig = {}) {
     country,
     currencyCode: currency.currencyCode,
     currencySymbol: currency.currencySymbol,
+    taxRate: taxInfo ? taxInfo.rate : null,
+    // Two decimal places, not one -- Quebec's combined rate (14.975%)
+    // rounds to a misleading 15.0% at one decimal place.
+    taxLabel: taxInfo ? `${taxInfo.label} (${Math.round(taxInfo.rate * 10000) / 100}%)` : null,
+    taxLow,
+    taxHigh,
+    totalWithTaxLow: taxLow != null ? result.totalLow + taxLow : null,
+    totalWithTaxHigh: taxHigh != null ? result.totalHigh + taxHigh : null,
   };
 }
 

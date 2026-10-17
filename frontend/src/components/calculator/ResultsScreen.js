@@ -77,6 +77,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
     recurringAnnualSavings,
     adjustments = [], keyFactors = [], disclaimer, urgencyLevel,
     serviceType, unit, currencySymbol = '$',
+    taxLabel, taxLow, taxHigh, totalWithTaxLow, totalWithTaxHigh,
   } = result;
 
   const primaryColor = companyConfig?.primaryColor || '#2563eb';
@@ -139,6 +140,11 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                     one line instead. */}
                 <div style={{ fontSize: 'clamp(26px, 8vw, 52px)', fontWeight: 800, lineHeight: 1.1, marginBottom: 8, letterSpacing: '-1px', whiteSpace: 'nowrap' }}>
                   {formatPrice(totalLow, currencySymbol)} – {formatPrice(totalHigh, currencySymbol)}
+                  {/* This headline is the pre-tax subtotal (matches the
+                      breakdown below) -- the "+ tax" tag keeps that
+                      explicit at a glance for a CA company's quote instead
+                      of only disclosing it further down the page. */}
+                  {taxLabel && <span style={{ fontSize: '0.35em', fontWeight: 700, opacity: 0.75, marginLeft: 8, verticalAlign: 'middle' }}>+ tax</span>}
                 </div>
                 <div style={{ fontSize: 13.5, opacity: 0.85 }}>
                   {unit === 'per_month' ? 'per month' : 'per visit'}
@@ -199,9 +205,26 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                     </div>
                   ))}
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '13px 12px', background: COLORS.surfaceMuted, borderTop: `1.5px solid ${COLORS.border}`, fontWeight: 700, fontSize: 15 }}>
-                    <span>Estimated total</span>
+                    <span>{taxLabel ? 'Subtotal' : 'Estimated total'}</span>
                     <span style={{ flexShrink: 0, whiteSpace: 'nowrap', color: primaryColor }}>{formatPriceRange(totalLow, totalHigh, null, currencySymbol)}</span>
                   </div>
+                  {/* Canadian quotes conventionally break tax out as its own
+                      line (subtotal -> tax -> total) -- only ever present
+                      for a CA company's result (see calculateCleaning's own
+                      comment on why), so a US quote renders exactly as
+                      before with nothing added here. */}
+                  {taxLabel && (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '9px 12px', fontSize: 13, color: COLORS.body, borderTop: `1px solid ${COLORS.borderSubtle}` }}>
+                        <span>{taxLabel} <span style={{ opacity: 0.7 }}>(estimated)</span></span>
+                        <span style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>{formatPriceRange(taxLow, taxHigh, null, currencySymbol)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '13px 12px', background: COLORS.surfaceMuted, borderTop: `1.5px solid ${COLORS.border}`, fontWeight: 700, fontSize: 15 }}>
+                        <span>Total (incl. tax)</span>
+                        <span style={{ flexShrink: 0, whiteSpace: 'nowrap', color: primaryColor }}>{formatPriceRange(totalWithTaxLow, totalWithTaxHigh, null, currencySymbol)}</span>
+                      </div>
+                    </>
+                  )}
                   {/* Plain midpoint of the range above, not a smarter
                       per-job recommendation -- labeled and subtitled to say
                       exactly that, so it reads as "here's one number to
@@ -210,7 +233,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                   {suggestedPrice != null && (
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '11px 12px', background: `${primaryColor}0d`, borderTop: `1px solid ${primaryColor}28` }}>
                       <span style={{ fontSize: 12.5, color: COLORS.body, fontWeight: 600 }}>
-                        Suggested price <span style={{ fontWeight: 400, opacity: 0.75 }}>(midpoint of the range above)</span>
+                        Suggested price <span style={{ fontWeight: 400, opacity: 0.75 }}>(midpoint of the {taxLabel ? 'subtotal, before tax' : 'range above'})</span>
                       </span>
                       <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: primaryColor }}>
                         {formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}

@@ -964,6 +964,53 @@ const CANADA_PROVINCE_NAMES = {
   SK: 'Saskatchewan', YT: 'Yukon',
 };
 
+// CANADA_PROVINCE_TAX_RATES -- unlike the US (sales tax on cleaning labor is
+// inconsistent enough across states that no US quote on this calculator
+// tries to show it), Canadian service quotes conventionally show a separate
+// tax line: subtotal -> GST/HST(/PST/QST) -> total. Omitting that line
+// entirely for Canada would read as an incomplete quote to a Canadian
+// customer, not just a missing nice-to-have -- this is the actual
+// reliability gap this table closes.
+//
+// The federal GST (5%, all 13 provinces/territories) and the 5
+// HST-harmonized provinces (ON 13%, NS 14% -- cut from 15% effective
+// 2025-04-01, NB/NL/PE 15%) are solid: GST/HST applies broadly to virtually
+// all goods and services with very few exemptions, and cleaning services
+// are not among them (confirmed -- e.g. a real BC invoice and a federal
+// cleaning-contract tender both show tax added as its own line).
+//
+// The remaining 5 (AB, NT, NU, YT: GST only, no territorial/provincial
+// sales tax exists there at all -- solid) vs the 4 non-harmonized
+// provincial-sales-tax provinces (BC, MB, SK, QC) are a genuine open
+// question for this specific service category: whether their PST/QST
+// portion applies to cleaning services specifically wasn't confirmed by
+// this research pass -- one BC PST reference document (2012, since
+// superseded) listed cleaning services as "GST only, no PST," while BC's
+// own 2026 budget proposes EXPANDING PST to more service categories from
+// Oct 2026. Saskatchewan and Quebec's general rule is broad service
+// taxability by default, but neither was confirmed for cleaning
+// specifically. The combined provincial rate is used below as the
+// estimate (the standard published rate for that province, and the safer
+// default for a "no room for error" tool vs. silently under-disclosing
+// tax), but flagged here -- and in the UI copy wherever this is shown --
+// as an estimate a company should confirm against their own province's
+// current rules, not a guaranteed-accurate tax calculation.
+const CANADA_PROVINCE_TAX_RATES = {
+  AB: { rate: 0.05,    label: 'GST' },
+  BC: { rate: 0.12,    label: 'GST + PST' },
+  MB: { rate: 0.12,    label: 'GST + PST' },
+  NB: { rate: 0.15,    label: 'HST' },
+  NL: { rate: 0.15,    label: 'HST' },
+  NS: { rate: 0.14,    label: 'HST' },
+  NT: { rate: 0.05,    label: 'GST' },
+  NU: { rate: 0.05,    label: 'GST' },
+  ON: { rate: 0.13,    label: 'HST' },
+  PE: { rate: 0.15,    label: 'HST' },
+  QC: { rate: 0.14975, label: 'GST + QST' },
+  SK: { rate: 0.11,    label: 'GST + PST' },
+  YT: { rate: 0.05,    label: 'GST' },
+};
+
 // Per-country currency display. US stays on a bare "$" (unchanged, so every
 // existing US quote renders byte-identical to before this feature existed);
 // Canada uses "C$" rather than a bare "$" specifically so a CAD quote is
@@ -985,6 +1032,7 @@ module.exports = {
   CANADA_SERVICE_FACTORS,
   CANADA_GENERAL_SERVICE_FACTOR,
   CANADA_PROVINCE_NAMES,
+  CANADA_PROVINCE_TAX_RATES,
   COUNTRIES,
   DEFAULT_COMPANY_CONFIG,
   HOME_SQFT_BASE_PRICES,

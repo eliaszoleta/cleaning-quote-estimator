@@ -215,6 +215,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   const {
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], recurringAnnualSavings, currencySymbol = '$',
+    taxLabel, taxLow, taxHigh, totalWithTaxLow, totalWithTaxHigh,
   } = result;
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
 
@@ -250,9 +251,16 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   adjustments.filter(a => !a.separate).forEach(a => {
     lines.push(`  ${a.label}: ${fmtAdjustment(a, currencySymbol)}`);
   });
-  lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
+  lines.push(`  ${taxLabel ? 'Subtotal' : 'Estimated total'}: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
+  // Canadian quotes conventionally show tax as its own line (subtotal ->
+  // tax -> total) -- only ever present for a CA result, see
+  // calculateCleaning's own comment for why.
+  if (taxLabel) {
+    lines.push(`  ${taxLabel} (estimated): ${fmtMoney(taxLow, currencySymbol)} - ${fmtMoney(taxHigh, currencySymbol)}`);
+    lines.push(`  Total (incl. tax): ${fmtMoney(totalWithTaxLow, currencySymbol)} - ${fmtMoney(totalWithTaxHigh, currencySymbol)}`);
+  }
   if (suggestedPrice != null) {
-    lines.push(`  Suggested price (midpoint of the range above): ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
+    lines.push(`  Suggested price (midpoint of the ${taxLabel ? 'subtotal, before tax' : 'range above'}): ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
   }
 
   if (partner) {
@@ -283,6 +291,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], keyFactors = [],
     recurringAnnualSavings, currencySymbol = '$',
+    taxLabel, taxLow, taxHigh, totalWithTaxLow, totalWithTaxHigh,
   } = result;
   // Same city-resolution ResultsScreen.js's eyebrow badge now shows --
   // see cleaningCalculation.js's own resolveCityForZip call.
@@ -339,7 +348,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:</p>
 
-  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span></p>
+  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span>${taxLabel ? ' <span style="font-size:13px;font-weight:700;color:#666666;">+ tax</span>' : ''}</p>
   ${recurringLine}
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 8px;">Price breakdown</p>
@@ -347,12 +356,21 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
     <table style="width:100%;border-collapse:collapse;">
       ${buildEstimateBreakdownRows(adjustments, currencySymbol)}
       <tr style="background:${primaryColor}0d;">
-        <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
+        <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">${taxLabel ? 'Subtotal' : 'Estimated total'}</td>
         <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}</td>
       </tr>
+      ${taxLabel ? `
+      <tr>
+        <td style="padding:9px 12px;color:#666666;font-size:12.5px;border-top:1px solid #e0e0e0;">${taxLabel} <span style="opacity:0.75;">(estimated)</span></td>
+        <td style="padding:9px 12px;text-align:right;color:#666666;font-size:12.5px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(taxLow, currencySymbol)} – ${fmtMoney(taxHigh, currencySymbol)}</td>
+      </tr>
+      <tr style="background:${primaryColor}0d;">
+        <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Total (incl. tax)</td>
+        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(totalWithTaxLow, currencySymbol)} – ${fmtMoney(totalWithTaxHigh, currencySymbol)}</td>
+      </tr>` : ''}
       ${suggestedPrice != null ? `
       <tr style="background:${primaryColor}0d;">
-        <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Suggested price <span style="font-weight:400;opacity:0.75;">(midpoint of the range above)</span></td>
+        <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Suggested price <span style="font-weight:400;opacity:0.75;">(midpoint of the ${taxLabel ? 'subtotal, before tax' : 'range above'})</span></td>
         <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
       </tr>` : ''}
     </table>
