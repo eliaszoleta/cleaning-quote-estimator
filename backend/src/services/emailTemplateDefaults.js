@@ -145,13 +145,20 @@ module.exports = [
     // Rewritten after both prior versions ("You're one step away..." and
     // "Still want to try...?") landed in Gmail's Promotions tab -- same
     // lesson already proven on website_request_received (see email.js's
-    // top-of-file comment): a colored CTA button and a question-y,
-    // "come back" subject line read as a marketing nudge to Gmail's
-    // classifier. Dropped the button for a plain inline link, dropped the
-    // hook-style subject for a flat status statement, and added a real,
-    // specific reference (the actual signup date) instead of generic
-    // "no rush" filler -- the same two levers (personalized reference +
-    // toned-down copy) that moved that other template to Primary.
+    // top-of-file comment): a question-y, "come back" subject line reads
+    // as a marketing nudge to Gmail's classifier. Dropped the hook-style
+    // subject for a flat status statement, and added a real, specific
+    // reference (the actual signup date) instead of generic "no rush"
+    // filler -- the same two levers (personalized reference + toned-down
+    // copy) that moved that other template to Primary.
+    //
+    // The CTA itself briefly went to a plain inline link on the theory
+    // that the button was also part of the problem, but every other
+    // lifecycle email in this file (company_welcome, trial_checkin_1,
+    // payment_failed, subscription_canceled, etc.) uses this exact same
+    // solid-color button with no Promotions-tab issue -- the subject line
+    // was the actual cause, so the button is back, matching that
+    // established style for consistency.
     subject: 'Your Clean Estimator account setup is incomplete',
     // signupDateSuffix carries its own leading " on <date>" (or '' with no
     // date) rather than a bare date, so a blank merge field -- e.g. a
@@ -185,8 +192,8 @@ module.exports = [
     You started setting up a Clean Estimator account{{signupDateSuffix}}, but checkout was never finished, so your 30-day trial hasn't started and your calculator isn't active.
   </p>
 
-  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Finish account setup: <a href="https://www.cleanestimator.com/company" style="color:#2563eb;">cleanestimator.com/company</a>
+  <p style="margin:0 0 24px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Finish account setup →</a>
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
