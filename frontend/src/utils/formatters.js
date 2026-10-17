@@ -20,6 +20,20 @@ export function formatPriceRange(low, high, serviceType, symbol = '$') {
   return `${formatPrice(low, symbol)} – ${formatPrice(high, symbol)}${suffix}`;
 }
 
+// Mirrors backend/src/config/defaults.js's COUNTRIES map -- a lead record
+// has no currencySymbol of its own (the leads table was never given that
+// column; a company only ever operates in one country, set once in
+// Settings, same reasoning calculateCleaning's own country derivation
+// comment gives), so any dashboard view showing a PAST lead's price derives
+// the symbol from the viewing company's own country setting instead.
+// Views showing a FRESH estimate (ResultsScreen.js) already get
+// currencySymbol directly off that estimate's own result and don't need
+// this -- only use this for data without that field attached.
+const COUNTRY_CURRENCY_SYMBOLS = { US: '$', CA: 'C$', GB: '£', AU: 'A$' };
+export function currencySymbolForCountry(country) {
+  return COUNTRY_CURRENCY_SYMBOLS[country] || '$';
+}
+
 export function formatDate(iso) {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });

@@ -153,13 +153,13 @@ function fmtAdjustment(adj, symbol = '$') {
 // which keep their plain, undecorated style -- see buildEstimateBreakdownRows
 // below for the more visually-styled version used in the actual
 // customer-facing estimate email.
-function buildBreakdownRows(adjustments) {
+function buildBreakdownRows(adjustments, symbol = '$') {
   return adjustments
     .filter(a => !a.separate)
     .map(a => `
       <tr>
         <td style="padding:5px 0;color:#333333;font-size:14px;text-transform:capitalize;">${a.label}</td>
-        <td style="padding:5px 0;text-align:right;font-size:14px;color:#333333;white-space:nowrap;">${fmtAdjustment(a)}</td>
+        <td style="padding:5px 0;text-align:right;font-size:14px;color:#333333;white-space:nowrap;">${fmtAdjustment(a, symbol)}</td>
       </tr>`)
     .join('');
 }
@@ -698,7 +698,7 @@ function buildServiceDetailsHtml(serviceDetails) {
   </table>`;
 }
 
-function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country }) {
+function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country, currencySymbol = '$' }) {
   const name = leadName || 'A visitor';
   const serviceLabel = getServiceLabel(serviceType, country);
   const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
@@ -706,7 +706,7 @@ function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, pr
   const lines = [
     `New lead on your ${companyName} estimator!`,
     '',
-    `${name} just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}.`,
+    `${name} just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: ${fmtMoney(priceLow, currencySymbol)} - ${fmtMoney(priceHigh, currencySymbol)}.`,
     '',
     'Contact info:',
     ...contactLines.map(l => `  ${l}`),
@@ -715,9 +715,9 @@ function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, pr
   if (adjustments.length) {
     lines.push('', 'Price breakdown:');
     adjustments.filter(a => !a.separate).forEach(a => {
-      lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
+      lines.push(`  ${a.label}: ${fmtAdjustment(a, currencySymbol)}`);
     });
-    lines.push(`  Estimated total: ${fmtMoney(priceLow)} - ${fmtMoney(priceHigh)}`);
+    lines.push(`  Estimated total: ${fmtMoney(priceLow, currencySymbol)} - ${fmtMoney(priceHigh, currencySymbol)}`);
   }
 
   if (keyFactors.length) {
@@ -736,7 +736,7 @@ function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, pr
   return lines.join('\n');
 }
 
-function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country }) {
+function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country, currencySymbol = '$' }) {
   const name = leadName || 'A visitor';
   const serviceLabel = getServiceLabel(serviceType, country);
   const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
@@ -754,10 +754,10 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
   const breakdownHtml = adjustments.length ? `
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Price breakdown</p>
   <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;">
-    ${buildBreakdownRows(adjustments)}
+    ${buildBreakdownRows(adjustments, currencySymbol)}
     <tr>
       <td style="padding:8px 0 0;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
-      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</td>
+      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(priceLow, currencySymbol)} – ${fmtMoney(priceHigh, currencySymbol)}</td>
     </tr>
   </table>
   ${buildKeyFactors(keyFactors)}` : '';
@@ -767,7 +767,7 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead on your ${companyName} estimator!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: <strong>${fmtMoney(priceLow)} – ${fmtMoney(priceHigh)}</strong>.
+    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: <strong>${fmtMoney(priceLow, currencySymbol)} – ${fmtMoney(priceHigh, currencySymbol)}</strong>.
   </p>
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
@@ -792,7 +792,7 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
 // which goes to the visitor themselves). Reply-to is the lead's own email
 // so the company can just hit reply, same pattern as sendPartnerLeadEmail.
 // Fire-and-forget, called from calculate.js whenever companyId is present.
-async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, city, state, zip, timeline, adjustments, keyFactors, serviceDetails, country }) {
+async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, city, state, zip, timeline, adjustments, keyFactors, serviceDetails, country, currencySymbol }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendCompanyLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -804,7 +804,7 @@ async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, lead
   }
 
   const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments, keyFactors, serviceDetails, country };
+  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments, keyFactors, serviceDetails, country, currencySymbol };
 
   try {
     await axios.post(

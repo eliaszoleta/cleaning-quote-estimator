@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw } from 'lucide-react';
 import { getCompanyLeads, patchLead, deleteLeadForever } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
-import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
+import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime, currencySymbolForCountry } from '../../../utils/formatters';
 import { useConfirm } from '../ConfirmDialog';
 
 const SERVICE_COLORS = {
@@ -12,6 +12,10 @@ const SERVICE_COLORS = {
 };
 
 export default function LeadsTab({ user, config }) {
+  // Lead rows never stored a currencySymbol of their own -- derived from
+  // the viewing company's own country setting instead (see
+  // currencySymbolForCountry's own comment).
+  const currencySymbol = currencySymbolForCountry(config?.country);
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -437,7 +441,7 @@ export default function LeadsTab({ user, config }) {
                       {serviceTypeLabel(lead.service_type, config?.country)}
                     </div>
                     <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>
-                      {lead.estimated_price_low ? formatPriceRange(lead.estimated_price_low, lead.estimated_price_high, lead.service_type) : '—'}
+                      {lead.estimated_price_low ? formatPriceRange(lead.estimated_price_low, lead.estimated_price_high, lead.service_type, currencySymbol) : '—'}
                     </div>
                     <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{formatDateTime(lead.created_at)}</div>
                   </div>
@@ -468,14 +472,14 @@ export default function LeadsTab({ user, config }) {
               ['Type',     userTypeLabel(selectedLead.user_type), null],
               ['Service',  serviceTypeLabel(selectedLead.service_type, config?.country), null],
               ['Location', [selectedLead.service_details?.city, selectedLead.zip, selectedLead.state].filter(Boolean).join(' · '), null],
-              ['Estimate', selectedLead.estimated_price_low ? formatPriceRange(selectedLead.estimated_price_low, selectedLead.estimated_price_high, selectedLead.service_type) : '—', null],
+              ['Estimate', selectedLead.estimated_price_low ? formatPriceRange(selectedLead.estimated_price_low, selectedLead.estimated_price_high, selectedLead.service_type, currencySymbol) : '—', null],
               // Plain midpoint of the stored range, computed here rather than
               // persisted on the lead row -- it's pure derived display data
               // (same formula calculateCleaning uses for suggestedPrice), so
               // recomputing it avoids a DB column/migration for something
               // that's always exactly reconstructible from what's already
               // stored.
-              ['Suggested', selectedLead.estimated_price_low ? `${formatPrice(Math.round((selectedLead.estimated_price_low + selectedLead.estimated_price_high) / 2))}${selectedLead.service_type === 'commercial' ? '/mo' : ''}` : '—', null],
+              ['Suggested', selectedLead.estimated_price_low ? `${formatPrice(Math.round((selectedLead.estimated_price_low + selectedLead.estimated_price_high) / 2), currencySymbol)}${selectedLead.service_type === 'commercial' ? '/mo' : ''}` : '—', null],
               ['Timeline', selectedLead.timeline || '—', null],
             ].filter(([, val]) => val && val !== '—' && val !== '').map(([label, val, href]) => (
               <div key={label} style={{ display: 'flex', gap: 8 }}>

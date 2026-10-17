@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { UserPlus, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
 import { getCompanyLeads, getCompanyEstimateRuns } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
-import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
+import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime, currencySymbolForCountry } from '../../../utils/formatters';
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
 export default function OverviewTab({ config, subStatus, user }) {
+  // Lead rows never stored a currencySymbol of their own -- derived from
+  // the viewing company's own country setting instead (see
+  // currencySymbolForCountry's own comment).
+  const currencySymbol = currencySymbolForCountry(config?.country);
   // Same isMobile pattern as CompanyDashboard.js/BrandingTab.js -- the stat
   // grid below used to rely on CSS auto-fit alone (minmax(190px, 1fr)),
   // which on a ~360-400px-wide phone only has room for one 190px+ column,
@@ -75,7 +79,7 @@ export default function OverviewTab({ config, subStatus, user }) {
     { label: 'Estimates Run',  value: estimateRuns.total,                                        Icon: Zap,         color: '#7c3aed', bg: '#f5f3ff' },
     { label: 'Total Leads',    value: leads.length,                                              Icon: UserPlus,    color: '#1d4ed8', bg: '#eff6ff' },
     { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a', bg: '#f0fdf4' },
-    { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate) : '—',         Icon: DollarSign,  color: '#d97706', bg: '#fffbeb' },
+    { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate, currencySymbol) : '—',         Icon: DollarSign,  color: '#d97706', bg: '#fffbeb' },
     { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—', Icon: Globe,       color: subStatus?.active ? '#16a34a' : '#dc2626', bg: subStatus?.active ? '#f0fdf4' : '#fef2f2' },
   ];
 
@@ -248,7 +252,7 @@ export default function OverviewTab({ config, subStatus, user }) {
                   <td style={{ padding: '12px 14px', fontSize: 13, color: '#374151' }}>{serviceTypeLabel(l.service_type, config?.country)}</td>
                   <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: '#16a34a' }}>
                     {l.estimated_price_low && l.estimated_price_high
-                      ? formatPriceRange(l.estimated_price_low, l.estimated_price_high, l.service_type)
+                      ? formatPriceRange(l.estimated_price_low, l.estimated_price_high, l.service_type, currencySymbol)
                       : '—'}
                   </td>
                   <td style={{ padding: '12px 14px', fontSize: 12, color: '#94a3b8' }}>{formatDateTime(l.created_at)}</td>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin, X, KeyRound, Construction } from 'lucide-react';
 import { getAllStates } from '../../../data/statePricing';
+import { currencySymbolForCountry } from '../../../utils/formatters';
 
 const ALL_STATES = getAllStates();
 
@@ -456,7 +457,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
                       <span style={{ fontSize: 12, color: '#cbd5e1' }}>×</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
-                      <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Min $</label>
+                      <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Min {currencySymbolForCountry(country)}</label>
                       <input
                         type="number" min={0} value={s.minimumCharge || ''}
                         onChange={e => setSvc(id, 'minimumCharge', e.target.value ? parseInt(e.target.value) : null)}
@@ -487,7 +488,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
 
         <div style={{ padding: '10px 18px', borderTop: '1px solid #f1f5f9', background: '#f8fafc', fontSize: 12, color: '#94a3b8' }}>
           <strong style={{ color: '#64748b' }}>Markup:</strong> 1.0 = no change, 1.2 = +20%. &nbsp;
-          <strong style={{ color: '#64748b' }}>Min $:</strong> minimum quote amount (leave blank for defaults).
+          <strong style={{ color: '#64748b' }}>Min {currencySymbolForCountry(country)}:</strong> minimum quote amount (leave blank for defaults).
         </div>
       </div>
 

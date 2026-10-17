@@ -130,23 +130,57 @@ function getStateMultiplier(state) {
 // constant applicable to all 12. serviceType is required for CA so the
 // right per-service factor (or the general fallback, for a service with no
 // distinct researched figure) gets multiplied in; it's unused for US.
+// The cross-country USD-vs-local-currency piece of getRegionMultiplier,
+// factored out on its own so it can also scale a flat minimum-charge
+// default (see scaledMinCharge below) -- a minimum charge needs the same
+// country-level price-floor adjustment as every other number in these
+// calculators, but deliberately NOT the region-relative part (a minimum
+// service charge is a flat business-policy number, not something that's
+// supposed to vary by province/region even for a US company today -- see
+// every minCharge default already being a flat constant regardless of
+// state). Returns 1.0 for US, so every existing flat-number minCharge
+// default stays byte-identical to before this existed.
+function getCountryServiceFactor(country, serviceType) {
+  if (country === 'CA') return CANADA_SERVICE_FACTORS[serviceType] ?? CANADA_GENERAL_SERVICE_FACTOR;
+  if (country === 'GB') return UK_SERVICE_FACTORS[serviceType] ?? UK_GENERAL_SERVICE_FACTOR;
+  if (country === 'AU') return AU_SERVICE_FACTORS[serviceType] ?? AU_GENERAL_SERVICE_FACTOR;
+  return 1.0;
+}
+
 function getRegionMultiplier(country, region, serviceType) {
+  const serviceFactor = getCountryServiceFactor(country, serviceType);
   if (country === 'CA') {
-    const serviceFactor = CANADA_SERVICE_FACTORS[serviceType] ?? CANADA_GENERAL_SERVICE_FACTOR;
     const provinceRelative = CANADA_PROVINCE_PRICING_MULTIPLIERS[region] || 1.0;
     return serviceFactor * provinceRelative;
   }
   if (country === 'GB') {
-    const serviceFactor = UK_SERVICE_FACTORS[serviceType] ?? UK_GENERAL_SERVICE_FACTOR;
     const regionRelative = UK_REGION_MULTIPLIERS[region] || 1.0;
     return serviceFactor * regionRelative;
   }
   if (country === 'AU') {
-    const serviceFactor = AU_SERVICE_FACTORS[serviceType] ?? AU_GENERAL_SERVICE_FACTOR;
     const regionRelative = AU_REGION_MULTIPLIERS[region] || 1.0;
     return serviceFactor * regionRelative;
   }
   return getStateMultiplier(region);
+}
+
+// Found during the CA/GB/AU end-to-end audit (Oct 2026): every calculate*
+// function's default minimum charge (used only when a company hasn't set
+// its own) was a bare USD-scale number -- e.g. air_duct's $300 -- applied
+// literally as-is in whatever currency the company's country uses. For a
+// country whose researched per-service factor runs well below 1.0 (UK
+// commercial 0.40, UK mold_remediation 0.35, etc.) that meant the "floor"
+// was actually a US-sized number mislabeled as the local currency: a UK
+// company's real UK-scaled price (correctly ~40% of the US figure) could
+// get silently overridden by a flat £300/£400/etc minimum sized for the US
+// market, sometimes collapsing the whole range to one point. Scaling the
+// flat default by the same per-service country factor used everywhere else
+// in that function keeps the floor proportional to the rest of that
+// service's researched local pricing instead of leaking in an unconverted
+// US number. Only ever affects a company that hasn't set its own minimum
+// charge; US is unaffected (factor always 1.0).
+function scaledMinCharge(flatUsdDefault, country, serviceType) {
+  return Math.round(flatUsdDefault * getCountryServiceFactor(country, serviceType));
 }
 
 function getRegionName(country, region) {
@@ -198,7 +232,8 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.homeResidential || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 100;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(100, country, 'home_residential');
 
   // Base price
   const base = HOME_SQFT_BASE_PRICES[sqftTier] || HOME_SQFT_BASE_PRICES['1500_2000'];
@@ -313,7 +348,8 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.apartment || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 85;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(85, country, 'apartment');
 
   const base = APARTMENT_SIZE_PRICES[size] || APARTMENT_SIZE_PRICES['2br'];
   const baAddon = BATHROOM_ADDON[bathrooms] || 0;
@@ -421,7 +457,8 @@ function calculateCommercialRecurring(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.commercial || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 200;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(200, country, 'commercial');
 
   const sqftRate = COMMERCIAL_SQFT_RATES[buildingType] || COMMERCIAL_SQFT_RATES.office;
   const levelMult = COMMERCIAL_SERVICE_LEVELS[serviceLevel] || COMMERCIAL_SERVICE_LEVELS.standard;
@@ -541,7 +578,8 @@ function calculateCommercialOneTime(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.commercial || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumChargeOneTime || COMMERCIAL_ONE_TIME_MINIMUM_CHARGE;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumChargeOneTime || scaledMinCharge(COMMERCIAL_ONE_TIME_MINIMUM_CHARGE, country, 'commercial');
 
   const sqftRate = COMMERCIAL_SQFT_RATES[buildingType] || COMMERCIAL_SQFT_RATES.office;
   const conditionMult = COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS[condition] || COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS.moderate;
@@ -599,7 +637,8 @@ function calculateCarpet(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.carpet || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 90;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(90, country, 'carpet');
 
   const condMult = CARPET_CONDITION_MULTIPLIERS[condition] || CARPET_CONDITION_MULTIPLIERS.moderate;
   const methodMult = CARPET_METHOD_MULTIPLIERS[method] || CARPET_METHOD_MULTIPLIERS.steam;
@@ -695,7 +734,8 @@ function calculateUpholstery(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.upholstery || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 90;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(90, country, 'upholstery');
   const effMult = stateMultiplier * markup;
 
   const condMult = UPHOLSTERY_CONDITION_MULTIPLIERS[condition] || UPHOLSTERY_CONDITION_MULTIPLIERS.moderate;
@@ -794,12 +834,12 @@ function calculateAirDuct(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.airDuct || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 300;
   // UK/AU use "mould", not "mold" -- see calculateEstimate's own `country`
   // derivation (companyConfig.country) and email.js's SERVICE_LABELS for
   // the established precedent on this spelling swap.
   const country = companyConfig?.country || 'US';
   const useMould = country === 'GB' || country === 'AU';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(300, country, 'air_duct');
 
   // Each line below shows its actual, state/markup-adjusted dollar
   // contribution -- previously the extra-vents and extra-systems addons
@@ -908,7 +948,8 @@ function calculateDryerVent(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.dryerVent || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 80;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(80, country, 'dryer_vent');
 
   // Each line shows its actual, state/markup-adjusted dollar contribution.
   // Previously this always returned a flat "Base dryer vent cleaning:
@@ -1007,7 +1048,8 @@ function calculateTileGrout(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.tileGrout || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 175;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(175, country, 'tile_grout');
 
   const tileRate = TILE_PRICE_PER_SQFT[tileType] || TILE_PRICE_PER_SQFT.ceramic;
   const condMult = TILE_CONDITION_MULTIPLIERS[condition] || TILE_CONDITION_MULTIPLIERS.moderate;
@@ -1281,7 +1323,8 @@ function calculateAirbnb(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.airbnb || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 85;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(85, country, 'airbnb');
 
   const base = AIRBNB_SIZE_PRICES[size] || AIRBNB_SIZE_PRICES['2br'];
   const baAddon = BATHROOM_ADDON[bathrooms] || 0;
@@ -1362,7 +1405,8 @@ function calculatePostConstruction(details, stateMultiplier, companyConfig) {
 
   const cfg = companyConfig?.services?.postConstruction || {};
   const markup = cfg.markup || 1.0;
-  const minCharge = cfg.minimumCharge || 200;
+  const country = companyConfig?.country || 'US';
+  const minCharge = cfg.minimumCharge || scaledMinCharge(200, country, 'post_construction');
 
   const base = HOME_SQFT_BASE_PRICES[sqftTier] || HOME_SQFT_BASE_PRICES['1500_2000'];
 

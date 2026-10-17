@@ -380,6 +380,7 @@ router.post('/', async (req, res) => {
               keyFactors: result.keyFactors,
               serviceDetails: serviceDetails || {},
               country: companyConfig.country,
+              currencySymbol: result.currencySymbol,
             });
           })().catch(err => console.error('Company lead email failed:', err.message));
         } else {
