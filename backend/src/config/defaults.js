@@ -1257,21 +1257,36 @@ const AU_REGION_NAMES = {
 //   tile_grout: AU per-sqm figures ranged $3-11/sqm depending on source and
 //     job-based figures ranged $139-747 for what should be a comparable
 //     job -- too wide and self-contradictory to responsibly pick a number.
-//   mold_remediation: flagged as a REAL gap, not just a formality. AU
-//     consumer-marketplace figures (Airtasker avg $300/room; Oneflare
-//     $45-90/sqm, implying ~$200-400 for a comparable room) run
-//     dramatically BELOW what 1.53x the US baseline would predict (~$3,557
-//     for a comparable medium room) -- roughly a 7-10x gap, far beyond the
-//     carpet/upholstery-style discount pattern. Most likely explanation:
-//     these AU marketplace listings price a basic mould wipe-down/clean,
-//     not the full certified-remediation protocol (containment, HEPA
-//     filtration, moisture testing) this calculator's US mold_remediation
-//     service models -- a probable job-scope mismatch, not a true price
-//     difference. Deliberately left unresolved rather than guessing a
-//     softened number: worth flagging to the user for a decision (research
-//     AU remediation-specific contractors, or decide the AU "mold
-//     remediation" service should mean something lighter-scope) before
-//     shipping a number either way.
+//   mold_remediation: RESOLVED (Nov 2026, second pass at the user's request
+//     after the gap below was first flagged). The original Airtasker
+//     "$300/room" figure that implied a 7-10x gap against the US baseline
+//     turned out to be the wrong anchor -- a basic wipe-down/spot-treat
+//     price, not a comparable job. A deeper pass found Oneflare's own cost
+//     guide lists a SEPARATE, much higher "Rooms (including kitchen and
+//     bathroom) $500-4,000 per room" figure, alongside inspection ($100-350)
+//     and air testing ($250-300) as their own line items -- i.e. a proper
+//     job with containment/treatment priced apart from diagnosis, the same
+//     shape of job the US mold_remediation service models, not a quick
+//     clean. Mid $2,250 vs. the US medium-room (10-100 sqft) baseline mid
+//     $2,325 -> 0.97, used 0.95. Caveats, stated plainly rather than
+//     smoothed over: (1) Oneflare and Airtasker's AU cost-guide pages
+//     appear to be co-branded/shared content (a page literally titled
+//     "Co-branding Airtasker Oneflare" turned up), so this and the original
+//     $300/room figure may not be two fully independent sources, just two
+//     different segments of the same content family -- weaker corroboration
+//     than, say, UK commercial's 4 independent guides. (2) Checking against
+//     Oneflare's "whole house $1,000-6,000" figure vs. the US extensive-tier
+//     (300+ sqft) mid $10,750 gives a much lower ratio (~0.33), suggesting
+//     AU pricing may not scale with severity as steeply as the US curve --
+//     but this service only has ONE factor applied across every severity
+//     tier (same structural limitation every other service in this table
+//     has), so the room-level ratio was used as the representative number
+//     rather than trying to split the difference with the whole-house one.
+//     The $45-90/sqm figure found earlier was deliberately NOT used, for
+//     the same reason the UK/AU commercial per-sqm figures weren't: it's
+//     very likely a smaller-scope (spot-treatment) rate, not a per-room
+//     remediation rate, given how far it diverges from both of Oneflare's
+//     own room-level and whole-house figures on the same page.
 //   water_damage: only one AU figure found (a single Melbourne
 //     contractor's own carpet-restoration estimate, not an independent
 //     industry average like Canada's DKI citation), and it didn't state a
@@ -1291,6 +1306,7 @@ const AU_SERVICE_FACTORS = {
   airbnb: 1.00,
   apartment: 0.70,
   commercial: 0.85,
+  mold_remediation: 0.95,
 };
 const AU_GENERAL_SERVICE_FACTOR = 1.53;
 const COUNTRIES = {
