@@ -1,5 +1,6 @@
 const { stateForZip } = require('../data/zipStateRanges');
 const { provinceForPostal } = require('../data/postalProvinceRanges');
+const { regionForPostcode } = require('../data/postcodeRegionRanges');
 const { resolveCityForZip } = require('./zipCity');
 const {
   STATE_PRICING_MULTIPLIERS,
@@ -7,6 +8,10 @@ const {
   CANADA_SERVICE_FACTORS,
   CANADA_GENERAL_SERVICE_FACTOR,
   CANADA_PROVINCE_NAMES,
+  UK_REGION_MULTIPLIERS,
+  UK_REGION_NAMES,
+  UK_SERVICE_FACTORS,
+  UK_GENERAL_SERVICE_FACTOR,
   COUNTRIES,
   HOME_SQFT_BASE_PRICES,
   BEDROOM_ADDON,
@@ -126,11 +131,17 @@ function getRegionMultiplier(country, region, serviceType) {
     const provinceRelative = CANADA_PROVINCE_PRICING_MULTIPLIERS[region] || 1.0;
     return serviceFactor * provinceRelative;
   }
+  if (country === 'GB') {
+    const serviceFactor = UK_SERVICE_FACTORS[serviceType] ?? UK_GENERAL_SERVICE_FACTOR;
+    const regionRelative = UK_REGION_MULTIPLIERS[region] || 1.0;
+    return serviceFactor * regionRelative;
+  }
   return getStateMultiplier(region);
 }
 
 function getRegionName(country, region) {
   if (country === 'CA') return CANADA_PROVINCE_NAMES[region] || region;
+  if (country === 'GB') return UK_REGION_NAMES[region] || region;
   return STATE_NAMES[region] || region;
 }
 
@@ -1354,17 +1365,20 @@ async function calculateCleaning(inputs, companyConfig = {}) {
   // exactly as before.
   const country = companyConfig.country || 'US';
 
-  // Resolve state/province -- an explicitly provided region is authoritative
-  // and never overridden by a ZIP/postal lookup, even when one was also
-  // given (the location step now only ever collects ZIP/postal as an
-  // optional field once a state/province is already selected, validated
-  // client-side against that same region -- see
-  // frontend/src/data/zipStateRanges.js and postalProvinceRanges.js).
-  // ZIP/postal-based resolution only runs as a fallback when no region was
-  // provided at all (a caller bypassing the normal flow, e.g. a direct API
-  // integration); an unresolved ZIP/postal then leaves the region genuinely
-  // unknown (null) rather than guessing a real, price-affecting region.
-  const resolvedState = providedState || (zip ? (country === 'CA' ? provinceForPostal(zip) : stateForZip(zip)) : null);
+  // Resolve state/province/region -- an explicitly provided region is
+  // authoritative and never overridden by a ZIP/postal lookup, even when
+  // one was also given (the location step now only ever collects ZIP/
+  // postal/postcode as an optional field once a region is already
+  // selected, validated client-side against that same region -- see
+  // frontend/src/data/zipStateRanges.js, postalProvinceRanges.js and
+  // postcodeRegionRanges.js). ZIP/postal-based resolution only runs as a
+  // fallback when no region was provided at all (a caller bypassing the
+  // normal flow, e.g. a direct API integration); an unresolved ZIP/postal
+  // then leaves the region genuinely unknown (null) rather than guessing a
+  // real, price-affecting region.
+  const RESOLVE_REGION_FOR_POSTAL = { CA: provinceForPostal, GB: regionForPostcode };
+  const resolvePostal = RESOLVE_REGION_FOR_POSTAL[country] || stateForZip;
+  const resolvedState = providedState || (zip ? resolvePostal(zip) : null);
 
   const stateMultiplier = getRegionMultiplier(country, resolvedState, serviceType);
   const stateName = getRegionName(country, resolvedState);

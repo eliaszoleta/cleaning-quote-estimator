@@ -18,6 +18,22 @@ const CA_PROVINCES = [
   { code: 'QC', name: 'Quebec' }, { code: 'SK', name: 'Saskatchewan' }, { code: 'YT', name: 'Yukon' },
 ];
 
+// UK pilot (Oct 2026) -- codes/names must match UK_REGION_NAMES' keys in
+// backend/src/config/defaults.js exactly.
+const GB_REGIONS = [
+  { code: 'LONDON', name: 'London' }, { code: 'SOUTH_EAST', name: 'South East England' },
+  { code: 'EAST_OF_ENGLAND', name: 'East of England' }, { code: 'SOUTH_WEST', name: 'South West England' },
+  { code: 'NORTH_WEST', name: 'North West England' }, { code: 'WEST_MIDLANDS', name: 'West Midlands' },
+  { code: 'EAST_MIDLANDS', name: 'East Midlands' }, { code: 'SCOTLAND', name: 'Scotland' },
+  { code: 'YORKSHIRE', name: 'Yorkshire and the Humber' }, { code: 'WALES', name: 'Wales' },
+  { code: 'NORTHERN_IRELAND', name: 'Northern Ireland' }, { code: 'NORTH_EAST', name: 'North East England' },
+];
+
+// Keyed lookup so adding a future country is one more entry here instead of
+// another ternary branch everywhere regionList/regionWord get used.
+const REGION_LISTS = { US: ALL_STATES, CA: CA_PROVINCES, GB: GB_REGIONS };
+const REGION_WORDS = { US: 'state', CA: 'province', GB: 'region' };
+
 const SERVICES = [
   { id: 'homeResidential', label: 'House Cleaning',      Icon: Home          },
   { id: 'apartment',       label: 'Apartment Cleaning',  Icon: Building2     },
@@ -64,13 +80,13 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
   const [country, setCountry] = useState('US');
   const [serviceStates, setServiceStates] = useState([]);
   const [stateSearch, setStateSearch] = useState('');
-  // Region list/labels switch on country -- a 'CA' company's serviceStates
-  // field holds province codes instead of state codes (same storage field,
-  // see DEFAULT_COMPANY_CONFIG's comment in defaults.js), so every lookup
-  // below needs to resolve against whichever list actually matches what's
-  // stored.
-  const regionList = country === 'CA' ? CA_PROVINCES : ALL_STATES;
-  const regionWord = country === 'CA' ? 'province' : 'state';
+  // Region list/labels switch on country -- a non-US company's
+  // serviceStates field holds province/region codes instead of state codes
+  // (same storage field, see DEFAULT_COMPANY_CONFIG's comment in
+  // defaults.js), so every lookup below needs to resolve against whichever
+  // list actually matches what's stored.
+  const regionList = REGION_LISTS[country] || ALL_STATES;
+  const regionWord = REGION_WORDS[country] || 'state';
   // { [stateCode]: string[] } -- keyed by state so a company serving
   // multiple states gets each state's own city list, instead of every
   // state's cities showing up mixed together in one shared dropdown no
@@ -249,7 +265,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
           Area below) just reads whatever that's currently set to. */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#94a3b8', marginBottom: 20 }}>
         <MapPin size={14} />
-        Operating in {country === 'CA' ? 'Canada' : 'the United States'} — change this from the country switcher in the header.
+        Operating in {{ US: 'the United States', CA: 'Canada', GB: 'the United Kingdom' }[country] || 'the United States'} — change this from the country switcher in the header.
       </div>
 
       {/* Service area */}
@@ -259,7 +275,7 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
             <MapPin size={15} color="#2563eb" /> Service Area
           </div>
           <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
-            Which {regionWord}(s) do you actually operate in? Leave empty to serve all {regionList.length} {country === 'CA' ? 'provinces/territories' : 'states'} with the standard picker. Pick one {regionWord} and your widget skips the {regionWord} question entirely and just asks visitors for their city instead — pick a few and it shows only those {regionWord}s, not the full list.
+            Which {regionWord}(s) do you actually operate in? Leave empty to serve all {regionList.length} {regionWord}s with the standard picker. Pick one {regionWord} and your widget skips the {regionWord} question entirely and just asks visitors for their city instead — pick a few and it shows only those {regionWord}s, not the full list.
           </div>
         </div>
         <div style={{ padding: '14px 18px' }}>

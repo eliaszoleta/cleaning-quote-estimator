@@ -976,14 +976,139 @@ const CANADA_PROVINCE_NAMES = {
 // "+ applicable taxes" note for a CA company, with no computed rate or
 // amount -- lighter, and doesn't assert a number that isn't fully sourced.
 
+// ─────────────────────────────────────────────────────────────────────────────
+// UNITED KINGDOM -- pilot country #3 (added Oct 2026). Same two-part method
+// as Canada: a region-relative multiplier (within-UK variance) x a
+// per-service country factor (GBP-vs-USD cost factor), rather than one
+// blanket number applied to all 12 services.
+//
+// UK_REGION_MULTIPLIERS: the 12 ITL1 regions (the standard UK statistical
+// regions: England's 9 regions + Scotland + Wales + Northern Ireland),
+// relative to the UK's own average, from ONS's "Regional gross disposable
+// household income (GDHI) per head, 2024" bulletin (published Sept 2025) --
+// a broader regional economic indicator than a single-occupation wage
+// figure, used here because, unlike the US (BLS) and Canada (Job Bank),
+// this research pass could not find an authoritative ONS wage breakdown
+// specifically for the cleaning occupation (SOC 9223) by region. Directly
+// confirmed from that ONS bulletin: UK average £25,965/head (index 100),
+// London £36,487 (140), North East £20,562 (79), Wales £21,469 (83),
+// Northern Ireland £22,258 (86), South West £25,924 (100). The remaining 6
+// English regions (South East, East of England, East/West Midlands,
+// Yorkshire and the Humber, North West) and Scotland were NOT individually
+// confirmed in this pass -- their values below are ESTIMATED from
+// well-established, slow-moving UK regional economic geography (South East
+// as the second-highest region after London via the commuter-belt effect,
+// the others clustered near or modestly below the UK average), the same
+// kind of relative-ranking judgment call the US table's own documentation
+// already makes for the states a search pass can't individually confirm.
+const UK_REGION_MULTIPLIERS = {
+  LONDON: 1.40,          // sourced (ONS GDHI 2024)
+  SOUTH_EAST: 1.10,       // estimated
+  EAST_OF_ENGLAND: 1.02,  // estimated
+  SOUTH_WEST: 1.00,       // sourced (ONS GDHI 2024)
+  NORTH_WEST: 0.94,       // estimated
+  WEST_MIDLANDS: 0.91,    // estimated
+  EAST_MIDLANDS: 0.91,    // estimated
+  SCOTLAND: 0.97,         // estimated
+  YORKSHIRE: 0.89,        // estimated
+  WALES: 0.83,            // sourced (ONS GDHI 2024)
+  NORTHERN_IRELAND: 0.86, // sourced (ONS GDHI 2024)
+  NORTH_EAST: 0.79,       // sourced (ONS GDHI 2024)
+};
+
+const UK_REGION_NAMES = {
+  LONDON: 'London', SOUTH_EAST: 'South East England', EAST_OF_ENGLAND: 'East of England',
+  SOUTH_WEST: 'South West England', NORTH_WEST: 'North West England', WEST_MIDLANDS: 'West Midlands',
+  EAST_MIDLANDS: 'East Midlands', SCOTLAND: 'Scotland', YORKSHIRE: 'Yorkshire and the Humber',
+  WALES: 'Wales', NORTHERN_IRELAND: 'Northern Ireland', NORTH_EAST: 'North East England',
+};
+
+// UK_SERVICE_FACTORS -- per-service GBP-vs-USD cost factor, same role as
+// CANADA_SERVICE_FACTORS above. UK_GENERAL_SERVICE_FACTOR (0.70) comes from
+// comparing a UK cleaner's typical nominal hourly wage (~£12.34, derived
+// from ONS ASHE 2025 provisional full-time median gross pay for SOC 9223
+// "cleaners and domestics," £24,130/year, at a standard ~1,955-hour work
+// year -- close to the UK's own April-2025 National Living Wage of £12.21,
+// consistent with cleaning being a near-minimum-wage occupation there)
+// against the US's BLS figure ($17.71/hr): 12.34 / 17.71 = 0.697, rounded
+// 0.70. Like Canada's factor, this compares NOMINAL figures in each
+// country's own currency, not an FX conversion -- it's a genuinely
+// counterintuitive result worth flagging: GBP is worth MORE than USD by
+// exchange rate, but UK cleaning wages run lower than US ones in nominal
+// terms, so the raw USD figure gets scaled DOWN, not up, to estimate a
+// GBP price.
+//
+// Per-service web research (Oct 2026: Bark, Fantastic Services, MyBuilder,
+// MyJobQuote, Airtasker UK) compared each service's US baseline dollar
+// figure against real UK sources and found a consistent pattern: physical,
+// labour-hours-driven cleaning jobs (carpet, upholstery, air duct, tile/
+// grout, mould remediation, Airbnb turnover) price noticeably BELOW what
+// the 0.70 wage ratio alone predicts, while whole-property/contract-type
+// jobs (house cleaning, commercial, water damage, post-construction) landed
+// close to 0.70 and were left on the fallback rather than replaced with a
+// number saying the same thing less precisely:
+//   carpet: UK (Bark, 2,800+ quotes) ~£30 for a small room vs US baseline
+//     $90 for a comparable room -> 0.33, used 0.50 (a less aggressive cut,
+//     since a single data point shouldn't fully override the wage-based
+//     floor).
+//   upholstery: UK 3-seat sofa ~£50-90 (several consistent sources) vs US
+//     baseline $146-230 -> ~0.37-0.39, used 0.40.
+//   air_duct: UK whole-job average £150-250 (MyBuilder, Airtasker) vs US
+//     baseline $420-535 -> ~0.31-0.52 (wide spread between the two UK
+//     sources), used 0.45; also genuinely a smaller market in the UK, where
+//     ducted forced-air HVAC is far less common than in US homes.
+//   tile_grout: UK £3-6/m² (Fantastic Services) vs US baseline ~$1.24/sqft
+//     -> ~0.34, used 0.35.
+//   mold_remediation: UK single-room mould job £500-1,000 (MyJobQuote,
+//     Fantastic Services) vs US baseline $2,325 for a comparable room ->
+//     ~0.32, used 0.35.
+//   airbnb: UK turnover £40-60 for a 1-bed (Airtasker UK, UK-wide not
+//     London-only) vs US baseline $97.50 -> ~0.41, used 0.40.
+//   apartment: the one service that came out ABOVE the general fallback,
+//     not below -- UK end-of-tenancy cleaning (the closest real UK
+//     equivalent to "apartment cleaning") runs £120-300 across several
+//     consistent sources vs US baseline $126-165.50, a ~1.27-1.36 ratio.
+//     Plausible: end-of-tenancy cleans are a distinct, higher-stakes UK
+//     service tied to deposit disputes and letting-agent requirements, not
+//     a routine recurring clean. Used 1.20.
+// Left on the fallback: home_residential (UK deep-clean rate implies ~0.74,
+// close enough to 0.70 not to need its own number), commercial (UK sources
+// contradicted each other too much -- plausible figures for the same
+// hypothetical office ranged from under half the fallback to well above
+// it, depending on which published rate was used), dryer_vent (no
+// UK-specific pricing found at all -- UK tumble dryers are predominantly
+// vent-less condenser/heat-pump types, a much smaller market than in the
+// US), water_damage (UK stage-cost estimate implies ~0.75, close to 0.70),
+// post_construction (UK after-builders rate implies ~0.69, essentially
+// exactly 0.70).
+const UK_SERVICE_FACTORS = {
+  carpet: 0.50,
+  upholstery: 0.40,
+  air_duct: 0.45,
+  tile_grout: 0.35,
+  mold_remediation: 0.35,
+  airbnb: 0.40,
+  apartment: 1.20,
+};
+const UK_GENERAL_SERVICE_FACTOR = 0.70;
+
 // Per-country currency display. US stays on a bare "$" (unchanged, so every
 // existing US quote renders byte-identical to before this feature existed);
-// Canada uses "C$" rather than a bare "$" specifically so a CAD quote is
-// never mistaken for the USD figure right next to it in a shared admin view
-// (dashboard listing both a US and a Canadian company's leads side by side).
+// Canada uses "C$" and the UK uses "£" so a quote in either currency is
+// never mistaken for USD right next to it in a shared admin view (dashboard
+// listing companies from more than one country side by side).
+//
+// No VAT note is shown for UK quotes, unlike the Canada GST/HST note --
+// UK VAT registration is threshold-based (£90,000 taxable turnover,
+// confirmed current via HMRC-aligned sources, Oct 2026) and voluntary below
+// it, so a flat "+ VAT" disclaimer would be wrong for the many small
+// cleaning businesses (this product's actual customer base) who aren't
+// VAT-registered at all -- unlike Canada's GST, which applies far more
+// broadly regardless of business size.
 const COUNTRIES = {
   US: { name: 'United States', currencyCode: 'USD', currencySymbol: '$' },
   CA: { name: 'Canada', currencyCode: 'CAD', currencySymbol: 'C$' },
+  GB: { name: 'United Kingdom', currencyCode: 'GBP', currencySymbol: '£' },
 };
 
 module.exports = {
@@ -997,6 +1122,10 @@ module.exports = {
   CANADA_SERVICE_FACTORS,
   CANADA_GENERAL_SERVICE_FACTOR,
   CANADA_PROVINCE_NAMES,
+  UK_REGION_MULTIPLIERS,
+  UK_REGION_NAMES,
+  UK_SERVICE_FACTORS,
+  UK_GENERAL_SERVICE_FACTOR,
   COUNTRIES,
   DEFAULT_COMPANY_CONFIG,
   HOME_SQFT_BASE_PRICES,

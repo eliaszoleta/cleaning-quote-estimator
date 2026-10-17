@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import { stateForZip } from '../../../data/zipStateRanges';
 import { provinceForPostal } from '../../../data/postalProvinceRanges';
+import { regionForPostcode } from '../../../data/postcodeRegionRanges';
 import { COLORS, RADIUS } from '../../../styles/theme';
 
 const US_STATES = [
@@ -27,6 +28,15 @@ const CA_PROVINCES = [
   ['SK','Saskatchewan'],['YT','Yukon'],
 ];
 
+// UK pilot (Oct 2026) -- codes/names must match UK_REGION_NAMES' keys in
+// backend/src/config/defaults.js exactly (the 12 ITL1 statistical regions).
+const GB_REGIONS = [
+  ['LONDON','London'],['SOUTH_EAST','South East England'],['EAST_OF_ENGLAND','East of England'],
+  ['SOUTH_WEST','South West England'],['NORTH_WEST','North West England'],['WEST_MIDLANDS','West Midlands'],
+  ['EAST_MIDLANDS','East Midlands'],['SCOTLAND','Scotland'],['YORKSHIRE','Yorkshire and the Humber'],
+  ['WALES','Wales'],['NORTHERN_IRELAND','Northern Ireland'],['NORTH_EAST','North East England'],
+];
+
 // Canadian postal codes are "A1A 1A1" -- letter/digit/letter, space,
 // digit/letter/digit. Formatted as the visitor types (uppercased, space
 // inserted after the 3rd character) rather than left as a raw 6-character
@@ -36,48 +46,85 @@ function formatCaPostal(raw) {
   return clean.length > 3 ? `${clean.slice(0, 3)} ${clean.slice(3)}` : clean;
 }
 
+// UK postcodes are "SW1A 1AA" -- a variable-length outward code (2-4 chars)
+// then a fixed 3-char inward code, space-separated. Formatted as the
+// visitor types by always splitting 3 characters off the end, which is
+// correct for every valid UK postcode length.
+function formatGbPostcode(raw) {
+  const clean = raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+  return clean.length > 3 ? `${clean.slice(0, -3)} ${clean.slice(-3)}` : clean;
+}
+
+// Per-country config -- everything LocationStep's UI/validation needs that
+// varies by country lives here, so adding a future country is a matter of
+// adding one more entry instead of threading another isXx boolean through
+// every branch below.
+const COUNTRY_CONFIG = {
+  US: {
+    regions: US_STATES, regionWord: 'State', postalLabel: 'ZIP Code',
+    postalPlaceholder: 'e.g. 90210', postalInputMode: 'numeric', postalMaxLength: 5,
+    formatPostal: v => v.replace(/\D/g, '').slice(0, 5),
+    isPostalComplete: zip => zip.length === 5,
+    resolveRegionForPostal: stateForZip,
+  },
+  CA: {
+    regions: CA_PROVINCES, regionWord: 'Province', postalLabel: 'Postal Code',
+    postalPlaceholder: 'e.g. M5V 2T6', postalInputMode: 'text', postalMaxLength: 7,
+    formatPostal: formatCaPostal,
+    isPostalComplete: zip => zip.replace(/\s/g, '').length === 6,
+    resolveRegionForPostal: provinceForPostal,
+  },
+  GB: {
+    regions: GB_REGIONS, regionWord: 'Region', postalLabel: 'Postcode',
+    postalPlaceholder: 'e.g. SW1A 1AA', postalInputMode: 'text', postalMaxLength: 8,
+    formatPostal: formatGbPostcode,
+    isPostalComplete: zip => zip.replace(/\s/g, '').length >= 5,
+    resolveRegionForPostal: regionForPostcode,
+  },
+};
+
 export default function LocationStep({ value, onBack, onNext, primaryColor, serviceStates = [], serviceCities = {}, country = 'US' }) {
-  const isCa = country === 'CA';
+  const cfg = COUNTRY_CONFIG[country] || COUNTRY_CONFIG.US;
   // "state" is used as the generic region-code variable name throughout --
-  // it holds a province code for a CA company, same field, same meaning
-  // as DEFAULT_COMPANY_CONFIG's serviceStates (see defaults.js's comment).
+  // it holds a province/region code for a non-US company, same field, same
+  // meaning as DEFAULT_COMPANY_CONFIG's serviceStates (see defaults.js's
+  // comment).
   const [state, setState] = useState(value.state || (serviceStates.length === 1 ? serviceStates[0] : ''));
   const [city, setCity] = useState(value.city || '');
   const [zip, setZip] = useState(value.zip || '');
 
-  const REGIONS = isCa ? CA_PROVINCES : US_STATES;
-  const regionWord = isCa ? 'Province' : 'State';
-  const resolveRegionForPostal = isCa ? (v) => provinceForPostal(v) : (v) => stateForZip(v);
+  const REGIONS = cfg.regions;
+  const regionWord = cfg.regionWord;
 
-  // A company that's told us which states/provinces it actually serves
-  // doesn't need visitors picking from the full list -- pricing only ever
-  // needs the region (city has zero effect on the math, see
-  // cleaningCalculation.js), but asking about a region that isn't in their
-  // service area is just confusing/irrelevant, and a single-region
-  // operator gets to skip the region question entirely and ask something
-  // actually useful instead: which city, for lead context.
+  // A company that's told us which regions it actually serves doesn't need
+  // visitors picking from the full list -- pricing only ever needs the
+  // region (city has zero effect on the math, see cleaningCalculation.js),
+  // but asking about a region that isn't in their service area is just
+  // confusing/irrelevant, and a single-region operator gets to skip the
+  // region question entirely and ask something actually useful instead:
+  // which city, for lead context.
   const scoped = serviceStates.length > 0;
   const singleState = serviceStates.length === 1;
   const scopedStates = REGIONS.filter(([abbr]) => serviceStates.includes(abbr));
-  // serviceCities is keyed by region -- a company serving multiple
-  // states/provinces only ever wants the cities THEY listed for whichever
-  // region is actually selected, not every city they've entered across
-  // every region mixed into one list.
+  // serviceCities is keyed by region -- a company serving multiple regions
+  // only ever wants the cities THEY listed for whichever region is
+  // actually selected, not every city they've entered across every region
+  // mixed into one list.
   const citiesForState = serviceCities[singleState ? serviceStates[0] : state] || [];
 
   const selectState = (code) => {
     setState(code);
     setCity(''); // a city picked for the old region won't belong to the new one
-    setZip(''); // ditto for a postal code/ZIP that was only valid in the old region
+    setZip(''); // ditto for a postal code/ZIP/postcode that was only valid in the old region
   };
 
-  // ZIP/postal is optional -- this only ever flags a *confident* mismatch
-  // (the prefix resolves to a real, different region), never an
-  // unrecognized prefix (US territory, Canada's ambiguous 'X' prefix, or
-  // just not fully typed yet), so a legitimate ZIP/postal code is never
-  // blocked on a false positive.
-  const zipComplete = isCa ? zip.replace(/\s/g, '').length === 6 : zip.length === 5;
-  const zipStateGuess = zipComplete ? resolveRegionForPostal(zip) : null;
+  // ZIP/postal/postcode is optional -- this only ever flags a *confident*
+  // mismatch (the prefix resolves to a real, different region), never an
+  // unrecognized prefix (a US territory, Canada's ambiguous 'X' prefix,
+  // an unrecognized UK postcode area, or just not fully typed yet), so a
+  // legitimate ZIP/postal/postcode is never blocked on a false positive.
+  const zipComplete = cfg.isPostalComplete(zip);
+  const zipStateGuess = zipComplete ? cfg.resolveRegionForPostal(zip) : null;
   const zipMismatch = !!zipStateGuess && zipStateGuess !== state;
 
   const canContinue = (scoped
@@ -148,19 +195,19 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
             {(scoped ? scopedStates : REGIONS).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
           </select>
 
-          {/* ZIP/postal only appears once a region is picked -- optional, and
-              only here as a sanity check against that region (see
-              zipMismatch above), not a second, independent way to set
+          {/* ZIP/postal/postcode only appears once a region is picked --
+              optional, and only here as a sanity check against that region
+              (see zipMismatch above), not a second, independent way to set
               location. */}
           {state && (
             <div style={{ marginTop: 14 }}>
               <label style={{ fontSize: 13, fontWeight: 600, color: COLORS.ink }}>
-                {isCa ? 'Postal Code' : 'ZIP Code'} <span style={{ fontWeight: 400, color: COLORS.muted }}>(optional)</span>
+                {cfg.postalLabel} <span style={{ fontWeight: 400, color: COLORS.muted }}>(optional)</span>
               </label>
               <input
-                type="text" inputMode={isCa ? 'text' : 'numeric'} maxLength={isCa ? 7 : 5} value={zip}
-                onChange={e => setZip(isCa ? formatCaPostal(e.target.value) : e.target.value.replace(/\D/g, '').slice(0, 5))}
-                placeholder={isCa ? 'e.g. M5V 2T6' : 'e.g. 90210'}
+                type="text" inputMode={cfg.postalInputMode} maxLength={cfg.postalMaxLength} value={zip}
+                onChange={e => setZip(cfg.formatPostal(e.target.value))}
+                placeholder={cfg.postalPlaceholder}
                 style={{ ...inputStyle, borderColor: zipMismatch ? COLORS.danger : COLORS.border }}
                 onFocus={e => { e.target.style.borderColor = zipMismatch ? COLORS.danger : primaryColor; }}
                 onBlur={e => { e.target.style.borderColor = zipMismatch ? COLORS.danger : COLORS.border; }}
@@ -168,7 +215,7 @@ export default function LocationStep({ value, onBack, onNext, primaryColor, serv
               />
               {zipMismatch && (
                 <p style={{ color: COLORS.danger, fontSize: 12.5, marginTop: 5 }}>
-                  That {isCa ? 'postal code' : 'ZIP'} isn't in {REGIONS.find(([abbr]) => abbr === state)?.[1] || state}.
+                  That {cfg.postalLabel.toLowerCase()} isn't in {REGIONS.find(([abbr]) => abbr === state)?.[1] || state}.
                 </p>
               )}
             </div>
