@@ -181,23 +181,27 @@ async function listAllCompanyConfigsWithOwnerInfo() {
 // creating a second account under a different email. Normalizes each field
 // before comparing so "ABC Cleaning Co." vs "abc cleaning co" or
 // "(555) 123-4567" vs "555-123-4567" still match.
+//
+// website is deliberately NOT checked here (removed Oct 2026, a real
+// support case): the signup field is labeled "Website or Facebook page" and
+// explicitly invites a business with no site of its own to type something
+// informal instead -- unlike a company name or a phone number, that's not a
+// reliable "this is the same real business" signal. A support audit found
+// two genuinely different companies had both typed the bare "facebook.com"
+// (no specific page, just the lazy/generic answer), and the second one's
+// real signup was being blocked as a "duplicate account" of the first. A
+// company name collision or a shared phone number is still a strong signal
+// worth blocking on; a shared generic placeholder website is not.
 function normalizeName(v) {
   return String(v || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 function normalizePhone(v) {
   return String(v || '').replace(/\D/g, '').slice(-10);
 }
-function normalizeWebsite(v) {
-  return String(v || '').toLowerCase().trim()
-    .replace(/^https?:\/\//, '')
-    .replace(/^www\./, '')
-    .replace(/\/+$/, '');
-}
 
-async function findDuplicateCompany({ companyName, phone, website }) {
+async function findDuplicateCompany({ companyName, phone }) {
   const nName = normalizeName(companyName);
   const nPhone = normalizePhone(phone);
-  const nWebsite = normalizeWebsite(website);
 
   let rows;
   try {
@@ -211,7 +215,6 @@ async function findDuplicateCompany({ companyName, phone, website }) {
     if (!config) continue;
     if (nName && normalizeName(config.companyName) === nName) return { field: 'companyName' };
     if (nPhone && nPhone.length === 10 && normalizePhone(config.phone) === nPhone) return { field: 'phone' };
-    if (nWebsite && normalizeWebsite(config.website) === nWebsite) return { field: 'website' };
   }
   return null;
 }

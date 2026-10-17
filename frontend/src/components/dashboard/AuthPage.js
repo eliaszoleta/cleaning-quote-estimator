@@ -76,18 +76,25 @@ export default function AuthPage({ onAuth }) {
 
       if (mode === 'signup') {
         // Checked before signUp() creates the account -- catches the same
-        // business signing up twice (different email) by company name,
-        // phone, or website, so we can block it and point them back to
-        // their existing account instead of letting a duplicate through.
+        // business signing up twice (different email) by company name or
+        // phone, so we can block it and point them back to their existing
+        // account instead of letting a duplicate through. website is
+        // deliberately NOT sent here -- this field is labeled "Website or
+        // Facebook page" specifically so a business with no site of its own
+        // can type something informal instead, and a real support case
+        // (Oct 2026) found two different companies had both just typed the
+        // bare "facebook.com" -- the second one's real signup was being
+        // blocked as a duplicate of the first over nothing but a shared
+        // placeholder answer. See findDuplicateCompany's own comment.
         try {
           const dupRes = await fetch(`${API_URL}/api/company/check-duplicate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ companyName: company, phone, website }),
+            body: JSON.stringify({ companyName: company, phone }),
           });
           const dupData = await dupRes.json();
           if (dupData.duplicate) {
-            const fieldLabel = { companyName: 'company name', phone: 'phone number', website: 'website' }[dupData.field] || 'details';
+            const fieldLabel = { companyName: 'company name', phone: 'phone number' }[dupData.field] || 'details';
             throw new Error(`An account already exists with this ${fieldLabel}. Please log back in to it instead.`);
           }
         } catch (dupErr) {

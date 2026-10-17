@@ -46,12 +46,13 @@ function normalizeServiceCities(config) {
 
 // POST /api/company/check-duplicate — no auth (runs before signup creates a
 // session) -- lets AuthPage.js block signup client-side when the company
-// name, phone, or website already belongs to an existing account, instead of
-// letting them create a second account for the same business.
+// name or phone already belongs to an existing account, instead of letting
+// them create a second account for the same business. website is
+// deliberately not checked -- see findDuplicateCompany's own comment.
 router.post('/check-duplicate', async (req, res) => {
-  const { companyName, phone, website } = req.body || {};
+  const { companyName, phone } = req.body || {};
   try {
-    const match = await findDuplicateCompany({ companyName, phone, website });
+    const match = await findDuplicateCompany({ companyName, phone });
     res.json({ success: true, duplicate: !!match, field: match?.field || null });
   } catch (err) {
     console.error('POST check-duplicate error:', err.message);
