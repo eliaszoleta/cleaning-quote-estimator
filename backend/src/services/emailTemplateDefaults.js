@@ -142,19 +142,21 @@ module.exports = [
   {
     key: 'activation_reminder',
     name: 'Activation reminder — checkout never finished',
-    subject: "You're one step away from your free Clean Estimator trial",
+    subject: 'Still want to try Clean Estimator?',
     variables: [{ name: 'companyName', example: 'Sparkle Clean Co' }],
     text: [
       'Hi {{companyName}},',
       '',
-      "You created a Clean Estimator account, but checkout was never finished -- so your 30-day free trial hasn't actually started yet, and your calculator isn't active.",
+      "Looks like you started setting up a Clean Estimator account but didn't quite finish — no rush, just didn't want you to miss out on the free trial.",
       '',
-      "It only takes a minute: add a card to activate your account, and you won't be charged anything for 30 days.",
+      "Pick up right where you left off whenever you're ready, it only takes a minute.",
       '',
-      'Finish setting up my trial:',
+      'Finish setting up my account:',
       'https://www.cleanestimator.com/company',
       '',
-      "If you ran into an issue or changed your mind, just reply and let me know -- happy to help.",
+      "Your 30-day trial doesn't start until you do, so nothing's running out in the meantime.",
+      '',
+      "If you ran into an issue or just changed your mind, just reply and let me know -- happy to help.",
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -163,19 +165,23 @@ module.exports = [
   <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    You created a Clean Estimator account, but checkout was never finished — so your 30-day free trial hasn't actually started yet, and your calculator isn't active.
+    Looks like you started setting up a Clean Estimator account but didn't quite finish — no rush, just didn't want you to miss out on the free trial.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    It only takes a minute: add a card to activate your account, and you won't be charged anything for 30 days.
+    Pick up right where you left off whenever you're ready, it only takes a minute.
   </p>
 
   <p style="margin:0 0 20px;">
-    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Finish setting up my trial →</a>
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Finish setting up my account →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your 30-day trial doesn't start until you do, so nothing's running out in the meantime.
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    If you ran into an issue or changed your mind, just reply and let me know — happy to help.
+    If you ran into an issue or just changed your mind, just reply and let me know — happy to help.
   </p>
   ${FOOTER_HTML}
 </div>`,
