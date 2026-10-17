@@ -97,21 +97,6 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
   // leaving them staged behind Save Changes was exactly the "did my change
   // actually take effect on the widget?" confusion the toggle autosave
   // already fixed once.
-  // Switching country invalidates any already-selected states/provinces and
-  // cities (e.g. 'TX' isn't a real pick once this company is Canadian) --
-  // clearing them here rather than leaving stale codes from the old
-  // country sitting in config, silently matching nothing in the new
-  // region list.
-  const changeCountry = (next) => {
-    if (next === country) return;
-    setCountry(next);
-    setServiceStates([]);
-    setServiceCities({});
-    const patch = { country: next, serviceStates: [], serviceCities: {} };
-    if (autoSave) autoSave(patch);
-    else if (update) update(patch);
-  };
-
   const toggleState = (code) => {
     const removing = serviceStates.includes(code);
     setServiceStates(prev => {
@@ -258,31 +243,13 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
         <p style={{ color: '#64748b', fontSize: 14 }}>Everything on this page saves automatically as you go — no need to click Save.</p>
       </div>
 
-      {/* Country -- set once, not asked of visitors on the calculator
-          itself (see LocationStep.js). Changing it clears Service Area
-          below since a state code and a province code aren't the same
-          namespace. */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-        <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14 }}>
-            <MapPin size={15} color="#2563eb" /> Country
-          </div>
-          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
-            Which country do you operate in? This sets your calculator's region list, pricing data, and currency.
-          </div>
-        </div>
-        <div style={{ padding: '14px 18px', display: 'flex', gap: 8 }}>
-          {[['US', 'United States'], ['CA', 'Canada']].map(([code, label]) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => changeCountry(code)}
-              style={{ padding: '9px 18px', borderRadius: 7, border: `1.5px solid ${country === code ? '#2563eb' : '#e2e8f0'}`, background: country === code ? '#eff6ff' : 'white', color: country === code ? '#1d4ed8' : '#374151', cursor: 'pointer', fontWeight: 600, fontSize: 13.5 }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      {/* Country now lives in the dashboard header (next to Widget/Calculator
+          Mode) rather than here -- same one-time account-wide setting,
+          just promoted somewhere more visible. This tab (and the Service
+          Area below) just reads whatever that's currently set to. */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#94a3b8', marginBottom: 20 }}>
+        <MapPin size={14} />
+        Operating in {country === 'CA' ? 'Canada' : 'the United States'} — change this from the country switcher in the header.
       </div>
 
       {/* Service area */}

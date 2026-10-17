@@ -304,7 +304,13 @@ export default function CompanyDashboard({ user, onLogout }) {
     overview:     <OverviewTab {...tabProps} />,
     help:         <HelpTab />,
     branding:     <BrandingTab config={localConfig} update={update} autoSave={autoSave} onSave={handleGlobalSave} saving={saving} saved={saved} user={user} />,
-    services:     <ServicesTab config={localConfig} update={update} patchServices={patchServiceToggle} autoSave={autoSave} />,
+    // Keyed on country so switching it from the header's dropdown (see
+    // above) always remounts this tab fresh -- ServicesTab's own region
+    // state only ever initializes once per mount (see its initialized
+    // ref), so without a fresh mount here a tab left open across a header
+    // country change would keep showing the old country's state/province
+    // list until manually reloaded.
+    services:     <ServicesTab key={localConfig?.country || 'US'} config={localConfig} update={update} patchServices={patchServiceToggle} autoSave={autoSave} />,
     leads:        <LeadsTab {...tabProps} />,
     settings:     <SettingsTab user={user} config={config} saveConfig={saveConfig} saving={saving} refetchConfig={refetch} onLogout={onLogout} section={settingsSection} onSectionChange={setSettingsSection} subStatus={subStatus} onSubRefresh={loadSubStatus} />,
   };
@@ -372,6 +378,31 @@ export default function CompanyDashboard({ user, onLogout }) {
               <Icon size={13} /> {label}
             </button>
           ))}
+        </div>
+
+        {/* Country -- which pricing data/currency/region list the calculator
+            uses (see ServicesTab.js's fuller explanation). Lives in the
+            header, not buried in Settings, since it's a one-time account-wide
+            switch like Widget/Calculator Mode next to it, not a per-visit
+            setting. Auto-saves on change, same immediate-persist treatment
+            as Service Area -- a setting this consequential shouldn't need a
+            separate Save Changes click to actually take effect. */}
+        <div style={{ flexShrink: 0 }}>
+          <select
+            value={localConfig?.country || 'US'}
+            onChange={e => autoSave({ country: e.target.value, serviceStates: [], serviceCities: [] })}
+            title="Country"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: isMobile ? '6px 6px' : '6px 10px 6px 8px', borderRadius: 20,
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)',
+              color: 'white', fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
+              cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
+            }}
+          >
+            <option value="US" style={{ color: '#111827' }}>🇺🇸 United States</option>
+            <option value="CA" style={{ color: '#111827' }}>🇨🇦 Canada</option>
+          </select>
         </div>
 
         {/* Right: badge, save, user -- Schedule a Walkthrough, the Saved
