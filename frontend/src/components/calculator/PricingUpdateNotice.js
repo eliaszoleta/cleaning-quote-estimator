@@ -11,13 +11,16 @@ import { COLORS, RADIUS } from '../../styles/theme';
 // commentary about cleanestimator.com's own data quality that would be
 // confusing or off-brand shown to someone else's customers.
 //
-// Dismissible per-visitor (localStorage) AND hard-expires on its own after
-// EXPIRES_AT, so a "we just refreshed our pricing" claim can't quietly go
-// stale and sit there making the same announcement forever.
+// country defaults 'US' so the public calculator pages (no company config,
+// no country in scope at all) keep showing this exactly as before -- the
+// gate below only matters for the dashboard's Calculator Mode, where a
+// CA/GB/AU company would otherwise see a claim that's specifically about
+// US data (HomeAdvisor/Angi/Thumbtack/BLS, "state by state") as if it
+// applied to their own country's pricing too.
 const STORAGE_KEY = 'cc-pricing-update-notice-dismissed-2026-10';
 const EXPIRES_AT = new Date('2026-12-15T00:00:00Z').getTime();
 
-export default function PricingUpdateNotice() {
+export default function PricingUpdateNotice({ country = 'US' }) {
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
@@ -28,6 +31,7 @@ export default function PricingUpdateNotice() {
     setDismissed(false);
   }, []);
 
+  if (country !== 'US') return null;
   if (dismissed) return null;
 
   const dismiss = () => {

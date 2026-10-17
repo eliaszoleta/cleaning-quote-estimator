@@ -356,77 +356,105 @@ export default function CompanyDashboard({ user, onLogout }) {
           </a>
         </div>
 
-        {/* Center: Widget Mode / Calculator Mode switch -- Widget Mode is
-            the full dashboard (sidebar + tabs) exactly as before; Calculator
-            Mode drops all of that and shows nothing but the calculator,
-            full-page, for running a quick internal estimate. Shorter labels
-            on mobile ("Widget"/"Calculator") since this is the one control
-            in the header that has to stay fully legible at any width. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 24, padding: 3, flexShrink: 0 }}>
-          {[
-            { id: 'widget', label: isMobile ? 'Widget' : 'Widget Mode', Icon: Code2 },
-            { id: 'calculator', label: isMobile ? 'Calculator' : 'Calculator Mode', Icon: Zap },
-          ].map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              onClick={() => setViewMode(id)}
+        {/* Everything right of the logo lives in one scrollable row instead
+            of 3 separate flexShrink:0 groups spread by the header's own
+            space-between -- that older layout had no fallback once Widget/
+            Calculator + country + the subscription badge + Save + Sign Out
+            together exceeded a phone's width: nothing could shrink
+            (flexShrink:0 on every group) and the header itself never
+            scrolled, so whatever didn't fit (the subscription badge, most
+            often) was silently clipped off the right edge of the screen
+            with no way to reach it at all. overflow-x:auto here means that
+            can now be reached with a swipe instead of vanishing; shrinking
+            the country select to flag-only on mobile (below) means it
+            usually doesn't even need to. Desktop is unaffected -- at
+            >768px this row has more space than its content needs, so
+            justify-content:space-between still spreads the three groups
+            exactly as before and nothing ever actually scrolls. */}
+        <div
+          className="ce-dash-header-scroll"
+          style={{
+            display: 'flex', alignItems: 'center', flex: 1, minWidth: 0,
+            gap: isMobile ? 10 : 0, justifyContent: isMobile ? 'flex-start' : 'space-between',
+            overflowX: isMobile ? 'auto' : 'visible', scrollbarWidth: 'none', msOverflowStyle: 'none',
+          }}
+        >
+          <style>{`.ce-dash-header-scroll::-webkit-scrollbar { display: none; }`}</style>
+
+          {/* Widget Mode / Calculator Mode switch -- Widget Mode is the full
+              dashboard (sidebar + tabs) exactly as before; Calculator Mode
+              drops all of that and shows nothing but the calculator,
+              full-page, for running a quick internal estimate. Shorter
+              labels on mobile ("Widget"/"Calculator"). */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 24, padding: 3, flexShrink: 0 }}>
+            {[
+              { id: 'widget', label: isMobile ? 'Widget' : 'Widget Mode', Icon: Code2 },
+              { id: 'calculator', label: isMobile ? 'Calculator' : 'Calculator Mode', Icon: Zap },
+            ].map(({ id, label, Icon }) => (
+              <button
+                key={id}
+                onClick={() => setViewMode(id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: isMobile ? '6px 8px' : '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                  background: viewMode === id ? '#2563eb' : 'transparent',
+                  color: viewMode === id ? 'white' : '#94a3b8',
+                  fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5, whiteSpace: 'nowrap',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+              >
+                <Icon size={13} /> {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Country -- which pricing data/currency/region list the calculator
+              uses (see ServicesTab.js's fuller explanation). Lives in the
+              header, not buried in Settings, since it's a one-time account-wide
+              switch like Widget/Calculator Mode next to it, not a per-visit
+              setting. Auto-saves on change, same immediate-persist treatment
+              as Service Area -- a setting this consequential shouldn't need a
+              separate Save Changes click to actually take effect. Flag-only
+              on mobile (no country name) -- the biggest single space saver
+              in this row, and the flag alone is already how every other
+              country switcher in this app (LocationStep.js, ServicesTab.js)
+              reads at a glance. */}
+          <div style={{ flexShrink: 0, position: 'relative', display: 'flex' }}>
+            {/* appearance:none above strips the native dropdown arrow with
+                nothing replacing it, so this read as a plain static badge
+                (like the Save/Saved indicator) rather than something
+                clickable. A chevron, overlaid and pointer-events:none so
+                clicks still reach the <select> underneath it, restores that
+                "this opens a menu" affordance without giving up the custom
+                pill styling. */}
+            <select
+              value={localConfig?.country || 'US'}
+              onChange={e => autoSave({ country: e.target.value, serviceStates: [], serviceCities: [] })}
+              title="Country"
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                padding: isMobile ? '6px 8px' : '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                background: viewMode === id ? '#2563eb' : 'transparent',
-                color: viewMode === id ? 'white' : '#94a3b8',
-                fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5, whiteSpace: 'nowrap',
-                transition: 'background 0.15s, color 0.15s',
+                padding: isMobile ? '6px 20px 6px 6px' : '6px 24px 6px 8px', borderRadius: 20,
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)',
+                color: 'white', fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
+                cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
               }}
             >
-              <Icon size={13} /> {label}
-            </button>
-          ))}
-        </div>
+              <option value="US" style={{ color: '#111827' }}>{isMobile ? '🇺🇸' : '🇺🇸 United States'}</option>
+              <option value="CA" style={{ color: '#111827' }}>{isMobile ? '🇨🇦' : '🇨🇦 Canada'}</option>
+              <option value="GB" style={{ color: '#111827' }}>{isMobile ? '🇬🇧' : '🇬🇧 United Kingdom'}</option>
+              <option value="AU" style={{ color: '#111827' }}>{isMobile ? '🇦🇺' : '🇦🇺 Australia'}</option>
+            </select>
+            <ChevronDown
+              size={13}
+              style={{ position: 'absolute', right: isMobile ? 5 : 8, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.65)', pointerEvents: 'none' }}
+            />
+          </div>
 
-        {/* Country -- which pricing data/currency/region list the calculator
-            uses (see ServicesTab.js's fuller explanation). Lives in the
-            header, not buried in Settings, since it's a one-time account-wide
-            switch like Widget/Calculator Mode next to it, not a per-visit
-            setting. Auto-saves on change, same immediate-persist treatment
-            as Service Area -- a setting this consequential shouldn't need a
-            separate Save Changes click to actually take effect. */}
-        <div style={{ flexShrink: 0, position: 'relative', display: 'flex' }}>
-          {/* appearance:none above strips the native dropdown arrow with
-              nothing replacing it, so this read as a plain static badge
-              (like the Save/Saved indicator) rather than something
-              clickable. A chevron, overlaid and pointer-events:none so
-              clicks still reach the <select> underneath it, restores that
-              "this opens a menu" affordance without giving up the custom
-              pill styling. */}
-          <select
-            value={localConfig?.country || 'US'}
-            onChange={e => autoSave({ country: e.target.value, serviceStates: [], serviceCities: [] })}
-            title="Country"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: isMobile ? '6px 20px 6px 6px' : '6px 24px 6px 8px', borderRadius: 20,
-              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)',
-              color: 'white', fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
-              cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
-            }}
-          >
-            <option value="US" style={{ color: '#111827' }}>🇺🇸 United States</option>
-            <option value="CA" style={{ color: '#111827' }}>🇨🇦 Canada</option>
-            <option value="GB" style={{ color: '#111827' }}>🇬🇧 United Kingdom</option>
-            <option value="AU" style={{ color: '#111827' }}>🇦🇺 Australia</option>
-          </select>
-          <ChevronDown
-            size={13}
-            style={{ position: 'absolute', right: isMobile ? 5 : 8, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.65)', pointerEvents: 'none' }}
-          />
-        </div>
-
-        {/* Right: badge, save, user -- Schedule a Walkthrough, the Saved
-            confirmation, the divider, and the email address all drop on
-            mobile (promotional/secondary, not needed to use the
-            dashboard); Save and Sign Out shrink to icon-only buttons. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 10, flexShrink: 0 }}>
+          {/* Right: badge, save, user -- Schedule a Walkthrough, the Saved
+              confirmation, the divider, and the email address all drop on
+              mobile (promotional/secondary, not needed to use the
+              dashboard); Save and Sign Out shrink to icon-only buttons. */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 10, flexShrink: 0 }}>
           {!isMobile && (
             <a
               href={WALKTHROUGH_URL}
@@ -504,6 +532,7 @@ export default function CompanyDashboard({ user, onLogout }) {
           >
             <LogOut size={13} /> {!isMobile && 'Sign Out'}
           </button>
+          </div>
         </div>
       </header>
 

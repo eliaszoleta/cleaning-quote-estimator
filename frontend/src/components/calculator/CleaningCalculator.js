@@ -585,7 +585,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 third-party embeds, BrandingTab.js's live preview) stay
                 excluded -- this message is about cleanestimator.com's own
                 data quality and would be confusing on someone else's site. */}
-            {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice />}
+            {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice country={companyConfig?.country || 'US'} />}
             {currentStep === 'service' && (
               <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={companyConfig?.country || 'US'} />
             )}
