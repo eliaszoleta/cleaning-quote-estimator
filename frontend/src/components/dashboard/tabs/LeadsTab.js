@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw } from 'lucide-react';
 import { getCompanyLeads, patchLead, deleteLeadForever } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
-import { formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
+import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../../utils/formatters';
 import { useConfirm } from '../ConfirmDialog';
 
 const SERVICE_COLORS = {
@@ -469,6 +469,13 @@ export default function LeadsTab({ user }) {
               ['Service',  serviceTypeLabel(selectedLead.service_type), null],
               ['Location', [selectedLead.service_details?.city, selectedLead.zip, selectedLead.state].filter(Boolean).join(' · '), null],
               ['Estimate', selectedLead.estimated_price_low ? formatPriceRange(selectedLead.estimated_price_low, selectedLead.estimated_price_high, selectedLead.service_type) : '—', null],
+              // Plain midpoint of the stored range, computed here rather than
+              // persisted on the lead row -- it's pure derived display data
+              // (same formula calculateCleaning uses for suggestedPrice), so
+              // recomputing it avoids a DB column/migration for something
+              // that's always exactly reconstructible from what's already
+              // stored.
+              ['Suggested', selectedLead.estimated_price_low ? `${formatPrice(Math.round((selectedLead.estimated_price_low + selectedLead.estimated_price_high) / 2))}${selectedLead.service_type === 'commercial' ? '/mo' : ''}` : '—', null],
               ['Timeline', selectedLead.timeline || '—', null],
             ].filter(([, val]) => val && val !== '—' && val !== '').map(([label, val, href]) => (
               <div key={label} style={{ display: 'flex', gap: 8 }}>

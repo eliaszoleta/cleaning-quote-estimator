@@ -73,7 +73,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
   const showPartnerCard = !!demoPartner || (!!partner && !embedded);
 
   const {
-    totalLow, totalHigh, stateName, stateMultiplier, city,
+    totalLow, totalHigh, suggestedPrice, stateName, stateMultiplier, city,
     recurringAnnualSavings,
     adjustments = [], keyFactors = [], disclaimer, urgencyLevel,
     serviceType, unit,
@@ -202,6 +202,21 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                     <span>Estimated total</span>
                     <span style={{ flexShrink: 0, whiteSpace: 'nowrap', color: primaryColor }}>{formatPriceRange(totalLow, totalHigh)}</span>
                   </div>
+                  {/* Plain midpoint of the range above, not a smarter
+                      per-job recommendation -- labeled and subtitled to say
+                      exactly that, so it reads as "here's one number to
+                      anchor on" rather than implying the tool knows more
+                      about this specific job than the range already shows. */}
+                  {suggestedPrice != null && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '10px 12px', borderTop: `1px dashed ${COLORS.borderSubtle}` }}>
+                      <span style={{ fontSize: 12.5, color: COLORS.muted }}>
+                        Suggested price <span style={{ opacity: 0.8 }}>(midpoint of the range above)</span>
+                      </span>
+                      <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 700, fontSize: 14, color: COLORS.ink }}>
+                        {formatPrice(suggestedPrice)}{unit === 'per_month' ? '/mo' : ''}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 {adjustments.filter(adj => adj.separate).map((adj, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', marginTop: 10, background: COLORS.warningMuted, border: `1px dashed ${COLORS.warningBorder}`, borderRadius: RADIUS.md, fontSize: 13 }}>

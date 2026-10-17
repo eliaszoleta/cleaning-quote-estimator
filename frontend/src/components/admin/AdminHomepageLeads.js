@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw, Target, Users } from 'lucide-react';
 import { getAdminHomepageLeads, patchAdminHomepageLead, deleteAdminHomepageLeadForever } from '../../utils/api';
-import { formatPriceRange, serviceTypeLabel, formatDateTime } from '../../utils/formatters';
+import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 import { theme, cardStyle, inputStyle, secondaryBtnStyle, dangerBtnStyle, pill, avatarGradient, PageHeader } from './adminTheme';
 
@@ -544,6 +544,11 @@ export default function AdminHomepageLeads({ adminKey }) {
                   ['Service',  serviceTypeLabel(selectedLead.service_type), null],
                   ['Location', [selectedLead.city, selectedLead.state, selectedLead.zip].filter(Boolean).join(' · '), null],
                   ['Estimate', selectedLead.estimated_price_low ? formatPriceRange(selectedLead.estimated_price_low, selectedLead.estimated_price_high, selectedLead.service_type) : '—', null],
+                  // Same plain midpoint as LeadsTab.js's matching row --
+                  // recomputed from the stored range rather than persisted,
+                  // same reasoning (always exactly reconstructible, no
+                  // migration needed for pure derived display data).
+                  ['Suggested', selectedLead.estimated_price_low ? `${formatPrice(Math.round((selectedLead.estimated_price_low + selectedLead.estimated_price_high) / 2))}${selectedLead.service_type === 'commercial' ? '/mo' : ''}` : '—', null],
                   ['Timeline', selectedLead.timeline || '—', null],
                 ].filter(([, val]) => val && val !== '—' && val !== '').map(([label, val, href]) => (
                   <div key={label} style={{ display: 'flex', gap: 8 }}>

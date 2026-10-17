@@ -209,7 +209,7 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
 // with bulk/marketing mail, on top of the styling itself.
 function buildText({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
-    totalLow, totalHigh, stateName, city, unit,
+    totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], recurringAnnualSavings,
   } = result;
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
@@ -247,6 +247,9 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     lines.push(`  ${a.label}: ${fmtAdjustment(a)}`);
   });
   lines.push(`  Estimated total: ${fmtMoney(totalLow)} - ${fmtMoney(totalHigh)}`);
+  if (suggestedPrice != null) {
+    lines.push(`  Suggested price (midpoint of the range above): ${fmtMoney(suggestedPrice)}${unit === 'per_month' ? '/mo' : ''}`);
+  }
 
   if (partner) {
     lines.push('', 'Recommended cleaner near you:', partner.business_name);
@@ -273,7 +276,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
 
 function buildHtml({ name, clientName, serviceType, result, companyConfig, partner }) {
   const {
-    totalLow, totalHigh, stateName, city, unit,
+    totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], keyFactors = [],
     recurringAnnualSavings,
   } = result;
@@ -343,6 +346,11 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
         <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
         <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(totalLow)} – ${fmtMoney(totalHigh)}</td>
       </tr>
+      ${suggestedPrice != null ? `
+      <tr>
+        <td style="padding:9px 12px;font-size:12px;color:#666666;border-top:1px dashed #e0e0e0;">Suggested price <span style="opacity:0.8;">(midpoint of the range above)</span></td>
+        <td style="padding:9px 12px;text-align:right;font-weight:700;font-size:13px;color:#111111;border-top:1px dashed #e0e0e0;white-space:nowrap;">${fmtMoney(suggestedPrice)}${unit === 'per_month' ? '/mo' : ''}</td>
+      </tr>` : ''}
     </table>
   </div>
   ${buildKeyFactors(keyFactors)}
