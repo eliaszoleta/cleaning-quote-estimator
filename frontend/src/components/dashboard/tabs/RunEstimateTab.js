@@ -50,6 +50,7 @@ export default function RunEstimateTab({ config, user }) {
           companyConfig={companyConfig}
           embedded={true}
           skipLeadCapture={true}
+          instantResults={true}
           onShareEmail={handleShareEmail}
         />
       </div>

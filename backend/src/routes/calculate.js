@@ -372,6 +372,7 @@ router.post('/', async (req, res) => {
               serviceType,
               priceLow: result.totalLow,
               priceHigh: result.totalHigh,
+              suggestedPrice: result.suggestedPrice,
               city: leadCity,
               state: result.state,
               zip: zip || null,

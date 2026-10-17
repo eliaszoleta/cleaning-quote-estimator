@@ -89,7 +89,7 @@ function labelForStep(step) {
   return 'Details';
 }
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false }) {
   const cardRef = useRef(null);
   // Measures the card's own rendered width, not window.innerWidth -- this
   // renders both in a real <iframe width="100%"> embed (where window IS
@@ -357,20 +357,23 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   const progressStep = Math.min(stepIndex, steps.length - 1);
 
-  // Results page. On a siteLanding page (our own standalone calculator
-  // pages) the wizard steps stay flush/embedded inside the page's own card,
-  // but results should look exactly like the homepage's full results screen
-  // (its own grey background, its own card, Share/Print/disclaimer outside
-  // it) -- only a real third-party embed (EmbedWrapper) needs it flush too.
+  // Results page. Nobody sees the on-screen breakdown by default anymore --
+  // the backend already emails it the moment handleLeadNext's /api/calculate
+  // call returns, so this is the one place to see the numbers for a real
+  // visitor on a real embedded widget (EmbedWrapper.js, the thing a company
+  // actually pastes onto their own site). Showing it on-screen too just made
+  // that email redundant and visitors never opened it.
   //
-  // On our own site (not a real third-party embed, and not the
-  // partner-recruitment demo page, which needs the real card to show
-  // prospects what it looks like) the full breakdown is never shown here --
-  // the backend already emails it the moment handleLeadNext's
-  // /api/calculate call returns, so showing it immediately on-screen too
-  // just made that email redundant and visitors never opened it. This way
-  // the email is the one place to see the numbers.
-  const showInstantResults = (embedded && !siteLanding) || !!demoPartner;
+  // Two call sites deliberately opt back in via the instantResults prop,
+  // since there's no real lead/email to wait on in either case: BrandingTab.js's
+  // Live Preview (a company configuring their widget, not a customer --
+  // there's no lead email to send a preview to) and RunEstimateTab.js's
+  // "Run an Estimate" tool (the account owner quoting a job themselves,
+  // often standing in front of that customer, who needs the number
+  // immediately rather than waiting on an email). demoPartner (the
+  // partner-recruitment demo page) also always shows it, to let a prospect
+  // see what the widget actually looks like.
+  const showInstantResults = instantResults || !!demoPartner;
 
   if (currentStep === 'results' && result) {
     if (!showInstantResults) {
