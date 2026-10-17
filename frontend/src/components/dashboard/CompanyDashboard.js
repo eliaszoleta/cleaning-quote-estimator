@@ -15,6 +15,71 @@ import SettingsTab from './tabs/SettingsTab';
 import HelpTab from './tabs/HelpTab';
 import RunEstimateTab from './tabs/RunEstimateTab';
 
+// Real flag glyphs, not the 🇺🇸/🇨🇦/🇬🇧/🇦🇺 emoji previously used as the
+// <option> text -- those rendered fine on Android (where the mobile
+// screenshot that drove this fix was taken) but as blank space or a bare
+// "CA"/"GB" text fallback on several desktop OS/browser combos (Windows in
+// particular ships without a flag-emoji font by default), so the same
+// country switcher looked broken on desktop while working on mobile.
+// Hand-drawn, simplified inline SVGs instead of an external flag-icon CDN
+// or npm package -- renders identically everywhere with no network
+// dependency, consistent with how every other icon in this header
+// (lucide-react) is already self-contained. Not pixel-accurate flags (the
+// UK/AU crosses and the CA maple leaf are simplified down to something
+// legible at ~16px), just recognizable at the size this is actually shown.
+function CountryFlag({ country, size = 16 }) {
+  const h = size * 0.72;
+  const common = { width: size, height: h, viewBox: '0 0 20 15', style: { borderRadius: 2, flexShrink: 0, display: 'block' } };
+  if (country === 'CA') return (
+    <svg {...common}>
+      <rect width="20" height="15" fill="#fff" />
+      <rect width="5" height="15" fill="#D80621" />
+      <rect x="15" width="5" height="15" fill="#D80621" />
+      <path d="M10 3l.8 2.1 2-.9-.6 2 1.8.3-1.5 1.3.9 1.9-2-.6.1 2-1.5-1.3-1.5 1.3.1-2-2 .6.9-1.9-1.5-1.3 1.8-.3-.6-2 2 .9z" fill="#D80621" />
+    </svg>
+  );
+  if (country === 'GB') return (
+    <svg {...common}>
+      <rect width="20" height="15" fill="#00247D" />
+      <path d="M0 0 L20 15 M20 0 L0 15" stroke="#fff" strokeWidth="3" />
+      <path d="M0 0 L20 15 M20 0 L0 15" stroke="#CF142B" strokeWidth="1.2" />
+      <path d="M10 0 V15 M0 7.5 H20" stroke="#fff" strokeWidth="5" />
+      <path d="M10 0 V15 M0 7.5 H20" stroke="#CF142B" strokeWidth="3" />
+    </svg>
+  );
+  if (country === 'AU') return (
+    <svg {...common}>
+      <rect width="20" height="15" fill="#00247D" />
+      <path d="M0 0 L10 7.5 M10 0 L0 7.5" stroke="#fff" strokeWidth="1.4" />
+      <path d="M0 0 L10 7.5 M10 0 L0 7.5" stroke="#CF142B" strokeWidth="0.6" />
+      <path d="M5 0 V7.5 M0 3.75 H10" stroke="#fff" strokeWidth="2.2" />
+      <path d="M5 0 V7.5 M0 3.75 H10" stroke="#CF142B" strokeWidth="1.2" />
+      <circle cx="4" cy="11.5" r="1.1" fill="#fff" />
+      <circle cx="14" cy="4" r="0.8" fill="#fff" />
+      <circle cx="16.5" cy="7" r="0.8" fill="#fff" />
+      <circle cx="17.5" cy="11" r="0.8" fill="#fff" />
+      <circle cx="13.5" cy="12.5" r="0.6" fill="#fff" />
+    </svg>
+  );
+  // US (and the fallback for an unrecognized/undefined country, same as
+  // every country-aware piece of this app already defaulting to US).
+  return (
+    <svg {...common}>
+      <rect width="20" height="15" fill="#fff" />
+      <g fill="#B22234">
+        <rect y="0" width="20" height="1.15" />
+        <rect y="2.3" width="20" height="1.15" />
+        <rect y="4.6" width="20" height="1.15" />
+        <rect y="6.9" width="20" height="1.15" />
+        <rect y="9.2" width="20" height="1.15" />
+        <rect y="11.5" width="20" height="1.15" />
+        <rect y="13.8" width="20" height="1.15" />
+      </g>
+      <rect width="8" height="8.1" fill="#3C3B6E" />
+    </svg>
+  );
+}
+
 // Discount (recurring-frequency %) now lives inside Services & Pricing, the
 // embed code now lives inside Branding (right after the live preview it
 // already shows), and Subscription now lives inside Settings as a third
@@ -436,11 +501,11 @@ export default function CompanyDashboard({ user, onLogout }) {
               switch like Widget/Calculator Mode next to it, not a per-visit
               setting. Auto-saves on change, same immediate-persist treatment
               as Service Area -- a setting this consequential shouldn't need a
-              separate Save Changes click to actually take effect. Flag-only
-              on mobile (no country name) -- the biggest single space saver
-              in this row, and the flag alone is already how every other
-              country switcher in this app (LocationStep.js, ServicesTab.js)
-              reads at a glance. */}
+              separate Save Changes click to actually take effect. Flag code
+              (not full name) on mobile, same space-saving as before -- the
+              difference now is the flag itself is a real rendered icon
+              (CountryFlag), not emoji text, so it's no longer the part that
+              was silently blank on desktop. */}
           <div style={{ flexShrink: 0, position: 'relative', display: 'flex' }}>
             {/* appearance:none above strips the native dropdown arrow with
                 nothing replacing it, so this read as a plain static badge
@@ -448,24 +513,30 @@ export default function CompanyDashboard({ user, onLogout }) {
                 clickable. A chevron, overlaid and pointer-events:none so
                 clicks still reach the <select> underneath it, restores that
                 "this opens a menu" affordance without giving up the custom
-                pill styling. */}
+                pill styling. The flag icon on the left is the same idea --
+                an overlay, not part of the <option> text, since a native
+                <select> can't render anything but plain text inside its own
+                options regardless of what the collapsed/closed state shows. */}
             <select
               value={localConfig?.country || 'US'}
               onChange={e => autoSave({ country: e.target.value, serviceStates: [], serviceCities: [] })}
               title="Country"
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                padding: isMobile ? '6px 20px 6px 6px' : '6px 24px 6px 8px', borderRadius: 20,
+                padding: isMobile ? '6px 20px 6px 24px' : '6px 24px 6px 28px', borderRadius: 20,
                 background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)',
                 color: 'white', fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
                 cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
               }}
             >
-              <option value="US" style={{ color: '#111827' }}>{isMobile ? '🇺🇸' : '🇺🇸 United States'}</option>
-              <option value="CA" style={{ color: '#111827' }}>{isMobile ? '🇨🇦' : '🇨🇦 Canada'}</option>
-              <option value="GB" style={{ color: '#111827' }}>{isMobile ? '🇬🇧' : '🇬🇧 United Kingdom'}</option>
-              <option value="AU" style={{ color: '#111827' }}>{isMobile ? '🇦🇺' : '🇦🇺 Australia'}</option>
+              <option value="US" style={{ color: '#111827' }}>{isMobile ? 'US' : 'United States'}</option>
+              <option value="CA" style={{ color: '#111827' }}>{isMobile ? 'CA' : 'Canada'}</option>
+              <option value="GB" style={{ color: '#111827' }}>{isMobile ? 'GB' : 'United Kingdom'}</option>
+              <option value="AU" style={{ color: '#111827' }}>{isMobile ? 'AU' : 'Australia'}</option>
             </select>
+            <div style={{ position: 'absolute', left: isMobile ? 7 : 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+              <CountryFlag country={localConfig?.country || 'US'} size={14} />
+            </div>
             <ChevronDown
               size={13}
               style={{ position: 'absolute', right: isMobile ? 5 : 8, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.65)', pointerEvents: 'none' }}
