@@ -296,7 +296,7 @@ router.get('/:id/public', async (req, res) => {
     const {
       companyName, logo, primaryColor, accentColor, fontFamily,
       ctaHeadline, ctaHeadlineEnabled, ctaSubtext, ctaPhone, ctaEmail,
-      serviceStates, frameHeight, borderRadius, services,
+      serviceStates, frameHeight, borderRadius, services, country,
     } = config;
     // Same no-store as the authed GET /:id -- a subscriber who just changed
     // their Service Area/branding and reloaded their own widget to check it
@@ -309,6 +309,20 @@ router.get('/:id/public', async (req, res) => {
         companyName, logo, primaryColor, accentColor, fontFamily,
         ctaHeadline, ctaHeadlineEnabled, ctaSubtext, ctaPhone, ctaEmail,
         serviceStates, serviceCities: normalizeServiceCities(config), frameHeight, borderRadius, services,
+        // Missing entirely before -- this is the actual field every real
+        // third-party embed (EmbedWrapper.js, via getCompanyPublic) bootstraps
+        // its companyConfig from. CleaningCalculator falls back to 'US'
+        // whenever country is undefined, so a CA/GB/AU company's own LIVE
+        // widget -- on their real website, shown to real visitors -- was
+        // rendering the US LocationStep (US states, not provinces/regions) no
+        // matter what they'd set their account to. The /api/calculate route
+        // itself was never affected (it reads the full row server-side via
+        // getCompanyConfig, not this trimmed response), but a visitor picking
+        // from a US state list when the company serves Canada/UK/Australia
+        // means whatever they picked couldn't resolve to a real province/
+        // region server-side either, silently falling back to no regional
+        // adjustment on their actual quoted price.
+        country,
         paused: req.params.id === ALWAYS_ACTIVE_COMPANY_ID ? false : (!sub.active || deletionPending),
         trialDaysLeft: sub.daysLeft,
       },
