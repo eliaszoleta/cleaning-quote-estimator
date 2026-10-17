@@ -57,6 +57,16 @@ const SERVICES = [
   { id: 'post_construction', configKey: 'postConstruction', Icon: Construction, label: 'Post-Construction',        desc: 'Debris, dust & paint splatter cleanup', color: '#78716c', bg: '#fafaf9' },
 ];
 
+// UK pilot (Oct 2026) -- real UK trade terminology, not a translation (see
+// serviceTypeLabel's matching comment in utils/formatters.js for the
+// sourcing). Only the card label changes; icon/color/description already
+// read fine as-is.
+const UK_LABEL_OVERRIDES = {
+  apartment: 'Flat Cleaning',
+  mold_remediation: 'Mould Removal',
+  post_construction: 'After Builders Clean',
+};
+
 // isMobile comes from CleaningCalculator's own ResizeObserver on the card
 // element (not window.innerWidth) -- this step used to measure the window
 // itself, which is correct inside a real <iframe> embed (the iframe has
@@ -65,7 +75,7 @@ const SERVICES = [
 // desktop browser, so a narrow preview panel never actually counted as
 // mobile, and looked different from how the same widget renders on a real
 // site.
-export default function ServiceSelect({ onSelect, primaryColor, companyName, ctaHeadline, ctaHeadlineEnabled, services, embedded, isMobile }) {
+export default function ServiceSelect({ onSelect, primaryColor, companyName, ctaHeadline, ctaHeadlineEnabled, services, embedded, isMobile, country }) {
   const wrapRef = useRef(null);
   // Real measured width of this step's own content area, used below to pick
   // an explicit column count for the embedded-desktop grid instead of
@@ -105,7 +115,9 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   // explicit entry both default to shown -- only an explicit enabled:false
   // hides it, matching the same default used everywhere else (DEFAULT_SVC
   // in the dashboard's Services tab).
-  const visibleServices = SERVICES.filter(s => services?.[s.configKey]?.enabled !== false);
+  const visibleServices = SERVICES
+    .filter(s => services?.[s.configKey]?.enabled !== false)
+    .map(s => (country === 'GB' && UK_LABEL_OVERRIDES[s.id]) ? { ...s, label: UK_LABEL_OVERRIDES[s.id] } : s);
 
   // The fixed-tile "squared" layout below exists for a real third-party
   // embed, whose container width a company's host site controls and could

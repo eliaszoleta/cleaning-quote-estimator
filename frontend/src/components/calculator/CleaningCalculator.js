@@ -380,6 +380,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             name={leadInfo?.name}
             email={leadInfo?.email}
             serviceType={serviceType}
+            country={companyConfig?.country || 'US'}
             onReset={handleReset}
           />
         </div>
@@ -586,7 +587,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 data quality and would be confusing on someone else's site. */}
             {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice />}
             {currentStep === 'service' && (
-              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} />
+              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={companyConfig?.country || 'US'} />
             )}
             {currentStep === 'location' && (
               <LocationStep
@@ -607,6 +608,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 primaryColor={primaryColor}
                 location={location}
                 companyConfig={companyConfig}
+                country={companyConfig?.country || 'US'}
                 isFinalStep={!enableLead}
                 loading={!enableLead && loading}
               />

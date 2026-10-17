@@ -15,7 +15,7 @@ const LOCATIONS = [
   { id: 'garage', label: 'Garage' },
 ];
 
-export default function MoldStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
+export default function MoldStep({ value, onBack, onNext, primaryColor, country, isFinalStep, loading }) {
   const [sqft, setSqft] = useState(value.sqft || 50);
   const [locations, setLocations] = useState(value.locations || ['bathroom']);
   const [moldType, setMoldType] = useState(value.moldType || 'not_sure');
@@ -28,7 +28,7 @@ export default function MoldStep({ value, onBack, onNext, primaryColor, isFinalS
   const toggleExtra = id => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
   return (
-    <StepWrapper title="Mold remediation details" subtitle="These are preliminary estimates — a professional inspection is required" onBack={onBack} onNext={() => onNext({ sqft, locations, moldType, sourceFixed, testingNeeded, propertyType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
+    <StepWrapper title={country === 'GB' ? 'Mould removal details' : 'Mold remediation details'} subtitle="These are preliminary estimates — a professional inspection is required" onBack={onBack} onNext={() => onNext({ sqft, locations, moldType, sourceFixed, testingNeeded, propertyType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
 
       <div style={{ background: COLORS.dangerMuted, border: `1px solid ${COLORS.dangerBorder}`, borderRadius: RADIUS.sm, padding: '12px 16px', marginBottom: 24 }}>
         <span style={{ fontWeight: 700, color: '#991b1b', display: 'inline-flex', alignItems: 'center', gap: 5 }}><AlertTriangle size={14} /> Important:</span>

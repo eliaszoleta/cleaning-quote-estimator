@@ -49,6 +49,16 @@ const SERVICES = [
   { id: 'postConstruction', label: 'Post-Construction', Icon: Construction  },
 ];
 
+// UK pilot (Oct 2026) -- real UK trade terminology, not a translation (see
+// serviceTypeLabel's matching comment in utils/formatters.js for the
+// sourcing). Keyed by this file's own camelCase ids, not the snake_case
+// service-type keys formatters.js uses.
+const UK_LABEL_OVERRIDES = {
+  apartment: 'Flat Cleaning',
+  moldRemediation: 'Mould Removal',
+  postConstruction: 'After Builders Clean',
+};
+
 // Exported so other dashboard tabs referencing "how many services we offer"
 // (e.g. HelpTab.js) derive it from this real list instead of a typed-out
 // number that goes stale the next time a service is added here.
@@ -391,7 +401,8 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
         </div>
 
         <div style={{ padding: '6px 8px' }}>
-          {SERVICES.map(({ id, label, Icon }) => {
+          {SERVICES.map(({ id, label: defaultLabel, Icon }) => {
+            const label = (country === 'GB' && UK_LABEL_OVERRIDES[id]) || defaultLabel;
             const s = getSvc(id);
             return (
               <div
@@ -479,7 +490,8 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
           <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>Optional % off for visitors who book weekly, bi-weekly, or monthly cleaning instead of a one-time visit.</div>
         </div>
         <div style={{ padding: '6px 8px' }}>
-          {DISCOUNT_SERVICES.map(({ id, label, Icon }) => {
+          {DISCOUNT_SERVICES.map(({ id, label: defaultLabel, Icon }) => {
+            const label = (country === 'GB' && UK_LABEL_OVERRIDES[id]) || defaultLabel;
             const d = getDiscounts(id);
             return (
               <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 7, marginBottom: 3, flexWrap: 'wrap' }}>

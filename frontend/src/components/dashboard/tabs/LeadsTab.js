@@ -11,7 +11,7 @@ const SERVICE_COLORS = {
   tile_grout: '#64748b', mold_remediation: '#991b1b', water_damage: '#0284c7',
 };
 
-export default function LeadsTab({ user }) {
+export default function LeadsTab({ user, config }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -253,7 +253,7 @@ export default function LeadsTab({ user }) {
     // something only visible by opening each lead's Service Details panel.
     const headers = ['Name', 'Email', 'Phone', 'Type', 'Service', 'City', 'State', 'ZIP', 'Estimate Low', 'Estimate High', 'Timeline', 'Date', 'Notes'];
     const rows = rowsSource.map(l => [
-      l.name || '', l.email || '', l.phone || '', userTypeLabel(l.user_type) || '', serviceTypeLabel(l.service_type),
+      l.name || '', l.email || '', l.phone || '', userTypeLabel(l.user_type) || '', serviceTypeLabel(l.service_type, config?.country),
       l.service_details?.city || '', l.state || '', l.zip || '',
       l.estimated_price_low || '', l.estimated_price_high || '',
       l.timeline || '', new Date(l.created_at).toLocaleDateString(), l.notes || '',
@@ -323,7 +323,7 @@ export default function LeadsTab({ user }) {
               style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13.5, background: 'white', cursor: 'pointer', outline: 'none', color: '#374151' }}
             >
               <option value="all">All services</option>
-              {serviceTypes.map(t => <option key={t} value={t}>{serviceTypeLabel(t)}</option>)}
+              {serviceTypes.map(t => <option key={t} value={t}>{serviceTypeLabel(t, config?.country)}</option>)}
             </select>
             <select
               value={userTypeFilter}
@@ -434,7 +434,7 @@ export default function LeadsTab({ user }) {
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
                     <div style={{ background: `${color}18`, color, padding: '2px 8px', borderRadius: 7, fontSize: 11.5, fontWeight: 700, marginBottom: 3, display: 'inline-block' }}>
-                      {serviceTypeLabel(lead.service_type)}
+                      {serviceTypeLabel(lead.service_type, config?.country)}
                     </div>
                     <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>
                       {lead.estimated_price_low ? formatPriceRange(lead.estimated_price_low, lead.estimated_price_high, lead.service_type) : '—'}
@@ -466,7 +466,7 @@ export default function LeadsTab({ user }) {
               ['Email',    selectedLead.email,  `mailto:${selectedLead.email}`],
               ['Phone',    selectedLead.phone,  `tel:${selectedLead.phone}`],
               ['Type',     userTypeLabel(selectedLead.user_type), null],
-              ['Service',  serviceTypeLabel(selectedLead.service_type), null],
+              ['Service',  serviceTypeLabel(selectedLead.service_type, config?.country), null],
               ['Location', [selectedLead.service_details?.city, selectedLead.zip, selectedLead.state].filter(Boolean).join(' · '), null],
               ['Estimate', selectedLead.estimated_price_low ? formatPriceRange(selectedLead.estimated_price_low, selectedLead.estimated_price_high, selectedLead.service_type) : '—', null],
               // Plain midpoint of the stored range, computed here rather than

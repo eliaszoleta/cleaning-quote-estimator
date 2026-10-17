@@ -30,7 +30,22 @@ export function formatDateTime(iso) {
   return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
-export function serviceTypeLabel(type) {
+// UK pilot (Oct 2026) -- real UK trade terminology, not just a translation:
+// every UK pricing source found during that research said "flat," never
+// "apartment"; "mould removal," never "mold remediation"; and "after
+// builders clean" is the UK trade's own recognized service name, more
+// specific than the generic "post-construction." The other 9 services'
+// English-language labels already read naturally in the UK as-is.
+const UK_SERVICE_LABEL_OVERRIDES = {
+  apartment: 'Flat Cleaning',
+  mold_remediation: 'Mould Removal',
+  post_construction: 'After Builders Clean',
+};
+
+// country defaults undefined so every existing call site (every one of
+// them, pre-UK-pilot) renders byte-identical to before this parameter
+// existed -- only 'GB' triggers an override.
+export function serviceTypeLabel(type, country) {
   const map = {
     home_residential: 'House Cleaning',
     apartment: 'Apartment Cleaning',
@@ -45,6 +60,7 @@ export function serviceTypeLabel(type) {
     airbnb: 'Airbnb/Vacation Rental Cleaning',
     post_construction: 'Post-Construction Cleaning',
   };
+  if (country === 'GB' && UK_SERVICE_LABEL_OVERRIDES[type]) return UK_SERVICE_LABEL_OVERRIDES[type];
   return map[type] || type;
 }
 

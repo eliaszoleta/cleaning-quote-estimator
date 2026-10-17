@@ -10,7 +10,7 @@ import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 // returns) already contains the full breakdown, so revealing it here too
 // made the email redundant and visitors never opened it. This screen's
 // whole job is to make the email the one place to see the numbers.
-export default function EstimateSentScreen({ name, email, serviceType, onReset }) {
+export default function EstimateSentScreen({ name, email, serviceType, country, onReset }) {
   const rootRef = useRef(null);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function EstimateSentScreen({ name, email, serviceType, onReset }
               </h1>
 
               <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.7, marginBottom: 4 }}>
-                Your {serviceTypeLabel(serviceType).toLowerCase()} estimate breakdown is on its way to:
+                Your {serviceTypeLabel(serviceType, country).toLowerCase()} estimate breakdown is on its way to:
               </p>
               <p style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', marginBottom: 20 }}>
                 {email}

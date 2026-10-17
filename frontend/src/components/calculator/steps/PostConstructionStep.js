@@ -29,7 +29,7 @@ const EXTRAS = [
   { id: 'vent_dust_removal', label: 'Vent / Duct Dust Removal' },
 ];
 
-export default function PostConstructionStep({ value, onBack, onNext, primaryColor, isFinalStep, loading }) {
+export default function PostConstructionStep({ value, onBack, onNext, primaryColor, country, isFinalStep, loading }) {
   const [sqftTier, setSqftTier] = useState(value.sqftTier || '1500_2000');
   const [constructionType, setConstructionType] = useState(value.constructionType || 'light');
   const [extras, setExtras] = useState(value.extras || []);
@@ -37,7 +37,7 @@ export default function PostConstructionStep({ value, onBack, onNext, primaryCol
   const toggleExtra = id => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
   return (
-    <StepWrapper title="Post-construction cleanup details" subtitle="Get a quote for cleanup after renovation or new construction" onBack={onBack} onNext={() => onNext({ sqftTier, constructionType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
+    <StepWrapper title={country === 'GB' ? 'After builders clean details' : 'Post-construction cleanup details'} subtitle="Get a quote for cleanup after renovation or new construction" onBack={onBack} onNext={() => onNext({ sqftTier, constructionType, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
       <StepSection label="Home / unit size">
         <div className="calc-grid-size">
           {SQFT_OPTIONS.map(o => (

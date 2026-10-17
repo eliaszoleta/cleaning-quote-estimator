@@ -41,7 +41,7 @@ const EXTRAS = [
   { id: 'balcony_patio', label: 'Balcony / Patio' },
 ];
 
-export default function ApartmentStep({ value, onBack, onNext, primaryColor, companyConfig, isFinalStep, loading }) {
+export default function ApartmentStep({ value, onBack, onNext, primaryColor, companyConfig, country, isFinalStep, loading }) {
   // Only reflects a real, company-set discount (Services tab) -- off by
   // default, so a fresh account shows no "% off" tag on any frequency
   // until the company actually configures one.
@@ -56,8 +56,8 @@ export default function ApartmentStep({ value, onBack, onNext, primaryColor, com
   const toggleExtra = id => setExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
 
   return (
-    <StepWrapper title="Apartment details" subtitle="Get an accurate quote for your unit" onBack={onBack} onNext={() => onNext({ size, bathrooms, cleaningType, frequency, furnished, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
-      <StepSection label="Apartment size">
+    <StepWrapper title={country === 'GB' ? 'Flat details' : 'Apartment details'} subtitle="Get an accurate quote for your unit" onBack={onBack} onNext={() => onNext({ size, bathrooms, cleaningType, frequency, furnished, extras })} primaryColor={primaryColor} nextLabel={isFinalStep ? 'See Estimate' : undefined} loading={loading}>
+      <StepSection label={country === 'GB' ? 'Flat size' : 'Apartment size'}>
         <div className="calc-grid-size">
           {SIZES.map(o => (
             <StepOptionCard key={o.id} selected={size === o.id} onClick={() => setSize(o.id)} primaryColor={primaryColor}>

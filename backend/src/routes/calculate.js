@@ -379,6 +379,7 @@ router.post('/', async (req, res) => {
               adjustments: result.adjustments,
               keyFactors: result.keyFactors,
               serviceDetails: serviceDetails || {},
+              country: companyConfig.country,
             });
           })().catch(err => console.error('Company lead email failed:', err.message));
         } else {

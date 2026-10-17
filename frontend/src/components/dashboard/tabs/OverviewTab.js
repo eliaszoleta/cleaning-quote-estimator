@@ -245,7 +245,7 @@ export default function OverviewTab({ config, subStatus, user }) {
                     <div style={{ fontWeight: 600, fontSize: 14, color: '#0f172a' }}>{l.name || '(No name)'}</div>
                     <div style={{ fontSize: 12, color: '#94a3b8' }}>{l.email}</div>
                   </td>
-                  <td style={{ padding: '12px 14px', fontSize: 13, color: '#374151' }}>{serviceTypeLabel(l.service_type)}</td>
+                  <td style={{ padding: '12px 14px', fontSize: 13, color: '#374151' }}>{serviceTypeLabel(l.service_type, config?.country)}</td>
                   <td style={{ padding: '12px 14px', fontSize: 13, fontWeight: 600, color: '#16a34a' }}>
                     {l.estimated_price_low && l.estimated_price_high
                       ? formatPriceRange(l.estimated_price_low, l.estimated_price_high, l.service_type)

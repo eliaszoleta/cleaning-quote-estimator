@@ -53,6 +53,25 @@ const SERVICE_LABELS = {
 // full descriptive text -- this only swaps what goes in the subject line.
 const SUBJECT_SERVICE_LABELS = { ...SERVICE_LABELS, airbnb: 'Vacation Rental Cleaning' };
 
+// UK pilot (Oct 2026) -- real UK trade terminology, not a translation (see
+// the matching comment on frontend/src/utils/formatters.js's
+// serviceTypeLabel for the sourcing). country defaults undefined so every
+// existing call site (every one of them, pre-UK-pilot) renders
+// byte-identical to before this function existed.
+const UK_SERVICE_LABEL_OVERRIDES = {
+  apartment: 'Flat Cleaning',
+  mold_remediation: 'Mould Removal',
+  post_construction: 'After Builders Clean',
+};
+function getServiceLabel(serviceType, country) {
+  if (country === 'GB' && UK_SERVICE_LABEL_OVERRIDES[serviceType]) return UK_SERVICE_LABEL_OVERRIDES[serviceType];
+  return SERVICE_LABELS[serviceType] || serviceType;
+}
+function getSubjectServiceLabel(serviceType, country) {
+  if (country === 'GB' && UK_SERVICE_LABEL_OVERRIDES[serviceType]) return UK_SERVICE_LABEL_OVERRIDES[serviceType];
+  return SUBJECT_SERVICE_LABELS[serviceType] || serviceType;
+}
+
 // Natural-reading short names for the "we cover these services" sentence in
 // the legacy-trial win-back email (see sendLegacyTrialExpiredEmail below).
 // Derived from SERVICE_LABELS above -- the single source of truth for which
@@ -218,7 +237,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   } = result;
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
 
-  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const serviceLabel = getServiceLabel(serviceType, country);
   const brandName = companyConfig?.companyName || 'Clean Estimator';
   const firstName = (name || '').trim().split(' ')[0] || 'there';
 
@@ -293,7 +312,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   // see cleaningCalculation.js's own resolveCityForZip call.
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
 
-  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const serviceLabel = getServiceLabel(serviceType, country);
   const brandName = companyConfig?.companyName || 'Clean Estimator';
   const firstName = (name || '').trim().split(' ')[0] || 'there';
   // Same default ResultsScreen.js falls back to when a company hasn't set
@@ -406,8 +425,8 @@ async function sendEstimateEmail({ to, name, clientName, serviceType, result, co
         // names whose estimate this is, so a teammate scanning their inbox
         // doesn't have to open the email to find out.
         subject: clientName
-          ? `${SUBJECT_SERVICE_LABELS[serviceType] || 'Cleaning'} estimate for ${clientName}`
-          : `Your ${SUBJECT_SERVICE_LABELS[serviceType] || 'cleaning'} estimate is ready`,
+          ? `${getSubjectServiceLabel(serviceType, result.country) || 'Cleaning'} estimate for ${clientName}`
+          : `Your ${getSubjectServiceLabel(serviceType, result.country) || 'cleaning'} estimate is ready`,
         html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner }),
         text: buildText({ name, clientName, serviceType, result, companyConfig, partner }),
       },
@@ -656,9 +675,9 @@ function buildServiceDetailsHtml(serviceDetails) {
   </table>`;
 }
 
-function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country }) {
   const name = leadName || 'A visitor';
-  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const serviceLabel = getServiceLabel(serviceType, country);
   const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
 
   const lines = [
@@ -694,9 +713,9 @@ function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, pr
   return lines.join('\n');
 }
 
-function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails }) {
+function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country }) {
   const name = leadName || 'A visitor';
-  const serviceLabel = SERVICE_LABELS[serviceType] || serviceType;
+  const serviceLabel = getServiceLabel(serviceType, country);
   const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
 
   const contactRows = contactLines.map(l => {
@@ -750,7 +769,7 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
 // which goes to the visitor themselves). Reply-to is the lead's own email
 // so the company can just hit reply, same pattern as sendPartnerLeadEmail.
 // Fire-and-forget, called from calculate.js whenever companyId is present.
-async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, city, state, zip, timeline, adjustments, keyFactors, serviceDetails }) {
+async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, leadPhone, serviceType, priceLow, priceHigh, city, state, zip, timeline, adjustments, keyFactors, serviceDetails, country }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendCompanyLeadEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -762,7 +781,7 @@ async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, lead
   }
 
   const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
-  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments, keyFactors, serviceDetails };
+  const args = { companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments, keyFactors, serviceDetails, country };
 
   try {
     await axios.post(
@@ -771,7 +790,7 @@ async function sendCompanyLeadEmail({ to, companyName, leadName, leadEmail, lead
         from: `Clean Estimator <${fromAddress}>`,
         to: [to],
         reply_to: leadEmail || undefined,
-        subject: `New ${SUBJECT_SERVICE_LABELS[serviceType] || 'cleaning'} lead on your estimator — ${fmtSubjectTimestamp()}`,
+        subject: `New ${getSubjectServiceLabel(serviceType, country) || 'cleaning'} lead on your estimator — ${fmtSubjectTimestamp()}`,
         html: buildCompanyLeadHtml(args),
         text: buildCompanyLeadText(args),
       },
