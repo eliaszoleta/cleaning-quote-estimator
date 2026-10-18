@@ -172,7 +172,7 @@ export default function OverviewTab({ config, user }) {
       )}
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(190px, 1fr))', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(190px, 220px))', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
         {stats.map(({ label, value, Icon, color, bg }) => (
           <div key={label} style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm, padding: isMobile ? '14px 14px' : '18px 20px', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
             onMouseEnter={e => { e.currentTarget.style.boxShadow = SHADOWS.md; e.currentTarget.style.transform = 'translateY(-2px)'; }}
