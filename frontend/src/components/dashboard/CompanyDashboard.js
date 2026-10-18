@@ -295,16 +295,67 @@ export default function CompanyDashboard({ user, onLogout }) {
   // either direction. Reads off localConfig (not some separately-tracked
   // snapshot) so it always stashes the latest edits, however many service-
   // area changes happened since the last switch.
+  // Same stash-and-restore need as serviceStates/serviceCities above, but
+  // for each service's custom minimum-charge override (ServicesTab.js's
+  // "Min $/£/C$/A$" field) -- a raw currency number, not a percentage or a
+  // toggle. cleaningCalculation.js uses it exactly as stored whenever it's
+  // set (`cfg.minimumCharge || scaledMinCharge(...)`), with zero currency
+  // conversion, so carrying a "$100 minimum" over unchanged after a switch
+  // to GB silently turns it into a "£100 minimum" -- worse than the
+  // service-area bug, since nothing clears or visibly changes, the number
+  // just quietly means something different. markup (a multiplier) and
+  // enabled (which services the business even offers) are deliberately
+  // NOT stashed here -- neither is currency-denominated, so there's
+  // nothing wrong with them staying the same across countries.
+  // minimumChargeOneTime (commercial's one-off job minimum, read by
+  // calculateCommercialOneTime) has no field in ServicesTab.js's UI today
+  // -- included anyway so this stays correct if that ever changes, instead
+  // of silently missing the same bug the day it's exposed.
+  const extractMinCharges = (services) => {
+    const out = {};
+    Object.keys(services || {}).forEach(id => {
+      const svc = services[id] || {};
+      const entry = {};
+      if (svc.minimumCharge != null) entry.minimumCharge = svc.minimumCharge;
+      if (svc.minimumChargeOneTime != null) entry.minimumChargeOneTime = svc.minimumChargeOneTime;
+      if (Object.keys(entry).length) out[id] = entry;
+    });
+    return out;
+  };
+
   const handleCountryChange = useCallback((newCountry) => {
     const oldCountry = localConfig?.country || 'US';
     const statesByCountry = { ...(localConfig?.serviceStatesByCountry || {}), [oldCountry]: localConfig?.serviceStates || [] };
     const citiesByCountry = { ...(localConfig?.serviceCitiesByCountry || {}), [oldCountry]: localConfig?.serviceCities || {} };
+
+    const currentServices = localConfig?.services || {};
+    const minChargesByCountry = { ...(localConfig?.serviceMinimumChargesByCountry || {}), [oldCountry]: extractMinCharges(currentServices) };
+    const restoredMinCharges = minChargesByCountry[newCountry] || {};
+    // Only touches minimumCharge/minimumChargeOneTime -- enabled/markup/
+    // frequencyDiscounts on every service pass through untouched, restored
+    // or not (null clears back to the correctly-scaled per-country default
+    // the first time a country's selected, same as before this fix).
+    const nextServices = {};
+    Object.keys(currentServices).forEach(id => {
+      const svc = currentServices[id] || {};
+      const restored = restoredMinCharges[id] || {};
+      nextServices[id] = {
+        ...svc,
+        minimumCharge: restored.minimumCharge ?? null,
+        ...('minimumChargeOneTime' in svc || 'minimumChargeOneTime' in restored
+          ? { minimumChargeOneTime: restored.minimumChargeOneTime ?? null }
+          : {}),
+      };
+    });
+
     autoSave({
       country: newCountry,
       serviceStates: statesByCountry[newCountry] || [],
       serviceCities: citiesByCountry[newCountry] || {},
       serviceStatesByCountry: statesByCountry,
       serviceCitiesByCountry: citiesByCountry,
+      services: nextServices,
+      serviceMinimumChargesByCountry: minChargesByCountry,
     });
   }, [localConfig, autoSave]);
 

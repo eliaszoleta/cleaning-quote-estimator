@@ -145,6 +145,16 @@ const DEFAULT_COMPANY_CONFIG = {
   // currently active.
   serviceStatesByCountry: {},
   serviceCitiesByCountry: {},
+  // Same stash-and-restore pattern, for each service's custom minimum-
+  // charge override instead of service area -- { US: { homeResidential:
+  // { minimumCharge: 100 }, commercial: { minimumCharge: 200, minimumChargeOneTime: 500 } }, GB: {...} }.
+  // Unlike markup (a multiplier) or enabled, minimumCharge/
+  // minimumChargeOneTime are raw currency amounts that
+  // cleaningCalculation.js uses exactly as stored with no conversion, so
+  // without this they'd silently carry over as the wrong currency's
+  // number on a country switch instead of clearing (see
+  // CompanyDashboard.js's handleCountryChange for the full reasoning).
+  serviceMinimumChargesByCountry: {},
   customSteps: [],
   subscription: {
     status: 'trialing',
