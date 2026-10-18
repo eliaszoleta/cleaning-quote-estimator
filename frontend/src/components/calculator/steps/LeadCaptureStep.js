@@ -8,7 +8,18 @@ export default function LeadCaptureStep({ onBack, onNext, loading, primaryColor,
   const [phone, setPhone] = useState('');
   const [timeline, setTimeline] = useState('');
   const [preferredContact, setPreferredContact] = useState('email');
-  const [userType, setUserType] = useState('');
+  // companyConfig.companyId is only ever set when this is the real embedded
+  // widget pasted on a subscriber's own cleaning-business website (see
+  // EmbedWrapper.js and BrandingTab.js's Live Preview) -- never on the
+  // public cleanestimator.com calculator pages (ServiceCalculatorPage,
+  // EstimatorPage, CalculatorPage, PartnerDemoPage all render this with no
+  // companyConfig at all). A visitor filling out a form embedded on a
+  // cleaning company's own site is overwhelmingly a homeowner/customer
+  // shopping for that company's services, not another cleaning business --
+  // so default to that instead of making them click it. Still changeable;
+  // this only saves the click for the common case. The public calculator
+  // keeps no default, since either answer is equally plausible there.
+  const [userType, setUserType] = useState(companyConfig?.companyId ? 'homeowner' : '');
   const [customAnswers, setCustomAnswers] = useState({});
   const [touched, setTouched] = useState({});
 
