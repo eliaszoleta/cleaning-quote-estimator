@@ -545,7 +545,25 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           </div>
         )}
 
-        <div style={{ padding: embedded && !isWideEmbedded ? 0 : '0 16px 28px' }}>
+        {/* This 16px/28px side-and-bottom padding is breathing room from the
+            PAGE background -- right for the public homepage (no card of its
+            own around this) and for a genuinely narrow third-party embed
+            (which gets 0 here instead, handled below). But it's wrong
+            wherever a caller already supplies its own outer card (passes
+            cardRadius -- RunEstimateTab's Calculator Mode, BrandingTab's
+            Widget Mode preview, and the 4 embedded siteLanding landing
+            pages): that caller's wrapper already IS the breathing room
+            from the page, so adding this on top left a 16px gap of the
+            caller's own background between its rounded wrapper and this
+            card's own (now correctly radius-matched) edge -- a notch at
+            the top corners and a visible sliver down both full sides,
+            confirmed pixel-for-pixel against a live screenshot (the user's
+            report, repeated three times, always on the left/right, never
+            top/bottom -- this padding is literally `0 16px 28px`, zero on
+            top). The two previous fixes (contrast, then corner radius)
+            were each real and still correct, but neither was this: this
+            padding is the actual source of the gap itself. */}
+        <div style={{ padding: (embedded && !isWideEmbedded) || cardRadius != null ? 0 : '0 16px 28px' }}>
         {/* Calculator card. maxWidth only applies when NOT embedded (the
             main site/dashboard, where nothing else constrains how wide this
             could stretch on a big monitor) -- when embedded, the iframe's
