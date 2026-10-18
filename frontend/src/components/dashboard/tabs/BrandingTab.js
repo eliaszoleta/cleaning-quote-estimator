@@ -340,7 +340,7 @@ export default function BrandingTab({ config, update, autoSave, onSave, saving, 
           <div style={{ maxWidth: 960, margin: '0 auto' }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Live Preview</div>
             <div style={{ border: '1px solid #e2e8f0', borderRadius: 7, overflow: 'hidden', background: 'white' }}>
-              <CleaningCalculator companyConfig={previewConfig} embedded={true} />
+              <CleaningCalculator companyConfig={previewConfig} embedded={true} cardRadius={7} />
             </div>
           </div>
         </div>

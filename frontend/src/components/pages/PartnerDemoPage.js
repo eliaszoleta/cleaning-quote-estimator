@@ -90,7 +90,7 @@ export default function PartnerDemoPage() {
         </p>
 
         <div style={{ maxWidth: 620, margin: '0 auto', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <CleaningCalculator embedded siteLanding demoPartner={SAMPLE_PARTNER} />
+          <CleaningCalculator embedded siteLanding cardRadius={16} demoPartner={SAMPLE_PARTNER} />
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 44 }}>

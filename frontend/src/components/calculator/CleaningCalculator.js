@@ -89,8 +89,26 @@ function labelForStep(step) {
   return 'Details';
 }
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, cardRadius = null }) {
   const cardRef = useRef(null);
+  // embedded=true normally means "flush, no card look" (a real third-party
+  // host embed via EmbedWrapper.js, meant to blend into someone else's
+  // page), so both the card and its header default to square corners in
+  // that mode. But several of OUR OWN surfaces pass embedded=true purely
+  // for its other behaviors (instant results, simplified lead flow) while
+  // still wrapping the calculator in their own rounded, overflow:hidden
+  // card (Calculator Mode's RunEstimateTab.js, the Branding tab's widget
+  // preview, and the public CalculatorPage/EstimatorPage/
+  // ServiceCalculatorPage/PartnerDemoPage landing pages). Left at the old
+  // embedded-only default, this card's header kept square corners while
+  // its wrapper clipped to a rounded one -- the wrapper's rounded corner
+  // cut straight through the header's square corner, leaving a sliver of
+  // the wrapper's own background showing through as a small notch at each
+  // top corner (reported from Calculator Mode and Widget Mode, but not the
+  // real public homepage, which renders this component standalone with no
+  // such wrapper). cardRadius lets a caller that supplies its own rounded
+  // wrapper tell this component to match that exact radius instead.
+  const resolvedCardRadius = cardRadius != null ? cardRadius : (embedded ? 0 : 10);
   // Measures the card's own rendered width, not window.innerWidth -- this
   // renders both in a real <iframe width="100%"> embed (where window IS
   // the iframe's own narrow viewport, so innerWidth happened to work) and
@@ -544,7 +562,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           margin: embedded ? '0 auto' : (currentStep === 'service' ? `${isMobile ? -32 : -72}px auto 0` : '14px auto 0'),
           position: 'relative',
           background: COLORS.surface,
-          borderRadius: embedded ? 0 : 10,
+          borderRadius: resolvedCardRadius,
           boxShadow: embedded ? 'none' : SHADOWS.lg,
           overflow: 'hidden',
           border: embedded ? 'none' : `1px solid ${COLORS.border}`,
@@ -573,9 +591,14 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
               fill enough contrast against both the white card body and
               the shadow halo that the eye reads it as a clearly bounded
               bar terminating right at the border, with no change to the
-              actual layout. */}
+              actual layout. Separately (reported from Calculator Mode and
+              Widget Mode, not the public homepage): this corner radius
+              must track the card's own resolvedCardRadius, not a bare
+              `embedded ? 0 : 10` -- see the resolvedCardRadius comment
+              near the top of this component for why a caller-supplied
+              rounded wrapper needs this to match. */}
           {currentStep !== 'service' && currentStep !== 'results' && (
-            <div style={{ background: '#eef2f6', borderBottom: `1px solid ${COLORS.border}`, borderTopLeftRadius: embedded ? 0 : 10, borderTopRightRadius: embedded ? 0 : 10, padding: (embedded && !isWideEmbedded) || isMobile ? '16px 12px' : '16px 24px' }}>
+            <div style={{ background: '#eef2f6', borderBottom: `1px solid ${COLORS.border}`, borderTopLeftRadius: resolvedCardRadius, borderTopRightRadius: resolvedCardRadius, padding: (embedded && !isWideEmbedded) || isMobile ? '16px 12px' : '16px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 {steps.map((step, i) => (
                   <span key={step} style={{

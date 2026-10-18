@@ -107,7 +107,7 @@ export default function ServiceCalculatorPage({ slug }) {
 
       <div className="page-hero-content">
         <div style={showingResults ? undefined : { maxWidth: 720, margin: '-64px auto 0', position: 'relative', background: 'white', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <CleaningCalculator embedded siteLanding initialService={service.id} onShowResults={setShowingResults} />
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 16} initialService={service.id} onShowResults={setShowingResults} />
         </div>
 
         <div style={{ marginTop: 48 }}>

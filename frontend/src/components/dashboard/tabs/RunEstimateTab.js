@@ -49,6 +49,7 @@ export default function RunEstimateTab({ config, user }) {
         <CleaningCalculator
           companyConfig={companyConfig}
           embedded={true}
+          cardRadius={10}
           skipLeadCapture={true}
           instantResults={true}
           onShareEmail={handleShareEmail}
