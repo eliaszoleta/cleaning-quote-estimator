@@ -310,21 +310,26 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
 // A plain-text alternative alongside the HTML body (multipart/alternative)
 // -- sending HTML-only is itself a signal Gmail's classifier associates
 // with bulk/marketing mail, on top of the styling itself.
-function buildText({ name, clientName, serviceType, result, companyConfig, partner, companyId }) {
+function buildText({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget }) {
   const {
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], recurringAnnualSavings, currencySymbol = '$', country,
   } = result;
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
-  // Single-midpoint formatting is only for a paying subscriber's own
-  // estimate (their embedded widget, or RunEstimateTab's "Email to
-  // Coworker" share -- both always have a real companyId). The free public
-  // calculator (cleanestimator.com's own homepage/state/city pages, no
-  // companyId) keeps the original low–high range + separate "suggested
-  // price" line -- that's a DIFFERENT product with no subscriber behind
-  // it, and was never part of the "show the embeddable widget's estimate
-  // as one number" request.
-  const isPublic = !companyId;
+  // Single-midpoint formatting is ONLY for a real visitor on a company's
+  // actual embedded widget (pasted on the subscriber's own site) -- that's
+  // the one surface explicitly scoped to show just one number. Every other
+  // customer-estimate-email path keeps the original low–high range + a
+  // separate "suggested price" line, same as Calculator Mode's own
+  // on-screen breakdown:
+  //  - the free public calculator (cleanestimator.com's own homepage/
+  //    state/city pages) -- a different product, no subscriber behind it.
+  //  - RunEstimateTab's "Email to Coworker" share (estimateShare.js) --
+  //    even though it's a real subscriber's own account, this is an
+  //    internal pricing tool: the whole point is seeing the range so they
+  //    can decide whether to lean lower or higher, not a pre-decided
+  //    single number the way a stranger on the embed widget needs.
+  const isPublic = !isEmbedWidget;
   // The one number shown everywhere in a subscriber's email (headline +
   // breakdown total) -- the midpoint of the range, not the range itself.
   // Falls back to computing it here only if a caller somehow didn't
@@ -417,17 +422,17 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   return lines.join('\n');
 }
 
-function buildHtml({ name, clientName, serviceType, result, companyConfig, partner, companyId }) {
+function buildHtml({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget }) {
   const {
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], keyFactors = [],
     recurringAnnualSavings, currencySymbol = '$', country,
   } = result;
   // Same isPublic / single-midpoint-vs-range split as buildText above --
-  // only a paying subscriber's own estimate (real companyId) gets the
-  // single-midpoint style; the free public calculator keeps the original
-  // range.
-  const isPublic = !companyId;
+  // only a real visitor on a company's actual embedded widget gets the
+  // single-midpoint style; the public calculator AND RunEstimateTab's
+  // "Email to Coworker" share both keep the original range.
+  const isPublic = !isEmbedWidget;
   // Same mainTotal fallback as buildText above.
   const mainTotal = suggestedPrice != null ? suggestedPrice : Math.round((totalLow + totalHigh) / 2);
   // Same city-resolution ResultsScreen.js's eyebrow badge now shows --
@@ -519,7 +524,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 // Fire-and-forget from the caller's perspective: never throws, returns
 // false (and logs why) instead so a missing config or a delivery failure
 // never breaks the /api/calculate response.
-async function sendEstimateEmail({ to, name, clientName, serviceType, result, companyConfig, partner, replyTo, companyId }) {
+async function sendEstimateEmail({ to, name, clientName, serviceType, result, companyConfig, partner, replyTo, isEmbedWidget }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendEstimateEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -558,8 +563,8 @@ async function sendEstimateEmail({ to, name, clientName, serviceType, result, co
           : clientName
             ? `${getSubjectServiceLabel(serviceType, result.country) || 'Cleaning'} estimate for ${clientName}`
             : `Your ${getSubjectServiceLabel(serviceType, result.country) || 'cleaning'} estimate is ready`,
-        html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner, companyId }),
-        text: buildText({ name, clientName, serviceType, result, companyConfig, partner, companyId }),
+        html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget }),
+        text: buildText({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget }),
       },
       { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
     );

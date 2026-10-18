@@ -338,13 +338,16 @@ router.post('/', async (req, res) => {
         companyConfig,
         partner: partnerInfo || null,
         replyTo: leadNotificationEmail || undefined,
-        // Tells buildText/buildHtml whether this is a paying subscriber's
-        // own estimate (embedded widget, real companyId -- single-midpoint
-        // style) or the free public calculator (no companyId -- original
-        // low–high range style). Never assume a "the embeddable calculator
-        // should..." request also means the public homepage calculator --
-        // they're different products with different audiences.
-        companyId: companyId || null,
+        // Tells buildText/buildHtml whether this is a real visitor on a
+        // company's actual embedded widget (real companyId here always
+        // means that -- this route's lead-capture flow is never reached
+        // from RunEstimateTab's internal tool, which skips lead capture
+        // entirely) -- single-midpoint style -- or the free public
+        // calculator (no companyId) -- original low–high range style.
+        // Never assume a "the embeddable calculator should..." request
+        // also means the public homepage calculator -- they're different
+        // products with different audiences.
+        isEmbedWidget: !!companyId,
       }).catch(err => console.error('Estimate email failed:', err.message));
 
       // Forward the same lead to the matched partner, if any -- the

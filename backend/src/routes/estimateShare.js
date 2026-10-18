@@ -50,10 +50,14 @@ router.post('/', async (req, res) => {
       companyConfig,
       partner: null,
       replyTo: companyConfig.leadNotificationEmail || undefined,
-      // Always a real, authenticated subscriber here (companyId is
-      // req.user.id above) -- single-midpoint style, same as their own
-      // embedded widget.
-      companyId,
+      // Deliberately omitted (not the real embedded widget): this is
+      // RunEstimateTab's internal "Email to Coworker" share -- an account
+      // owner sending a number to their own teammate, not a stranger on
+      // their public-facing widget. It should read exactly like Calculator
+      // Mode's own on-screen breakdown (low–high range + a separate
+      // suggested-price line), since the whole point of this internal
+      // tool is letting them see the range and decide whether to lean
+      // lower or higher -- not a pre-decided single number.
     });
 
     if (!sent) return res.status(502).json({ success: false, error: 'Failed to send the email. Please try again in a moment.' });
