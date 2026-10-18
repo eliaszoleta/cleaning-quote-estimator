@@ -291,16 +291,18 @@ export default function SEOContent() {
               desktop, which is why it used to only kick in there), and a
               plain gray bordered box of justified body copy reads like
               boilerplate SEO filler rather than real page content. Dropping
-              the box/border and leading with a slightly larger, darker hook
-              sentence gives the block an actual visual entry point; the
-              highlight chips below echo the closing paragraph's three
-              points (no signup, 24/7, any device) as something scannable
-              instead of only buried in a sentence. None of the SEO copy
-              itself changed -- same three paragraphs, same links, same
-              service list and keywords, just restyled. */}
+              the box/border alone was enough of a visual improvement; all
+              four paragraphs share the same size/weight/color now -- an
+              earlier pass singled out the first one as a bolder, larger
+              hook, but that broke the uniform feel the rest of the page
+              already has. The highlight chips below echo the closing
+              paragraph's three points (no signup, 24/7, any device) as
+              something scannable instead of only buried in a sentence.
+              None of the SEO copy itself changed -- same three paragraphs,
+              same links, same service list and keywords, just restyled. */}
           <div className="ce-seo-intro" style={{ maxWidth: 680, margin: '0 auto' }}>
-            <p style={{ fontSize: 'clamp(15px, 3.6vw, 17px)', fontWeight: 600, color: '#1e293b', lineHeight: 1.6, margin: '0 0 14px' }}>
-              No phone calls, no waiting on a callback — just a real cleaning cost estimate online from a dedicated <a href="/cleaning-cost-estimator" style={{ color: '#2563eb', fontWeight: 700 }}>cleaning cost estimator</a>, built from actual state-by-state pricing data instead of a generic national average.
+            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.75, margin: '0 0 14px' }}>
+              No phone calls, no waiting on a callback — just a real cleaning cost estimate online from a dedicated <a href="/cleaning-cost-estimator" style={{ color: '#2563eb', fontWeight: 600 }}>cleaning cost estimator</a>, built from actual state-by-state pricing data instead of a generic national average.
             </p>
             <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.75, margin: '0 0 14px' }}>
               Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.
