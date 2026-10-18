@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles, KeyRound, Construction, Clock, Smartphone } from 'lucide-react';
+import { Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, Check, MapPin, Ruler, ListChecks, RefreshCw, PlusCircle, Sparkles, KeyRound, Construction } from 'lucide-react';
 import { getAllFaqs } from '../../data/faqs';
 import { getAllServices, typicalCost } from '../../data/services';
 import { getFeaturedStates } from '../../data/statePricing';
@@ -10,16 +10,6 @@ const FAQ = getAllFaqs();
 // hardcoded "12 services" claim goes stale the moment a 13th is added,
 // the same way an earlier "10 services" reference did.
 const SERVICE_COUNT = getAllServices().length;
-
-// Visual summary of the intro paragraphs below -- the same three points
-// ("no signup", "24/7", "works on mobile or desktop") already exist as
-// prose in the last paragraph for SEO, this just surfaces them as
-// scannable chips so the block isn't just a wall of justified text.
-const INTRO_HIGHLIGHTS = [
-  { Icon: Check, label: 'No signup required', color: '#059669' },
-  { Icon: Clock, label: 'Available 24/7', color: '#2563eb' },
-  { Icon: Smartphone, label: 'Works on any device', color: '#ea580c' },
-];
 
 const PRICE_FACTORS = [
   { Icon: Ruler, term: 'Home Size (Square Footage)', detail: 'Your base price scales with square footage — $90–$115 for a home under 1,000 sq ft, up to $272–$338 for a home over 3,000 sq ft.' },
@@ -283,41 +273,28 @@ export default function SEOContent() {
               risking an off-screen clip if the estimate is slightly off on
               an unusually narrow device; it just wraps to 2 lines there
               instead, same as before. */}
-          <h2 style={{ fontSize: 'clamp(14.5px, 4.4vw, 23px)', fontWeight: 700, color: '#0f172a', marginBottom: 16, letterSpacing: '-0.3px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(14.5px, 4.4vw, 23px)', fontWeight: 700, color: '#0f172a', marginBottom: 12, letterSpacing: '-0.3px', textAlign: 'center' }}>
             Get a FREE Cleaning Cost Estimate Online
           </h2>
-          {/* Left-aligned, not justified -- justify was producing uneven
-              "rivers" of whitespace in a column this width (most visible at
-              desktop, which is why it used to only kick in there), and a
-              plain gray bordered box of justified body copy reads like
-              boilerplate SEO filler rather than real page content. Dropping
-              the box/border and leading with a slightly larger, darker hook
-              sentence gives the block an actual visual entry point; the
-              highlight chips below echo the closing paragraph's three
-              points (no signup, 24/7, any device) as something scannable
-              instead of only buried in a sentence. None of the SEO copy
-              itself changed -- same three paragraphs, same links, same
-              service list and keywords, just restyled. */}
-          <div className="ce-seo-intro" style={{ maxWidth: 680, margin: '0 auto' }}>
-            <p style={{ fontSize: 'clamp(15px, 3.6vw, 17px)', fontWeight: 600, color: '#1e293b', lineHeight: 1.6, margin: '0 0 14px' }}>
-              No phone calls, no waiting on a callback — just a real cleaning cost estimate online from a dedicated <a href="/cleaning-cost-estimator" style={{ color: '#2563eb', fontWeight: 700 }}>cleaning cost estimator</a>, built from actual state-by-state pricing data instead of a generic national average.
+          {/* text-align:justify only kicks in at the desktop breakpoint below --
+              on a narrow phone column, justify stretches short lines into
+              uneven "rivers" of whitespace since there isn't enough width per
+              line to distribute the extra space smoothly. */}
+          <style>{`
+            @media (min-width: 768px) {
+              .ce-seo-intro p { text-align: justify; }
+            }
+          `}</style>
+          <div className="ce-seo-intro" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: 'clamp(18px, 4vw, 24px) clamp(18px, 4vw, 22px)' }}>
+            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
+              No phone calls, no waiting on a callback — just a real cleaning cost estimate online from a dedicated <a href="/cleaning-cost-estimator" style={{ color: '#2563eb', fontWeight: 600 }}>cleaning cost estimator</a>, built from actual state-by-state pricing data instead of a generic national average. Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.
             </p>
-            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.75, margin: '0 0 14px' }}>
-              Enter your ZIP code and a few details about the size and layout of the space, the specific type of cleaning requested, and the current condition or level of mess in the home or office. Every price factors in size, scope, and frequency — the same three factors that determine what a professional cleaning company would actually charge on-site.
-            </p>
-            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.75, margin: '0 0 14px' }}>
+            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto 14px' }}>
               It works the same way across all {SERVICE_COUNT} services — house cleaning, apartment cleaning, commercial cleaning, carpet cleaning, upholstery cleaning, air duct cleaning, dryer vent cleaning, tile &amp; grout cleaning, mold remediation, water damage restoration, Airbnb/vacation rental cleaning, and post-construction cleanup — each with its own scope questions, not a one-size-fits-all form.
             </p>
-            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.75, margin: 0 }}>
+            <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.7, margin: '0 auto' }}>
               It's available 24/7, works the same on mobile or desktop, and there's no signup required to see your cleaning cost estimate online — just your price range, instantly.
             </p>
-            <div style={{ display: 'flex', justifyContent: 'center', rowGap: 10, columnGap: 28, flexWrap: 'wrap', marginTop: 22, paddingTop: 20, borderTop: '1px solid #e2e8f0' }}>
-              {INTRO_HIGHLIGHTS.map(({ Icon, label, color }) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#475569', fontWeight: 500 }}>
-                  <Icon size={14} color={color} /> {label}
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 
