@@ -182,7 +182,7 @@ export default function OverviewTab({ config, subStatus, user }) {
             <div style={{ width: isMobile ? 32 : 38, height: isMobile ? 32 : 38, borderRadius: 7, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: isMobile ? 10 : 14 }}>
               <Icon size={isMobile ? 16 : 18} strokeWidth={2.1} />
             </div>
-            <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 800, letterSpacing: '-0.5px', lineHeight: 1, color: COLORS.ink, marginBottom: 8 }}>{value}</div>
+            <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, letterSpacing: '-0.3px', lineHeight: 1, color: '#1e293b', marginBottom: 8 }}>{value}</div>
             <div style={{ fontSize: 11.5, color: COLORS.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
           </div>
         ))}
