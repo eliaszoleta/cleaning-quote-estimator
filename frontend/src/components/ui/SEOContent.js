@@ -267,7 +267,7 @@ export default function SEOContent() {
       </Helmet>
 
       <div style={{ background: 'white' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(32px, 7vw, 56px) 20px 0' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto', padding: 'clamp(32px, 7vw, 56px) 20px 0' }}>
           {/* Pure vw-based floor (no nowrap) -- text width and viewport width
               both scale with vw, so the fit holds across phone sizes without
               risking an off-screen clip if the estimate is slightly off on
@@ -289,7 +289,7 @@ export default function SEOContent() {
               paragraphs only. None of the SEO copy itself changed -- same
               three paragraphs, same links, same service list and
               keywords, just restyled. */}
-          <div className="ce-seo-intro" style={{ maxWidth: 680, margin: '0 auto' }}>
+          <div className="ce-seo-intro">
             <p style={{ fontSize: 14.5, color: '#64748b', lineHeight: 1.75, margin: '0 0 14px' }}>
               No phone calls, no waiting on a callback — just a real cleaning cost estimate online from a dedicated <a href="/cleaning-cost-estimator" style={{ color: '#2563eb', fontWeight: 600 }}>cleaning cost estimator</a>, built from actual state-by-state pricing data instead of a generic national average.
             </p>
