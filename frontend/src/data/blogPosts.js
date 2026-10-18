@@ -9568,6 +9568,74 @@ For first-time or large one-time jobs, a deposit (20–50%) before scheduling is
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'how-to-scale-cleaning-business-multiple-locations-seasonal-turnovers',
+    title: 'How to Scale a Cleaning Business to Multiple Locations for Seasonal Turnovers',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-10-18',
+    readTime: '9 min',
+    excerpt: 'A large multi-property contract — student housing turnovers, a management company offering several locations at once — is one of the biggest growth opportunities a cleaning business can get, and one of the easiest to lose money on if the systems aren\'t in place first. Here\'s how to structure staffing, quality control, and finances before saying yes.',
+    content: `
+## Why Multi-Location Turnover Work Is a Different Problem Than Growing Locally
+
+Taking on a handful of new recurring clients in your own city is a scaling problem you already know how to solve — more crews, more schedule slots, same systems. A seasonal multi-location turnover contract (student housing move-out/move-in, a property management company handing you several buildings across different cities or states at once) is a different kind of problem entirely: a compressed 2–3 week window, a large number of units that all need to be done on roughly the same deadline, and locations you can't physically be at yourself. Getting this wrong doesn't just mean a bad week — it means missed move-in dates for tenants, a damaged relationship with whoever handed you the contract, and a real risk of losing money on a job that looked like a great opportunity on paper.
+
+## 1. Decide Your Staffing Model Before You Say Yes
+
+There are three real options, and they trade off differently:
+
+- **Hire temporary employees directly.** Gives you the most control over training and quality, but means running payroll, workers' comp, and tax withholding correctly in every state or county you operate in — for a workforce that may only work 2–3 weeks a year. The compliance overhead is real and easy to underestimate.
+- **Use independent contractors.** Lighter administratively, but worker classification rules vary by state and get real scrutiny if a contractor is effectively working like an employee (set hours, your equipment, your direct supervision) — worth a conversation with an accountant or employment attorney before you build a model around it.
+- **Partner with an established local cleaning company in each market.** For a project that only runs a few weeks a year, this is usually the most practical option: a local company already has trained staff, already handles its own payroll and insurance in that state, and already knows the market. You're paying more per job than running your own crew, but you're not building and tearing down a temporary workforce from scratch every season.
+
+For a short, seasonal, multi-location project specifically, leaning toward local partnerships over building an entirely new temporary workforce in each new market is usually the lower-risk path — you're trading margin for someone else's already-solved compliance and recruiting problem.
+
+## 2. Start Recruiting and Lining Up Partners Months, Not Weeks, Ahead
+
+Whichever staffing model you choose, the biggest avoidable mistake is starting the search the same month the turnover window opens. Reliable local cleaning companies and good contractors get booked up, especially around the same late-July/August window every student housing turnover in a region needs crews at once. Start outreach and get commitments locked in at least 2–3 months ahead of the work, not 2–3 weeks.
+
+## 3. Put a Dedicated On-Site Lead at Every Property
+
+You can't personally supervise multiple properties in different cities running at the same time, so each location needs someone whose job is specifically to run that site — checking units off against a standardized checklist, catching problems before they become a client complaint, and being the one point of contact if something goes wrong. Without a named lead at each property, quality control becomes "hope it goes well," which doesn't hold up once you're managing more units than you can see with your own eyes.
+
+## 4. Standardize the Process So Quality Doesn't Depend on Who's There
+
+A written, standardized checklist — the same one at every property, covering exactly what "done" means for a turnover unit — is what lets quality stay consistent when you (or any single supervisor) can't be everywhere. Pair it with photo documentation of each completed unit and, if you're working through a property management company or middleman, confirm upfront exactly what proof of completion they require — a clunky, slow-loading documentation system that eats hours per unit is a real, reported problem with some of these platforms, and it's much cheaper to know that before the first turnover day than to discover it mid-project.
+
+## 5. Line Up Backup Crews Before Day One, Not After Someone Doesn't Show
+
+On a fixed-deadline project, a no-show crew member isn't a minor inconvenience — it's a unit that doesn't get turned over on time. Identify backup staffing (an extra contractor on call, a second local company you could pull from) for each location before the turnover window opens, not as a scramble once you're already short-handed on-site.
+
+## 6. Watch the Financial Side Closely — It's Easy to Underestimate
+
+A multi-location project can look highly profitable on the headline number and still lose money in the details. Travel between properties, the cost of supervision/on-site leads, rework on units that don't pass inspection the first time, and paying a premium for last-minute backup labor when someone falls through all eat into margin — and they eat into it faster on a project working against a fixed, non-negotiable move-in deadline where you can't just push the schedule back a day. Build these costs into your quote from the start rather than treating them as an acceptable surprise.
+
+## 7. Confirm the Real Scope Before You Commit
+
+Before agreeing to anything, get specific answers: How many total units, across how many properties? Are they all turning over on the same dates, or staggered? Staggered turnovers across properties let the same crews move between locations over a longer window; everything hitting the same few days means you need enough simultaneous crews to cover every property at once. This single detail changes the entire staffing plan, so it has to be answered before you price the job, not after.
+
+## 8. Price for the Real Complexity, Not a Standard Clean
+
+A large, multi-unit, fixed-deadline turnover project carries genuinely more risk and coordination cost than a standard one-off residential clean, and the price should reflect that — not just the per-unit cleaning cost, but the supervision, travel, and contingency staffing this guide covers. [Clean Estimator](/estimator) prices apartment and turnover-style cleaning consistently across every team member and every location, so whether it's your own crew lead or a local partner company's team completing a unit, the quote they're working from is the same formula every time — no inconsistent numbers between properties for a client (or a management company comparing invoices across buildings) to notice.
+
+## FAQ
+
+**Should I hire employees or use subcontractors for a multi-location cleaning project?**
+For a short seasonal project (a few weeks a year), partnering with established local cleaning companies or using independent contractors is usually more practical than hiring and training a temporary employee workforce from scratch in each new market — it shifts payroll, insurance, and multi-state compliance onto a business that's already set up for it.
+
+**How do I find reliable cleaning subcontractors or partner companies in a new city?**
+Start with local cleaning business associations, referrals from other property managers or cleaning business owners in that market, and direct outreach to established companies with good reviews — and start that search several months before the work begins, not weeks before.
+
+**How do I maintain quality control across properties I can't personally visit?**
+A standardized checklist used at every location, a dedicated on-site lead per property, and required photo documentation of completed units are the three things that let quality stay consistent without your own physical presence at every site.
+
+**How much lead time do I need before a large multi-property turnover contract?**
+Two to three months is a reasonable minimum for recruiting staff or lining up local partners, confirming the full scope (unit count, dates, documentation requirements), and building backup staffing into the plan — starting the week the window opens is the most common way this kind of project goes wrong.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
