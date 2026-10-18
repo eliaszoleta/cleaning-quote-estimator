@@ -135,6 +135,34 @@ export default function CompanyDashboard({ user, onLogout }) {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
+  // A second, wider breakpoint for the same header -- 1366x768 (the single
+  // most common laptop resolution) and plenty of other everyday laptop/
+  // half-maximized-window widths sit ABOVE the 768px isMobile cutoff but
+  // still aren't wide enough for the full row (logo + mode switch +
+  // country + Schedule a Walkthrough + badge + Save + divider + email +
+  // Sign Out): measured in a real browser (header's rendered scrollWidth,
+  // Poppins, this exact copy including a representative email address),
+  // that combination needs ~1332px, so anything between 769px and ~1366px
+  // fell back to the "desktop has room to spare" assumption and silently
+  // pushed the whole page into horizontal scroll instead of just the
+  // header -- exactly what showed up at the recorded 1366x768 window.
+  // isCompact drops the same secondary/promotional pieces isMobile
+  // already drops (Schedule a Walkthrough, the divider, the email) at a
+  // wider 1450px cutoff -- comfortably past 1366px, with headroom for a
+  // longer email address or a browser's own chrome/scrollbar -- while
+  // leaving everything isMobile shrinks to icon-only/abbreviated (Save,
+  // Sign Out, country, mode-switch labels) untouched here: those stay
+  // full-size since removing the three biggest items (measured at ~970px
+  // for what's left) already buys back more than enough room for them.
+  const compactQuery = () => window.matchMedia('(max-width: 1450px)');
+  const [isCompact, setIsCompact] = useState(() => compactQuery().matches);
+  useEffect(() => {
+    const mq = compactQuery();
+    const onChange = () => setIsCompact(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
   const [activeTab, setActiveTab] = useState('overview');
   // Top-level switch, independent of the tab sidebar: 'widget' is today's
   // full dashboard (sidebar + tabs), 'calculator' hides all of that and
@@ -468,16 +496,20 @@ export default function CompanyDashboard({ user, onLogout }) {
             with no way to reach it at all. overflow-x:auto here means that
             can now be reached with a swipe instead of vanishing; shrinking
             the country select to flag-only on mobile (below) means it
-            usually doesn't even need to. Desktop is unaffected -- at
-            >768px this row has more space than its content needs, so
-            justify-content:space-between still spreads the three groups
-            exactly as before and nothing ever actually scrolls. */}
+            usually doesn't even need to. isCompact (below) removes enough
+            content that most everyday desktop widths fit without ever
+            needing to scroll, but overflow-x stays 'auto' unconditionally
+            (not just under isMobile) as a fallback for whatever's left
+            between 1450px and 768px, a long email address, browser zoom,
+            or a half-maximized window -- so if content ever does exceed
+            the available width, only this row scrolls, not the whole
+            page. */}
         <div
           className="ce-dash-header-scroll"
           style={{
             display: 'flex', alignItems: 'center', flex: 1, minWidth: 0,
-            gap: isMobile ? 10 : 0, justifyContent: isMobile ? 'flex-start' : 'space-between',
-            overflowX: isMobile ? 'auto' : 'visible', scrollbarWidth: 'none', msOverflowStyle: 'none',
+            gap: isMobile ? 10 : 12, justifyContent: isMobile ? 'flex-start' : 'space-between',
+            overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none',
           }}
         >
           <style>{`.ce-dash-header-scroll::-webkit-scrollbar { display: none; }`}</style>
@@ -557,12 +589,18 @@ export default function CompanyDashboard({ user, onLogout }) {
             />
           </div>
 
-          {/* Right: badge, save, user -- Schedule a Walkthrough, the Saved
-              confirmation, the divider, and the email address all drop on
-              mobile (promotional/secondary, not needed to use the
-              dashboard); Save and Sign Out shrink to icon-only buttons. */}
+          {/* Right: badge, save, user -- Schedule a Walkthrough, the divider,
+              and the email address all drop under isCompact already (1450px,
+              see its own comment above), well before isMobile's narrower
+              768px -- they're the biggest, least essential items (promotional/
+              secondary, not needed to use the dashboard) so dropping them
+              first is what buys back enough width for everything else to
+              keep showing full labels at ordinary laptop sizes. The Saved
+              confirmation stays isMobile-gated (it's short-lived and only
+              shown right after a click); Save and Sign Out shrink to
+              icon-only buttons, also only under isMobile. */}
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 10, flexShrink: 0 }}>
-          {!isMobile && (
+          {!isCompact && (
             <a
               href={WALKTHROUGH_URL}
               target="_blank"
@@ -620,9 +658,9 @@ export default function CompanyDashboard({ user, onLogout }) {
             </div>
           )}
 
-          {!isMobile && <div style={{ width: 1, height: 20, background: '#1e293b', margin: '0 2px' }} />}
+          {!isCompact && <div style={{ width: 1, height: 20, background: '#1e293b', margin: '0 2px' }} />}
 
-          {!isMobile && <span style={{ color: '#64748b', fontSize: 12 }}>{user.email}</span>}
+          {!isCompact && <span style={{ color: '#64748b', fontSize: 12 }}>{user.email}</span>}
 
           <button
             onClick={onLogout}

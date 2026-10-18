@@ -145,6 +145,14 @@ body {
   background: var(--bg);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  /* Safety net, not a fix for any specific element: if something somewhere
+     ever overflows its container width (a too-wide header row, a table
+     that doesn't wrap, a fixed-width element at a narrow viewport), this
+     keeps that confined to its own scrollable element instead of pushing
+     the whole page into horizontal scroll. Elements with their own
+     overflow-x:auto (e.g. the dashboard header row, data tables) are
+     unaffected -- they still scroll internally exactly as before. */
+  overflow-x: hidden;
 }
 
 a { color: var(--primary); text-decoration: none; }
