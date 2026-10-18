@@ -549,6 +549,72 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 </div>`;
 }
 
+// Carpet cleaning and mold remediation estimate emails from the public
+// homepage calculator were reported landing in Gmail's Promotions tab,
+// unlike every other service. The template itself is identical across all
+// 12 services (see sendEstimateEmail below) -- nothing structural singles
+// these two out -- so the most likely cause is the subject line itself:
+// "carpet cleaning" and "mold remediation" are two of the most heavily
+// spammed home-service lead-gen categories (Angi/HomeAdvisor/Thumbtack-
+// style "Your carpet cleaning quote is ready!" blasts go out at huge
+// volume), which plausibly trained Gmail's classifier to associate that
+// near-exact phrase pattern with Promotions more strongly than less-
+// commonly-spammed categories like "house cleaning" or "tile & grout."
+// Can't verify Gmail's actual model, so this leans on two concrete,
+// defensible levers instead of guessing at word choice:
+//   1. A real computed price in the subject ("$158-$198") is something a
+//      templated bulk "quote is ready" blast never has -- those exist
+//      specifically because the price ISN'T known yet. Showing the actual
+//      number is a genuine point of difference from the spam pattern this
+//      is plausibly being confused with, not just different wording for
+//      its own sake.
+//   2. Personalizing with the visitor's own first name, when they gave
+//      one (the lead-capture field is optional) -- the same lever that
+//      already moved sendWebsiteRequestReceivedEmail from Promotions to
+//      Primary (see the file-level comment at the top of this file).
+// Scoped to these two services only, matching what was actually reported;
+// every other service keeps its existing subject unchanged below.
+const PRICE_IN_SUBJECT_SERVICES = new Set(['carpet', 'mold_remediation']);
+
+function buildEstimateSubject({ name, clientName, serviceType, result, isEmbedWidget }) {
+  const label = getSubjectServiceLabel(serviceType, result.country) || 'cleaning';
+  const firstName = (clientName || name || '').trim().split(/\s+/)[0] || '';
+
+  // UK flat cleaning (apartment service, GB country) is rephrased on
+  // request to "Your flat cleaning estimate is ready, <name>" instead of
+  // the general "<Service> estimate for <name>" pattern -- scoped to this
+  // one service+country combo only; every other service/country keeps the
+  // phrasing below.
+  if (serviceType === 'apartment' && result.country === 'GB') {
+    return `Your ${label} estimate is ready${firstName ? `, ${firstName}` : ''}`;
+  }
+  // clientName (only ever set on the "Email to Coworker" share path -- see
+  // estimateShare.js) replaces the generic subject with one that names
+  // whose estimate this is, so a teammate scanning their inbox doesn't
+  // have to open the email to find out.
+  if (clientName) {
+    return `${label} estimate for ${clientName}`;
+  }
+  if (PRICE_IN_SUBJECT_SERVICES.has(serviceType)) {
+    // Mirrors exactly what the body actually shows: the public calculator
+    // (and this is only ever reached when isEmbedWidget is false for the
+    // services in question, but kept general in case that changes) shows
+    // the low-high range; a real embedded-widget visitor sees a single
+    // midpoint number instead -- same split buildHtml/buildText use.
+    const { totalLow, totalHigh, suggestedPrice, currencySymbol = '$' } = result;
+    const priceText = !isEmbedWidget
+      ? (totalLow != null && totalHigh != null ? `${fmtMoney(totalLow, currencySymbol)}–${fmtMoney(totalHigh, currencySymbol)}` : null)
+      : (() => {
+          const mainTotal = suggestedPrice != null ? suggestedPrice : (totalLow != null && totalHigh != null ? Math.round((totalLow + totalHigh) / 2) : null);
+          return mainTotal != null ? fmtMoney(mainTotal, currencySymbol) : null;
+        })();
+    if (priceText) {
+      return `${firstName ? `${firstName}, your` : 'Your'} ${label} estimate: ${priceText}`;
+    }
+  }
+  return `Your ${label} estimate is ready${firstName ? `, ${firstName}` : ''}`;
+}
+
 // Fire-and-forget from the caller's perspective: never throws, returns
 // false (and logs why) instead so a missing config or a delivery failure
 // never breaks the /api/calculate response.
@@ -576,21 +642,7 @@ async function sendEstimateEmail({ to, name, clientName, serviceType, result, co
         // spoofed), but reply_to lets "Reply" in the visitor's mail client
         // route straight to the business anyway.
         reply_to: replyTo || undefined,
-        // clientName (only ever set on the "Email to Coworker" share path --
-        // see estimateShare.js) replaces the generic subject with one that
-        // names whose estimate this is, so a teammate scanning their inbox
-        // doesn't have to open the email to find out.
-        //
-        // UK flat cleaning (apartment service, GB country) is rephrased on
-        // request to "Your flat cleaning estimate is ready, <name>" instead
-        // of the general "<Service> estimate for <name>" pattern -- scoped
-        // to this one service+country combo only; every other
-        // service/country keeps the existing phrasing below.
-        subject: (serviceType === 'apartment' && result.country === 'GB')
-          ? `Your ${getSubjectServiceLabel(serviceType, result.country) || 'flat cleaning'} estimate is ready${clientName ? `, ${clientName}` : ''}`
-          : clientName
-            ? `${getSubjectServiceLabel(serviceType, result.country) || 'Cleaning'} estimate for ${clientName}`
-            : `Your ${getSubjectServiceLabel(serviceType, result.country) || 'cleaning'} estimate is ready`,
+        subject: buildEstimateSubject({ name, clientName, serviceType, result, isEmbedWidget }),
         html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget, userType }),
         text: buildText({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget, userType }),
       },
