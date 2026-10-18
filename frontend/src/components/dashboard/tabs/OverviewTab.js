@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
+import { UserPlus, CalendarDays, DollarSign, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
+import CountryFlag from '../CountryFlag';
 import { getCompanyLeads, getCompanyEstimateRuns } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime, currencySymbolForCountry } from '../../../utils/formatters';
@@ -85,7 +86,11 @@ export default function OverviewTab({ config, user }) {
     { label: 'Total Leads',    value: leads.length,                                              Icon: UserPlus,    color: '#1d4ed8', bg: '#eff6ff' },
     { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a', bg: '#f0fdf4' },
     { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate, currencySymbol) : '—',         Icon: DollarSign,  color: '#d97706', bg: '#fffbeb' },
-    { label: 'Account Country', value: COUNTRY_NAMES[config?.country] || 'United States',          Icon: Globe,       color: '#0891b2', bg: '#ecfeff' },
+    // The real country flag (same artwork as the header's switcher), not a
+    // generic globe icon -- a flag reads as the country itself at a glance,
+    // which a globe never could since it's the same icon regardless of
+    // which country's actually selected.
+    { label: 'Account Country', value: COUNTRY_NAMES[config?.country] || 'United States',          Icon: (props) => <CountryFlag country={config?.country} size={props.size} />, color: '#0891b2', bg: '#ecfeff' },
   ];
 
   // Setup checklist -- shown until every required step is done, then
