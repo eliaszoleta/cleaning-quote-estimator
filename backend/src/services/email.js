@@ -384,6 +384,10 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
     if (suggestedPrice != null && !isHomeowner) {
       lines.push(`  Suggested price (midpoint of the range above): ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
+      // Shown to the same audience as ResultsScreen.js's matching note --
+      // the estimator can't see the actual space, so it hands that
+      // judgment back to whoever can.
+      lines.push('  (Lean higher or lower than this based on the actual level of cleaning the job needs.)');
     }
   } else {
     // Every line below (and the total) is a single midpoint figure, not a
@@ -516,6 +520,9 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
       <tr style="background:${primaryColor}0d;">
         <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Suggested price <span style="font-weight:400;opacity:0.75;">(midpoint of the range above)</span></td>
         <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
+      </tr>
+      <tr style="background:${primaryColor}0d;">
+        <td colspan="2" style="padding:0 12px 10px;font-size:11px;color:#888888;line-height:1.4;">Lean higher or lower than this based on the actual level of cleaning the job needs.</td>
       </tr>` : ''}
     </table>
   </div>

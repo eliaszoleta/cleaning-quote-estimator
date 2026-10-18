@@ -221,13 +221,22 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                       anchor on" rather than implying the tool knows more
                       about this specific job than the range already shows. */}
                   {suggestedPrice != null && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '11px 12px', background: `${primaryColor}0d`, borderTop: `1px solid ${primaryColor}28` }}>
-                      <span style={{ fontSize: 12.5, color: COLORS.body, fontWeight: 600 }}>
-                        Suggested price <span style={{ fontWeight: 400, opacity: 0.75 }}>(midpoint of the range above)</span>
-                      </span>
-                      <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: primaryColor }}>
-                        {formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}
-                      </span>
+                    <div style={{ padding: '11px 12px', background: `${primaryColor}0d`, borderTop: `1px solid ${primaryColor}28` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontSize: 12.5, color: COLORS.body, fontWeight: 600 }}>
+                          Suggested price <span style={{ fontWeight: 400, opacity: 0.75 }}>(midpoint of the range above)</span>
+                        </span>
+                        <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: primaryColor }}>
+                          {formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}
+                        </span>
+                      </div>
+                      {/* The estimator can't see the actual space, so it can't
+                          know whether this job needs more or less effort than
+                          a typical one -- this line hands that judgment back
+                          to the person who can see it. */}
+                      <p style={{ margin: '6px 0 0', fontSize: 11.5, color: COLORS.muted, lineHeight: 1.4 }}>
+                        Lean higher or lower than this based on the actual level of cleaning the job needs.
+                      </p>
                     </div>
                   )}
                   {/* Plain flag, not a computed line item -- see
