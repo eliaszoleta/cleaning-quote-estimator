@@ -128,6 +128,46 @@ function getClientIp(req) {
   return req.ip || req.socket?.remoteAddress || null;
 }
 
+// Backstop for tryRecordPublicEstimateAttempt below -- this limit is
+// explicitly a "must never silently stop working" requirement (it protects
+// the paid Internal Estimator plan from being replaced by the free public
+// tool), so the DB-backed check failing open on ANY error -- missing
+// Supabase config, a migration that was never run, a transient network
+// blip, anything -- is not an acceptable failure mode; it previously meant
+// a real production incident (the limit silently stopped applying at all)
+// surfaced only as a console.warn nobody was watching. This in-process Map
+// is the fallback enforcement for exactly that gap: it doesn't survive a
+// restart and doesn't synchronize across multiple server instances the way
+// the DB check does, but on this app's actual single-instance Railway
+// deployment it's a real, continuously-enforced cap, not just a log line.
+// Used only when the DB-backed check can't be reached at all -- when it's
+// reachable, it stays the primary (and more accurate/synchronized) source
+// of truth.
+const fallbackPublicAttempts = new Map(); // ip -> { day: 'YYYY-MM-DD', count }
+
+function fallbackCheckAndRecord(ip) {
+  if (!ip) return true; // no identifier to check -- never block
+  const today = new Date().toISOString().slice(0, 10);
+  const entry = fallbackPublicAttempts.get(ip);
+  if (!entry || entry.day !== today) {
+    fallbackPublicAttempts.set(ip, { day: today, count: 1 });
+    return true;
+  }
+  if (entry.count >= PUBLIC_DAILY_LIMIT) return false;
+  entry.count += 1;
+  return true;
+}
+
+// Sweeps stale entries once an hour so this Map doesn't grow unbounded
+// across days -- .unref() so this timer never keeps the process alive on
+// its own (matters for graceful shutdown / test runs importing this file).
+setInterval(() => {
+  const today = new Date().toISOString().slice(0, 10);
+  for (const [ip, entry] of fallbackPublicAttempts) {
+    if (entry.day !== today) fallbackPublicAttempts.delete(ip);
+  }
+}, 60 * 60 * 1000).unref();
+
 // Was two separate round trips -- a SELECT count to check the limit, then
 // (after the whole calculation ran) a plain INSERT to record the attempt --
 // with nothing synchronizing them. Two requests from the same visitor
@@ -142,7 +182,11 @@ function getClientIp(req) {
 // already hit.
 async function tryRecordPublicEstimateAttempt(ip) {
   const supabase = getSupabase();
-  if (!supabase || !ip) return true; // no DB configured (local dev), or no identifier to check -- never block
+  // No DB configured at all (local dev, or a genuine misconfiguration in
+  // production) -- previously always allowed; now still enforces the cap
+  // via the in-process fallback instead of leaving this completely open.
+  if (!supabase) return fallbackCheckAndRecord(ip);
+  if (!ip) return true; // no identifier to check -- never block
   try {
     const { data, error } = await supabase.rpc('record_public_estimate_attempt', { p_ip: ip, p_limit: PUBLIC_DAILY_LIMIT });
     // supabase-js doesn't throw on an API-level error (bad key, function
@@ -150,11 +194,14 @@ async function tryRecordPublicEstimateAttempt(ip) {
     // so this has to be checked explicitly or a real misconfiguration
     // would silently read as "always allowed" forever instead of ever
     // surfacing in the logs.
-    if (error) { console.warn('tryRecordPublicEstimateAttempt failed:', error.message); return true; }
+    if (error) {
+      console.warn('tryRecordPublicEstimateAttempt failed, using in-process fallback limiter:', error.message);
+      return fallbackCheckAndRecord(ip);
+    }
     return data !== false;
   } catch (err) {
-    console.warn('tryRecordPublicEstimateAttempt failed:', err.message);
-    return true; // fail open -- a DB hiccup shouldn't block a real visitor
+    console.warn('tryRecordPublicEstimateAttempt failed, using in-process fallback limiter:', err.message);
+    return fallbackCheckAndRecord(ip);
   }
 }
 
