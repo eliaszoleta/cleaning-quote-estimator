@@ -348,6 +348,15 @@ router.post('/', async (req, res) => {
         // also means the public homepage calculator -- they're different
         // products with different audiences.
         isEmbedWidget: !!companyId,
+        // Only meaningful on the public path (isEmbedWidget false) --
+        // LeadCaptureStep.js's required "I am a..." question. A homeowner
+        // just wants to know what it'll cost them, so the separate
+        // "Suggested price (midpoint...)" line is dropped for them (the
+        // range + full breakdown stays -- just not that one extra line);
+        // a self-identified cleaning business still gets it, since they're
+        // actually pricing their own jobs and the range alone doesn't tell
+        // them where to land.
+        userType: leadInfo.userType || null,
       }).catch(err => console.error('Estimate email failed:', err.message));
 
       // Forward the same lead to the matched partner, if any -- the

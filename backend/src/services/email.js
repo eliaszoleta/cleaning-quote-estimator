@@ -310,7 +310,7 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
 // A plain-text alternative alongside the HTML body (multipart/alternative)
 // -- sending HTML-only is itself a signal Gmail's classifier associates
 // with bulk/marketing mail, on top of the styling itself.
-function buildText({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget }) {
+function buildText({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget, userType }) {
   const {
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], recurringAnnualSavings, currencySymbol = '$', country,
@@ -330,6 +330,14 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   //    can decide whether to lean lower or higher, not a pre-decided
   //    single number the way a stranger on the embed widget needs.
   const isPublic = !isEmbedWidget;
+  // Only meaningful on the public path -- LeadCaptureStep.js's required
+  // "I am a..." question. A homeowner just wants the number it'll cost
+  // them, so the separate "Suggested price (midpoint...)" line below is
+  // dropped for them -- the range breakdown and range total stay exactly
+  // as-is, this only removes that one extra line. A self-identified
+  // cleaning business keeps it, since they're actually pricing jobs and
+  // need somewhere to land, not just a range.
+  const isHomeowner = isPublic && userType === 'homeowner';
   // The one number shown everywhere in a subscriber's email (headline +
   // breakdown total) -- the midpoint of the range, not the range itself.
   // Falls back to computing it here only if a caller somehow didn't
@@ -374,7 +382,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
       lines.push(`  ${a.label}: ${fmtAdjustment(a, currencySymbol)}`);
     });
     lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
-    if (suggestedPrice != null) {
+    if (suggestedPrice != null && !isHomeowner) {
       lines.push(`  Suggested price (midpoint of the range above): ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
     }
   } else {
@@ -422,7 +430,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   return lines.join('\n');
 }
 
-function buildHtml({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget }) {
+function buildHtml({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget, userType }) {
   const {
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], keyFactors = [],
@@ -433,6 +441,9 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   // single-midpoint style; the public calculator AND RunEstimateTab's
   // "Email to Coworker" share both keep the original range.
   const isPublic = !isEmbedWidget;
+  // Same homeowner/business split as buildText above -- homeowner keeps
+  // the full range breakdown, just without the extra "Suggested price" row.
+  const isHomeowner = isPublic && userType === 'homeowner';
   // Same mainTotal fallback as buildText above.
   const mainTotal = suggestedPrice != null ? suggestedPrice : Math.round((totalLow + totalHigh) / 2);
   // Same city-resolution ResultsScreen.js's eyebrow badge now shows --
@@ -501,7 +512,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
         <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
         <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : `${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`}</td>
       </tr>
-      ${isPublic && suggestedPrice != null ? `
+      ${isPublic && suggestedPrice != null && !isHomeowner ? `
       <tr style="background:${primaryColor}0d;">
         <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Suggested price <span style="font-weight:400;opacity:0.75;">(midpoint of the range above)</span></td>
         <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
@@ -524,7 +535,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 // Fire-and-forget from the caller's perspective: never throws, returns
 // false (and logs why) instead so a missing config or a delivery failure
 // never breaks the /api/calculate response.
-async function sendEstimateEmail({ to, name, clientName, serviceType, result, companyConfig, partner, replyTo, isEmbedWidget }) {
+async function sendEstimateEmail({ to, name, clientName, serviceType, result, companyConfig, partner, replyTo, isEmbedWidget, userType }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendEstimateEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -563,8 +574,8 @@ async function sendEstimateEmail({ to, name, clientName, serviceType, result, co
           : clientName
             ? `${getSubjectServiceLabel(serviceType, result.country) || 'Cleaning'} estimate for ${clientName}`
             : `Your ${getSubjectServiceLabel(serviceType, result.country) || 'cleaning'} estimate is ready`,
-        html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget }),
-        text: buildText({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget }),
+        html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget, userType }),
+        text: buildText({ name, clientName, serviceType, result, companyConfig, partner, isEmbedWidget, userType }),
       },
       { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
     );
