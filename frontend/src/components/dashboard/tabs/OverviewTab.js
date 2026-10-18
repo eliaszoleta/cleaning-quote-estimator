@@ -5,7 +5,7 @@ import { supabase } from '../../../lib/supabase';
 import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime, currencySymbolForCountry } from '../../../utils/formatters';
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
 
-export default function OverviewTab({ config, subStatus, user }) {
+export default function OverviewTab({ config, user }) {
   // Lead rows never stored a currencySymbol of their own -- derived from
   // the viewing company's own country setting instead (see
   // currencySymbolForCountry's own comment).
@@ -80,7 +80,6 @@ export default function OverviewTab({ config, subStatus, user }) {
     { label: 'Total Leads',    value: leads.length },
     { label: 'This Month',     value: thisMonth.length },
     { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate, currencySymbol) : '—' },
-    { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—' },
   ];
 
   // Setup checklist -- shown until every required step is done, then
