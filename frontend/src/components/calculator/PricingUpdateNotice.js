@@ -20,7 +20,7 @@ import { COLORS, RADIUS } from '../../styles/theme';
 const STORAGE_KEY = 'cc-pricing-update-notice-dismissed-2026-10';
 const EXPIRES_AT = new Date('2026-12-15T00:00:00Z').getTime();
 
-export default function PricingUpdateNotice({ country = 'US' }) {
+export default function PricingUpdateNotice({ country = 'US', onVisibleChange }) {
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
@@ -31,8 +31,25 @@ export default function PricingUpdateNotice({ country = 'US' }) {
     setDismissed(false);
   }, []);
 
-  if (country !== 'US') return null;
-  if (dismissed) return null;
+  const visible = country === 'US' && !dismissed;
+
+  // Lets a caller that wraps this in its own spacing (CalculatorPage.js,
+  // EstimatorPage.js -- both put it in a `padding: 16px 16px 0` div to
+  // give it breathing room off the card's rounded top corner) collapse
+  // that wrapper to 0 padding instead of leaving a dead ~16px gap between
+  // the card's top edge and whatever comes next (the step header) when
+  // this component has nothing to show -- already dismissed in a past
+  // session (the common case once this notice has been up a while), past
+  // its EXPIRES_AT, or a non-US company. Fires on mount with the real
+  // answer (not just whenever it happens to render true) and again the
+  // instant the visitor clicks dismiss, so the wrapper collapses live
+  // rather than only on the next page load.
+  useEffect(() => {
+    onVisibleChange?.(visible);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- onVisibleChange is a setState function from the caller; including it would only matter if its identity changed across renders, which would itself be a bug in the caller
+  }, [visible]);
+
+  if (!visible) return null;
 
   const dismiss = () => {
     setDismissed(true);
