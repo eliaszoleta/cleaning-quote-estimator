@@ -234,7 +234,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                           know whether this job needs more or less effort than
                           a typical one -- this line hands that judgment back
                           to the person who can see it. */}
-                      <p style={{ margin: '6px 0 0', fontSize: 12.5, fontWeight: 600, color: COLORS.body, lineHeight: 1.4 }}>
+                      <p style={{ margin: '6px 0 0', fontSize: 12.5, fontWeight: 400, color: primaryColor, lineHeight: 1.4 }}>
                         Treat this as a guide, not a fixed number — lean up or down based on the job in front of you.
                       </p>
                     </div>
