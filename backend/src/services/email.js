@@ -399,6 +399,12 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
       lines.push(`  ${a.label}: ${fmtAdjustmentMid(a, currencySymbol)}`);
     });
     lines.push(`  Estimated total: ${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
+    // This is the one number a stranger on a subscriber's widget sees --
+    // no range to signal "this could move," unlike the public/business
+    // path above. Without this line, a visitor can read it as a locked-in
+    // quote instead of an estimate, and push back when the real price
+    // differs once the business actually sees the job.
+    lines.push('  (This is an estimate, not a final quote -- the price may be higher or lower depending on the actual level of cleaning needed. We\'ll confirm the exact price when you book.)');
   }
   // Plain flag, not a computed line -- see cleaningCalculation.js's
   // comment for why this stayed lightweight for Canada, and defaults.js's
@@ -523,6 +529,10 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
       </tr>
       <tr style="background:${primaryColor}0d;">
         <td colspan="2" style="padding:0 12px 10px;font-size:11px;color:#888888;line-height:1.4;">Lean higher or lower than this based on the actual level of cleaning the job needs.</td>
+      </tr>` : ''}
+      ${!isPublic ? `
+      <tr style="background:${primaryColor}0d;">
+        <td colspan="2" style="padding:8px 12px 10px;font-size:11px;color:#888888;line-height:1.4;">This is an estimate, not a final quote — the price may be higher or lower depending on the actual level of cleaning needed. We'll confirm the exact price when you book.</td>
       </tr>` : ''}
     </table>
   </div>
