@@ -163,6 +163,33 @@ export default function CompanyDashboard({ user, onLogout }) {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
+  // Whether this row's actual content (which differs a lot by viewMode --
+  // Widget Mode's fuller row vs. Calculator Mode's much sparser one, see
+  // the screenshot this was reported from) genuinely overflows its own
+  // width, measured directly rather than guessed from a fixed breakpoint
+  // the way isMobile/isCompact are above -- a single width cutoff can't
+  // be right for both, since the same 768px that's correctly cramped for
+  // Widget Mode's row has easily enough spare room for Calculator Mode's.
+  // Drives justifyContent below: packed flex-start (plus this row's own
+  // overflow-x:auto) only once content truly doesn't fit, so a tablet- or
+  // laptop-width Calculator Mode header isn't left-anchored with a dead
+  // strip of unused space on the right the way isMobile alone would do.
+  // Mount-once: a ResizeObserver reports every box-size change on its own
+  // (isMobile/isCompact toggling, viewMode swapping the row's children,
+  // a plain window resize), so there's no need to re-attach it off a
+  // dependency list the way the matchMedia listeners above do.
+  const headerRowRef = useRef(null);
+  const [headerOverflowing, setHeaderOverflowing] = useState(false);
+  useEffect(() => {
+    const el = headerRowRef.current;
+    if (!el) return;
+    const check = () => setHeaderOverflowing(el.scrollWidth > el.clientWidth + 1);
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const [activeTab, setActiveTab] = useState('overview');
   // Top-level switch, independent of the tab sidebar: 'widget' is today's
   // full dashboard (sidebar + tabs), 'calculator' hides all of that and
@@ -505,10 +532,11 @@ export default function CompanyDashboard({ user, onLogout }) {
             the available width, only this row scrolls, not the whole
             page. */}
         <div
+          ref={headerRowRef}
           className="ce-dash-header-scroll"
           style={{
             display: 'flex', alignItems: 'center', flex: 1, minWidth: 0,
-            gap: isMobile ? 10 : 12, justifyContent: isMobile ? 'flex-start' : 'space-between',
+            gap: isMobile ? 10 : 12, justifyContent: headerOverflowing ? 'flex-start' : 'space-between',
             overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none',
           }}
         >
