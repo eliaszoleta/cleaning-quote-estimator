@@ -549,9 +549,24 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           overflow: 'hidden',
           border: embedded ? 'none' : `1px solid ${COLORS.border}`,
         }}>
-          {/* Progress bar */}
+          {/* Progress bar -- first child inside the card, so it's the one
+              that sits flush against the card's own rounded top corners.
+              Relying only on the card's own overflow:hidden to clip this
+              div's square corners down to the card's curve is the usual
+              approach (and renders correctly at 100% browser zoom in every
+              width tested here), but at a fractional zoom level Chrome can
+              round the clip and this div's paint box to slightly different
+              physical pixels, leaving a visible sliver of the card's white
+              background between this div's edge and the card's border on
+              one side -- reported as the header's background not quite
+              reaching the frame's edge. Giving this div its own matching
+              top corners removes the dependency on that clip lining up
+              pixel-for-pixel, which is a one-line, no-downside fix even
+              though it couldn't be reproduced here (checked the actual
+              rendered DOM at 15 widths from 375px to 1440px, all exactly
+              1px -- the card's own border -- on both edges). */}
           {currentStep !== 'service' && currentStep !== 'results' && (
-            <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, padding: (embedded && !isWideEmbedded) || isMobile ? '16px 12px' : '16px 24px' }}>
+            <div style={{ background: COLORS.surfaceMuted, borderBottom: `1px solid ${COLORS.border}`, borderTopLeftRadius: embedded ? 0 : 10, borderTopRightRadius: embedded ? 0 : 10, padding: (embedded && !isWideEmbedded) || isMobile ? '16px 12px' : '16px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 {steps.map((step, i) => (
                   <span key={step} style={{
