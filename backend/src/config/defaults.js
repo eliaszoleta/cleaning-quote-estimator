@@ -133,6 +133,18 @@ const DEFAULT_COMPANY_CONFIG = {
   // each region's own city list in the widget instead of one pool
   // shared/mixed across every region they operate in.
   serviceCities: {},
+  // Per-country memory of the two fields above, each keyed by country code
+  // -- serviceStatesByCountry: { US: [...], CA: [...] }, serviceCitiesByCountry:
+  // { US: {...}, CA: {...} } (same per-region shape as serviceCities itself).
+  // Only ever written by CompanyDashboard.js's country switcher
+  // (handleCountryChange), which stashes serviceStates/serviceCities here
+  // under the country being switched away from, then restores whatever was
+  // previously stashed for the country being switched to (or starts empty
+  // the first time that country's selected) -- so switching country no
+  // longer wipes out the service area set up for whichever country isn't
+  // currently active.
+  serviceStatesByCountry: {},
+  serviceCitiesByCountry: {},
   customSteps: [],
   subscription: {
     status: 'trialing',

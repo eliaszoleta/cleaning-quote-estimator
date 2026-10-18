@@ -281,6 +281,33 @@ export default function CompanyDashboard({ user, onLogout }) {
     autoSaveQueue.current = autoSaveQueue.current.then(() => saveConfig(partial));
   }, [update, saveConfig]);
 
+  // Switching country used to flat-out wipe serviceStates/serviceCities
+  // (autoSave({ country, serviceStates: [], serviceCities: [] })) -- correct
+  // in that a US state code and a CA province code aren't interchangeable,
+  // but it meant a company that had set up service areas for both the US
+  // and Canada lost whichever one it wasn't currently on every time it
+  // switched, with nowhere for the "left behind" selection to go. Stashes
+  // the current country's serviceStates/serviceCities into a by-country map
+  // (serviceStatesByCountry/serviceCitiesByCountry) before switching, and
+  // restores whatever was previously stashed for the country being switched
+  // TO -- or starts empty, same as before, the first time that country's
+  // ever selected -- so flipping back and forth no longer loses anything
+  // either direction. Reads off localConfig (not some separately-tracked
+  // snapshot) so it always stashes the latest edits, however many service-
+  // area changes happened since the last switch.
+  const handleCountryChange = useCallback((newCountry) => {
+    const oldCountry = localConfig?.country || 'US';
+    const statesByCountry = { ...(localConfig?.serviceStatesByCountry || {}), [oldCountry]: localConfig?.serviceStates || [] };
+    const citiesByCountry = { ...(localConfig?.serviceCitiesByCountry || {}), [oldCountry]: localConfig?.serviceCities || {} };
+    autoSave({
+      country: newCountry,
+      serviceStates: statesByCountry[newCountry] || [],
+      serviceCities: citiesByCountry[newCountry] || {},
+      serviceStatesByCountry: statesByCountry,
+      serviceCitiesByCountry: citiesByCountry,
+    });
+  }, [localConfig, autoSave]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     let tab = params.get('tab');
@@ -519,7 +546,7 @@ export default function CompanyDashboard({ user, onLogout }) {
                 options regardless of what the collapsed/closed state shows. */}
             <select
               value={localConfig?.country || 'US'}
-              onChange={e => autoSave({ country: e.target.value, serviceStates: [], serviceCities: [] })}
+              onChange={e => handleCountryChange(e.target.value)}
               title="Country"
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
