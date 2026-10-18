@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
+import { UserPlus, Inbox, SlidersHorizontal, Code2, CreditCard, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
 import { getCompanyLeads, getCompanyEstimateRuns } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime, currencySymbolForCountry } from '../../../utils/formatters';
@@ -76,11 +76,11 @@ export default function OverviewTab({ config, subStatus, user }) {
     : 0;
 
   const stats = [
-    { label: 'Estimates Run',  value: estimateRuns.total,                                        Icon: Zap,         color: '#7c3aed', bg: '#f5f3ff' },
-    { label: 'Total Leads',    value: leads.length,                                              Icon: UserPlus,    color: '#1d4ed8', bg: '#eff6ff' },
-    { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a', bg: '#f0fdf4' },
-    { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate, currencySymbol) : '—',         Icon: DollarSign,  color: '#d97706', bg: '#fffbeb' },
-    { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—', Icon: Globe,       color: subStatus?.active ? '#16a34a' : '#dc2626', bg: subStatus?.active ? '#f0fdf4' : '#fef2f2' },
+    { label: 'Estimates Run',  value: estimateRuns.total },
+    { label: 'Total Leads',    value: leads.length },
+    { label: 'This Month',     value: thisMonth.length },
+    { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate, currencySymbol) : '—' },
+    { label: 'Widget Status',  value: subStatus?.active ? 'Active' : config ? 'Inactive' : '—' },
   ];
 
   // Setup checklist -- shown until every required step is done, then
@@ -172,18 +172,15 @@ export default function OverviewTab({ config, subStatus, user }) {
         </div>
       )}
 
-      {/* Stat cards */}
+      {/* Stat cards -- plain label-over-number, no icon badge/shadow/hover
+          lift, matching the flatter reference the user pointed to (a plain
+          bordered card reads lighter than a colored icon chip + heavy
+          800-weight number did before). */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(190px, 1fr))', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
-        {stats.map(({ label, value, Icon, color, bg }) => (
-          <div key={label} style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm, padding: isMobile ? '14px 14px' : '18px 20px', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
-            onMouseEnter={e => { e.currentTarget.style.boxShadow = SHADOWS.md; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-            onMouseLeave={e => { e.currentTarget.style.boxShadow = SHADOWS.sm; e.currentTarget.style.transform = 'none'; }}
-          >
-            <div style={{ width: isMobile ? 32 : 38, height: isMobile ? 32 : 38, borderRadius: 7, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: isMobile ? 10 : 14 }}>
-              <Icon size={isMobile ? 16 : 18} strokeWidth={2.1} />
-            </div>
-            <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, letterSpacing: '-0.3px', lineHeight: 1, color: '#1e293b', marginBottom: 8 }}>{value}</div>
-            <div style={{ fontSize: 11.5, color: COLORS.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+        {stats.map(({ label, value }) => (
+          <div key={label} style={{ background: COLORS.surface, borderRadius: 10, border: `1px solid ${COLORS.border}`, padding: isMobile ? '14px 14px' : '18px 20px' }}>
+            <div style={{ fontSize: 13, color: COLORS.body, fontWeight: 500, marginBottom: 10 }}>{label}</div>
+            <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, letterSpacing: '-0.3px', lineHeight: 1, color: '#1e293b' }}>{value}</div>
           </div>
         ))}
       </div>
