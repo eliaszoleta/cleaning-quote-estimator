@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, CalendarDays, DollarSign, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
+import { UserPlus, CalendarDays, DollarSign, Globe, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
 import { getCompanyLeads, getCompanyEstimateRuns } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime, currencySymbolForCountry } from '../../../utils/formatters';
 import { COLORS, RADIUS, SHADOWS } from '../../../styles/theme';
+
+// Same 4 options as the header's country switcher (CompanyDashboard.js) --
+// just the full name here, since that switcher already handles the
+// flag/abbreviation treatment for its own pill.
+const COUNTRY_NAMES = { US: 'United States', CA: 'Canada', GB: 'United Kingdom', AU: 'Australia' };
 
 export default function OverviewTab({ config, user }) {
   // Lead rows never stored a currencySymbol of their own -- derived from
@@ -80,6 +85,7 @@ export default function OverviewTab({ config, user }) {
     { label: 'Total Leads',    value: leads.length,                                              Icon: UserPlus,    color: '#1d4ed8', bg: '#eff6ff' },
     { label: 'This Month',     value: thisMonth.length,                                          Icon: CalendarDays, color: '#16a34a', bg: '#f0fdf4' },
     { label: 'Avg Estimate',   value: avgEstimate > 0 ? formatPrice(avgEstimate, currencySymbol) : '—',         Icon: DollarSign,  color: '#d97706', bg: '#fffbeb' },
+    { label: 'Account Country', value: COUNTRY_NAMES[config?.country] || 'United States',          Icon: Globe,       color: '#0891b2', bg: '#ecfeff' },
   ];
 
   // Setup checklist -- shown until every required step is done, then
@@ -172,7 +178,7 @@ export default function OverviewTab({ config, user }) {
       )}
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(190px, 220px))', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(190px, 1fr))', gap: isMobile ? 10 : 14, marginBottom: 24 }}>
         {stats.map(({ label, value, Icon, color, bg }) => (
           <div key={label} style={{ background: COLORS.surface, borderRadius: 7, border: `1px solid ${COLORS.border}`, boxShadow: SHADOWS.sm, padding: isMobile ? '14px 14px' : '18px 20px', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
             onMouseEnter={e => { e.currentTarget.style.boxShadow = SHADOWS.md; e.currentTarget.style.transform = 'translateY(-2px)'; }}
