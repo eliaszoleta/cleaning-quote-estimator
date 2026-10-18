@@ -50,6 +50,10 @@ router.post('/', async (req, res) => {
       companyConfig,
       partner: null,
       replyTo: companyConfig.leadNotificationEmail || undefined,
+      // Always a real, authenticated subscriber here (companyId is
+      // req.user.id above) -- single-midpoint style, same as their own
+      // embedded widget.
+      companyId,
     });
 
     if (!sent) return res.status(502).json({ success: false, error: 'Failed to send the email. Please try again in a moment.' });

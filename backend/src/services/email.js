@@ -310,17 +310,27 @@ function buildGenericCta({ ctaUrl, ctaText, ctaPhone }) {
 // A plain-text alternative alongside the HTML body (multipart/alternative)
 // -- sending HTML-only is itself a signal Gmail's classifier associates
 // with bulk/marketing mail, on top of the styling itself.
-function buildText({ name, clientName, serviceType, result, companyConfig, partner }) {
+function buildText({ name, clientName, serviceType, result, companyConfig, partner, companyId }) {
   const {
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], recurringAnnualSavings, currencySymbol = '$', country,
   } = result;
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
-  // The one number shown everywhere in this email (headline + breakdown
-  // total) -- the midpoint of the range, not the range itself. Falls back
-  // to computing it here only if a caller somehow didn't already have it
-  // (every real calculateCleaning() result does -- see its own comment on
-  // suggestedPrice for why it's deliberately a plain, unweighted midpoint).
+  // Single-midpoint formatting is only for a paying subscriber's own
+  // estimate (their embedded widget, or RunEstimateTab's "Email to
+  // Coworker" share -- both always have a real companyId). The free public
+  // calculator (cleanestimator.com's own homepage/state/city pages, no
+  // companyId) keeps the original low–high range + separate "suggested
+  // price" line -- that's a DIFFERENT product with no subscriber behind
+  // it, and was never part of the "show the embeddable widget's estimate
+  // as one number" request.
+  const isPublic = !companyId;
+  // The one number shown everywhere in a subscriber's email (headline +
+  // breakdown total) -- the midpoint of the range, not the range itself.
+  // Falls back to computing it here only if a caller somehow didn't
+  // already have it (every real calculateCleaning() result does -- see
+  // its own comment on suggestedPrice for why it's deliberately a plain,
+  // unweighted midpoint).
   const mainTotal = suggestedPrice != null ? suggestedPrice : Math.round((totalLow + totalHigh) / 2);
 
   const serviceLabel = getServiceLabel(serviceType, country);
@@ -340,7 +350,9 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   lines.push(
     `Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:`,
     '',
-    `${fmtMoney(mainTotal, currencySymbol)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
+    isPublic
+      ? `${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)} ${unit === 'per_month' ? 'per month' : 'per visit'}`
+      : `${fmtMoney(mainTotal, currencySymbol)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
   );
 
   // totalLow/High above are already the discounted recurring price when a
@@ -351,16 +363,26 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     lines.push(`Recurring discount applied (save ~${fmtMoney(recurringAnnualSavings, currencySymbol)}/year)`);
   }
 
-  // Every line below (and the total) is a single midpoint figure now, not a
-  // low–high range -- reconciled via toMidpointRows() so the line items
-  // always add up to exactly the "Estimated total" shown, which is the same
-  // mainTotal as the headline above (not a separate "suggested price" line
-  // anymore, since that's now just... the total).
   lines.push('', 'Price breakdown:');
-  toMidpointRows(adjustments, mainTotal).filter(a => !a.separate).forEach(a => {
-    lines.push(`  ${a.label}: ${fmtAdjustmentMid(a, currencySymbol)}`);
-  });
-  lines.push(`  Estimated total: ${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
+  if (isPublic) {
+    adjustments.filter(a => !a.separate).forEach(a => {
+      lines.push(`  ${a.label}: ${fmtAdjustment(a, currencySymbol)}`);
+    });
+    lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
+    if (suggestedPrice != null) {
+      lines.push(`  Suggested price (midpoint of the range above): ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
+    }
+  } else {
+    // Every line below (and the total) is a single midpoint figure, not a
+    // low–high range -- reconciled via toMidpointRows() so the line items
+    // always add up to exactly the "Estimated total" shown, which is the
+    // same mainTotal as the headline above (not a separate "suggested
+    // price" line, since that's now just... the total).
+    toMidpointRows(adjustments, mainTotal).filter(a => !a.separate).forEach(a => {
+      lines.push(`  ${a.label}: ${fmtAdjustmentMid(a, currencySymbol)}`);
+    });
+    lines.push(`  Estimated total: ${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
+  }
   // Plain flag, not a computed line -- see cleaningCalculation.js's
   // comment for why this stayed lightweight for Canada, and defaults.js's
   // currency-display comment for why Australia gets the same treatment
@@ -395,12 +417,17 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   return lines.join('\n');
 }
 
-function buildHtml({ name, clientName, serviceType, result, companyConfig, partner }) {
+function buildHtml({ name, clientName, serviceType, result, companyConfig, partner, companyId }) {
   const {
     totalLow, totalHigh, suggestedPrice, stateName, city, unit,
     adjustments = [], keyFactors = [],
     recurringAnnualSavings, currencySymbol = '$', country,
   } = result;
+  // Same isPublic / single-midpoint-vs-range split as buildText above --
+  // only a paying subscriber's own estimate (real companyId) gets the
+  // single-midpoint style; the free public calculator keeps the original
+  // range.
+  const isPublic = !companyId;
   // Same mainTotal fallback as buildText above.
   const mainTotal = suggestedPrice != null ? suggestedPrice : Math.round((totalLow + totalHigh) / 2);
   // Same city-resolution ResultsScreen.js's eyebrow badge now shows --
@@ -458,17 +485,22 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:</p>
 
-  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(mainTotal, currencySymbol)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span>${(country === 'CA' || country === 'AU') ? ' <span style="font-size:13px;font-weight:700;color:#666666;">+ tax</span>' : ''}</p>
+  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : fmtMoney(mainTotal, currencySymbol)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span>${(country === 'CA' || country === 'AU') ? ' <span style="font-size:13px;font-weight:700;color:#666666;">+ tax</span>' : ''}</p>
   ${recurringLine}
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 8px;">Price breakdown</p>
   <div style="border:1px solid #e0e0e0;border-radius:10px;overflow:hidden;">
     <table style="width:100%;border-collapse:collapse;">
-      ${buildEstimateBreakdownRowsMid(adjustments, mainTotal, currencySymbol)}
+      ${isPublic ? buildEstimateBreakdownRows(adjustments, currencySymbol) : buildEstimateBreakdownRowsMid(adjustments, mainTotal, currencySymbol)}
       <tr style="background:${primaryColor}0d;">
         <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
-        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
+        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : `${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`}</td>
       </tr>
+      ${isPublic && suggestedPrice != null ? `
+      <tr style="background:${primaryColor}0d;">
+        <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Suggested price <span style="font-weight:400;opacity:0.75;">(midpoint of the range above)</span></td>
+        <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
+      </tr>` : ''}
     </table>
   </div>
   ${country === 'CA' ? '<p style="font-size:11.5px;color:#999999;margin:8px 0 0;">+ applicable taxes (GST/HST, varies by province)</p>' : ''}
@@ -487,7 +519,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 // Fire-and-forget from the caller's perspective: never throws, returns
 // false (and logs why) instead so a missing config or a delivery failure
 // never breaks the /api/calculate response.
-async function sendEstimateEmail({ to, name, clientName, serviceType, result, companyConfig, partner, replyTo }) {
+async function sendEstimateEmail({ to, name, clientName, serviceType, result, companyConfig, partner, replyTo, companyId }) {
   const { RESEND_API_KEY, RESEND_FROM_EMAIL } = process.env;
   if (!RESEND_API_KEY) {
     console.warn('sendEstimateEmail skipped: Resend not configured (RESEND_API_KEY)');
@@ -526,8 +558,8 @@ async function sendEstimateEmail({ to, name, clientName, serviceType, result, co
           : clientName
             ? `${getSubjectServiceLabel(serviceType, result.country) || 'Cleaning'} estimate for ${clientName}`
             : `Your ${getSubjectServiceLabel(serviceType, result.country) || 'cleaning'} estimate is ready`,
-        html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner }),
-        text: buildText({ name, clientName, serviceType, result, companyConfig, partner }),
+        html: buildHtml({ name, clientName, serviceType, result, companyConfig, partner, companyId }),
+        text: buildText({ name, clientName, serviceType, result, companyConfig, partner, companyId }),
       },
       { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
     );
