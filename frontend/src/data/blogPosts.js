@@ -9502,6 +9502,72 @@ None of this is a reason to avoid post-construction cleaning as a service line �
 [Learn how to price post-construction jobs correctly](/blog/how-to-price-post-construction-cleaning-jobs), or [start your free trial of Clean Estimator](/estimator) to price this service consistently as you add it to your offerings.
     `,
   },
+  {
+    slug: 'how-to-get-cleaning-clients-to-pay-on-time',
+    title: 'How to Get Cleaning Clients to Pay On Time (and What to Do When They Don\'t)',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-10-18',
+    readTime: '8 min',
+    excerpt: 'Chasing payment days or weeks after a clean is one of the most common frustrations small cleaning business owners run into. Here\'s how to set up payment terms that actually get followed, and what to do when a client still doesn\'t pay.',
+    content: `
+## Getting Paid Is Part of the Job, Not an Afterthought
+
+Doing the cleaning is only half the work — collecting for it is the other half, and it's the half most new cleaning business owners don't plan for. A client who's "good for it" but pays a week late, or not at all without a nudge, isn't just annoying. Every hour spent chasing an invoice is an hour not spent cleaning, quoting, or finding new clients — and for a small or solo operation, that adds up fast.
+
+The good news: most late-payment problems trace back to one root cause — the client never had a clear, upfront understanding of when and how they're expected to pay. Fix that, and most of the chasing goes away on its own.
+
+## 1. Put Payment Terms in Writing Before You Ever Clean
+
+If your terms are "payment due within 24 hours," the client needs to know and agree to that before the first clean — not discover it when an invoice lands in their inbox. Put it in your booking confirmation, service agreement, or intake form: when payment is due, how it can be paid, and what happens if it's late (see #6 below). A client who agreed to the terms upfront has a much harder time treating a reminder as unreasonable.
+
+## 2. Collect Payment at the Door for One-Time Jobs
+
+For one-time residential cleans especially, the simplest fix is to stop invoicing after the fact at all. Take a card on file at booking and charge it when the job's done, or collect payment before you leave. This removes the entire "chase it down later" problem for the jobs where it's most common — a one-off client has no ongoing relationship with you keeping them accountable to pay promptly.
+
+## 3. Take a Deposit for Larger or First-Time Jobs
+
+For bigger one-time jobs (move-out cleans, post-construction, a large deep clean) or a brand-new client with no payment history with you, a deposit before you schedule — typically 20–50% — protects you from doing the work and then finding out the client was never going to pay the balance. Apply it to the final invoice, and make clear upfront it's non-refundable if they cancel last-minute.
+
+## 4. Automate Invoicing and Reminders for Recurring Clients
+
+For clients on a weekly, biweekly, or monthly schedule, don't rely on yourself to remember to invoice and then remember to follow up. Most booking/invoicing software (Housecall Pro, Jobber, and similar tools built for home service businesses) can send an invoice automatically the moment a job's marked complete, then fire a reminder at a set number of days if it's still unpaid. That turns "chasing payment" into something that happens without you lifting a finger.
+
+## 5. Don't Keep Servicing a Client With an Outstanding Balance
+
+If a client owes you for a previous clean, don't show up for the next one until that's resolved. Continuing to clean for someone who hasn't paid the last job just compounds the amount you're owed and signals that your payment terms aren't actually enforced. This is the single most common mistake new business owners make — it feels awkward to "deny service" over money, but every clean you do on top of an unpaid balance is working for free.
+
+## 6. Charge a Late Fee After the Grace Period
+
+A flat fee or small percentage (e.g., $15 or 5% after 7 days past due) gives clients a real incentive to pay on time instead of treating your invoice as optional. This only works if it's disclosed in your terms from the start — surprising a client with a late fee they never agreed to is a fast way to create a dispute instead of resolving one.
+
+## 7. Know When to Escalate
+
+For a client who's genuinely gone quiet — no response to invoices or reminders — a firm, written final notice (a short, professional "payment is X days overdue, please remit by [date] or this will be referred for collection") is usually the next step, followed by a formal letter of demand if that doesn't work. For a small balance, weigh the cost of your time (and any collection agency or small-claims filing fee) against what you'd actually recover — sometimes the right call is writing off a small amount and simply not working with that client again, rather than spending more chasing it than it's worth.
+
+## 8. Give a Clear, Agreed Price Before You Ever Show Up
+
+A surprising number of payment disputes don't start with the client being unwilling to pay — they start with the client being surprised by the final number. If the price quoted at booking doesn't match what's actually invoiced, that gap is exactly where "I'll pay once we sort this out" turns into weeks of silence. Giving clients a clear, specific estimate upfront — before you ever clean — removes that excuse entirely: they already agreed to the number.
+
+[Clean Estimator](/estimator) gives every client an instant, location-accurate price estimate the moment they request one, emailed to them in writing, so there's a clear record of what was quoted before the job ever happens — not something either side has to remember or argue about afterward.
+
+## FAQ
+
+**How long should I give clients to pay a cleaning invoice?**
+Most cleaning businesses use somewhere between due-on-completion and 7 days. Shorter terms (24–48 hours) work well for one-time residential jobs; slightly longer terms (7 days) are more common for recurring commercial or property-management accounts that process payments through their own AP schedule. Whatever you choose, the key is stating it clearly upfront and applying it consistently.
+
+**Should I charge a late fee for a cleaning business?**
+Yes, as long as it's disclosed in your terms before the client ever books — a flat fee or small percentage after a stated grace period is standard practice and gives clients a real reason to pay on time rather than treating your invoice as flexible.
+
+**What do I do if a cleaning client refuses to pay?**
+Start with a clear, professional written notice stating the amount owed and a firm due date. If that goes unanswered, a formal letter of demand is the next step, followed by small claims court or a collection agency for a balance worth pursuing. For a small amount, it's often more cost-effective to write it off and stop working with that client than to spend more time and money chasing it than it's worth.
+
+**Should I require payment upfront for cleaning jobs?**
+For first-time or large one-time jobs, a deposit (20–50%) before scheduling is common and protects you from doing the work with no payment history to fall back on. For established recurring clients, upfront payment is less common — automated invoicing right when the job's marked complete, with a short, clear payment window, is usually enough.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
