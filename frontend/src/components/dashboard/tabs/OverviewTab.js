@@ -193,7 +193,7 @@ export default function OverviewTab({ config, user }) {
               <Icon size={isMobile ? 16 : 18} strokeWidth={2.1} />
             </div>
             <div style={{ fontSize: isMobile ? 22 : 26, fontWeight: 800, letterSpacing: '-0.5px', lineHeight: 1, color: COLORS.ink, marginBottom: 8 }}>{value}</div>
-            <div style={{ fontSize: 11.5, color: COLORS.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+            <div style={{ fontSize: 11.5, color: COLORS.body, fontWeight: 600 }}>{label}</div>
           </div>
         ))}
       </div>
