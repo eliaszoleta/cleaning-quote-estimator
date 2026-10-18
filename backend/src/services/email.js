@@ -528,7 +528,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
         <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
       </tr>
       <tr style="background:${primaryColor}0d;">
-        <td colspan="2" style="padding:0 12px 10px;font-size:11px;color:#888888;line-height:1.4;">Lean higher or lower than this based on the actual level of cleaning the job needs.</td>
+        <td colspan="2" style="padding:0 12px 10px;font-size:12.5px;font-weight:600;color:#444444;line-height:1.4;">Lean higher or lower than this based on the actual level of cleaning the job needs.</td>
       </tr>` : ''}
       ${!isPublic ? `
       <tr style="background:${primaryColor}0d;">
