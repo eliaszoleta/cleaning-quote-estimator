@@ -380,7 +380,15 @@ img { max-width: 100%; height: auto; }
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .dash-main { flex-direction: column; }
-  .dash-nav { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; padding: 8px 12px; flex-wrap: nowrap; }
+  /* justify-content:center -- at tablet widths (this breakpoint covers
+     phones too) all 6 tabs comfortably fit on one line with room to
+     spare, so the default flex-start packed them against the left edge
+     with a big dead strip of white on the right, looking like a layout
+     bug rather than a deliberate design. Centering here is still safe on
+     a genuinely narrow phone where the tabs DON'T all fit: overflow-x
+     stays auto so it's still a scrollable row, just a centered one
+     instead of a left-anchored one when nothing's cut off. */
+  .dash-nav { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; padding: 8px 12px; flex-wrap: nowrap; justify-content: center; }
   .dash-nav-item { width: auto; white-space: nowrap; flex-shrink: 0; }
   .dash-content { padding: 16px; }
   .appearance-layout { flex-direction: column; }
