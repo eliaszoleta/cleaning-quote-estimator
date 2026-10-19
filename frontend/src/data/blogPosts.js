@@ -10318,6 +10318,56 @@ Narrow down to a few genuinely multipurpose products instead of carrying a singl
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'deposit-structure-for-move-out-bond-cleans',
+    title: 'The Deposit Structure That Protects You on Move-Out and Bond Cleans',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-10-19',
+    readTime: '6 min',
+    excerpt: 'Move-out and bond cleans carry more non-payment risk than almost any other job type — one-off client, high stakes, tight timeline. Here\'s the deposit structure and contract timing that actually protects you.',
+    content: `
+## Why Move-Out and Bond Cleans Carry More Risk
+
+A move-out clean (or a "bond clean," as it's commonly called where the job is tied to getting a rental deposit back) is one of the riskiest job types for non-payment, for reasons that don't apply to most recurring residential work. The client is almost always one-off — there's no ongoing relationship keeping them accountable the way there is with a weekly recurring client. The job is usually tied to a stressful, deadline-driven move, which means the client's attention and cash flow are stretched elsewhere. And the work often has to start and finish in a narrow window, which pressures cleaners into starting before every piece of paperwork is actually settled. All three of those factors push in the same direction: more exposure, less room to recover if something goes wrong.
+
+## The 50/50 Deposit Structure
+
+A deposit split that comes up repeatedly among cleaners who do a lot of move-out and bond work: 50% to secure the booking, and the remaining 50% collected on the day, once you actually have access to the property — not after the job is finished and the client has walked through to inspect it. Collecting the second half at the point of access rather than at completion matters because it moves your payment checkpoint to the moment you have the most leverage (you're standing there with the keys and the job hasn't started yet) rather than the moment you have the least (the job is done and the client has already gotten what they wanted from you).
+
+For smaller, lower-risk one-time jobs, a smaller deposit (20–30%) at booking is common. The 50/50 split is specifically a move-out/bond-clean convention, reflecting the higher risk and higher average job value of that category.
+
+## Never Start Work Before the Signed Contract Is Actually Back
+
+This is the mistake that comes up again and again in cleaner-to-cleaner advice: having a contract isn't enough protection if it was sent but never actually signed and returned before work began. A client who intends to shortchange you has no reason to rush getting a signed agreement back to you, and starting the job anyway — assuming the paperwork will catch up — removes your strongest piece of leverage before the work even starts. If a signed contract isn't back in hand, the job doesn't start, full stop, no matter how tight the client's moving timeline is.
+
+If a client does try to shortchange you after the job's already underway, stopping work at that point (rather than finishing the whole job and then trying to collect) is the standard move — it preserves what leverage you have left, even though it's a far worse position than simply not having started without a signed agreement in the first place.
+
+## If You're Not Using Formal Contracts
+
+Not every cleaner uses a formal signed contract for every job, and that's a legitimate choice for some business models. But skipping a contract doesn't mean skipping documentation — getting the price, deposit amount, and scope of work confirmed in writing, even just in a text message or email thread, creates a real record you can point back to if a dispute comes up. "We agreed on $X, 50% now and 50% on access" sent as a text the client replied "ok" to is far from a formal contract, but it's meaningfully better than a verbal-only agreement with nothing to reference later.
+
+## Treat Pre-Booking Pushback as a Signal
+
+If a prospective client starts negotiating your deposit terms, questioning why you need anything in writing, or trying to go back and forth on payment structure before the job is even booked, several experienced cleaners treat that specifically as a reason to walk away from the job rather than compromise on terms to win it. A client who resists a standard, clearly-explained deposit and contract process before any work has happened is giving you information about how the rest of the relationship is likely to go.
+
+## FAQ
+
+**What deposit should I charge for a move-out or bond clean?**
+A common structure is 50% to secure the booking and 50% collected on the day once you have access to the property — reflecting the higher non-payment risk and typically higher job value of move-out work compared to routine recurring cleaning.
+
+**Should I start a move-out clean if the signed contract hasn't been returned yet?**
+No — treat a signed, returned contract as a hard requirement before work begins, even under time pressure from the client's moving deadline. Starting work without it removes your strongest leverage if the client doesn't pay as agreed.
+
+**What should I do if a client tries to underpay after I've already started the job?**
+Stop work at that point rather than finishing the full job and then trying to collect — it's a worse position than not having started without a signed agreement, but it preserves more leverage than completing the work first.
+
+**Do I need a formal contract for every cleaning job?**
+Not necessarily, but you do need documentation. If you're not using a formal signed contract, confirm price, deposit, and scope of work in writing — even a text or email thread the client replied to — so there's a record to point back to if a dispute comes up.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
