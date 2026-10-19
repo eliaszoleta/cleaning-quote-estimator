@@ -209,12 +209,18 @@ async function listCompanyContacts(sb) {
     companyId: row.company_id,
     config: row.config || {},
     email: userById.get(row.company_id)?.email || null,
+    createdAt: userById.get(row.company_id)?.created_at || null,
   }));
 }
 
 // `audience`: { sources: ['leads','companies','partners'], leadUserType,
-// leadScope, companyActiveOnly, partnersActiveOnly } -- all filter fields
-// optional/omittable, meaning "no filter" on that dimension.
+// leadScope, companyActiveOnly, companyLegacyNoCardOnly, partnersActiveOnly }
+// -- all filter fields optional/omittable, meaning "no filter" on that
+// dimension. companyActiveOnly and companyLegacyNoCardOnly are opposite ends
+// of the same spectrum (currently paying vs. never-added-a-card) and aren't
+// meant to both be on at once, but nothing stops it -- companyActiveOnly is
+// applied first, then companyLegacyNoCardOnly, so turning both on just
+// resolves to 0 recipients rather than doing anything surprising.
 async function resolveAudience(sb, audience = {}) {
   const sources = Array.isArray(audience.sources) && audience.sources.length ? audience.sources : ['leads', 'companies', 'partners'];
   const recipients = [];
@@ -243,9 +249,21 @@ async function resolveAudience(sb, audience = {}) {
         const sub = computeSubscriptionStatus(c.config, c.email);
         if (!sub.active) return;
       }
+      // Legacy no-card accounts: trialStartedAt is only ever set by the old
+      // pre-Stripe signup flow (see subscriptionStatus.js's comment -- nothing
+      // sets it anymore), and a true legacy account never has a
+      // stripeSubscriptionId since it never went through Checkout. Checked
+      // regardless of whether that old trial has since expired, since the
+      // point of this filter is "signed up under the old no-card flow", not
+      // "whose trial already ran out."
+      if (audience.companyLegacyNoCardOnly) {
+        const sub = c.config.subscription || {};
+        if (!sub.trialStartedAt || sub.stripeSubscriptionId) return;
+      }
+      const signupDateSuffix = c.createdAt ? ` on ${formatDate(c.createdAt)}` : '';
       recipients.push({
         email: c.email, name: c.config.companyName || '', type: 'company', ref: c.companyId,
-        vars: { name: c.config.companyName || 'there', companyName: c.config.companyName || '', email: c.email },
+        vars: { name: c.config.companyName || 'there', companyName: c.config.companyName || '', email: c.email, signupDateSuffix },
       });
     });
   }

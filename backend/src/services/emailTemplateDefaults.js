@@ -309,6 +309,67 @@ module.exports = [
 </div>`,
   },
   {
+    key: 'legacy_calculator_mode_reminder',
+    // Not sent automatically by any code path -- unlike every other entry
+    // in this file, this one exists purely to be seeded into the DB and
+    // picked for a manual campaign (Email Marketing tab's Compose/Send or
+    // Campaigns panel) targeting the "Legacy no-card signups only" audience
+    // filter (see emailMarketing.js's resolveAudience). That segment is
+    // accounts from before Stripe Checkout became mandatory at signup, back
+    // when the product was pitched mainly as the embeddable website widget
+    // -- Calculator Mode (unlimited on-screen pricing with no website or
+    // embed required) didn't exist yet at signup time for this group, so
+    // the whole point of this email is reintroducing it, not just winning
+    // back a lapsed trial (that's legacy_trial_expired_winback, below).
+    name: 'Legacy no-card signups — Calculator Mode reminder',
+    subject: 'Clean Estimator now works without a website too',
+    variables: [
+      { name: 'companyName', example: 'Sparkle Clean Co' },
+      { name: 'signupDateSuffix', example: ' on October 14, 2026' },
+    ],
+    text: [
+      'Hi {{companyName}},',
+      '',
+      "You signed up for Clean Estimator{{signupDateSuffix}}. Back then, it was pitched mainly as an embeddable price calculator for your website -- so if you never got a website set up (or it's been a while), there's a good chance the account's just been sitting there since.",
+      '',
+      "Since you signed up, we've added a second way to use it: Calculator Mode. No website, no embed code, nothing to set up -- just log in, answer a few quick questions about a job, and get an accurate, consistent price on screen in seconds. It's built for pricing jobs yourself, not managing leads.",
+      '',
+      'Try Calculator Mode:',
+      'https://www.cleanestimator.com/company',
+      '',
+      "The embeddable widget is still part of the same plan too, whenever you do have a website -- same account, same login, nothing to redo.",
+      '',
+      "It's $25/month flat, with a 30-day free trial if you haven't already used yours. Reply to this email if you have any questions -- happy to help.",
+      '',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    You signed up for Clean Estimator{{signupDateSuffix}}. Back then, it was pitched mainly as an embeddable price calculator for your website — so if you never got a website set up (or it's been a while), there's a good chance the account's just been sitting there since.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Since you signed up, we've added a second way to use it: <strong>Calculator Mode</strong>. No website, no embed code, nothing to set up — just log in, answer a few quick questions about a job, and get an accurate, consistent price on screen in seconds. It's built for pricing jobs yourself, not managing leads.
+  </p>
+
+  <p style="margin:0 0 24px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Try Calculator Mode →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    The embeddable widget is still part of the same plan too, whenever you do have a website — same account, same login, nothing to redo.
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    It's $25/month flat, with a 30-day free trial if you haven't already used yours. Reply to this email if you have any questions — happy to help.
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
+  {
     key: 'payment_failed',
     name: 'Payment failed',
     subject: "Your Clean Estimator payment didn't go through",

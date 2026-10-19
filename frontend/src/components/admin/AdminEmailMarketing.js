@@ -342,6 +342,7 @@ function ComposePanel({ adminKey, templates }) {
   const [leadScope, setLeadScope] = useState('all');
   const [leadUserType, setLeadUserType] = useState('all');
   const [companyActiveOnly, setCompanyActiveOnly] = useState(true);
+  const [companyLegacyNoCardOnly, setCompanyLegacyNoCardOnly] = useState(false);
   const [partnersActiveOnly, setPartnersActiveOnly] = useState(true);
   const [campaignName, setCampaignName] = useState('');
   const [scheduledAt, setScheduledAt] = useState('');
@@ -357,7 +358,7 @@ function ComposePanel({ adminKey, templates }) {
 
   const buildAudience = () => ({
     sources: Object.entries(sources).filter(([, v]) => v).map(([k]) => k),
-    leadScope, leadUserType, companyActiveOnly, partnersActiveOnly,
+    leadScope, leadUserType, companyActiveOnly, companyLegacyNoCardOnly, partnersActiveOnly,
   });
 
   const runPreview = async () => {
@@ -547,9 +548,14 @@ function ComposePanel({ adminKey, templates }) {
                 <input type="checkbox" checked={sources.companies} onChange={e => setSources(s => ({ ...s, companies: e.target.checked }))} style={{ accentColor: theme.accentSolid }} /> Companies (subscribers)
               </label>
               {sources.companies && (
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: theme.textMuted, marginLeft: 24 }}>
-                  <input type="checkbox" checked={companyActiveOnly} onChange={e => setCompanyActiveOnly(e.target.checked)} style={{ accentColor: theme.accentSolid }} /> Active subscribers only
-                </label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginLeft: 24 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: theme.textMuted }}>
+                    <input type="checkbox" checked={companyActiveOnly} onChange={e => setCompanyActiveOnly(e.target.checked)} style={{ accentColor: theme.accentSolid }} /> Active subscribers only
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: theme.textMuted }}>
+                    <input type="checkbox" checked={companyLegacyNoCardOnly} onChange={e => setCompanyLegacyNoCardOnly(e.target.checked)} style={{ accentColor: theme.accentSolid }} /> Legacy no-card signups only (old free trial, never added a card)
+                  </label>
+                </div>
               )}
 
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: theme.textSecondary }}>
