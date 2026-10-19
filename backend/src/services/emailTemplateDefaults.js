@@ -321,8 +321,17 @@ module.exports = [
     // embed required) didn't exist yet at signup time for this group, so
     // the whole point of this email is reintroducing it, not just winning
     // back a lapsed trial (that's legacy_trial_expired_winback, below).
+    // Original subject ("Clean Estimator now works without a website too")
+    // landed in Gmail's Promotions tab -- same documented lesson as
+    // activation_reminder (see its comment above): a feature-announcement-
+    // style subject reads as a marketing nudge to Gmail's classifier.
+    // Replaced with the same two proven levers that moved that other
+    // template to Primary -- a flat, factual status statement instead of a
+    // hook, and a real personalized reference (the actual signup date,
+    // already computed server-side as signupDateSuffix) right in the
+    // subject itself rather than buried in the body.
     name: 'Legacy no-card signups — Calculator Mode reminder',
-    subject: 'Clean Estimator now works without a website too',
+    subject: 'Your Clean Estimator account{{signupDateSuffix}}',
     variables: [
       { name: 'companyName', example: 'Sparkle Clean Co' },
       { name: 'signupDateSuffix', example: ' on October 14, 2026' },
