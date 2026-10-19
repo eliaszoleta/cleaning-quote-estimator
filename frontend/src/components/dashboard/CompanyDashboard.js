@@ -82,7 +82,7 @@ function ActivationGate({ subStatus, onLogout }) {
     : isExpiredTrial
     ? 'Your 30-day free trial has ended with no card on file, so your calculator is paused. Subscribe for $25/month to activate your account.'
     : isNeverActivated
-    ? 'Your calculator is ready, but checkout was never finished. Activate your account to start your 30-day free trial.'
+    ? 'Your calculator is ready, but activation was never finished. Activate your account to start your 30-day free trial.'
     : isPastDue
     ? 'Your last payment failed. Update your payment method to keep your calculator running.'
     : 'Your subscription has ended. Reactivate to get back into your calculator.';

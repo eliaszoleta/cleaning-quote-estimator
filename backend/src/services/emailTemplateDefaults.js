@@ -173,7 +173,7 @@ module.exports = [
     text: [
       'Hi {{companyName}},',
       '',
-      "You started setting up a Clean Estimator account{{signupDateSuffix}}, but checkout was never finished, so your 30-day trial hasn't started and your calculator isn't active.",
+      "You started setting up a Clean Estimator account{{signupDateSuffix}}, but activation was never finished, so your 30-day trial hasn't started and your calculator isn't active.",
       '',
       'Finish account setup:',
       'https://www.cleanestimator.com/company',
@@ -189,7 +189,7 @@ module.exports = [
   <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    You started setting up a Clean Estimator account{{signupDateSuffix}}, but checkout was never finished, so your 30-day trial hasn't started and your calculator isn't active.
+    You started setting up a Clean Estimator account{{signupDateSuffix}}, but activation was never finished, so your 30-day trial hasn't started and your calculator isn't active.
   </p>
 
   <p style="margin:0 0 24px;">

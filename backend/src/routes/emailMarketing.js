@@ -26,6 +26,18 @@ const { getTemplateById, sendTemplatedEmail } = require('../services/emailTempla
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
+
+// Same "earlier today" vs. a real date logic as email.js's own
+// signupDateSuffix (duplicated for the same reason as formatDate above) --
+// used wherever this file fills in a company recipient's signupDateSuffix
+// merge field, so a same-day send (the common case for activation_reminder,
+// now that it fires ~6 hours after signup) doesn't read a full date back at
+// someone the same afternoon.
+function signupDateSuffix(signedUpAt) {
+  if (!signedUpAt) return '';
+  const sameDay = new Date(signedUpAt).toDateString() === new Date().toDateString();
+  return sameDay ? ' earlier today' : ` on ${formatDate(signedUpAt)}`;
+}
 const DEFAULTS = require('../services/emailTemplateDefaults');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -261,10 +273,10 @@ async function resolveAudience(sb, audience = {}) {
         const sub = c.config.subscription || {};
         if (!sub.trialStartedAt || sub.stripeSubscriptionId) return;
       }
-      const signupDateSuffix = c.createdAt ? ` on ${formatDate(c.createdAt)}` : '';
+      const dateSuffix = signupDateSuffix(c.createdAt);
       recipients.push({
         email: c.email, name: c.config.companyName || '', type: 'company', ref: c.companyId,
-        vars: { name: c.config.companyName || 'there', companyName: c.config.companyName || '', email: c.email, signupDateSuffix },
+        vars: { name: c.config.companyName || 'there', companyName: c.config.companyName || '', email: c.email, signupDateSuffix: dateSuffix },
       });
     });
   }
@@ -389,8 +401,8 @@ router.post('/send-individual', async (req, res) => {
       // blank {{signupDateSuffix}} even though the automated path never
       // can (it skips the send entirely if signedUpAt is missing).
       const signedUpAt = userData?.user?.created_at || null;
-      const signupDateSuffix = signedUpAt ? ` on ${formatDate(signedUpAt)}` : '';
-      resolvedVars = { name: toName || 'there', companyName: toName, email: toEmail, signupDateSuffix, ...resolvedVars };
+      const dateSuffix = signupDateSuffix(signedUpAt);
+      resolvedVars = { name: toName || 'there', companyName: toName, email: toEmail, signupDateSuffix: dateSuffix, ...resolvedVars };
     } else if (recipientType === 'partner' && recipientRef) {
       const { data: partner, error } = await sb.from('partners').select('*').eq('id', recipientRef).maybeSingle();
       if (error) throw error;

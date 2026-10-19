@@ -1104,7 +1104,7 @@ async function sendActivationReminderEmail({ to, companyName, signedUpAt }) {
     template: 'activation_reminder',
     to,
     toName: companyName,
-    vars: { companyName, signupDateSuffix: signedUpAt ? ` on ${formatDate(signedUpAt)}` : '' },
+    vars: { companyName, signupDateSuffix: signupDateSuffix(signedUpAt) },
     recipientType: 'company',
   });
   return sent;
@@ -1194,6 +1194,21 @@ async function sendLegacyTrialExpiredEmail({ to, companyName }) {
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+// Builds the " on <date>" (or " earlier today") suffix spliced into
+// activation_reminder's "You started setting up a Clean Estimator
+// account{{signupDateSuffix}}..." sentence. Now that this email fires only
+// ~6 hours after signup (ACTIVATION_REMINDER_DELAY_HOURS in
+// trialScheduler.js), send time and signup time are almost always the same
+// calendar day -- stating a full date back to someone the same afternoon
+// ("...on October 14, 2026") reads oddly, so this uses "earlier today"
+// whenever send and signup share a calendar day, falling back to a real
+// date for the rare case they don't (e.g. a signup just before midnight).
+function signupDateSuffix(signedUpAt) {
+  if (!signedUpAt) return '';
+  const sameDay = new Date(signedUpAt).toDateString() === new Date().toDateString();
+  return sameDay ? ' earlier today' : ` on ${formatDate(signedUpAt)}`;
 }
 
 // Sent once, the moment a company requests account deletion (see company.js's
