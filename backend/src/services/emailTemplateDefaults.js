@@ -411,9 +411,9 @@ module.exports = [
       '',
       "You signed up for Clean Estimator{{signupDateSuffix}}, and your free trial ran out before you got much chance to use it.",
       '',
-      "We've reset that: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup.",
-      '',
       "Since you signed up, we've also added Calculator Mode -- an on-screen, unlimited pricing tool for your own quoting. No website or embed code required; log in, answer a few quick questions about a job, and get an accurate, consistent price in seconds. (If you do have a website, the embeddable calculator widget is still part of the same plan.)",
+      '',
+      "And we've reset your trial too: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup.",
       '',
       'Start my new trial:',
       'https://www.cleanestimator.com/company',
@@ -431,11 +431,11 @@ module.exports = [
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    We've reset that: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup.
+    Since you signed up, we've also added <strong>Calculator Mode</strong> — an on-screen, unlimited pricing tool for your own quoting. No website or embed code required; log in, answer a few quick questions about a job, and get an accurate, consistent price in seconds. (If you do have a website, the embeddable calculator widget is still part of the same plan.)
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Since you signed up, we've also added <strong>Calculator Mode</strong> — an on-screen, unlimited pricing tool for your own quoting. No website or embed code required; log in, answer a few quick questions about a job, and get an accurate, consistent price in seconds. (If you do have a website, the embeddable calculator widget is still part of the same plan.)
+    And we've reset your trial too: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup.
   </p>
 
   <p style="margin:0 0 24px;">
