@@ -10475,6 +10475,58 @@ Right at job completion, while satisfaction is highest and the work is freshest 
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'cancellation-rescheduling-policy-recurring-clients',
+    title: 'How to Set a Cancellation and Rescheduling Policy for Recurring Cleaning Clients',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-10-19',
+    readTime: '7 min',
+    excerpt: 'Most cleaners run on trust for years with no formal cancellation policy — until a handful of repeat cancelers start costing real income. Here\'s how to set a policy that protects your schedule without losing good clients over it.',
+    content: `
+## Why So Many Cleaners Go Years Without a Policy
+
+It's genuinely common for an established cleaner to operate for years with no written cancellation or rescheduling policy at all — most recurring clients are respectful, cancellations are rare, and a formal policy can feel unnecessary, or even like it might put off a prospective client before they've booked a single job. The problem is that this approach only works until it doesn't: a small number of clients canceling or rescheduling repeatedly can quietly erode a meaningful share of monthly income, and by the time it's noticeable, it's usually already been happening for months.
+
+## Solo Cleaner vs. Cleaning Company: Different Starting Points
+
+The right level of formality depends heavily on your business structure. A cleaning company with employees generally needs a real, written cancellation policy, because staff have to be paid for booked time whether or not the job happens — a client cancellation is a direct cost, not just a missed opportunity. A solo cleaner working with a smaller, more personal client base has more room to handle this case by case: simply being direct with a client about what cancellation frequency is actually sustainable, and ending the relationship with repeat offenders rather than building out a formal fee structure, is a legitimate and commonly used approach at that scale.
+
+## A Standard Policy Structure
+
+For businesses that do want a formal policy, a structure that comes up repeatedly: require 24 hours' notice for a cancellation or reschedule, and charge a fee when that notice isn't given — commonly either a flat minimum (such as a 2-hour minimum payment, mirroring a standard lockout policy) or a percentage of the job price, with 50% being a commonly cited figure. The fee doesn't need to apply to every single late cancellation from day one; several cleaners reserve it specifically for repeat offenders, applying it only once a client has already shown a pattern rather than on a first-time, genuine emergency.
+
+A related tool for genuinely unreliable clients: a hold deposit, often around 25% of the job price, collected when a repeat-cancel client reschedules, specifically to give them a real stake in actually showing up for the rebooked time.
+
+## How to Roll Out a New Policy Without Losing Good Clients
+
+Introducing a cancellation policy to an existing client base — especially after years without one — tends to land better when it's framed as a natural consequence of business growth rather than as a response to any one person's behavior. A short, neutral notice explaining that the business has grown to the point where reliable scheduling is now essential reads very differently than one that implicitly or explicitly calls out the clients who've been canceling — even if everyone involved knows exactly why the policy is being introduced now.
+
+## The "Limited Chances" Approach
+
+Rather than an indefinite, case-by-case tolerance for cancellations, several experienced cleaners use a defined limit: a repeat canceler gets a set number of chances (two is a commonly cited number) before being moved to a short list for replacement, or dropped from the schedule outright. This removes the emotional weight of deciding, cancellation by cancellation, whether this particular one crosses the line — the threshold is already defined, which makes it far easier to actually enforce consistently.
+
+## When the Real Answer Is Just Letting the Client Go
+
+For a smaller or solo operation, the simplest and most effective response to a chronically unreliable client is often not a fee or a policy at all — it's directly and kindly ending the relationship. Several cleaners describe arriving at this conclusion after trying to accommodate a client who kept canceling or rescheduling with thin excuses, eventually recognizing that the client likely no longer wanted or needed the service and simply hadn't said so directly. A short, kind message thanking them for their business and explaining it's no longer a good fit resolves the situation cleanly, frees up that time slot for a more reliable client, and avoids an ongoing cycle of chasing cancellation fees from someone who was never going to be a stable client regardless of what policy was in place.
+
+## FAQ
+
+**Do solo cleaners need a formal cancellation policy?**
+Not necessarily. Many solo cleaners with a smaller, more personal client base handle cancellations case by case — being direct with clients about what's sustainable and ending the relationship with repeat offenders — rather than implementing a formal fee structure. A cleaning company with employees to pay for booked time generally needs something more formal.
+
+**What's a reasonable cancellation notice period for a cleaning business?**
+24 hours' notice is a commonly used standard, with a fee (either a flat minimum payment or a percentage of the job price, often 50%) applied when that notice isn't met — particularly for clients who've already shown a pattern of late cancellations.
+
+**How do I introduce a new cancellation policy without upsetting existing clients?**
+Frame it as a natural result of business growth rather than a response to any specific client's behavior. A neutral, forward-looking explanation tends to generate far less pushback than one that reads as a reaction to recent cancellations, even when that's the real reason.
+
+**When should I just stop working with a client instead of enforcing a cancellation fee?**
+When a client's cancellation pattern suggests they no longer actually want the service and simply haven't said so — repeated thin excuses, declining engagement, or cancellations even when provided a clear schedule in advance are common signs. A direct, kind message ending the relationship is often simpler and more effective than continuing to chase fees from a client who was never going to be reliable.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
