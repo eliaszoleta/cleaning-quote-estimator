@@ -1085,7 +1085,7 @@ async function sendCompanyWelcomeEmail({ to, companyId, subject, statusLine }) {
   return sent;
 }
 
-// Sent once, ~12 hours after a company's account was created if checkout
+// Sent once, ~6 hours after a company's account was created if checkout
 // still hasn't been completed (status stays 'requires_trial_setup' --
 // see checkActivationReminders in services/trialScheduler.js). These
 // accounts show up in the admin Companies list as "Not started". Deduped

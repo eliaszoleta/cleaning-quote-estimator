@@ -3,7 +3,7 @@ const { sendTrialCheckin1Email, sendActivationReminderEmail, sendLegacyTrialExpi
 const { computeSubscriptionStatus, ALWAYS_ACTIVE_EMAIL } = require('./subscriptionStatus');
 
 const TRIAL_DAYS = 30;
-const ACTIVATION_REMINDER_DELAY_HOURS = 12;
+const ACTIVATION_REMINDER_DELAY_HOURS = 6;
 
 function getSupabase() {
   const { createClient } = require('@supabase/supabase-js');
@@ -100,7 +100,7 @@ async function checkTrialReminders() {
 // Checks every company still sitting at status 'requires_trial_setup' --
 // signed up, but never finished Stripe Checkout, so no trial ever actually
 // started (shows up in the admin Companies list as "Not started"). Sends
-// one nudge email ~12 hours after signup if they're still in that state,
+// one nudge email ~6 hours after signup if they're still in that state,
 // deduped via activationReminderEmailSentAt on config.subscription so it
 // only ever goes out once per company, same pattern as checkTrialReminders
 // above. Needs each account's signup timestamp (nothing in config itself
