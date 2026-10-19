@@ -18,7 +18,22 @@ function getStripe() {
 // GET /api/subscription/status
 router.get('/status', async (req, res) => {
   try {
-    const { config } = await getOrCreateCompanyConfig(req.user.id);
+    // Seed matches company.js's GET /:id exactly (companyName/phone/website
+    // from the signup metadata) -- these two routes both hit
+    // getOrCreateCompanyConfig on a brand-new account's very first dashboard
+    // load, in parallel, with no ordering guarantee (see the comment on
+    // getOrCreateCompanyConfig itself). Each one still does its own
+    // build-and-save even when it loses the "who creates it" race, so
+    // whichever upsert lands second overwrites the first -- this used to
+    // leave a real typed-in company name clobbered by a blank one whenever
+    // this route's unseeded write landed after company.js's seeded write.
+    // Passing the identical seed here makes the two racing writes produce
+    // the same content regardless of order, closing that window.
+    const { config } = await getOrCreateCompanyConfig(req.user.id, {
+      companyName: req.user.metadata?.company_name,
+      phone: req.user.metadata?.phone,
+      website: req.user.metadata?.website,
+    });
     // Deliberately does NOT send the welcome email here -- see the matching
     // comment in company.js's GET /:id. This route's own `created` flag
     // only means "the row didn't exist before this call", not "Stripe

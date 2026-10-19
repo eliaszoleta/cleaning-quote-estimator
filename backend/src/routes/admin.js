@@ -3,7 +3,7 @@ const router = express.Router();
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { sendCompanyWelcomeEmail, sendWebsiteSampleReadyEmail, sendWebsiteSubscriptionConfirmedEmail } = require('../services/email');
-const { getCompanyConfig } = require('../services/companyConfig');
+const { getCompanyConfig, saveCompanyConfig } = require('../services/companyConfig');
 const { resolveCityForZip } = require('../services/zipCity');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -62,6 +62,13 @@ async function listCompaniesWithConfig(sb) {
     updatedAt: row.updated_at || null,
     email: userById.get(row.company_id)?.email || null,
     signedUpAt: userById.get(row.company_id)?.created_at || null,
+    // The raw signup metadata (company_name/phone/website) -- still sitting
+    // on the Supabase Auth user regardless of what cleaning_company_configs
+    // ended up with. Used by the unnamed-preview/backfill-company-names
+    // routes below to recover a company name that got clobbered by the
+    // GET /api/subscription/status + GET /api/company/:id race (see
+    // subscription.js's GET /status for the actual fix).
+    metadata: userById.get(row.company_id)?.user_metadata || {},
   }));
 }
 
@@ -173,6 +180,95 @@ router.delete('/companies/:id', async (req, res) => {
   } catch (err) {
     console.error(`Admin delete company ${id} error:`, err.message);
     res.status(500).json({ success: false, error: err.message || 'Failed to delete company' });
+  }
+});
+
+// GET /api/admin/companies/unnamed-preview — read-only. A race between GET
+// /api/subscription/status and GET /api/company/:id (both fire on a brand
+// new account's very first dashboard load, in parallel, with no ordering
+// guarantee -- see the fix + comment on subscription.js's GET /status)
+// could let the unseeded /status write land after the properly-seeded
+// /:id write and clobber a real typed-in company name with a blank one.
+// That race is now closed, but it already happened to existing accounts
+// before the fix shipped. This lists every account currently showing a
+// blank companyName, split into "recoverable" (the Supabase Auth signup
+// metadata still has the real company_name, phone, website -- we just
+// never wrote it back) and "unrecoverable" (metadata is blank too, so
+// there's nothing left to recover it from). Check this before calling
+// backfill-company-names below.
+router.get('/companies/unnamed-preview', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  try {
+    const rows = await listCompaniesWithConfig(sb);
+    const unnamed = rows.filter(r => !r.config.companyName);
+    const recoverable = unnamed
+      .filter(r => r.metadata.company_name)
+      .map(r => ({
+        companyId: r.companyId,
+        email: r.email,
+        signedUpAt: r.signedUpAt,
+        recoveredCompanyName: r.metadata.company_name,
+        recoveredPhone: r.config.phone ? null : (r.metadata.phone || null),
+        recoveredWebsite: r.config.website ? null : (r.metadata.website || null),
+      }));
+    const unrecoverable = unnamed
+      .filter(r => !r.metadata.company_name)
+      .map(r => ({ companyId: r.companyId, email: r.email, signedUpAt: r.signedUpAt }));
+
+    res.json({
+      success: true,
+      unnamedCount: unnamed.length,
+      recoverableCount: recoverable.length,
+      recoverable,
+      unrecoverableCount: unrecoverable.length,
+      unrecoverable,
+    });
+  } catch (err) {
+    console.error('Admin unnamed-preview error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to build preview' });
+  }
+});
+
+// POST /api/admin/companies/backfill-company-names — the real fix for the
+// accounts unnamed-preview found. Requires { confirm: true }, same
+// deliberate-second-step pattern as the other mutating admin routes below.
+// Strictly additive: only ever fills a currently-blank companyName/phone/
+// website from that account's own Supabase Auth signup metadata, never
+// overwrites a value that's already there. Optional { companyIds: [...] }
+// restricts it to just those accounts (matched against unnamed-preview's
+// recoverable list); omit it to backfill every recoverable account.
+router.post('/companies/backfill-company-names', async (req, res) => {
+  if (req.body?.confirm !== true) {
+    return res.status(400).json({ success: false, error: 'Refusing to backfill without { confirm: true } in the request body.' });
+  }
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  try {
+    const rows = await listCompaniesWithConfig(sb);
+    const companyIds = Array.isArray(req.body?.companyIds) ? new Set(req.body.companyIds) : null;
+    const targets = rows.filter(r =>
+      !r.config.companyName && r.metadata.company_name && (!companyIds || companyIds.has(r.companyId))
+    );
+
+    const updated = [];
+    for (const row of targets) {
+      const newConfig = {
+        ...row.config,
+        companyName: row.metadata.company_name,
+        phone: row.config.phone || row.metadata.phone || row.config.phone,
+        website: row.config.website || row.metadata.website || row.config.website,
+      };
+      await saveCompanyConfig(row.companyId, newConfig);
+      updated.push({ companyId: row.companyId, email: row.email, companyName: newConfig.companyName });
+    }
+
+    res.json({ success: true, updatedCount: updated.length, updated });
+  } catch (err) {
+    console.error('Admin backfill-company-names error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to backfill company names' });
   }
 });
 
