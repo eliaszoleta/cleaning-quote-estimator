@@ -165,7 +165,7 @@ module.exports = [
       "If you had the embeddable calculator widget on your own website, nothing there needs to change -- it's the same embed code as before, still on the Branding tab whenever you need it:",
       'https://www.cleanestimator.com/company?tab=branding',
       '',
-      "It's $25/month, same plan as before. Reply to this email if anything looks off or you run into any trouble getting back in.",
+      'Reply to this email if anything looks off or you run into any trouble getting back in.',
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -186,7 +186,7 @@ module.exports = [
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    It's $25/month, same plan as before. Reply to this email if anything looks off or you run into any trouble getting back in.
+    Reply to this email if anything looks off or you run into any trouble getting back in.
   </p>
   ${FOOTER_HTML}
 </div>`,
