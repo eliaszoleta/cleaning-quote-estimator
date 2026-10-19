@@ -178,6 +178,21 @@ export async function sendTrialEmails(adminKey, companyIds) {
   });
 }
 
+// The subscription.js GET /status + company.js GET /:id race (see
+// subscription.js's own comment) could clobber a brand-new signup's
+// companyName/phone/website with blanks before the fix shipped. These two
+// find and recover the accounts it already happened to -- the real values
+// are still sitting in that account's Supabase Auth signup metadata.
+export async function getIncompleteProfilePreview(adminKey) {
+  return apiFetch('/api/admin/companies/incomplete-profile-preview', { headers: { 'x-admin-key': adminKey } });
+}
+
+export async function backfillCompanyProfiles(adminKey, companyIds) {
+  return apiFetch('/api/admin/companies/backfill-company-profiles', {
+    method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ confirm: true, companyIds }),
+  });
+}
+
 export async function sendTrialEmailPreview(adminKey, to) {
   return apiFetch('/api/admin/companies/send-trial-email-preview', {
     method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify({ to }),
