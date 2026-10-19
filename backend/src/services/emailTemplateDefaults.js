@@ -409,9 +409,9 @@ module.exports = [
     text: [
       'Hi {{companyName}},',
       '',
-      "You signed up for Clean Estimator{{signupDateSuffix}}, and your free trial ran out before you got much chance to use it -- common for accounts from before adding a card became part of signing up.",
+      "You signed up for Clean Estimator{{signupDateSuffix}}, and your free trial ran out before you got much chance to use it.",
       '',
-      "We've reset that: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup. Your card isn't charged until the 30 days are up, and you can cancel anytime before then.",
+      "We've reset that: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup.",
       '',
       "Since you signed up, we've also added Calculator Mode -- an on-screen, unlimited pricing tool for your own quoting. No website or embed code required; log in, answer a few quick questions about a job, and get an accurate, consistent price in seconds. (If you do have a website, the embeddable calculator widget is still part of the same plan.)",
       '',
@@ -427,11 +427,11 @@ module.exports = [
   <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    You signed up for Clean Estimator{{signupDateSuffix}}, and your free trial ran out before you got much chance to use it — common for accounts from before adding a card became part of signing up.
+    You signed up for Clean Estimator{{signupDateSuffix}}, and your free trial ran out before you got much chance to use it.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    We've reset that: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup. Your card isn't charged until the 30 days are up, and you can cancel anytime before then.
+    We've reset that: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
