@@ -1521,7 +1521,7 @@ async function calculateCleaning(inputs, companyConfig = {}) {
       throw new Error(`Unknown service type: ${serviceType}`);
   }
 
-  // The single number shown as "Suggested price" everywhere this estimate
+  // The single number shown as "Midpoint Price" everywhere this estimate
   // appears (on-screen, Calculator Mode, the customer-facing email, the
   // admin lead card) -- deliberately just the plain midpoint of the final
   // total, computed once here so every surface uses the exact same number

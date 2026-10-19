@@ -351,7 +351,7 @@ router.post('/', async (req, res) => {
         // Only meaningful on the public path (isEmbedWidget false) --
         // LeadCaptureStep.js's required "I am a..." question. A homeowner
         // just wants to know what it'll cost them, so the separate
-        // "Suggested price (midpoint...)" line is dropped for them (the
+        // "Midpoint Price" line is dropped for them (the
         // range + full breakdown stays -- just not that one extra line);
         // a self-identified cleaning business still gets it, since they're
         // actually pricing their own jobs and the range alone doesn't tell

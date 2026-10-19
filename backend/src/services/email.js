@@ -320,7 +320,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   // actual embedded widget (pasted on the subscriber's own site) -- that's
   // the one surface explicitly scoped to show just one number. Every other
   // customer-estimate-email path keeps the original low–high range + a
-  // separate "suggested price" line, same as Calculator Mode's own
+  // separate "Midpoint Price" line, same as Calculator Mode's own
   // on-screen breakdown:
   //  - the free public calculator (cleanestimator.com's own homepage/
   //    state/city pages) -- a different product, no subscriber behind it.
@@ -332,7 +332,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   const isPublic = !isEmbedWidget;
   // Only meaningful on the public path -- LeadCaptureStep.js's required
   // "I am a..." question. A homeowner just wants the number it'll cost
-  // them, so the separate "Suggested price (midpoint...)" line below is
+  // them, so the separate "Midpoint Price" line below is
   // dropped for them -- the range breakdown and range total stay exactly
   // as-is, this only removes that one extra line. A self-identified
   // cleaning business keeps it, since they're actually pricing jobs and
@@ -383,7 +383,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     });
     lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
     if (suggestedPrice != null && !isHomeowner) {
-      lines.push(`  Suggested price (midpoint of the range above): ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
+      lines.push(`  Midpoint Price: ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
       // Shown to the same audience as ResultsScreen.js's matching note --
       // the estimator can't see the actual space, so it hands that
       // judgment back to whoever can.
@@ -452,7 +452,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
   // "Email to Coworker" share both keep the original range.
   const isPublic = !isEmbedWidget;
   // Same homeowner/business split as buildText above -- homeowner keeps
-  // the full range breakdown, just without the extra "Suggested price" row.
+  // the full range breakdown, just without the extra "Midpoint Price" row.
   const isHomeowner = isPublic && userType === 'homeowner';
   // Same mainTotal fallback as buildText above.
   const mainTotal = suggestedPrice != null ? suggestedPrice : Math.round((totalLow + totalHigh) / 2);
@@ -524,7 +524,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
       </tr>
       ${isPublic && suggestedPrice != null && !isHomeowner ? `
       <tr style="background:${primaryColor}0d;">
-        <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Suggested price <span style="font-weight:400;opacity:0.75;">(midpoint of the range above)</span></td>
+        <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Midpoint Price</td>
         <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
       </tr>
       <tr style="background:${primaryColor}0d;">

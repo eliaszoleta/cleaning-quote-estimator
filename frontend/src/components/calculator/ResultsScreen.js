@@ -224,7 +224,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                     <div style={{ padding: '11px 12px', background: `${primaryColor}0d`, borderTop: `1px solid ${primaryColor}28` }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
                         <span style={{ fontSize: 12.5, color: COLORS.body, fontWeight: 600 }}>
-                          Suggested price <span style={{ fontWeight: 400, opacity: 0.75 }}>(midpoint of the range above)</span>
+                          Midpoint Price
                         </span>
                         <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: primaryColor }}>
                           {formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}
