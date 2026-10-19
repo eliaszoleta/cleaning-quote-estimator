@@ -3,7 +3,7 @@ import { Mail, Plus, Trash2, Eye, Send, X, RefreshCw, Calendar, Ban, ArrowLeft, 
 import {
   getAdminEmailTemplates, createAdminEmailTemplate, updateAdminEmailTemplate, deleteAdminEmailTemplate,
   resyncAdminEmailTemplateDefault,
-  previewAdminEmailAudience, sendAdminIndividualEmail,
+  previewAdminEmailAudience, sendAdminIndividualEmail, grantLegacyWinbackTrial,
   getAdminEmailCampaigns, getAdminEmailCampaign, createAdminEmailCampaign, cancelAdminEmailCampaign,
   getAdminHomepageLeads, getAdminCompanies, getAdminPartners,
 } from '../../utils/api';
@@ -350,6 +350,22 @@ function ComposePanel({ adminKey, templates }) {
   const [previewing, setPreviewing] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createResult, setCreateResult] = useState(null);
+  const [granting, setGranting] = useState(false);
+  const [grantResult, setGrantResult] = useState(null);
+
+  const grantTrial = async () => {
+    if (!window.confirm('Grant a fresh 30-day Stripe trial to every legacy no-card signup that doesn\'t already have one? This changes what happens when they check out -- do this once, right before sending the win-back campaign.')) return;
+    setGranting(true);
+    setGrantResult(null);
+    try {
+      const res = await grantLegacyWinbackTrial(adminKey);
+      setGrantResult({ ok: true, msg: `Granted to ${res.granted} compan${res.granted === 1 ? 'y' : 'ies'} (${res.alreadyEligible} already had it).` });
+    } catch (err) {
+      setGrantResult({ ok: false, msg: err.message || 'Failed to grant trial eligibility' });
+    } finally {
+      setGranting(false);
+    }
+  };
 
   useEffect(() => {
     setVarValues({}); setSendResult(null); setPreview(null); setCreateResult(null);
@@ -555,6 +571,17 @@ function ComposePanel({ adminKey, templates }) {
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: theme.textMuted }}>
                     <input type="checkbox" checked={companyLegacyNoCardOnly} onChange={e => setCompanyLegacyNoCardOnly(e.target.checked)} style={{ accentColor: theme.accentSolid }} /> Legacy no-card signups only (old free trial, never added a card)
                   </label>
+                  {companyLegacyNoCardOnly && (
+                    <div style={{ marginTop: 2 }}>
+                      <button onClick={grantTrial} disabled={granting} style={{ ...secondaryBtnStyle, padding: '6px 12px', fontSize: 12.5, opacity: granting ? 0.7 : 1 }}>
+                        {granting ? 'Granting…' : 'Grant fresh 30-day trial to this segment'}
+                      </button>
+                      <div style={{ fontSize: 11.5, color: theme.textMuted, marginTop: 4, maxWidth: 420 }}>
+                        Required for the "legacy_winback_fresh_trial" template's 30-day offer to actually be true at checkout. Do this once before sending that campaign.
+                      </div>
+                      {grantResult && <div style={{ marginTop: 4, fontSize: 12.5, fontWeight: 600, color: grantResult.ok ? '#16a34a' : '#dc2626' }}>{grantResult.msg}</div>}
+                    </div>
+                  )}
                 </div>
               )}
 

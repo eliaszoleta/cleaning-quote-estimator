@@ -17,6 +17,7 @@ const router = express.Router();
 const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
+const { saveCompanyConfig } = require('../services/companyConfig');
 const { getTemplateById, sendTemplatedEmail } = require('../services/emailTemplates');
 
 // Same formatting as email.js's own formatDate -- duplicated rather than
@@ -311,6 +312,39 @@ router.post('/audience/preview', async (req, res) => {
   } catch (err) {
     console.error('Audience preview error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to resolve audience' });
+  }
+});
+
+// POST /api/admin/email-marketing/companies/grant-legacy-winback-trial —
+// a deliberate, explicit write, separate from the read-only audience
+// preview/resolution above on purpose: this is the one action that actually
+// makes the "legacy_winback_fresh_trial" template's 30-day-trial promise
+// true. Sets config.subscription.winbackTrialEligible = true on every
+// company in the "legacy no-card signups" segment (same predicate as
+// resolveAudience's companyLegacyNoCardOnly filter) that doesn't already
+// have it, so subscription.js's checkout route grants a real fresh Stripe
+// trial instead of charging immediately. Click this once before sending
+// that campaign -- sending the email alone does not grant anything.
+router.post('/companies/grant-legacy-winback-trial', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+  try {
+    const companies = await listCompanyContacts(sb);
+    let granted = 0;
+    let alreadyEligible = 0;
+    for (const c of companies) {
+      const sub = c.config.subscription || {};
+      const isLegacyNoCard = sub.trialStartedAt && !sub.stripeSubscriptionId;
+      if (!isLegacyNoCard) continue;
+      if (sub.winbackTrialEligible) { alreadyEligible += 1; continue; }
+      const nextConfig = { ...c.config, subscription: { ...sub, winbackTrialEligible: true } };
+      await saveCompanyConfig(c.companyId, nextConfig);
+      granted += 1;
+    }
+    res.json({ success: true, granted, alreadyEligible, total: granted + alreadyEligible });
+  } catch (err) {
+    console.error('Grant legacy winback trial error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to grant trial eligibility' });
   }
 });
 

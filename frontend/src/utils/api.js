@@ -321,6 +321,17 @@ export async function previewAdminEmailAudience(adminKey, audience) {
   });
 }
 
+// Grants subscription.winbackTrialEligible=true to every company in the
+// "legacy no-card signups" segment that doesn't already have it -- what
+// actually makes the legacy_winback_fresh_trial template's "new 30-day
+// trial" promise true at checkout (see subscription.js). Sending that
+// campaign alone does not grant anything; call this once first.
+export async function grantLegacyWinbackTrial(adminKey) {
+  return apiFetch('/api/admin/email-marketing/companies/grant-legacy-winback-trial', {
+    method: 'POST', headers: { 'x-admin-key': adminKey },
+  });
+}
+
 export async function sendAdminIndividualEmail(adminKey, payload) {
   return apiFetch('/api/admin/email-marketing/send-individual', {
     method: 'POST', headers: { 'x-admin-key': adminKey }, body: JSON.stringify(payload),
