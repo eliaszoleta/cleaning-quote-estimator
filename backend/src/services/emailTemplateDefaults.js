@@ -141,7 +141,7 @@ module.exports = [
   },
   {
     key: 'activation_reminder',
-    name: 'Activation reminder — checkout never finished',
+    name: 'Activation reminder — activation never finished',
     // Rewritten after both prior versions ("You're one step away..." and
     // "Still want to try...?") landed in Gmail's Promotions tab -- same
     // lesson already proven on website_request_received (see email.js's
