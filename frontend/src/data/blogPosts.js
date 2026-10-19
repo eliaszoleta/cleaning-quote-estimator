@@ -10527,6 +10527,60 @@ When a client's cancellation pattern suggests they no longer actually want the s
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'storing-equipment-supplies-at-commercial-accounts',
+    title: 'Where to Store Cleaning Equipment and Supplies at Commercial Accounts',
+    category: 'commercial',
+    categoryLabel: 'Commercial',
+    date: '2026-10-19',
+    readTime: '7 min',
+    excerpt: 'Pack in and pack out every night, or leave a fully stocked cart on-site? For commercial accounts, the right answer depends on cleaning frequency, available storage, and what you put in writing at the walkthrough.',
+    content: `
+## There's No Single Industry Standard — It's Frequency-Dependent
+
+Commercial cleaning business owners managing multiple accounts generally land on one of three approaches to equipment and supply storage: pack everything in and out every visit, leave a fully stocked janitorial cart on-site permanently, or a hybrid where some items (the cart, concentrated chemicals) stay on-site while others (vacuums, mop heads, rags) get hauled back for emptying, refilling, or laundering. Which one makes sense depends heavily on how often you're servicing that specific account — a once-a-week office and a five-day-a-week office have genuinely different storage needs, and the same policy applied to both tends to work poorly for at least one of them.
+
+## Why Visit Frequency Changes the Calculation
+
+For a once-a-week account, on-site storage space often isn't guaranteed — the client may not offer a dedicated closet, which means hauling a vacuum and mop bucket in and out each visit. That's a real inconvenience, but it's manageable at low frequency. The math changes fast for accounts serviced three or five days a week: hauling a vacuum and mop bucket on every visit, multiple times a week, becomes a genuine burden on time and physical effort, which is why these higher-frequency accounts make on-site storage considerably more important — to the point that some commercial cleaners specifically weigh storage availability when deciding whether to take on a higher-frequency account at all.
+
+## Practical Storage Solutions When Space Is Limited
+
+When a client doesn't have a dedicated closet or mop sink available, several workable options come up: a large trash barrel (a 44-gallon size is commonly cited) can double as storage for a vacuum and mop bucket in a pinch. A free-standing cabinet is another option, and when indoor space genuinely isn't available, storing that cabinet outside is sometimes the only practical fallback. None of these are ideal compared to a real dedicated closet, but they're real solutions commercial cleaners actually use when office space constraints (which, in a commercial setting, usually means real cost to the tenant per square foot) make a dedicated storage area a hard ask.
+
+## Bring Up Storage at the Walkthrough, Not After
+
+The clearest piece of advice that comes up repeatedly: raise storage expectations during the initial walkthrough, before the account is won, and put the specifics in the service agreement — where the storage closet is, who holds the key, and what happens to your equipment if the contract ends. That last point matters more than it might seem: if equipment you own is left on-site and the relationship ends, getting it back can become genuinely awkward without something in writing establishing upfront that it's yours, not something that transfers with the contract. Settling this before the account starts avoids a dispute over ownership of gear you've already paid for.
+
+## If You Leave Chemicals On-Site, Keep the SDS Sheets With Them
+
+Any concentrated cleaning chemicals left at a client location should be stored with their Safety Data Sheets (SDS) on hand — many commercial locations require this regardless of your own preference, since it's a standard workplace safety expectation for any chemicals stored on a property, not just something you're choosing to do as a courtesy.
+
+## How to Keep Your Storage Area
+
+For any storage space a commercial client actually provides, keeping it genuinely neat and clean matters more than it might seem worth the effort. A cluttered, messy storage closet is something a client or their staff can see, and it reads as a direct signal about the quality of service you're providing elsewhere in the building — a disorganized supply closet undermines trust even if the actual cleaning work is excellent.
+
+## Covering Startup Equipment Costs: Build It Into Pricing or Charge Separately
+
+When taking on a new commercial account that requires a dedicated set of equipment and supplies, there are two common ways to recover that upfront cost: a separate one-time startup fee, or building the cost into the regular monthly price gradually over the first few months of the contract. Smaller offices in particular tend to resist a separate setup charge more than they resist a price that's simply built in from the start — a quoted monthly rate that already accounts for startup costs tends to generate less pushback than an itemized extra fee on top of it, even when the total cost to the client ends up similar either way.
+
+## FAQ
+
+**Should I leave my cleaning equipment at a commercial client's location or bring it with me every visit?**
+It depends mainly on visit frequency. For once-a-week accounts, hauling equipment in and out is manageable even without dedicated storage. For accounts serviced three or more days a week, on-site storage becomes considerably more important, since repeatedly hauling equipment at that frequency is a real time and effort burden.
+
+**What should I put in writing about equipment stored at a client's location?**
+Specify where the storage area is, who holds the key, and explicitly state that any equipment you provide remains your property if the contract ends. Settling this at the walkthrough, before the account starts, avoids an awkward dispute over equipment ownership later.
+
+**Do I need to store Safety Data Sheets with chemicals I leave on-site?**
+Yes — many commercial locations require SDS sheets to accompany any chemicals stored on the property as a standard workplace safety requirement, regardless of whether it's your own company's policy.
+
+**Should I charge a separate setup fee for new equipment, or build it into my price?**
+Both are used in practice, but building startup costs into the regular monthly price over the first few months tends to generate less resistance than a separate line-item setup fee, particularly with smaller offices.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
