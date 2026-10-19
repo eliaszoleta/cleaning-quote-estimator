@@ -229,9 +229,16 @@ export async function deleteAdminPartner(adminKey, id) {
 
 // AdminHomepageLeads.js -- leads captured by the main public calculator
 // (no companyId, so company_id is null on the row), same adminKey convention
-// as the rest of the admin API.
-export async function getAdminHomepageLeads(adminKey, includeDeleted = false) {
-  return apiFetch(`/api/admin/homepage-leads${includeDeleted ? '?deleted=true' : ''}`, { headers: { 'x-admin-key': adminKey } });
+// as the rest of the admin API. Paginated (offset/limit, defaults to the
+// backend's own 20/0) so opening the page doesn't have to wait on fetching
+// + ZIP-resolving every lead ever captured -- see the matching comment on
+// GET /api/admin/homepage-leads.
+export async function getAdminHomepageLeads(adminKey, { includeDeleted = false, offset = 0, limit } = {}) {
+  const params = new URLSearchParams();
+  if (includeDeleted) params.set('deleted', 'true');
+  params.set('offset', String(offset));
+  if (limit) params.set('limit', String(limit));
+  return apiFetch(`/api/admin/homepage-leads?${params.toString()}`, { headers: { 'x-admin-key': adminKey } });
 }
 
 export async function patchAdminHomepageLead(adminKey, id, updates) {

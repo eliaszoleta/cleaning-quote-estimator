@@ -307,7 +307,11 @@ function ComposePanel({ adminKey, templates }) {
     try {
       let rows = [];
       if (mode === 'lead') {
-        const res = await getAdminHomepageLeads(adminKey);
+        // This recipient picker needs every lead to search/pick from, not
+        // just the most recent page -- getAdminHomepageLeads now defaults
+        // to a small page (see AdminHomepageLeads.js's own "Load more"),
+        // so this explicitly asks for the old effectively-everything limit.
+        const res = await getAdminHomepageLeads(adminKey, { limit: 2000 });
         rows = (res.data || []).map(l => ({ id: l.id, name: l.name || '(no name)', email: l.email, detail: l.service_type ? l.service_type.replace(/_/g, ' ') : '' }));
       } else if (mode === 'company') {
         const res = await getAdminCompanies(adminKey);

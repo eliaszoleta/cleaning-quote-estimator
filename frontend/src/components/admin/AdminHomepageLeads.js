@@ -5,6 +5,8 @@ import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from 
 import { useConfirm } from '../dashboard/ConfirmDialog';
 import { theme, cardStyle, inputStyle, secondaryBtnStyle, dangerBtnStyle, pill, avatarGradient, PageHeader } from './adminTheme';
 
+const PAGE_SIZE = 20;
+
 const SERVICE_COLORS = {
   home_residential: '#2563eb', apartment: '#7c3aed', commercial: '#0891b2',
   carpet: '#16a34a', upholstery: '#be185d', air_duct: '#d97706', dryer_vent: '#dc2626',
@@ -42,6 +44,16 @@ function matchesDateFilter(createdAt, dateFilter) {
 export default function AdminHomepageLeads({ adminKey }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Loads PAGE_SIZE most recent at a time instead of every lead ever
+  // captured -- see the matching comment on GET /api/admin/homepage-leads
+  // for why the old "fetch everything" default made this page slow to
+  // open. hasMore/offset track the next page to fetch; loadingMore and
+  // exportingAll are separate from `loading` so "Load more" and "Export"
+  // each show their own state instead of blanking the whole list.
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [exportingAll, setExportingAll] = useState(false);
   const [filter, setFilter] = useState('all');
   const [stateFilter, setStateFilter] = useState('all');
   const [cityFilter, setCityFilter] = useState('all');
@@ -70,12 +82,16 @@ export default function AdminHomepageLeads({ adminKey }) {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
+  // Always starts over from the most recent page -- used on mount and by
+  // the Refresh button. loadMoreLeads below is the only thing that appends.
   const loadLeads = useCallback(async (key) => {
     setLoading(true);
     try {
-      const res = await getAdminHomepageLeads(key, true);
+      const res = await getAdminHomepageLeads(key, { includeDeleted: true, offset: 0, limit: PAGE_SIZE });
       const loaded = res.data || [];
       setLeads(loaded);
+      setOffset(loaded.length);
+      setHasMore(!!res.hasMore);
       const activeLoaded = loaded.filter(l => !l.deleted_at);
       setSelectedLead(prev => prev || (activeLoaded.length > 0 ? activeLoaded[0] : null));
     } catch (err) {
@@ -85,11 +101,47 @@ export default function AdminHomepageLeads({ adminKey }) {
     }
   }, []);
 
+  const loadMoreLeads = async () => {
+    setLoadingMore(true);
+    try {
+      const res = await getAdminHomepageLeads(adminKey, { includeDeleted: true, offset, limit: PAGE_SIZE });
+      const loaded = res.data || [];
+      setLeads(prev => [...prev, ...loaded]);
+      setOffset(prev => prev + loaded.length);
+      setHasMore(!!res.hasMore);
+    } catch (err) {
+      console.error('Error loading more homepage leads:', err.message);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   useEffect(() => { if (adminKey) loadLeads(adminKey); }, [adminKey, loadLeads]);
   useEffect(() => () => { if (notesTimer.current) clearTimeout(notesTimer.current); }, []);
   useEffect(() => {
     if (selectedLead) setNotes(selectedLead.notes || '');
   }, [selectedLead?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Pulled out of the component so exportCSV/exportFacebookCSV can run the
+  // exact same filtering against a full on-demand fetch (see those below)
+  // instead of whatever's currently paginated into `leads` -- otherwise an
+  // export would silently only cover the leads loaded so far on screen.
+  const applyFilters = (arr, { filter, stateFilter, cityFilter, dateFilter, userTypeFilter, view, search }) => {
+    const dateFiltered = arr.filter(l => matchesDateFilter(l.created_at, dateFilter));
+    const base = dateFiltered.filter(l => (view === 'trash' ? !!l.deleted_at : !l.deleted_at));
+    return base.filter(l => {
+      if (filter !== 'all' && l.service_type !== filter) return false;
+      if (stateFilter !== 'all' && l.state !== stateFilter) return false;
+      if (cityFilter !== 'all' && l.city !== cityFilter) return false;
+      if (userTypeFilter !== 'all' && l.user_type !== userTypeFilter) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return (l.name || '').toLowerCase().includes(q) || (l.email || '').toLowerCase().includes(q) || (l.zip || '').includes(q) || (l.city || '').toLowerCase().includes(q);
+      }
+      return true;
+    });
+  };
+  const activeFilters = { filter, stateFilter, cityFilter, dateFilter, userTypeFilter, view, search };
 
   // Date filter narrows the whole pool first -- the Active/Trash tab counts
   // and the list itself should agree on what "this month" includes, not
@@ -99,17 +151,7 @@ export default function AdminHomepageLeads({ adminKey }) {
   const activeCount = dateFilteredLeads.filter(l => !l.deleted_at).length;
   const trashCount = dateFilteredLeads.filter(l => l.deleted_at).length;
 
-  const filtered = baseLeads.filter(l => {
-    if (filter !== 'all' && l.service_type !== filter) return false;
-    if (stateFilter !== 'all' && l.state !== stateFilter) return false;
-    if (cityFilter !== 'all' && l.city !== cityFilter) return false;
-    if (userTypeFilter !== 'all' && l.user_type !== userTypeFilter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return (l.name || '').toLowerCase().includes(q) || (l.email || '').toLowerCase().includes(q) || (l.zip || '').includes(q) || (l.city || '').toLowerCase().includes(q);
-    }
-    return true;
-  });
+  const filtered = applyFilters(leads, activeFilters);
 
   const serviceTypes = [...new Set(baseLeads.map(l => l.service_type))];
   const states = [...new Set(baseLeads.map(l => l.state).filter(Boolean))].sort();
@@ -282,8 +324,26 @@ export default function AdminHomepageLeads({ adminKey }) {
     return [headers, ...rows].map(r => r.map(c => `"${sanitizeCsvCell(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   };
 
-  const exportCSV = () => {
-    const rowsSource = selectedIds.size > 0 ? filtered.filter(l => selectedIds.has(l.id)) : filtered;
+  // With an explicit selection, exports exactly those. Otherwise -- the
+  // common "export everything matching my filters" case -- a page that's
+  // only loaded the most recent PAGE_SIZE leads can't just export `filtered`
+  // anymore, or it would silently drop every older lead that matches. So
+  // this fetches the full set on demand (same filters re-applied to it)
+  // instead of ever exporting a partial list without saying so.
+  const rowsToExport = async () => {
+    if (selectedIds.size > 0) return filtered.filter(l => selectedIds.has(l.id));
+    if (!hasMore) return filtered;
+    setExportingAll(true);
+    try {
+      const res = await getAdminHomepageLeads(adminKey, { includeDeleted: true, limit: 2000 });
+      return applyFilters(res.data || [], activeFilters);
+    } finally {
+      setExportingAll(false);
+    }
+  };
+
+  const exportCSV = async () => {
+    const rowsSource = await rowsToExport();
     const csv = toCSV(rowsSource);
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -318,8 +378,8 @@ export default function AdminHomepageLeads({ adminKey }) {
     return [headers, ...rows].map(r => r.map(c => `"${sanitizeCsvCell(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   };
 
-  const exportFacebookCSV = () => {
-    const rowsSource = selectedIds.size > 0 ? filtered.filter(l => selectedIds.has(l.id)) : filtered;
+  const exportFacebookCSV = async () => {
+    const rowsSource = await rowsToExport();
     const csv = toFacebookCSV(rowsSource);
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -350,11 +410,11 @@ export default function AdminHomepageLeads({ adminKey }) {
                   <button onClick={() => loadLeads(adminKey)} style={secondaryBtnStyle}>
                     <RefreshCw size={13} /> Refresh
                   </button>
-                  <button onClick={exportCSV} disabled={filtered.length === 0} style={{ ...secondaryBtnStyle, opacity: filtered.length === 0 ? 0.5 : 1 }}>
-                    <Download size={13} /> {selectedIds.size > 0 ? `Export Selected (${selectedIds.size})` : 'Export CSV'}
+                  <button onClick={exportCSV} disabled={filtered.length === 0 || exportingAll} style={{ ...secondaryBtnStyle, opacity: (filtered.length === 0 || exportingAll) ? 0.5 : 1 }}>
+                    <Download size={13} /> {exportingAll ? 'Exporting…' : selectedIds.size > 0 ? `Export Selected (${selectedIds.size})` : 'Export CSV'}
                   </button>
-                  <button onClick={exportFacebookCSV} disabled={filtered.length === 0} title="Formatted for Meta Ads Manager > Audiences > Custom Audience > Customer List" style={{ ...secondaryBtnStyle, opacity: filtered.length === 0 ? 0.5 : 1 }}>
-                    <Target size={13} /> Export for Facebook
+                  <button onClick={exportFacebookCSV} disabled={filtered.length === 0 || exportingAll} title="Formatted for Meta Ads Manager > Audiences > Custom Audience > Customer List" style={{ ...secondaryBtnStyle, opacity: (filtered.length === 0 || exportingAll) ? 0.5 : 1 }}>
+                    <Target size={13} /> {exportingAll ? 'Exporting…' : 'Export for Facebook'}
                   </button>
                 </div>
               </div>
@@ -514,6 +574,19 @@ export default function AdminHomepageLeads({ adminKey }) {
                     </div>
                   );
                 })}
+              </div>
+            )}
+
+            {hasMore && !loading && (
+              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                <button onClick={loadMoreLeads} disabled={loadingMore} style={secondaryBtnStyle}>
+                  <RefreshCw size={13} className={loadingMore ? 'spin' : ''} /> {loadingMore ? 'Loading…' : `Load ${PAGE_SIZE} more`}
+                </button>
+                {(search || filter !== 'all' || stateFilter !== 'all' || cityFilter !== 'all' || userTypeFilter !== 'all') && (
+                  <div style={{ fontSize: 11.5, color: theme.textMuted, textAlign: 'center' }}>
+                    Searching/filtering only looks at the {leads.length} leads loaded so far — load more to look further back.
+                  </div>
+                )}
               </div>
             )}
           </div>

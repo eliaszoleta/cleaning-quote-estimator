@@ -424,35 +424,49 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 // GET shouldn't have side effects, and re-resolving on each server restart
 // is cheap enough at this volume).
 
-// GET /api/admin/homepage-leads
+// GET /api/admin/homepage-leads — paginated (offset/limit), newest first.
+// Used to default to fetching up to 1000-2000 rows in one shot, which made
+// AdminHomepageLeads.js slow to open: every row's ZIP needs a city resolved
+// (resolveCityForZip below -- an external API call per unique, uncached
+// ZIP) on top of the Supabase round trip itself. Defaults to the 20 most
+// recent now; the frontend's "Load more" button pages through the rest on
+// demand. An explicit larger `limit` (e.g. the frontend's own "export
+// everything" fetch) still works, capped at 2000 same as before.
 router.get('/homepage-leads', async (req, res) => {
   const sb = getSupabase();
   if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
 
   const includeDeleted = req.query.deleted === 'true';
-  const limit = Math.min(parseInt(req.query.limit, 10) || 1000, 2000);
+  const limit = Math.min(parseInt(req.query.limit, 10) || 20, 2000);
+  const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
 
   try {
-    let query = sb.from('leads').select('*').is('company_id', null).order('created_at', { ascending: false }).limit(limit);
+    // Fetches one extra row past `limit` purely to answer "is there more?"
+    // without a separate count query -- trimmed back off below before
+    // anything is sent to the client.
+    let query = sb.from('leads').select('*').is('company_id', null).order('created_at', { ascending: false }).range(offset, offset + limit);
     if (!includeDeleted) query = query.is('deleted_at', null);
     const { data, error } = await query;
     if (error) throw error;
+
+    const rows = data || [];
+    const hasMore = rows.length > limit;
+    const page = hasMore ? rows.slice(0, limit) : rows;
 
     // Resolve each unique ZIP once (not once per lead -- many leads share
     // a ZIP), then attach the result as a top-level `city` field. Prefers
     // an explicit service_details.city when one exists (a scoped-widget
     // lead that really was asked, vs. a homepage lead being backfilled),
     // so this never overrides real visitor input with a guess.
-    const rows = data || [];
-    const uniqueZips = [...new Set(rows.map(r => r.zip).filter(Boolean))];
+    const uniqueZips = [...new Set(page.map(r => r.zip).filter(Boolean))];
     const cityByZip = new Map();
     await Promise.all(uniqueZips.map(async zip => { cityByZip.set(zip, await resolveCityForZip(zip)); }));
-    const enriched = rows.map(row => ({
+    const enriched = page.map(row => ({
       ...row,
       city: row.service_details?.city || cityByZip.get(row.zip) || null,
     }));
 
-    res.json({ success: true, count: enriched.length, data: enriched });
+    res.json({ success: true, count: enriched.length, hasMore, data: enriched });
   } catch (err) {
     console.error('Admin homepage-leads list error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to load leads' });
