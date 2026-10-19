@@ -10420,6 +10420,61 @@ Not by itself. New software inherits whatever data collection process feeds it �
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'job-completion-photos-dispute-protection',
+    title: 'Why Every Cleaning Job Needs a Completion Photo and Review Request Workflow',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-10-19',
+    readTime: '7 min',
+    excerpt: 'A quick set of timestamped photos and a same-day send-off does two things at once: it protects you from a bogus complaint and it turns a finished job into a Google review. Here\'s the workflow experienced cleaners actually use.',
+    content: `
+## Documentation Isn't Just About Disputes — It's a Workflow
+
+Ask a group of experienced cleaning business owners what they do when a job wraps up, and a consistent pattern shows up: photos, a completion note or checklist, and a review request — done close together, right after the job, not scattered across the rest of the day. The photos protect against a bogus complaint. The completion note gives the client a clear record of what was done. The review request turns a satisfied client into public proof while the job is still fresh in their mind. Treating these as one connected close-out step, rather than three separate afterthoughts, is what makes the whole system actually work.
+
+## What to Photograph (and What Not To)
+
+You don't need to document every room of every job — that's more effort than it's worth and produces more photos than anyone will ever look at. The pattern that comes up repeatedly: a small, consistent set of high-dispute areas, photographed the same way every time. A main living area, the stove, and the master bathroom vanity are commonly cited as the spots worth covering by default, since they're the areas a client is most likely to scrutinize or raise a concern about later. Timestamped photos matter specifically because a timestamp removes any ambiguity about when the documentation was actually taken relative to the job.
+
+For a brand-new client, before-and-after photos are standard — they give you a real baseline and protect you if a client claims something was already damaged or dirty before you arrived. For a returning client or a home that's consistently in good condition, after-only photos are often enough, since there's less dispute risk and less need to document a "before" state that's already well established from prior visits.
+
+## Internal Evidence vs. What the Client Actually Sees
+
+An important distinction: the raw photo set you keep is mainly for your own protection and your business's portfolio, not necessarily something you forward wholesale to every client. What the client typically sees is a short, clean completion checklist or summary — confirmation of what was done, in a format that's easy to skim — while the full photo set stays on the job record as your evidence in case a dispute does come up later. Sending every raw photo to every client adds friction without adding much value; keeping them on file while sending a simple summary gets the protection without the overhead.
+
+## Speed Matters More Than Most Cleaners Expect
+
+The single most repeated piece of advice in this workflow: send the completion note, photos, or checklist right away, not later that day or the next morning. A completion message sent immediately, while you're still on-site or just leaving, reads as a straightforward record of the job. The same message sent the next day — especially after a complaint has already come in — reads as an excuse, even if the content is identical. If a dispute does come up, the timing of when you documented the job (not just that you documented it) is part of what makes that documentation credible.
+
+## The Standard Close-Out Sequence
+
+Put together, the workflow that shows up again and again looks like this:
+
+1. **Mark the job complete** in whatever system you're using to track jobs.
+2. **Take your standard set of timestamped photos** — the same key areas, every time, so the habit doesn't depend on remembering in the moment.
+3. **Send the invoice along with a short walkthrough of what was completed** — not just a bill, but a quick summary that shows the client exactly what they're being charged for.
+4. **Send a Google review request immediately**, while the job and the client's satisfaction are both fresh — a review asked for days later gets a noticeably lower response rate than one asked for right at hand-off.
+
+Several field-service apps built for home service businesses (Jobber, Housecall Pro, ZenMaid, and similar tools) are built around this exact sequence — job completion, photo capture, invoicing, and automated review requests in one flow — which is part of why this process has become close to standard practice rather than something each business invents independently.
+
+## FAQ
+
+**Do I need before-and-after photos for every cleaning job?**
+Before-and-after is most valuable for new clients, where you don't yet have an established baseline of the home's condition. For returning clients in consistently good condition, after-only photos are often sufficient.
+
+**Should I send all my job photos to the client?**
+Not necessarily. Many cleaners keep the full photo set as internal evidence and business-profile material, and send the client a short completion checklist or summary instead — getting the dispute protection without overwhelming the client with raw images.
+
+**Why does it matter when I send the completion documentation?**
+Sending it immediately, at or near job completion, reads as a straightforward record. The same documentation sent later — especially after a complaint has already surfaced — looks like an excuse constructed after the fact, even when the content itself hasn't changed.
+
+**When's the best time to ask for a Google review?**
+Right at job completion, while satisfaction is highest and the work is freshest in the client's mind. Review requests sent even a day or two later get noticeably fewer responses.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
