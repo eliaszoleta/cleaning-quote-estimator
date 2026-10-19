@@ -10368,6 +10368,58 @@ Not necessarily, but you do need documentation. If you're not using a formal sig
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'why-cleaning-quotes-are-still-inconsistent',
+    title: 'Why Your Cleaning Quotes Are Still Inconsistent (Even With a Calculator or Spreadsheet)',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-10-19',
+    readTime: '7 min',
+    excerpt: 'Pricing software and spreadsheets solve the math. They don\'t solve the real source of inconsistent quotes: what gets captured at the walkthrough, and whether anyone ever checks a quote against what the job actually took.',
+    content: `
+## The Math Was Never the Problem
+
+A lot of cleaning business owners assume inconsistent quotes are a calculation problem — the wrong formula, a spreadsheet that's out of date, software that doesn't handle some edge case. In practice, the formula part is usually fine. Square footage, number of bathrooms, and frequency are easy to price consistently once you've settled on a base rate. The actual source of inconsistent quotes is almost always upstream of the math: what gets captured during the walkthrough, and how consistently it gets captured, job after job, person after person.
+
+## The Real Bottleneck Is Walkthrough Data, Not Calculation
+
+If square footage, bathroom count, pets, and condition get recorded differently every time — sometimes noted carefully, sometimes eyeballed, sometimes skipped entirely — then the calculator or spreadsheet downstream of that data is only ever as accurate as the weakest walkthrough. A perfect pricing formula fed inconsistent inputs still produces inconsistent quotes. This is why simply switching pricing tools rarely fixes the underlying problem: the new tool inherits the same inconsistent data collection the old one had.
+
+The fix isn't more sophisticated math — it's a fixed intake process. A required-field walkthrough form (square footage, bathroom and bedroom counts, pets, current condition, any job-specific factors) filled out the same way every time, ideally with photos attached, closes most of the gap between "what the tool calculated" and "what the job actually required." A condition adjustment applied as a defined multiplier — rather than a gut-feel bump decided differently by whoever's doing the walkthrough that day — removes one of the biggest sources of quote-to-quote variance.
+
+## Square Footage Pricing Misses What Actually Drives Cost
+
+Tools generally price square footage correctly. What they miss, consistently, is everything that doesn't show up in a square footage number: the actual condition of the home, how much pet hair is involved, and whether this is genuinely a standard recurring clean or actually a reset clean — a first visit on a home that hasn't been properly maintained, priced like routine maintenance because nobody flagged it as something different. A reset clean can easily take two to three times longer than a standard clean of the same square footage, and if that distinction isn't captured at the walkthrough, it never makes it into the price.
+
+Capturing that distinction at the point of the walkthrough — in the same record that becomes the actual job ticket, not a separate note that may or may not get passed along — is what closes this gap in practice. If the person doing the walkthrough and the person pricing the job are relying on different information (or the same information passed along secondhand and incompletely), inconsistency is close to guaranteed.
+
+## The Second Gap: Nobody Checks Quotes Against Reality
+
+Even with a clean walkthrough process, there's a second, less obvious gap: most cleaning businesses never go back and compare what a job was quoted at against what it actually took in scheduled or clocked hours. Without that feedback loop, a job type that's been systematically underpriced for months can go completely unnoticed — the business just quietly operates at a lower margin on that category of job, and nobody finds out until it shows up as a vague feeling that certain jobs "never seem profitable," without ever being able to say exactly which ones or why.
+
+Closing this loop doesn't require anything elaborate: periodically pulling quoted price, scheduled hours, and actual time-clock entries for a sample of recent jobs, grouped by job type or condition tier, and looking for patterns where actual time consistently runs ahead of what was quoted. That comparison is what turns "we feel like deep cleans always run long" into "deep cleans on homes marked heavy condition are underpriced by roughly 20%" — a finding you can actually act on by adjusting that specific multiplier.
+
+## Where a Standardized Intake Tool Helps
+
+This is exactly the gap a structured estimating tool is built to close: instead of a walkthrough form filled out differently by whoever's on-site that day, [Clean Estimator](/estimator) asks the same condition, size, pet, and service-specific questions every time and applies the same defined adjustments consistently — removing the person-to-person and day-to-day variance that's usually the real source of inconsistent quotes, before you ever get to the question of whether the formula itself is right.
+
+## FAQ
+
+**Why are my cleaning quotes inconsistent even though I use a calculator?**
+Most inconsistency comes from how walkthrough data is captured, not from the pricing math itself. If square footage, condition, and pet presence are recorded differently every time, the calculator downstream is only as accurate as that inconsistent input.
+
+**What's the difference between a standard clean and a "reset clean" for pricing purposes?**
+A reset clean is a first-time deep clean on a home that hasn't been properly maintained, which can take two to three times longer than a routine maintenance clean of the same square footage. If it's priced as a standard clean because that distinction wasn't flagged at the walkthrough, it's effectively underpriced from the start.
+
+**How do I find out if I'm underpricing certain types of jobs?**
+Periodically compare quoted price and scheduled hours against actual time-clock entries for recent jobs, grouped by job type or condition tier. A consistent gap between quoted and actual time for a specific category is a sign that category's pricing needs adjustment.
+
+**Does better software fix inconsistent quotes on its own?**
+Not by itself. New software inherits whatever data collection process feeds it — if walkthrough data is still inconsistent, a better calculator will just calculate inconsistent inputs more precisely. Standardizing the intake process matters more than which tool does the math.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
