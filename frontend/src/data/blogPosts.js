@@ -10087,6 +10087,73 @@ Yes — working top to bottom in every room means dust and debris that gets knoc
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'dedicated-microfiber-cloths-for-window-cleaning',
+    title: 'Why Window Cleaning Needs Its Own Dedicated Microfiber Cloths (and How to Keep Staff From Grabbing Them)',
+    category: 'house-cleaning',
+    categoryLabel: 'House Cleaning',
+    date: '2026-10-19',
+    readTime: '6 min',
+    excerpt: 'A set of cloths used only on glass stays streak-free for years. The same cloths used on counters, mirrors, and spills with other chemicals won\'t. Here\'s how to build a dedicated window-cloth system, keep it water-only, and stop other staff from quietly ruining it.',
+    content: `
+## Why Windows Need Their Own Cloths
+
+A microfiber cloth streaks on glass for one of two reasons: it's picked up a residue it can't fully release, or it's been washed and dried in a way that's flattened or gummed up its fibers. Both problems get worse every time a window cloth gets used for something else — wiping a counter that was just sprayed with a degreaser, mopping up a spill, or cleaning a mirror with a product that leaves a film. Once that residue is in the fibers, it transfers straight onto the next pane of glass as a streak, no matter how careful the technique is.
+
+The fix most experienced cleaners land on is the same one already used for kitchen-vs-bathroom cloths: dedicate a specific set of cloths to glass only, color-code them so they're visually distinct from every other cloth in the kit, and train the whole team (or just yourself, if you're solo) to treat that color as off-limits for anything else.
+
+## Does Water Alone Actually Work?
+
+Yes — for a cloth that's genuinely clean and residue-free, plain water is often enough to get glass streak-free, especially on routine maintenance cleaning rather than a first-time deep clean on heavily soiled windows. The two things that matter more than the liquid in the cloth are:
+
+- **Wringing it out properly.** A cloth that's too wet leaves water sheeting on the glass that has to evaporate (and often leaves its own marks as it does). Wring until the cloth feels just barely damp, not wet, before it touches glass.
+- **Using a second, dry microfiber cloth to buff.** A damp pass to lift dust and grime, followed immediately by a dry cloth to buff the surface, is what actually produces the streak-free finish — the water alone doesn't do all the work.
+
+For heavier buildup (grease film near a kitchen window, hard water spots, or a first clean on windows that haven't been done in a while), a dedicated glass cleaner or a light vinegar-water solution still outperforms water alone. But for routine upkeep, a well-cared-for microfiber cloth and water get most cleaners most of the way there.
+
+## Color-Coding So Other Staff Don't "Borrow" Them
+
+If you run a team, the single biggest threat to a good window-cloth system isn't the cloths themselves — it's another cleaner grabbing one because it's nearby and convenient, using it on something else, and handing it back contaminated without realizing it mattered. The fix is the same principle already used for kitchen/bathroom color-coding, applied one color further:
+
+- Pick a color that isn't already assigned to another task (if blue is bathrooms and yellow is kitchens, windows might be white or a distinct pattern).
+- Store window cloths in their own labeled bin or pouch inside the caddy, physically separated from the general-purpose stack.
+- Make the rule explicit during onboarding, not assumed: "the [color] cloths are glass only, every time, no exceptions." A rule that only exists in one person's head doesn't survive a staffing change.
+- Replace a cloth the moment it's been misused rather than trying to "rescue" it — a cloth that's absorbed the wrong chemical rarely performs the same again, and a cheap replacement costs less than the time lost to streaky windows on a callback.
+
+## Drying Microfiber Without Killing It
+
+Microfiber's cleaning power comes from thousands of tiny split fibers that grab dust and grime at a microscopic level. Two laundry habits damage those fibers and shorten a cloth's useful life:
+
+- **Fabric softener.** It coats fibers with a residue that fills in the microscopic splits microfiber relies on, which is exactly why it reduces performance over time — skip it entirely for microfiber loads, even though it feels like it should help a cloth that's getting a little rough.
+- **High heat.** Repeated high-heat drying breaks down the synthetic fibers faster than low or medium heat does. Air-drying or a low-heat tumble cycle takes a little longer but meaningfully extends how long a cloth stays effective.
+
+Washed and dried correctly — no fabric softener, no high heat, washed separately from cotton or lint-heavy fabrics that shed into the microfiber — a good microfiber cloth can realistically last years of regular use, not months. Several experienced cleaners report getting half a decade or more out of a cloth cared for this way, while a neglected one (fabric softener, high heat, mixed in with everything else) can go rough and streaky within a season.
+
+## A Note on "Premium" Window Cloths
+
+Specialty window-cloth products marketed specifically for glass show up periodically, sometimes at a noticeably higher price than standard microfiber. Durability on these varies and isn't something we've independently verified, so it's worth treating any specific product claim with the same skepticism you'd apply to a disinfectant marketing claim — check reviews from other cleaners, and don't assume a higher price guarantees a longer lifespan over a well-maintained standard microfiber cloth.
+
+## A Flour Sack Towel Alternative
+
+Some cleaners skip microfiber for the final glass pass entirely and finish with a flour sack towel instead — a thin, lint-free cotton towel that leaves a notably streak-free finish on glass when used dry after a damp cleaning pass. Paired with a simple spray mix (a few drops of dish soap and a splash of vinegar in water), it's a low-cost alternative worth testing against your current method, particularly on large window jobs where buffing speed matters.
+
+## FAQ
+
+**Can I clean windows with just water and no cleaning product?**
+Yes, for routine maintenance cleaning on glass that isn't heavily soiled — a properly wrung-out damp microfiber cloth followed by a dry buffing cloth gets most windows streak-free. Heavier grease film or hard water deposits usually still need an actual glass cleaner or a vinegar solution.
+
+**Why do my window cloths streak after a while even though I'm using the same technique?**
+The most common cause is residue buildup from the cloth being used on something other than glass, or from fabric softener and high heat during laundering coating and degrading the microfiber's split fibers. Dedicating cloths to glass only and washing them without fabric softener or high heat usually resolves it.
+
+**What color should I use for dedicated window cloths?**
+Any color not already assigned to another surface in your color-coding system works — what matters more than the specific color is that it's distinct, labeled, stored separately from general-purpose cloths, and the rule is explained clearly to anyone on the team who might otherwise grab the nearest cloth.
+
+**Are flour sack towels better than microfiber for windows?**
+Neither is universally better — flour sack towels are a popular low-cost alternative for the final dry buffing pass and many cleaners prefer the finish, but a well-maintained microfiber cloth works well too. It's worth testing both on your own jobs to see which gives a better result with your technique and water quality.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
