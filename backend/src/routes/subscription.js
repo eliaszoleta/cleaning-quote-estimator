@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { sendCompanyWelcomeEmail, sendPaymentFailedEmail, sendSubscriptionCanceledEmail } = require('../services/email');
+const { sendCompanyWelcomeEmail, sendSubscriptionReactivatedEmail, sendPaymentFailedEmail, sendSubscriptionCanceledEmail } = require('../services/email');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -265,18 +265,21 @@ async function handleStripeEvent(event) {
         if (!config.subscription.welcomeEmailSentAt || wasCanceled) {
           const email = await getOwnerEmail(companyId);
           if (email) {
-            // This same webhook fires for a brand-new trial, a reactivation
-            // of an expired no-card trial, AND a win-back reactivation of a
-            // previously canceled paying account -- all charge the card
-            // immediately with no trial attached except the first, so the
-            // opening line is chosen from what this specific session
-            // actually granted plus whether this is a returning cancellation.
-            const statusLine = subObj?.status === 'trialing'
-              ? undefined // use sendCompanyWelcomeEmail's default "trial started" line
-              : wasCanceled
-              ? "Welcome back! Your subscription has been reactivated and your account is active again."
-              : "Your account is now active and ready to use.";
-            const sent = await sendCompanyWelcomeEmail({ to: email, companyId, statusLine });
+            // A true win-back (previously canceled, now resubscribing) gets
+            // its own short, separate email (sendSubscriptionReactivatedEmail
+            // -- see email.js) instead of the full first-day onboarding
+            // content in company_welcome: a returning customer already knows
+            // what Calculator Mode is and already has their embed code, so
+            // re-explaining both every time they resubscribe is noise, not
+            // help. Brand-new trial and immediate-active brand-new-account
+            // cases still go through company_welcome as before.
+            const sent = wasCanceled
+              ? await sendSubscriptionReactivatedEmail({ to: email, companyName: config.companyName })
+              : await sendCompanyWelcomeEmail({
+                  to: email,
+                  companyId,
+                  statusLine: subObj?.status === 'trialing' ? undefined : "Your account is now active and ready to use.",
+                });
             if (sent) {
               const fresh = (await getCompanyConfig(companyId)) || config;
               await saveCompanyConfig(companyId, {

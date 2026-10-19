@@ -1085,6 +1085,35 @@ async function sendCompanyWelcomeEmail({ to, companyId, subject, statusLine }) {
   return sent;
 }
 
+// Sent once per cancel-then-resubscribe cycle, from the checkout webhook
+// (subscription.js's checkout.session.completed handler) when a previously
+// canceled account completes checkout again. Used to be handled by calling
+// sendCompanyWelcomeEmail with a swapped-in statusLine ("Welcome back! Your
+// subscription has been reactivated...") -- that worked, but it meant a
+// returning customer got the full first-day onboarding email again: the
+// "Welcome to Clean Estimator!" headline, a re-explanation of what
+// Calculator Mode is, the embed code dumped inline with a full walkthrough
+// of pasting it into a site. None of that is useful to someone who already
+// set all of this up before; this is a short, separate note instead that
+// just confirms the account is back and nothing was lost -- same branding,
+// services, and (per buildEmbedIframeCode being keyed off companyId, which
+// never changes) the exact same embed code as before, just linked from the
+// Branding tab rather than reprinted. Deduped the same way the old
+// statusLine-swap approach was -- see wasCanceled in subscription.js's
+// webhook handler, which now calls this function instead for that case.
+// Content lives in the editable email_templates table
+// (key: 'subscription_reactivated').
+async function sendSubscriptionReactivatedEmail({ to, companyName }) {
+  const { sent } = await sendTemplatedEmail({
+    template: 'subscription_reactivated',
+    to,
+    toName: companyName,
+    vars: { companyName: companyName || 'there' },
+    recipientType: 'company',
+  });
+  return sent;
+}
+
 // Sent once, ~6 hours after a company's account was created if checkout
 // still hasn't been completed (status stays 'requires_trial_setup' --
 // see checkActivationReminders in services/trialScheduler.js). These
@@ -1543,6 +1572,7 @@ module.exports = {
   sendPartnerLeadEmail,
   sendCompanyLeadEmail,
   sendCompanyWelcomeEmail,
+  sendSubscriptionReactivatedEmail,
   sendPaymentFailedEmail,
   sendSubscriptionCanceledEmail,
   sendLegacyTrialExpiredEmail,

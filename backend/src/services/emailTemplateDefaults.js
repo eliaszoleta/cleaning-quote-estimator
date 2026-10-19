@@ -140,6 +140,58 @@ module.exports = [
 </div>`,
   },
   {
+    key: 'subscription_reactivated',
+    // Sent instead of company_welcome for a cancel-then-resubscribe cycle
+    // (see sendSubscriptionReactivatedEmail in email.js for the full
+    // reasoning) -- a returning customer already knows what Calculator Mode
+    // is and already has their embed code, so this is deliberately short:
+    // confirm the account's back, confirm nothing was lost, link back in.
+    // Subject written as a flat status statement from the start (not a
+    // "Welcome back!" hook) -- the same lesson already learned twice this
+    // cycle on activation_reminder and legacy_calculator_mode_reminder,
+    // both of which landed in Gmail's Promotions tab on a more
+    // announcement-style first subject and had to be rewritten.
+    name: 'Subscription reactivated (welcome back)',
+    subject: 'Your Clean Estimator subscription is active again',
+    variables: [{ name: 'companyName', example: 'Sparkle Clean Co' }],
+    text: [
+      'Hi {{companyName}},',
+      '',
+      "Your Clean Estimator subscription is active again, and everything's picked up right where you left it -- your branding, services, and pricing settings are all still exactly as you had them.",
+      '',
+      'Open my calculator →',
+      'https://www.cleanestimator.com/company',
+      '',
+      "If you had the embeddable calculator widget on your own website, nothing there needs to change -- it's the same embed code as before, still on the Branding tab whenever you need it:",
+      'https://www.cleanestimator.com/company?tab=branding',
+      '',
+      "It's $25/month, same plan as before. Reply to this email if anything looks off or you run into any trouble getting back in.",
+      '',
+      'Clean Estimator - cleanestimator.com',
+    ].join('\n'),
+    html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your Clean Estimator subscription is active again, and everything's picked up right where you left it — your branding, services, and pricing settings are all still exactly as you had them.
+  </p>
+
+  <p style="margin:0 0 24px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Open my calculator →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    If you had the embeddable calculator widget on your own website, nothing there needs to change — it's the same embed code as before, still on the <a href="https://www.cleanestimator.com/company?tab=branding" style="color:#2563eb;font-weight:700;">Branding tab</a> whenever you need it.
+  </p>
+
+  <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
+    It's $25/month, same plan as before. Reply to this email if anything looks off or you run into any trouble getting back in.
+  </p>
+  ${FOOTER_HTML}
+</div>`,
+  },
+  {
     key: 'activation_reminder',
     name: 'Activation reminder — activation never finished',
     // Rewritten after both prior versions ("You're one step away..." and
