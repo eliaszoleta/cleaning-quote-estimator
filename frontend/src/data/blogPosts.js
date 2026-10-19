@@ -9724,6 +9724,68 @@ A booking email mention is better than nothing, but a short service agreement si
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'who-keeps-the-airbnb-cleaning-tip',
+    title: 'Who Keeps the Tip? Handling Guest Tips When Multiple Cleaners Work an Airbnb Turnover',
+    category: 'airbnb',
+    categoryLabel: 'Airbnb & Vacation Rental Cleaning',
+    date: '2026-10-19',
+    readTime: '6 min',
+    excerpt: 'A guest leaves a cash tip for "housekeeping" on checkout — but the cleaner who prepped the property before they arrived isn\'t the same one who turns it over after they leave. Here\'s how turnover cleaning teams actually handle it, and how to set a clear policy before it causes friction.',
+    content: `
+## The Scenario: Two Cleaners, One Tip
+
+It's a situation that comes up constantly in short-term rental turnover cleaning: one cleaner preps the property before a guest's stay, the guest stays for several days, and on checkout they leave a cash tip on the counter marked for "housekeeping." The cleaner who shows up afterward — to turn the property over for the next guest — is the one who actually finds the tip. But they're not the same person who did the cleaning the guest actually experienced during their stay.
+
+So who does the tip belong to? It's a genuinely ambiguous situation, and it's worth having an actual policy for instead of leaving it to whoever happens to find the cash that day.
+
+## Why This Is Different From Regular House Cleaning
+
+With a recurring residential cleaning client, there's usually one cleaner (or one consistent team) the homeowner knows and tips directly. Short-term rental turnover cleaning breaks that pattern: a single property might rotate through several different cleaners over a month depending on scheduling, availability, and who's covering that day. A guest leaving a tip has no way of knowing — or specifying — which of those cleaners they mean, which is exactly why this question comes up so often among vacation rental cleaning teams.
+
+## How Turnover Cleaning Teams Actually Handle It
+
+There's no single industry-wide standard, but a few approaches come up repeatedly among cleaning businesses that work vacation rentals:
+
+### The Turnover Cleaner Keeps It
+
+The most common view: whoever does the turnover clean — the one who's actually there to find the tip and is cleaning up after the stay the guest is tipping for — keeps it. The reasoning is straightforward: the tip was left in response to the stay the guest just had, and the turnover cleaner is the one dealing with the direct aftermath of that stay (used towels, dishes, trash, and general wear).
+
+### Split It Between Both Cleaners
+
+Some teams split any tip found on checkout evenly between the prep cleaner and the turnover cleaner, treating it as a team tip rather than an individual one — especially when the same two or three cleaners regularly rotate the same property and it would otherwise cause friction over time.
+
+### Pool and Redistribute Monthly
+
+Businesses running larger teams across many properties sometimes skip per-job tip assignment entirely and instead pool all guest tips (and sometimes a host-paid bonus tied to review scores) into a shared pot, redistributed monthly based on how many cleans each person worked. This removes the day-to-day ambiguity completely, at the cost of a tip no longer being tied to one specific job.
+
+### Keep the Same Cleaner on the Same Property
+
+A number of businesses sidestep the problem a different way: by assigning the same cleaner (or same small team) to a given property consistently, so the person prepping it before a stay is usually also the one turning it over afterward. It doesn't eliminate every edge case (someone's still occasionally out and gets covered), but it meaningfully cuts down how often the split-tip question even comes up.
+
+## Setting a Written Tip Policy for Your Team
+
+Whichever approach fits your business, the actual fix is the same: write it down and tell your cleaners what it is before the ambiguity causes a dispute, not after. A short, clear policy — "guest tips found on checkout belong to the cleaner performing the turnover clean that day, unless a host or guest specifies otherwise" (or whichever rule you choose) — removes the guesswork and keeps it from becoming a recurring source of friction on a team.
+
+It's also worth deciding, in writing, what happens when a host pays a tip or bonus directly to your business rather than leaving cash at the property — most businesses handle that the same way they handle any other team pay, splitting it by hours worked or cleans completed that period rather than by who happened to be on-site.
+
+## FAQ
+
+**Who should keep a cash tip left at an Airbnb checkout?**
+There's no universal rule, but the most common practice among turnover cleaning teams is that the cleaner performing the turnover (the one dealing with the aftermath of the stay the guest is tipping for) keeps it, unless your business has a different written policy in place.
+
+**Should cleaning businesses split tips between team members?**
+Many do, especially when the same small group of cleaners rotates the same properties — splitting evenly or pooling tips monthly avoids the day-to-day question of who happened to find the cash on any given job.
+
+**How do you avoid tip disputes on a cleaning team?**
+Put a specific tip policy in writing and share it with every cleaner before it comes up, rather than deciding case by case. Assigning the same cleaner to the same property whenever possible also reduces how often two different people are involved in one guest's stay at all.
+
+**Does the same tip policy apply to tips a host pays directly to the business?**
+Not necessarily — many businesses treat host-paid tips or bonuses as part of regular team pay, split by hours or cleans worked that period, separate from cash a guest leaves on-site for whoever happens to be there.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
