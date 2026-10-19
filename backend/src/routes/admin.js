@@ -183,63 +183,88 @@ router.delete('/companies/:id', async (req, res) => {
   }
 });
 
-// GET /api/admin/companies/unnamed-preview — read-only. A race between GET
-// /api/subscription/status and GET /api/company/:id (both fire on a brand
-// new account's very first dashboard load, in parallel, with no ordering
-// guarantee -- see the fix + comment on subscription.js's GET /status)
-// could let the unseeded /status write land after the properly-seeded
-// /:id write and clobber a real typed-in company name with a blank one.
-// That race is now closed, but it already happened to existing accounts
-// before the fix shipped. This lists every account currently showing a
-// blank companyName, split into "recoverable" (the Supabase Auth signup
-// metadata still has the real company_name, phone, website -- we just
-// never wrote it back) and "unrecoverable" (metadata is blank too, so
-// there's nothing left to recover it from). Check this before calling
-// backfill-company-names below.
-router.get('/companies/unnamed-preview', async (req, res) => {
+// company_name/phone/website on the signup form are all `required` --
+// AuthPage.js won't even submit without them -- so a completed signup
+// having any of the three blank in cleaning_company_configs is never a
+// typo, it's always this same race having clobbered that write. Shared by
+// both admin routes below so "which accounts are affected" and "what gets
+// backfilled" can never drift apart.
+function findIncompleteProfileRows(rows) {
+  return rows
+    .map(r => {
+      const missing = {
+        companyName: !r.config.companyName && !!r.metadata.company_name,
+        phone: !r.config.phone && !!r.metadata.phone,
+        website: !r.config.website && !!r.metadata.website,
+      };
+      const unrecoverableFields = ['companyName', 'phone', 'website']
+        .filter(f => !r.config[f] && !missing[f] && !r.metadata[f === 'companyName' ? 'company_name' : f]);
+      return { row: r, missing, unrecoverableFields };
+    })
+    .filter(({ missing, unrecoverableFields }) =>
+      missing.companyName || missing.phone || missing.website || unrecoverableFields.length > 0
+    );
+}
+
+// GET /api/admin/companies/incomplete-profile-preview — read-only. A race
+// between GET /api/subscription/status and GET /api/company/:id (both fire
+// on a brand new account's very first dashboard load, in parallel, with no
+// ordering guarantee -- see the fix + comment on subscription.js's GET
+// /status) could let the unseeded /status write land after the properly-
+// seeded /:id write and clobber a real signup's company name, phone, and/or
+// website with blanks. That race is now closed, but it already happened to
+// existing accounts before the fix shipped. This lists every account
+// currently missing any of those three fields, split per account into what
+// can still be recovered from Supabase Auth's own signup metadata (which
+// the config write never touches) and what's genuinely gone because the
+// metadata is blank too. Check this before calling backfill-company-profiles
+// below.
+router.get('/companies/incomplete-profile-preview', async (req, res) => {
   const sb = getSupabase();
   if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
 
   try {
     const rows = await listCompaniesWithConfig(sb);
-    const unnamed = rows.filter(r => !r.config.companyName);
-    const recoverable = unnamed
-      .filter(r => r.metadata.company_name)
-      .map(r => ({
-        companyId: r.companyId,
-        email: r.email,
-        signedUpAt: r.signedUpAt,
-        recoveredCompanyName: r.metadata.company_name,
-        recoveredPhone: r.config.phone ? null : (r.metadata.phone || null),
-        recoveredWebsite: r.config.website ? null : (r.metadata.website || null),
+    const affected = findIncompleteProfileRows(rows);
+    const recoverable = affected
+      .filter(({ missing }) => missing.companyName || missing.phone || missing.website)
+      .map(({ row, missing, unrecoverableFields }) => ({
+        companyId: row.companyId,
+        email: row.email,
+        signedUpAt: row.signedUpAt,
+        recoveredCompanyName: missing.companyName ? row.metadata.company_name : null,
+        recoveredPhone: missing.phone ? row.metadata.phone : null,
+        recoveredWebsite: missing.website ? row.metadata.website : null,
+        stillMissing: unrecoverableFields,
       }));
-    const unrecoverable = unnamed
-      .filter(r => !r.metadata.company_name)
-      .map(r => ({ companyId: r.companyId, email: r.email, signedUpAt: r.signedUpAt }));
+    const unrecoverable = affected
+      .filter(({ missing }) => !missing.companyName && !missing.phone && !missing.website)
+      .map(({ row, unrecoverableFields }) => ({ companyId: row.companyId, email: row.email, signedUpAt: row.signedUpAt, missingFields: unrecoverableFields }));
 
     res.json({
       success: true,
-      unnamedCount: unnamed.length,
+      affectedCount: affected.length,
       recoverableCount: recoverable.length,
       recoverable,
       unrecoverableCount: unrecoverable.length,
       unrecoverable,
     });
   } catch (err) {
-    console.error('Admin unnamed-preview error:', err.message);
+    console.error('Admin incomplete-profile-preview error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to build preview' });
   }
 });
 
-// POST /api/admin/companies/backfill-company-names — the real fix for the
-// accounts unnamed-preview found. Requires { confirm: true }, same
-// deliberate-second-step pattern as the other mutating admin routes below.
-// Strictly additive: only ever fills a currently-blank companyName/phone/
-// website from that account's own Supabase Auth signup metadata, never
-// overwrites a value that's already there. Optional { companyIds: [...] }
-// restricts it to just those accounts (matched against unnamed-preview's
-// recoverable list); omit it to backfill every recoverable account.
-router.post('/companies/backfill-company-names', async (req, res) => {
+// POST /api/admin/companies/backfill-company-profiles — the real fix for
+// the accounts incomplete-profile-preview found. Requires { confirm: true },
+// same deliberate-second-step pattern as the other mutating admin routes
+// below. Strictly additive: only ever fills a currently-blank
+// companyName/phone/website from that account's own Supabase Auth signup
+// metadata, never overwrites a value that's already there. Optional
+// { companyIds: [...] } restricts it to just those accounts (matched
+// against incomplete-profile-preview's recoverable list); omit it to
+// backfill every recoverable account.
+router.post('/companies/backfill-company-profiles', async (req, res) => {
   if (req.body?.confirm !== true) {
     return res.status(400).json({ success: false, error: 'Refusing to backfill without { confirm: true } in the request body.' });
   }
@@ -249,20 +274,26 @@ router.post('/companies/backfill-company-names', async (req, res) => {
   try {
     const rows = await listCompaniesWithConfig(sb);
     const companyIds = Array.isArray(req.body?.companyIds) ? new Set(req.body.companyIds) : null;
-    const targets = rows.filter(r =>
-      !r.config.companyName && r.metadata.company_name && (!companyIds || companyIds.has(r.companyId))
-    );
+    const targets = findIncompleteProfileRows(rows)
+      .filter(({ missing }) => missing.companyName || missing.phone || missing.website)
+      .filter(({ row }) => !companyIds || companyIds.has(row.companyId));
 
     const updated = [];
-    for (const row of targets) {
+    for (const { row, missing } of targets) {
       const newConfig = {
         ...row.config,
-        companyName: row.metadata.company_name,
-        phone: row.config.phone || row.metadata.phone || row.config.phone,
-        website: row.config.website || row.metadata.website || row.config.website,
+        companyName: missing.companyName ? row.metadata.company_name : row.config.companyName,
+        phone: missing.phone ? row.metadata.phone : row.config.phone,
+        website: missing.website ? row.metadata.website : row.config.website,
       };
       await saveCompanyConfig(row.companyId, newConfig);
-      updated.push({ companyId: row.companyId, email: row.email, companyName: newConfig.companyName });
+      updated.push({
+        companyId: row.companyId,
+        email: row.email,
+        companyName: newConfig.companyName,
+        phone: newConfig.phone,
+        website: newConfig.website,
+      });
     }
 
     res.json({ success: true, updatedCount: updated.length, updated });
