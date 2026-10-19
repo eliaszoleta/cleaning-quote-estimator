@@ -74,27 +74,40 @@ router.post('/', async (req, res) => {
   let saved = false;
   const sb = getSupabase();
   if (sb) {
-    try {
-      const { error } = await sb.from('website_requests').insert({
-        name, business, email,
-        phone: phone || null,
-        services_offered: servicesOffered || null,
-        other_services: otherServices || null,
-        business_address: businessAddress || null,
-        service_areas: serviceAreas || null,
-        has_domain: !!hasDomain,
-        domain1: domain1 || null,
-        domain2: domain2 || null,
-        domain3: domain3 || null,
-        current_website: currentWebsite || null,
-        facebook_page: facebookPage || null,
-        message: message || null,
-        plan_tier: resolvedPlanTier,
-      });
-      if (error) console.error('website_requests insert failed:', error.message);
-      else saved = true;
-    } catch (err) {
-      console.error('website_requests insert error:', err.message);
+    const row = {
+      name, business, email,
+      phone: phone || null,
+      services_offered: servicesOffered || null,
+      other_services: otherServices || null,
+      business_address: businessAddress || null,
+      service_areas: serviceAreas || null,
+      has_domain: !!hasDomain,
+      domain1: domain1 || null,
+      domain2: domain2 || null,
+      domain3: domain3 || null,
+      current_website: currentWebsite || null,
+      facebook_page: facebookPage || null,
+      message: message || null,
+      plan_tier: resolvedPlanTier,
+    };
+    // One retry before giving up -- this used to fail silently on the
+    // first try (a transient Supabase blip) and just move on, which is
+    // how a real application (Oct 2026, Elevated Cleaning Solutions) sent
+    // the internal notification email but never created a row, so it
+    // never showed up in AdminWebsiteRequests.js at all and the only
+    // record was an email nobody realized was the only record. If this
+    // retry still fails, the notification email below gets an unmissable
+    // "NOT SAVED" warning instead (see sendWebsiteRequestNotificationEmail's
+    // `saved` arg) so that can't happen silently again.
+    for (let attempt = 1; attempt <= 2 && !saved; attempt++) {
+      try {
+        const { error } = await sb.from('website_requests').insert(row);
+        if (error) throw error;
+        saved = true;
+      } catch (err) {
+        console.error(`website_requests insert failed (attempt ${attempt}):`, err.message);
+        if (attempt === 1) await new Promise(r => setTimeout(r, 500));
+      }
     }
   } else {
     console.warn('Website request not saved: Supabase not configured');
@@ -117,6 +130,7 @@ router.post('/', async (req, res) => {
       planTier: resolvedPlanTier,
       planName: PLAN_TIERS[resolvedPlanTier].name,
       planPrice: PLAN_TIERS[resolvedPlanTier].priceCents / 100,
+      saved,
     });
     if (!sent) console.warn('Website request notification email did not send for:', email);
     res.json({ success: true });

@@ -1310,11 +1310,12 @@ function fmtPlanLine({ planName, planPrice }) {
 }
 
 function buildWebsiteRequestText(args) {
-  const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
+  const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message, saved } = args;
   const domainLines = buildWebsiteRequestDomainLines(args);
   const planLine = fmtPlanLine(args);
 
   const lines = [
+    ...(saved === false ? [buildNotSavedWarningText(), ''] : []),
     'New website + chatbot application!',
     '',
     `${name} (${business}) just applied for a Done-For-You cleaning website.`,
@@ -1344,8 +1345,21 @@ function buildWebsiteRequestText(args) {
   return lines.join('\n');
 }
 
+// The not-saved warning (see POST /api/website-request's own comment on
+// `saved`) deliberately isn't a colored/bordered callout box -- bold red
+// text is enough to get attention without reviving the "highlighted box"
+// look that got this exact email landing in Gmail's Promotions tab before
+// (see buildWebsiteRequestHtml's own plan-line fix).
+function buildNotSavedWarningHtml() {
+  return `<p style="font-size:14px;font-weight:700;color:#dc2626;margin:0 0 20px;">⚠️ NOT SAVED -- this failed to write to the database and will NOT show up in Admin → Website Requests. Add it by hand there (the "+" button) using the details below before this gets lost.</p>`;
+}
+
+function buildNotSavedWarningText() {
+  return '⚠️ NOT SAVED -- this failed to write to the database and will NOT show up in Admin -> Website Requests. Add it by hand there (the "+" button) using the details below before this gets lost.';
+}
+
 function buildWebsiteRequestHtml(args) {
-  const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message } = args;
+  const { name, business, email, phone, servicesOffered, otherServices, businessAddress, serviceAreas, message, saved } = args;
   const domainLines = buildWebsiteRequestDomainLines(args);
   const planLine = fmtPlanLine(args);
 
@@ -1363,13 +1377,14 @@ function buildWebsiteRequestHtml(args) {
 
   return `
 <div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  ${saved === false ? buildNotSavedWarningHtml() : ''}
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New website + chatbot application!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
     <strong>${name}</strong> (${business}) just applied for a Done-For-You cleaning website.
   </p>
 
-  ${planLine ? `<p style="font-size:14px;line-height:1.6;margin:0 0 20px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;"><strong>${planLine}</strong></p>` : ''}
+  ${planLine ? `<p style="font-size:14px;line-height:1.6;margin:0 0 20px;"><strong>${planLine}</strong></p>` : ''}
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
   <table style="border-collapse:collapse;border-top:1px solid #e0e0e0;margin:0 0 20px;">${contactRows}</table>
@@ -1410,7 +1425,7 @@ async function sendWebsiteRequestNotificationEmail(args) {
         from: `Clean Estimator <${fromAddress}>`,
         to: [notifyEmail],
         reply_to: args.email || undefined,
-        subject: `New website application${args.planName ? ` (${args.planName})` : ''} — ${args.business || args.name} — ${fmtSubjectTimestamp()}`,
+        subject: `${args.saved === false ? '⚠️ NOT SAVED — ' : ''}New website application${args.planName ? ` (${args.planName})` : ''} — ${args.business || args.name} — ${fmtSubjectTimestamp()}`,
         html: buildWebsiteRequestHtml(args),
         text: buildWebsiteRequestText(args),
       },
