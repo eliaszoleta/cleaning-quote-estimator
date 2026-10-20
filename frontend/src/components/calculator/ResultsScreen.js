@@ -235,8 +235,8 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                         the business or was never asked, so the midpoint
                         still shows by default there. */}
                     {suggestedPrice != null && userType !== 'homeowner' && (
-                      <div style={{ marginTop: 3, fontWeight: 500, fontSize: 12, color: COLORS.body }}>
-                        Midpoint Price: <span style={{ fontWeight: 700, color: primaryColor }}>{formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}</span>
+                      <div style={{ marginTop: 3, fontSize: 13.5, color: COLORS.ink }}>
+                        Midpoint Price @ {formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}
                       </div>
                     )}
                   </div>
