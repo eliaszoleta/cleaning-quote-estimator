@@ -234,20 +234,13 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                   {suggestedPrice != null && userType !== 'homeowner' && (
                     <div style={{ padding: '11px 12px', background: `${primaryColor}0d`, borderTop: `1px solid ${primaryColor}28` }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-                        <span style={{ fontSize: 12.5, color: COLORS.body, fontWeight: 600 }}>
+                        <span style={{ fontSize: 15, color: COLORS.body, fontWeight: 700 }}>
                           Midpoint Price
                         </span>
-                        <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: primaryColor }}>
+                        <span style={{ flexShrink: 0, whiteSpace: 'nowrap', fontWeight: 600, fontSize: 16, color: primaryColor }}>
                           {formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}
                         </span>
                       </div>
-                      {/* The estimator can't see the actual space, so it can't
-                          know whether this job needs more or less effort than
-                          a typical one -- this line hands that judgment back
-                          to the person who can see it. */}
-                      <p style={{ margin: '6px 0 0', fontSize: 12.5, fontWeight: 400, color: primaryColor, lineHeight: 1.4 }}>
-                        Treat this as a guide, not a fixed number — lean up or down based on the job in front of you.
-                      </p>
                     </div>
                   )}
                   {/* Plain flag, not a computed line item -- see

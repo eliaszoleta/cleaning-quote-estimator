@@ -384,10 +384,6 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
     if (suggestedPrice != null && !isHomeowner) {
       lines.push(`  Midpoint Price: ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
-      // Shown to the same audience as ResultsScreen.js's matching note --
-      // the estimator can't see the actual space, so it hands that
-      // judgment back to whoever can.
-      lines.push('  (Treat this as a guide, not a fixed number -- lean up or down based on the job in front of you.)');
     }
   } else {
     // Every line below (and the total) is a single midpoint figure, not a
@@ -524,11 +520,8 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
       </tr>
       ${isPublic && suggestedPrice != null && !isHomeowner ? `
       <tr style="background:${primaryColor}0d;">
-        <td style="padding:10px 12px;font-size:12.5px;font-weight:600;color:#444444;border-top:1px solid ${primaryColor}28;">Midpoint Price</td>
-        <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:15px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
-      </tr>
-      <tr style="background:${primaryColor}0d;">
-        <td colspan="2" style="padding:0 12px 10px;font-size:12.5px;font-weight:400;color:${primaryColor};line-height:1.4;">Treat this as a guide, not a fixed number — lean up or down based on the job in front of you.</td>
+        <td style="padding:10px 12px;font-weight:700;font-size:14px;border-top:1px solid ${primaryColor}28;">Midpoint Price</td>
+        <td style="padding:10px 12px;text-align:right;font-size:14px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
       </tr>` : ''}
       ${!isPublic ? `
       <tr style="background:${primaryColor}0d;">
