@@ -526,7 +526,7 @@ export default function App() {
                 limit (calculate.js's tryRecordPublicEstimateAttempt) is
                 enforced server-side on every /api/calculate call regardless
                 of companyId/leadInfo, so it's unaffected by any of this. */}
-            <CleaningCalculator skipLeadCapture instantResults showSignupCta askUserType />
+            <CleaningCalculator skipLeadCapture instantResults showSignupCta askUserType showCountrySelector />
             <SEOContent />
           </Suspense>
         </main>

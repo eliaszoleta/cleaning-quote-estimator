@@ -106,7 +106,7 @@ export default function EstimatorPage() {
               homepage instance for the full comment on this conversion
               test -- same treatment here since this is the same tool,
               just reached via a different URL. */}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} skipLeadCapture instantResults showSignupCta askUserType />
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} skipLeadCapture instantResults showSignupCta askUserType showCountrySelector />
         </div>
 
         <div style={{ marginTop: 48 }}>

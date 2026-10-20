@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import './CleaningCalculator.css';
-import { AlertCircle, MapPin, BarChart3, Zap } from 'lucide-react';
+import { AlertCircle, MapPin, BarChart3, Zap, ChevronDown } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
+import CountryFlag from '../dashboard/CountryFlag';
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import { trackMetaEvent } from '../../utils/metaPixel';
 import { trackNextdoorEvent } from '../../utils/nextdoorPixel';
@@ -91,7 +92,7 @@ function labelForStep(step) {
   return 'Details';
 }
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, showSignupCta = false, askUserType = false, cardRadius = null }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, showSignupCta = false, askUserType = false, showCountrySelector = false, cardRadius = null }) {
   const cardRef = useRef(null);
   // embedded=true normally means "flush, no card look" (a real third-party
   // host embed via EmbedWrapper.js, meant to blend into someone else's
@@ -129,6 +130,15 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   const [serviceType, setServiceType] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? initialService : null);
   const [stepIndex, setStepIndex] = useState(() => (initialService && SERVICE_STEPS[initialService]) ? 1 : 0);
   const [location, setLocation] = useState({ zip: '', state: '' });
+  // Public-page country picker (showCountrySelector -- homepage + the 3
+  // siteLanding pages, all of which pass no companyConfig, so there's no
+  // company-level country to read). Always starts on US, same "default
+  // selected country as always has to be US" rule the dashboard's own
+  // header switcher follows for a new company. A real companyConfig (the
+  // embedded widget, Calculator Mode, Branding preview) still wins below --
+  // this only ever matters when companyConfig is null.
+  const [publicCountry, setPublicCountry] = useState('US');
+  const country = companyConfig?.country || publicCountry;
   const [serviceDetails, setServiceDetails] = useState({});
   const [leadInfo, setLeadInfo] = useState(null);
   const [result, setResult] = useState(null);
@@ -331,6 +341,11 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             companyId: companyConfig?.companyId || null,
             leadInfo: lead?.email ? lead : null,
             partnerInfo: partnerMatch,
+            // Only meaningful when companyId is null -- a real company's
+            // calculation always uses its own saved companyConfig.country
+            // server-side (see calculate.js), same as before this public
+            // selector existed. This is the public-page-only override.
+            country: companyConfig?.companyId ? undefined : country,
           });
         })(),
       ]);
@@ -442,7 +457,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             name={leadInfo?.name}
             email={leadInfo?.email}
             serviceType={serviceType}
-            country={companyConfig?.country || 'US'}
+            country={country}
             onReset={handleReset}
           />
         </div>
@@ -697,9 +712,52 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 (EmbedWrapper.js's real third-party embeds, BrandingTab.js's
                 live preview) stay excluded -- that message would be
                 confusing on someone else's site. */}
-            {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice country={companyConfig?.country || 'US'} />}
+            {showCountrySelector && currentStep === 'service' && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 14 }}>
+                <div style={{ position: 'relative', display: 'flex' }}>
+                  {/* Same pill styling/flag overlay as the dashboard header's
+                      own country switcher (CompanyDashboard.js), just on a
+                      light card background instead of the dark header bar --
+                      this is the public, no-company-account version of that
+                      exact control, so a visitor sees the same affordance a
+                      subscriber already does. Resets `location` on change:
+                      it's only ever rendered before a service/region has
+                      been picked, but a visitor can still get here via Back
+                      after starting a different country's flow, and a
+                      leftover region code (zip/state) from one country can
+                      coincidentally look valid in another's region list
+                      (e.g. US's "WA" vs. Australia's "WA"). */}
+                  <select
+                    value={publicCountry}
+                    onChange={e => { setPublicCountry(e.target.value); setLocation({ zip: '', state: '' }); }}
+                    title="Country"
+                    aria-label="Country"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: isMobile ? '6px 20px 6px 24px' : '6px 24px 6px 28px', borderRadius: 20,
+                      background: COLORS.surfaceMuted, border: `1px solid ${COLORS.border}`,
+                      color: COLORS.ink, fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
+                      cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
+                    }}
+                  >
+                    <option value="US">{isMobile ? 'US' : 'United States'}</option>
+                    <option value="CA">{isMobile ? 'CA' : 'Canada'}</option>
+                    <option value="GB">{isMobile ? 'GB' : 'United Kingdom'}</option>
+                    <option value="AU">{isMobile ? 'AU' : 'Australia'}</option>
+                  </select>
+                  <div style={{ position: 'absolute', left: isMobile ? 7 : 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+                    <CountryFlag country={publicCountry} size={14} />
+                  </div>
+                  <ChevronDown
+                    size={13}
+                    style={{ position: 'absolute', right: isMobile ? 5 : 8, top: '50%', transform: 'translateY(-50%)', color: COLORS.muted, pointerEvents: 'none' }}
+                  />
+                </div>
+              </div>
+            )}
+            {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice country={country} />}
             {currentStep === 'service' && (
-              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={companyConfig?.country || 'US'} />
+              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={country} />
             )}
             {currentStep === 'location' && (
               <LocationStep
@@ -709,7 +767,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 primaryColor={primaryColor}
                 serviceStates={companyConfig?.serviceStates || []}
                 serviceCities={companyConfig?.serviceCities || {}}
-                country={companyConfig?.country || 'US'}
+                country={country}
               />
             )}
             {DetailComponent && (
@@ -720,7 +778,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 primaryColor={primaryColor}
                 location={location}
                 companyConfig={companyConfig}
-                country={companyConfig?.country || 'US'}
+                country={country}
                 isFinalStep={!enableLead && !askUserType}
                 loading={!enableLead && !askUserType && loading}
               />
@@ -750,8 +808,18 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
         {!embedded && currentStep === 'service' && (
           <div style={{ maxWidth: 720, margin: '20px auto 0', display: 'flex', justifyContent: 'center', rowGap: 10, columnGap: 28, flexWrap: 'wrap' }}>
             {[
-              { Icon: MapPin,    label: 'All 50 states',     color: '#059669' },
-              { Icon: BarChart3, label: '12 service types',   color: '#2563eb' },
+              // "All 50 states" is US-specific (and wrong once a visitor
+              // picks a different country via showCountrySelector) --
+              // "Nationwide coverage" reads correctly for all four without
+              // needing each country's own region count threaded in here.
+              // Service count is derived from SERVICE_STEPS itself, not
+              // typed out, so this can't go stale the next time a service
+              // is added (see this repo's standing "don't hardcode a
+              // specific service count" rule -- the exact failure mode that
+              // made the old "10 services" claim wrong once this calculator
+              // grew to 12).
+              { Icon: MapPin,    label: country === 'US' ? 'All 50 states' : 'Nationwide coverage', color: '#059669' },
+              { Icon: BarChart3, label: `${Object.keys(SERVICE_STEPS).length} service types`, color: '#2563eb' },
               { Icon: Zap,       label: 'Instant results',   color: '#ea580c' },
             ].map(({ Icon, label, color }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: COLORS.body, fontWeight: 500 }}>

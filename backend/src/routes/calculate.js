@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { calculateCleaning } = require('../services/cleaningCalculation');
-const { STATE_PRICING_MULTIPLIERS, STATE_AVERAGE_HOME_CLEANING_COST, STATE_NAMES } = require('../config/defaults');
+const { STATE_PRICING_MULTIPLIERS, STATE_AVERAGE_HOME_CLEANING_COST, STATE_NAMES, COUNTRIES } = require('../config/defaults');
 const { getCompanyConfig } = require('../services/companyConfig');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { saveLead } = require('./leads');
@@ -225,7 +225,7 @@ async function recordCompanyEstimateRun(companyId, serviceType) {
 
 // POST /api/calculate
 router.post('/', async (req, res) => {
-  const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo } = req.body;
+  const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo, country } = req.body;
 
   // Validate
   if (!serviceType || !VALID_SERVICE_TYPES.includes(serviceType)) {
@@ -264,6 +264,18 @@ router.post('/', async (req, res) => {
         return res.status(402).json({ success: false, subscriptionInactive: true, error: 'This estimator is temporarily unavailable. Please contact the business directly.' });
       }
     } else {
+      // Public calculator pages (cleanestimator.com's own homepage/landing
+      // pages) now expose the same US/CA/GB/AU country picker a subscriber
+      // sets in their dashboard header -- see CleaningCalculator.js's
+      // publicCountry state. No companyConfig to read it from here, so it
+      // arrives directly in the body instead; validated against the real
+      // supported-country list rather than trusted outright, since this is
+      // a public, unauthenticated endpoint. Falls back to US for anything
+      // unrecognized (an older cached frontend bundle sending no country
+      // at all included), matching every other country-aware surface's
+      // default.
+      companyConfig = { country: COUNTRIES[country] ? country : 'US' };
+
       const ip = getClientIp(req);
       // Checks the limit and records this attempt in one atomic DB call --
       // see tryRecordPublicEstimateAttempt's own comment for why this isn't
