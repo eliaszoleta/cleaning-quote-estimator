@@ -383,7 +383,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     });
     lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
     if (suggestedPrice != null && !isHomeowner) {
-      lines.push(`  Midpoint Price: ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
+      lines.push(`  Midpoint Price @ ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
     }
   } else {
     // Every line below (and the total) is a single midpoint figure, not a
@@ -517,7 +517,7 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
       <tr style="background:${primaryColor}0d;">
         <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;vertical-align:top;">
           Estimated total
-          ${isPublic && suggestedPrice != null && !isHomeowner ? `<div style="margin-top:3px;font-weight:500;font-size:11.5px;color:#666666;">Midpoint Price: <span style="font-weight:700;color:${primaryColor};">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</span></div>` : ''}
+          ${isPublic && suggestedPrice != null && !isHomeowner ? `<div style="margin-top:3px;font-weight:400;font-size:13.5px;color:#333333;">Midpoint Price @ ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</div>` : ''}
         </td>
         <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;vertical-align:top;">
           ${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : `${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`}
