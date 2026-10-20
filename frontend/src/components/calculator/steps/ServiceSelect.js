@@ -53,7 +53,7 @@ const SERVICES = [
   { id: 'tile_grout',       configKey: 'tileGrout',       Icon: Grid3x3,        label: 'Tile & Grout Cleaning',    desc: 'Deep clean, sealing, recoloring',    color: '#0d9488', bg: '#f0fdfa' },
   { id: 'mold_remediation', configKey: 'moldRemediation', Icon: AlertTriangle,  label: 'Mold Remediation',         desc: 'Assessment, removal, prevention',    color: '#d97706', bg: '#fffbeb' },
   { id: 'water_damage',     configKey: 'waterDamage',     Icon: Droplets,       label: 'Water Damage Restoration', desc: 'Emergency extraction & drying',      color: '#0284c7', bg: '#f0f9ff' },
-  { id: 'airbnb',           configKey: 'airbnb',          Icon: KeyRound,       label: 'Airbnb Hosts & Vacation Rentals', desc: 'Turnover cleaning between guests', color: '#9333ea', bg: '#faf5ff' },
+  { id: 'airbnb',           configKey: 'airbnb',          Icon: KeyRound,       label: 'Airbnb & Vacation Rentals', desc: 'Turnover cleaning between guests', color: '#9333ea', bg: '#faf5ff' },
   { id: 'post_construction', configKey: 'postConstruction', Icon: Construction, label: 'Post-Construction',        desc: 'Debris, dust & paint splatter cleanup', color: '#78716c', bg: '#fafaf9' },
 ];
 
