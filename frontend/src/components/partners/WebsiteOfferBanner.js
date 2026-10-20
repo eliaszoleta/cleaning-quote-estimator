@@ -171,8 +171,8 @@ export default function WebsiteOfferBanner() {
           Still Don't Have a Website?
         </div>
         {!isMobile && (
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)', marginTop: 4, lineHeight: 1.5, fontFamily: 'Calibri, sans-serif' }}>
-            We'll build your free sample first — you only pay if you like it and want to go live.
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)', marginTop: 4, lineHeight: 1.5 }}>
+            We build you a free sample first — you only pay if you like it and want to go live.
           </div>
         )}
       </div>
