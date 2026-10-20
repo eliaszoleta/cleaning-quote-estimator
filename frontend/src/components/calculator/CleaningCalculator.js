@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import './CleaningCalculator.css';
-import { AlertCircle, MapPin, BarChart3, Zap, ChevronDown } from 'lucide-react';
+import { AlertCircle, MapPin, BarChart3, Zap, ChevronDown, Loader2 } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
 import CountryFlag from '../dashboard/CountryFlag';
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import { trackMetaEvent } from '../../utils/metaPixel';
 import { trackNextdoorEvent } from '../../utils/nextdoorPixel';
 import { getFontStack, getGoogleFontHref } from '../../utils/fonts';
-import { COLORS, SHADOWS } from '../../styles/theme';
+import { COLORS, SHADOWS, RADIUS } from '../../styles/theme';
 import ServiceSelect from './steps/ServiceSelect';
 import LocationStep from './steps/LocationStep';
 import HomeStep from './steps/HomeStep';
@@ -79,6 +79,8 @@ const DETAIL_STEP_COMPONENT = {
   post_construction: PostConstructionStep,
 };
 
+const COUNTRY_NAMES = { US: 'United States', CA: 'Canada', GB: 'United Kingdom', AU: 'Australia' };
+
 // Maps a step id to its progress-bar label -- indexed by step name rather
 // than position, so it stays correct whether or not 'lead' is actually
 // present in `steps` (see skipLeadCapture below). Every per-service detail
@@ -139,6 +141,27 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // this only ever matters when companyConfig is null.
   const [publicCountry, setPublicCountry] = useState('US');
   const country = companyConfig?.country || publicCountry;
+  // Brief, purely cosmetic loading state on the country dropdown itself --
+  // switching country is actually instant (no network round trip, just a
+  // re-render with different labels/region data), but with zero feedback
+  // that read as if the click did nothing. Mirrors the dashboard header's
+  // own country switcher, where picking a new country triggers a real
+  // save-in-flight + a full remount of whatever's showing (RunEstimateTab,
+  // ServicesTab) -- visibly "something happened" there for free. This gives
+  // the public picker that same unmistakable-switch feeling on purpose,
+  // via a short timed spinner over the service grid, since there's no
+  // async save/remount here to borrow that feedback from.
+  const [countrySwitching, setCountrySwitching] = useState(false);
+  const countrySwitchTimer = useRef(null);
+  useEffect(() => () => { if (countrySwitchTimer.current) clearTimeout(countrySwitchTimer.current); }, []);
+  const handleCountrySwitch = (newCountry) => {
+    if (newCountry === publicCountry) return;
+    setPublicCountry(newCountry);
+    setLocation({ zip: '', state: '' });
+    setCountrySwitching(true);
+    if (countrySwitchTimer.current) clearTimeout(countrySwitchTimer.current);
+    countrySwitchTimer.current = setTimeout(() => setCountrySwitching(false), 550);
+  };
   const [serviceDetails, setServiceDetails] = useState({});
   const [leadInfo, setLeadInfo] = useState(null);
   const [result, setResult] = useState(null);
@@ -729,7 +752,8 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                       (e.g. US's "WA" vs. Australia's "WA"). */}
                   <select
                     value={publicCountry}
-                    onChange={e => { setPublicCountry(e.target.value); setLocation({ zip: '', state: '' }); }}
+                    onChange={e => handleCountrySwitch(e.target.value)}
+                    disabled={countrySwitching}
                     title="Country"
                     aria-label="Country"
                     style={{
@@ -737,7 +761,8 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                       padding: isMobile ? '6px 20px 6px 24px' : '6px 24px 6px 28px', borderRadius: 20,
                       background: COLORS.surfaceMuted, border: `1px solid ${COLORS.border}`,
                       color: COLORS.ink, fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
-                      cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
+                      cursor: countrySwitching ? 'wait' : 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
+                      opacity: countrySwitching ? 0.7 : 1,
                     }}
                   >
                     <option value="US">{isMobile ? 'US' : 'United States'}</option>
@@ -746,7 +771,9 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                     <option value="AU">{isMobile ? 'AU' : 'Australia'}</option>
                   </select>
                   <div style={{ position: 'absolute', left: isMobile ? 7 : 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
-                    <CountryFlag country={publicCountry} size={14} />
+                    {countrySwitching
+                      ? <Loader2 size={14} className="spin" color={COLORS.muted} />
+                      : <CountryFlag country={publicCountry} size={14} />}
                   </div>
                   <ChevronDown
                     size={13}
@@ -757,7 +784,28 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             )}
             {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice country={country} />}
             {currentStep === 'service' && (
-              <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={country} />
+              <div style={{ position: 'relative' }}>
+                <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={country} />
+                {/* Covers the grid for handleCountrySwitch's short window --
+                    the grid underneath re-renders with the new country's
+                    labels (Flat Cleaning vs. Apartment Cleaning, etc.)
+                    instantly, but showing that mid-swap read as a flicker,
+                    not a deliberate switch. This gives it the same
+                    unmistakable "something just changed" beat the dashboard
+                    gets for free from its own save-in-flight + remount. */}
+                {showCountrySelector && countrySwitching && (
+                  <div style={{
+                    position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.85)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    gap: 10, borderRadius: RADIUS.md, zIndex: 5,
+                  }}>
+                    <Loader2 size={22} className="spin" color={primaryColor} />
+                    <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.body }}>
+                      Switching to {COUNTRY_NAMES[publicCountry] || publicCountry}…
+                    </span>
+                  </div>
+                )}
+              </div>
             )}
             {currentStep === 'location' && (
               <LocationStep
