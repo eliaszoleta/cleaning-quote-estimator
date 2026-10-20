@@ -84,7 +84,7 @@ const COUNTRY_LABEL_OVERRIDES = { GB: UK_LABEL_OVERRIDES, AU: AU_LABEL_OVERRIDES
 // desktop browser, so a narrow preview panel never actually counted as
 // mobile, and looked different from how the same widget renders on a real
 // site.
-export default function ServiceSelect({ onSelect, primaryColor, companyName, ctaHeadline, ctaHeadlineEnabled, services, embedded, isMobile, country }) {
+export default function ServiceSelect({ onSelect, primaryColor, companyName, ctaHeadline, ctaHeadlineEnabled, services, embedded, isMobile, country, countrySelector = null }) {
   const wrapRef = useRef(null);
   // Real measured width of this step's own content area, used below to pick
   // an explicit column count for the embedded-desktop grid instead of
@@ -174,10 +174,23 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
           toggling it off) there visibly did nothing. Respecting both here
           too, since this is the first (and in a static preview, the only)
           screen a company actually sees them apply to. */}
-      {ctaHeadlineEnabled !== false && (
-        <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: COLORS.ink, marginBottom: 4, letterSpacing: '-0.3px' }}>
-          {ctaHeadline || (companyName ? `${companyName} — Get Your Quote` : 'What service do you need?')}
-        </h2>
+      {/* countrySelector (CleaningCalculator's public-page country picker)
+          renders on the same line as the heading instead of as a row of
+          its own above it -- on mobile, a separate row left it floating
+          disconnected from the heading it's actually scoped to (reported
+          from a live screenshot). flexWrap/rowGap is the fallback for a
+          long custom ctaHeadline (Branding tab's own field, no length
+          limit) that genuinely can't fit alongside the pill at any width:
+          it drops to its own line below instead of overlapping/squishing. */}
+      {(ctaHeadlineEnabled !== false || countrySelector) && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', rowGap: 6, marginBottom: 4 }}>
+          {ctaHeadlineEnabled !== false && (
+            <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight: 700, color: COLORS.ink, letterSpacing: '-0.3px', margin: 0, flex: '1 1 auto', minWidth: 0 }}>
+              {ctaHeadline || (companyName ? `${companyName} — Get Your Quote` : 'What service do you need?')}
+            </h2>
+          )}
+          {countrySelector}
+        </div>
       )}
       <p style={{ color: COLORS.body, fontSize: 13, marginBottom: 18 }}>
         Tap a service to get your free, instant estimate.

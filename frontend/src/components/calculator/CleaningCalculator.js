@@ -505,6 +505,57 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   const DetailComponent = DETAIL_STEP_COMPONENT[currentStep];
 
+  // Handed to ServiceSelect to render inline with its own "What service do
+  // you need?" heading, rather than as a separate row above it -- on
+  // mobile, a row of its own left it floating above the heading with
+  // nothing visually tying the two together (reported from a live
+  // screenshot). Built here (not inside ServiceSelect) since it owns
+  // publicCountry/countrySwitching, both private to this component.
+  const countrySelectorNode = showCountrySelector && (
+    <div style={{ position: 'relative', display: 'flex', flexShrink: 0 }}>
+      {/* Same pill styling/flag overlay as the dashboard header's own
+          country switcher (CompanyDashboard.js), just on a light card
+          background instead of the dark header bar -- this is the public,
+          no-company-account version of that exact control, so a visitor
+          sees the same affordance a subscriber already does. Resets
+          `location` on change: it's only ever rendered before a
+          service/region has been picked, but a visitor can still get here
+          via Back after starting a different country's flow, and a
+          leftover region code (zip/state) from one country can
+          coincidentally look valid in another's region list (e.g. US's
+          "WA" vs. Australia's "WA"). */}
+      <select
+        value={publicCountry}
+        onChange={e => handleCountrySwitch(e.target.value)}
+        disabled={countrySwitching}
+        title="Country"
+        aria-label="Country"
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: isMobile ? '6px 20px 6px 24px' : '6px 24px 6px 28px', borderRadius: 20,
+          background: COLORS.surfaceMuted, border: `1px solid ${COLORS.border}`,
+          color: COLORS.ink, fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
+          cursor: countrySwitching ? 'wait' : 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
+          opacity: countrySwitching ? 0.7 : 1,
+        }}
+      >
+        <option value="US">{isMobile ? 'US' : 'United States'}</option>
+        <option value="CA">{isMobile ? 'CA' : 'Canada'}</option>
+        <option value="GB">{isMobile ? 'GB' : 'United Kingdom'}</option>
+        <option value="AU">{isMobile ? 'AU' : 'Australia'}</option>
+      </select>
+      <div style={{ position: 'absolute', left: isMobile ? 7 : 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+        {countrySwitching
+          ? <Loader2 size={14} className="spin" color={COLORS.muted} />
+          : <CountryFlag country={publicCountry} size={14} />}
+      </div>
+      <ChevronDown
+        size={13}
+        style={{ position: 'absolute', right: isMobile ? 5 : 8, top: '50%', transform: 'translateY(-50%)', color: COLORS.muted, pointerEvents: 'none' }}
+      />
+    </div>
+  );
+
   return (
     <>
       {/* Only ever set when calculate.js's public daily limit blocked the
@@ -735,57 +786,10 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 (EmbedWrapper.js's real third-party embeds, BrandingTab.js's
                 live preview) stay excluded -- that message would be
                 confusing on someone else's site. */}
-            {showCountrySelector && currentStep === 'service' && (
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 14 }}>
-                <div style={{ position: 'relative', display: 'flex' }}>
-                  {/* Same pill styling/flag overlay as the dashboard header's
-                      own country switcher (CompanyDashboard.js), just on a
-                      light card background instead of the dark header bar --
-                      this is the public, no-company-account version of that
-                      exact control, so a visitor sees the same affordance a
-                      subscriber already does. Resets `location` on change:
-                      it's only ever rendered before a service/region has
-                      been picked, but a visitor can still get here via Back
-                      after starting a different country's flow, and a
-                      leftover region code (zip/state) from one country can
-                      coincidentally look valid in another's region list
-                      (e.g. US's "WA" vs. Australia's "WA"). */}
-                  <select
-                    value={publicCountry}
-                    onChange={e => handleCountrySwitch(e.target.value)}
-                    disabled={countrySwitching}
-                    title="Country"
-                    aria-label="Country"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 6,
-                      padding: isMobile ? '6px 20px 6px 24px' : '6px 24px 6px 28px', borderRadius: 20,
-                      background: COLORS.surfaceMuted, border: `1px solid ${COLORS.border}`,
-                      color: COLORS.ink, fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
-                      cursor: countrySwitching ? 'wait' : 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
-                      opacity: countrySwitching ? 0.7 : 1,
-                    }}
-                  >
-                    <option value="US">{isMobile ? 'US' : 'United States'}</option>
-                    <option value="CA">{isMobile ? 'CA' : 'Canada'}</option>
-                    <option value="GB">{isMobile ? 'GB' : 'United Kingdom'}</option>
-                    <option value="AU">{isMobile ? 'AU' : 'Australia'}</option>
-                  </select>
-                  <div style={{ position: 'absolute', left: isMobile ? 7 : 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
-                    {countrySwitching
-                      ? <Loader2 size={14} className="spin" color={COLORS.muted} />
-                      : <CountryFlag country={publicCountry} size={14} />}
-                  </div>
-                  <ChevronDown
-                    size={13}
-                    style={{ position: 'absolute', right: isMobile ? 5 : 8, top: '50%', transform: 'translateY(-50%)', color: COLORS.muted, pointerEvents: 'none' }}
-                  />
-                </div>
-              </div>
-            )}
             {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice country={country} />}
             {currentStep === 'service' && (
               <div style={{ position: 'relative' }}>
-                <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={country} />
+                <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={country} countrySelector={countrySelectorNode} />
                 {/* Covers the grid for handleCountrySwitch's short window --
                     the grid underneath re-renders with the new country's
                     labels (Flat Cleaning vs. Apartment Cleaning, etc.)
