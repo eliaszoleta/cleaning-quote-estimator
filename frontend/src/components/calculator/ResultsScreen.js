@@ -211,35 +211,34 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                       </span>
                     </div>
                   ))}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, padding: '13px 12px', background: COLORS.surfaceMuted, borderTop: `1.5px solid ${COLORS.border}`, fontWeight: 700, fontSize: 15 }}>
-                    <span>Estimated total</span>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ whiteSpace: 'nowrap', color: primaryColor }}>{formatPriceRange(totalLow, totalHigh, null, currencySymbol)}</div>
-                      {/* Plain midpoint of the range above, not a smarter
-                          per-job recommendation -- tucked right under the
-                          range as a lighter-weight second line in this same
-                          row rather than its own separate boxed section,
-                          which used to read as a leftover/out-of-place chunk
-                          once the explanatory paragraph that used to justify
-                          that separation was dropped. Hidden specifically
-                          from a homeowner (userType, from UserTypeStep.js --
-                          only ever set on cleanestimator.com's own public
-                          pages, see CleaningCalculator.js's askUserType) --
-                          a single anchor number is exactly what a customer
-                          would push a real cleaning company down to, the
-                          same lowballing risk the range-vs-midpoint
-                          distinction already exists to avoid. userType is
-                          null everywhere else (Calculator Mode, the embedded
-                          widget, demoPartner, BrandingTab's preview), where
-                          the viewer either IS the business or was never
-                          asked, so the midpoint still shows by default
-                          there. */}
-                      {suggestedPrice != null && userType !== 'homeowner' && (
-                        <div style={{ marginTop: 3, fontWeight: 500, fontSize: 12, color: COLORS.body, whiteSpace: 'nowrap' }}>
-                          Midpoint Price: <span style={{ fontWeight: 700, color: primaryColor }}>{formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}</span>
-                        </div>
-                      )}
+                  <div style={{ padding: '13px 12px', background: COLORS.surfaceMuted, borderTop: `1.5px solid ${COLORS.border}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, fontWeight: 700, fontSize: 15 }}>
+                      <span>Estimated total</span>
+                      <span style={{ flexShrink: 0, whiteSpace: 'nowrap', color: primaryColor }}>{formatPriceRange(totalLow, totalHigh, null, currencySymbol)}</span>
                     </div>
+                    {/* Plain midpoint of the range above, not a smarter
+                        per-job recommendation -- its own lighter-weight line
+                        directly under "Estimated total", left-aligned like a
+                        caption on the row rather than tucked under the price
+                        on the right (reported as reading disconnected from
+                        the label it's actually describing). Hidden
+                        specifically from a homeowner (userType, from
+                        UserTypeStep.js -- only ever set on
+                        cleanestimator.com's own public pages, see
+                        CleaningCalculator.js's askUserType) -- a single
+                        anchor number is exactly what a customer would push a
+                        real cleaning company down to, the same lowballing
+                        risk the range-vs-midpoint distinction already exists
+                        to avoid. userType is null everywhere else
+                        (Calculator Mode, the embedded widget, demoPartner,
+                        BrandingTab's preview), where the viewer either IS
+                        the business or was never asked, so the midpoint
+                        still shows by default there. */}
+                    {suggestedPrice != null && userType !== 'homeowner' && (
+                      <div style={{ marginTop: 3, fontWeight: 500, fontSize: 12, color: COLORS.body }}>
+                        Midpoint Price: <span style={{ fontWeight: 700, color: primaryColor }}>{formatPrice(suggestedPrice, currencySymbol)}{unit === 'per_month' ? '/mo' : ''}</span>
+                      </div>
+                    )}
                   </div>
                   {/* Plain flag, not a computed line item -- see
                       cleaningCalculation.js's comment on why this stayed

@@ -515,10 +515,12 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
     <table style="width:100%;border-collapse:collapse;">
       ${isPublic ? buildEstimateBreakdownRows(adjustments, currencySymbol) : buildEstimateBreakdownRowsMid(adjustments, mainTotal, currencySymbol)}
       <tr style="background:${primaryColor}0d;">
-        <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;vertical-align:top;">Estimated total</td>
-        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">
-          ${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : `${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`}
+        <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;vertical-align:top;">
+          Estimated total
           ${isPublic && suggestedPrice != null && !isHomeowner ? `<div style="margin-top:3px;font-weight:500;font-size:11.5px;color:#666666;">Midpoint Price: <span style="font-weight:700;color:${primaryColor};">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</span></div>` : ''}
+        </td>
+        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;vertical-align:top;">
+          ${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : `${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`}
         </td>
       </tr>
       ${!isPublic ? `
