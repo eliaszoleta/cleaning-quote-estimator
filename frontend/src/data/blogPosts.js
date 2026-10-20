@@ -10581,6 +10581,72 @@ Both are used in practice, but building startup costs into the regular monthly p
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'early-termination-fee-commercial-cleaning-contract',
+    title: 'How to Set an Early Termination Fee for a Commercial Cleaning Contract',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-10-20',
+    readTime: '7 min',
+    excerpt: 'Landed a $3,800/month, 2-year commercial account? Here\'s how to actually structure an early termination clause — and why charging for the full remaining contract value usually backfires.',
+    content: `
+## This Is General Business Guidance, Not Legal Advice
+
+Contract enforceability varies by state, and a liquidated-damages clause that looks reasonable on paper can still be thrown out by a court if it reads as punitive rather than a fair estimate of actual harm. The structures below reflect how early termination is commonly handled in commercial service contracts — for a contract of real size (a $3,800/month, 2-year account totals over $91,000), it's worth a one-time attorney review before you send it out, not after a dispute happens.
+
+## Why You Need This Clause at All
+
+Without a termination clause, a commercial client can walk away with little or no notice, leaving you with staff scheduled, equipment and supplies already allocated to that site, and a hole in your revenue you didn't plan for. The clause exists to do two things: give you real notice so you can wind down or replace the account, and recover genuine costs if that notice window gets skipped.
+
+## The Three Pieces Most Commercial Cleaning Contracts Use Together
+
+### 1. A Required Notice Period
+This does most of the actual protective work, and it's the part every commercial cleaning contract should have regardless of contract length. 60–90 days' written notice is standard for a multi-year commercial account — long enough to either replace the lost revenue with a new account or wind down staffing without a sudden gap. A $3,800/month contract with no stated notice period is the single most common gap new commercial operators leave in their agreements.
+
+### 2. A Fee for Skipping the Notice Period
+This is the actual "early termination fee" — charged only if the client ends service without giving the required notice, not simply for leaving before the 2-year term is up. The fee is typically set equal to the service value of the notice period itself, not the entire remaining contract:
+
+- **90-day notice clause, skipped entirely:** 3 months × $3,800 = **$11,400**
+- **60-day notice clause, skipped entirely:** 2 months × $3,800 = **$7,600**
+- **Partial notice given:** prorate — if they gave 30 days against a required 90, the fee covers the remaining 60 days owed
+
+This framing (paying for the notice you were owed, not the whole contract) is what tends to hold up if it's ever actually disputed, and it reads as fair to the client reviewing the contract before they sign, which matters for actually closing commercial deals in the first place.
+
+### 3. Separate Recovery of Unamortized Setup Costs
+If you bought equipment, supplies, or made any site-specific investment to start the account (a dedicated janitorial cart, specialized equipment, uniforms sized for this job), it's reasonable to have a separate clause stating those costs are billed back, prorated, if the contract ends before they've been recovered through the monthly rate. This is distinct from the notice-period fee above and only applies if you genuinely incurred those costs.
+
+## What to Avoid: Charging for the Full Remaining Term
+
+It's tempting to write "if canceled early, client owes all remaining payments through the end of the 2-year term" — on a $3,800/month account canceled in month 3, that's roughly $80,000 owed with 21 months left. In practice this almost never gets paid, is the type of clause most likely to be struck down as an unenforceable penalty rather than a genuine damages estimate, and a client who feels cornered by it is far more likely to leave a bad review or dispute the charge outright than one facing a fair, notice-based fee. The notice-period approach above protects your revenue just as effectively without that risk.
+
+## A Worked Example for a $3,800/Month, 2-Year Contract
+
+Putting it together for the exact scenario in the original question:
+
+- **Contract value:** $3,800/month × 24 months = $91,200 total
+- **Required notice to terminate:** 90 days written notice, either party
+- **Fee if notice is skipped:** 3 months of service value = $11,400, prorated down if partial notice was given
+- **Separate line:** any site-specific equipment cost not yet recovered, billed back prorated if applicable
+
+This gives you a real, enforceable deterrent against being dropped overnight, without the "all remaining payments" structure that tends to blow up client relationships and doesn't actually get collected in practice anyway.
+
+## FAQ
+
+**Can I just charge a flat percentage of the contract value instead, like 10%?**
+Some contracts do use a flat percentage (commonly 10–20% of the total remaining value) instead of a notice-period calculation — it's simpler to write, but a notice-based fee is generally easier to defend as a genuine damages estimate rather than an arbitrary penalty number, which matters if it's ever challenged.
+
+**Should the notice period and fee be the same for both sides, or just the client?**
+Making it mutual — your business also owes the client the same notice if you choose to end the account — is standard practice and makes the clause read as fair rather than one-sided, which helps it hold up and helps you close the deal in the first place.
+
+**What if the client wants to negotiate the termination fee before signing?**
+This is normal for a contract this size, especially with a property manager or facilities contact who has their own standard terms. A willingness to negotiate the specific notice window (say, 60 vs. 90 days) while keeping the underlying structure intact is usually a smoother conversation than refusing to budge on the number itself.
+
+**Does this change if the client is on a month-to-month agreement instead of a fixed 2-year term?**
+Yes — month-to-month agreements typically rely on the notice period alone (e.g., 30 days' notice to cancel) with no separate termination fee, since there's no fixed remaining term to protect. The fee structure above is specifically for a fixed-term commitment like the 2-year contract in question.
+
+[See our full guide on writing a cleaning service contract →](/blog/how-to-write-a-cleaning-service-contract)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
