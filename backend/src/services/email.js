@@ -515,14 +515,12 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
     <table style="width:100%;border-collapse:collapse;">
       ${isPublic ? buildEstimateBreakdownRows(adjustments, currencySymbol) : buildEstimateBreakdownRowsMid(adjustments, mainTotal, currencySymbol)}
       <tr style="background:${primaryColor}0d;">
-        <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
-        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : `${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`}</td>
+        <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;vertical-align:top;">Estimated total</td>
+        <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;">
+          ${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : `${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`}
+          ${isPublic && suggestedPrice != null && !isHomeowner ? `<div style="margin-top:3px;font-weight:500;font-size:11.5px;color:#666666;">Midpoint Price: <span style="font-weight:700;color:${primaryColor};">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</span></div>` : ''}
+        </td>
       </tr>
-      ${isPublic && suggestedPrice != null && !isHomeowner ? `
-      <tr style="background:${primaryColor}0d;">
-        <td style="padding:10px 12px;font-weight:700;font-size:14px;border-top:1px solid ${primaryColor}28;">Midpoint Price</td>
-        <td style="padding:10px 12px;text-align:right;font-size:14px;color:${primaryColor};border-top:1px solid ${primaryColor}28;white-space:nowrap;">${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</td>
-      </tr>` : ''}
       ${!isPublic ? `
       <tr style="background:${primaryColor}0d;">
         <td colspan="2" style="padding:8px 12px 10px;font-size:11px;color:#888888;line-height:1.4;">This is an estimate, not a final quote — the price may be higher or lower depending on the actual level of cleaning needed. We'll confirm the exact price when you book.</td>
