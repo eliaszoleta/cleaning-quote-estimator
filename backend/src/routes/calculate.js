@@ -143,18 +143,33 @@ function getClientIp(req) {
 // Used only when the DB-backed check can't be reached at all -- when it's
 // reachable, it stays the primary (and more accurate/synchronized) source
 // of truth.
-const fallbackPublicAttempts = new Map(); // ip -> { day: 'YYYY-MM-DD', count }
+const fallbackPublicAttempts = new Map(); // 'ip:<ip>' | 'device:<id>' -> { day: 'YYYY-MM-DD', count }
 
-function fallbackCheckAndRecord(ip) {
-  if (!ip) return true; // no identifier to check -- never block
+// Checked (and recorded) against BOTH identifiers when both are present --
+// blocked if EITHER is already at the limit, same OR logic as the DB-backed
+// path below. This is what actually closes the "just switch VPN servers"
+// bypass: the IP-keyed entry resets to a fresh count on a new IP, but the
+// device-keyed entry (backed by a persisted localStorage id, see
+// deviceId.js) doesn't, so the visitor is still capped by whichever of the
+// two they didn't also rotate.
+function fallbackCheckAndRecord(ip, deviceId) {
+  if (!ip && !deviceId) return true; // no identifier to check -- never block
   const today = new Date().toISOString().slice(0, 10);
-  const entry = fallbackPublicAttempts.get(ip);
-  if (!entry || entry.day !== today) {
-    fallbackPublicAttempts.set(ip, { day: today, count: 1 });
-    return true;
+  const keys = [];
+  if (ip) keys.push(`ip:${ip}`);
+  if (deviceId) keys.push(`device:${deviceId}`);
+  for (const key of keys) {
+    const entry = fallbackPublicAttempts.get(key);
+    if (entry && entry.day === today && entry.count >= PUBLIC_DAILY_LIMIT) return false;
   }
-  if (entry.count >= PUBLIC_DAILY_LIMIT) return false;
-  entry.count += 1;
+  for (const key of keys) {
+    const entry = fallbackPublicAttempts.get(key);
+    if (!entry || entry.day !== today) {
+      fallbackPublicAttempts.set(key, { day: today, count: 1 });
+    } else {
+      entry.count += 1;
+    }
+  }
   return true;
 }
 
@@ -163,8 +178,8 @@ function fallbackCheckAndRecord(ip) {
 // its own (matters for graceful shutdown / test runs importing this file).
 setInterval(() => {
   const today = new Date().toISOString().slice(0, 10);
-  for (const [ip, entry] of fallbackPublicAttempts) {
-    if (entry.day !== today) fallbackPublicAttempts.delete(ip);
+  for (const [key, entry] of fallbackPublicAttempts) {
+    if (entry.day !== today) fallbackPublicAttempts.delete(key);
   }
 }, 60 * 60 * 1000).unref();
 
@@ -179,16 +194,20 @@ setInterval(() => {
 // check and the insert in one atomic DB call, serialized per-IP via an
 // advisory lock, so this can't happen anymore. Returns true if this
 // attempt was allowed (and is now recorded), false if the limit was
-// already hit.
-async function tryRecordPublicEstimateAttempt(ip) {
+// already hit. deviceId (see deviceId.js on the frontend) is a second,
+// independent identifier -- a persisted localStorage value, not derived
+// from the request -- checked and recorded alongside ip so that switching
+// VPN servers (a fresh IP, same browser/localStorage) doesn't reset the
+// count. Blocked if EITHER identifier is already at the limit.
+async function tryRecordPublicEstimateAttempt(ip, deviceId) {
   const supabase = getSupabase();
   // No DB configured at all (local dev, or a genuine misconfiguration in
   // production) -- previously always allowed; now still enforces the cap
   // via the in-process fallback instead of leaving this completely open.
-  if (!supabase) return fallbackCheckAndRecord(ip);
-  if (!ip) return true; // no identifier to check -- never block
+  if (!supabase) return fallbackCheckAndRecord(ip, deviceId);
+  if (!ip && !deviceId) return true; // no identifier to check -- never block
   try {
-    const { data, error } = await supabase.rpc('record_public_estimate_attempt', { p_ip: ip, p_limit: PUBLIC_DAILY_LIMIT });
+    const { data, error } = await supabase.rpc('record_public_estimate_attempt', { p_ip: ip, p_limit: PUBLIC_DAILY_LIMIT, p_device_id: deviceId || null });
     // supabase-js doesn't throw on an API-level error (bad key, function
     // not migrated yet, etc.) -- it resolves with { error, data: null } --
     // so this has to be checked explicitly or a real misconfiguration
@@ -196,12 +215,12 @@ async function tryRecordPublicEstimateAttempt(ip) {
     // surfacing in the logs.
     if (error) {
       console.warn('tryRecordPublicEstimateAttempt failed, using in-process fallback limiter:', error.message);
-      return fallbackCheckAndRecord(ip);
+      return fallbackCheckAndRecord(ip, deviceId);
     }
     return data !== false;
   } catch (err) {
     console.warn('tryRecordPublicEstimateAttempt failed, using in-process fallback limiter:', err.message);
-    return fallbackCheckAndRecord(ip);
+    return fallbackCheckAndRecord(ip, deviceId);
   }
 }
 
@@ -225,7 +244,7 @@ async function recordCompanyEstimateRun(companyId, serviceType) {
 
 // POST /api/calculate
 router.post('/', async (req, res) => {
-  const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo, country } = req.body;
+  const { serviceType, zip, state, serviceDetails, companyId, leadInfo, partnerInfo, country, deviceId } = req.body;
 
   // Validate
   if (!serviceType || !VALID_SERVICE_TYPES.includes(serviceType)) {
@@ -286,7 +305,11 @@ router.post('/', async (req, res) => {
       // valid, already-validated serviceType/zip/state is rare enough that
       // costing a visitor one of their two attempts on it is an acceptable
       // tradeoff for actually closing the loophole.
-      if (!(await tryRecordPublicEstimateAttempt(ip))) {
+      // Defensive against a malformed/oversized value (this is a public,
+      // unauthenticated endpoint) -- a real deviceId is always a short
+      // UUID-ish string from deviceId.js, never anything close to this.
+      const safeDeviceId = typeof deviceId === 'string' && deviceId.length > 0 && deviceId.length <= 100 ? deviceId : null;
+      if (!(await tryRecordPublicEstimateAttempt(ip, safeDeviceId))) {
         return res.status(429).json({
           success: false,
           limitReached: true,

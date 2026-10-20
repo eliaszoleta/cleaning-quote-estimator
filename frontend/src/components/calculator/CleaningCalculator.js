@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import './CleaningCalculator.css';
 import { AlertCircle, MapPin, BarChart3, Zap, ChevronDown, Loader2 } from 'lucide-react';
 import { postCalculate } from '../../utils/api';
+import { getDeviceId } from '../../utils/deviceId';
 import CountryFlag from '../dashboard/CountryFlag';
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import { trackMetaEvent } from '../../utils/metaPixel';
@@ -369,6 +370,15 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             // server-side (see calculate.js), same as before this public
             // selector existed. This is the public-page-only override.
             country: companyConfig?.companyId ? undefined : country,
+            // Backs the public daily-estimate limit with a second
+            // dimension beyond IP (see calculate.js) -- a visitor cycling
+            // VPN servers gets a fresh IP but not a fresh deviceId, since
+            // it's a persisted localStorage value, not derived from the
+            // request at all. Only meaningful on the same no-companyId
+            // path as country above -- a real company's own widget/
+            // Calculator Mode was never subject to this limit in the
+            // first place (gated on an active subscription instead).
+            deviceId: companyConfig?.companyId ? undefined : getDeviceId(),
           });
         })(),
       ]);
