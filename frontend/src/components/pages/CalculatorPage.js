@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ChevronDown, Zap, MapPin, ShieldCheck, Gift } from 'lucide-react';
 import CleaningCalculator from '../calculator/CleaningCalculator';
-import PricingUpdateNotice from '../calculator/PricingUpdateNotice';
 import PageHero from './PageHero';
 import './PageHero.css';
 
@@ -54,7 +53,6 @@ export default function CalculatorPage() {
   // (grey background, its own card, Share/Print/disclaimer outside it) --
   // drop this wrapper's fixed white card so it isn't boxed in a second time.
   const [showingResults, setShowingResults] = useState(false);
-  const [noticeVisible, setNoticeVisible] = useState(false);
 
   const title = 'Cleaning Cost Calculator - Free Instant Estimate (2026)';
   const description = 'Free cleaning cost calculator with ZIP-code accurate pricing. Instantly estimate house cleaning, carpet cleaning, commercial cleaning, mold remediation, and more. No signup required.';
@@ -109,16 +107,15 @@ export default function CalculatorPage() {
             normal flow gets visually covered by the card sliding up over it.
             Keeping it inside means it moves with the card instead. */}
         <div className={showingResults ? undefined : 'calc-card-sink'} style={showingResults ? undefined : { maxWidth: 720, position: 'relative', background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          {/* Collapses to 0 padding (via PricingUpdateNotice's
-              onVisibleChange) once the notice has nothing to show --
-              already dismissed in a past session is the common case, not
-              a rare edge case. Left as a fixed `padding: 16px 16px 0`
-              regardless of content, this div used to sit here empty
-              (16px tall) between the card's rounded top corner and the
-              step header below it, reading as the header's background
-              not reaching the top of its own card. */}
-          {!showingResults && <div style={{ padding: noticeVisible ? '16px 16px 0' : 0 }}><PricingUpdateNotice onVisibleChange={setNoticeVisible} /></div>}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} />
+          {/* skipLeadCapture/instantResults/showSignupCta: see App.js's
+              homepage instance for the full comment on this conversion
+              test -- same treatment here since this is the same tool, just
+              reached via a different URL. This is also why the page no
+              longer renders its own PricingUpdateNotice here: skipLeadCapture
+              now makes CleaningCalculator show that same notice internally
+              (see its own comment on the condition), so keeping this one too
+              would have shown it twice, stacked. */}
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} skipLeadCapture instantResults showSignupCta />
         </div>
 
         <div style={{ marginTop: 48 }}>

@@ -102,7 +102,11 @@ export default function EstimatorPage() {
 
       <div className="page-hero-content">
         <div className={showingResults ? undefined : 'calc-card-sink'} style={showingResults ? undefined : { maxWidth: 720, position: 'relative', background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} />
+          {/* skipLeadCapture/instantResults/showSignupCta: see App.js's
+              homepage instance for the full comment on this conversion
+              test -- same treatment here since this is the same tool,
+              just reached via a different URL. */}
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} skipLeadCapture instantResults showSignupCta />
         </div>
 
         <div style={{ marginTop: 48 }}>

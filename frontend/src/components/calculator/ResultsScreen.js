@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { MapPin, AlertTriangle, Zap, Phone, Mail, Share2, Printer, Check, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { MapPin, AlertTriangle, Zap, Phone, Mail, Share2, Printer, Check, ArrowLeft, CheckCircle2, ArrowRight } from 'lucide-react';
 import { formatPrice, formatPriceRange, serviceTypeLabel, urgencyColor } from '../../utils/formatters';
 import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import PartnerCard from '../partners/PartnerCard';
 import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 
-export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner, onShareEmail }) {
+export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner, onShareEmail, showSignupCta = false }) {
   const [shared, setShared] = useState(false);
   const [partner, setPartner] = useState(null);
   const rootRef = useRef(null);
@@ -280,14 +280,36 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                 </span>
               </div>
 
-              {showPartnerCard && <PartnerCard partner={effectivePartner} />}
+              {/* showSignupCta (cleanestimator.com's own homepage/landing
+                  pages only -- see CleaningCalculator.js's comment) pitches
+                  THIS tool itself to the business owner who just saw it work,
+                  instead of the partner-referral / "contact a cleaner" cards
+                  below -- those are aimed at a homeowner shopping for
+                  service, the opposite audience for this specific CTA, so
+                  they're suppressed here rather than shown alongside it. */}
+              {showSignupCta ? (
+                <div style={{ background: `${primaryColor}0d`, border: `1px solid ${primaryColor}28`, borderRadius: RADIUS.md, padding: '18px 20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <Zap size={16} color={primaryColor} />
+                    <span style={{ fontWeight: 700, fontSize: 15, color: COLORS.ink }}>Own a cleaning business?</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: COLORS.body, margin: '0 0 14px' }}>
+                    This is Clean Estimator's internal pricing tool -- the same unlimited, instant calculator, built for your own quoting. 30-day free trial, cancel anytime.
+                  </p>
+                  <a href="/estimator" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: RADIUS.sm, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
+                    Start Free Trial <ArrowRight size={14} />
+                  </a>
+                </div>
+              ) : (
+                <>
+                  {showPartnerCard && <PartnerCard partner={effectivePartner} />}
 
-              {/* "Ready to book" / contact-us card only makes sense when a
-                  customer is looking at someone else's estimate -- in
-                  Calculator Mode (onShareEmail only ever passed there, same
-                  signal the Email-to-Coworker button above uses) the viewer
-                  IS the business, so there's no one to contact. */}
-              {!showPartnerCard && !onShareEmail && (
+                  {/* "Ready to book" / contact-us card only makes sense when a
+                      customer is looking at someone else's estimate -- in
+                      Calculator Mode (onShareEmail only ever passed there, same
+                      signal the Email-to-Coworker button above uses) the viewer
+                      IS the business, so there's no one to contact. */}
+                  {!showPartnerCard && !onShareEmail && (
                 <div style={{ background: embedded && companyName ? `${primaryColor}08` : COLORS.surfaceMuted, border: `1px solid ${embedded && companyName ? primaryColor + '28' : COLORS.border}`, borderRadius: RADIUS.md, padding: '18px 20px' }}>
                   <div style={{ fontWeight: 700, fontSize: 15, color: COLORS.ink, marginBottom: 4 }}>
                     {companyName ? `Ready to book with ${companyName}?` : 'Ready to get real quotes?'}
@@ -318,8 +340,10 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                         Contact Us
                       </a>
                     )}
-                  </div>
-                </div>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

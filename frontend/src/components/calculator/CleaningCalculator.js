@@ -89,7 +89,7 @@ function labelForStep(step) {
   return 'Details';
 }
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, cardRadius = null }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, showSignupCta = false, cardRadius = null }) {
   const cardRef = useRef(null);
   // embedded=true normally means "flush, no card look" (a real third-party
   // host embed via EmbedWrapper.js, meant to blend into someone else's
@@ -148,12 +148,19 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   // Skips the lead-capture step entirely when the company has it disabled
   // (ServicesTab.js's "Enable Lead Capture" toggle) or the caller forces it
-  // off (skipLeadCapture -- the dashboard's own "Run an Estimate" tab,
-  // where there's no outside visitor to capture). Filtering `steps` itself
-  // here is what actually keeps the step unreachable -- a previous version
-  // only filtered a separate, display-only array used for the progress bar,
-  // so the real lead step still showed up in normal navigation regardless
-  // of either toggle.
+  // off (skipLeadCapture -- originally only the dashboard's own "Run an
+  // Estimate" tab, where there's no outside visitor to capture; since Oct
+  // 2026 also set by cleanestimator.com's own homepage/landing pages
+  // (App.js, CalculatorPage.js, EstimatorPage.js, ServiceCalculatorPage.js)
+  // for a conversion test -- show the real Calculator-Mode-style instant
+  // result with zero contact-form friction, instead of gating it behind a
+  // name/email/phone form and only emailing the number. This does mean
+  // those pages no longer feed AdminHomepageLeads.js or send the estimate
+  // email -- a deliberate tradeoff for this test, not an oversight).
+  // Filtering `steps` itself here is what actually keeps the step
+  // unreachable -- a previous version only filtered a separate, display-only
+  // array used for the progress bar, so the real lead step still showed up
+  // in normal navigation regardless of either toggle.
   const enableLead = !skipLeadCapture && companyConfig?.enableLeadCapture !== false;
   const steps = serviceType
     ? (enableLead ? SERVICE_STEPS[serviceType] : SERVICE_STEPS[serviceType].filter(s => s !== 'lead'))
@@ -329,10 +336,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
       if (err.responseData?.limitReached) {
         setLimitReached(true);
       } else if (err.responseData?.subscriptionInactive && skipLeadCapture) {
-        // skipLeadCapture is only ever set by RunEstimateTab.js -- the
-        // account owner running their own calculator, not a stranger on
-        // the embedded widget -- so only they get the "please subscribe"
-        // popup. A visitor on the actual widget still just sees the plain,
+        // subscriptionInactive only ever comes back when companyId was sent
+        // (see calculate.js), which RunEstimateTab.js does (the account
+        // owner running their own calculator) and cleanestimator.com's own
+        // public pages never do (companyId is always null there) -- so this
+        // branch is unreachable for the homepage/landing-page skipLeadCapture
+        // use (see its own comment above), even though they share the flag.
+        // A visitor on the actual embedded widget still just sees the plain,
         // customer-safe inline error below.
         setSubscriptionPaused(true);
       } else {
@@ -375,25 +385,32 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   const progressStep = Math.min(stepIndex, steps.length - 1);
 
-  // Results page. Nobody sees the on-screen breakdown by default anymore --
-  // the backend already emails it the moment handleLeadNext's /api/calculate
-  // call returns, so this is the one place to see the numbers for a real
-  // visitor on a real embedded widget (EmbedWrapper.js, the thing a company
-  // actually pastes onto their own site). Showing it on-screen too just made
+  // Results page. On a real subscriber's embedded widget (EmbedWrapper.js,
+  // the thing a company actually pastes onto their own site), nobody sees
+  // the on-screen breakdown -- the backend emails it the moment
+  // handleLeadNext's /api/calculate call returns, which is the one place a
+  // real visitor there sees the numbers. Showing it on-screen too just made
   // that email redundant and visitors never opened it.
   //
-  // Only RunEstimateTab.js's "Run an Estimate" tool deliberately opts back
-  // in via the instantResults prop -- skipLeadCapture means there's no
-  // lead-capture step and no estimate email at all there, just the account
-  // owner quoting a job themselves (often standing in front of that
-  // customer, who needs the number immediately). BrandingTab.js's Live
-  // Preview does NOT opt in: it passes a real companyId (so a company
-  // testing their own widget goes through the actual lead-capture +
-  // estimate-email flow, the same as a real visitor would on
-  // EmbedWrapper.js), so it should behave identically to the real embed --
-  // email only, no on-screen breakdown. demoPartner (the partner-
-  // recruitment demo page) always shows it, to let a prospect see what the
-  // widget actually looks like without needing to complete a fake lead form.
+  // instantResults opts back into the on-screen breakdown instead. Three
+  // callers do this, for three different reasons:
+  //   - RunEstimateTab.js's "Run an Estimate" tool (paired with
+  //     skipLeadCapture, so there's no lead-capture step and no estimate
+  //     email at all) -- the account owner quoting a job themselves, often
+  //     standing in front of that customer, who needs the number
+  //     immediately.
+  //   - cleanestimator.com's own homepage/landing pages (also paired with
+  //     skipLeadCapture, since Oct 2026 -- see skipLeadCapture's own
+  //     comment above) -- a conversion test showing a visitor the real
+  //     Calculator-Mode experience instead of a contact form + email.
+  //   - demoPartner (the partner-recruitment demo page), always on, to let
+  //     a prospect see what the widget actually looks like without needing
+  //     to complete a fake lead form.
+  // BrandingTab.js's Live Preview deliberately does NOT opt in: it passes a
+  // real companyId (so a company testing their own widget goes through the
+  // actual lead-capture + estimate-email flow, the same as a real visitor
+  // would on EmbedWrapper.js), so it behaves identically to the real embed
+  // -- email only, no on-screen breakdown.
   const showInstantResults = instantResults || !!demoPartner;
 
   if (currentStep === 'results' && result) {
@@ -419,6 +436,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           embedded={embedded && !siteLanding}
           onReset={handleReset}
           demoPartner={demoPartner}
+          showSignupCta={showSignupCta}
           onShareEmail={onShareEmail ? (email, clientName) => onShareEmail({ to: email, clientName, serviceType, zip: location.zip || null, state: location.state || null, serviceDetails }) : undefined}
         />
       </div>
@@ -648,14 +666,15 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
           {/* Steps */}
           <div style={{ padding: isMobile ? '20px 12px' : embedded && !isWideEmbedded ? '20px 12px' : '32px 40px' }}>
-            {/* skipLeadCapture is only ever set by RunEstimateTab.js (see its
-                own comment) -- that's the dashboard's internal "Run an
-                Estimate" tool for our own paying subscribers, so it's fine to
-                show them the same refreshed-pricing reassurance as our public
-                site. The other embedded=true callers (EmbedWrapper.js's real
-                third-party embeds, BrandingTab.js's live preview) stay
-                excluded -- this message is about cleanestimator.com's own
-                data quality and would be confusing on someone else's site. */}
+            {/* skipLeadCapture callers (see its own comment) are
+                RunEstimateTab.js -- the dashboard's internal "Run an
+                Estimate" tool for our own paying subscribers -- and
+                cleanestimator.com's own homepage/landing pages, so it's fine
+                to show either this same refreshed-pricing reassurance about
+                our own data quality. The other embedded=true callers
+                (EmbedWrapper.js's real third-party embeds, BrandingTab.js's
+                live preview) stay excluded -- that message would be
+                confusing on someone else's site. */}
             {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice country={companyConfig?.country || 'US'} />}
             {currentStep === 'service' && (
               <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={companyConfig?.country || 'US'} />
