@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
-import NoWebsiteBanner from '../ui/NoWebsiteBanner';
 
 const PRIMARY = '#1d4ed8';
 
@@ -224,8 +223,6 @@ export default function CompanyLanding() {
               </div>
             </div>
           </div>
-
-          <NoWebsiteBanner />
 
           {/* Trust strip */}
           <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '22px 24px' }}>
