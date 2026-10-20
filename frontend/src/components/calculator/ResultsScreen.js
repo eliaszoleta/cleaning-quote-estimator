@@ -413,7 +413,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
 
           {!embedded && (
             <p style={{ textAlign: 'center', fontSize: 11.5, color: COLORS.muted, marginTop: 16, maxWidth: 520, margin: '16px auto 0' }}>
-              These estimates are for informational purposes only. Actual prices vary. Always get multiple quotes from licensed, insured professionals.
+              These estimates are for informational purposes only. Actual prices vary.
             </p>
           )}
         </div>
