@@ -23,6 +23,7 @@ import WaterDamageStep from './steps/WaterDamageStep';
 import AirbnbStep from './steps/AirbnbStep';
 import PostConstructionStep from './steps/PostConstructionStep';
 import LeadCaptureStep from './steps/LeadCaptureStep';
+import UserTypeStep from './steps/UserTypeStep';
 import ResultsScreen from './ResultsScreen';
 import EstimateSentScreen from './EstimateSentScreen';
 import PricingUpdateNotice from './PricingUpdateNotice';
@@ -85,11 +86,12 @@ function labelForStep(step) {
   if (step === 'service') return 'Service';
   if (step === 'location') return 'Location';
   if (step === 'lead') return 'Send';
+  if (step === 'usertype') return 'You';
   if (step === 'results') return 'Results';
   return 'Details';
 }
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, showSignupCta = false, cardRadius = null }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, showSignupCta = false, askUserType = false, cardRadius = null }) {
   const cardRef = useRef(null);
   // embedded=true normally means "flush, no card look" (a real third-party
   // host embed via EmbedWrapper.js, meant to blend into someone else's
@@ -162,8 +164,19 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // array used for the progress bar, so the real lead step still showed up
   // in normal navigation regardless of either toggle.
   const enableLead = !skipLeadCapture && companyConfig?.enableLeadCapture !== false;
+  // askUserType (only ever paired with skipLeadCapture on the public
+  // homepage/landing pages -- never on RunEstimateTab.js, where the viewer
+  // is already a known business owner) swaps the old lead step for the
+  // single "I am a…" question instead of dropping it outright, same
+  // position in the flow. See UserTypeStep.js and ResultsScreen.js's
+  // showSuggestedPrice for why that answer still matters even with no
+  // other contact info collected.
   const steps = serviceType
-    ? (enableLead ? SERVICE_STEPS[serviceType] : SERVICE_STEPS[serviceType].filter(s => s !== 'lead'))
+    ? (enableLead
+        ? SERVICE_STEPS[serviceType]
+        : askUserType
+          ? SERVICE_STEPS[serviceType].map(s => s === 'lead' ? 'usertype' : s)
+          : SERVICE_STEPS[serviceType].filter(s => s !== 'lead'))
     : ['service'];
   const currentStep = steps[stepIndex];
 
@@ -355,12 +368,20 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
   const handleLeadNext = (lead) => runCalculation(lead);
 
+  // userType alone (no name/email/phone) still goes through the same
+  // leadInfo state/shape runCalculation already handles -- postCalculate
+  // only treats it as a real lead (saved + emailed) when leadInfo.email is
+  // present (see runCalculation and calculate.js), so this never creates a
+  // lead record, same as the plain skipLeadCapture path. leadInfo.userType
+  // is what ResultsScreen's showSuggestedPrice reads below.
+  const handleUserTypeNext = (userType) => runCalculation({ userType });
+
   const handleDetailsNext = (details) => {
     setServiceDetails(details);
-    if (enableLead) {
+    if (enableLead || askUserType) {
       goNext();
     } else {
-      // No lead step to trigger the calculation from in this flow --
+      // No further step to trigger the calculation from in this flow --
       // run it directly off the details just submitted.
       runCalculation(null, details);
     }
@@ -437,6 +458,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           onReset={handleReset}
           demoPartner={demoPartner}
           showSignupCta={showSignupCta}
+          userType={leadInfo?.userType}
           onShareEmail={onShareEmail ? (email, clientName) => onShareEmail({ to: email, clientName, serviceType, zip: location.zip || null, state: location.state || null, serviceDetails }) : undefined}
         />
       </div>
@@ -699,8 +721,8 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 location={location}
                 companyConfig={companyConfig}
                 country={companyConfig?.country || 'US'}
-                isFinalStep={!enableLead}
-                loading={!enableLead && loading}
+                isFinalStep={!enableLead && !askUserType}
+                loading={!enableLead && !askUserType && loading}
               />
             )}
             {currentStep === 'lead' && (
@@ -711,6 +733,14 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 primaryColor={primaryColor}
                 customQuestions={customQuestions}
                 companyConfig={companyConfig}
+              />
+            )}
+            {currentStep === 'usertype' && (
+              <UserTypeStep
+                onBack={goBack}
+                onNext={handleUserTypeNext}
+                loading={loading}
+                primaryColor={primaryColor}
               />
             )}
           </div>

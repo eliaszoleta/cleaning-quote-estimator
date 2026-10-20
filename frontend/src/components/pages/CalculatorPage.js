@@ -115,7 +115,7 @@ export default function CalculatorPage() {
               now makes CleaningCalculator show that same notice internally
               (see its own comment on the condition), so keeping this one too
               would have shown it twice, stacked. */}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} skipLeadCapture instantResults showSignupCta />
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} skipLeadCapture instantResults showSignupCta askUserType />
         </div>
 
         <div style={{ marginTop: 48 }}>

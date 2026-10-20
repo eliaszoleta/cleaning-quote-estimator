@@ -111,7 +111,7 @@ export default function ServiceCalculatorPage({ slug }) {
               homepage instance for the full comment on this conversion
               test -- same treatment here since this is the same tool,
               just reached via a different URL. */}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 16} initialService={service.id} onShowResults={setShowingResults} skipLeadCapture instantResults showSignupCta />
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 16} initialService={service.id} onShowResults={setShowingResults} skipLeadCapture instantResults showSignupCta askUserType />
         </div>
 
         <div style={{ marginTop: 48 }}>

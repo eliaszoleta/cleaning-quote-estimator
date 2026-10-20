@@ -6,7 +6,7 @@ import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import PartnerCard from '../partners/PartnerCard';
 import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 
-export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner, onShareEmail, showSignupCta = false }) {
+export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner, onShareEmail, showSignupCta = false, userType = null }) {
   const [shared, setShared] = useState(false);
   const [partner, setPartner] = useState(null);
   const rootRef = useRef(null);
@@ -219,8 +219,19 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                       per-job recommendation -- labeled and subtitled to say
                       exactly that, so it reads as "here's one number to
                       anchor on" rather than implying the tool knows more
-                      about this specific job than the range already shows. */}
-                  {suggestedPrice != null && (
+                      about this specific job than the range already shows.
+                      Hidden specifically from a homeowner (userType, from
+                      UserTypeStep.js -- only ever set on cleanestimator.com's
+                      own public pages, see CleaningCalculator.js's
+                      askUserType) -- a single anchor number is exactly what
+                      a customer would push a real cleaning company down to,
+                      the same lowballing risk the range-vs-midpoint
+                      distinction already exists to avoid. userType is null
+                      everywhere else (Calculator Mode, the embedded widget,
+                      demoPartner, BrandingTab's preview), where the viewer
+                      either IS the business or was never asked, so the
+                      midpoint still shows by default there. */}
+                  {suggestedPrice != null && userType !== 'homeowner' && (
                     <div style={{ padding: '11px 12px', background: `${primaryColor}0d`, borderTop: `1px solid ${primaryColor}28` }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
                         <span style={{ fontSize: 12.5, color: COLORS.body, fontWeight: 600 }}>
