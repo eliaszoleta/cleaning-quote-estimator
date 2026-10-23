@@ -513,20 +513,17 @@ export default function App() {
         <Header />
         <main>
           <Suspense fallback={<PageFallback />}>
-            {/* Conversion test (Oct 2026): skipLeadCapture + instantResults +
-                showSignupCta together drop the name/email/phone form and
-                show the real on-screen estimate immediately, same as
-                Calculator Mode, with a "Start Free Trial" CTA in its place
-                instead of the usual partner-referral card -- see
-                CleaningCalculator.js's own comments on each prop. Trades
-                away this page's homepage-lead capture (no more
-                AdminHomepageLeads.js rows or estimate emails from here) to
-                test whether seeing the tool work live converts better to a
-                paid signup than a contact form ever did. The public daily
-                limit (calculate.js's tryRecordPublicEstimateAttempt) is
-                enforced server-side on every /api/calculate call regardless
-                of companyId/leadInfo, so it's unaffected by any of this. */}
-            <CleaningCalculator skipLeadCapture instantResults showSignupCta askUserType showCountrySelector />
+            {/* Ran as skipLeadCapture+instantResults+showSignupCta+askUserType
+                for about a week (Oct 2026) to test whether an instant
+                on-screen result converted better to a paid signup than the
+                lead-capture form -- reverted back to the normal flow
+                (name/email/phone form -> "check your email" -> estimate
+                email) before any conclusion was drawn. Those props (and the
+                UserTypeStep/showSignupCta machinery in CleaningCalculator.js
+                and ResultsScreen.js) are left in place, just unused, in case
+                this is worth testing again later. showCountrySelector is a
+                separate, still-wanted feature, not part of that test. */}
+            <CleaningCalculator showCountrySelector />
             <SEOContent />
           </Suspense>
         </main>

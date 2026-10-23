@@ -398,7 +398,15 @@ router.post('/', async (req, res) => {
       // lead-capture form already tells visitors "we'll connect you with
       // local cleaning professionals," so this makes that a proactive
       // handoff instead of just a passive listing they might not click.
-      if (partnerInfo && partnerInfo.id) {
+      // Only ever for a self-identified homeowner (LeadCaptureStep.js's
+      // required "I am a..." question) -- a self-identified cleaning
+      // business isn't a prospective customer for one of our local
+      // partners, so forwarding their contact info as a "lead" would be
+      // meaningless at best. The recommended-partner card/section shown to
+      // the visitor themselves (EstimateSentScreen.js, and the partner
+      // section inside their own estimate email) is a separate thing and
+      // deliberately NOT gated on userType -- see each of those for why.
+      if (leadInfo.userType === 'homeowner' && partnerInfo && partnerInfo.id) {
         const partnerIdForLead = partnerInfo.id;
         getVerifiedPartnerEmail(partnerIdForLead)
           .then(async partnerEmail => {
@@ -441,6 +449,8 @@ router.post('/', async (req, res) => {
             else console.warn(`Partner lead email send failed for partner ${partnerIdForLead} (see sendPartnerLeadEmail warning above)`);
           })
           .catch(err => console.error('Partner lead email failed:', err.message));
+      } else if (leadInfo.userType !== 'homeowner') {
+        console.log(`Partner lead forwarding skipped -- userType is '${leadInfo.userType || 'unset'}', not 'homeowner' (serviceType=${serviceType})`);
       } else {
         // No client-supplied partner match at all -- either there's
         // genuinely no active partner in this visitor's city, or the

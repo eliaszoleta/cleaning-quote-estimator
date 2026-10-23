@@ -1,7 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { MailCheck, RotateCcw } from 'lucide-react';
 import { serviceTypeLabel } from '../../utils/formatters';
+import { getCachedPartnerMatch } from '../../utils/partnerLookup';
+import PartnerCard from '../partners/PartnerCard';
 import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 
 // Shown in place of the full on-screen breakdown once a lead has submitted
@@ -10,8 +12,9 @@ import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 // returns) already contains the full breakdown, so revealing it here too
 // made the email redundant and visitors never opened it. This screen's
 // whole job is to make the email the one place to see the numbers.
-export default function EstimateSentScreen({ name, email, serviceType, country, onReset }) {
+export default function EstimateSentScreen({ name, email, serviceType, country, embedded, onReset }) {
   const rootRef = useRef(null);
+  const [partner, setPartner] = useState(null);
 
   useEffect(() => {
     if (!rootRef.current) return;
@@ -19,6 +22,20 @@ export default function EstimateSentScreen({ name, email, serviceType, country, 
     const top = rootRef.current.getBoundingClientRect().top + window.scrollY - navbarHeight;
     window.scrollTo({ top, behavior: 'smooth' });
   }, []);
+
+  // Same client-side geo match ResultsScreen.js uses for its own partner
+  // card -- shown here regardless of the "I am a..." answer the lead just
+  // gave (homeowner or business), since this is a recommendation surfaced
+  // to the visitor themselves, not the separate homeowner-only lead
+  // forwarded to the partner's own inbox (see calculate.js's userType
+  // gate on sendPartnerLeadEmail). Excluded on a real third-party embed
+  // (embedded=true, EmbedWrapper.js) and BrandingTab.js's live preview --
+  // a subscriber's own widget shouldn't push a visitor toward a different
+  // cleaning business.
+  useEffect(() => {
+    if (embedded) return;
+    getCachedPartnerMatch().then(setPartner);
+  }, [embedded]);
 
   const firstName = (name || '').trim().split(/\s+/)[0] || null;
 
@@ -71,6 +88,12 @@ export default function EstimateSentScreen({ name, email, serviceType, country, 
               </button>
             </div>
           </div>
+
+          {!embedded && partner && (
+            <div style={{ marginTop: 20 }}>
+              <PartnerCard partner={partner} />
+            </div>
+          )}
         </div>
       </div>
     </>

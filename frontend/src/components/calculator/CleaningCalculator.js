@@ -461,17 +461,17 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // real visitor there sees the numbers. Showing it on-screen too just made
   // that email redundant and visitors never opened it.
   //
-  // instantResults opts back into the on-screen breakdown instead. Three
-  // callers do this, for three different reasons:
+  // instantResults opts back into the on-screen breakdown instead. Two
+  // callers do this, for two different reasons (cleanestimator.com's own
+  // homepage/landing pages briefly did too, Oct 2026, as a conversion test
+  // -- reverted back to the lead-capture flow below before any conclusion
+  // was drawn; the prop itself is left in place, just unused by those 4
+  // pages now, in case it's worth testing again):
   //   - RunEstimateTab.js's "Run an Estimate" tool (paired with
   //     skipLeadCapture, so there's no lead-capture step and no estimate
   //     email at all) -- the account owner quoting a job themselves, often
   //     standing in front of that customer, who needs the number
   //     immediately.
-  //   - cleanestimator.com's own homepage/landing pages (also paired with
-  //     skipLeadCapture, since Oct 2026 -- see skipLeadCapture's own
-  //     comment above) -- a conversion test showing a visitor the real
-  //     Calculator-Mode experience instead of a contact form + email.
   //   - demoPartner (the partner-recruitment demo page), always on, to let
   //     a prospect see what the widget actually looks like without needing
   //     to complete a fake lead form.
@@ -491,6 +491,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             email={leadInfo?.email}
             serviceType={serviceType}
             country={country}
+            embedded={embedded}
             onReset={handleReset}
           />
         </div>
@@ -789,14 +790,18 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           <div style={{ padding: isMobile ? '20px 12px' : embedded && !isWideEmbedded ? '20px 12px' : '32px 40px' }}>
             {/* skipLeadCapture callers (see its own comment) are
                 RunEstimateTab.js -- the dashboard's internal "Run an
-                Estimate" tool for our own paying subscribers -- and
-                cleanestimator.com's own homepage/landing pages, so it's fine
-                to show either this same refreshed-pricing reassurance about
-                our own data quality. The other embedded=true callers
-                (EmbedWrapper.js's real third-party embeds, BrandingTab.js's
-                live preview) stay excluded -- that message would be
-                confusing on someone else's site. */}
-            {(!embedded || skipLeadCapture) && currentStep === 'service' && <PricingUpdateNotice country={country} />}
+                Estimate" tool for our own paying subscribers -- so it's fine
+                to show this same refreshed-pricing reassurance about our own
+                data quality there. siteLanding is the public homepage's 3
+                landing-page twins (CalculatorPage/EstimatorPage/
+                ServiceCalculatorPage), our own pages too even though they
+                don't set skipLeadCapture (they went back to the normal
+                lead-capture flow, Oct 2026 -- see showInstantResults' own
+                comment). The other embedded=true callers (EmbedWrapper.js's
+                real third-party embeds, BrandingTab.js's live preview) stay
+                excluded -- that message would be confusing on someone
+                else's site. */}
+            {(!embedded || skipLeadCapture || siteLanding) && currentStep === 'service' && <PricingUpdateNotice country={country} />}
             {currentStep === 'service' && (
               <div style={{ position: 'relative' }}>
                 <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={country} countrySelector={countrySelectorNode} />

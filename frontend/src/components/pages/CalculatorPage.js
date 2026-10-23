@@ -107,15 +107,13 @@ export default function CalculatorPage() {
             normal flow gets visually covered by the card sliding up over it.
             Keeping it inside means it moves with the card instead. */}
         <div className={showingResults ? undefined : 'calc-card-sink'} style={showingResults ? undefined : { maxWidth: 720, position: 'relative', background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          {/* skipLeadCapture/instantResults/showSignupCta: see App.js's
-              homepage instance for the full comment on this conversion
-              test -- same treatment here since this is the same tool, just
-              reached via a different URL. This is also why the page no
-              longer renders its own PricingUpdateNotice here: skipLeadCapture
-              now makes CleaningCalculator show that same notice internally
-              (see its own comment on the condition), so keeping this one too
-              would have shown it twice, stacked. */}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} skipLeadCapture instantResults showSignupCta askUserType showCountrySelector />
+          {/* See App.js's homepage instance for the full comment on the
+              Oct 2026 instant-results conversion test, reverted back to the
+              normal lead-capture flow here too. PricingUpdateNotice still
+              shows (CleaningCalculator.js's internal condition covers
+              siteLanding pages regardless of skipLeadCapture), so this page
+              still doesn't need its own separate copy of it. */}
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector />
         </div>
 
         <div style={{ marginTop: 48 }}>
