@@ -279,6 +279,24 @@ function renderBlogPost(post, cat, assets, opts = {}) {
     mainEntity: post.faqs.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
   }) : null;
 
+  // Visible counterpart to faqSchemaStr above -- mirrors BlogPost.js's
+  // PostFaqs component. Google's FAQPage rich-result eligibility requires
+  // the Q&A content to actually be visible on the page, not just present in
+  // the JSON-LD, so this keeps the static (pre-hydration) HTML consistent
+  // with what the schema claims. Rendered fully expanded here (no
+  // interactivity needed before React hydrates takes over with the real
+  // accordion).
+  const faqsHtml = (post.faqs && post.faqs.length) ? `
+  <div style="margin-top:40px">
+    <h2 style="font-size:clamp(21px,5vw,26px);font-weight:800;color:#0f172a;margin-bottom:16px;letter-spacing:-0.01em">Frequently Asked Questions</h2>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${post.faqs.map(f => `<div style="background:#fafafa;border:1px solid #f1f5f9;border-radius:10px;padding:14px 18px">
+        <div style="font-weight:700;font-size:14.5px;color:#0f172a;margin-bottom:6px">${esc(f.q)}</div>
+        <p style="font-size:13.5px;color:#475569;line-height:1.7;margin:0">${esc(f.a)}</p>
+      </div>`).join('\n      ')}
+    </div>
+  </div>` : '';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -336,6 +354,7 @@ function renderBlogPost(post, cat, assets, opts = {}) {
     <a href="/" style="background:${PRIMARY};color:white;padding:9px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;flex-shrink:0">Use Free Calculator &#8594;</a>
   </div>
   <div style="line-height:1.8">${contentHtml}</div>
+  ${faqsHtml}
   <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;padding:32px 36px;margin-top:48px;color:white;text-align:center">
     <h3 style="font-size:22px;font-weight:800;margin-bottom:10px">Get a Free Local Estimate</h3>
     <p style="color:#94a3b8;margin-bottom:20px;font-size:15px">${basePath === '/blog' ? 'Our calculator gives ZIP-code specific prices across all 50 states. Free and instant.' : 'Our calculator gives location-specific prices in seconds. Free and instant.'}</p>

@@ -1,9 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { FileQuestion, Lightbulb, ArrowRight } from 'lucide-react';
+import { FileQuestion, Lightbulb, ArrowRight, ChevronDown } from 'lucide-react';
 import { getPostBySlug, BLOG_POSTS } from '../../data/blogPosts';
 import { getCountryBlog } from '../../data/intl/blogRegistry';
 import '../pages/PageHero.css';
+
+// Renders the same Q&A pairs the FAQPage schema below already carries.
+// Google's rich-result eligibility for FAQPage data requires that content
+// actually be visible on the page, not just present in the JSON-LD -- this
+// was previously schema-only, so every post with `faqs` was emitting
+// structured data for content a visitor (and, per that guideline, Google)
+// never actually saw. Same accordion pattern as ServiceCalculatorPage.js's
+// FaqAccordion, kept local here rather than shared since the two pages'
+// surrounding layout differs enough that a shared component would need its
+// own prop surface anyway.
+function PostFaqs({ faqs }) {
+  const [openIndex, setOpenIndex] = useState(0);
+  return (
+    <div style={{ marginTop: 40 }}>
+      <h2 style={{ fontSize: 'clamp(21px,5vw,26px)', fontWeight: 800, color: '#0f172a', marginBottom: 16, letterSpacing: '-0.01em' }}>Frequently Asked Questions</h2>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {faqs.map((faq, i) => {
+          const open = openIndex === i;
+          return (
+            <div key={i} style={{ background: '#fafafa', border: '1px solid #f1f5f9', borderRadius: 10, overflow: 'hidden' }}>
+              <button
+                onClick={() => setOpenIndex(open ? -1 : i)}
+                style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                aria-expanded={open}
+              >
+                <span style={{ fontWeight: 700, fontSize: 14.5, color: '#0f172a' }}>{faq.q}</span>
+                <ChevronDown size={16} color="#94a3b8" style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+              </button>
+              {open && (
+                <div style={{ padding: '0 18px 16px' }}>
+                  <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.7, margin: 0 }}>{faq.a}</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 // Simple markdown-to-HTML renderer (tables, headers, bold, lists, links).
 // sponsored posts (paid guest contributions) pass every link through as
@@ -198,6 +238,8 @@ export default function BlogPost({ slug, country }) {
 
           {/* Content */}
           <div style={{ lineHeight: 1.65 }} dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content, { sponsored: post.sponsored }) }} />
+
+          {post.faqs?.length > 0 && <PostFaqs faqs={post.faqs} />}
         </div>
 
         {/* Bottom CTA */}
