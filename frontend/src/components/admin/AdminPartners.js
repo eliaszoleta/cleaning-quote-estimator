@@ -53,7 +53,7 @@ export default function AdminPartners({ adminKey }) {
       }
       setLocationsByPartner(grouped);
 
-      // Banner impressions/calls per partner, for reporting back to each
+      // Banner impressions/leads per partner, for reporting back to each
       // paying partner what they're getting for the placement.
       setStats(Object.fromEntries((statsRows || []).map(s => [s.partner_id, s])));
     } catch (err) {
@@ -291,20 +291,16 @@ export default function AdminPartners({ adminKey }) {
   );
 }
 
-// Impressions/calls for the floating banner (see partner_banner_stats view
+// Impressions/leads for the floating banner (see partner_banner_stats view
 // in the setup SQL) -- the KPI numbers reported back to each paying partner.
 function PartnerBannerStats({ stats }) {
   const impressions = stats?.impressions || 0;
-  const calls = stats?.calls || 0;
   const leads = stats?.leads || 0;
-  if (!impressions && !calls && !leads) return null;
-  const ctr = impressions > 0 ? ((calls / impressions) * 100).toFixed(1) : '0.0';
+  if (!impressions && !leads) return null;
   return (
     <div style={{ display: 'flex', gap: 12, marginTop: 7, fontSize: 12, color: theme.textSecondary }}>
       <span><strong>{impressions.toLocaleString()}</strong> banner views</span>
-      <span><strong>{calls.toLocaleString()}</strong> call button taps</span>
       <span><strong>{leads.toLocaleString()}</strong> leads emailed</span>
-      <span style={{ color: theme.textMuted }}>{ctr}% CTR</span>
     </div>
   );
 }

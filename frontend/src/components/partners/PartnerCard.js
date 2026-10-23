@@ -4,9 +4,9 @@ import { logBannerEvent } from '../../utils/partnerLookup';
 
 // This card -- shown to a visitor who already filled out the full estimate
 // form -- is arguably higher-intent than the sitewide FloatingPartnerBanner,
-// but it wasn't logging impressions or call taps at all, so the partner
-// portal's numbers only ever reflected the floating banner. Logs the same
-// event types so both placements roll up into one honest total.
+// but it wasn't logging impressions at all, so the partner portal's numbers
+// only ever reflected the floating banner. Logs the same event type so both
+// placements roll up into one honest total.
 export default function PartnerCard({ partner }) {
   useEffect(() => {
     logBannerEvent(partner.id, 'impression');
@@ -41,7 +41,6 @@ export default function PartnerCard({ partner }) {
         {partner.phone && (
           <a
             href={`tel:${partner.phone}`}
-            onClick={() => logBannerEvent(partner.id, 'call_click')}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#16a34a', color: 'white', padding: '9px 18px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 13.5 }}
           >
             <Phone size={13} /> {partner.phone}

@@ -136,7 +136,7 @@ function PartnerPreview() {
           <div style={{ width: '60%', height: 9, borderRadius: 4, background: '#f1f5f9', marginBottom: 8 }} />
           <div style={{ width: '75%', height: 9, borderRadius: 4, background: '#f1f5f9' }} />
 
-          <PartnerBannerCard partner={SAMPLE_PARTNER} isMobile={false} fixed={false} onDismiss={() => {}} onCallClick={() => {}} />
+          <PartnerBannerCard partner={SAMPLE_PARTNER} isMobile={false} fixed={false} onDismiss={() => {}} />
         </div>
       </div>
 
@@ -462,8 +462,8 @@ export default function PartnerWithUs() {
             <StepCard number="2" title="Your business goes live on our platform" desc="Buy your city instantly and your profile — business name, address, phone number, website, and logo — goes live the moment payment clears, no waiting on us. Prefer to apply first? We'll set it up for you within 48 hours instead. Either way, no tech work needed on your end." />
             <StepCard number="3" title="We detect each visitor's city automatically — no guesswork" desc="The moment someone lands on the site, we detect their city automatically — no signup or location sharing needed. If it matches one of your listed cities, your listing shows up. If not, they never see it." />
             <StepCard number="4" title="You show up wherever your customers are — not just one page" desc="Once matched, your listing appears as a recommended local cleaner on their estimate results page, as a floating banner on every other page they visit — the home page, blog posts, cost guides, all of it — and again in their inbox if they opt in to get their estimate emailed to them. Three placements from one match, not one." />
-            <StepCard number="5" title="Every lead lands straight in your inbox — you don't have to wait for a call" desc="The moment a matched visitor gets their estimate emailed to them, we email you that same lead's name, contact info, and timeline directly, reply-to set to them so you can just hit reply. On top of that, they can call or visit your website directly too — there's no middleman and no lead fee either way. Every lead is yours, no commission, no strings." />
-            <StepCard number="6" title="You track exactly what it's earning you" desc="Log into your free partner dashboard anytime to see how many times your listing was shown, how many calls it generated, and how many leads were emailed to you — real numbers, not guesswork." />
+            <StepCard number="5" title="Every lead reaches you two ways — no middleman, ever" desc="Direct calls: your phone number is shown right on the banner and your listing, so anyone ready to book can call you the second they see it. Email lead alerts: we capture every matched visitor's name, contact info, and timeline before they even finish their estimate, then email it straight to your inbox, reply-to set to them so you can just hit reply. Either way, the lead is 100% yours — no lead fee, no commission, no strings." />
+            <StepCard number="6" title="You see exactly what it's earning you" desc="Log into your free partner dashboard anytime to see how many times your listing was shown and how many leads were emailed to you — real numbers, not guesswork." />
           </div>
         </div>
       </div>
@@ -498,9 +498,9 @@ export default function PartnerWithUs() {
               <Check>Exclusive placement &mdash; only 1 partner per city</Check>
               <Check>Your name, address, phone, website &amp; logo on every results page in your city, a floating recommendation banner sitewide, and in the estimate email if they opt in to get one</Check>
               <Check>Every matched lead emailed straight to you &mdash; name, contact info, and timeline, reply-to set to them so you can just hit reply</Check>
-              <Check>Direct contact &mdash; customers can also call or click you straight away</Check>
+              <Check>Direct contact &mdash; your phone number is shown right on the listing, so customers can call you the moment they see it</Check>
               <Check>No lead fees, no commissions, no hidden costs</Check>
-              <Check>Free performance dashboard &mdash; see your views, calls, and click-through rate anytime</Check>
+              <Check>Free performance dashboard &mdash; see your banner views and leads emailed anytime</Check>
               <Check>Cancel anytime with 30 days notice</Check>
               <Check>Serve multiple cities under one account &mdash; each priced by that city's own tier</Check>
             </div>
@@ -550,7 +550,7 @@ export default function PartnerWithUs() {
               { q: 'Is there really only one partner per city?', a: 'Yes. We give one cleaning business exclusive placement per city. Once a city is taken, we waitlist new applicants. Apply early to lock in your market.' },
               { q: 'How exactly does my business appear?', a: 'Three ways. After a user completes an estimate, a branded card with your business name, address, logo, phone number, and website link appears on their results page as a recommended local cleaner. A small floating banner with the same info follows visitors in your city across the whole site — home page, blog posts, cost guides — not just the results page. And if that visitor opts in to have their estimate emailed to them, the same recommendation card is included right in that email too. All three look like trusted recommendations, not banner ads.' },
               { q: 'Can I cover more than one city?', a: `Yes. There's no limit — add as many cities as you want to serve, each priced by that city's own tier ($${MAJOR_CITY_PRICE}/month for major metros, $${MINOR_CITY_PRICE}/month for smaller cities), all under one account and one dashboard.` },
-              { q: 'Can I see how it\'s performing?', a: "Yes. Every partner gets free access to a performance dashboard at cleanestimator.com/client. Sign up with the email your listing is set up with to see exactly how many times your listing was shown and how many calls it generated." },
+              { q: 'Can I see how it\'s performing?', a: "Yes. Every partner gets free access to a performance dashboard at cleanestimator.com/client. Sign up with the email your listing is set up with to see exactly how many times your listing was shown and how many leads were emailed to you." },
               { q: 'What counts as a city, and how is pricing decided?', a: `We go by city name as detected from the user's IP address. Pricing is size-based: cities with roughly ${POPULATION_THRESHOLD.toLocaleString()}+ residents are "major" and billed at $${MAJOR_CITY_PRICE}/month; smaller cities are "minor" and billed at $${MINOR_CITY_PRICE}/month, half price. Add your cities in the form below and we'll show you exactly which tier each one falls into before you commit.` },
               { q: 'What if traffic in my city is low?', a: "We can share an estimate of current monthly sessions for your city before you commit. You're still getting targeted, high-intent visitors for less than the cost of one Google Ads day." },
               { q: 'Can I cancel?', a: "Yes. Give us 30 days notice and we'll remove your listing at the end of the billing cycle. No long-term contracts." },

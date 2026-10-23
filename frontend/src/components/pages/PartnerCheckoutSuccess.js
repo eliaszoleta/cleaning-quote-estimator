@@ -61,7 +61,7 @@ export default function PartnerCheckoutSuccess() {
             <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '16px 18px', textAlign: 'left', marginBottom: 22 }}>
               <div style={{ fontSize: 13.5, fontWeight: 700, color: '#1d4ed8', marginBottom: 4 }}>Next: set up your dashboard</div>
               <p style={{ fontSize: 13, color: '#1d4ed8', lineHeight: 1.6, margin: 0 }}>
-                Head to <strong>cleanestimator.com/client</strong> and sign up with the personal email you checked out with to unlock your KPI dashboard &mdash; impressions, calls, and click-through-rate for every city.
+                Head to <strong>cleanestimator.com/client</strong> and sign up with the personal email you checked out with to unlock your KPI dashboard &mdash; banner views and leads emailed for every city.
               </p>
             </div>
             <a

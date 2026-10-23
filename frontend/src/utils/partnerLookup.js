@@ -162,9 +162,8 @@ export async function getCachedPartnerMatch() {
   return partner;
 }
 
-// KPI tracking for the floating partner banner: one row per time it's shown
-// (event_type 'impression') and per time the call button is tapped
-// ('call_click'), so impressions/calls/click-through-rate can be reported to
+// KPI tracking for the partner placements: one row per time a listing is
+// shown (event_type 'impression'), so impressions/leads can be reported to
 // each paying partner. Fire-and-forget -- never blocks or breaks the UI if
 // it fails (e.g. offline, ad blocker on the Supabase request).
 export function logBannerEvent(partnerId, eventType) {

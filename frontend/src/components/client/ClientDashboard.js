@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, MapPin, Phone, Eye, PhoneCall, TrendingUp, ChevronDown, ArrowUpRight, ArrowDownRight, Minus, Mail, Pencil, X, Globe, Loader2 } from 'lucide-react';
+import { LogOut, MapPin, Phone, Eye, ChevronDown, ArrowUpRight, ArrowDownRight, Minus, Mail, Pencil, X, Globe, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatPhoneInput } from '../../utils/formatPhone';
 import { updateClientPartner } from '../../utils/api';
@@ -47,7 +47,6 @@ function countsInRange(events, start, end) {
   });
   return {
     impressions: inRange.filter(e => e.event_type === 'impression').length,
-    calls: inRange.filter(e => e.event_type === 'call_click').length,
     leads: inRange.filter(e => e.event_type === 'lead_email').length,
   };
 }
@@ -100,7 +99,7 @@ export default function ClientDashboard({ user, onLogout }) {
       ]);
 
       setLocations(locData || []);
-      setStats(statsData || { impressions: 0, calls: 0 });
+      setStats(statsData || { impressions: 0 });
       setMonthlyEvents(eventsData || []);
       setState('ready');
     })();
@@ -172,13 +171,12 @@ export default function ClientDashboard({ user, onLogout }) {
     );
   }
 
-  const allTime = { impressions: stats?.impressions || 0, calls: stats?.calls || 0, leads: stats?.leads || 0 };
+  const allTime = { impressions: stats?.impressions || 0, leads: stats?.leads || 0 };
   const thisMonth = countsInRange(monthlyEvents, ranges.thisMonth.start, ranges.thisMonth.end);
   const lastMonth = countsInRange(monthlyEvents, ranges.lastMonth.start, ranges.lastMonth.end);
   const current = period === 'this_month' ? thisMonth : period === 'last_month' ? lastMonth : allTime;
 
-  const { impressions, calls, leads } = current;
-  const ctr = impressions > 0 ? ((calls / impressions) * 100).toFixed(1) : '0.0';
+  const { impressions, leads } = current;
 
   const showTrend = period === 'this_month';
 
@@ -288,14 +286,9 @@ export default function ClientDashboard({ user, onLogout }) {
             trend={showTrend && <TrendBadge current={thisMonth.impressions} previous={lastMonth.impressions} />}
           />
           <StatCard
-            icon={PhoneCall} label="Call Button Taps" value={calls.toLocaleString()} color="#16a34a" bg="#f0fdf4"
-            trend={showTrend && <TrendBadge current={thisMonth.calls} previous={lastMonth.calls} />}
-          />
-          <StatCard
             icon={Mail} label="Leads Emailed to You" value={leads.toLocaleString()} color="#ea580c" bg="#fff7ed"
             trend={showTrend && <TrendBadge current={thisMonth.leads} previous={lastMonth.leads} />}
           />
-          <StatCard icon={TrendingUp} label="Click-Through Rate" value={`${ctr}%`} color="#7c3aed" bg="#f5f3ff" />
         </div>
 
         <div className="cd-hover-lift" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 7, padding: '18px 24px', marginBottom: 24 }}>
@@ -313,13 +306,10 @@ export default function ClientDashboard({ user, onLogout }) {
                 <strong style={{ color: '#0f172a' }}>Banner Views</strong> — how many times your listing appeared on cleanestimator.com to a visitor in one of your service areas.
               </p>
               <p style={{ margin: '0 0 10px' }}>
-                <strong style={{ color: '#0f172a' }}>Call Button Taps</strong> — how many times a visitor tapped "Call," opening their dialer with your number ready — a stronger signal than just seeing the banner. We can't confirm the call actually connected (that happens on their phone, not ours), and since your number's also printed on the listing, some visitors dial it directly instead of tapping — so your real call volume is likely a bit higher than this.
-              </p>
-              <p style={{ margin: '0 0 10px' }}>
                 <strong style={{ color: '#0f172a' }}>Leads Emailed to You</strong> — every time a visitor in your service area emails themselves their estimate, we forward you that same lead's name, contact info, and timeline, with reply-to set to them so you can just hit reply. The most actionable number here: these people already have their price and are actively looking, not just browsing.
               </p>
               <p style={{ margin: 0 }}>
-                <strong style={{ color: '#0f172a' }}>Click-Through Rate</strong> — the share of banner views that turned into a call tap. The clearest read on how compelling your listing is once someone sees it, worth watching as your service areas or details change.
+                <strong style={{ color: '#0f172a' }}>How leads actually reach you</strong> — two ways, both always on. Direct calls: your phone number is shown right on the banner and listing, so anyone ready to book can call you the second they see it — we don't track those taps as a number, but they're happening. Email lead alerts: we capture a matched visitor's contact details before they even finish their estimate, so you get the lead even if they never pick up the phone.
               </p>
             </div>
           )}

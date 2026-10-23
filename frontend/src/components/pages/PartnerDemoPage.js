@@ -72,7 +72,6 @@ export default function PartnerDemoPage() {
             partner={SAMPLE_PARTNER}
             isMobile={isMobile}
             onDismiss={() => setBannerDismissed(true)}
-            onCallClick={() => {}}
           />,
           document.body
         )}

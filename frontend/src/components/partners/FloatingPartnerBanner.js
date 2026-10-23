@@ -33,7 +33,7 @@ export function computeIsCompact() {
 // live demo both pin it to the viewport, but the Get Leads page hero shows
 // this same card inside a small static mockup, where it needs to sit in
 // the corner of that mockup instead of the real browser window.
-export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, fixed = true }) {
+export function PartnerBannerCard({ partner, isMobile, onDismiss, fixed = true }) {
   return (
     <div
       role="complementary"
@@ -117,7 +117,6 @@ export function PartnerBannerCard({ partner, isMobile, onDismiss, onCallClick, f
       {partner.phone && (
         <a
           href={`tel:${partner.phone}`}
-          onClick={onCallClick}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: '#16a34a', color: 'white', padding: isMobile ? '6px 8px' : '9px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: isMobile ? 11.5 : 13, whiteSpace: 'nowrap' }}
         >
           <Phone size={isMobile ? 11 : 13} /> Call {partner.phone}
@@ -179,7 +178,6 @@ export default function FloatingPartnerBanner() {
       partner={partner}
       isMobile={isMobile}
       onDismiss={dismiss}
-      onCallClick={() => logBannerEvent(partner.id, 'call_click')}
     />,
     document.body
   );
