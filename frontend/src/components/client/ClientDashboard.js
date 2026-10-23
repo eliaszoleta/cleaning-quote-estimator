@@ -309,7 +309,7 @@ export default function ClientDashboard({ user, onLogout }) {
                 <strong style={{ color: '#0f172a' }}>Leads Emailed to You</strong> — every time a visitor in your service area emails themselves their estimate, we forward you that same lead's name, contact info, and timeline, with reply-to set to them so you can just hit reply. The most actionable number here: these people already have their price and are actively looking, not just browsing.
               </p>
               <p style={{ margin: 0 }}>
-                <strong style={{ color: '#0f172a' }}>How leads actually reach you</strong> — two ways, both always on. Direct calls: your phone number is shown right on the banner and listing, so anyone ready to book can call you the second they see it — we don't track those taps as a number, but they're happening. Email lead alerts: we capture a matched visitor's contact details before they even finish their estimate, so you get the lead even if they never pick up the phone.
+                <strong style={{ color: '#0f172a' }}>How leads actually reach you</strong> — two ways, both always on. Direct calls: your phone number is shown right on the banner and listing, so anyone ready to book can call you the second they see it. Email lead alerts: we capture visitor's contact details before they even finish their estimate, so you get the lead even if they never pick up the phone.
               </p>
             </div>
           )}
