@@ -144,6 +144,19 @@ router.post('/checkout', async (req, res) => {
       }
     }
 
+    // Stripe Checkout's own bordered "Due today" price-breakdown box (the
+    // one a coupon/promotion with a scheduled price change gets) isn't
+    // something the Checkout Session API can turn on for a plain trial --
+    // that layout is Stripe's own, triggered by a multi-phase discount, not
+    // a configurable option. custom_text.submit.message is the one thing we
+    // DO control: it renders directly above the pay button on Stripe's
+    // hosted page, and is the clearest way available to spell out "$0.00
+    // due today" next to the button someone's about to click, rather than
+    // leaving it implied by the trial-days copy above the form.
+    const trialEndDateLabel = trialPeriodDays
+      ? new Date(Date.now() + trialPeriodDays * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      : null;
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -151,7 +164,12 @@ router.post('/checkout', async (req, res) => {
       customer: existingCustomerId || undefined,
       customer_email: existingCustomerId ? undefined : req.user.email,
       metadata: { companyId },
-      ...(trialPeriodDays ? { subscription_data: { trial_period_days: trialPeriodDays } } : {}),
+      ...(trialPeriodDays ? {
+        subscription_data: { trial_period_days: trialPeriodDays },
+        custom_text: {
+          submit: { message: `**$0.00 due today.** Your ${trialPeriodDays}-day free trial starts now -- you won't be charged until ${trialEndDateLabel}.` },
+        },
+      } : {}),
       success_url: `${FRONTEND_URL}/company?subscribed=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${FRONTEND_URL}/company?tab=settings&section=subscription`,
     });
