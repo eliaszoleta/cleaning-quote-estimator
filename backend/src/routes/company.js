@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
-const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, findDuplicateCompany } = require('../services/companyConfig');
+const { getCompanyConfig, patchCompanyConfig, removeCompanyConfigKeys, getOrCreateCompanyConfig, findDuplicateCompany } = require('../services/companyConfig');
 const { sendAccountDeletionScheduledEmail } = require('../services/email');
 const { requireAuth } = require('../middleware/auth');
 
@@ -152,18 +152,27 @@ router.put('/:id', requireAuth, async (req, res) => {
     return res.status(400).json({ success: false, error: 'Invalid config object' });
   }
 
+  // Never allow subscription to be overwritten from the client -- stripped
+  // before the patch ever reaches the merge, rather than read-back-and-
+  // reassert (the old approach), which would silently undo a concurrent
+  // webhook's legitimate subscription update landing in the same window.
+  const { subscription, ...patch } = updates;
+
   try {
-    const existing = (await getCompanyConfig(id)) || { ...DEFAULT_COMPANY_CONFIG };
-    const merged = { ...existing, ...updates };
-    // Never allow subscription to be overwritten from client
-    merged.subscription = existing.subscription || DEFAULT_COMPANY_CONFIG.subscription;
-    const bodyKeys = Object.keys(updates).join(',');
-    const svcStatesIn = Object.entries(updates.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') || '(none)';
-    const svcStatesMerged = Object.entries(merged.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ');
+    // A brand-new row still needs the full default config seeded, same as
+    // before -- an atomic merge only ever adds/overwrites the keys it's
+    // given, so a first-ever save with just a couple of changed fields
+    // would otherwise create a config missing every other default.
+    const existing = await getCompanyConfig(id);
+    const seed = existing ? patch : { ...DEFAULT_COMPANY_CONFIG, ...patch };
+
+    const bodyKeys = Object.keys(patch).join(',');
+    const svcStatesIn = Object.entries(patch.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') || '(none)';
     console.log(`[PUT config] user=${id} | body_keys: ${bodyKeys}`);
     console.log(`[PUT config] user=${id} | received services: ${svcStatesIn}`);
+    const merged = await patchCompanyConfig(id, seed);
+    const svcStatesMerged = Object.entries(merged.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ');
     console.log(`[PUT config] user=${id} | merged services:   ${svcStatesMerged}`);
-    await saveCompanyConfig(id, merged);
     console.log(`[PUT config] user=${id} | saved ok`);
     res.json({ success: true, data: merged });
   } catch (err) {
@@ -267,11 +276,9 @@ router.patch('/:id/services', requireAuth, async (req, res) => {
     const existing = (await getCompanyConfig(id)) || { ...DEFAULT_COMPANY_CONFIG };
     // Deep merge: existing services + incoming changes (preserves unmentioned services)
     const mergedServices = { ...(existing.services || {}), ...services };
-    const updated = { ...existing, services: mergedServices };
-    updated.subscription = existing.subscription || DEFAULT_COMPANY_CONFIG.subscription;
     const svcLog = Object.entries(mergedServices).map(([k,v]) => `${k}=${v?.enabled}`).join(' ');
     console.log(`[PATCH services] user=${id} | ${svcLog}`);
-    await saveCompanyConfig(id, updated);
+    const updated = await patchCompanyConfig(id, { services: mergedServices });
     res.json({ success: true, data: updated });
   } catch (err) {
     console.error('PATCH services error:', err.message);
@@ -349,8 +356,7 @@ router.delete('/account', requireAuth, async (req, res) => {
   try {
     const config = (await getCompanyConfig(companyId)) || { ...DEFAULT_COMPANY_CONFIG };
     const scheduledFor = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    const updated = { ...config, pendingDeletion: { requestedAt: new Date().toISOString(), scheduledFor } };
-    await saveCompanyConfig(companyId, updated);
+    await patchCompanyConfig(companyId, { pendingDeletion: { requestedAt: new Date().toISOString(), scheduledFor } });
 
     sendAccountDeletionScheduledEmail({ to: req.user.email, companyName: config.companyName || 'there', scheduledFor })
       .catch(err => console.error('sendAccountDeletionScheduledEmail failed:', err.message));
@@ -370,8 +376,7 @@ router.post('/account/cancel-deletion', requireAuth, async (req, res) => {
   try {
     const config = await getCompanyConfig(companyId);
     if (config?.pendingDeletion) {
-      const { pendingDeletion, ...rest } = config;
-      await saveCompanyConfig(companyId, rest);
+      await removeCompanyConfigKeys(companyId, ['pendingDeletion']);
     }
     res.json({ success: true });
   } catch (err) {

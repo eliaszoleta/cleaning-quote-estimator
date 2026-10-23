@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
+const { getCompanyConfig, saveCompanyConfig, patchCompanyConfig, getOrCreateCompanyConfig } = require('../services/companyConfig');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { sendCompanyWelcomeEmail, sendSubscriptionReactivatedEmail, sendPaymentFailedEmail, sendSubscriptionCanceledEmail } = require('../services/email');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
@@ -205,18 +205,19 @@ router.post('/verify-checkout', async (req, res) => {
 
     const sub = session.subscription;
     const subObj = sub && typeof sub !== 'string' ? sub : null;
-    config.subscription = {
-      ...(config.subscription || {}),
-      stripeCustomerId: session.customer,
-      stripeSubscriptionId: typeof sub === 'string' ? sub : sub?.id,
-      status: subObj?.status || 'active',
-      cancelAtPeriodEnd: subObj?.cancel_at_period_end || false,
-      currentPeriodEnd: subObj?.current_period_end
-        ? new Date(subObj.current_period_end * 1000).toISOString()
-        : null,
-    };
-    await saveCompanyConfig(companyId, config);
-    res.json({ success: true, data: computeSubscriptionStatus(config, req.user.email) });
+    const updatedConfig = await patchCompanyConfig(companyId, {
+      subscription: {
+        ...(config.subscription || {}),
+        stripeCustomerId: session.customer,
+        stripeSubscriptionId: typeof sub === 'string' ? sub : sub?.id,
+        status: subObj?.status || 'active',
+        cancelAtPeriodEnd: subObj?.cancel_at_period_end || false,
+        currentPeriodEnd: subObj?.current_period_end
+          ? new Date(subObj.current_period_end * 1000).toISOString()
+          : null,
+      },
+    });
+    res.json({ success: true, data: computeSubscriptionStatus(updatedConfig, req.user.email) });
   } catch (err) {
     console.error('verify-checkout error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to verify checkout session' });
@@ -297,17 +298,18 @@ async function handleStripeEvent(event) {
         // again) apart from a brand-new signup for the welcome-email logic
         // further down.
         const wasCanceled = config.subscription?.status === 'canceled';
-        config.subscription = {
-          ...(config.subscription || {}),
-          stripeCustomerId: fullSession.customer,
-          stripeSubscriptionId: typeof sub === 'string' ? sub : sub?.id,
-          status: subObj?.status || 'active',
-          cancelAtPeriodEnd: subObj?.cancel_at_period_end || false,
-          currentPeriodEnd: subObj?.current_period_end
-            ? new Date(subObj.current_period_end * 1000).toISOString()
-            : (config.subscription?.currentPeriodEnd || null),
-        };
-        await saveCompanyConfig(companyId, config);
+        const updatedConfig = await patchCompanyConfig(companyId, {
+          subscription: {
+            ...(config.subscription || {}),
+            stripeCustomerId: fullSession.customer,
+            stripeSubscriptionId: typeof sub === 'string' ? sub : sub?.id,
+            status: subObj?.status || 'active',
+            cancelAtPeriodEnd: subObj?.cancel_at_period_end || false,
+            currentPeriodEnd: subObj?.current_period_end
+              ? new Date(subObj.current_period_end * 1000).toISOString()
+              : (config.subscription?.currentPeriodEnd || null),
+          },
+        });
         console.log(`Webhook: activated company ${companyId}`);
 
         // The dashboard's own "first load ever" welcome-email check
@@ -328,7 +330,7 @@ async function handleStripeEvent(event) {
         // bypasses that dedup specifically for a true reactivation, since
         // each cancel-then-resubscribe cycle is its own event worth a
         // confirmation, same reasoning as payment_failed's per-invoice dedup.
-        if (!config.subscription.welcomeEmailSentAt || wasCanceled) {
+        if (!updatedConfig.subscription.welcomeEmailSentAt || wasCanceled) {
           const email = await getOwnerEmail(companyId);
           if (email) {
             // A true win-back (previously canceled, now resubscribing) gets
@@ -340,17 +342,15 @@ async function handleStripeEvent(event) {
             // help. Brand-new trial and immediate-active brand-new-account
             // cases still go through company_welcome as before.
             const sent = wasCanceled
-              ? await sendSubscriptionReactivatedEmail({ to: email, companyName: config.companyName })
+              ? await sendSubscriptionReactivatedEmail({ to: email, companyName: updatedConfig.companyName })
               : await sendCompanyWelcomeEmail({
                   to: email,
                   companyId,
                   statusLine: subObj?.status === 'trialing' ? undefined : "Your account is now active and ready to use.",
                 });
             if (sent) {
-              const fresh = (await getCompanyConfig(companyId)) || config;
-              await saveCompanyConfig(companyId, {
-                ...fresh,
-                subscription: { ...fresh.subscription, welcomeEmailSentAt: new Date().toISOString() },
+              await patchCompanyConfig(companyId, {
+                subscription: { ...updatedConfig.subscription, welcomeEmailSentAt: new Date().toISOString() },
               });
             }
           }
@@ -372,16 +372,17 @@ async function handleStripeEvent(event) {
           console.log(`Webhook: ignoring customer.subscription.updated for ${sub.id} -- company ${companyId}'s current subscription is ${config.subscription.stripeSubscriptionId}`);
           break;
         }
-        config.subscription = {
-          ...(config.subscription || {}),
-          status: sub.status,
-          cancelAtPeriodEnd: sub.cancel_at_period_end || false,
-          currentPeriodEnd: sub.current_period_end
-            ? new Date(sub.current_period_end * 1000).toISOString()
-            : (config.subscription?.currentPeriodEnd || null),
-          stripeSubscriptionId: sub.id,
-        };
-        await saveCompanyConfig(companyId, config);
+        await patchCompanyConfig(companyId, {
+          subscription: {
+            ...(config.subscription || {}),
+            status: sub.status,
+            cancelAtPeriodEnd: sub.cancel_at_period_end || false,
+            currentPeriodEnd: sub.current_period_end
+              ? new Date(sub.current_period_end * 1000).toISOString()
+              : (config.subscription?.currentPeriodEnd || null),
+            stripeSubscriptionId: sub.id,
+          },
+        });
         console.log(`Webhook: subscription updated to "${sub.status}" (cancelAtPeriodEnd: ${sub.cancel_at_period_end}) for company ${companyId}`);
       } catch (err) {
         console.error(`Webhook customer.subscription.updated failed:`, err.message);
@@ -405,20 +406,19 @@ async function handleStripeEvent(event) {
           console.log(`Webhook: ignoring customer.subscription.deleted for ${sub.id} -- company ${companyId}'s current subscription is ${config.subscription.stripeSubscriptionId}`);
           break;
         }
-        config.subscription = { ...(config.subscription || {}), status: 'canceled', stripeSubscriptionId: sub.id };
-        await saveCompanyConfig(companyId, config);
+        const updatedConfig = await patchCompanyConfig(companyId, {
+          subscription: { ...(config.subscription || {}), status: 'canceled', stripeSubscriptionId: sub.id },
+        });
         console.log(`Webhook: canceled subscription for company ${companyId}`);
 
         // Deduped via cancellationEmailSentAt -- webhook deliveries can repeat.
-        if (!config.subscription.cancellationEmailSentAt) {
+        if (!updatedConfig.subscription.cancellationEmailSentAt) {
           const email = await getOwnerEmail(companyId);
           if (email) {
-            const sent = await sendSubscriptionCanceledEmail({ to: email, companyName: config.companyName || 'there' });
+            const sent = await sendSubscriptionCanceledEmail({ to: email, companyName: updatedConfig.companyName || 'there' });
             if (sent) {
-              const fresh = (await getCompanyConfig(companyId)) || config;
-              await saveCompanyConfig(companyId, {
-                ...fresh,
-                subscription: { ...fresh.subscription, cancellationEmailSentAt: new Date().toISOString() },
+              await patchCompanyConfig(companyId, {
+                subscription: { ...updatedConfig.subscription, cancellationEmailSentAt: new Date().toISOString() },
               });
             }
           }
@@ -446,23 +446,22 @@ async function handleStripeEvent(event) {
           console.log(`Webhook: ignoring invoice.payment_failed for subscription ${invoice.subscription} -- company ${companyId}'s current subscription is ${config.subscription.stripeSubscriptionId}`);
           break;
         }
-        config.subscription = { ...(config.subscription || {}), status: 'past_due' };
-        await saveCompanyConfig(companyId, config);
+        const updatedConfig = await patchCompanyConfig(companyId, {
+          subscription: { ...(config.subscription || {}), status: 'past_due' },
+        });
         console.log(`Webhook: marked past_due for company ${companyId}`);
 
         // Deduped by invoice id, not a one-time flag -- Stripe's own retry
         // schedule fires this same webhook multiple times for the SAME
         // invoice (shouldn't re-send each time), but a genuinely new failed
         // invoice next billing cycle has a different id and should.
-        if (config.subscription.lastPaymentFailedInvoiceId !== invoice.id) {
+        if (updatedConfig.subscription.lastPaymentFailedInvoiceId !== invoice.id) {
           const email = await getOwnerEmail(companyId);
           if (email) {
-            const sent = await sendPaymentFailedEmail({ to: email, companyName: config.companyName || 'there' });
+            const sent = await sendPaymentFailedEmail({ to: email, companyName: updatedConfig.companyName || 'there' });
             if (sent) {
-              const fresh = (await getCompanyConfig(companyId)) || config;
-              await saveCompanyConfig(companyId, {
-                ...fresh,
-                subscription: { ...fresh.subscription, lastPaymentFailedInvoiceId: invoice.id },
+              await patchCompanyConfig(companyId, {
+                subscription: { ...updatedConfig.subscription, lastPaymentFailedInvoiceId: invoice.id },
               });
             }
           }

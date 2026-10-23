@@ -1,4 +1,4 @@
-const { listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, getCompanyConfig, saveCompanyConfig } = require('./companyConfig');
+const { listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, patchCompanyConfig } = require('./companyConfig');
 const { sendTrialCheckin1Email, sendActivationReminderEmail, sendLegacyTrialExpiredEmail } = require('./email');
 const { computeSubscriptionStatus, ALWAYS_ACTIVE_EMAIL } = require('./subscriptionStatus');
 
@@ -85,10 +85,8 @@ async function checkTrialReminders() {
       const email = await getOwnerEmail(companyId);
       if (!email || email.toLowerCase() === ALWAYS_ACTIVE_EMAIL) continue;
       if (await sendTrialCheckin1Email({ to: email, companyName })) {
-        const fresh = (await getCompanyConfig(companyId)) || config;
-        await saveCompanyConfig(companyId, {
-          ...fresh,
-          subscription: { ...fresh.subscription, trialCheckin1EmailSentAt: new Date().toISOString() },
+        await patchCompanyConfig(companyId, {
+          subscription: { ...sub, trialCheckin1EmailSentAt: new Date().toISOString() },
         });
       }
     } catch (err) {
@@ -127,10 +125,8 @@ async function checkActivationReminders() {
     try {
       const companyName = config.companyName || 'there';
       if (await sendActivationReminderEmail({ to: email, companyName, signedUpAt })) {
-        const fresh = (await getCompanyConfig(companyId)) || config;
-        await saveCompanyConfig(companyId, {
-          ...fresh,
-          subscription: { ...fresh.subscription, activationReminderEmailSentAt: new Date().toISOString() },
+        await patchCompanyConfig(companyId, {
+          subscription: { ...sub, activationReminderEmailSentAt: new Date().toISOString() },
         });
       }
     } catch (err) {
@@ -182,10 +178,8 @@ async function checkLegacyTrialExpired() {
 
     try {
       if (await sendLegacyTrialExpiredEmail({ to: email, companyName })) {
-        const fresh = (await getCompanyConfig(companyId)) || config;
-        await saveCompanyConfig(companyId, {
-          ...fresh,
-          subscription: { ...fresh.subscription, legacyTrialExpiredEmailSentAt: new Date().toISOString() },
+        await patchCompanyConfig(companyId, {
+          subscription: { ...sub, legacyTrialExpiredEmailSentAt: new Date().toISOString() },
         });
       }
     } catch (err) {

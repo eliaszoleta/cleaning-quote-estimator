@@ -80,6 +80,68 @@ async function saveCompanyConfig(companyId, config) {
   fileSave(fileCache);
 }
 
+// Atomic partial update: merges ONLY the given top-level keys into the
+// stored config, at the database row level, via migration 027's
+// merge_company_config function -- see that migration's comment for why
+// this exists (a full getCompanyConfig + mutate-in-memory + saveCompanyConfig
+// cycle can lose an unrelated concurrent writer's change to a DIFFERENT top-
+// level key). Returns the full post-merge config, so callers that need the
+// result (e.g. to compute a response or to read a field they just merged
+// alongside others already on it) don't need a separate re-read.
+//
+// File-fallback mode has no real concurrency to protect against (single
+// local dev process), so a plain read-merge-write is fine there.
+async function patchCompanyConfig(companyId, patch) {
+  const sb = getSupabase();
+  if (sb) {
+    const { data, error } = await sb.rpc('merge_company_config', {
+      p_company_id: companyId,
+      p_patch: patch,
+    });
+    if (error) {
+      console.error('[companyConfig] PATCH error:', error.message, error.code);
+      throw new Error(error.message);
+    }
+    console.log(`[companyConfig] PATCH ok company_id=${companyId} keys=${Object.keys(patch).join(',')}`);
+    return data;
+  }
+
+  console.log('[companyConfig] PATCH using file cache (no Supabase)');
+  const merged = { ...(fileCache.get(companyId) || {}), ...patch };
+  fileCache.set(companyId, merged);
+  fileSave(fileCache);
+  return merged;
+}
+
+// Companion to patchCompanyConfig for the one case a merge can't express:
+// deleting a top-level key entirely (e.g. clearing pendingDeletion), via
+// migration 027's remove_company_config_keys. Same atomicity guarantee as
+// patchCompanyConfig -- see that migration's comment.
+async function removeCompanyConfigKeys(companyId, keys) {
+  const sb = getSupabase();
+  if (sb) {
+    const { data, error } = await sb.rpc('remove_company_config_keys', {
+      p_company_id: companyId,
+      p_keys: keys,
+    });
+    if (error) {
+      console.error('[companyConfig] REMOVE_KEYS error:', error.message, error.code);
+      throw new Error(error.message);
+    }
+    console.log(`[companyConfig] REMOVE_KEYS ok company_id=${companyId} keys=${keys.join(',')}`);
+    return data;
+  }
+
+  console.log('[companyConfig] REMOVE_KEYS using file cache (no Supabase)');
+  const existing = fileCache.get(companyId);
+  if (!existing) return null;
+  const rest = { ...existing };
+  for (const k of keys) delete rest[k];
+  fileCache.set(companyId, rest);
+  fileSave(fileCache);
+  return rest;
+}
+
 // Companies hit this from two different routes on dashboard load in
 // parallel -- GET /api/company/:id and GET /api/subscription/status -- with
 // no ordering guarantee between them. Both need the exact same "create a
@@ -219,4 +281,4 @@ async function findDuplicateCompany({ companyName, phone }) {
   return null;
 }
 
-module.exports = { getCompanyConfig, saveCompanyConfig, getOrCreateCompanyConfig, listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, findDuplicateCompany, DEFAULT_COMPANY_CONFIG };
+module.exports = { getCompanyConfig, saveCompanyConfig, patchCompanyConfig, removeCompanyConfigKeys, getOrCreateCompanyConfig, listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, findDuplicateCompany, DEFAULT_COMPANY_CONFIG };
