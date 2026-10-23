@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Database, MapPin, SlidersHorizontal, BookOpen, ShieldCheck, RefreshCw, Scale } from 'lucide-react';
 import CountryFlag from '../dashboard/CountryFlag';
+import { getAllServices } from '../../data/services';
 import './PageHero.css';
+
+// Derived from the real service list, not typed out as a number -- a
+// hardcoded count goes stale the moment a new service is added.
+const SERVICE_COUNT = getAllServices().length;
 
 // Four tabs -- US, Canada, UK, Australia -- the same four countries the
 // calculator itself prices (see defaults.js's COUNTRIES). US is first and
@@ -112,7 +117,7 @@ const COPY = {
     regionBody: "The same house cleaning job costs more in California than in Arkansas, and our numbers reflect that. Each state carries a multiplier — California sits around 1.40× the national baseline, Arkansas around 0.80× — built from regional labor cost and cost-of-living differences. That multiplier is applied directly to the national base price for whichever service you're pricing, not estimated separately per state.",
     cityTitle: 'City and ZIP Code Pricing',
     cityBody: "For city-level pages, we intentionally reuse the parent state's pricing data rather than inventing separate city-specific numbers. Reliable, verifiable cost data doesn't exist at neighborhood granularity for most markets — and we'd rather show you a number we can stand behind than a more precise-looking one we made up. If that changes for a given metro area, we'll update it.",
-    updateBody: "We review and adjust our pricing models as national and regional market conditions change, rather than on a fixed calendar schedule. Most recently, in October 2026, we re-verified every one of our 12 services against current published cost guides and BLS labor-wage data, state by state — several tables (carpet, upholstery, dryer vent, water damage restoration, apartment cleaning, and Airbnb turnover pricing) were adjusted as a result. If you ever see a number that looks out of step with what you're being quoted locally, we want to know — contact us and we'll take a look.",
+    updateBody: `We review and adjust our pricing models as national and regional market conditions change, rather than on a fixed calendar schedule. Most recently, in October 2026, we re-verified every one of our ${SERVICE_COUNT} services against current published cost guides and BLS labor-wage data, state by state — several tables (carpet, upholstery, dryer vent, water damage restoration, apartment cleaning, and Airbnb turnover pricing) were adjusted as a result. If you ever see a number that looks out of step with what you're being quoted locally, we want to know — contact us and we'll take a look.`,
     crossChecks: CROSS_CHECKS_US,
     citations: CITATIONS_US,
   },

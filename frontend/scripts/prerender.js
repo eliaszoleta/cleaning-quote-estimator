@@ -1195,7 +1195,7 @@ function renderServiceCalculatorPage(service, servicesMod, assets) {
 function renderStatePage(state, servicesMod, statesMod, faqsMod, assets, citiesMod) {
   const otherStates = statesMod.getAllStates().filter(s => s.slug !== state.slug);
   const cities = citiesMod.getCitiesByState(state.slug);
-  const faqs = faqsMod.getAllFaqs().slice(0, 5);
+  const faqs = faqsMod.getAllFaqs(ALL_SERVICES.length - 3).slice(0, 5);
   const pctVsNational = Math.round((state.multiplier - 1) * 100);
   const TIER_COPY = {
     high: `Cleaning service costs in ${state.name} run above the national average, driven by higher labor rates and cost of living.`,
@@ -1472,7 +1472,7 @@ function renderStartBusinessIndexPage(statesMod, blogPosts, assets) {
 function renderCityPage(city, servicesMod, citiesMod, faqsMod, assets) {
   const otherCitiesInState = citiesMod.getCitiesByState(city.stateSlugRef).filter(c => c.slug !== city.slug);
   const featuredCities = citiesMod.getFeaturedCities().filter(c => c.slug !== city.slug).slice(0, 8);
-  const faqs = faqsMod.getAllFaqs().slice(0, 5);
+  const faqs = faqsMod.getAllFaqs(ALL_SERVICES.length - 3).slice(0, 5);
   const pctVsNational = Math.round((city.multiplier - 1) * 100);
   const TIER_COPY = {
     high: `Cleaning service costs in ${city.name} run above the national average, in line with ${city.name}'s overall cost of living.`,

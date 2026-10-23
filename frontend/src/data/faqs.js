@@ -4,6 +4,17 @@
 // so it can also be reused on the new state cost pages). Service-specific
 // FAQs live alongside each service in services.js.
 
+// This file is also loaded by scripts/prerender.js via a sandboxed
+// `new Function(...)` eval of its raw source text (see that script's
+// loadFaqsData) rather than a real module import, so a top-level `import`
+// here breaks the static-site build even though it compiles fine for the
+// live React app. The one FAQ answer below that needs the real service
+// count uses this placeholder instead, resolved by getAllFaqs(otherServicesCount)
+// -- every caller already has the real count on hand (SEOContent.js,
+// StatePage.js, CityPage.js and prerender.js's own renderers all derive it
+// from services.js directly), so it's passed in rather than computed here.
+const OTHER_SERVICES_PLACEHOLDER = '__OTHER_SERVICES_COUNT__';
+
 const FAQS = [
   { q: 'How much does house cleaning cost in 2026?', a: 'The average house cleaning cost in 2026 is $158–$245 for a standard clean of a 1,500–2,500 sq ft home. Prices vary by state — California runs $170–$230 and New York $175–$235, while Texas and Florida run $130–$175. Use our free cleaning cost calculator above to get a ZIP-code specific estimate in seconds.' },
   { q: 'How do I calculate cleaning costs for my home?', a: 'To calculate cleaning costs, use our free cleaning cost estimator: select your service type, enter your ZIP code, and specify your home size and bedrooms. Our calculator uses real market data and state-by-state pricing to generate an accurate estimate in under 60 seconds. You can also estimate manually: multiply your home\'s square footage by $0.05–$0.15 for a standard clean, then adjust for your local cost of living.' },
@@ -18,9 +29,16 @@ const FAQS = [
   { q: 'What factors affect cleaning service costs?', a: 'The main factors that affect cleaning costs are: (1) Home size — larger homes cost more, (2) Location — cities and high cost-of-living states charge more, (3) Frequency — weekly and biweekly clients get 10–20% discounts, (4) Service type — deep cleans and move-out cleans cost more than standard recurring cleans, (5) Condition — heavily cluttered or dirty homes may incur surcharges, and (6) Add-ons — oven, fridge, and window cleaning typically cost extra.' },
   { q: 'Is it cheaper to hire a cleaning service or clean yourself?', a: 'Hiring a professional cleaning service costs $158–$245 per visit for a standard 1,500–2,500 sq ft home, but saves 3–6 hours of your time. For many homeowners, the time savings and professional results justify the cost. Recurring service packages (weekly or biweekly) offer the best value at $126–$196 per visit with consistency discounts of 15–20%. DIY is cheaper upfront but requires purchasing supplies and the right techniques to achieve the same results.' },
   { q: 'How do I get a free cleaning estimate?', a: 'Use the Clean Estimator cleaning cost calculator at the top of this page — it\'s completely free, requires no signup, and gives you an instant estimate based on your ZIP code, service type, and home size. For an official quote, contact 2–3 local cleaning companies and request an in-home or virtual walkthrough.' },
-  { q: 'Can I get a cleaning cost estimate online instead of scheduling an in-home visit?', a: 'Yes — that\'s exactly what Clean Estimator is built for. You get a full cleaning cost estimate online in under 60 seconds, based on real state-by-state pricing data, without a salesperson visiting your home or a phone call. It works for house cleaning, carpet cleaning, commercial cleaning, and 9 other services, and there\'s no signup required.' },
+  { q: 'Can I get a cleaning cost estimate online instead of scheduling an in-home visit?', a: `Yes — that's exactly what Clean Estimator is built for. You get a full cleaning cost estimate online in under 60 seconds, based on real state-by-state pricing data, without a salesperson visiting your home or a phone call. It works for house cleaning, carpet cleaning, commercial cleaning, and ${OTHER_SERVICES_PLACEHOLDER} other services, and there's no signup required.` },
 ];
 
-export function getAllFaqs() {
-  return FAQS;
+// otherServicesCount: how many services beyond the 3 named in the FAQ above
+// ("house cleaning, carpet cleaning, commercial cleaning, and N other
+// services"). Omit it to get the FAQs back with that placeholder text
+// un-resolved (fine for callers that don't render that specific answer).
+export function getAllFaqs(otherServicesCount) {
+  if (otherServicesCount == null) return FAQS;
+  return FAQS.map(f => f.a.includes(OTHER_SERVICES_PLACEHOLDER)
+    ? { ...f, a: f.a.replace(OTHER_SERVICES_PLACEHOLDER, otherServicesCount) }
+    : f);
 }

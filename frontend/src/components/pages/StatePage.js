@@ -7,6 +7,10 @@ import { getAllFaqs } from '../../data/faqs';
 import { getCitiesByState } from '../../data/cityPricing';
 import './PageHero.css';
 
+// Derived from the real service list, not typed out as a number -- a
+// hardcoded count goes stale the moment a new service is added.
+const SERVICE_COUNT = getAllServices().length;
+
 const ICONS = {
   home_residential: Home,
   apartment: Building2,
@@ -105,7 +109,7 @@ export default function StatePage({ slug }) {
 
   const otherStates = getAllStates().filter(s => s.slug !== state.slug);
   const cities = getCitiesByState(state.slug);
-  const faqs = getAllFaqs().slice(0, 5);
+  const faqs = getAllFaqs(SERVICE_COUNT - 3).slice(0, 5);
   const pctVsNational = Math.round((state.multiplier - 1) * 100);
 
   const title = `Cleaning Service Cost in ${state.name} (2026) | Average Prices & Estimates | Clean Estimator`;

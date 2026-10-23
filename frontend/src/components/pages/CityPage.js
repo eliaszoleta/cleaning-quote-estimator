@@ -3,7 +3,12 @@ import { Helmet } from 'react-helmet-async';
 import { ChevronDown, Home, Building2, Building, Layers, Sofa, Wind, Flame, Grid3x3, AlertTriangle, Droplets, MapPin } from 'lucide-react';
 import { getCityBySlug, getCitiesByState, getFeaturedCities, cityServicePrices } from '../../data/cityPricing';
 import { getAllFaqs } from '../../data/faqs';
+import { getAllServices } from '../../data/services';
 import './PageHero.css';
+
+// Derived from the real service list, not typed out as a number -- a
+// hardcoded count goes stale the moment a new service is added.
+const SERVICE_COUNT = getAllServices().length;
 
 const ICONS = {
   home_residential: Home,
@@ -101,7 +106,7 @@ export default function CityPage({ slug }) {
 
   const otherCitiesInState = getCitiesByState(city.stateSlugRef).filter(c => c.slug !== city.slug);
   const featuredCities = getFeaturedCities().filter(c => c.slug !== city.slug).slice(0, 8);
-  const faqs = getAllFaqs().slice(0, 5);
+  const faqs = getAllFaqs(SERVICE_COUNT - 3).slice(0, 5);
   const pctVsNational = Math.round((city.multiplier - 1) * 100);
 
   const title = `Cleaning Service Cost in ${city.name}, ${city.stateCode} (2026) | Clean Estimator`;

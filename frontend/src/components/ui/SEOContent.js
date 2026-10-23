@@ -5,11 +5,11 @@ import { getAllFaqs } from '../../data/faqs';
 import { getAllServices, typicalCost } from '../../data/services';
 import { getFeaturedStates } from '../../data/statePricing';
 
-const FAQ = getAllFaqs();
 // Derived from the real service list, not typed out as a number -- a
 // hardcoded "12 services" claim goes stale the moment a 13th is added,
 // the same way an earlier "10 services" reference did.
 const SERVICE_COUNT = getAllServices().length;
+const FAQ = getAllFaqs(SERVICE_COUNT - 3);
 
 const PRICE_FACTORS = [
   { Icon: Ruler, term: 'Home Size (Square Footage)', detail: 'Your base price scales with square footage — $90–$115 for a home under 1,000 sq ft, up to $272–$338 for a home over 3,000 sq ft.' },
@@ -361,7 +361,7 @@ export default function SEOContent() {
               Cleaning Cost Calculator — Every Service, Every State
             </h2>
             <p style={{ fontSize: 17, color: '#64748b', maxWidth: 580, margin: '0 auto' }}>
-              Clean Estimator covers 9 cleaning and restoration services with ZIP-code specific pricing across all 50 states. Select a service below to get your instant estimate.
+              Clean Estimator covers {SERVICE_COUNT} cleaning and restoration services with ZIP-code specific pricing across all 50 states. Select a service below to get your instant estimate.
             </p>
           </div>
 

@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ChevronDown, BarChart3, ListChecks, Lock, Repeat } from 'lucide-react';
 import CleaningCalculator from '../calculator/CleaningCalculator';
+import { getAllServices } from '../../data/services';
 import PageHero from './PageHero';
 import './PageHero.css';
+
+// Derived from the real service list, not typed out as a number -- a
+// hardcoded count goes stale the moment a new service is added.
+const OTHER_SERVICES_COUNT = getAllServices().length - 3;
 
 const WHY_POINTS = [
   { Icon: BarChart3, title: 'Real Market Pricing', body: 'This cleaning cost estimator pulls from actual state-by-state pricing data, not a generic industry average.' },
@@ -96,7 +101,7 @@ export default function EstimatorPage() {
       <PageHero
         breadcrumbLabel="Cleaning Cost Estimator"
         title="Cleaning Cost Estimator"
-        subtitle="Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and 9 other services — enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation."
+        subtitle={`Get a free cleaning cost estimator for house cleaning, carpet cleaning, commercial cleaning, and ${OTHER_SERVICES_COUNT} other services — enter your ZIP code and property details to see a real price range in under a minute. This standalone estimator works the same whether you're comparing quotes or budgeting ahead, with no signup and no obligation.`}
         subtitleAlign="justify"
       />
 

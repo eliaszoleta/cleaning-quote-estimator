@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ChevronDown, Zap, MapPin, ShieldCheck, Gift } from 'lucide-react';
 import CleaningCalculator from '../calculator/CleaningCalculator';
+import { getAllServices } from '../../data/services';
 import PageHero from './PageHero';
 import './PageHero.css';
+
+// Derived from the real service list, not typed out as a number -- a
+// hardcoded count goes stale the moment a new service is added.
+const OTHER_SERVICES_COUNT = getAllServices().length - 3;
 
 const WHY_POINTS = [
   { Icon: MapPin, title: 'ZIP-Code Accurate', body: 'Every price this cleaning cost calculator returns is adjusted for your local labor rates and cost of living, not a flat national guess.' },
@@ -96,7 +101,7 @@ export default function CalculatorPage() {
       <PageHero
         breadcrumbLabel="Cleaning Cost Calculator"
         title="Cleaning Cost Calculator"
-        subtitle="This free cleaning cost calculator gives you an instant, ZIP-code specific price for house cleaning, carpet cleaning, commercial cleaning, and 9 other services. Built as a standalone cleaning calculator you can bookmark and reuse — no signup, no phone calls, just enter your details and get a real cleaning estimator price range in under 60 seconds."
+        subtitle={`This free cleaning cost calculator gives you an instant, ZIP-code specific price for house cleaning, carpet cleaning, commercial cleaning, and ${OTHER_SERVICES_COUNT} other services. Built as a standalone cleaning calculator you can bookmark and reuse — no signup, no phone calls, just enter your details and get a real cleaning estimator price range in under 60 seconds.`}
         subtitleAlign="justify"
       />
 

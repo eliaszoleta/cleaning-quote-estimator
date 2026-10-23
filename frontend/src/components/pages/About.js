@@ -175,7 +175,7 @@ export default function About() {
               We connect visitors who want a real quote with an exclusive local cleaning partner in their city — a warm, ready-to-call lead instead of a cold listing.
             </ProductCard>
             <ProductCard Icon={Sparkles} color="#d97706" bg="#fffbeb" title="Free Cost Calculator" href="/cleaning-cost-calculator" linkLabel="Try it">
-              Instant price ranges for house cleaning, carpet cleaning, commercial cleaning, and 9 other services — no signup, no phone calls.
+              Instant price ranges for house cleaning, carpet cleaning, commercial cleaning, and {SERVICE_COUNT - 3} other services — no signup, no phone calls.
             </ProductCard>
           </div>
         </section>
