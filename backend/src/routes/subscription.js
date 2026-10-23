@@ -71,6 +71,40 @@ router.post('/checkout', async (req, res) => {
       await saveCompanyConfig(companyId, config);
     }
     const existingCustomerId = config.subscription?.stripeCustomerId;
+    const existingSubscriptionId = config.subscription?.stripeSubscriptionId;
+
+    // Guard against creating a SECOND real Stripe subscription for an
+    // account that already has one genuinely in force. Real incident (Oct
+    // 2026, coinciding with a Railway infra outage that made our own
+    // endpoints flaky): a visitor's first Checkout completed fine and
+    // created a real 'trialing' subscription, but something -- a slow/
+    // failed response, a reload, a second click, all more likely during
+    // exactly that kind of outage -- sent them through Checkout a SECOND
+    // time. The three-case trial logic below correctly withheld a second
+    // trial (stripeSubscriptionId was already set), but nothing stopped a
+    // second Checkout Session -- and therefore a second real Stripe
+    // Subscription object -- from being created at all. That second one's
+    // immediate, no-trial charge failed and landed as 'incomplete', and its
+    // own failed invoice stamped the WHOLE account 'past_due' even though
+    // the real (first) subscription was still healthy -- see the matching
+    // subscriptionId-mismatch guard in the webhook handlers below for that
+    // half of the fix. Deliberately asks Stripe directly rather than
+    // trusting config.subscription.status: that cached value is exactly
+    // what this incident corrupted, so it's not a trustworthy source of
+    // truth for a decision this consequential.
+    if (existingSubscriptionId) {
+      try {
+        const existingSub = await stripe.subscriptions.retrieve(existingSubscriptionId);
+        if (existingSub.status === 'trialing' || existingSub.status === 'active') {
+          return res.status(409).json({ success: false, error: 'You already have an active subscription. Refresh the page, and contact support if this seems wrong.' });
+        }
+      } catch (err) {
+        // Subscription on file was deleted/inaccessible -- fall through and
+        // let a new Checkout Session proceed, same as if none had ever
+        // been set.
+        console.warn(`Checkout: couldn't verify existing subscription ${existingSubscriptionId} for company ${companyId}:`, err.message);
+      }
+    }
 
     const priceId = process.env.STRIPE_PRICE_ID;
     if (!priceId) return res.status(500).json({ success: false, error: 'Stripe pricing not configured' });
@@ -227,6 +261,23 @@ async function getOwnerEmail(companyId) {
   }
 }
 
+// True when a webhook event is about a DIFFERENT Stripe subscription than
+// the one this company's config currently considers its real, current
+// subscription -- a stray/duplicate/abandoned subscription object (see
+// POST /checkout's own comment on the Oct 2026 incident this guards
+// against) whose own lifecycle events -- a failed invoice, Stripe
+// auto-expiring an unpaid 'incomplete' subscription after ~23 hours, etc.
+// -- must never be allowed to overwrite the status of a company's real,
+// currently-active subscription just because it happens to share the same
+// customer. An unset stripeSubscriptionId on file means "no current
+// subscription yet" and lets any event through unguarded, same as before
+// this check existed -- it only ever suppresses a MISMATCH against an
+// already-known-good id, never a first-time one.
+function isStaleSubscriptionEvent(config, subscriptionId) {
+  const current = config.subscription?.stripeSubscriptionId;
+  return !!current && !!subscriptionId && current !== subscriptionId;
+}
+
 async function handleStripeEvent(event) {
   const stripe = getStripe();
 
@@ -317,6 +368,10 @@ async function handleStripeEvent(event) {
         const companyId = await findCompanyByCustomer(sub.customer);
         if (!companyId) break;
         const config = (await getCompanyConfig(companyId)) || {};
+        if (isStaleSubscriptionEvent(config, sub.id)) {
+          console.log(`Webhook: ignoring customer.subscription.updated for ${sub.id} -- company ${companyId}'s current subscription is ${config.subscription.stripeSubscriptionId}`);
+          break;
+        }
         config.subscription = {
           ...(config.subscription || {}),
           status: sub.status,
@@ -341,6 +396,15 @@ async function handleStripeEvent(event) {
         const companyId = await findCompanyByCustomer(sub.customer);
         if (!companyId) break;
         const config = (await getCompanyConfig(companyId)) || {};
+        if (isStaleSubscriptionEvent(config, sub.id)) {
+          // E.g. Stripe auto-expiring a stray, never-paid 'incomplete'
+          // subscription (the duplicate-checkout failure mode above) --
+          // must NOT cancel this company's real, current subscription or
+          // send them a "your subscription has been canceled" email for a
+          // subscription they never actually had running.
+          console.log(`Webhook: ignoring customer.subscription.deleted for ${sub.id} -- company ${companyId}'s current subscription is ${config.subscription.stripeSubscriptionId}`);
+          break;
+        }
         config.subscription = { ...(config.subscription || {}), status: 'canceled', stripeSubscriptionId: sub.id };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: canceled subscription for company ${companyId}`);
@@ -373,6 +437,15 @@ async function handleStripeEvent(event) {
         const companyId = await findCompanyByCustomer(invoice.customer);
         if (!companyId) break;
         const config = (await getCompanyConfig(companyId)) || {};
+        if (isStaleSubscriptionEvent(config, invoice.subscription)) {
+          // This is the exact failure mode from the Oct 2026 incident: a
+          // stray duplicate subscription's own no-trial charge fails, and
+          // without this check its invoice.payment_failed would stamp
+          // 'past_due' onto the WHOLE company even though their real
+          // subscription (a different id) was never actually unpaid.
+          console.log(`Webhook: ignoring invoice.payment_failed for subscription ${invoice.subscription} -- company ${companyId}'s current subscription is ${config.subscription.stripeSubscriptionId}`);
+          break;
+        }
         config.subscription = { ...(config.subscription || {}), status: 'past_due' };
         await saveCompanyConfig(companyId, config);
         console.log(`Webhook: marked past_due for company ${companyId}`);
