@@ -881,6 +881,19 @@ router.patch('/website-requests/:id', async (req, res) => {
       updates.status = 'sample_ready';
     }
 
+    // Keeps the admin UI's Billing summary (setup_fee_paid_at /
+    // subscription_started_at / canceled_at) accurate for the plain
+    // "Mark Active" / "Mark Canceled" label buttons (AdminWebsiteRequests.js)
+    // too, not just the Stripe-linked path above, which already sets
+    // subscription_started_at itself -- the `!updates.subscription_started_at`
+    // guard here avoids clobbering that.
+    if (updates.status === 'active' && !existing.subscription_started_at && !updates.subscription_started_at) {
+      updates.subscription_started_at = new Date().toISOString();
+    }
+    if (updates.status === 'canceled' && !existing.canceled_at) {
+      updates.canceled_at = new Date().toISOString();
+    }
+
     const { data: updated, error: updateErr } = await sb.from('website_requests').update(updates).eq('id', id).select().single();
     if (updateErr) throw updateErr;
 
