@@ -1026,4 +1026,25 @@ router.delete('/website-requests/:id', async (req, res) => {
   }
 });
 
+// GET /api/admin/company-feedback — every submission from the "Send
+// Feedback" button in the dashboard header (routes/company.js's POST
+// /:id/general-feedback), newest first. Read-only list, same as
+// AdminHomepageLeads.js's own feed -- there's no status/workflow to this
+// one, just a record an admin can read and reply to directly (each row
+// already has the submitter's contact details, snapshotted at submission
+// time -- see 030_company_feedback.sql).
+router.get('/company-feedback', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  try {
+    const { data, error } = await sb.from('company_feedback').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('Admin list company-feedback error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to load feedback' });
+  }
+});
+
 module.exports = router;

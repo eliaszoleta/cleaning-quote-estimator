@@ -1591,6 +1591,57 @@ async function sendChatbotLeadAlertEmail({ chatbot, lead, summary }) {
   }
 }
 
+// General in-app feedback from the "Send Feedback" button in the dashboard
+// header (routes/company.js's POST /:id/general-feedback). Fire-and-forget
+// from that route -- the submission is already saved to company_feedback
+// (visible in Admin -> Feedback) regardless of whether this send succeeds,
+// same "DB write is the source of truth, email is just a faster heads-up"
+// pattern as sendWebsiteRequestNotificationEmail above. reply_to is set to
+// the submitter's own address so replying from the inbox goes straight back
+// to them, no copy-paste needed.
+async function sendCompanyFeedbackEmail({ business, email, message }) {
+  const { RESEND_API_KEY, RESEND_FROM_EMAIL, COMPANY_FEEDBACK_NOTIFY_EMAIL } = process.env;
+  if (!RESEND_API_KEY) {
+    console.warn('sendCompanyFeedbackEmail skipped: Resend not configured (RESEND_API_KEY)');
+    return false;
+  }
+
+  const fromAddress = RESEND_FROM_EMAIL || 'info@cleanestimator.com';
+  const notifyEmail = COMPANY_FEEDBACK_NOTIFY_EMAIL || 'eliaszoleta87@gmail.com';
+  const who = business ? `${business}${email ? ` (${email})` : ''}` : (email || 'A Clean Estimator user');
+  const safeMessage = String(message || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  try {
+    await axios.post(
+      `${RESEND_API_BASE}/emails`,
+      {
+        from: `Clean Estimator <${fromAddress}>`,
+        to: [notifyEmail],
+        reply_to: email || undefined,
+        subject: `New feedback — ${business || email || 'Clean Estimator user'} — ${fmtSubjectTimestamp()}`,
+        text: [
+          'New feedback submitted from the dashboard.',
+          '',
+          `From: ${who}`,
+          '',
+          message,
+        ].join('\n'),
+        html: `
+<div style="max-width:520px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#111111;">
+  <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New feedback submitted from the dashboard</p>
+  <p style="font-size:13px;color:#64748b;margin:0 0 16px;">From: ${who}</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.6;white-space:pre-wrap;">${safeMessage}</div>
+</div>`,
+      },
+      { headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+    );
+    return true;
+  } catch (err) {
+    console.warn('sendCompanyFeedbackEmail failed:', err.response?.data ? JSON.stringify(err.response.data) : err.message);
+    return false;
+  }
+}
+
 module.exports = {
   sendEstimateEmail,
   sendPartnerWelcomeEmail,
@@ -1609,4 +1660,5 @@ module.exports = {
   sendWebsiteSampleReadyEmail,
   sendWebsiteSubscriptionConfirmedEmail,
   sendChatbotLeadAlertEmail,
+  sendCompanyFeedbackEmail,
 };
