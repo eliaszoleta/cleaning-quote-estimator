@@ -12283,6 +12283,416 @@ If you're considering [weekly, biweekly, or monthly service](/blog/how-often-sho
 A few minutes of questions upfront is the difference between a smooth first cleaning and an unpleasant surprise. Once you're ready, [get your free Houston estimate](/?service=home_residential) — entering your ZIP code and home details takes under a minute, and you'll see a recommended local cleaning service alongside your price range if one serves your area.
     `,
   },
+  {
+    slug: 'is-it-safe-to-hire-a-house-cleaner',
+    title: 'Is It Safe to Hire a House Cleaner? What to Know Before Letting Someone Into Your Home',
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-20',
+    readTime: '6 min',
+    excerpt: "Letting a stranger into your home for the first time is a bigger decision than picking a price. Here's what actually makes a cleaning service safe to hire, and what to check before you book.",
+    content: `
+## The Short Answer
+
+Yes — hiring a house cleaner is safe, as long as you're hiring through a legitimate company or a cleaner with a verifiable track record, and you take a few basic precautions most people skip simply because they're in a hurry to get the house clean. The risk isn't really "will this person steal something" (that's rare); it's hiring someone with no real accountability behind them — no insurance, no background check, no business license, nothing to lose if something goes wrong.
+
+## What Actually Makes a Cleaning Service Safe
+
+### 1. They're a real, registered business
+A legitimate cleaning company has a business name, a working phone number that isn't just a personal cell, and a real online presence — a website, reviews on Google or Yelp, something you can check before anyone shows up. If a "company" only exists as a single phone number from a classifieds ad, that's not automatically a scam, but it's a step down in accountability from a registered business.
+
+### 2. They carry liability insurance
+Insurance means that if something is damaged or broken during a cleaning, there's a real process for making it right — not just an apology. Reputable companies carry this and will tell you so without hesitation if you ask.
+
+### 3. They're bonded
+A fidelity bond is separate from insurance — it specifically protects you against theft by an employee. It's not universal across the industry, but larger, established companies commonly carry one, and it's worth asking about directly.
+
+### 4. They background-check the people they send to your home
+Most established companies run some form of background check on employees before sending them into clients' homes, and many will say so on their website without being asked. If it's not mentioned anywhere, it's a fair question to ask directly.
+
+### 5. You can verify who's actually coming
+A company that tells you the name of the person or team assigned to your home — and lets you confirm it at the door — is giving you a basic layer of accountability that a same-day, no-names-given booking doesn't.
+
+## Questions Worth Asking Before You Book
+
+- "Are you licensed, bonded, and insured?"
+- "Do you run background checks on your cleaners?"
+- "Will the same person/team come every time, or does it vary?"
+- "What happens if something is damaged during the clean?"
+
+A company with confident, specific answers to all four has almost certainly handled these questions before. Hesitation or vague answers are worth paying attention to.
+
+## Red Flags Worth Pausing On
+
+- No way to verify the company exists outside of a single phone number or social media post
+- Reluctance to confirm insurance or background checks when asked directly
+- Pressure to pay the full amount in cash upfront, before any work is done
+- No reviews anywhere, positive or negative, for a company that claims to have been operating for years
+
+None of these are automatic disqualifiers on their own, but two or three together are worth taking seriously.
+
+## Company vs. Independent Cleaner: Which Is Safer?
+
+Neither is inherently safer — it depends on who's behind them. A well-reviewed independent cleaner with years of local references can be just as safe as a large company, sometimes more consistent since it's the same person every time. What matters is the same checklist either way: can you verify who they are, is there insurance behind the work, and do other real people vouch for them.
+
+## Bottom Line
+
+The actual risk in hiring a cleaner isn't the stranger-in-your-home part — it's skipping the five-minute check that confirms who you're actually letting in. Ask the questions above, confirm insurance and background checks in writing if it matters to you, and you've covered the overwhelming majority of what could go wrong. Once you're ready to compare, [get a free price estimate](/?service=home_residential) for your home — it takes under a minute and helps you know a fair price before you start calling companies.
+    `,
+  },
+  {
+    slug: 'how-to-vet-a-house-cleaner',
+    title: 'How to Vet a House Cleaner: Background Checks, Insurance, and Red Flags to Watch For',
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-20',
+    readTime: '7 min',
+    excerpt: "Vetting a cleaner properly takes about ten minutes and almost entirely prevents the handful of things that actually go wrong. Here's exactly what to check, in order.",
+    content: `
+## Why Vetting Matters More Than Price
+
+It's easy to spend twenty minutes comparing prices between cleaning companies and zero minutes checking whether they're actually legitimate. Price differences are usually small and explainable. The gap between a properly vetted company and an unvetted one is bigger — it's the difference between "if something goes wrong, there's a real process" and "if something goes wrong, there's nothing you can do about it."
+
+## Step 1: Confirm They're a Real Business
+
+Search the company name plus your city. A real, established cleaning business will have some combination of: a website, a Google Business profile with reviews, a Better Business Bureau listing, or a presence on Yelp, Thumbtack, or Nextdoor. If you find literally nothing beyond a single ad or listing, that's not proof of a problem, but it does mean you're relying entirely on word-of-mouth or your own judgment with no outside verification.
+
+## Step 2: Ask for Proof of Insurance
+
+Ask directly: "Can you send me proof of liability insurance?" A legitimate company can produce this — often a certificate of insurance (COI) — without much delay. This protects you if a cleaner accidentally damages a floor, a countertop, or a piece of furniture during the visit.
+
+## Step 3: Ask About Bonding
+
+Separate from insurance, ask: "Are your employees bonded?" Bonding specifically covers theft, which insurance typically does not. Not every company carries this, but larger, more established ones usually do, and it's a meaningful signal either way.
+
+## Step 4: Ask How They Screen Employees
+
+Ask: "What's your hiring and background check process?" You're listening for a real, specific answer — criminal background checks, reference checks, in-person interviews — rather than a vague "oh yeah, we're careful about who we hire."
+
+## Step 5: Read Recent Reviews, Not Just the Average Rating
+
+A 4.8-star average with 200 reviews from three years ago tells you less than ten reviews from the last two months. Read a handful of the most recent ones specifically, and look for any pattern — repeated mentions of lateness, no-shows, or billing surprises are worth more than one bad review buried in hundreds of good ones.
+
+## Step 6: Pay Attention to the Booking Process Itself
+
+A company that's organized about insurance and background checks is usually also organized about scheduling, confirmations, and communication. If the booking process itself feels chaotic — no confirmation, unclear pricing, no one answering questions directly — that's often a preview of what the actual service experience will be like.
+
+## Red Flags That Should Slow You Down
+
+- Won't answer insurance/bonding questions directly, or gets defensive when asked
+- Only accepts cash, paid in full, before any work is done
+- No verifiable reviews or online presence at all
+- Pressure to book immediately without time to check anything
+
+## A Simple Vetting Checklist
+
+- [ ] Business is findable online (website, Google, Yelp, BBB, or similar)
+- [ ] Proof of insurance available on request
+- [ ] Bonding confirmed (or explained why not)
+- [ ] Background check process explained in specific terms
+- [ ] Recent reviews (last few months) checked, not just the overall rating
+- [ ] Booking/communication process felt organized, not rushed
+
+## Bottom Line
+
+Vetting a cleaner properly takes less time than most people spend comparing prices between two nearly-identical quotes, and it's the part that actually protects you. Once a company clears this checklist, [get a free price estimate](/?service=home_residential) to know what a fair price looks like for your home before you book.
+    `,
+  },
+  {
+    slug: 'bonded-and-insured-house-cleaner-meaning',
+    title: '"Bonded and Insured": What It Actually Means When Hiring a House Cleaner',
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-19',
+    readTime: '5 min',
+    excerpt: "\"Bonded and insured\" shows up in nearly every cleaning company's marketing, but the two words mean different things and protect you from different problems. Here's the actual difference.",
+    content: `
+## The Short Version
+
+**Insured** means the company carries liability insurance that covers accidental damage — a cleaner knocks over a lamp, scratches a floor, or breaks a dish, and the insurance covers the cost to fix or replace it. **Bonded** means the company carries a fidelity bond, which specifically covers theft by an employee — something goes missing from your home, and the bond is what makes you whole, separate from any insurance claim.
+
+They're both real protections, they cover different situations, and a company can technically have one without the other.
+
+## Insurance, in Plain Terms
+
+General liability insurance is what most businesses carry, cleaning or otherwise. For a cleaning company, it typically covers:
+
+- Accidental property damage during a cleaning visit
+- Injuries that happen on the job (to the cleaner or, in some cases, to you)
+
+If a cleaner breaks something valuable while cleaning, insurance is the mechanism that gets it repaired or replaced without you having to argue about who pays.
+
+## Bonding, in Plain Terms
+
+A fidelity bond (sometimes called a janitorial bond) is specifically about theft. If an employee steals something from a client's home, the bond — not the insurance policy — is what reimburses the client. It's a narrower, more specific protection than general liability insurance, and not every company carries one, even some otherwise reputable ones.
+
+## Why the Distinction Actually Matters
+
+If something breaks, insurance is what protects you. If something goes missing, bonding is what protects you. A company that says "we're insured" has answered the damage question but not necessarily the theft question — which is why it's worth asking about both separately, rather than assuming "bonded and insured" is one package deal every company automatically has.
+
+## What to Actually Ask
+
+- "Can you confirm you carry general liability insurance?"
+- "Are your employees individually bonded?"
+- "If something is damaged or goes missing during a visit, what's the process?"
+
+A company confident in all three answers has almost certainly dealt with this before and has a real process, not an improvised one.
+
+## Does This Mean Unbonded Companies Are Unsafe?
+
+Not necessarily — many smaller, well-reputed independent cleaners aren't formally bonded and have spotless track records built on years of local references instead. Bonding is one signal among several (reviews, how long they've operated, how they answer your questions), not a strict pass/fail test on its own.
+
+## Bottom Line
+
+"Bonded and insured" is doing a lot of work in a lot of cleaning companies' marketing, and it's worth actually understanding what each half covers before you take it at face value. Ask both questions directly, get a clear answer, and you'll know exactly what protection you actually have before anyone sets foot in your home. Once you're ready to compare options, [get a free price estimate](/?service=home_residential) for your home.
+    `,
+  },
+  {
+    slug: 'should-i-be-home-when-cleaner-comes',
+    title: "Should You Be Home When the Cleaner Comes? Pros, Cons, and What's Normal",
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-19',
+    readTime: '6 min',
+    excerpt: "There's no single right answer, but there is a clearly better approach for your first cleaning versus every visit after that. Here's how to decide what's right for you.",
+    content: `
+## The Short Answer
+
+For your very first cleaning, being home (or at least available by phone) is worth it so you can walk through expectations directly. After that first visit, most regular clients don't stay home — and that's completely normal, as long as you've taken a few basic steps to make that comfortable.
+
+## Why the First Visit Is Different
+
+The first cleaning is really a two-way interview. You're seeing how the cleaner or crew actually works, and they're learning your home — which surfaces need extra care, what "clean" means to you specifically, where things are. Being present (even just for the first 15–20 minutes, with a walkthrough) heads off most of the misunderstandings that would otherwise take two or three visits to sort out.
+
+## Why Most People Don't Stay Home After That
+
+Once a cleaner knows your home and your preferences, most clients find it's actually easier — and the cleaning sometimes goes faster — without someone else in the house. Many regular, recurring clients give their cleaner a key or a door code and go to work, run errands, or simply aren't home, the same way they would for any other scheduled home service.
+
+## What Makes Not Being Home Feel Comfortable
+
+- **A company (or cleaner) you've already vetted** — insurance, bonding, background checks, reviews (see [how to vet a house cleaner](/blog/how-to-vet-a-house-cleaner) for the full checklist)
+- **A consistent person or team**, rather than someone different every time
+- **A written list of what's being cleaned**, so there's no ambiguity about scope while you're away
+- **A secure way to give access** — a lockbox, a smart lock code you can change, or a key you've specifically designated for this, rather than handing over your only copy
+
+## If You'd Rather Not Leave Keys or Codes
+
+Plenty of clients stay home every single time, and that's completely fine too — it's not a sign you're being overly cautious. Some people simply prefer to be present, work from home anyway, or want direct contact each visit. If that's you, just let the company know upfront so scheduling accounts for it; some companies have slightly more flexible windows for appointments where the client will be present, since there's coordination involved.
+
+## A Reasonable Middle Ground
+
+If leaving someone alone in your home still feels like a big leap, a common middle ground is: be home for the first visit, leave a key or code starting the second or third visit once you're comfortable, and keep the arrangement flexible — you can always go back to being home any time you want, for any reason, with no explanation needed.
+
+## Bottom Line
+
+There's no universally "right" choice here — plenty of people stay home every time, and plenty don't, and both are normal. What actually matters is that the decision is based on trust you've verified (not just assumed), not on feeling like you don't have a choice. Once you're ready to find a service, [get a free price estimate](/?service=home_residential) for your home.
+    `,
+  },
+  {
+    slug: 'what-to-hide-before-house-cleaner-comes',
+    title: 'What to Put Away Before a House Cleaner Comes (and What You Really Don\'t Need To)',
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-18',
+    readTime: '5 min',
+    excerpt: "You don't need to hide your whole house before a cleaner arrives — but a short, sensible list of what to put away makes everyone more comfortable and protects what actually matters.",
+    content: `
+## You Don't Need to "Hide" Much — But a Little Prep Helps Everyone
+
+Most of what a cleaner sees in your home is completely unremarkable — laundry, dishes, normal household clutter. You don't need to stage your home like it's for sale. That said, there's a short, sensible list of things worth putting away, both to protect what matters to you and to make the visit easier for the cleaner to do their job well.
+
+## Worth Putting Away: Valuables and Irreplaceables
+
+- Cash, jewelry, and small valuables left out on dressers or countertops
+- Important documents (passports, financial paperwork) left in plain sight
+- Sentimental, fragile, or irreplaceable items in high-traffic cleaning areas
+- Firearms — these should always be securely stored regardless of who's in your home
+
+This isn't about distrust of a specific cleaner — it's the same reasonable precaution you'd take for any contractor, guest, or service visit, and a good cleaning company won't think twice about it.
+
+## Worth Putting Away: Anything That Slows Down the Cleaning
+
+- Clothes and items on the floor in rooms being cleaned (makes vacuuming and mopping faster and more thorough)
+- Dishes piled in the sink, if you want the kitchen counters fully cleaned
+- Loose papers or clutter on surfaces you want wiped down
+
+This one's practical, not about safety — the less a cleaner has to work around, the more time they can spend actually cleaning instead of tidying first.
+
+## Things You Genuinely Don't Need to Worry About
+
+- Normal household mess — that's the entire reason you're hiring a cleaner
+- Pets (just let the company know in advance if you have any, and whether they'll be home during the visit)
+- Personal items that aren't valuables — a professional cleaner isn't paying attention to your bookshelf or your laundry pile beyond cleaning around it
+
+## A Quick Pre-Cleaning Checklist
+
+- [ ] Cash, jewelry, and documents secured
+- [ ] Firearms stored securely (always, regardless of visitors)
+- [ ] Floors cleared enough to vacuum/mop easily
+- [ ] Sink cleared if you want full counter access
+- [ ] Pets accounted for and the company informed
+- [ ] Any do-not-touch items or areas flagged clearly, verbally or in a note
+
+## What a Legitimate Cleaner Actually Does With Access to Your Home
+
+A properly vetted cleaner — insured, often bonded, background-checked (see [how to vet a house cleaner](/blog/how-to-vet-a-house-cleaner)) — is there to do one job: clean. They're not inventorying your belongings, and a company with a real reputation to protect has far more to lose from a single bad incident than anything they'd gain from one. The precautions above aren't really about distrust; they're the same baseline prep you'd do for any service provider in your home.
+
+## Bottom Line
+
+A few minutes of reasonable prep — valuables secured, floors cleared, pets accounted for — covers almost everything worth thinking about. Beyond that, let the cleaner do their job. Once you're ready to find one, [get a free price estimate](/?service=home_residential) for your home.
+    `,
+  },
+  {
+    slug: 'house-cleaning-etiquette-guide',
+    title: "House Cleaning Etiquette: Tipping, Communication, and What's Actually Expected",
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-18',
+    readTime: '6 min',
+    excerpt: "Most of what feels awkward about hiring a cleaner for the first time — tipping, small talk, feeding them, what to say if something's wrong — has a straightforward, normal answer.",
+    content: `
+## Tipping: Is It Expected?
+
+Tipping a house cleaner is appreciated but not required — it's closer to restaurant norms than, say, a mandatory service charge. A common range is **$5–$20 per cleaner per visit**, or roughly **10–15% of the total bill**, with higher amounts common around the holidays or after an especially large job (move-out cleans, post-construction, deep cleans). If you're on recurring service and happy with it, many clients tip a bit extra once or twice a year rather than every single visit — both approaches are completely normal.
+
+## Do You Need to Provide Food or Drinks?
+
+No, and most cleaners don't expect it. Offering a glass of water on a hot day is a nice gesture, never a requirement. Cleaners generally bring whatever they need and aren't expecting hospitality beyond basic courtesy.
+
+## Should You Make Small Talk, or Stay Out of the Way?
+
+Either is fine. Some clients chat briefly at the start to go over expectations and then leave the cleaner to work; others step out entirely once the walkthrough is done. Cleaners are there to work efficiently, so a brief, friendly check-in is welcome, but you're not obligated to entertain or supervise.
+
+## What If You're Not Happy With Something?
+
+Say so — directly, specifically, and as soon as you notice. "The baseboards in the living room were missed" is far more useful than a vague bad review two weeks later with no chance to fix it. Reputable companies want this feedback and will usually offer a free touch-up or address it on the next visit. This is also exactly why the [satisfaction guarantee question](/blog/questions-to-ask-house-cleaning-company) is worth asking before you book — you want to know the process exists before you need it.
+
+## How Much Notice Should You Give to Cancel or Reschedule?
+
+This varies by company, but as a general rule, 24–48 hours' notice is considered reasonable and avoids most cancellation fees. Ask about the specific policy when you book so there are no surprises.
+
+## Is It Rude to Ask a Cleaner to Redo Something?
+
+No — it's the entire point of hiring a professional service. A respectfully worded request ("could you go back over the kitchen counters, there's still some residue") is completely normal and something any reputable cleaner expects to hear occasionally. It only becomes a problem if it happens every single visit, at which point it's worth a direct conversation or reconsidering the company.
+
+## What About Pets?
+
+Just tell the company in advance — whether you have pets, whether they'll be home during the cleaning, and anything specific they should know (a dog that barks at strangers, a cat that bolts for open doors). Most cleaners are completely comfortable around pets, but it's basic courtesy to give them a heads-up rather than a surprise.
+
+## A Few Etiquette Basics
+
+- Clear general clutter so the cleaner can focus on actually cleaning, not tidying first
+- Communicate specific priorities upfront rather than assuming they're obvious
+- Give direct, specific feedback — good or bad — rather than staying silent
+- Tip if the service was good and it fits your budget; don't feel obligated if it doesn't
+
+## Bottom Line
+
+Almost everything that feels socially awkward about hiring a cleaner for the first time has a simple, normal answer, and reputable companies have handled every version of these questions many times before. Once you're ready to book, [get a free price estimate](/?service=home_residential) for your home.
+    `,
+  },
+  {
+    slug: 'first-time-house-cleaner-what-to-expect',
+    title: 'First Time Hiring a House Cleaner? Here\'s Exactly What to Expect',
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-17',
+    readTime: '6 min',
+    excerpt: "From the first phone call to the moment they leave, here's a realistic walkthrough of what actually happens the first time you hire a house cleaner.",
+    content: `
+## Before You Book: Getting a Price and Scope
+
+Most companies start with a quick questionnaire — home size, number of bedrooms/bathrooms, type of clean (standard vs. deep), and your ZIP code, since pricing varies a lot by location. A [quick online estimate](/?service=home_residential) gives you a realistic price range before you talk to anyone, so you're not negotiating blind.
+
+## Booking and Confirmation
+
+Once you choose a company, you'll typically schedule a date and time, confirm the scope of work in writing (what's included, what costs extra), and get a confirmation — by email or text — a day or so before the visit. This is also the point to mention anything specific: pets, parking instructions, a gate code, areas to skip.
+
+## The Day Of: What Actually Happens
+
+- The cleaner or crew arrives, usually within a scheduled window rather than an exact minute
+- If it's your first visit, expect a brief walkthrough — this is your chance to point out priorities, trouble spots, or anything fragile
+- A standard clean for an average-sized home typically takes **1.5 to 3 hours**, depending on size and condition; deep cleans and first-time cleans run longer
+- You're not expected to supervise the entire time — many clients step away to work, run errands, or simply relax elsewhere in the home
+
+## What's Typically Included in a Standard Clean
+
+- Dusting surfaces, furniture, and fixtures
+- Vacuuming and mopping floors
+- Cleaning and sanitizing bathrooms (toilets, sinks, showers/tubs)
+- Wiping kitchen counters, stovetop, and exterior of appliances
+- Taking out trash and making beds (sheets not usually changed unless specified)
+
+Deep cleans and add-ons (inside the fridge, inside the oven, interior windows, baseboards) usually cost extra and aren't included by default — see our [full house cleaning checklist](/blog/what-does-house-cleaning-include-checklist) for the complete breakdown.
+
+## After the Cleaning
+
+Most companies ask you to do a quick walkthrough before the cleaner leaves, specifically so anything missed can be fixed on the spot rather than becoming a complaint later. This is the moment to speak up if something was overlooked — it's normal, expected, and far easier to fix immediately than after the fact.
+
+## Payment
+
+Depending on the company, payment is due either at booking, immediately after the visit, or on a recurring billing cycle if you've set up ongoing service. Confirm which applies when you book so it's not a surprise.
+
+## What If You Want to Switch to Recurring Service?
+
+Many first-time clients who are happy with the result switch to weekly, biweekly, or monthly recurring cleaning afterward — usually at a discount compared to the one-time rate, often in the 10–20% range depending on frequency. There's no obligation to decide this upfront; most companies are happy to convert a one-time clean into recurring service after the fact if you liked how it went.
+
+## Bottom Line
+
+The first visit is mostly about getting your questions answered and seeing how the cleaner actually works — after that, it becomes routine fast. Start with a [free price estimate](/?service=home_residential) to know what to expect before you make your first call.
+    `,
+  },
+  {
+    slug: 'giving-house-cleaner-key-or-code-safely',
+    title: 'Giving a House Cleaner a Key or Door Code: Is It Safe, and How to Do It Right',
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-17',
+    readTime: '6 min',
+    excerpt: "Handing over access to your home is a bigger decision than it sounds like, but it's also extremely common for recurring cleaning clients. Here's how to do it without worrying about it.",
+    content: `
+## Is It Normal to Give a Cleaner a Key or Code?
+
+Yes — this is standard practice for recurring clients who aren't home during cleanings, which is a large share of ongoing cleaning arrangements. It's not something only "trusting" people do; it's a practical choice once you've vetted the company, and there are ways to do it that minimize the actual risk involved.
+
+## Your Options, From Least to Most Control
+
+### 1. A traditional key, handed over directly
+Simple, but it's the hardest to control — if the relationship ends, you need to physically get the key back or re-key your locks.
+
+### 2. A lockbox with a key inside
+A coded lockbox (the kind real estate agents use) mounted somewhere discreet. You control the code, can change it anytime, and never hand over a physical key that could be copied.
+
+### 3. A smart lock with a unique, changeable code
+The most flexible option if you already have (or are willing to install) a smart lock. You can issue a code that only works during scheduled cleaning windows, see a log of when it was used, and revoke it instantly if anything changes — no re-keying, no physical item to return.
+
+### 4. Leave a key inside with the property manager or doorman (apartments/condos)
+If your building has staff who can let the cleaner in, this avoids giving the cleaner direct access to a key at all.
+
+## How to Make Any of These Safer
+
+- **Only do this after vetting the company** — insurance, bonding, background checks, reviews (see [how to vet a house cleaner](/blog/how-to-vet-a-house-cleaner))
+- **Request a consistent cleaner or team**, rather than a different person every time, if the company can accommodate it
+- **Use a code instead of a physical key whenever possible** — it's revocable instantly, a key is not
+- **Keep a record of who has access and when it was given**, especially if you ever change cleaning companies
+- **Change the code immediately if you switch companies or end service**
+
+## What If You're Still Not Comfortable With It?
+
+You don't have to do this — plenty of long-term, happy cleaning clients simply schedule around being home, or coordinate a specific window with a neighbor, family member, or building staff present instead. There's no requirement to hand over access if it doesn't sit right with you; it's one option among several, not a precondition for hiring a cleaner at all.
+
+## A Few Signs You're Ready to Take This Step
+
+- You've used the company for a few visits while home and were comfortable with the result
+- You've confirmed insurance, bonding, and background checks
+- You have a way to revoke or change access easily (a code, not just a key)
+- The company has been consistent about who they send and when
+
+## Bottom Line
+
+Giving a cleaner access when you're not home is extremely common and, done the right way — a changeable code rather than a handed-over key, with a company you've actually vetted — it's a low-risk, practical arrangement for most recurring clients. If you'd rather not, that's completely reasonable too. Once you're ready to find a service, [get a free price estimate](/?service=home_residential) for your home.
+    `,
+  },
 ];
 
 export const CATEGORIES = [
@@ -12297,6 +12707,7 @@ export const CATEGORIES = [
   { id: 'restoration', label: 'Mold & Water Damage', icon: '⚠️' },
   { id: 'airbnb', label: 'Airbnb & Vacation Rental Cleaning', icon: '🔑' },
   { id: 'post-construction', label: 'Post-Construction Cleaning', icon: '🧱' },
+  { id: 'trust-safety', label: 'Trust & Safety', icon: '🛡️' },
   { id: 'grow-your-business', label: 'Grow Your Business', icon: '📈' },
   { id: 'starting-out', label: 'Starting Your Business', icon: '🚀' },
 ];

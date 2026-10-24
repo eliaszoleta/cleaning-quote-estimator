@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Home, SprayCan, Building2, ShieldAlert, Rocket, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Home, SprayCan, Building2, ShieldAlert, ShieldCheck, Rocket, ArrowRight, ArrowLeft } from 'lucide-react';
 import { getPostsByCategory, CATEGORIES, BLOG_POSTS } from '../../data/blogPosts';
 import { getCountryBlog } from '../../data/intl/blogRegistry';
 import '../pages/PageHero.css';
@@ -10,6 +10,7 @@ const CATEGORY_ICONS = {
   carpet: { Icon: SprayCan, color: '#7c3aed', bg: 'linear-gradient(135deg,#f5f3ff,#ede9fe)' },
   commercial: { Icon: Building2, color: '#0891b2', bg: 'linear-gradient(135deg,#ecfeff,#cffafe)' },
   restoration: { Icon: ShieldAlert, color: '#dc2626', bg: 'linear-gradient(135deg,#fef2f2,#fee2e2)' },
+  'trust-safety': { Icon: ShieldCheck, color: '#0d9488', bg: 'linear-gradient(135deg,#f0fdfa,#ccfbf1)' },
   'starting-out': { Icon: Rocket, color: '#ea580c', bg: 'linear-gradient(135deg,#fff7ed,#ffedd5)' },
 };
 
