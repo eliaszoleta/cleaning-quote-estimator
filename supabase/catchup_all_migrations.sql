@@ -241,32 +241,17 @@ GROUP BY partner_id;
 -- These policies grant read-only access, scoped to the partner's own row
 -- only, matched by the email they signed up with (must match partners.email
 -- exactly -- case-insensitive).
-
-DROP POLICY IF EXISTS "partners can read own row" ON partners;
-CREATE POLICY "partners can read own row"
-  ON partners FOR SELECT
-  TO authenticated
-  USING (lower(email) = lower(auth.jwt() ->> 'email'));
-
-DROP POLICY IF EXISTS "partners can read own locations" ON partner_locations;
-CREATE POLICY "partners can read own locations"
-  ON partner_locations FOR SELECT
-  TO authenticated
-  USING (
-    partner_id IN (
-      SELECT id FROM partners WHERE lower(email) = lower(auth.jwt() ->> 'email')
-    )
-  );
-
-DROP POLICY IF EXISTS "partners can read own banner events" ON partner_banner_events;
-CREATE POLICY "partners can read own banner events"
-  ON partner_banner_events FOR SELECT
-  TO authenticated
-  USING (
-    partner_id IN (
-      SELECT id FROM partners WHERE lower(email) = lower(auth.jwt() ->> 'email')
-    )
-  );
+--
+-- Original 003 created these 3 policies referencing the `email` column
+-- directly (error 42703 "column email does not exist" if the live table
+-- already had it renamed to business_email by the time this replays --
+-- which, like the view bug above, happens when the live DB is AHEAD of
+-- this step in the migration history). Migration 007 immediately drops
+-- and recreates these exact same 3 policies a few steps below, pointed
+-- at the correct personal_email column once the rename has definitely
+-- happened -- so this step's own version is pure dead weight that only
+-- adds fragility. Skipped entirely here; 007's block below is the only
+-- place these 3 policies actually get created in this catch-up script.
 
 -- Recreate the stats view with security_invoker so it enforces the
 -- querying user's own RLS (the policy just above) instead of running with
