@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
   UserPlus, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle,
-  Globe, X, Zap, ChevronDown,
+  Globe, X, Zap, ChevronDown, MessageSquare,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
-import { getSubscriptionStatus, verifyCheckout, postCheckout, postPortal } from '../../utils/api';
+import { getSubscriptionStatus, verifyCheckout, postCheckout, postPortal, postGeneralFeedback } from '../../utils/api';
 import { supabase } from '../../lib/supabase';
 import OverviewTab from './tabs/OverviewTab';
 import BrandingTab from './tabs/BrandingTab';
@@ -137,25 +137,27 @@ export default function CompanyDashboard({ user, onLogout }) {
   // most common laptop resolution) and plenty of other everyday laptop/
   // half-maximized-window widths sit ABOVE the 768px isMobile cutoff but
   // still aren't wide enough for the full row (logo + mode switch +
-  // country + badge + Save + divider + email + Sign Out): measured in a
-  // real browser (header's rendered scrollWidth, Poppins, this exact copy
-  // including a representative email address, back when a Schedule a
-  // Walkthrough link also sat in this row), that combination needed
-  // ~1332px, so anything between 769px and ~1366px fell back to the
-  // "desktop has room to spare" assumption and silently pushed the whole
-  // page into horizontal scroll instead of just the header -- exactly
-  // what showed up at the recorded 1366x768 window. Removing the
-  // walkthrough link only shrinks the full-row width further, so these
-  // cutoffs stay safely conservative rather than becoming wrong.
+  // country + Send Feedback + badge + Save + divider + email + Sign Out):
+  // measured in a real browser (header's rendered scrollWidth, Poppins,
+  // this exact copy including a representative email address, back when
+  // this spot held a Schedule a Walkthrough link of similar width instead
+  // of Send Feedback), that combination needed ~1332px, so anything
+  // between 769px and ~1366px fell back to the "desktop has room to
+  // spare" assumption and silently pushed the whole page into horizontal
+  // scroll instead of just the header -- exactly what showed up at the
+  // recorded 1366x768 window.
   // isCompact drops the same secondary/promotional pieces isMobile
-  // already drops (the divider, the email) at a wider 1450px cutoff --
-  // comfortably past 1366px, with headroom for a
+  // already drops (the Send Feedback button, the divider, the email) at a
+  // wider 1450px cutoff -- comfortably past 1366px, with headroom for a
   // longer email address or a browser's own chrome/scrollbar -- while
   // leaving everything isMobile shrinks to icon-only/abbreviated (Save,
   // Sign Out, country, mode-switch labels) untouched here: those stay
-  // full-size since removing the divider and email already buys back more
-  // than enough room for them (more room than when this was originally
-  // measured with the walkthrough link also included in that removal).
+  // full-size since removing those three items already buys back more
+  // than enough room for them. Send Feedback took over the Schedule a
+  // Walkthrough link's old spot and role in this row (similar footprint,
+  // same "secondary, not needed to use the dashboard" category), so the
+  // original ~1332px/~970px measurements this breakpoint was based on are
+  // a reasonable approximation again, not stale.
   const compactQuery = () => window.matchMedia('(max-width: 1450px)');
   const [isCompact, setIsCompact] = useState(() => compactQuery().matches);
   useEffect(() => {
@@ -221,6 +223,50 @@ export default function CompanyDashboard({ user, onLogout }) {
   const [websiteOfferDismissed, setWebsiteOfferDismissed] = useState(false);
   const dismissWebsiteOffer = () => setWebsiteOfferDismissed(true);
   const { config, loading, saving, saved, error, saveConfig, patchServices, refetch, justCreated } = useCompanyConfig(user.id);
+
+  // "Send Feedback" header button + its modal -- replaces the spot that
+  // used to hold a "Schedule a Walkthrough" calendar link. Free text, no
+  // fixed reason list (see routes/company.js's POST
+  // /:id/general-feedback), saved to company_feedback and visible in
+  // Admin -> Feedback, plus a best-effort email alert -- neither of which
+  // blocks this button from showing success as soon as the save itself
+  // succeeds.
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [sendingFeedback, setSendingFeedback] = useState(false);
+  const [feedbackError, setFeedbackError] = useState('');
+  const [feedbackSent, setFeedbackSent] = useState(false);
+
+  const submitFeedback = async () => {
+    if (!feedbackMessage.trim()) return;
+    setSendingFeedback(true);
+    setFeedbackError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Not signed in');
+      await postGeneralFeedback(token, user.id, {
+        business: config?.companyName || null,
+        email: user.email,
+        message: feedbackMessage.trim(),
+      });
+      setFeedbackSent(true);
+      setFeedbackMessage('');
+    } catch (err) {
+      setFeedbackError(err.message || 'Failed to send feedback. Please try again.');
+    } finally {
+      setSendingFeedback(false);
+    }
+  };
+
+  const closeFeedback = () => {
+    setShowFeedback(false);
+    // Reset after the close animation would run (there isn't one here, but
+    // this still avoids showing the just-sent confirmation again if the
+    // modal is reopened later in the same session).
+    setFeedbackSent(false);
+    setFeedbackError('');
+  };
 
   const localConfigReady = useRef(false);
   useEffect(() => {
@@ -625,17 +671,35 @@ export default function CompanyDashboard({ user, onLogout }) {
             />
           </div>
 
-          {/* Right: badge, save, user -- the divider and the email address
-              both drop under isCompact already (1450px,
-              see its own comment above), well before isMobile's narrower
-              768px -- they're the biggest, least essential items (promotional/
-              secondary, not needed to use the dashboard) so dropping them
-              first is what buys back enough width for everything else to
-              keep showing full labels at ordinary laptop sizes. The Saved
-              confirmation stays isMobile-gated (it's short-lived and only
-              shown right after a click); Save and Sign Out shrink to
-              icon-only buttons, also only under isMobile. */}
+          {/* Right: Send Feedback, badge, save, user -- Send Feedback, the
+              divider and the email address all drop under isCompact
+              already (1450px, see its own comment above), well before
+              isMobile's narrower 768px -- they're the biggest, least
+              essential items (promotional/secondary, not needed to use the
+              dashboard) so dropping them first is what buys back enough
+              width for everything else to keep showing full labels at
+              ordinary laptop sizes. The Saved confirmation stays
+              isMobile-gated (it's short-lived and only shown right after a
+              click); Save and Sign Out shrink to icon-only buttons, also
+              only under isMobile. */}
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 10, flexShrink: 0 }}>
+          {!isCompact && (
+            <button
+              onClick={() => setShowFeedback(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 12px', borderRadius: 20,
+                border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.06)',
+                color: 'white', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+                transition: 'background 0.15s, border-color 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; }}
+            >
+              <MessageSquare size={13} /> Send Feedback
+            </button>
+          )}
+
           {subBadge && (
             <div style={{
               fontSize: 11.5, padding: '3px 10px', borderRadius: 20, fontWeight: 700,
@@ -851,6 +915,75 @@ export default function CompanyDashboard({ user, onLogout }) {
                 Maybe later
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Send Feedback -- opened from the header button above. Saved to
+          company_feedback (visible in Admin -> Feedback) plus a best-effort
+          email alert, see routes/company.js's POST /:id/general-feedback.
+          Shows a short confirmation in place of the form instead of just
+          closing, since closing silently gives no sign the submission
+          actually went through. */}
+      {showFeedback && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: 20 }}
+          onClick={closeFeedback}
+        >
+          <div
+            style={{ background: 'white', borderRadius: 14, padding: '26px 24px', maxWidth: 440, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.35)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {feedbackSent ? (
+              <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+                  <Check size={24} color="#16a34a" />
+                </div>
+                <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Thanks for the feedback!</h3>
+                <p style={{ fontSize: 13.5, color: '#64748b', lineHeight: 1.5, marginBottom: 20 }}>We read every submission.</p>
+                <button
+                  onClick={closeFeedback}
+                  style={{ background: '#0f172a', color: 'white', border: 'none', padding: '10px 22px', borderRadius: 9, fontWeight: 700, fontSize: 13.5, cursor: 'pointer' }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0 }}>Send Feedback</h3>
+                  <button onClick={closeFeedback} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: 4 }}>
+                    <X size={18} />
+                  </button>
+                </div>
+                <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.5, marginBottom: 16 }}>
+                  Bug, idea, or anything else about Clean Estimator -- goes straight to our team.
+                </p>
+                <textarea
+                  value={feedbackMessage}
+                  onChange={e => setFeedbackMessage(e.target.value)}
+                  placeholder="What's on your mind?"
+                  autoFocus
+                  style={{ width: '100%', minHeight: 110, padding: '10px 12px', borderRadius: 9, border: '1.5px solid #e2e8f0', fontSize: 14, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', marginBottom: 14 }}
+                />
+                {feedbackError && <p style={{ fontSize: 12.5, color: '#dc2626', margin: '0 0 12px' }}>{feedbackError}</p>}
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button
+                    onClick={closeFeedback}
+                    style={{ flex: 1, background: 'none', border: '1.5px solid #e2e8f0', color: '#64748b', padding: '11px 0', borderRadius: 9, fontWeight: 600, fontSize: 13.5, cursor: 'pointer' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={submitFeedback}
+                    disabled={sendingFeedback || !feedbackMessage.trim()}
+                    style={{ flex: 1.4, background: '#2563eb', border: 'none', color: 'white', padding: '11px 0', borderRadius: 9, fontWeight: 700, fontSize: 13.5, cursor: (sendingFeedback || !feedbackMessage.trim()) ? 'default' : 'pointer', opacity: (sendingFeedback || !feedbackMessage.trim()) ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                  >
+                    {sendingFeedback ? <Loader2 size={14} className="spin" /> : null} {sendingFeedback ? 'Sending…' : 'Send Feedback'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -3,7 +3,7 @@ const router = express.Router();
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { getCompanyConfig, patchCompanyConfig, removeCompanyConfigKeys, getOrCreateCompanyConfig, findDuplicateCompany } = require('../services/companyConfig');
-const { sendAccountDeletionScheduledEmail } = require('../services/email');
+const { sendAccountDeletionScheduledEmail, sendCompanyFeedbackEmail } = require('../services/email');
 const { requireAuth } = require('../middleware/auth');
 
 // Same upload-to-Supabase-Storage pattern as partnerCheckout.js's
@@ -212,6 +212,56 @@ router.post('/:id/feedback', requireAuth, async (req, res) => {
     console.error('POST company feedback error:', err.message);
     // Fail open -- a feedback-save failure should never block the portal redirect.
     res.json({ success: true, skipped: true });
+  }
+});
+
+// POST /api/company/:id/general-feedback — auth required. The "Send
+// Feedback" button in the dashboard header (CompanyDashboard.js) -- unlike
+// /:id/feedback above, this isn't tied to the cancellation flow and has no
+// fixed reason list, just free text, available any time. Message is
+// required (unlike the optional cancellation fields above): an empty
+// submission here isn't a meaningful "no feedback" signal the way skipping
+// the cancellation step is, it's just a stray click.
+// business/email come from the request body rather than being re-fetched
+// server-side from the company's current config -- see
+// 030_company_feedback.sql: this snapshots who said it and what business
+// they ran at the time, which stays accurate even if that info changes
+// later.
+router.post('/:id/general-feedback', requireAuth, async (req, res) => {
+  const { id } = req.params;
+  if (req.user.id !== id) return res.status(403).json({ success: false, error: 'Forbidden' });
+
+  const { business, email, message } = req.body || {};
+  if (!message || !message.trim()) return res.status(400).json({ success: false, error: 'Feedback message is required' });
+
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+    const supabase = createClient(url, key, { auth: { persistSession: false } });
+    const { error } = await supabase.from('company_feedback').insert({
+      company_id: id,
+      business: business || null,
+      email: email || req.user.email || null,
+      message: message.trim(),
+    });
+    if (error) throw error;
+
+    // Fire-and-forget -- the submission is already saved and visible in
+    // Admin -> Feedback regardless of whether this email goes out, same
+    // "DB write is the source of truth, email is just a faster heads-up"
+    // pattern as every other internal notification in this codebase.
+    sendCompanyFeedbackEmail({
+      business: business || null,
+      email: email || req.user.email || null,
+      message: message.trim(),
+    }).catch(err => console.error('sendCompanyFeedbackEmail failed:', err.message));
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('POST company general-feedback error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to save feedback' });
   }
 });
 

@@ -79,6 +79,15 @@ export async function postCompanyFeedback(token, companyId, payload) {
   });
 }
 
+// The "Send Feedback" button in CompanyDashboard.js's header -- distinct
+// from postCompanyFeedback above, which is scoped to the "before you go"
+// cancellation step. This one's free text, available any time.
+export async function postGeneralFeedback(token, companyId, payload) {
+  return apiFetch(`/api/company/${companyId}/general-feedback`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload),
+  });
+}
+
 export async function verifyCheckout(token, sessionId) {
   return apiFetch('/api/subscription/verify-checkout', {
     method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ sessionId }),
@@ -276,6 +285,12 @@ export async function deleteAdminHomepageLeadForever(adminKey, id) {
 // convention as the rest of the admin API.
 export async function getAdminWebsiteRequests(adminKey) {
   return apiFetch('/api/admin/website-requests', { headers: { 'x-admin-key': adminKey } });
+}
+
+// AdminCompanyFeedback.js's list -- every "Send Feedback" submission from
+// the dashboard header, newest first.
+export async function getAdminCompanyFeedback(adminKey) {
+  return apiFetch('/api/admin/company-feedback', { headers: { 'x-admin-key': adminKey } });
 }
 
 // Manual add (e.g. a client who reached out outside the public apply form)
