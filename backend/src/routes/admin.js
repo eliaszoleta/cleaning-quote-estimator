@@ -431,7 +431,10 @@ function applyLeadFilters(query, req, trashed) {
   query = trashed ? query.not('deleted_at', 'is', null) : query.is('deleted_at', null);
   if (serviceType && serviceType !== 'all') query = query.eq('service_type', serviceType);
   if (state && state !== 'all') query = query.eq('state', state);
-  if (userType && userType !== 'all') query = query.eq('user_type', userType);
+  // 'none' means "leads from before the homeowner/business question
+  // existed" -- their user_type is NULL, not a value that .eq() can match.
+  if (userType === 'none') query = query.is('user_type', null);
+  else if (userType && userType !== 'all') query = query.eq('user_type', userType);
   if (dateFrom) query = query.gte('created_at', dateFrom);
   if (dateTo) query = query.lte('created_at', dateTo);
   return query;

@@ -526,6 +526,11 @@ export default function AdminHomepageLeads({ adminKey }) {
                   <option value="all">Homeowner & business</option>
                   <option value="homeowner">Homeowner only</option>
                   <option value="business">Cleaning business only</option>
+                  {/* Leads captured before this question existed on the
+                      calculator have no user_type at all -- not "all",
+                      not "homeowner", not "business". This isolates them
+                      instead of leaving them unreachable by any filter. */}
+                  <option value="none">Not specified (older leads)</option>
                 </select>
               </div>
             </div>
