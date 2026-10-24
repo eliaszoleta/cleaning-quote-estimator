@@ -129,7 +129,6 @@ router.post('/', async (req, res) => {
       currentWebsite, facebookPage, message,
       planTier: resolvedPlanTier,
       planName: PLAN_TIERS[resolvedPlanTier].name,
-      planPrice: PLAN_TIERS[resolvedPlanTier].priceCents / 100,
       saved,
     });
     if (!sent) console.warn('Website request notification email did not send for:', email);

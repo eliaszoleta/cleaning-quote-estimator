@@ -1298,8 +1298,18 @@ function buildWebsiteRequestDomainLines({ hasDomain, currentWebsite, domain1, do
 // "Not provided"/"None" placeholder when left blank -- so the notification
 // always shows the complete shape of what was submitted, and nothing an
 // applicant left blank is silently missing versus one they filled in.
-function fmtPlanLine({ planName, planPrice }) {
-  return planName ? `Plan selected: ${planName} ($${planPrice}/mo after the 2 free months)` : null;
+//
+// Deliberately omits the price ("$179/mo after the 2 free months") -- a
+// real application (Oct 2026, Elevated Cleaning Solutions) landed in
+// Gmail's Promotions tab, and a dollar-amount-plus-"/mo" pattern is exactly
+// the kind of marketing-email signal Gmail's classifier keys on (the same
+// lesson already learned twice elsewhere in this file -- see
+// website_request_received and activation_reminder's history). The plan
+// name alone (Starter/Growth/Pro) is all an admin needs to know which
+// tier to set up in Stripe; the price is already defined server-side in
+// PLAN_TIERS and doesn't need repeating here.
+function fmtPlanLine({ planName }) {
+  return planName ? `Plan selected: ${planName}` : null;
 }
 
 function buildWebsiteRequestText(args) {
