@@ -375,17 +375,19 @@ export default function CompanyLanding() {
                     <Lock size={16} color={PRIMARY} />
                     <span style={{ fontWeight: 800, fontSize: 16.5, color: '#0f172a' }}>Internal Estimator</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginBottom: 6 }}>
-                    <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$25</span>
-                    <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
-                  </div>
-                  <div style={{ color: '#64748b', fontSize: 13, marginBottom: 22 }}>
-                    After your{' '}
+                  <div style={{ fontSize: 13, color: '#64748b', marginBottom: 6 }}>
                     <span style={{ position: 'relative', fontWeight: 700, color: '#78350f', padding: '1px 6px', whiteSpace: 'nowrap' }}>
                       <span aria-hidden="true" style={{ position: 'absolute', inset: '2px -2px', background: '#fde047', borderRadius: '3px 7px 4px 8px / 5px 3px 6px 4px', transform: 'rotate(-0.6deg)', zIndex: 0 }} />
                       <span style={{ position: 'relative', zIndex: 1 }}>30-day free trial</span>
                     </span>
-                    {' '}&middot; cancel anytime
+                    {' '}then
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap', marginBottom: 22 }}>
+                    <span style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
+                      <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$25</span>
+                      <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
+                    </span>
+                    <span style={{ fontSize: 13, color: '#64748b' }}>&middot; cancel anytime</span>
                   </div>
                   <ul style={{ listStyle: 'none', padding: 0, marginBottom: 24, textAlign: 'left' }}>
                     {PLAN_FEATURES.map(item => (
