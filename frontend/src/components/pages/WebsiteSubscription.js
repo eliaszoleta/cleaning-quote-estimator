@@ -189,7 +189,16 @@ export default function WebsiteSubscription() {
   const [showThankYou, setShowThankYou] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
-  const [selectedTierId, setSelectedTierId] = useState(DEFAULT_TIER_ID);
+  // No plan pre-selected -- a prospect applying for "Growth" because it was
+  // just the pre-highlighted card (not a deliberate choice) is how a real
+  // application (Oct 2026, Elevated Cleaning Solutions) ended up on a plan
+  // nobody consciously picked. Nothing is active/"Selected" above, and the
+  // form below requires an explicit dropdown choice before it will submit.
+  // selectedTier still falls back to DEFAULT_TIER_ID purely so the pricing-
+  // timeline/value-breakdown preview below the cards has something sensible
+  // to show before a choice is made -- that preview is informational, not a
+  // claim that a plan has been chosen.
+  const [selectedTierId, setSelectedTierId] = useState(null);
   const selectedTier = getTierById(selectedTierId) || getTierById(DEFAULT_TIER_ID);
   const [openFaqIndex, setOpenFaqIndex] = useState(-1);
   const [form, setForm] = useState({
@@ -221,6 +230,10 @@ export default function WebsiteSubscription() {
     // satisfies the requirement, both is fine too, neither is not.
     if (!form.currentWebsite.trim() && !form.facebookPage.trim()) {
       setError('Please provide your current website or Facebook page/profile -- at least one is required.');
+      return;
+    }
+    if (!selectedTierId) {
+      setError('Please choose a plan.');
       return;
     }
     setSending(true);
@@ -670,7 +683,7 @@ export default function WebsiteSubscription() {
                 Piece the {selectedTier.name} plan together yourself with separate tools and it adds up fast:
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
-                {VALUE_BREAKDOWN_BY_TIER[selectedTierId].map(row => (
+                {VALUE_BREAKDOWN_BY_TIER[selectedTier.id].map(row => (
                   <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#374151' }}>
                     <span>{row.label}</span>
                     <span style={{ color: '#94a3b8', fontWeight: 600 }}>{row.cost}</span>
@@ -784,6 +797,26 @@ export default function WebsiteSubscription() {
                 <div style={{ gridColumn: '1 / -1' }}>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Business Name *</label>
                   <input required style={inputStyle} value={form.business} onChange={e => setForm(f => ({ ...f, business: e.target.value }))} placeholder="Maple Street Cleaning Co." />
+                </div>
+                {/* No option pre-selected -- clicking a card up in the
+                    pricing section still updates this (same selectedTierId
+                    state), but nothing fills it in on its own, so submitting
+                    always reflects a choice the applicant actually made. */}
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Which Plan? *</label>
+                  <select
+                    required
+                    style={{ ...inputStyle, cursor: 'pointer' }}
+                    value={selectedTierId || ''}
+                    onChange={e => setSelectedTierId(e.target.value || null)}
+                  >
+                    <option value="" disabled>Select a plan</option>
+                    {WEBSITE_PLAN_TIERS.map(tier => (
+                      <option key={tier.id} value={tier.id}>
+                        {tier.name} — {FREE_MONTHS} months free, then ${tier.price}/month
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email *</label>

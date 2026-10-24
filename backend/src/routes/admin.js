@@ -751,7 +751,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 // with routes/websiteRequest.js's PLAN_TIERS and
 // frontend/src/data/websitePricingTiers.js.
 const WEBSITE_TRIAL_DAYS = 60;
-const WEBSITE_TIER_PRICES = { starter: 97, growth: 179, pro: 249 };
+const WEBSITE_TIER_PRICES = { starter: 97, growth: 180, pro: 250 };
 const WEBSITE_DEFAULT_TIER = 'pro';
 
 // GET /api/admin/website-requests
@@ -892,6 +892,7 @@ router.patch('/website-requests/:id', async (req, res) => {
         business: updated.business,
         sampleUrl: updated.sample_url,
         approvalUrl: `${FRONTEND_URL}/website-approval/${updated.approval_token}`,
+        monthlyPrice: WEBSITE_TIER_PRICES[updated.plan_tier] || WEBSITE_TIER_PRICES[WEBSITE_DEFAULT_TIER],
       }).catch(err => console.error('sendWebsiteSampleReadyEmail failed:', err.message));
     }
 

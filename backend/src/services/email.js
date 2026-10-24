@@ -1470,12 +1470,19 @@ async function sendWebsiteRequestReceivedEmail({ to, name, business }) {
 // Sent by PATCH /api/admin/website-requests/:id when an admin attaches a
 // sample link and the request moves to 'sample_ready'. Content lives in the
 // editable email_templates table (key: 'website_sample_ready').
-async function sendWebsiteSampleReadyEmail({ to, name, business, sampleUrl, approvalUrl }) {
+//
+// monthlyPrice is required, not defaulted here, so a missing caller-side
+// price fails loudly instead of silently quoting the wrong tier -- this
+// template used to hardcode "a flat $249/month" regardless of which plan
+// the prospect actually applied for, which was simply wrong for anyone on
+// Starter or Growth. See routes/admin.js for how the tier-correct price is
+// looked up before calling this.
+async function sendWebsiteSampleReadyEmail({ to, name, business, sampleUrl, approvalUrl, monthlyPrice }) {
   const { sent } = await sendTemplatedEmail({
     template: 'website_sample_ready',
     to,
     toName: name,
-    vars: { name, business, sampleUrl, approvalUrl },
+    vars: { name, business, sampleUrl, approvalUrl, monthlyPriceText: fmtMoney(monthlyPrice) },
     recipientType: 'other',
   });
   return sent;

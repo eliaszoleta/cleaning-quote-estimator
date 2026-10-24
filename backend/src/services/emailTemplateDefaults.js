@@ -670,6 +670,7 @@ module.exports = [
       { name: 'business', example: 'Sparkle Clean Co' },
       { name: 'sampleUrl', example: 'https://sample.cleanestimator.com/sparkle-clean-co' },
       { name: 'approvalUrl', example: 'https://www.cleanestimator.com/website-approval/abc123' },
+      { name: 'monthlyPriceText', example: '$180' },
     ],
     text: [
       'Hi {{name}},',
@@ -678,7 +679,7 @@ module.exports = [
       '',
       'Take a look: {{sampleUrl}}',
       '',
-      "Like what you see? Approve it to get started — just $5 one-time to lock in your build, then your first 2 months are completely free. After that it's a flat $249/month, cancel anytime.",
+      "Like what you see? Approve it to get started — just $5 one-time to lock in your build, then your first 2 months are completely free. After that it's a flat {{monthlyPriceText}}/month, cancel anytime.",
       '',
       'Review & approve: {{approvalUrl}}',
       '',
@@ -699,7 +700,7 @@ module.exports = [
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Like what you see? Approve it to get started — just $5 one-time to lock in your build, then your first 2 months are completely free. After that it's a flat $249/month, cancel anytime.
+    Like what you see? Approve it to get started — just $5 one-time to lock in your build, then your first 2 months are completely free. After that it's a flat {{monthlyPriceText}}/month, cancel anytime.
   </p>
 
   <p style="margin:0 0 20px;">

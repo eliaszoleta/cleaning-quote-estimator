@@ -13,8 +13,8 @@ const SETUP_FEE_CENTS = 500; // $5
 // Keep these prices in sync with frontend/src/data/websitePricingTiers.js.
 const PLAN_TIERS = {
   starter: { name: 'Starter', priceCents: 9700 },
-  growth: { name: 'Growth', priceCents: 17900 },
-  pro: { name: 'Pro', priceCents: 24900 },
+  growth: { name: 'Growth', priceCents: 18000 },
+  pro: { name: 'Pro', priceCents: 25000 },
 };
 const DEFAULT_PLAN_TIER = 'pro';
 
