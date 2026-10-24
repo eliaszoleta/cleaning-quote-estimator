@@ -424,47 +424,125 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 // GET shouldn't have side effects, and re-resolving on each server restart
 // is cheap enough at this volume).
 
-// GET /api/admin/homepage-leads — paginated (offset/limit), newest first.
-// Used to default to fetching up to 1000-2000 rows in one shot, which made
-// AdminHomepageLeads.js slow to open: every row's ZIP needs a city resolved
-// (resolveCityForZip below -- an external API call per unique, uncached
-// ZIP) on top of the Supabase round trip itself. Defaults to the 20 most
-// recent now; the frontend's "Load more" button pages through the rest on
-// demand. An explicit larger `limit` (e.g. the frontend's own "export
-// everything" fetch) still works, capped at 2000 same as before.
+// Shared by GET /homepage-leads and GET /homepage-leads/counts below, so the
+// two can never disagree about what a given set of query params means.
+function applyLeadFilters(query, req, trashed) {
+  const { service_type: serviceType, state, user_type: userType, date_from: dateFrom, date_to: dateTo } = req.query;
+  query = trashed ? query.not('deleted_at', 'is', null) : query.is('deleted_at', null);
+  if (serviceType && serviceType !== 'all') query = query.eq('service_type', serviceType);
+  if (state && state !== 'all') query = query.eq('state', state);
+  if (userType && userType !== 'all') query = query.eq('user_type', userType);
+  if (dateFrom) query = query.gte('created_at', dateFrom);
+  if (dateTo) query = query.lte('created_at', dateTo);
+  return query;
+}
+
+// GET /api/admin/homepage-leads/counts — exact Active/Trash counts for the
+// current service_type/state/user_type/date filters. Needed because the
+// list endpoint below only ever loads one view (active or trash) per
+// request now that it's genuinely filtering/paginating over the whole
+// table -- without this, the Active (N)/Trash (N) tab labels would only be
+// able to count whatever page happens to be loaded for the OTHER tab.
+// Ignores `q`: once a free-text search actually runs, its own result length
+// already is the count for that view, so the tab toggle doesn't need a
+// separate number in that case.
+router.get('/homepage-leads/counts', async (req, res) => {
+  const sb = getSupabase();
+  if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
+
+  try {
+    const countQuery = (trashed) => applyLeadFilters(
+      sb.from('leads').select('*', { count: 'exact', head: true }).is('company_id', null), req, trashed
+    );
+    const [activeRes, trashRes] = await Promise.all([countQuery(false), countQuery(true)]);
+    if (activeRes.error) throw activeRes.error;
+    if (trashRes.error) throw trashRes.error;
+    res.json({ success: true, active: activeRes.count || 0, trash: trashRes.count || 0 });
+  } catch (err) {
+    console.error('Admin homepage-leads counts error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to load lead counts' });
+  }
+});
+
+// GET /api/admin/homepage-leads — filtered + paginated (offset/limit), newest
+// first. Used to default to fetching up to 1000-2000 rows in one shot, which
+// made AdminHomepageLeads.js slow to open: every row's ZIP needs a city
+// resolved (resolveCityForZip below -- an external API call per unique,
+// uncached ZIP) on top of the Supabase round trip itself. Defaults to the 20
+// most recent now; the frontend's "Load more" button pages through the rest
+// on demand. An explicit larger `limit` (e.g. the frontend's own export
+// fetch) still works, capped at 2000 same as before.
+//
+// service_type/state/user_type/date_from/date_to/trashed are real columns
+// (or a real timestamp range), so they're applied as actual WHERE clauses --
+// filtering runs over every matching row in the table, not just whatever
+// page the frontend happens to have loaded already. `city` has no column of
+// its own (see resolveCityForZip above -- it's derived live from the ZIP, or
+// taken from service_details.city when a scoped widget collected it
+// directly), so it can't be pushed into the query the same way; the frontend
+// still narrows by city client-side on top of whatever this returns.
+//
+// `q` (free-text search) also can't safely become a raw ILIKE fragment
+// spliced into a PostgREST `.or()` filter string -- that string is parsed
+// for its own reserved characters (`,` separates clauses, `()` nests them),
+// so untrusted input placed there can inject extra filter clauses, not just
+// mismatch results. Postgrest *can* be escaped for that correctly, but it's
+// easy to get subtly wrong, and this table is small enough that it isn't
+// worth the risk: instead, when `q` is present every other (real-column)
+// filter above still runs as a normal parameterized query, capped at 2000
+// rows, and the text match itself (name/email/zip/explicit city, all
+// case-insensitive substring) happens in plain JS against that result. No
+// user input ever reaches the filter string. `truncated: true` on the
+// response means the 2000-row cap was hit before text-matching, i.e. there
+// could be older matches this search didn't see.
 router.get('/homepage-leads', async (req, res) => {
   const sb = getSupabase();
   if (!sb) return res.status(503).json({ success: false, error: 'Supabase not configured' });
 
-  const includeDeleted = req.query.deleted === 'true';
+  const trashed = req.query.trashed === 'true';
   const limit = Math.min(parseInt(req.query.limit, 10) || 20, 2000);
   const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+  const q = (req.query.q || '').trim().toLowerCase();
+  const applyCommonFilters = (query) => applyLeadFilters(query, req, trashed);
+
+  const enrichWithCity = async (rows) => {
+    const uniqueZips = [...new Set(rows.map(r => r.zip).filter(Boolean))];
+    const cityByZip = new Map();
+    await Promise.all(uniqueZips.map(async zip => { cityByZip.set(zip, await resolveCityForZip(zip)); }));
+    return rows.map(row => ({ ...row, city: row.service_details?.city || cityByZip.get(row.zip) || null }));
+  };
 
   try {
+    if (q) {
+      const SEARCH_CAP = 2000;
+      let query = applyCommonFilters(sb.from('leads').select('*').is('company_id', null))
+        .order('created_at', { ascending: false }).limit(SEARCH_CAP);
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const enriched = await enrichWithCity(data || []);
+      const matched = enriched.filter(l =>
+        (l.name || '').toLowerCase().includes(q) ||
+        (l.email || '').toLowerCase().includes(q) ||
+        (l.zip || '').toLowerCase().includes(q) ||
+        (l.city || '').toLowerCase().includes(q)
+      );
+
+      return res.json({ success: true, count: matched.length, hasMore: false, truncated: (data || []).length >= SEARCH_CAP, data: matched });
+    }
+
     // Fetches one extra row past `limit` purely to answer "is there more?"
     // without a separate count query -- trimmed back off below before
     // anything is sent to the client.
-    let query = sb.from('leads').select('*').is('company_id', null).order('created_at', { ascending: false }).range(offset, offset + limit);
-    if (!includeDeleted) query = query.is('deleted_at', null);
+    let query = applyCommonFilters(sb.from('leads').select('*').is('company_id', null))
+      .order('created_at', { ascending: false }).range(offset, offset + limit);
     const { data, error } = await query;
     if (error) throw error;
 
     const rows = data || [];
     const hasMore = rows.length > limit;
     const page = hasMore ? rows.slice(0, limit) : rows;
-
-    // Resolve each unique ZIP once (not once per lead -- many leads share
-    // a ZIP), then attach the result as a top-level `city` field. Prefers
-    // an explicit service_details.city when one exists (a scoped-widget
-    // lead that really was asked, vs. a homepage lead being backfilled),
-    // so this never overrides real visitor input with a guess.
-    const uniqueZips = [...new Set(page.map(r => r.zip).filter(Boolean))];
-    const cityByZip = new Map();
-    await Promise.all(uniqueZips.map(async zip => { cityByZip.set(zip, await resolveCityForZip(zip)); }));
-    const enriched = page.map(row => ({
-      ...row,
-      city: row.service_details?.city || cityByZip.get(row.zip) || null,
-    }));
+    const enriched = await enrichWithCity(page);
 
     res.json({ success: true, count: enriched.length, hasMore, data: enriched });
   } catch (err) {

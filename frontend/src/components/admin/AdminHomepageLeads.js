@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { RefreshCw, Download, Inbox, Mail, Phone, X, Trash2, RotateCcw, Target, Users } from 'lucide-react';
-import { getAdminHomepageLeads, patchAdminHomepageLead, deleteAdminHomepageLeadForever } from '../../utils/api';
+import { getAdminHomepageLeads, getAdminHomepageLeadCounts, patchAdminHomepageLead, deleteAdminHomepageLeadForever } from '../../utils/api';
 import { formatPrice, formatPriceRange, serviceTypeLabel, formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 import { theme, cardStyle, inputStyle, secondaryBtnStyle, dangerBtnStyle, pill, avatarGradient, PageHeader } from './adminTheme';
@@ -18,17 +18,20 @@ const SERVICE_COLORS = {
 // a person glancing at a calendar. 'this_week' is the one rolling window
 // here (last 7 days), since "calendar week" has no single obvious start
 // day and a rolling window is what "leads this week" usually means day to
-// day.
-function matchesDateFilter(createdAt, dateFilter) {
-  if (dateFilter === 'all') return true;
-  const d = new Date(createdAt);
+// day. Returns ISO bounds sent straight to the backend (GET
+// /api/admin/homepage-leads's date_from/date_to) so date filtering runs
+// over the whole table, not just whatever's already loaded on screen.
+function computeDateRange(dateFilter) {
+  if (dateFilter === 'all') return {};
   const now = new Date();
   if (dateFilter === 'this_week') {
-    const ms = now.getTime() - d.getTime();
-    return ms >= 0 && ms <= 7 * 24 * 60 * 60 * 1000;
+    return { dateFrom: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString() };
   }
-  const monthsAgo = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
-  return dateFilter === 'this_month' ? monthsAgo === 0 : monthsAgo === 1;
+  const monthOffset = dateFilter === 'last_month' ? -1 : 0;
+  return {
+    dateFrom: new Date(now.getFullYear(), now.getMonth() + monthOffset, 1).toISOString(),
+    dateTo: new Date(now.getFullYear(), now.getMonth() + monthOffset + 1, 1).toISOString(),
+  };
 }
 
 // Site-owner view of every lead the main public calculator has ever
@@ -54,12 +57,31 @@ export default function AdminHomepageLeads({ adminKey }) {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [exportingAll, setExportingAll] = useState(false);
+  // Search results come back already matched against the whole table (see
+  // GET /api/admin/homepage-leads), capped at 2000 rows pre-match --
+  // `truncated` means that cap was hit, i.e. there could be older matches
+  // this search didn't reach.
+  const [truncated, setTruncated] = useState(false);
   const [filter, setFilter] = useState('all');
   const [stateFilter, setStateFilter] = useState('all');
   const [cityFilter, setCityFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [userTypeFilter, setUserTypeFilter] = useState('all');
   const [search, setSearch] = useState('');
+  // Debounced copy of `search` that actually drives the fetch, so typing
+  // doesn't fire a request per keystroke -- see the effect below.
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const searchTimer = useRef(null);
+  // Active/Trash tab counts -- fetched separately (GET .../counts) since
+  // the list below only ever loads ONE view's rows per request now that
+  // it's genuinely filtering/paginating server-side; see that endpoint's
+  // comment for why.
+  const [counts, setCounts] = useState({ active: 0, trash: 0 });
+  // Guards against a stale filter-driven reload landing after a newer one
+  // (e.g. two dropdown changes fired in quick succession) -- without this,
+  // whichever response happens to arrive last would win even if it's for
+  // filters the user has since changed away from.
+  const requestIdRef = useRef(0);
   const [selectedLead, setSelectedLead] = useState(null);
   const [notes, setNotes] = useState('');
   const [noteStatus, setNoteStatus] = useState('');
@@ -82,77 +104,106 @@ export default function AdminHomepageLeads({ adminKey }) {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
-  // Always starts over from the most recent page -- used on mount and by
-  // the Refresh button. loadMoreLeads below is the only thing that appends.
+  // Debounces `search` -> `debouncedSearch` so typing doesn't fire a fetch
+  // per keystroke; everything else (service/state/date/user-type/view)
+  // reloads immediately since those are discrete dropdown/tab picks, not
+  // free text.
+  useEffect(() => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => setDebouncedSearch(search.trim()), 350);
+    return () => clearTimeout(searchTimer.current);
+  }, [search]);
+
+  // Always starts over from the most recent page for the CURRENT filters --
+  // used on mount, by the Refresh button, and (via the effect below)
+  // whenever any filter/search/view/adminKey changes. Filtering now happens
+  // server-side (see GET /api/admin/homepage-leads), so this always
+  // searches the whole table, not just whatever was already loaded.
+  // loadMoreLeads below is the only thing that appends to an existing page.
   const loadLeads = useCallback(async (key) => {
+    const myRequestId = ++requestIdRef.current;
     setLoading(true);
     try {
-      const res = await getAdminHomepageLeads(key, { includeDeleted: true, offset: 0, limit: PAGE_SIZE });
+      const { dateFrom, dateTo } = computeDateRange(dateFilter);
+      const res = await getAdminHomepageLeads(key, {
+        trashed: view === 'trash', offset: 0, limit: PAGE_SIZE,
+        serviceType: filter, state: stateFilter, userType: userTypeFilter,
+        dateFrom, dateTo, q: debouncedSearch,
+      });
+      if (requestIdRef.current !== myRequestId) return; // superseded by a newer filter change
       const loaded = res.data || [];
       setLeads(loaded);
       setOffset(loaded.length);
       setHasMore(!!res.hasMore);
-      const activeLoaded = loaded.filter(l => !l.deleted_at);
-      setSelectedLead(prev => prev || (activeLoaded.length > 0 ? activeLoaded[0] : null));
+      setTruncated(!!res.truncated);
+      setSelectedLead(prev => prev || (loaded.length > 0 ? loaded[0] : null));
     } catch (err) {
+      if (requestIdRef.current !== myRequestId) return;
       console.error('Error loading homepage leads:', err.message);
     } finally {
-      setLoading(false);
+      if (requestIdRef.current === myRequestId) setLoading(false);
     }
-  }, []);
+  }, [view, filter, stateFilter, userTypeFilter, dateFilter, debouncedSearch]);
 
   const loadMoreLeads = async () => {
+    const myRequestId = requestIdRef.current;
     setLoadingMore(true);
     try {
-      const res = await getAdminHomepageLeads(adminKey, { includeDeleted: true, offset, limit: PAGE_SIZE });
+      const { dateFrom, dateTo } = computeDateRange(dateFilter);
+      const res = await getAdminHomepageLeads(adminKey, {
+        trashed: view === 'trash', offset, limit: PAGE_SIZE,
+        serviceType: filter, state: stateFilter, userType: userTypeFilter,
+        dateFrom, dateTo, q: debouncedSearch,
+      });
+      if (requestIdRef.current !== myRequestId) return; // a filter changed while this was in flight
       const loaded = res.data || [];
       setLeads(prev => [...prev, ...loaded]);
       setOffset(prev => prev + loaded.length);
       setHasMore(!!res.hasMore);
     } catch (err) {
-      console.error('Error loading more homepage leads:', err.message);
+      if (requestIdRef.current === myRequestId) console.error('Error loading more homepage leads:', err.message);
     } finally {
-      setLoadingMore(false);
+      if (requestIdRef.current === myRequestId) setLoadingMore(false);
     }
   };
 
   useEffect(() => { if (adminKey) loadLeads(adminKey); }, [adminKey, loadLeads]);
+
+  // Active/Trash tab counts -- independent of `view` (covers both tabs
+  // every time) and of search (a search result's own length already is the
+  // count for that case; see GET .../counts's comment for why it ignores q).
+  useEffect(() => {
+    if (!adminKey) return;
+    const { dateFrom, dateTo } = computeDateRange(dateFilter);
+    getAdminHomepageLeadCounts(adminKey, { serviceType: filter, state: stateFilter, userType: userTypeFilter, dateFrom, dateTo })
+      .then(res => setCounts({ active: res.active || 0, trash: res.trash || 0 }))
+      .catch(() => {});
+  }, [adminKey, filter, stateFilter, userTypeFilter, dateFilter]);
   useEffect(() => () => { if (notesTimer.current) clearTimeout(notesTimer.current); }, []);
   useEffect(() => {
     if (selectedLead) setNotes(selectedLead.notes || '');
   }, [selectedLead?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Pulled out of the component so exportCSV/exportFacebookCSV can run the
-  // exact same filtering against a full on-demand fetch (see those below)
-  // instead of whatever's currently paginated into `leads` -- otherwise an
-  // export would silently only cover the leads loaded so far on screen.
-  const applyFilters = (arr, { filter, stateFilter, cityFilter, dateFilter, userTypeFilter, view, search }) => {
-    const dateFiltered = arr.filter(l => matchesDateFilter(l.created_at, dateFilter));
-    const base = dateFiltered.filter(l => (view === 'trash' ? !!l.deleted_at : !l.deleted_at));
-    return base.filter(l => {
-      if (filter !== 'all' && l.service_type !== filter) return false;
-      if (stateFilter !== 'all' && l.state !== stateFilter) return false;
-      if (cityFilter !== 'all' && l.city !== cityFilter) return false;
-      if (userTypeFilter !== 'all' && l.user_type !== userTypeFilter) return false;
-      if (search) {
-        const q = search.toLowerCase();
-        return (l.name || '').toLowerCase().includes(q) || (l.email || '').toLowerCase().includes(q) || (l.zip || '').includes(q) || (l.city || '').toLowerCase().includes(q);
-      }
-      return true;
-    });
-  };
-  const activeFilters = { filter, stateFilter, cityFilter, dateFilter, userTypeFilter, view, search };
+  // Everything except city now happens server-side (see GET
+  // /api/admin/homepage-leads) -- `leads` already only contains rows
+  // matching view/service/state/date/user-type/search across the WHOLE
+  // table, not just a loaded page. City has no column of its own (it's
+  // resolved live from ZIP, or taken from an explicit service_details.city
+  // -- see that endpoint's comment), so it's the one filter still applied
+  // here, on top of the already-server-filtered rows.
+  const filterByCity = (arr) => cityFilter === 'all' ? arr : arr.filter(l => l.city === cityFilter);
 
-  // Date filter narrows the whole pool first -- the Active/Trash tab counts
-  // and the list itself should agree on what "this month" includes, not
-  // just the visible list while the tab counts stay stuck at the total.
-  const dateFilteredLeads = leads.filter(l => matchesDateFilter(l.created_at, dateFilter));
-  const baseLeads = dateFilteredLeads.filter(l => (view === 'trash' ? !!l.deleted_at : !l.deleted_at));
-  const activeCount = dateFilteredLeads.filter(l => !l.deleted_at).length;
-  const trashCount = dateFilteredLeads.filter(l => l.deleted_at).length;
+  const baseLeads = leads;
+  const activeCount = counts.active;
+  const trashCount = counts.trash;
 
-  const filtered = applyFilters(leads, activeFilters);
+  const filtered = filterByCity(leads);
 
+  // Reflects only what's been loaded so far for the current filters --
+  // a service type or state with zero currently-loaded leads won't appear
+  // as an option until a matching lead is loaded. Selecting one still
+  // filters/exports against the whole table regardless (it's a real
+  // column), this just affects which options show up to pick from.
   const serviceTypes = [...new Set(baseLeads.map(l => l.service_type))];
   const states = [...new Set(baseLeads.map(l => l.state).filter(Boolean))].sort();
   // Scoped to the selected state (like LocationStep.js's own citiesForState)
@@ -324,19 +375,28 @@ export default function AdminHomepageLeads({ adminKey }) {
     return [headers, ...rows].map(r => r.map(c => `"${sanitizeCsvCell(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   };
 
+  // Matches the backend's own cap (GET /api/admin/homepage-leads clamps
+  // `limit` to 2000, and the search path's own SEARCH_CAP is 2000 too) --
+  // passing anything larger wouldn't get more rows back.
+  const EXPORT_LIMIT = 2000;
+
   // With an explicit selection, exports exactly those. Otherwise -- the
-  // common "export everything matching my filters" case -- a page that's
-  // only loaded the most recent PAGE_SIZE leads can't just export `filtered`
-  // anymore, or it would silently drop every older lead that matches. So
-  // this fetches the full set on demand (same filters re-applied to it)
-  // instead of ever exporting a partial list without saying so.
+  // common "export everything matching my filters" case -- always does a
+  // dedicated fetch with the current filters instead of reusing `filtered`,
+  // so an export can never silently cover only whatever happened to be
+  // loaded on screen already.
   const rowsToExport = async () => {
     if (selectedIds.size > 0) return filtered.filter(l => selectedIds.has(l.id));
-    if (!hasMore) return filtered;
     setExportingAll(true);
     try {
-      const res = await getAdminHomepageLeads(adminKey, { includeDeleted: true, limit: 2000 });
-      return applyFilters(res.data || [], activeFilters);
+      const { dateFrom, dateTo } = computeDateRange(dateFilter);
+      const res = await getAdminHomepageLeads(adminKey, {
+        trashed: view === 'trash', offset: 0, limit: EXPORT_LIMIT,
+        serviceType: filter, state: stateFilter, userType: userTypeFilter,
+        dateFrom, dateTo, q: debouncedSearch,
+      });
+      setTruncated(!!res.truncated || !!res.hasMore);
+      return filterByCity(res.data || []);
     } finally {
       setExportingAll(false);
     }
@@ -582,11 +642,16 @@ export default function AdminHomepageLeads({ adminKey }) {
                 <button onClick={loadMoreLeads} disabled={loadingMore} style={secondaryBtnStyle}>
                   <RefreshCw size={13} className={loadingMore ? 'spin' : ''} /> {loadingMore ? 'Loading…' : `Load ${PAGE_SIZE} more`}
                 </button>
-                {(search || filter !== 'all' || stateFilter !== 'all' || cityFilter !== 'all' || userTypeFilter !== 'all') && (
+                {cityFilter !== 'all' && (
                   <div style={{ fontSize: 11.5, color: theme.textMuted, textAlign: 'center' }}>
-                    Searching/filtering only looks at the {leads.length} leads loaded so far — load more to look further back.
+                    City isn't a stored field, so it's only narrowed down from what's loaded — load more to check further back for "{cityFilter}".
                   </div>
                 )}
+              </div>
+            )}
+            {truncated && !loading && (
+              <div style={{ marginTop: 10, fontSize: 11.5, color: '#b45309', textAlign: 'center' }}>
+                Showing the first 2,000 matches — there may be older leads this search/export didn't reach. Narrow the filters to see everything.
               </div>
             )}
           </div>

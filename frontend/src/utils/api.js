@@ -232,13 +232,34 @@ export async function deleteAdminPartner(adminKey, id) {
 // as the rest of the admin API. Paginated (offset/limit, defaults to the
 // backend's own 20/0) so opening the page doesn't have to wait on fetching
 // + ZIP-resolving every lead ever captured -- see the matching comment on
-// GET /api/admin/homepage-leads.
-export async function getAdminHomepageLeads(adminKey, { includeDeleted = false, offset = 0, limit } = {}) {
+// GET /api/admin/homepage-leads. service_type/state/user_type/dateFrom/
+// dateTo/trashed/q are forwarded as real query filters so the backend
+// filters/searches the whole table, not just whatever page is loaded.
+export async function getAdminHomepageLeads(adminKey, { trashed = false, offset = 0, limit, serviceType, state, userType, dateFrom, dateTo, q } = {}) {
   const params = new URLSearchParams();
-  if (includeDeleted) params.set('deleted', 'true');
+  if (trashed) params.set('trashed', 'true');
   params.set('offset', String(offset));
   if (limit) params.set('limit', String(limit));
+  if (serviceType && serviceType !== 'all') params.set('service_type', serviceType);
+  if (state && state !== 'all') params.set('state', state);
+  if (userType && userType !== 'all') params.set('user_type', userType);
+  if (dateFrom) params.set('date_from', dateFrom);
+  if (dateTo) params.set('date_to', dateTo);
+  if (q) params.set('q', q);
   return apiFetch(`/api/admin/homepage-leads?${params.toString()}`, { headers: { 'x-admin-key': adminKey } });
+}
+
+// Exact Active/Trash counts for the current filters -- see the matching
+// comment on GET /api/admin/homepage-leads/counts for why the list endpoint
+// above can't answer this itself once it's genuinely paginating per-view.
+export async function getAdminHomepageLeadCounts(adminKey, { serviceType, state, userType, dateFrom, dateTo } = {}) {
+  const params = new URLSearchParams();
+  if (serviceType && serviceType !== 'all') params.set('service_type', serviceType);
+  if (state && state !== 'all') params.set('state', state);
+  if (userType && userType !== 'all') params.set('user_type', userType);
+  if (dateFrom) params.set('date_from', dateFrom);
+  if (dateTo) params.set('date_to', dateTo);
+  return apiFetch(`/api/admin/homepage-leads/counts?${params.toString()}`, { headers: { 'x-admin-key': adminKey } });
 }
 
 export async function patchAdminHomepageLead(adminKey, id, updates) {
