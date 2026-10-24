@@ -212,12 +212,13 @@ module.exports = [
     // was the actual cause, so the button is back, matching that
     // established style for consistency.
     subject: 'Your Clean Estimator account setup is incomplete',
-    // signupDateSuffix carries its own leading " on <date>" (or '' with no
-    // date) rather than a bare date, so a blank merge field -- e.g. a
-    // manual send from the admin dashboard's Compose/Send tab with nothing
-    // typed into it -- still reads as a complete sentence instead of
-    // "...was created on , but checkout..." (what actually shipped once,
-    // from exactly that path, before this was caught).
+    // signupDateSuffix is still computed and passed on every send (see
+    // email.js's sendActivationReminderEmail / emailMarketing.js's manual-
+    // send path) even though this copy no longer references it in the body
+    // -- dropped in favor of a flatter "no rush" framing that doesn't lean
+    // on the exact signup date, but kept in `variables` since the merge
+    // field is still populated and available to anyone editing this in the
+    // admin dashboard.
     variables: [
       { name: 'companyName', example: 'Sparkle Clean Co' },
       { name: 'signupDateSuffix', example: ' on October 14, 2026' },
@@ -225,14 +226,18 @@ module.exports = [
     text: [
       'Hi {{companyName}},',
       '',
-      "You started setting up a Clean Estimator account{{signupDateSuffix}}, but activation was never finished, so your 30-day trial hasn't started and your calculator isn't active.",
+      "Looks like you started setting up a Clean Estimator account but didn't quite finish — no rush, just didn't want you to miss out on the free trial.",
       '',
-      'Finish account setup:',
+      "Once it's set up, you get unlimited, instant, accurate price estimates for every job you quote — plus a free embeddable calculator widget for your own website if you want leads coming in from there too.",
+      '',
+      "Pick up right where you left off whenever you're ready, it only takes a minute.",
+      '',
+      'Finish setting up my account:',
       'https://www.cleanestimator.com/company',
       '',
-      "Once it's done, you'll have unlimited price estimates for every job you quote, plus an embeddable calculator widget for your own website if you want it.",
+      "Your 30-day trial doesn't start until you do, so nothing's running out in the meantime.",
       '',
-      "Reply to this email if anything got in the way -- happy to help.",
+      'If you ran into an issue or just changed your mind, just reply and let me know — happy to help.',
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -241,19 +246,27 @@ module.exports = [
   <p style="font-size:14px;margin:0 0 20px;">Hi {{companyName}},</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    You started setting up a Clean Estimator account{{signupDateSuffix}}, but activation was never finished, so your 30-day trial hasn't started and your calculator isn't active.
-  </p>
-
-  <p style="margin:0 0 24px;">
-    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Finish account setup →</a>
+    Looks like you started setting up a Clean Estimator account but didn't quite finish — no rush, just didn't want you to miss out on the free trial.
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Once it's done, you'll have unlimited price estimates for every job you quote, plus an embeddable calculator widget for your own website if you want it.
+    Once it's set up, you get unlimited, instant, accurate price estimates for every job you quote — plus a free embeddable calculator widget for your own website if you want leads coming in from there too.
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Pick up right where you left off whenever you're ready, it only takes a minute.
+  </p>
+
+  <p style="margin:0 0 24px;">
+    <a href="https://www.cleanestimator.com/company" style="display:inline-block;background-color:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:6px;">Finish setting up my account →</a>
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
+    Your 30-day trial doesn't start until you do, so nothing's running out in the meantime.
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    Reply to this email if anything got in the way — happy to help.
+    If you ran into an issue or just changed your mind, just reply and let me know — happy to help.
   </p>
   ${FOOTER_HTML}
 </div>`,
