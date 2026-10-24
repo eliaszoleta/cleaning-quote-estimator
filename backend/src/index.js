@@ -25,6 +25,7 @@ const { requireAuth } = require('./middleware/auth');
 const { checkTrialReminders, checkActivationReminders, checkLegacyTrialExpired } = require('./services/trialScheduler');
 const { checkPendingDeletions } = require('./services/deletionScheduler');
 const { cleanupPublicEstimateAttempts } = require('./services/publicAttemptsCleanup');
+const { cleanupOldChatbotConversations } = require('./services/chatbotConversationsCleanup');
 const { ensureSeeded: ensureEmailTemplatesSeeded } = require('./services/emailTemplates');
 const { checkScheduledCampaigns } = require('./services/emailCampaignScheduler');
 const { checkIdleConversations } = require('./services/chatbotSummary');
@@ -409,12 +410,14 @@ app.listen(PORT, () => {
   checkLegacyTrialExpired().catch(err => console.error('checkLegacyTrialExpired (startup run) failed:', err.message));
   checkPendingDeletions().catch(err => console.error('checkPendingDeletions (startup run) failed:', err.message));
   cleanupPublicEstimateAttempts().catch(err => console.error('cleanupPublicEstimateAttempts (startup run) failed:', err.message));
+  cleanupOldChatbotConversations().catch(err => console.error('cleanupOldChatbotConversations (startup run) failed:', err.message));
   setInterval(() => {
     checkTrialReminders().catch(err => console.error('checkTrialReminders failed:', err.message));
     checkActivationReminders().catch(err => console.error('checkActivationReminders failed:', err.message));
     checkLegacyTrialExpired().catch(err => console.error('checkLegacyTrialExpired failed:', err.message));
     checkPendingDeletions().catch(err => console.error('checkPendingDeletions failed:', err.message));
     cleanupPublicEstimateAttempts().catch(err => console.error('cleanupPublicEstimateAttempts failed:', err.message));
+    cleanupOldChatbotConversations().catch(err => console.error('cleanupOldChatbotConversations failed:', err.message));
   }, 60 * 60 * 1000);
 
   // One-time (per boot, effectively once ever per DB) seed of the built-in
