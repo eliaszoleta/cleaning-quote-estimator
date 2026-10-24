@@ -13928,6 +13928,382 @@ Yes — none of this is exclusive to professionals. A well-stocked home kit (all
 The real difference is a purpose-built kit used correctly, not a single secret product — most of it is available to anyone willing to stock a few more specific cleaners instead of relying on one all-purpose bottle. If you'd rather skip the kit-building entirely, [get a free price estimate](/?service=home_residential) for professional cleaning.
     `,
   },
+  {
+    slug: 'how-to-clean-a-washing-machine',
+    title: 'How to Clean a Washing Machine (Yes, It Needs Cleaning Too)',
+    category: 'house-cleaning',
+    categoryLabel: 'House Cleaning',
+    date: '2026-10-26',
+    readTime: '5 min',
+    excerpt: "If laundry has started smelling musty even right out of the wash, the machine itself is the likely culprit. Here's how to actually clean it, front-load and top-load both.",
+    content: `
+## Why a Washing Machine Needs Its Own Cleaning
+
+It sounds backwards — the appliance that cleans everything else building up grime of its own — but detergent residue, fabric softener buildup, and trapped moisture create exactly the environment mold and mildew need, especially in front-load machines with a rubber door gasket that stays damp between loads.
+
+## Signs Your Washing Machine Needs Cleaning
+
+- Clothes smell musty or sour even immediately after a wash cycle
+- Visible residue or a slimy film around the detergent dispenser or door gasket
+- A persistent odor from the machine itself, even when it's empty
+
+## How to Clean a Front-Load Washing Machine
+
+1. **Wipe the door gasket thoroughly** — pull back the rubber seal and clean inside the fold, where moisture and grime collect most (this is the single biggest source of odor in front-loaders)
+2. **Remove and clean the detergent dispenser drawer**, soaking it if there's visible residue buildup
+3. **Run an empty hot-water cycle with either a washing-machine cleaner or a cup of white vinegar**, which breaks down residue and mineral buildup inside the drum
+4. **Wipe down the drum interior** once the cycle finishes
+5. **Leave the door open between loads** going forward — this single habit prevents most future buildup by letting the interior actually dry out
+
+## How to Clean a Top-Load Washing Machine
+
+1. **Run an empty hot-water cycle with washing-machine cleaner or vinegar**, same principle as front-loaders, to break down residue
+2. **Wipe down the agitator, lid, and rim** where residue tends to accumulate
+3. **Clean the detergent and fabric softener dispensers**, which collect buildup over time
+4. **Leave the lid open between loads** to let the drum dry out
+
+## How Often to Clean It
+
+A deep clean roughly **once a month** is a reasonable baseline for most households, more often for heavy use or if odor becomes noticeable sooner. The door-open habit between loads matters as much as the monthly deep clean itself.
+
+## Bottom Line
+
+A washing machine that smells or leaves clothes smelling off almost always needs cleaning itself, not a different detergent. A monthly cycle with vinegar or a dedicated cleaner, plus leaving the door open between loads, solves the overwhelming majority of cases. If the rest of the home's cleaning is what's actually falling behind, [get a free price estimate](/?service=home_residential) to see what help would cost.
+    `,
+  },
+  {
+    slug: 'how-to-clean-a-dishwasher',
+    title: 'How to Clean a Dishwasher the Right Way',
+    category: 'house-cleaning',
+    categoryLabel: 'House Cleaning',
+    date: '2026-10-26',
+    readTime: '5 min',
+    excerpt: "A dishwasher that isn't cleaning dishes as well as it used to, or smells off, almost always needs a clean of its own first. Here's the full process.",
+    content: `
+## Why Dishwashers Need Regular Cleaning
+
+Food particles, grease, and hard water deposits build up in the filter, spray arms, and door seal over time — and once that buildup is significant enough, it actively reduces how well the dishwasher cleans, creating a frustrating cycle where dishes come out worse despite using the same detergent.
+
+## Step 1: Clean the Filter
+
+Most modern dishwashers have a removable filter at the bottom, under the lower spray arm. Remove it, rinse it under hot water, and scrub off any trapped food debris with an old toothbrush. This is the single most impactful step and the one most people have never done, sometimes for years.
+
+## Step 2: Clear the Spray Arms
+
+Check the holes in the spray arms for clogs — a toothpick or thin wire works well to clear them. Clogged spray arm holes are a common, under-diagnosed reason for dishes coming out less clean than expected.
+
+## Step 3: Wipe Down the Door Seal and Edges
+
+Food debris and grime collect along the rubber door gasket, similar to a front-load washing machine. Wipe this down with a damp cloth, checking the bottom edge where debris tends to settle.
+
+## Step 4: Run an Empty Cleaning Cycle
+
+Place a cup of white vinegar on the top rack and run a hot, empty cycle. This helps break down grease and mineral deposits throughout the interior. A dishwasher-specific cleaner works as an alternative or addition.
+
+## Step 5: Address Hard Water Buildup
+
+If you have hard water, a cloudy film on the interior walls and dishes is common. Dishwasher-specific descaling products handle this better than vinegar alone for significant buildup.
+
+## Step 6: Clean the Exterior
+
+Wipe down the control panel and exterior door, including the handle — a frequently touched, infrequently cleaned surface.
+
+## How Often to Clean a Dishwasher
+
+Check and rinse the filter **monthly**, with a full cleaning cycle (vinegar or dishwasher cleaner) roughly **once a month** as well — more often if you notice odor, cloudy dishes, or reduced cleaning performance.
+
+## When It's More Than a Cleaning Issue
+
+If dishes still aren't coming out clean after a thorough cleaning, the issue may be water temperature, detergent type, or a mechanical problem rather than buildup — worth ruling out cleaning first since it's the most common and easiest fix, but not assuming it's always the answer.
+
+## Bottom Line
+
+A dishwasher that isn't performing well usually needs its own cleaning before anything else — the filter specifically is the step most people have never done. If the rest of the kitchen (or home) needs attention too, [get a free price estimate](/?service=home_residential) for professional cleaning.
+    `,
+  },
+  {
+    slug: 'how-to-clean-windows-streak-free',
+    title: 'How to Clean Windows Streak-Free, Every Time',
+    category: 'house-cleaning',
+    categoryLabel: 'House Cleaning',
+    date: '2026-10-26',
+    readTime: '5 min',
+    excerpt: "Streaky windows almost always come down to one of a few fixable habits — wrong weather, wrong tool, or wrong technique. Here's how to actually get a streak-free result.",
+    content: `
+## The Biggest Mistake: Cleaning in Direct Sunlight
+
+Cleaning cleaner dries too fast in direct sun, leaving streaks behind before you can wipe it away evenly. Cloudy days or shaded times of day (early morning, evening) give you much more working time and noticeably better results for the same effort.
+
+## What You'll Need
+
+- A squeegee (genuinely makes the biggest difference of any single tool)
+- A microfiber cloth or lint-free towel
+- Glass cleaner, or a simple water-and-vinegar solution
+- A bucket, if doing multiple windows
+
+## Step-by-Step
+
+1. **Dust or wipe down the frame and sill first** — dust that falls onto a wet window creates new streaks and smudges
+2. **Apply cleaner generously** — skimping leads to dragging dirt across the glass rather than lifting it off
+3. **Use a squeegee in a single, continuous motion**, top to bottom or side to side — stopping partway and restarting is a common cause of streaking
+4. **Wipe the squeegee blade dry after each pass** with a cloth, so you're not redepositing dirty water on the next stroke
+5. **Dry the edges and corners** with a microfiber cloth, since a squeegee can't fully reach them
+
+## Indoor vs. Outdoor Streaks: How to Tell Which Side
+
+Wipe one side in a horizontal motion and the other in a vertical motion. Whichever direction the streak lines run tells you which side still needs attention — a simple trick that saves time troubleshooting.
+
+## What Causes Streaks (Beyond Sunlight)
+
+- **Using paper towels instead of microfiber or a squeegee** — paper towels can leave lint and don't lift cleaner as evenly
+- **Too little cleaner**, which drags dirt rather than lifting it
+- **Hard water spots**, which need a vinegar solution or a dedicated hard-water remover rather than standard glass cleaner
+- **Dirty cleaning cloths** reused past the point of still being effective
+
+## How Often to Clean Windows
+
+Interior windows every **1–3 months** is a reasonable baseline for most homes; exterior windows **twice a year** (commonly tied to spring and fall cleaning) unless you're in a particularly dusty or high-pollen area, where more frequent cleaning helps.
+
+## When to Call a Professional
+
+Exterior windows above the first floor, or a whole-home window cleaning that would otherwise eat an entire weekend, are common reasons people hire this out specifically rather than handling the full home's windows themselves.
+
+## Bottom Line
+
+Streak-free windows come down to timing (avoid direct sun), tool (a squeegee beats paper towels), and technique (continuous strokes, dry the blade between passes) — all three matter more than which specific cleaner you use. [Get a free price estimate](/?service=home_residential) if windows are part of a bigger cleaning job you'd rather hand off.
+    `,
+  },
+  {
+    slug: 'how-to-get-rid-of-house-odors',
+    title: 'How to Get Rid of Bad Odors in Your House, Room by Room',
+    category: 'house-cleaning',
+    categoryLabel: 'House Cleaning',
+    date: '2026-10-27',
+    readTime: '6 min',
+    excerpt: "Air fresheners mask odors instead of fixing them. Here's how to actually find and eliminate the source, room by room, for a home that's genuinely odor-free rather than just temporarily covered up.",
+    content: `
+## Masking vs. Actually Fixing the Problem
+
+Air fresheners and scented candles cover odors temporarily but don't address the source — which means the smell comes back, often stronger, once the scent fades. Finding and eliminating the actual source is the only real fix, and it's usually more straightforward than it seems.
+
+## Kitchen Odors
+
+- **Garbage disposal** — grind ice cubes with citrus peels, or baking soda and vinegar, to clear trapped food residue
+- **Trash can** — wash the can itself, not just replacing the bag; residue builds up on the can's interior over time
+- **Refrigerator** — an open box of baking soda absorbs ongoing odors; a deep clean addresses existing buildup (see our [kitchen deep-clean guide](/blog/how-to-deep-clean-a-kitchen))
+- **Dishwasher and washing machine** — both can be significant, often-overlooked odor sources (see our [dishwasher](/blog/how-to-clean-a-dishwasher) and [washing machine](/blog/how-to-clean-a-washing-machine) cleaning guides)
+
+## Bathroom Odors
+
+- **Drains** — hair and soap residue trapped in drains is a common, persistent source; a drain cleaner or baking soda/vinegar combination run regularly helps
+- **Exhaust fan** — a dusty, underused exhaust fan doesn't effectively clear moisture, which contributes to mildew odor over time
+- **Towels and bath mats** — these hold moisture and odor longer than people expect; wash more frequently if odor is an issue
+
+## Pet Odors
+
+- **Litter boxes** — scoop daily and fully clean (not just scoop) weekly; location matters too, since poor airflow makes any odor worse
+- **Pet bedding** — wash regularly; it holds odor more than most people account for
+- **Furniture and carpet** — enzyme-based cleaners specifically break down pet odor at a molecular level, unlike general cleaners that only mask it
+
+## Musty or Mildew Smells
+
+Usually a moisture issue — check bathrooms, basements, and any area with poor ventilation. A dehumidifier helps address ongoing moisture; the existing smell itself often needs an enzyme or odor-neutralizing product rather than a standard air freshener, which won't actually eliminate it.
+
+## General Whole-Home Odor Sources
+
+- **Carpets and rugs** absorb and hold odors from pets, cooking, and general use over time — a deep clean (see our [carpet cleaning guide](/blog/carpet-cleaning-cost-guide)) addresses this directly
+- **HVAC system** — if odors seem to come from the vents specifically, [duct cleaning](/blog/air-duct-cleaning-cost-guide) may be the actual source
+- **Closed-up rooms** with poor airflow tend to develop a stale smell even without an obvious cause — regular airing out helps prevent this
+
+## Bottom Line
+
+Lasting odor control means finding the actual source — a drain, a trash can, an appliance, fabric that's absorbed smell over time — rather than covering it up. [Get a free price estimate](/?service=home_residential) if a deeper clean would help address odor sources throughout your home.
+    `,
+  },
+  {
+    slug: 'cleaning-service-scams-how-to-avoid',
+    title: 'Cleaning Service Scams: How to Spot and Avoid Them',
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-27',
+    readTime: '6 min',
+    excerpt: "Actual cleaning service scams are rare, but they do happen — and knowing the specific patterns makes them easy to spot and avoid entirely.",
+    content: `
+## How Rare This Actually Is — and Why It's Still Worth Knowing
+
+The overwhelming majority of cleaning companies and independent cleaners are exactly what they claim to be. Scams are the exception, not the norm — but the handful of patterns they follow are specific and recognizable enough that a few minutes of awareness essentially eliminates the risk.
+
+## Common Scam Patterns to Watch For
+
+### 1. Demanding Full Payment Upfront, in Cash Only
+Legitimate companies typically accept standard payment methods and don't require full payment, in cash specifically, before any work has started. A hard insistence on cash-only, paid-in-full, before anyone shows up is a real red flag.
+
+### 2. No Verifiable Business Information
+If a "company" exists only as a phone number with no searchable business name, no reviews, and no way to confirm it's real, you're relying entirely on trust with nothing to verify it against. This alone isn't proof of a scam, but it removes your ability to check.
+
+### 3. Prices That Are Dramatically Below Market Rate
+A quote far below every other quote you've received can be a legitimate small operation with low overhead — or it can be bait, designed to get a foot in the door before pressuring you into unnecessary "upsells" once someone's in your home. Compare against [typical pricing](/blog/how-much-does-house-cleaning-cost) for your area and treat a dramatic outlier with extra scrutiny, not automatic excitement.
+
+### 4. High-Pressure Tactics to Book Immediately
+Real companies are generally fine with you taking time to compare options, check reviews, or think it over. Pressure to commit on the spot, especially paired with an unusually low price, is a common combination in actual scam patterns.
+
+### 5. Refusing to Answer Insurance or Background Check Questions
+A legitimate company answers these directly (see our [vetting checklist](/blog/how-to-vet-a-house-cleaner)). Evasiveness, deflection, or irritation at being asked is worth paying attention to.
+
+### 6. Unsolicited Door-to-Door or Cold-Call Offers With No Way to Verify Them
+A random knock or call offering cleaning services, with no referral and no way to independently verify the business, deserves more scrutiny than a company you found through a search, a review site, or a personal recommendation.
+
+## What to Do If Something Feels Off
+
+Trust the hesitation — you're not obligated to explain or justify declining. "I need to think about it" or "I'll call you back" are complete, sufficient answers, and a legitimate business won't push hard against them.
+
+## If You Think You've Been Scammed
+
+- Contact your bank or card issuer immediately if payment was involved, especially if paid by card (cash payments are harder to recover)
+- Report it to your local consumer protection office or the Better Business Bureau
+- Leave an honest, factual review to help others avoid the same situation
+
+## The Simple Version
+
+Nearly everything above comes down to one habit: verify before you pay, especially before you pay in full, in cash, under pressure. That single practice prevents almost every version of this problem.
+
+## Bottom Line
+
+Cleaning service scams are uncommon, and the patterns behind them are specific enough to spot easily once you know what to look for. [Get a free price estimate](/?service=home_residential) and compare it against real market rates before booking anyone.
+    `,
+  },
+  {
+    slug: 'leaving-instructions-for-your-cleaner',
+    title: "Can You Leave a Note Instead of Being Home for Your Cleaner?",
+    category: 'trust-safety',
+    categoryLabel: 'Trust & Safety',
+    date: '2026-10-28',
+    readTime: '5 min',
+    excerpt: "Yes — and for a lot of recurring clients, a clear note or message is actually a better communication method than a rushed conversation at the door. Here's how to do it well.",
+    content: `
+## Yes, This Is Completely Normal
+
+Plenty of regular cleaning clients aren't home during visits and communicate entirely through written instructions — a note, a text, or a shared document — rather than a conversation every time. It's not an inferior substitute for being present; for routine, established service, it's often more precise than a verbal recap given quickly at the door.
+
+## What Makes a Good Note or Set of Instructions
+
+- **Specific, not general** — "please focus extra time on the kids' bathroom this week" is more useful than "do a good job" (which they're already trying to do)
+- **Prioritized if time might be tight** — if something absolutely needs to happen, say so explicitly rather than assuming everything gets equal attention
+- **Anything temporarily different from normal** — a guest staying over, a room that's off-limits this visit, a pet behaving differently than usual
+- **Where to leave things** — if furniture was moved, items need to go back in a specific spot, or anything else about end-of-visit state matters to you
+
+## Ongoing vs. One-Time Instructions
+
+For recurring service, many clients keep a running, lightly-updated note (physical, in a shared digital doc, or through the company's own app if they have one) rather than writing a fresh note every single visit — updating it only when something changes from the usual routine.
+
+## Should You Still Communicate Verbally Sometimes?
+
+It's worth an occasional check-in, even brief — by phone, text, or in person on a day you happen to be home — just to confirm things are still going the way you want and give feedback directly rather than only ever through written notes. Written instructions work well for routine logistics; direct feedback works better for anything more nuanced, like adjusting overall priorities.
+
+## What If Something in the Note Didn't Get Done?
+
+Follow up the same way you'd follow up on anything else — directly and specifically (see our [etiquette guide](/blog/house-cleaning-etiquette-guide) for how to raise this well). A note not being followed isn't automatically a problem with the cleaner; sometimes it's a timing or clarity issue worth a quick clarifying message rather than an assumption.
+
+## Does This Work Better With Some Companies Than Others?
+
+Companies with consistent staff (the same person or team each visit) tend to work especially well with this approach, since the same person building familiarity with your notes and preferences over time needs less explicit detail with each visit than someone new encountering your home for the first time.
+
+## Bottom Line
+
+A clear note is a completely normal, often more precise way to communicate with a cleaner you're not home for — specific, prioritized, and updated when something changes is really all it takes. [Get a free price estimate](/?service=home_residential) to get started with a service.
+    `,
+  },
+  {
+    slug: 'solo-cleaner-vs-team-what-to-expect',
+    title: 'Solo Cleaner or a Team? What to Expect and How to Choose',
+    category: 'house-cleaning',
+    categoryLabel: 'House Cleaning',
+    date: '2026-10-28',
+    readTime: '5 min',
+    excerpt: "Some companies send one person, others send a team of two or three. Neither is better across the board — here's what actually differs, and how to think about which fits your situation.",
+    content: `
+## The Core Difference
+
+A solo cleaner typically works through your entire home alone, room by room, over a longer visit. A team divides the work — one person on bathrooms, another on kitchen and floors, for example — covering the same home in less total time, but with more than one person present at once.
+
+## What Differs in Practice
+
+### Time in Your Home
+A team typically finishes faster since work happens in parallel — a home that takes a solo cleaner 2–3 hours might take a two-person team 1–1.5 hours. If having someone in your home for a shorter window matters to you, teams have a real advantage here.
+
+### Consistency
+A solo cleaner who handles your home every visit tends to build deep familiarity with your specific preferences and layout over time. Teams can offer this too if the same team is consistently assigned, but there's more room for variation if team composition changes visit to visit — worth asking a company directly whether your team stays consistent.
+
+### Cost
+This varies by company and doesn't follow a strict rule — some companies price identically regardless of crew size, others charge somewhat more for a team given the faster turnaround and higher immediate staffing cost. Worth asking directly rather than assuming either way.
+
+### Comfort With Multiple People in Your Home
+Some people specifically prefer a single, familiar face over multiple new people being in their space at once — worth considering if you're not planning to be home during cleanings, since this affects how much access and trust you're extending at one time.
+
+## Questions Worth Asking When Booking
+
+- "Do you send one cleaner or a team?"
+- "If a team, is it the same people each visit, or does that vary?"
+- "Does crew size affect the price?"
+- "Roughly how long will the visit take either way?"
+
+## Is One Objectively Better?
+
+No — it genuinely depends on what matters more to you: a shorter window with more people present, or a longer visit with one consistent, familiar person. Both are completely standard ways companies structure their service, and most companies that offer one can tell you clearly what to expect.
+
+## Bottom Line
+
+Solo vs. team is a real tradeoff — time in your home vs. number of people in it — not a quality difference. Ask directly what a company offers and how consistent the assigned cleaner(s) will be. [Get a free price estimate](/?service=home_residential) to compare options.
+    `,
+  },
+  {
+    slug: 'how-to-clean-blinds-and-curtains',
+    title: 'How to Clean Blinds and Curtains Without Ruining Them',
+    category: 'house-cleaning',
+    categoryLabel: 'House Cleaning',
+    date: '2026-10-29',
+    readTime: '5 min',
+    excerpt: "Blinds and curtains collect more dust than almost anything else in a room, and they're also two of the easiest things to accidentally damage while cleaning. Here's how to do it right.",
+    content: `
+## Why These Get Skipped (and Why That's a Problem)
+
+Blinds and curtains aren't part of most people's weekly routine, which means dust has months, sometimes longer, to accumulate — and because they're often near windows, they also collect pollen and outdoor particles more than most surfaces in a room.
+
+## Cleaning Horizontal Blinds
+
+1. **Close them fully** so slats present a flat surface, then dust with a microfiber cloth or a blind-specific duster, working top to bottom
+2. **Flip and repeat on the other side** — don't skip this; the underside collects just as much dust
+3. **For heavier buildup**, wipe each slat with a damp microfiber cloth dampened with a mild soap solution, drying as you go to avoid water spots
+4. **For significant grime**, especially in a kitchen, take them down and soak in a bathtub with warm soapy water, then rinse and air dry
+
+## Cleaning Vertical Blinds
+
+Similar approach — dust first with a microfiber tool, then spot-clean individual panels with a damp cloth as needed. Vertical blind fabric panels (if yours are fabric rather than vinyl) may be removable for washing; check the specific attachment method before attempting this.
+
+## Cleaning Curtains
+
+- **Check the care label first** — this determines everything else, and skipping this step is the most common cause of curtain damage during cleaning
+- **Vacuum with an upholstery attachment** regularly between deeper cleanings to remove surface dust
+- **Machine-washable curtains**: wash on a gentle cycle with cold water, and consider air-drying rather than a hot dryer, which can cause shrinkage
+- **Dry-clean-only curtains**: don't attempt to wash these at home — the fabric or lining can be damaged in ways that aren't reversible
+- **Heavy or lined curtains** often do better with professional cleaning regardless of the label, given their weight and structure
+
+## How Often to Clean Blinds and Curtains
+
+- **Dusting**: monthly is a reasonable baseline, more often near a frequently-opened window or in a dusty environment
+- **Deep cleaning**: every **3–6 months** for blinds, and roughly **every 6–12 months** for curtains, depending on fabric and how much direct sun/dust exposure they get
+
+## What to Avoid
+
+- Harsh scrubbing on vinyl or faux-wood blinds, which can scratch or dull the finish
+- Washing dry-clean-only fabric curtains at home
+- Hanging curtains back up while still damp, which can lead to mildew if there's any lining or heavier fabric involved
+
+## Bottom Line
+
+Blinds and curtains need less frequent attention than most of a home, but they're also easy to damage with the wrong method — checking care labels and dusting regularly prevents most of what goes wrong. [Get a free price estimate](/?service=home_residential) if you'd rather have this (and the rest of your home) professionally handled.
+    `,
+  },
 ];
 
 export const CATEGORIES = [
