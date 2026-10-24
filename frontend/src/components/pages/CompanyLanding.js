@@ -391,8 +391,8 @@ export default function CompanyLanding() {
                   </div>
                   <ul style={{ listStyle: 'none', padding: 0, marginBottom: 24, textAlign: 'left' }}>
                     {PLAN_FEATURES.map(item => (
-                      <li key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 10, fontSize: 14, color: '#374151', lineHeight: 1.4 }}>
-                        <span style={{ width: 17, height: 17, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                      <li key={item} className="ce-plan-feature" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, color: '#374151' }}>
+                        <span className="ce-plan-feature-dot" style={{ borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
                           <Check size={10} color="#16a34a" strokeWidth={3} strokeLinecap="square" strokeLinejoin="miter" />
                         </span>
                         {item}
@@ -430,6 +430,12 @@ export default function CompanyLanding() {
         @media (min-width: 900px) {
           .ce-steps-grid { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; }
           .ce-step-arrow { display: flex; align-items: center; justify-content: center; color: #cbd5e1; }
+        }
+        .ce-plan-feature { margin-bottom: 10px; font-size: 14px; line-height: 1.4; }
+        .ce-plan-feature-dot { width: 17px; height: 17px; }
+        @media (max-width: 480px) {
+          .ce-plan-feature { margin-bottom: 6px; font-size: 13.5px; line-height: 1.3; }
+          .ce-plan-feature-dot { width: 15px; height: 15px; }
         }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
