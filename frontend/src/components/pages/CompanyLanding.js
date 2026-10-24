@@ -52,7 +52,7 @@ const PLAN_FEATURES = [
   'Email a result to a coworker in one click',
   'ZIP-code local market accurate pricing',
   'Per-service markup control',
-  'Calculator widget for your website for lead capture',
+  'Website calculator widget for lead capture',
   'Instant email lead alerts once it\'s on your site',
   'API access to connect to other tools you use',
 ];
