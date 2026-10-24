@@ -495,7 +495,13 @@ export default function CompanyDashboard({ user, onLogout }) {
         padding: isMobile ? '0 8px' : '0 24px', position: 'sticky', top: 0, zIndex: 100,
         borderBottom: '1px solid #1e293b',
         boxShadow: '0 1px 0 #1e293b, 0 4px 20px rgba(0,0,0,0.35)',
-        gap: isMobile ? 4 : 8,
+        // Logo-to-content gap -- the only separator between the "Clean
+        // Estimator" title and whatever sits first in the scrollable row
+        // (the Widget/Calculator switch), since they're direct flex
+        // siblings with nothing else between them. 24px matches this
+        // header's own 24px side padding instead of the cramped 8px it
+        // had before.
+        gap: isMobile ? 4 : 24,
       }}>
         {/* Left: logo + breadcrumb -- text dropped on mobile, same as
             Header.js's public nav, so the icon alone anchors this side. */}
