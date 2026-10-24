@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { RefreshCw, Inbox, Mail, Phone, X, Copy, Check, ExternalLink, Ban, Trash2, Plus } from 'lucide-react';
-import { getAdminWebsiteRequests, createAdminWebsiteRequest, patchAdminWebsiteRequest, cancelAdminWebsiteSubscription, deleteAdminWebsiteRequestForever } from '../../utils/api';
+import { getAdminWebsiteRequests, createAdminWebsiteRequest, patchAdminWebsiteRequest, deleteAdminWebsiteRequestForever } from '../../utils/api';
 import { formatDateTime } from '../../utils/formatters';
 import { useConfirm } from '../dashboard/ConfirmDialog';
 import { theme, cardStyle, inputStyle, labelStyle, secondaryBtnStyle, primaryBtnStyle, dangerBtnStyle, pill, avatarGradient, PageHeader } from './adminTheme';
@@ -40,10 +40,8 @@ export default function AdminWebsiteRequests({ adminKey }) {
   const [noteStatus, setNoteStatus] = useState('');
   const [savingSample, setSavingSample] = useState(false);
   const [cancelingSub, setCancelingSub] = useState(false);
+  const [markingActive, setMarkingActive] = useState(false);
   const [deletingReq, setDeletingReq] = useState(false);
-  const [subscriptionIdInput, setSubscriptionIdInput] = useState('');
-  const [linkingSub, setLinkingSub] = useState(false);
-  const [linkError, setLinkError] = useState('');
   // The list/detail split below used to render both panes side by side
   // unconditionally -- the detail panel's fixed 360px width left almost no
   // room for the list (or vice versa) on a phone, and nothing scrolled
@@ -90,8 +88,6 @@ export default function AdminWebsiteRequests({ adminKey }) {
       setNotes(selected.admin_notes || '');
       setSampleUrlInput(selected.sample_url || '');
       setNoteStatus('');
-      setSubscriptionIdInput('');
-      setLinkError('');
     }
   }, [selected?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -208,43 +204,47 @@ export default function AdminWebsiteRequests({ adminKey }) {
     }
   };
 
-  // Links the per-tier trial subscription (price depends on which of the 3
-  // plans this request selected) an admin created by hand in the Stripe
-  // Dashboard (see WEBSITE_TRIAL_DAYS/WEBSITE_TIER_PRICES in
-  // routes/admin.js) -- the backend verifies the id actually exists in
-  // Stripe and belongs to this request's customer before trusting it, so a
-  // typo or pasted-the-wrong-id mistake surfaces here instead of silently
-  // linking the wrong client.
-  const linkSubscription = async () => {
-    if (!selected || !subscriptionIdInput.trim()) return;
-    setLinkingSub(true);
-    setLinkError('');
+  // Marks the request active as a plain status label -- no Stripe call of
+  // any kind. The actual $X/mo trial subscription (60-day trial, correct
+  // tier price, their saved card) is created entirely by hand in the
+  // Stripe Dashboard, outside this app; this button only reflects that in
+  // the dashboard here. Deliberately does NOT send the "subscription
+  // confirmed" email -- that only fires when stripe_subscription_id gets
+  // set (see routes/admin.js's justBecameActive check), which this path
+  // never touches, so the email stays something the admin always sends by
+  // hand (e.g. from the Email Marketing tab) instead of auto-firing from
+  // a label change that doesn't guarantee a real subscription exists yet.
+  const markActive = async () => {
+    if (!selected) return;
+    setMarkingActive(true);
     try {
-      const res = await patchAdminWebsiteRequest(adminKey, selected.id, { stripe_subscription_id: subscriptionIdInput.trim() });
+      const res = await patchAdminWebsiteRequest(adminKey, selected.id, { status: 'active' });
       applyUpdate(selected.id, res.data);
-      setSubscriptionIdInput('');
     } catch (err) {
-      setLinkError(err.message || 'Failed to link subscription');
+      console.error('Failed to mark active:', err.message);
     } finally {
-      setLinkingSub(false);
+      setMarkingActive(false);
     }
   };
 
+  // Same plain-label approach as markActive above -- this does NOT cancel
+  // anything in Stripe. Billing must be stopped in the Stripe Dashboard
+  // separately; this only updates what this dashboard shows.
   const cancelSubscription = async () => {
     if (!selected) return;
     const ok = await confirm({
-      title: `Cancel ${selected.business}'s subscription?`,
-      message: "This cancels it in Stripe immediately -- they'll lose access to their site right away, and this can't be undone from here.",
-      confirmLabel: 'Cancel Subscription',
+      title: `Mark ${selected.business} as canceled?`,
+      message: "This only updates the label here -- it does NOT cancel their billing in Stripe. Cancel the subscription in the Stripe Dashboard yourself first (or right after), or they'll keep being charged.",
+      confirmLabel: 'Mark Canceled',
       danger: true,
     });
     if (!ok) return;
     setCancelingSub(true);
     try {
-      const res = await cancelAdminWebsiteSubscription(adminKey, selected.id);
+      const res = await patchAdminWebsiteRequest(adminKey, selected.id, { status: 'canceled' });
       applyUpdate(selected.id, res.data);
     } catch (err) {
-      console.error('Failed to cancel subscription:', err.message);
+      console.error('Failed to mark canceled:', err.message);
     } finally {
       setCancelingSub(false);
     }
@@ -501,33 +501,27 @@ export default function AdminWebsiteRequests({ adminKey }) {
                 </div>
               )}
 
-              {/* Shown once the $5 fee is paid but no subscription is linked
-                  yet -- the trial itself (price depends on their selected
-                  tier) is created by hand in the
-                  Stripe Dashboard (60-day trial, their saved card), then
-                  pasted in here to activate the client and notify them. */}
-              {selected.status === 'approved' && (
+              {/* Shown once the $5 fee is paid -- the trial subscription
+                  itself (price depends on their selected tier) is created
+                  entirely by hand in the Stripe Dashboard (60-day trial,
+                  correct tier price, their saved card). This button is
+                  just a label for this dashboard -- it doesn't talk to
+                  Stripe and doesn't send any email on its own; send the
+                  "subscription confirmed" email yourself once the real
+                  subscription exists. */}
+              {selected.status !== 'active' && (
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 11.5, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Link Subscription</div>
+                  <div style={{ fontWeight: 700, fontSize: 11.5, color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 7 }}>Activation</div>
                   <p style={{ fontSize: 11.5, color: theme.textMuted, margin: '0 0 8px', lineHeight: 1.5 }}>
-                    They requested the <strong>{tierOf(selected).name}</strong> plan (${tierOf(selected).price}/mo). Create their subscription in Stripe at that price (60-day trial, using their saved card), then paste the subscription ID here to activate and notify them.
+                    They requested the <strong>{tierOf(selected).name}</strong> plan (${tierOf(selected).price}/mo). Once you've created their subscription in Stripe yourself, mark it active here -- this only updates the label in this dashboard and doesn't email them.
                   </p>
-                  <div style={{ display: 'flex', gap: 7 }}>
-                    <input
-                      value={subscriptionIdInput}
-                      onChange={e => setSubscriptionIdInput(e.target.value)}
-                      placeholder="sub_..."
-                      style={{ ...inputStyle, flex: 1 }}
-                    />
-                    <button
-                      onClick={linkSubscription}
-                      disabled={linkingSub || !subscriptionIdInput.trim()}
-                      style={{ padding: '9px 14px', background: '#16a34a', color: 'white', border: 'none', borderRadius: theme.radiusSm, cursor: 'pointer', fontWeight: 700, fontSize: 12.5, opacity: (linkingSub || !subscriptionIdInput.trim()) ? 0.5 : 1, whiteSpace: 'nowrap' }}
-                    >
-                      {linkingSub ? 'Linking…' : 'Link & Activate'}
-                    </button>
-                  </div>
-                  {linkError && <p style={{ fontSize: 11.5, color: '#dc2626', margin: '6px 0 0' }}>{linkError}</p>}
+                  <button
+                    onClick={markActive}
+                    disabled={markingActive}
+                    style={{ width: '100%', padding: '9px 0', background: '#16a34a', color: 'white', border: 'none', borderRadius: theme.radiusSm, cursor: markingActive ? 'default' : 'pointer', fontWeight: 700, fontSize: 12.5, opacity: markingActive ? 0.6 : 1 }}
+                  >
+                    {markingActive ? 'Marking…' : 'Mark Active'}
+                  </button>
                 </div>
               )}
 
@@ -599,7 +593,7 @@ export default function AdminWebsiteRequests({ adminKey }) {
                     disabled={cancelingSub}
                     style={{ width: '100%', ...dangerBtnStyle, justifyContent: 'center', padding: '9px 0', opacity: cancelingSub ? 0.6 : 1, cursor: cancelingSub ? 'default' : 'pointer' }}
                   >
-                    <Ban size={13} /> {cancelingSub ? 'Canceling…' : 'Cancel Subscription'}
+                    <Ban size={13} /> {cancelingSub ? 'Marking…' : 'Mark Canceled'}
                   </button>
                 )}
                 {selected.status !== 'declined' && selected.status !== 'active' && selected.status !== 'canceled' && (
