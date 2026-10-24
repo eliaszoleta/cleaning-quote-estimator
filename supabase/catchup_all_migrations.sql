@@ -208,7 +208,14 @@ CREATE POLICY "anon_select_banner_events" ON partner_banner_events FOR SELECT US
 -- Impressions/calls per partner, read by AdminPartners.js. Views inherit the
 -- RLS of their underlying tables (already anon-readable above), so no
 -- separate policy is needed here.
-CREATE OR REPLACE VIEW partner_banner_stats AS
+-- Guarded with DROP VIEW first (not just CREATE OR REPLACE) -- this
+-- script replays the view's full history in order, and Postgres refuses
+-- "CREATE OR REPLACE VIEW" when it would drop a column that exists on
+-- the CURRENT live view (error 42P16). If the live DB is already at a
+-- later version of this view (more columns than this step defines),
+-- replacing in place fails; dropping first always works.
+DROP VIEW IF EXISTS partner_banner_stats;
+CREATE VIEW partner_banner_stats AS
 SELECT
   partner_id,
   COUNT(*) FILTER (WHERE event_type = 'impression') AS impressions,
@@ -266,7 +273,9 @@ CREATE POLICY "partners can read own banner events"
 -- the view owner's (effectively superuser, RLS-bypassing) permissions --
 -- without this, ANY logged-in partner could see every partner's numbers
 -- through this view even with the policies above in place.
-CREATE OR REPLACE VIEW partner_banner_stats
+-- DROP first, same reasoning as the 002 step above (42P16 guard).
+DROP VIEW IF EXISTS partner_banner_stats;
+CREATE VIEW partner_banner_stats
 WITH (security_invoker = true)
 AS
 SELECT
@@ -326,7 +335,11 @@ ALTER TABLE partner_banner_events ADD CONSTRAINT partner_banner_events_event_typ
 
 -- Recreate the stats view (still security_invoker, per 003_client_portal_rls.sql)
 -- with a `leads` column alongside impressions/calls.
-CREATE OR REPLACE VIEW partner_banner_stats
+-- DROP first, same reasoning as the two steps above (42P16 guard) --
+-- this is the final/current shape of the view, so after this point in
+-- the script it's just CREATE, not CREATE OR REPLACE.
+DROP VIEW IF EXISTS partner_banner_stats;
+CREATE VIEW partner_banner_stats
 WITH (security_invoker = true)
 AS
 SELECT
