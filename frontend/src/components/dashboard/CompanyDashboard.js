@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   LayoutDashboard, Paintbrush, SlidersHorizontal, Code2,
   UserPlus, Settings, Loader2, Check, LogOut, AlertCircle, Save, HelpCircle,
-  Globe, X, CalendarClock, Zap, ChevronDown,
+  Globe, X, Zap, ChevronDown,
 } from 'lucide-react';
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout, postCheckout, postPortal } from '../../utils/api';
@@ -31,8 +31,6 @@ const NAV = [
   { id: 'help',          Icon: HelpCircle,         label: 'Help & Docs' },
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
 ];
-
-const WALKTHROUGH_URL = '/book-a-call';
 
 // Shown instead of the dashboard whenever subStatus.active is false --
 // neither Widget Mode nor Calculator Mode render behind this. Account
@@ -115,8 +113,8 @@ function ActivationGate({ subStatus, onLogout }) {
 
 export default function CompanyDashboard({ user, onLogout }) {
   // The header below used to be a single fixed-height flex row with no
-  // responsive handling at all -- logo, mode switch, walkthrough link,
-  // badge, Save Changes, email, and Sign Out together run well past a
+  // responsive handling at all -- logo, mode switch, badge, Save Changes,
+  // email, and Sign Out together run well past a
   // phone's width, forcing the whole page into horizontal scroll just to
   // reach Sign Out. isMobile drops/shrinks the non-essential pieces below
   // so everything still fits in one row (same 768px breakpoint .dash-nav
@@ -139,21 +137,25 @@ export default function CompanyDashboard({ user, onLogout }) {
   // most common laptop resolution) and plenty of other everyday laptop/
   // half-maximized-window widths sit ABOVE the 768px isMobile cutoff but
   // still aren't wide enough for the full row (logo + mode switch +
-  // country + Schedule a Walkthrough + badge + Save + divider + email +
-  // Sign Out): measured in a real browser (header's rendered scrollWidth,
-  // Poppins, this exact copy including a representative email address),
-  // that combination needs ~1332px, so anything between 769px and ~1366px
-  // fell back to the "desktop has room to spare" assumption and silently
-  // pushed the whole page into horizontal scroll instead of just the
-  // header -- exactly what showed up at the recorded 1366x768 window.
+  // country + badge + Save + divider + email + Sign Out): measured in a
+  // real browser (header's rendered scrollWidth, Poppins, this exact copy
+  // including a representative email address, back when a Schedule a
+  // Walkthrough link also sat in this row), that combination needed
+  // ~1332px, so anything between 769px and ~1366px fell back to the
+  // "desktop has room to spare" assumption and silently pushed the whole
+  // page into horizontal scroll instead of just the header -- exactly
+  // what showed up at the recorded 1366x768 window. Removing the
+  // walkthrough link only shrinks the full-row width further, so these
+  // cutoffs stay safely conservative rather than becoming wrong.
   // isCompact drops the same secondary/promotional pieces isMobile
-  // already drops (Schedule a Walkthrough, the divider, the email) at a
-  // wider 1450px cutoff -- comfortably past 1366px, with headroom for a
+  // already drops (the divider, the email) at a wider 1450px cutoff --
+  // comfortably past 1366px, with headroom for a
   // longer email address or a browser's own chrome/scrollbar -- while
   // leaving everything isMobile shrinks to icon-only/abbreviated (Save,
   // Sign Out, country, mode-switch labels) untouched here: those stay
-  // full-size since removing the three biggest items (measured at ~970px
-  // for what's left) already buys back more than enough room for them.
+  // full-size since removing the divider and email already buys back more
+  // than enough room for them (more room than when this was originally
+  // measured with the walkthrough link also included in that removal).
   const compactQuery = () => window.matchMedia('(max-width: 1450px)');
   const [isCompact, setIsCompact] = useState(() => compactQuery().matches);
   useEffect(() => {
@@ -617,8 +619,8 @@ export default function CompanyDashboard({ user, onLogout }) {
             />
           </div>
 
-          {/* Right: badge, save, user -- Schedule a Walkthrough, the divider,
-              and the email address all drop under isCompact already (1450px,
+          {/* Right: badge, save, user -- the divider and the email address
+              both drop under isCompact already (1450px,
               see its own comment above), well before isMobile's narrower
               768px -- they're the biggest, least essential items (promotional/
               secondary, not needed to use the dashboard) so dropping them
@@ -628,26 +630,6 @@ export default function CompanyDashboard({ user, onLogout }) {
               shown right after a click); Save and Sign Out shrink to
               icon-only buttons, also only under isMobile. */}
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 10, flexShrink: 0 }}>
-          {!isCompact && (
-            <a
-              href={WALKTHROUGH_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pulse-cta"
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '6px 12px', borderRadius: 20,
-                border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.06)',
-                color: 'white', textDecoration: 'none', fontSize: 12.5, fontWeight: 600,
-                transition: 'background 0.15s, border-color 0.15s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; }}
-            >
-              <CalendarClock size={13} /> Schedule a Walkthrough
-            </a>
-          )}
-
           {subBadge && (
             <div style={{
               fontSize: 11.5, padding: '3px 10px', borderRadius: 20, fontWeight: 700,
