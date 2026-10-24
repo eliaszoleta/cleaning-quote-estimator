@@ -78,10 +78,10 @@ export default function WebsiteOfferBanner() {
     try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
   };
 
-  // Mobile hidden for now -- the small bottom-corner card was crowding an
-  // already busy mobile viewport; desktop (which has room for the roomy
-  // top-anchored version) keeps showing it.
-  if (!city || !visible || isMobile) return null;
+  // Mobile shows the same compact bottom-corner card FloatingPartnerBanner.js
+  // already uses for its own banner -- already mobile-sized/positioned below
+  // (isMobile branches throughout this component), so nothing else to add.
+  if (!city || !visible) return null;
 
   // Portal to document.body for the same reason as FloatingPartnerBanner --
   // Header's backdropFilter would otherwise anchor position:fixed to its
