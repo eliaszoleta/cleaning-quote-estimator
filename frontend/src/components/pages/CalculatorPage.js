@@ -118,7 +118,7 @@ export default function CalculatorPage() {
               shows (CleaningCalculator.js's internal condition covers
               siteLanding pages regardless of skipLeadCapture), so this page
               still doesn't need its own separate copy of it. */}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector gateLeadByPartner />
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector gateLeadByPartner showSignupCta />
         </div>
 
         <div style={{ marginTop: 48 }}>
