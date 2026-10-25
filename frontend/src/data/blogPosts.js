@@ -15967,6 +15967,50 @@ Growing past yourself as the business's only cleaner is less about hiring and mo
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'llc-vs-s-corp-cleaning-business',
+    title: 'LLC or S Corp for Your Cleaning Business? How to Decide',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-11-28',
+    readTime: '7 min',
+    excerpt: "This question usually shows up right when a cleaning business is actually taking off -- adding commercial contracts, bigger buildings, real revenue -- which is exactly when it's worth answering correctly.",
+    content: `
+## They're Not Actually Alternatives
+
+This is the part that trips up most owners first: LLC and S corp aren't two competing business structures you pick between. An LLC is a legal entity. S corp is a *tax election* you can apply on top of an LLC (or a corporation) -- it doesn't change your liability protection, your contracts, or how clients see your business at all. If you already [formed an LLC](/blog/llc-vs-sole-proprietorship-cleaning-business), the real question isn't "LLC or S corp" -- it's "should my existing LLC elect to be taxed as an S corp."
+
+## What Staying a Default LLC Means Tax-Wise
+
+By default, a single-member LLC is a "disregarded entity" -- all of its net profit flows to your personal return and is subject to self-employment tax (Social Security + Medicare, currently 15.3%) on top of regular income tax. It's simple: no payroll, no extra filings, just your profit taxed as self-employment income.
+
+## What Electing S-Corp Status Changes
+
+Once you elect S-corp tax treatment, you become a W-2 employee of your own business. You run payroll, pay yourself a salary, and only that salary is subject to employment tax -- the remaining profit gets paid out as a distribution, which isn't subject to self-employment tax at all. That gap is the entire reason owners consider it: real, legal tax savings, but only once the math actually works in your favor.
+
+## When It Actually Makes Financial Sense
+
+There's no universal cutoff, but a commonly cited rule of thumb is that S-corp election starts paying for itself somewhere in the **$40,000–$60,000+ net profit per year** range, after a reasonable salary is factored in. Below that, the added cost of payroll administration and a separate business tax return often eats up most or all of the self-employment tax savings -- making the switch a wash or even a net loss for a smaller operation.
+
+## The "Reasonable Salary" Requirement
+
+This is the part owners most often get wrong, and it's a real audit flag: the IRS requires you to pay yourself a "reasonable salary" for the work you actually do, based on what a similar role would pay in your market, *before* taking any distributions. Paying yourself a token salary and taking the rest as distributions specifically to dodge employment tax is the exact pattern the IRS looks for -- the savings only hold up if the salary number is defensible.
+
+## Why Scaling Into Commercial or Bigger Buildings Changes the Math
+
+This is usually the actual trigger for the question, not a coincidence. A cleaning business that's purely residential, one home at a time, often sits well under the threshold where S-corp status pays off. The moment you start [bidding commercial contracts](/blog/how-to-bid-commercial-cleaning-contracts) or taking on bigger buildings, net profit can climb past that breakeven point fairly quickly -- which is exactly when it's worth re-running the numbers, not before.
+
+## What It Actually Costs to Run as an S-Corp
+
+Budget for a payroll service (to run your own salary correctly), a separate business tax return (Form 1120-S) on top of your personal filing, and cleaner books than a sole-owner LLC typically needs -- which is also exactly why [keeping business and personal finances separated](/blog/separating-business-and-personal-finances-cleaning-business) stops being optional once you're here. These are real, recurring costs that have to be weighed against the self-employment tax savings, not just the savings number in isolation.
+
+## Bottom Line
+
+This is one of the few decisions in this business genuinely worth paying a CPA for a specific answer rather than guessing from a rule of thumb -- bring them your actual current net profit and a realistic growth projection, and let them run the real comparison for your numbers. See the [general LLC vs. sole proprietorship breakdown](/blog/llc-vs-sole-proprietorship-cleaning-business) if you haven't settled that first step yet, and [quarterly estimated taxes and deductions](/blog/cleaning-business-taxes-deductions-estimated-payments) for what else tends to catch owners off guard around this same part of running the business.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
