@@ -80,8 +80,8 @@ export default function CommercialStep({ value, onBack, onNext, primaryColor, co
       <StepSection label="Building type">
         <div className="calc-grid-size">
           {BUILDING_TYPES.map(t => (
-            <StepOptionCard key={t.id} selected={buildingType === t.id} onClick={() => setBuildingType(t.id)} primaryColor={primaryColor}>
-              <span style={{ fontWeight: 600, fontSize: 14, color: buildingType === t.id ? primaryColor : COLORS.ink }}>{t.label}</span>
+            <StepOptionCard key={t.id} selected={buildingType === t.id} onClick={() => setBuildingType(t.id)} primaryColor={primaryColor} compact>
+              <span style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.2, color: buildingType === t.id ? primaryColor : COLORS.ink }}>{t.label}</span>
             </StepOptionCard>
           ))}
         </div>

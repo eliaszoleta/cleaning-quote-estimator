@@ -37,12 +37,17 @@ export function StepChip({ selected, onClick, primaryColor, children }) {
 }
 
 // Two-line card (title + sub/desc), tinted background when selected.
-export function StepOptionCard({ selected, onClick, primaryColor, children }) {
+// `compact` trims padding for grids of short, single-line labels (e.g.
+// CommercialStep's building-type picker) where the default padding reads
+// as oversized once the label wraps to two lines on a narrow screen --
+// every other caller renders real title+description content and keeps
+// the roomier default.
+export function StepOptionCard({ selected, onClick, primaryColor, compact, children }) {
   return (
     <button
       onClick={onClick}
       style={{
-        padding: '12px 14px', borderRadius: RADIUS.md, textAlign: 'left', cursor: 'pointer',
+        padding: compact ? '8px 10px' : '12px 14px', borderRadius: RADIUS.md, textAlign: 'left', cursor: 'pointer',
         border: `2px solid ${selected ? primaryColor : COLORS.border}`,
         background: selected ? `${primaryColor}10` : COLORS.surface,
         transition: 'all 0.15s', width: '100%',
