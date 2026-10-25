@@ -16011,6 +16011,58 @@ This is one of the few decisions in this business genuinely worth paying a CPA f
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'client-wont-pay-collecting-unpaid-cleaning-invoice',
+    title: "A Client Won't Pay: What to Actually Do About an Unpaid Cleaning Invoice",
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-11-29',
+    readTime: '8 min',
+    excerpt: "Sourced from a real situation: a $1,400 move-out clean, 30 days unpaid, a client who's gone quiet. Here's the actual escalation path -- including where some of the advice that circulates in cleaning groups gets the law wrong.",
+    content: `
+## Document Everything Before You Do Anything Else
+
+Before any letter or filing, get your paper trail in order: the signed estimate or agreement showing the price the client agreed to, [before-and-after photos](/blog/job-completion-photos-dispute-protection) proving the work was done, and a dated record of every attempt you've made to collect (texts, emails, calls). None of what follows works well without this -- a demand letter, a lien claim, or a small-claims filing is only as strong as the proof behind it.
+
+## Step 1: A Real Written Demand Letter
+
+A demand letter needs to be specific, not just firm: the exact amount owed, the original due date, a new firm deadline (10–14 days is typical), and a plain statement of what happens if it's ignored (small claims filing, referral to collections). Send it a way you can prove was received -- email with a read confirmation, or certified mail with a return receipt -- not just a text that's easy to claim was never seen.
+
+## Can You Put a Lien on the Property? Usually No, for Ordinary Cleaning
+
+This comes up constantly in cleaning-business groups, and the advice is often wrong. A mechanic's or contractor's lien exists for work that *improves* real property -- construction, renovation, materials and labor that add value to the building. Case law in multiple states has specifically held that routine cleaning doesn't qualify: a Utah appeals court ruled directly on this point, finding that cleaning services (of any type) don't create lien rights, because cleaning isn't an "improvement" to the property. A few states define "improvement" more broadly -- Florida's statute, for example, can cover debris and waste removal tied to a construction project -- but a standard move-out or recurring residential clean almost never qualifies anywhere. Don't count on a lien as a backup plan without checking your specific state's lien statute first; for most cleaning businesses, it simply isn't an available tool.
+
+## Is "Theft of Services" Actually a Legal Claim Here?
+
+You'll sometimes see advice to tell a non-paying client they've "committed theft of services." Some states do have theft-of-services statutes that can apply when someone knowingly accepts a service with no intent to pay -- but that's a criminal matter for police or a prosecutor to pursue, not something your demand letter should assert as an established fact. An unpaid invoice is overwhelmingly treated as a civil debt dispute, not a crime, and overstating your legal position in writing can undermine your credibility if the dispute does end up in front of a judge.
+
+## Filing in Small Claims Court
+
+Small claims limits and filing fees vary a lot by state -- dollar caps commonly fall somewhere between about $2,500 and $25,000 depending on the state, and filing fees are typically modest (often well under $100, though a few states run higher). You generally don't need a lawyer, and the process is built to be navigable on your own. For a documented, reasonable invoice amount like the $1,400 example that prompted this, it's usually a realistic option.
+
+**The part most advice leaves out: winning the case doesn't collect the money for you.** A judgment just establishes legally that you're owed the debt -- actually collecting still means pursuing the person's bank account or wages through your state's specific enforcement process, which takes additional time, sometimes additional filings, and only works if they actually have reachable assets or income to collect from. Budget for that second step mentally before you file, not after you win.
+
+## When It's Worth Pursuing vs. Writing It Off
+
+Weigh your time, the filing fee, and the real odds of collecting against the amount owed. A documented $1,400 debt with a clear paper trail is usually worth pursuing. A $150 balance from a client who's already stopped responding may genuinely cost you more in time than it's worth to chase through court -- sometimes the right business decision is writing it off, blocking the client, and moving on.
+
+## What a State Attorney General Complaint Actually Does
+
+This isn't a formal payment-collection mechanism, but it's a real pressure tactic some owners have seen work -- a business or individual doesn't want a consumer-protection complaint on record with the state, and the mere mention of filing one has prompted fast payment in cases other cleaning business owners have reported. Don't rely on it as your only plan, but it's a reasonable step to combine with a demand letter, not a replacement for one.
+
+## Prevent This Next Time
+
+The real fix is upstream of all of this. A [deposit before scheduling a large or first-time job](/blog/how-to-get-cleaning-clients-to-pay-on-time) -- exactly the category a move-out clean falls into -- would have limited this exposure from the start, and collecting payment by card rather than relying on a check removes the "the check is in the mail" stall entirely.
+
+[Clean Estimator](/estimator) gives every client a clear, written price estimate before the job happens, so there's a documented record of what was agreed to if a payment dispute ever comes up later.
+
+## Bottom Line
+
+Document first, send a specific written demand, skip the lien and "theft" framing for ordinary cleaning work in most states, and go into small claims court understanding that winning the judgment is step one, not the finish line.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
