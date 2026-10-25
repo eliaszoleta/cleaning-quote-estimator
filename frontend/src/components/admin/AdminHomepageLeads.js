@@ -136,7 +136,12 @@ export default function AdminHomepageLeads({ adminKey }) {
       setOffset(loaded.length);
       setHasMore(!!res.hasMore);
       setTruncated(!!res.truncated);
-      setSelectedLead(prev => prev || (loaded.length > 0 ? loaded[0] : null));
+      // Desktop only -- auto-opening the latest lead on load pushes the
+      // list off-screen behind the detail panel on mobile, interrupting
+      // the view right after login.
+      if (!mobileQuery().matches) {
+        setSelectedLead(prev => prev || (loaded.length > 0 ? loaded[0] : null));
+      }
     } catch (err) {
       if (requestIdRef.current !== myRequestId) return;
       console.error('Error loading homepage leads:', err.message);
