@@ -518,12 +518,20 @@ export default function App() {
                 on-screen result converted better to a paid signup than the
                 lead-capture form -- reverted back to the normal flow
                 (name/email/phone form -> "check your email" -> estimate
-                email) before any conclusion was drawn. Those props (and the
-                UserTypeStep/showSignupCta machinery in CleaningCalculator.js
-                and ResultsScreen.js) are left in place, just unused, in case
-                this is worth testing again later. showCountrySelector is a
-                separate, still-wanted feature, not part of that test. */}
-            <CleaningCalculator showCountrySelector gateLeadByPartner />
+                email) before any conclusion was drawn. skipLeadCapture,
+                instantResults and askUserType are still unused (lead
+                capture is now gated per-visitor by gateLeadByPartner
+                instead), but showSignupCta came back with it (2026-10-25,
+                see partner-gated-lead-capture's CLAUDE.md entry): whenever
+                gateLeadByPartner drops a visitor to the instant on-screen
+                result (no partner in their area), ResultsScreen otherwise
+                falls back to a generic, dead-end "Contact Us" card linking
+                to "/" -- showSignupCta replaces that with the actual
+                "Own a cleaning business? Start Free Trial" promo, the
+                thing worth showing someone who isn't getting forwarded to
+                a partner anyway. showCountrySelector is unrelated to any
+                of this, a separate, still-wanted feature. */}
+            <CleaningCalculator showCountrySelector gateLeadByPartner showSignupCta />
             <SEOContent />
           </Suspense>
         </main>

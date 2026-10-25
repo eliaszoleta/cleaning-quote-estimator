@@ -110,7 +110,7 @@ export default function ServiceCalculatorPage({ slug }) {
           {/* See App.js's homepage instance for the full comment on the
               Oct 2026 instant-results conversion test, reverted back to the
               normal lead-capture flow here too. */}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 16} initialService={service.id} onShowResults={setShowingResults} showCountrySelector gateLeadByPartner />
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 16} initialService={service.id} onShowResults={setShowingResults} showCountrySelector gateLeadByPartner showSignupCta />
         </div>
 
         <div style={{ marginTop: 48 }}>
