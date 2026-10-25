@@ -73,7 +73,12 @@ export default function AdminWebsiteRequests({ adminKey }) {
       const res = await getAdminWebsiteRequests(key);
       const loaded = res.data || [];
       setRequests(loaded);
-      setSelected(prev => prev || (loaded.length > 0 ? loaded[0] : null));
+      // Desktop only -- auto-opening the latest item on load pushes the
+      // list off-screen behind the detail panel on mobile (see isMobile
+      // branch below), interrupting the view right after login.
+      if (!mobileQuery().matches) {
+        setSelected(prev => prev || (loaded.length > 0 ? loaded[0] : null));
+      }
     } catch (err) {
       console.error('Error loading website requests:', err.message);
     } finally {

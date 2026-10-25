@@ -58,7 +58,12 @@ export default function AdminChatbots({ adminKey }) {
       const res = await getAdminChatbots(key);
       const loaded = res.data || [];
       setChatbots(loaded);
-      setSelected(prev => prev || (loaded.length > 0 ? loaded[0] : null));
+      // Desktop only -- auto-opening the latest chatbot on load pushes the
+      // list off-screen behind the detail panel on mobile, interrupting
+      // the view right after login.
+      if (!mobileQuery().matches) {
+        setSelected(prev => prev || (loaded.length > 0 ? loaded[0] : null));
+      }
     } catch (err) {
       console.error('Error loading chatbots:', err.message);
     } finally {
