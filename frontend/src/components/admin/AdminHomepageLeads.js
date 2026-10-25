@@ -528,7 +528,12 @@ export default function AdminHomepageLeads({ adminKey }) {
                   <option value="last_month">Last month</option>
                 </select>
                 <select value={userTypeFilter} onChange={e => setUserTypeFilter(e.target.value)} style={selectStyle}>
-                  <option value="all">Homeowner & business</option>
+                  {/* Backend-side, "all" already means no user_type filter
+                      at all (see admin.js's homepage-leads handler) -- it
+                      was just mislabeled here as "Homeowner & business",
+                      which reads like it silently excludes the "none"
+                      (unspecified/older) bucket below when it never did. */}
+                  <option value="all">All types</option>
                   <option value="homeowner">Homeowner only</option>
                   <option value="business">Cleaning business only</option>
                   {/* Leads captured before this question existed on the
