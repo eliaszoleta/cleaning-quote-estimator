@@ -38,3 +38,17 @@ Standing rule from the user (2026-10-17): pricing (region multipliers, per-servi
 - **Anything else locale-specific** that would make a question, unit, or term inaccurate or confusing to a business or customer actually operating in that country, even if it wasn't explicitly listed here.
 
 If an audit finds something worth changing, apply the same rigor as the "Adding a new calculator scenario" rule above — research it, don't guess, and verify it doesn't regress any other country's output. If something is genuinely ambiguous or a judgment call (as the VAT-note decision was), it's fine to make the call and explain the reasoning, but flag it clearly rather than silently deciding. This is a standing checklist for every future country, not a one-off for Canada/UK.
+
+# Named reversible changes
+
+A log of named, self-contained changes the user may later ask to revert by name ("revert the X change") instead of by describing it again. Each entry is one commit per branch (or a short, deliberately exact list of commits) -- when asked to revert one, `git revert` those exact commits on both `claude/setup-quote-estimator-5p7Je` and `claude/website-indexing-audit-qf91rp` (same dual-branch push pattern as any other change here), don't reconstruct the change from memory or description.
+
+## partner-gated-lead-capture (2026-10-25)
+
+What it does: on the 4 public entry points (homepage `App.js`, `CalculatorPage.js`, `EstimatorPage.js`, `ServiceCalculatorPage.js`), the lead-capture form (name/email/phone) only shows if the visitor's geolocation matches an active partner -- no partner in their area drops straight to the old zero-friction instant-on-screen-estimate flow instead. New opt-in `gateLeadByPartner` prop on `CleaningCalculator.js`, wired only into those 4 pages. Also fixed a real pre-existing bug found while building this: the partner-forwarding lookup and `EstimateSentScreen`'s own partner card were using the raw `embedded` flag instead of `embedded && !siteLanding`, which meant partner-lead forwarding silently never worked on `/calculator`, `/estimator`, or `/services/:slug` -- only ever on the bare homepage.
+
+Commits:
+- `claude/setup-quote-estimator-5p7Je`: `251af8e` "Gate public lead capture on whether there's a partner to forward it to"
+- `claude/website-indexing-audit-qf91rp`: `be93a3e` (same commit, cherry-picked)
+
+To revert: `git revert 251af8e` on production, `git revert be93a3e` on sync (or cherry-pick one revert's content to the other, same as any other dual-branch change). This also un-fixes the embedded/siteLanding partner-lookup bug described above -- if the user only wants the gating undone but wants to keep that bug fix, say so explicitly rather than reverting wholesale.
