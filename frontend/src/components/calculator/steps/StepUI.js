@@ -41,7 +41,11 @@ export function StepChip({ selected, onClick, primaryColor, children }) {
 // CommercialStep's building-type picker) where the default padding reads
 // as oversized once the label wraps to two lines on a narrow screen --
 // every other caller renders real title+description content and keeps
-// the roomier default.
+// the roomier default. A fixed minHeight + vertical centering keeps every
+// card in a compact grid the same height regardless of whether its own
+// label happens to wrap to one line or two -- without it, a row mixing
+// short ("Gym / Fitness") and long ("Warehouse / Industrial") labels
+// produced visibly mismatched card heights next to each other.
 export function StepOptionCard({ selected, onClick, primaryColor, compact, children }) {
   return (
     <button
@@ -51,6 +55,7 @@ export function StepOptionCard({ selected, onClick, primaryColor, compact, child
         border: `2px solid ${selected ? primaryColor : COLORS.border}`,
         background: selected ? `${primaryColor}10` : COLORS.surface,
         transition: 'all 0.15s', width: '100%',
+        ...(compact ? { minHeight: 52, display: 'flex', alignItems: 'center' } : null),
       }}
     >
       {children}
