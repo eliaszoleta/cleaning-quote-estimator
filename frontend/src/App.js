@@ -523,7 +523,7 @@ export default function App() {
                 and ResultsScreen.js) are left in place, just unused, in case
                 this is worth testing again later. showCountrySelector is a
                 separate, still-wanted feature, not part of that test. */}
-            <CleaningCalculator showCountrySelector />
+            <CleaningCalculator showCountrySelector gateLeadByPartner />
             <SEOContent />
           </Suspense>
         </main>

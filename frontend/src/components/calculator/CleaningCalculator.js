@@ -95,7 +95,7 @@ function labelForStep(step) {
   return 'Details';
 }
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, showSignupCta = false, askUserType = false, showCountrySelector = false, cardRadius = null }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, showSignupCta = false, askUserType = false, showCountrySelector = false, cardRadius = null, gateLeadByPartner = false }) {
   const cardRef = useRef(null);
   // embedded=true normally means "flush, no card look" (a real third-party
   // host embed via EmbedWrapper.js, meant to blend into someone else's
@@ -182,6 +182,35 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // from their own Calculator Mode, not a stranger on the embedded widget.
   const [subscriptionPaused, setSubscriptionPaused] = useState(false);
 
+  // gateLeadByPartner (cleanestimator.com's own homepage + 3 siteLanding
+  // twins only, since Oct 2026's first real partner signup in Houston --
+  // see the "Bring back lead capture" commit) ties the lead-capture form to
+  // whether there's actually a partner to forward the lead to: a visitor
+  // outside any partner's coverage area gets zero contact-form friction
+  // (same as the old instant-results conversion test) instead of being
+  // asked for name/email/phone for a lead nobody can act on. Defaults to
+  // true (keep the normal lead-capture flow) until the lookup below
+  // resolves -- by the time a visitor reaches the one place this actually
+  // matters (handleDetailsNext, after picking a service AND submitting
+  // location AND filling in service details), this same-origin geo check +
+  // cached Supabase lookup has long since finished; true is also the safe
+  // side to default to if it somehow hasn't, since it just keeps asking,
+  // never silently drops a lead that should have reached a real partner.
+  const [hasAreaPartner, setHasAreaPartner] = useState(true);
+  useEffect(() => {
+    if (!gateLeadByPartner) return;
+    let cancelled = false;
+    getCachedPartnerMatch().then(partner => {
+      if (!cancelled) setHasAreaPartner(!!partner);
+    });
+    return () => { cancelled = true; };
+  }, [gateLeadByPartner]);
+  // True only when gateLeadByPartner is actually in effect AND the lookup
+  // above resolved to no coverage -- never true for a real company's
+  // embedded widget or RunEstimateTab.js (neither ever passes
+  // gateLeadByPartner), so this can't affect their own lead capture.
+  const noAreaPartner = gateLeadByPartner && !hasAreaPartner;
+
   // Skips the lead-capture step entirely when the company has it disabled
   // (ServicesTab.js's "Enable Lead Capture" toggle) or the caller forces it
   // off (skipLeadCapture -- originally only the dashboard's own "Run an
@@ -193,11 +222,14 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // name/email/phone form and only emailing the number. This does mean
   // those pages no longer feed AdminHomepageLeads.js or send the estimate
   // email -- a deliberate tradeoff for this test, not an oversight).
+  // Also off when gateLeadByPartner determined there's no partner in this
+  // visitor's area (noAreaPartner above) -- same zero-friction tradeoff,
+  // just decided per-visitor instead of sitewide.
   // Filtering `steps` itself here is what actually keeps the step
   // unreachable -- a previous version only filtered a separate, display-only
   // array used for the progress bar, so the real lead step still showed up
   // in normal navigation regardless of either toggle.
-  const enableLead = !skipLeadCapture && companyConfig?.enableLeadCapture !== false;
+  const enableLead = !skipLeadCapture && companyConfig?.enableLeadCapture !== false && !noAreaPartner;
   // askUserType (only ever paired with skipLeadCapture on the public
   // homepage/landing pages -- never on RunEstimateTab.js, where the viewer
   // is already a known business owner) swaps the old lead step for the
@@ -350,8 +382,17 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           // Same match ResultsScreen shows on-page (skipped when embedded,
           // same as ResultsScreen's own guard) -- forwarded so the estimate
           // email can include the same recommended-partner card, not a
-          // separate lookup.
-          const partnerMatch = embedded ? null : await getCachedPartnerMatch();
+          // separate lookup. `embedded && !siteLanding`, not bare `embedded`
+          // -- siteLanding's 3 pages (CalculatorPage/EstimatorPage/
+          // ServiceCalculatorPage) pass embedded=true purely for this
+          // component's CSS (see resolvedCardRadius's own comment), not
+          // because they're a real third-party host embed; ResultsScreen
+          // below already gets this same correction (embedded={embedded &&
+          // !siteLanding}) -- this was the one spot that didn't, which
+          // meant a real partner match (and the lead-forwarding email that
+          // depends on it) silently never happened for any visitor on those
+          // 3 pages, only ever on the bare homepage.
+          const partnerMatch = (embedded && !siteLanding) ? null : await getCachedPartnerMatch();
           return postCalculate({
             serviceType,
             zip: location.zip || null,
@@ -480,7 +521,12 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // actual lead-capture + estimate-email flow, the same as a real visitor
   // would on EmbedWrapper.js), so it behaves identically to the real embed
   // -- email only, no on-screen breakdown.
-  const showInstantResults = instantResults || !!demoPartner;
+  //
+  // noAreaPartner opts in too, for the same reason enableLead above turns
+  // off for it: with no lead step run at all, there's no email to send the
+  // breakdown in, so the on-screen result is the only place this visitor
+  // ever sees their number.
+  const showInstantResults = instantResults || !!demoPartner || noAreaPartner;
 
   if (currentStep === 'results' && result) {
     if (!showInstantResults) {
@@ -491,7 +537,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             email={leadInfo?.email}
             serviceType={serviceType}
             country={country}
-            embedded={embedded}
+            embedded={embedded && !siteLanding}
             onReset={handleReset}
           />
         </div>
