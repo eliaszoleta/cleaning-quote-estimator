@@ -1788,6 +1788,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/client-wont-pay-collecting-unpaid-cleaning-invoice</loc>
+    <lastmod>2026-11-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- UK/Canada/Australia pilot blogs (auto-generated from src/data/intl/) -->
   <url>
