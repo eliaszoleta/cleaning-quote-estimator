@@ -228,6 +228,20 @@ export default function AdminHomepageLeads({ adminKey }) {
 
   const selectStateFilter = (v) => { setStateFilter(v); setCityFilter('all'); };
 
+  // Plain "clear every filter" action -- distinct from switchView's reset,
+  // which also flips the Active/Trash tab and clears the current
+  // selection as a side effect of actually changing views. This only
+  // touches the filter/search inputs themselves.
+  const hasActiveFilters = !!search || filter !== 'all' || stateFilter !== 'all' || cityFilter !== 'all' || dateFilter !== 'all' || userTypeFilter !== 'all';
+  const resetFilters = () => {
+    setSearch('');
+    setFilter('all');
+    setStateFilter('all');
+    setCityFilter('all');
+    setDateFilter('all');
+    setUserTypeFilter('all');
+  };
+
   const switchView = (v) => { setView(v); setFilter('all'); setStateFilter('all'); setCityFilter('all'); setDateFilter('all'); setUserTypeFilter('all'); setSelectedLead(null); setSelectedIds(new Set()); };
 
   const userTypeLabel = (t) => t === 'homeowner' ? 'Homeowner' : t === 'business' ? 'Cleaning business' : null;
@@ -542,6 +556,13 @@ export default function AdminHomepageLeads({ adminKey }) {
                       instead of leaving them unreachable by any filter. */}
                   <option value="none">Not specified (older leads)</option>
                 </select>
+                <button
+                  onClick={resetFilters}
+                  disabled={!hasActiveFilters}
+                  style={{ ...secondaryBtnStyle, opacity: hasActiveFilters ? 1 : 0.5, cursor: hasActiveFilters ? 'pointer' : 'default' }}
+                >
+                  <X size={13} /> Reset filters
+                </button>
               </div>
             </div>
 
