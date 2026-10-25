@@ -110,7 +110,7 @@ export default function EstimatorPage() {
           {/* See App.js's homepage instance for the full comment on the
               Oct 2026 instant-results conversion test, reverted back to the
               normal lead-capture flow here too. */}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector />
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector gateLeadByPartner />
         </div>
 
         <div style={{ marginTop: 48 }}>
