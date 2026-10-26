@@ -16530,6 +16530,51 @@ There's no single right answer to "by area or by cleaner" -- they solve differen
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'how-to-price-cleaning-job-two-person-team-per-job-or-per-person',
+    title: 'How to Price a Cleaning Job With a Two-Person Team: Per Job, or Per Person?',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-12-11',
+    readTime: '6 min',
+    excerpt: "A real question from a sister-run two-person cleaning team: do you price a job as one flat number, or per person since there are two of you? The uncertainty is common enough to be the actual reason a lot of new team operations hesitate to start advertising at all.",
+    content: `
+## The Question That Quietly Stalls a Lot of New Teams
+
+Two people starting a cleaning business together -- sisters, friends, a couple -- run into this almost immediately, and it's genuinely confusing the first time: do you quote a job as a single flat price, or price it per person since there are two of you doing the work? Getting stuck on this is common enough that it's a real reason teams delay advertising at all, not just a minor detail to sort out later.
+
+## Price the Job, Not the Headcount
+
+The short answer: quote one flat price for the job, based on the scope of the work -- home size, bedrooms and bathrooms, condition, general vs. deep clean -- not on how many people show up to do it. A client is paying for a home cleaned to a certain standard, not for a specific number of bodies in the house, and pricing per head (effectively charging double just because two people came instead of one) is both unusual in the market and a hard thing to justify to a client comparing you against solo cleaners who'd charge a single rate for the same result.
+
+## Why This Is Actually Good News for a Two-Person Team
+
+Here's the part that makes a flat, scope-based price work in your favor rather than against it: two people working together typically finish the same job meaningfully faster than one -- real production-rate estimates put a two-person team at roughly **800-1,000 sq ft per hour combined**, against roughly **500 sq ft per hour for a solo cleaner**. That's not twice as fast (two people in the same rooms hit diminishing returns), but it's a real, meaningful speed advantage. Pricing by the job instead of by the hour means that speed advantage becomes extra bookable time in your day, not a reason to charge the client less for getting done faster.
+
+## How to Actually Build the Flat Price
+
+Quote the client one number, but build that number from your real crew cost, not a guess:
+
+1. **Start with a loaded hourly cost per person** -- wages plus payroll taxes, insurance, supplies, and vehicle/overhead, commonly landing around **$25-$40 per person per hour** for an employee on a two-person crew.
+2. **Estimate the job's total crew-hours** using your team's real production rate (the 800-1,000 sq ft/hour combined figure above as a starting point -- calibrate it against your own first several jobs, since every team's actual pace differs).
+3. **Multiply loaded cost × crew-hours × a markup** to cover margin, the risk that a job runs longer than estimated, and client acquisition cost -- a commonly used multiplier is around **1.4x**, though your own margin targets may differ.
+4. **Check the floor before you quote it.** Divide your flat price by the crew-hours you estimated -- if that number is below your fully loaded hourly cost, you're paying to do the job, not profiting from it.
+
+## General vs. Deep Clean, and Everything Else That Changes the Number
+
+Knowing general cleans run less than deep cleans, as the original question already did, is the right instinct -- condition, cleaning type, square footage, and bedroom/bathroom count are the real scope drivers the flat price should scale with. [How to build that full estimate formula -- the actual math behind turning scope into a number](/blog/how-to-calculate-cleaning-job-estimate) -- is worth working through once, so every future quote comes from the same consistent formula instead of being re-guessed job by job. This is the same scope-based model [Clean Estimator's own calculator](/estimator) uses -- price by home size, bedrooms, bathrooms, and condition, not by how many cleaners are on the job -- so plugging a job's details in gives a consistent, defensible number to quote from on day one, before you've built your own pricing table from scratch.
+
+## One Caveat If You're Paying Yourselves Per Job
+
+Pricing the client flat is one question; paying the two of you is a separate one. If you split a flat job price evenly after the fact, double-check the math still clears minimum wage for the actual hours each of you worked -- a job priced and timed well should clear that easily, but it's worth confirming rather than assuming, especially if you're also counting yourselves as employees for compliance purposes.
+
+## Bottom Line
+
+Quote the job, not the headcount -- one flat price based on scope, built from your real crew cost and production rate, not doubled just because two people are doing the work. The two-person speed advantage is real, but it shows up as more jobs fitting into your week, not as a reason to charge per person.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
