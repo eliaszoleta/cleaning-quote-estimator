@@ -19,7 +19,8 @@ function getStripe() {
 router.get('/status', async (req, res) => {
   try {
     // Seed matches company.js's GET /:id exactly (companyName/phone/website
-    // from the signup metadata) -- these two routes both hit
+    // from the signup metadata, email from the Auth user itself) -- these
+    // two routes both hit
     // getOrCreateCompanyConfig on a brand-new account's very first dashboard
     // load, in parallel, with no ordering guarantee (see the comment on
     // getOrCreateCompanyConfig itself). Each one still does its own
@@ -33,6 +34,7 @@ router.get('/status', async (req, res) => {
       companyName: req.user.metadata?.company_name,
       phone: req.user.metadata?.phone,
       website: req.user.metadata?.website,
+      email: req.user.email,
     });
     // Deliberately does NOT send the welcome email here -- see the matching
     // comment in company.js's GET /:id. This route's own `created` flag

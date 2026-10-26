@@ -174,6 +174,15 @@ async function getOrCreateCompanyConfig(companyId, seed = {}) {
       companyName: seed.companyName || DEFAULT_COMPANY_CONFIG.companyName,
       phone: seed.phone || DEFAULT_COMPANY_CONFIG.phone,
       website: seed.website || DEFAULT_COMPANY_CONFIG.website,
+      // Pre-fills the Branding tab's "Results Page Call-to-Action" fields
+      // with the same phone/email the owner already typed in at signup --
+      // a real starting value instead of a blank field they'd otherwise
+      // have to notice and fill in themselves before it ever reaches a
+      // visitor. Only happens here, in the brand-new-account branch, so an
+      // existing company's own edited ctaPhone/ctaEmail (including a
+      // deliberate blank) is never overwritten later.
+      ctaPhone: seed.phone || DEFAULT_COMPANY_CONFIG.ctaPhone,
+      ctaEmail: seed.email || DEFAULT_COMPANY_CONFIG.ctaEmail,
     };
     await saveCompanyConfig(companyId, config);
     return { config, created };
