@@ -16259,6 +16259,61 @@ A client's new eczema lining up with your visits is worth taking seriously, but 
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'paying-training-mileage-growing-cleaning-business-questions',
+    title: 'Equipment Pay, Meeting Pay, Mileage, and Training: What a Growing Cleaning Business Actually Owes Its Crew',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-12-04',
+    readTime: '8 min',
+    excerpt: "A real set of questions from a 5-6-month-old, family-run cleaning business with 34 recurring clients and 3 small commercial accounts: do you pay for equipment cleaning, team meetings, and mileage, and what's actually required by law versus just a good idea?",
+    content: `
+## The Questions Every Growing Cleaning Business Hits Around Month Five or Six
+
+A cleaning business with 34 recurring residential clients and 3 small commercial accounts, five to six months in, run by a husband-wife-and-sister-in-law team -- that's a real, specific stage: past the solo-operator phase, now managing a small crew, and running into the questions that only come up once you have employees instead of just yourself. Two of these are legal compliance questions with a real right answer, not just a style preference -- worth getting right from the start rather than fixing later.
+
+## 1. Do You Pay Cleaners to Clean Their Own Equipment?
+
+Generally, yes, and this isn't optional once equipment maintenance is a required part of the job. Under the Fair Labor Standards Act, time spent on a task that's regular, required, and reasonably trackable counts as compensable work time -- the Department of Labor has specifically addressed this for required equipment upkeep (a 2026 opinion letter found pre-shift equipment preparation compensable for a comparable hourly-worker scenario). If you require a cleaner to maintain their vacuum, mop heads, or other equipment as part of the job, that time has to be on the clock, whether it happens at the start of a shift, the end, or at home.
+
+## 2. Are Team Meetings Paid, and When Do You Start Holding Them?
+
+Paid, in virtually every real-world version of this. Mandatory meetings only escape being compensable time if **all four** conditions of 29 CFR 785.27 are met: attendance is outside regular working hours, attendance is genuinely voluntary, the meeting isn't job-related, and no productive work happens during it. A required team meeting to go over schedules, client feedback, or technique fails at least two of those four almost by definition -- so plan to pay for it. As for when to start: there's no legal trigger, but the practical one is whenever coordination problems start costing you more than the meeting does -- for most businesses that's somewhere around the point you cross from one crew to two, or from entirely word-of-mouth scheduling to needing everyone aligned on the same week's changes. A short, regular cadence (even 15-20 minutes, weekly or biweekly) beats a long, rare one for actually changing behavior day to day.
+
+## 3. Incentive Programs Worth Running
+
+A few patterns that hold up across cleaning-industry sources, rather than one gimmick:
+- **Referral bonuses split in two parts** -- a smaller amount at hire, the larger piece at a 60-90 day mark. Paying it all upfront rewards volume; splitting it rewards referring someone who actually sticks.
+- **Tie bonuses to things you're already measuring**, not a new system on top -- quality/inspection scores, attendance, and client retention are the three a lot of cleaning businesses land on, since all three are already worth tracking for other reasons.
+- **Client-loyalty-linked bonuses** -- a payout to the cleaner when a client hits a retention milestone (a 6th cleaning, a 3-month anniversary) ties the incentive to the outcome you actually want: happy, long-term clients, not just more clients.
+- **Keep any bonus framed as discretionary unless you intend to guarantee it.** A bonus program that reads like a guaranteed entitlement, paid inconsistently, is a common source of wage disputes -- be explicit in writing about whether it's guaranteed or discretionary, and apply it consistently either way.
+
+## 4. Building a Real Training System
+
+At 34+ clients and a small crew, "I'll just show them" stops scaling. A system that holds up as you add people:
+- **A written checklist per service tier** (standard, deep, move-in/move-out) that spells out exactly what's included -- this is also what keeps [quality consistent once you're not the one checking every job yourself](/blog/how-to-quality-check-cleans-when-youre-not-on-site).
+- **Shadow, then solo, then spot-check** -- a new cleaner shadows an experienced one for a set number of jobs, then runs solo jobs that get checked (photos, or an in-person spot check) for a probation window before being fully independent.
+- **A short video library** of your actual standard for the trickier tasks (stove interiors, grout, the exact fold/stage for move-outs) -- cheap to build once, reusable for every new hire after, and removes "how exactly do you want this done" as a judgment call.
+
+## 5. Is 34 Recurring Clients + 3 Commercial Accounts at 5-6 Months Good Progress?
+
+That's a genuinely solid pace for a family-run operation at this stage -- enough recurring volume to justify exactly the next-stage questions being asked here (paid meetings, formal training, incentive structure), without yet being so large that informal, relationship-based management stops working. The commercial accounts specifically are worth protecting and growing deliberately: [commercial clients are generally stickier and higher-value per account than residential](/blog/residential-vs-commercial-cleaning-which-to-specialize-in) once you have the operational systems above in place to service them reliably.
+
+## 6. Mileage for W2 Employees
+
+Two separate questions live inside this one -- what's legally required, and what's smart practice:
+
+- **Home-to-first-job commuting is not compensable and not something you're required to reimburse** -- that's true even for a cleaner who drives to a different client's home every day; "ordinary commute" doesn't become paid time just because the destination changes daily.
+- **Travel between job sites during the workday is compensable time and should be mileage-reimbursed.** Once a cleaner leaves job site A for job site B, that drive time counts as hours worked under federal law (29 CFR 785.38), and reimbursing the mileage on top is standard practice, not just generosity.
+- **The IRS standard mileage rate for 2026 is 72.5 cents per mile** -- reimbursing at or below that rate is simple to administer and isn't taxable income to the employee; paying nothing at all for job-to-job mileage is legal only if it never drags a cleaner's effective hourly pay below minimum wage once gas and vehicle wear are factored in (the FLSA's "kickback" rule) -- which for a cleaner driving between several homes a day, it usually does. In practice, most cleaning businesses track job-to-job mileage and reimburse it at or near the IRS rate rather than risk that math.
+
+## Bottom Line
+
+Two of these six questions aren't really judgment calls -- equipment-maintenance time and mandatory meeting time are compensable under federal law in virtually every real scenario, and job-to-job mileage during the workday is both paid time and (practically) reimbursable, while the home-to-first-job commute isn't either. The other three -- incentives, training systems, and how fast you're growing -- are where the actual judgment calls live, and a 5-6-month-old business already asking these questions is in good shape to build the systems before they become painful to retrofit.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
