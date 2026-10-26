@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, CalendarDays, DollarSign, Inbox, SlidersHorizontal, Code2, CreditCard, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
+import { UserPlus, CalendarDays, DollarSign, Inbox, SlidersHorizontal, Code2, HelpCircle, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
 import CountryFlag from '../CountryFlag';
 import { getCompanyLeads, getCompanyEstimateRuns } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
@@ -119,7 +119,7 @@ export default function OverviewTab({ config, user }) {
     { label: 'Services & Pricing', href: '?tab=services',      Icon: SlidersHorizontal },
     { label: 'Branding & Embed Code', href: '?tab=branding',   Icon: Code2       },
     { label: 'View All Leads',     href: '?tab=leads',         Icon: UserPlus    },
-    { label: 'Manage Billing',     href: '?tab=settings&section=subscription',  Icon: CreditCard  },
+    { label: 'Help & Docs',        href: '?tab=help',                           Icon: HelpCircle  },
   ];
 
   return (
