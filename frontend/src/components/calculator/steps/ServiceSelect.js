@@ -5,6 +5,10 @@ import { COLORS, RADIUS } from '../../../styles/theme';
 const TILE_MIN = 260;
 const TILE_MAX = 300;
 const GRID_GAP = 10;
+// Matches the wide/public grid's own long-standing minmax(195px, 1fr) tile
+// width -- used below to work out how many of ITS tracks a wide embed can
+// fit, the same way TILE_MIN is used for the narrow embed's fixed tiles.
+const WIDE_TILE_MIN = 195;
 
 // Picks a column count (1..maxCols) that lays the n cards out closest to a
 // square block, rather than always maximizing columns just because the
@@ -139,8 +143,11 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   // Branding tab's live preview -- and both are comfortably wide, predictable
   // surfaces, not odd-width embeds. Forcing the narrow-embed tile math on
   // them anyway picked only 2 columns at ~700px wide, fewer than the public
-  // site's plain auto-fill grid manages in less space. Past this width, just
-  // use the same dense grid the public site uses instead of the squared one.
+  // site's plain auto-fill grid manages in less space. Past this width, use
+  // the wide grid's own tile math instead (wideGridCols below) rather than
+  // the fixed, wider tiles -- but it still gets squared, not left as plain
+  // unbounded auto-fill (see wideGridCols' own comment for why that part
+  // changed 2026-10-26).
   const WIDE_EMBED_MIN_WIDTH = 500;
   const useSquaredGrid = embedded && !(gridWidth > 0 && gridWidth >= WIDE_EMBED_MIN_WIDTH);
 
@@ -163,6 +170,39 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
   const contentMaxWidth = gridCols && gridWidth > 0
     ? Math.min(gridCols * TILE_MAX + (gridCols - 1) * GRID_GAP, gridWidth)
     : undefined;
+
+  // 2026-10-26 fix -- a real company widget wider than WIDE_EMBED_MIN_WIDTH
+  // (very common: most host sites give an embedded widget more than 500px)
+  // fell all the way through to the plain, unbounded 'auto-fill' grid below,
+  // which has no idea how many services are actually enabled -- disabling a
+  // handful down to 2-4 left large empty cells sitting right next to the
+  // remaining cards, reported directly as "a vacant space is left inside
+  // the container... looks awful." auto-fill's own natural column count at
+  // this width (naturalWideCols) gets run through the SAME pickSquareColumns
+  // used for the narrow case, just against the wide grid's own 195px tiles
+  // instead of the narrow grid's wider fixed ones -- so a full 12-service
+  // list (RunEstimateTab.js, BrandingTab's live preview, or a real embed
+  // that enables everything) still lands on the same natural column count
+  // as before (12 divides cleanly, so pickSquareColumns just confirms it),
+  // while a reduced list collapses to fewer, fuller columns instead of
+  // leaving gaps. Only computed when NOT using the narrow squared grid --
+  // the two are mutually exclusive branches of the same `embedded` case.
+  const naturalWideCols = embedded && !useSquaredGrid && gridWidth > 0
+    ? Math.max(1, Math.floor((gridWidth + GRID_GAP) / (WIDE_TILE_MIN + GRID_GAP)))
+    : null;
+  const wideGridCols = naturalWideCols ? pickSquareColumns(Math.max(visibleServices.length, 1), naturalWideCols) : null;
+
+  // Whichever branch is actually rendering (mirrors gridTemplateColumns
+  // below exactly, mobile's forced 2 columns included) -- used to center a
+  // single leftover card alone in the last row instead of leaving it flush
+  // left with an empty cell beside it (the one gap pickSquareColumns can't
+  // avoid outright when the enabled count simply doesn't divide evenly into
+  // any reasonable column count, e.g. 3 services in 2 columns). Only
+  // relevant for the embedded cases -- the public site's plain multi-row
+  // grid (always all 12 services) is untouched.
+  const effectiveCols = !embedded ? null : isMobile ? 2 : (useSquaredGrid ? gridCols : wideGridCols);
+  const lastRowCount = effectiveCols ? visibleServices.length % effectiveCols : 0;
+  const isLastCardAlone = effectiveCols && visibleServices.length > effectiveCols && lastRowCount === 1;
 
   return (
     <div ref={wrapRef}>
@@ -220,9 +260,16 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
         // gridCols is measured (a brief instant on first mount), 'auto-fit'
         // is a reasonable placeholder since it can only ever be too
         // conservative for that one frame, never wrong in a visible way.
+        //
+        // The wide/non-squared embedded branch now uses wideGridCols (see
+        // its own comment) instead of a bare 'auto-fill' -- same reasoning
+        // as gridCols above, just against the wide grid's own 195px tiles.
+        // isMobile and the public (non-embedded) site are both untouched.
         gridTemplateColumns: isMobile
           ? 'repeat(2, 1fr)'
-          : useSquaredGrid ? `repeat(${gridCols || 'auto-fit'}, minmax(${TILE_MIN}px, ${TILE_MAX}px))` : 'repeat(auto-fill, minmax(195px, 1fr))',
+          : useSquaredGrid ? `repeat(${gridCols || 'auto-fit'}, minmax(${TILE_MIN}px, ${TILE_MAX}px))`
+          : embedded ? `repeat(${wideGridCols || 'auto-fill'}, minmax(${WIDE_TILE_MIN}px, 1fr))`
+          : 'repeat(auto-fill, minmax(195px, 1fr))',
         gap: isMobile ? 8 : 10,
       }}>
         {visibleServices.map(({ id, Icon, label, desc, color, bg, popular }, i) => (
@@ -239,7 +286,17 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
               textAlign: 'left',
               transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s',
               display: 'block',
-              width: '100%',
+              // A single card left alone in the last row (isLastCardAlone,
+              // see its own comment above) spans the full row instead of
+              // sitting flush left with an empty cell beside it, and caps
+              // its own width + centers so it still reads as one normal
+              // card, not a stretched one -- this is what actually closes
+              // the one gap pickSquareColumns can't avoid by column count
+              // alone (an enabled count that doesn't divide evenly into any
+              // reasonable number of columns, e.g. 3 services in 2 columns).
+              ...(isLastCardAlone && i === visibleServices.length - 1
+                ? { gridColumn: '1 / -1', maxWidth: useSquaredGrid ? TILE_MAX : 320, margin: '0 auto', width: '100%' }
+                : { width: '100%' }),
               boxShadow: '0 1px 2px rgba(15,23,42,0.03)',
               animation: 'cc-card-in 0.35s ease backwards',
               animationDelay: `${i * 35}ms`,
