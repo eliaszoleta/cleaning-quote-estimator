@@ -1860,6 +1860,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/how-to-price-cleaning-job-two-person-team-per-job-or-per-person</loc>
+    <lastmod>2026-12-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- UK/Canada/Australia pilot blogs (auto-generated from src/data/intl/) -->
   <url>
