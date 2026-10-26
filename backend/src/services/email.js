@@ -146,48 +146,6 @@ function fmtAdjustment(adj, symbol = '$') {
   return `${fmtMoney(adj.low, symbol)} – ${fmtMoney(adj.high, symbol)}`;
 }
 
-// Collapses each adjustment's {low, high} range to a single midpoint
-// value, for the "every line shows one number, and they add up to the
-// total" email style (as opposed to buildBreakdownRows/fmtAdjustment's
-// range style, still used nowhere now but kept for anything that
-// reintroduces a range view later).
-//
-// Rounding each row's (low+high)/2 independently can drift the SUM of
-// those rounded rows by ±1 (or more, with enough rows) away from
-// targetMid, even though the exact/unrounded row midpoints always sum to
-// exactly (totalLow+totalHigh)/2 -- the classic "sum of rounded parts !=
-// rounded whole" problem. Fixed the same way cleaningCalculation.js's own
-// reconcileAdjustments() already fixes the equivalent drift for low/high:
-// the last included (non-`separate`) row absorbs whatever the remaining
-// rounding difference is, so the displayed rows always sum to exactly
-// targetMid (normally result.suggestedPrice) -- never off by a dollar.
-function toMidpointRows(adjustments, targetMid) {
-  const rows = adjustments.map(a => ({ ...a, mid: Math.round((a.low + a.high) / 2) }));
-  const includedIdx = [];
-  rows.forEach((a, i) => { if (!a.separate) includedIdx.push(i); });
-  if (includedIdx.length && targetMid != null) {
-    const sum = includedIdx.reduce((s, i) => s + rows[i].mid, 0);
-    const diff = targetMid - sum;
-    if (diff !== 0) {
-      // Prefer a row that isn't a $0/$0 "Included" line to absorb the
-      // remainder, so a genuinely-free line item never silently turns into
-      // a nonzero figure while fmtAdjustmentMid still labels it "Included"
-      // (it checks the original low/high, not mid). Falls back to the
-      // last included row if every row happens to be $0/$0.
-      const nonZero = includedIdx.filter(i => !(rows[i].low === 0 && rows[i].high === 0));
-      const target = nonZero.length ? nonZero[nonZero.length - 1] : includedIdx[includedIdx.length - 1];
-      rows[target].mid += diff;
-    }
-  }
-  return rows;
-}
-
-function fmtAdjustmentMid(adj, symbol = '$') {
-  if (adj.low === 0 && adj.high === 0) return 'Included';
-  if (adj.mid < 0) return `−${fmtMoney(Math.abs(adj.mid), symbol)}`;
-  return fmtMoney(adj.mid, symbol);
-}
-
 // Mirrors ResultsScreen's own "Price breakdown" table -- same rows,
 // same total, so the email matches what was actually shown on-screen
 // instead of just repeating the headline range. Used by the internal
@@ -219,35 +177,6 @@ function buildEstimateBreakdownRows(adjustments, symbol = '$') {
       <tr style="background:${i % 2 === 0 ? '#ffffff' : '#fafafa'};">
         <td style="padding:10px 12px;color:#333333;font-size:13.5px;text-transform:capitalize;${i < rows.length - 1 ? 'border-bottom:1px solid #e0e0e0;' : ''}">${a.label}</td>
         <td style="padding:10px 12px;text-align:right;font-size:13.5px;color:#333333;white-space:nowrap;${i < rows.length - 1 ? 'border-bottom:1px solid #e0e0e0;' : ''}">${fmtAdjustment(a, symbol)}</td>
-      </tr>`)
-    .join('');
-}
-
-// Single-number (midpoint) versions of buildBreakdownRows/
-// buildEstimateBreakdownRows above, for the customer estimate email
-// (sendEstimateEmail) and the internal lead-alert email (sendCompanyLeadEmail)
-// -- both now show one total (result.suggestedPrice) instead of a low–high
-// range, so their line items show one number each too, reconciled via
-// toMidpointRows() to sum to exactly that total. sendPartnerLeadEmail keeps
-// the original range-based rows/total untouched.
-function buildBreakdownRowsMid(adjustments, targetMid, symbol = '$') {
-  return toMidpointRows(adjustments, targetMid)
-    .filter(a => !a.separate)
-    .map(a => `
-      <tr>
-        <td style="padding:5px 0;color:#333333;font-size:14px;text-transform:capitalize;">${a.label}</td>
-        <td style="padding:5px 0;text-align:right;font-size:14px;color:#333333;white-space:nowrap;">${fmtAdjustmentMid(a, symbol)}</td>
-      </tr>`)
-    .join('');
-}
-
-function buildEstimateBreakdownRowsMid(adjustments, targetMid, symbol = '$') {
-  const rows = toMidpointRows(adjustments, targetMid).filter(a => !a.separate);
-  return rows
-    .map((a, i) => `
-      <tr style="background:${i % 2 === 0 ? '#ffffff' : '#fafafa'};">
-        <td style="padding:10px 12px;color:#333333;font-size:13.5px;text-transform:capitalize;${i < rows.length - 1 ? 'border-bottom:1px solid #e0e0e0;' : ''}">${a.label}</td>
-        <td style="padding:10px 12px;text-align:right;font-size:13.5px;color:#333333;white-space:nowrap;${i < rows.length - 1 ? 'border-bottom:1px solid #e0e0e0;' : ''}">${fmtAdjustmentMid(a, symbol)}</td>
       </tr>`)
     .join('');
 }
@@ -316,35 +245,27 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
     adjustments = [], recurringAnnualSavings, currencySymbol = '$', country,
   } = result;
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
-  // Single-midpoint formatting is ONLY for a real visitor on a company's
-  // actual embedded widget (pasted on the subscriber's own site) -- that's
-  // the one surface explicitly scoped to show just one number. Every other
-  // customer-estimate-email path keeps the original low–high range + a
-  // separate "Midpoint Price" line, same as Calculator Mode's own
-  // on-screen breakdown:
-  //  - the free public calculator (cleanestimator.com's own homepage/
-  //    state/city pages) -- a different product, no subscriber behind it.
-  //  - RunEstimateTab's "Email to Coworker" share (estimateShare.js) --
-  //    even though it's a real subscriber's own account, this is an
-  //    internal pricing tool: the whole point is seeing the range so they
-  //    can decide whether to lean lower or higher, not a pre-decided
-  //    single number the way a stranger on the embed widget needs.
-  const isPublic = !isEmbedWidget;
-  // Only meaningful on the public path -- LeadCaptureStep.js's required
-  // "I am a..." question. A homeowner just wants the number it'll cost
-  // them, so the separate "Midpoint Price" line below is
-  // dropped for them -- the range breakdown and range total stay exactly
-  // as-is, this only removes that one extra line. A self-identified
-  // cleaning business keeps it, since they're actually pricing jobs and
-  // need somewhere to land, not just a range.
-  const isHomeowner = isPublic && userType === 'homeowner';
-  // The one number shown everywhere in a subscriber's email (headline +
-  // breakdown total) -- the midpoint of the range, not the range itself.
-  // Falls back to computing it here only if a caller somehow didn't
-  // already have it (every real calculateCleaning() result does -- see
-  // its own comment on suggestedPrice for why it's deliberately a plain,
-  // unweighted midpoint).
-  const mainTotal = suggestedPrice != null ? suggestedPrice : Math.round((totalLow + totalHigh) / 2);
+  // Every customer-estimate-email path -- the free public calculator, a
+  // real visitor on a company's actual embedded widget, and RunEstimateTab's
+  // "Email to Coworker" share -- shows the same low-high range + a separate
+  // "Midpoint Price" line, same as Calculator Mode's own on-screen
+  // breakdown. The embed-widget path showed a single collapsed midpoint
+  // number instead until 2026-10-26 (reverted at the user's explicit
+  // request -- a range is a more honest "this is an estimate, not a locked
+  // number" signal than the disclaimer sentence alone ever was, not a less
+  // honest one, and a stranger on a subscriber's widget deserves the same
+  // real range a public visitor gets).
+  //
+  // isHomeowner is only meaningful on the public path -- LeadCaptureStep.js's
+  // required "I am a..." question. A homeowner just wants the number it'll
+  // cost them, so the separate "Midpoint Price" line below is dropped for
+  // them -- the range breakdown and range total stay exactly as-is, this
+  // only removes that one extra line. A self-identified cleaning business
+  // keeps it, since they're actually pricing jobs and need somewhere to
+  // land, not just a range. The embed-widget path never shows it either --
+  // no midpoint number anywhere in that email, by design.
+  const isHomeowner = !isEmbedWidget && userType === 'homeowner';
+  const showMidpointLine = !isEmbedWidget && !isHomeowner && suggestedPrice != null;
 
   const serviceLabel = getServiceLabel(serviceType, country);
   const brandName = companyConfig?.companyName || 'Clean Estimator';
@@ -363,9 +284,7 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   lines.push(
     `Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:`,
     '',
-    isPublic
-      ? `${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)} ${unit === 'per_month' ? 'per month' : 'per visit'}`
-      : `${fmtMoney(mainTotal, currencySymbol)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
+    `${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)} ${unit === 'per_month' ? 'per month' : 'per visit'}`,
   );
 
   // totalLow/High above are already the discounted recurring price when a
@@ -377,29 +296,19 @@ function buildText({ name, clientName, serviceType, result, companyConfig, partn
   }
 
   lines.push('', 'Price breakdown:');
-  if (isPublic) {
-    adjustments.filter(a => !a.separate).forEach(a => {
-      lines.push(`  ${a.label}: ${fmtAdjustment(a, currencySymbol)}`);
-    });
-    lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
-    if (suggestedPrice != null && !isHomeowner) {
-      lines.push(`  Midpoint Price @ ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
-    }
-  } else {
-    // Every line below (and the total) is a single midpoint figure, not a
-    // low–high range -- reconciled via toMidpointRows() so the line items
-    // always add up to exactly the "Estimated total" shown, which is the
-    // same mainTotal as the headline above (not a separate "suggested
-    // price" line, since that's now just... the total).
-    toMidpointRows(adjustments, mainTotal).filter(a => !a.separate).forEach(a => {
-      lines.push(`  ${a.label}: ${fmtAdjustmentMid(a, currencySymbol)}`);
-    });
-    lines.push(`  Estimated total: ${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
-    // This is the one number a stranger on a subscriber's widget sees --
-    // no range to signal "this could move," unlike the public/business
-    // path above. Without this line, a visitor can read it as a locked-in
-    // quote instead of an estimate, and push back when the real price
-    // differs once the business actually sees the job.
+  adjustments.filter(a => !a.separate).forEach(a => {
+    lines.push(`  ${a.label}: ${fmtAdjustment(a, currencySymbol)}`);
+  });
+  lines.push(`  Estimated total: ${fmtMoney(totalLow, currencySymbol)} - ${fmtMoney(totalHigh, currencySymbol)}`);
+  if (showMidpointLine) {
+    lines.push(`  Midpoint Price @ ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`);
+  }
+  if (isEmbedWidget) {
+    // The range above already signals "this could move" better than a
+    // single number ever did, but the explicit caveat is still worth
+    // keeping for a stranger on a subscriber's own widget specifically --
+    // they have no prior relationship with this business the way a
+    // returning public-calculator visitor might.
     lines.push('  (This is an estimate, not a final quote -- the price may be higher or lower depending on the actual level of cleaning needed. We\'ll confirm the exact price when you book.)');
   }
   // Plain flag, not a computed line -- see cleaningCalculation.js's
@@ -442,16 +351,14 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
     adjustments = [], keyFactors = [],
     recurringAnnualSavings, currencySymbol = '$', country,
   } = result;
-  // Same isPublic / single-midpoint-vs-range split as buildText above --
-  // only a real visitor on a company's actual embedded widget gets the
-  // single-midpoint style; the public calculator AND RunEstimateTab's
-  // "Email to Coworker" share both keep the original range.
-  const isPublic = !isEmbedWidget;
+  // Same range-everywhere approach as buildText above -- see its matching
+  // comment for why the embed-widget path no longer collapses to a single
+  // midpoint number.
   // Same homeowner/business split as buildText above -- homeowner keeps
-  // the full range breakdown, just without the extra "Midpoint Price" row.
-  const isHomeowner = isPublic && userType === 'homeowner';
-  // Same mainTotal fallback as buildText above.
-  const mainTotal = suggestedPrice != null ? suggestedPrice : Math.round((totalLow + totalHigh) / 2);
+  // the full range breakdown, just without the extra "Midpoint Price" row;
+  // the embed-widget path never shows that row either way.
+  const isHomeowner = !isEmbedWidget && userType === 'homeowner';
+  const showMidpointLine = !isEmbedWidget && !isHomeowner && suggestedPrice != null;
   // Same city-resolution ResultsScreen.js's eyebrow badge now shows --
   // see cleaningCalculation.js's own resolveCityForZip call.
   const locationLabel = city ? `${city}, ${stateName}` : stateName;
@@ -507,23 +414,23 @@ function buildHtml({ name, clientName, serviceType, result, companyConfig, partn
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 4px;">Here's your ${serviceLabel.toLowerCase()} estimate${locationLabel ? ` for ${locationLabel}` : ''}:</p>
 
-  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : fmtMoney(mainTotal, currencySymbol)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span>${(country === 'CA' || country === 'AU') ? ' <span style="font-size:13px;font-weight:700;color:#666666;">+ tax</span>' : ''}</p>
+  <p style="font-size:30px;font-weight:800;margin:10px 0 0;color:${primaryColor};letter-spacing:-0.5px;">${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)} <span style="font-size:13px;font-weight:400;color:#666666;">${unit === 'per_month' ? 'per month' : 'per visit'}</span>${(country === 'CA' || country === 'AU') ? ' <span style="font-size:13px;font-weight:700;color:#666666;">+ tax</span>' : ''}</p>
   ${recurringLine}
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 8px;">Price breakdown</p>
   <div style="border:1px solid #e0e0e0;border-radius:10px;overflow:hidden;">
     <table style="width:100%;border-collapse:collapse;">
-      ${isPublic ? buildEstimateBreakdownRows(adjustments, currencySymbol) : buildEstimateBreakdownRowsMid(adjustments, mainTotal, currencySymbol)}
+      ${buildEstimateBreakdownRows(adjustments, currencySymbol)}
       <tr style="background:${primaryColor}0d;">
         <td style="padding:11px 12px;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;vertical-align:top;">
           Estimated total
-          ${isPublic && suggestedPrice != null && !isHomeowner ? `<div style="margin-top:3px;font-weight:400;font-size:13.5px;color:#333333;">Midpoint Price @ ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</div>` : ''}
+          ${showMidpointLine ? `<div style="margin-top:3px;font-weight:400;font-size:13.5px;color:#333333;">Midpoint Price @ ${fmtMoney(suggestedPrice, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}</div>` : ''}
         </td>
         <td style="padding:11px 12px;text-align:right;font-weight:700;font-size:14px;color:${primaryColor};border-top:1px solid #e0e0e0;white-space:nowrap;vertical-align:top;">
-          ${isPublic ? `${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}` : `${fmtMoney(mainTotal, currencySymbol)}${unit === 'per_month' ? '/mo' : ''}`}
+          ${fmtMoney(totalLow, currencySymbol)} – ${fmtMoney(totalHigh, currencySymbol)}
         </td>
       </tr>
-      ${!isPublic ? `
+      ${isEmbedWidget ? `
       <tr style="background:${primaryColor}0d;">
         <td colspan="2" style="padding:8px 12px 10px;font-size:11px;color:#888888;line-height:1.4;">This is an estimate, not a final quote — the price may be higher or lower depending on the actual level of cleaning needed. We'll confirm the exact price when you book.</td>
       </tr>` : ''}
@@ -589,18 +496,12 @@ function buildEstimateSubject({ name, clientName, serviceType, result, isEmbedWi
     return `${label} estimate for ${clientName}`;
   }
   if (PRICE_IN_SUBJECT_SERVICES.has(serviceType)) {
-    // Mirrors exactly what the body actually shows: the public calculator
-    // (and this is only ever reached when isEmbedWidget is false for the
-    // services in question, but kept general in case that changes) shows
-    // the low-high range; a real embedded-widget visitor sees a single
-    // midpoint number instead -- same split buildHtml/buildText use.
-    const { totalLow, totalHigh, suggestedPrice, currencySymbol = '$' } = result;
-    const priceText = !isEmbedWidget
-      ? (totalLow != null && totalHigh != null ? `${fmtMoney(totalLow, currencySymbol)}–${fmtMoney(totalHigh, currencySymbol)}` : null)
-      : (() => {
-          const mainTotal = suggestedPrice != null ? suggestedPrice : (totalLow != null && totalHigh != null ? Math.round((totalLow + totalHigh) / 2) : null);
-          return mainTotal != null ? fmtMoney(mainTotal, currencySymbol) : null;
-        })();
+    // Mirrors exactly what the body actually shows -- the low-high range,
+    // for every path including the embed widget now (see buildHtml/
+    // buildText's matching comment for why that stopped collapsing to a
+    // single midpoint number).
+    const { totalLow, totalHigh, currencySymbol = '$' } = result;
+    const priceText = totalLow != null && totalHigh != null ? `${fmtMoney(totalLow, currencySymbol)}–${fmtMoney(totalHigh, currencySymbol)}` : null;
     if (priceText) {
       return `${firstName ? `${firstName}, your` : 'Your'} ${label} estimate: ${priceText}`;
     }
@@ -884,18 +785,15 @@ function buildServiceDetailsHtml(serviceDetails) {
   </table>`;
 }
 
-function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, suggestedPrice, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country, currencySymbol = '$' }) {
+function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country, currencySymbol = '$' }) {
   const name = leadName || 'A visitor';
   const serviceLabel = getServiceLabel(serviceType, country);
   const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
-  // Same single-number total (not a range) as the customer-facing estimate
-  // email now uses -- see buildText's matching comment.
-  const mainTotal = suggestedPrice != null ? suggestedPrice : Math.round((priceLow + priceHigh) / 2);
 
   const lines = [
     `New lead on your ${companyName} estimator!`,
     '',
-    `${name} just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: ${fmtMoney(mainTotal, currencySymbol)}.`,
+    `${name} just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: ${fmtMoney(priceLow, currencySymbol)} - ${fmtMoney(priceHigh, currencySymbol)}.`,
     '',
     'Contact info:',
     ...contactLines.map(l => `  ${l}`),
@@ -903,10 +801,10 @@ function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, pr
 
   if (adjustments.length) {
     lines.push('', 'Price breakdown:');
-    toMidpointRows(adjustments, mainTotal).filter(a => !a.separate).forEach(a => {
-      lines.push(`  ${a.label}: ${fmtAdjustmentMid(a, currencySymbol)}`);
+    adjustments.filter(a => !a.separate).forEach(a => {
+      lines.push(`  ${a.label}: ${fmtAdjustment(a, currencySymbol)}`);
     });
-    lines.push(`  Estimated total: ${fmtMoney(mainTotal, currencySymbol)}`);
+    lines.push(`  Estimated total: ${fmtMoney(priceLow, currencySymbol)} - ${fmtMoney(priceHigh, currencySymbol)}`);
   }
 
   if (keyFactors.length) {
@@ -925,11 +823,10 @@ function buildCompanyLeadText({ companyName, leadName, serviceType, priceLow, pr
   return lines.join('\n');
 }
 
-function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, suggestedPrice, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country, currencySymbol = '$' }) {
+function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, priceHigh, leadEmail, leadPhone, city, state, zip, timeline, adjustments = [], keyFactors = [], serviceDetails, country, currencySymbol = '$' }) {
   const name = leadName || 'A visitor';
   const serviceLabel = getServiceLabel(serviceType, country);
   const contactLines = buildLeadContactLines({ leadEmail, leadPhone, city: city || serviceDetails?.city, state, zip, timeline });
-  const mainTotal = suggestedPrice != null ? suggestedPrice : Math.round((priceLow + priceHigh) / 2);
 
   const contactRows = contactLines.map(l => {
     const [label, ...rest] = l.split(': ');
@@ -944,10 +841,10 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
   const breakdownHtml = adjustments.length ? `
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:24px 0 6px;">Price breakdown</p>
   <table style="width:100%;border-collapse:collapse;border-top:1px solid #e0e0e0;">
-    ${buildBreakdownRowsMid(adjustments, mainTotal, currencySymbol)}
+    ${buildBreakdownRows(adjustments, currencySymbol)}
     <tr>
       <td style="padding:8px 0 0;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;">Estimated total</td>
-      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(mainTotal, currencySymbol)}</td>
+      <td style="padding:8px 0 0;text-align:right;font-weight:700;font-size:14px;border-top:1px solid #e0e0e0;white-space:nowrap;">${fmtMoney(priceLow, currencySymbol)} – ${fmtMoney(priceHigh, currencySymbol)}</td>
     </tr>
   </table>
   ${buildKeyFactors(keyFactors)}` : '';
@@ -957,7 +854,7 @@ function buildCompanyLeadHtml({ companyName, leadName, serviceType, priceLow, pr
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">New lead on your ${companyName} estimator!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: <strong>${fmtMoney(mainTotal, currencySymbol)}</strong>.
+    <strong>${name}</strong> just got a ${serviceLabel.toLowerCase()} estimate on your embedded widget: <strong>${fmtMoney(priceLow, currencySymbol)} – ${fmtMoney(priceHigh, currencySymbol)}</strong>.
   </p>
 
   <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Contact info</p>
