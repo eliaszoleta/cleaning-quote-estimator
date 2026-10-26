@@ -434,7 +434,15 @@ const COMMERCIAL_FREQUENCY_MULTIPLIER = {
   monthly:        { low: 0.4,  high: 0.5  }, // estimated -- not independently sourced
 };
 
-// Day porter monthly rate (loaded labor including benefits/overhead)
+// Day porter DAILY rate (loaded labor including benefits/overhead) -- the
+// name and the formula that uses it (DAY_PORTER_DAILY_RATE × 22 workdays,
+// see calculateCommercialRecurring) both already treat this correctly as a
+// per-day figure; this comment used to say "monthly rate" instead, the
+// exact same mislabeling that caused the 2026-10-26 COMMERCIAL_SQFT_RATES
+// bug elsewhere in this file -- caught here during that same audit before
+// it did any damage, since the code never actually matched the old
+// comment. Fixed so a future edit doesn't "correct" the formula to match
+// a wrong comment.
 const DAY_PORTER_DAILY_RATE = { low: 218, high: 265 };
 
 // Restroom cleaning per restroom, per visit -- ~10-15 min of fixture-level
@@ -450,22 +458,28 @@ const DAY_PORTER_DAILY_RATE = { low: 218, high: 265 };
 const COMMERCIAL_RESTROOM_PER_VISIT_RATE = { low: 4, high: 7 };
 
 // One-time commercial deep clean / restoration pricing -- a separate model
-// from the recurring janitorial-contract pricing above (COMMERCIAL_VISITS_PER_MONTH
-// x per-visit rate). Added Oct 2026 after a real request (a vacant restaurant,
-// evicted tenant, years unmaintained, grease-caked equipment, needing a one-off
-// multi-day restoration clean) had no way to be quoted accurately -- forcing it
+// from the recurring janitorial-contract pricing above. Added Oct 2026
+// after a real request (a vacant restaurant, evicted tenant, years
+// unmaintained, grease-caked equipment, needing a one-off multi-day
+// restoration clean) had no way to be quoted accurately -- forcing it
 // through "Monthly" priced it as a single routine janitorial visit to an
 // occupied space, wildly underquoting the actual labor. Multiplies the SAME
 // COMMERCIAL_SQFT_RATES used for recurring service rather than a separate rate
 // table, so building-type differences (a restaurant still costs more per sq ft
 // than an office) still apply to a one-time job.
-// Cross-checked Oct 2026 against published one-time-deep-clean-vs-recurring
-// comparisons (Nilfisk, Housecall Pro, HomeAdvisor: a one-time deep clean runs
-// roughly 1.5-2x a recurring per-visit rate) and a restaurant-specific guide
-// citing $0.15-$0.50/sq ft for quarterly/deep restaurant cleans against
-// $0.06-$0.20/sq ft routine. A long-vacant, heavily neglected space is
-// effectively restoration work, not a deep clean of an otherwise-maintained
-// space, so it's priced at the top of that range and above.
+// Originally cross-checked (Oct 2026) against "a one-time deep clean runs
+// roughly 1.5-2x a recurring per-visit rate" -- worth flagging that
+// COMMERCIAL_SQFT_RATES is now documented as a MONTHLY rate, not a
+// per-visit one (see its own comment, fixed 2026-10-26), so that specific
+// framing no longer matches what this multiplier is actually applied to.
+// Re-verified 2026-10-26 anyway, independent of that framing: a severe-tier
+// (1+ years vacant, heavily neglected) job computes to roughly $0.38-$0.61/
+// sq ft here, which lands at or above the upper end of a broader 2026
+// commercial-deep-clean/post-construction-cleanup research pass
+// ($0.15-$0.60+/sq ft, "expect the upper end... for a neglected, long-vacant
+// building") -- appropriately high for restoration-level work, so the
+// OUTPUT still checks out even though the original sourcing comment's
+// wording doesn't anymore. Left as-is; not treated as a bug.
 const COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS = {
   light:    { low: 1.5, high: 1.8 }, // occupied space, just needs a thorough one-time deep clean
   moderate: { low: 2.0, high: 2.5 }, // vacant under ~1 year, visible buildup but no severe neglect
