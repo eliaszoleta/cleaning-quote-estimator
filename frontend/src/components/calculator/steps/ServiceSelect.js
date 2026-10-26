@@ -289,13 +289,17 @@ export default function ServiceSelect({ onSelect, primaryColor, companyName, cta
               // A single card left alone in the last row (isLastCardAlone,
               // see its own comment above) spans the full row instead of
               // sitting flush left with an empty cell beside it, and caps
-              // its own width + centers so it still reads as one normal
-              // card, not a stretched one -- this is what actually closes
-              // the one gap pickSquareColumns can't avoid by column count
-              // alone (an enabled count that doesn't divide evenly into any
-              // reasonable number of columns, e.g. 3 services in 2 columns).
+              // its own width so it still reads as one normal card, not a
+              // stretched one -- this is what actually closes the one gap
+              // pickSquareColumns can't avoid by column count alone (an
+              // enabled count that doesn't divide evenly into any
+              // reasonable number of columns, e.g. 3 services in 2
+              // columns). Left-aligned (no auto margin) rather than
+              // centered -- centered read as visually "off," floating
+              // disconnected from the row above instead of continuing its
+              // left edge (reported from a live screenshot).
               ...(isLastCardAlone && i === visibleServices.length - 1
-                ? { gridColumn: '1 / -1', maxWidth: useSquaredGrid ? TILE_MAX : 320, margin: '0 auto', width: '100%' }
+                ? { gridColumn: '1 / -1', maxWidth: useSquaredGrid ? TILE_MAX : 320, margin: '0', width: '100%' }
                 : { width: '100%' }),
               boxShadow: '0 1px 2px rgba(15,23,42,0.03)',
               animation: 'cc-card-in 0.35s ease backwards',
