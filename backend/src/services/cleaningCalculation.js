@@ -295,19 +295,35 @@ function calculateHomeResidential(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: `Condition: ${labelFor(HOME_CONDITION_LABELS, condition)}`, low: range.low - before.low, high: range.high - before.high });
   }
 
+  // Frequency discount -- off by default (0%) unless the company has set
+  // one for this frequency in the Services tab (cfg.frequencyDiscounts).
+  // Applied BEFORE the minimum charge below (not after, as this used to
+  // be ordered) -- flooring to the minimum and THEN discounting let a
+  // configured discount push the final price below the company's own
+  // minimum (e.g. a job floored to a $100 minimum, then discounted 20%,
+  // billed at $80 -- found 2026-10-26 during the commercial pricing
+  // audit). Discounting first and flooring the result after means the
+  // minimum is always a genuine floor on what's actually charged.
+  const discount = cfg.frequencyDiscounts?.[frequency] || 0;
+  let recurringLow = null, recurringHigh = null, annualSavings = null;
+  const beforeDiscount = { ...range };
+  if (frequency !== 'one_time' && discount > 0) {
+    range = { low: Math.round(range.low * (1 - discount)), high: Math.round(range.high * (1 - discount)) };
+    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: range.low - beforeDiscount.low, high: range.high - beforeDiscount.high });
+  }
+
   // Minimum
   range = applyMinCharge(range, minCharge, adjustments);
 
-  // Frequency discount -- off by default (0%) unless the company has set
-  // one for this frequency in the Services tab (cfg.frequencyDiscounts).
-  const discount = cfg.frequencyDiscounts?.[frequency] || 0;
-  let recurringLow = null, recurringHigh = null, annualSavings = null;
   if (frequency !== 'one_time' && discount > 0) {
-    recurringLow = Math.round(range.low * (1 - discount));
-    recurringHigh = Math.round(range.high * (1 - discount));
+    recurringLow = range.low;
+    recurringHigh = range.high;
     const visitsPerYear = { weekly: 52, biweekly: 26, triweekly: 17, monthly: 12 }[frequency] || 12;
-    annualSavings = Math.round(((range.low + range.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
-    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: -Math.round(range.low * discount), high: -Math.round(range.high * discount) });
+    // Against the real, post-minimum-charge final price, not the
+    // theoretical pre-floor discount -- if the minimum charge ends up
+    // kicking in, the customer's real annual savings is less than the
+    // raw discount percentage would suggest, and this should say so.
+    annualSavings = Math.round(((beforeDiscount.low + beforeDiscount.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
   }
 
   const finalLow = recurringLow || range.low;
@@ -393,16 +409,25 @@ function calculateApartment(details, stateMultiplier, companyConfig) {
     }
   }
 
-  range = applyMinCharge(range, minCharge, adjustments);
-
+  // Frequency discount -- applied BEFORE the minimum charge below (not
+  // after, as this used to be ordered -- see the matching home_residential
+  // comment for the full story on why that let a configured discount push
+  // the final price below the company's own minimum).
   const discount = cfg.frequencyDiscounts?.[frequency] || 0;
   let recurringLow = null, recurringHigh = null, annualSavings = null;
+  const beforeDiscount = { ...range };
   if (frequency !== 'one_time' && discount > 0) {
-    recurringLow = Math.round(range.low * (1 - discount));
-    recurringHigh = Math.round(range.high * (1 - discount));
+    range = { low: Math.round(range.low * (1 - discount)), high: Math.round(range.high * (1 - discount)) };
+    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: range.low - beforeDiscount.low, high: range.high - beforeDiscount.high });
+  }
+
+  range = applyMinCharge(range, minCharge, adjustments);
+
+  if (frequency !== 'one_time' && discount > 0) {
+    recurringLow = range.low;
+    recurringHigh = range.high;
     const visitsPerYear = { weekly: 52, biweekly: 26, monthly: 12 }[frequency] || 12;
-    annualSavings = Math.round(((range.low + range.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
-    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: -Math.round(range.low * discount), high: -Math.round(range.high * discount) });
+    annualSavings = Math.round(((beforeDiscount.low + beforeDiscount.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
   }
 
   const finalLow = recurringLow || range.low;
@@ -513,24 +538,32 @@ function calculateCommercialRecurring(details, stateMultiplier, companyConfig) {
     adjustments.push({ label: 'After-hours access (+15%)', low: afterHoursMonthlyLow, high: afterHoursMonthlyHigh });
   }
 
-  let { low: monthlyLow, high: monthlyHigh } = applyMinCharge(
-    { low: monthlyBaseLow + afterHoursMonthlyLow, high: monthlyBaseHigh + afterHoursMonthlyHigh },
-    minCharge,
-    adjustments,
-  );
-
   // Recurring-frequency discount -- same mechanism as residential/apartment
   // (cfg.frequencyDiscounts, set in the Services tab), applied to the
   // cleaning cost itself rather than day porter staffing, which doesn't get
   // cheaper just because the client picked a more frequent schedule.
+  // Applied BEFORE the minimum charge below (not after, as this used to be
+  // ordered) -- flooring to the minimum and THEN discounting let a
+  // configured discount push the final price below the company's own
+  // minimum (e.g. a job floored to a $200 minimum, then discounted 15%,
+  // billed at $170 -- found 2026-10-26 during the commercial pricing
+  // audit). Discounting first and flooring the result after means the
+  // minimum is always a genuine floor on what's actually charged.
   const discount = cfg.frequencyDiscounts?.[frequency] || 0;
   let annualSavings = null;
+  let monthlyLow = monthlyBaseLow + afterHoursMonthlyLow;
+  let monthlyHigh = monthlyBaseHigh + afterHoursMonthlyHigh;
   if (discount > 0) {
     const before = { low: monthlyLow, high: monthlyHigh };
     monthlyLow = Math.round(monthlyLow * (1 - discount));
     monthlyHigh = Math.round(monthlyHigh * (1 - discount));
-    annualSavings = Math.round(((before.low + before.high) / 2 - (monthlyLow + monthlyHigh) / 2) * 12);
     adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: monthlyLow - before.low, high: monthlyHigh - before.high });
+
+    ({ low: monthlyLow, high: monthlyHigh } = applyMinCharge({ low: monthlyLow, high: monthlyHigh }, minCharge, adjustments));
+
+    annualSavings = Math.round(((before.low + before.high) / 2 - (monthlyLow + monthlyHigh) / 2) * 12);
+  } else {
+    ({ low: monthlyLow, high: monthlyHigh } = applyMinCharge({ low: monthlyLow, high: monthlyHigh }, minCharge, adjustments));
   }
 
   let porterMonthlyLow = 0, porterMonthlyHigh = 0;
@@ -1363,19 +1396,28 @@ function calculateAirbnb(details, stateMultiplier, companyConfig) {
     }
   }
 
-  range = applyMinCharge(range, minCharge, adjustments);
-
   // Frequency discount -- hosts booking recurring turnover cleanings
   // (weekly/biweekly/monthly volume) get the same opt-in discount
-  // mechanism as every other recurring service.
+  // mechanism as every other recurring service. Applied BEFORE the
+  // minimum charge below (not after, as this used to be ordered -- see
+  // the matching home_residential comment for the full story on why that
+  // let a configured discount push the final price below the company's
+  // own minimum).
   const discount = cfg.frequencyDiscounts?.[frequency] || 0;
   let recurringLow = null, recurringHigh = null, annualSavings = null;
+  const beforeDiscount = { ...range };
   if (frequency !== 'one_time' && discount > 0) {
-    recurringLow = Math.round(range.low * (1 - discount));
-    recurringHigh = Math.round(range.high * (1 - discount));
+    range = { low: Math.round(range.low * (1 - discount)), high: Math.round(range.high * (1 - discount)) };
+    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: range.low - beforeDiscount.low, high: range.high - beforeDiscount.high });
+  }
+
+  range = applyMinCharge(range, minCharge, adjustments);
+
+  if (frequency !== 'one_time' && discount > 0) {
+    recurringLow = range.low;
+    recurringHigh = range.high;
     const visitsPerYear = { weekly: 52, biweekly: 26, monthly: 12 }[frequency] || 12;
-    annualSavings = Math.round(((range.low + range.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
-    adjustments.push({ label: `${frequency} discount (${Math.round(discount * 100)}% off)`, low: -Math.round(range.low * discount), high: -Math.round(range.high * discount) });
+    annualSavings = Math.round(((beforeDiscount.low + beforeDiscount.high) / 2 - (recurringLow + recurringHigh) / 2) * visitsPerYear);
   }
 
   const finalLow = recurringLow || range.low;
