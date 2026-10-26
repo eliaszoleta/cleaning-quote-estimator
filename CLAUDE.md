@@ -52,3 +52,15 @@ Commits:
 - `claude/website-indexing-audit-qf91rp`: `be93a3e` (same commit, cherry-picked)
 
 To revert: `git revert 251af8e` on production, `git revert be93a3e` on sync (or cherry-pick one revert's content to the other, same as any other dual-branch change). This also un-fixes the embedded/siteLanding partner-lookup bug described above -- if the user only wants the gating undone but wants to keep that bug fix, say so explicitly rather than reverting wholesale.
+
+# Blog posts: always write for organic Google search traffic
+
+Standing rule from the user (2026-10-26): every `blogPosts.js` post is written to maximize organic search traffic from Google, not just to answer the source question well. This applies to every post, not just the ones explicitly flagged as "make this SEO optimized" -- treat it as the default, always-on goal for this file. In practice:
+
+- **Title and slug should match real search phrasing**, ideally close to how someone would actually type the question into Google -- a source question phrased as a real, specific question (like "do you organize by area, by address, or use an app?") is itself a strong signal of real search intent, worth keeping close to verbatim in the title rather than rephrased into something blander.
+- **`excerpt` doubles as the likely meta description** -- write it to be genuinely clickable from a search-results page, not just an internal summary.
+- **`##` headers should mirror how people phrase sub-questions when searching**, not just organize the content logically for a reader who's already on the page.
+- **Before writing a new post, check for an existing one covering the same ground** (`grep` the relevant keywords/slugs in `blogPosts.js` first) -- a near-duplicate post competing with an existing one for the same search terms hurts both instead of capturing more traffic. If the topic overlaps an existing post, find a genuinely distinct angle and cross-link to the existing one rather than re-covering it (see the 2026-12-05 through 2026-12-09 posts, all written this way deliberately after their topics turned out to already have coverage).
+- **Internal links** (to other posts, to `/estimator`) still matter for SEO beyond just reader navigation -- keep using them the way existing posts do.
+
+This is a standing default for all future blog-post work in this repo, not a one-off instruction for whichever post prompted writing it down.
