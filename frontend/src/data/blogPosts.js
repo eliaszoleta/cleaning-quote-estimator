@@ -16660,6 +16660,47 @@ The specific gift matters less than picking something that fits your delivery lo
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'how-to-build-reusable-cleaning-checklists-by-job-type',
+    title: 'How to Build Cleaning Checklists for Every Job Type (So You Stop Rewriting Them for Every New Client)',
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-12-14',
+    readTime: '7 min',
+    excerpt: "Rewriting a checklist from scratch for every new client, or realizing mid-job that something got missed and you have to go back -- both trace back to the same root cause: checklists built per client instead of per job type.",
+    content: `
+## The Real Problem Isn't Memory, It's Structure
+
+Forgetting a task and having to go back isn't usually about one cleaner having a bad day -- it's what happens when there's no standing reference checklist for that type of job in the first place, so the scope gets reconstructed from memory every single time. Rewriting a checklist from scratch for every new client has the same root cause: there's no reusable template to start from, so each new client means starting over.
+
+## Build by Job Type, Not by Client
+
+The fix is a structural one: a single master checklist per **job type** -- standard/recurring, deep clean, move-in/move-out, Airbnb turnover, post-construction, whatever service types you actually offer -- reused for every client who books that type, instead of a new document per client. [The real scope difference between job types like deep clean and move-in/move-out](/blog/deep-clean-vs-move-in-move-out-whats-the-difference) is what each master checklist should capture once, clearly, rather than re-deciding on the fly every time a new booking of that type comes in.
+
+Client-specific details -- where the breakables are, a room to skip, a product sensitivity -- don't belong baked into the job-type checklist itself. Keep those as a short, separate per-client note layered on top of the standard checklist for that job type. This is what actually lets one checklist serve every client of that type: the 95% that's identical stays in the reusable template, and only the genuinely client-specific 5% lives somewhere else.
+
+## What a Checklist Actually Needs, Beyond a Task List
+
+- **Room-by-room structure**, not one long undifferentiated list -- it's faster to work from and easier to spot a skipped section.
+- **Included vs. add-on items marked explicitly** -- whether appliance interiors, inside cabinets, or baseboards are standard for that job type or a separate line item, stated on the checklist itself instead of left to assumption.
+- **A completion sign-off**, not just a list of tasks -- [pairing the checklist with a required completion step (a check, a photo) is what actually confirms the job was done](/blog/how-to-know-every-cleaning-job-actually-got-done), not just that a checklist theoretically exists somewhere.
+- **Space for the per-client notes** mentioned above, kept visually separate from the standard scope so it's obvious what's universal and what's specific to this one home.
+
+## You Don't Need a Paid Tool to Start
+
+The system matters far more than the format. A shared document, a spreadsheet, a notes app, or a printed and laminated sheet all work -- what makes a checklist actually useful is that it's the same one every cleaner reaches for on every job of that type, not which software it was built in. Build the five or six master checklists your actual service types need once, and the forgotten-task problem mostly disappears on its own.
+
+## Checklists Are Also a Training Tool
+
+Once these exist, they stop being just a quality-control safety net and become [the actual reference new hires learn from](/blog/training-new-cleaning-staff-checklist) -- instead of a new cleaner absorbing your standard secondhand by shadowing, they have a written document that defines it precisely, the same one every other cleaner on the team is working from.
+
+## Bottom Line
+
+Rewriting checklists per client and missing tasks mid-job are the same underlying problem: no reusable reference for that job type. Build one master checklist per service type, keep genuinely client-specific details separate from it, and pair it with a completion sign-off -- that system does more for consistency than any one-off checklist ever will, free tools included.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [

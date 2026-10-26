@@ -1878,6 +1878,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/how-to-build-reusable-cleaning-checklists-by-job-type</loc>
+    <lastmod>2026-12-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- UK/Canada/Australia pilot blogs (auto-generated from src/data/intl/) -->
   <url>
