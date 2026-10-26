@@ -16204,6 +16204,61 @@ Airbnb and vacation-rental cleaning isn't a strictly better or worse line of bus
 [Start your free trial →](/estimator)
     `,
   },
+  {
+    slug: 'client-skin-reaction-eczema-after-cleaning-what-to-do',
+    title: "A Client Developed Eczema After You Cleaned Their Home: What It Could Actually Be, and What to Do",
+    category: 'grow-your-business',
+    categoryLabel: 'Grow Your Business',
+    date: '2026-12-03',
+    readTime: '7 min',
+    excerpt: "A real question from a cleaning-business group: a careful, experienced cleaner's client developed eczema and wondered if the products were to blame. Here's what's actually in common cleaning products that can trigger a reaction, why it's genuinely hard to pin down, and what to do about it either way.",
+    content: `
+## A Situation That's More Common Than You'd Think
+
+A cleaner with a year of regular, well-reviewed work -- careful rinsing, clean microfiber, procedures double-checked by a mentor -- gets told by a client that she's developed eczema, and the client isn't sure if it's the cleaning products or a collagen supplement she started around the same time. Nothing about this cleaner's technique sounds wrong. That's exactly what makes this question worth answering properly instead of just reassuring: being careful doesn't rule out a reaction, because some of the most common ingredients in everyday cleaning products are documented skin allergens and irritants, at any skill level.
+
+## Irritant Reaction vs. Allergic Reaction vs. Eczema -- They're Not the Same Thing
+
+These three get used interchangeably, but they're different, and the difference matters for figuring out what's actually going on:
+- **Irritant contact dermatitis** is direct chemical damage to the skin barrier -- it happens to anyone with enough exposure, no immune response involved. Repeated, incompletely-rinsed exposure to a harsh cleaner is a classic cause.
+- **Allergic contact dermatitis** is a true immune reaction to a specific substance -- it only happens in someone who's become sensitized to that exact ingredient, and once sensitized, even a tiny amount can trigger it.
+- **Eczema (atopic dermatitis)** is usually a chronic, often genetic skin condition that flares from many different triggers -- a new product, stress, weather, a new supplement, or nothing identifiable at all.
+
+A new flare that lines up with a new cleaner, a new product, or a new supplement is a real clue -- but a clue toward several different possible explanations, not proof of any one of them. That's not a cleaner's or a blog's call to make -- it's what a dermatologist and patch testing are actually for.
+
+## What's Actually in These Products That Can Trigger a Reaction
+
+This part is worth knowing regardless of what caused this specific case, because it affects every client you clean for:
+
+- **Isothiazolinone preservatives (MI/MCI, often listed as "Kathon CG")** are one of the most well-documented contact allergens in household cleaning products -- the American Contact Dermatitis Society named MI its "Allergen of the Year" in 2013. A 2009 label survey found these preservatives on roughly a third of household cleaning product labels. MI is also volatile enough to cause a reaction just from being in the air of a recently-cleaned room, not only from direct skin contact.
+- **Fragrance, including "natural" fragrance,** is the other major category -- the same 2009 survey found a fragrance component (limonene) on about 44% of labels. "Unscented" and "fragrance-free" are not the same claim; only the second one reliably means no fragrance compounds at all.
+- **Acidic scouring ingredients** like oxalic acid (used in some scouring powders and pastes for rust and mineral stains) are a known skin irritant if left on skin or incompletely rinsed from a surface.
+
+None of this means any specific product in this story is guilty -- it means these categories are common enough that "could my products be the cause" is a legitimate question to take seriously, not just reassure away.
+
+## Why It Showed Up After Multiple Visits, Not the First One
+
+A reaction appearing on visit four, not visit one, doesn't rule out the products -- allergic sensitization specifically works this way. The first few exposures can cause no reaction at all while the immune system becomes sensitized; the reaction itself often doesn't show up until a later exposure, sometimes after weeks or months of fine visits. That pattern is actually more consistent with a developing product allergy than an acute one-time irritant reaction would be -- worth knowing before ruling products out just because "the first three visits were fine."
+
+## The Supplement Is a Real Possibility Too, Not a Convenient Excuse
+
+Collagen supplements are derived from animal sources (commonly bovine, marine, or porcine), and someone with a fish, shellfish, or egg allergy can react to the wrong source -- with itching, hives, or an eczema-like flare as a documented, if uncommon, response. There isn't strong general evidence that collagen supplements cause eczema flares broadly; the plausible path is specific to an existing allergy or an additive in that particular product. In other words: genuinely worth ruling in or out with a doctor, not a throwaway explanation to get the cleaner off the hook.
+
+## What to Actually Do -- for the Client and for Your Business
+
+1. **Don't try to diagnose it yourself, and don't let anyone else pressure you into confirming or denying it either.** That's a dermatologist's job, ideally with patch testing against the specific products used in that home.
+2. **Give the client (or their doctor) the exact product list.** Every product you used, by name -- this is what makes patch testing against the real suspects possible instead of guessing. Keeping a simple per-client product log going forward makes this a five-minute favor instead of a scramble to remember.
+3. **Offer to switch that client to fragrance-free, MI/MCI-free products going forward**, regardless of what patch testing eventually finds. It costs you little, it's a reasonable precaution either way, and it shows the client you're taking the concern seriously rather than being defensive about it.
+4. **Keep your general liability insurance current** and loop your insurer in if the client raises it formally -- a skin-reaction claim is exactly the kind of thing that coverage exists for, and having it in place means one real complaint doesn't become a business-ending event even in the unlikely case it's found to be product-related.
+5. **Consider offering a standing "sensitive skin / fragrance-free" product option** across your client base, not just this one case. Skin sensitivities are common enough that this is a legitimate service differentiator, not just damage control for one incident.
+
+## Bottom Line
+
+A client's new eczema lining up with your visits is worth taking seriously, but it isn't proof your products caused it -- irritant reactions, true allergies, and unrelated eczema triggers (including a new supplement) are all genuinely plausible, and only a dermatologist with patch testing can actually sort out which. What you control is handling it professionally: documenting what you use, offering a fragrance-free alternative as a reasonable precaution, and keeping your insurance in order -- not trying to self-diagnose a skin condition from a Facebook thread.
+
+[Start your free trial →](/estimator)
+    `,
+  },
 ];
 
 export const CATEGORIES = [
