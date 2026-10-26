@@ -342,12 +342,27 @@ const APARTMENT_SIZE_PRICES = {
   '4br_plus': { low: 221, high: 271 },
 };
 
-// Commercial cleaning prices per sq ft per visit
-// Source: ISSA (International Sanitary Supply Association), BuildingOperationsManagement
-// Cross-checked Oct 2026: current per-visit commercial janitorial guides
-// cluster around $0.07-$0.20/sq ft standard recurring service, with medical
-// running meaningfully higher ($0.20-$0.60/sq ft) -- every tier below
-// already falls inside its matching real-world band. Left unchanged.
+// Commercial cleaning prices per sq ft -- MONTHLY total, at weekly
+// frequency (the calculator's own default, and the frequency ISSA's own
+// published office benchmark and most other sourced guides anchor to).
+// RELABELED 2026-10-26 -- this table was previously commented "per sq ft
+// per visit" and calculateCommercialRecurring multiplied it by
+// visitsPerMonth (4 for weekly, 20 for daily) on top of that, as if it
+// really were a per-visit rate. It never was: re-checking the same
+// sources this table cites (ISSA's general-office figure is $0.09-$0.17
+// per sq ft, matching COMMERCIAL_SQFT_RATES.office almost exactly) shows
+// they're already quoting a monthly contract rate, not a single cleaning.
+// Re-multiplying a monthly rate by visit count overcounted every
+// commercial quote roughly in proportion to how often it's cleaned -- a
+// 23,000 sq ft daily (5x/week) medical contract came out to
+// $87,620-$112,880/month, a visitor called this out as obviously wrong in
+// a Facebook cleaning-business group (2026-10-26), and they were right:
+// a facility that size, cleaned daily, realistically runs roughly
+// $9,000-$20,000/month (scaled from a 2026 guide's $2,000-$4,500/month
+// example for a 5,000 sq ft daily-cleaned medical facility). See
+// COMMERCIAL_FREQUENCY_MULTIPLIER below for how frequency is now
+// accounted for instead -- a real, but much smaller, effect than a flat
+// ×visitsPerMonth implied.
 const COMMERCIAL_SQFT_RATES = {
   office:    { low: 0.088, high: 0.107 },
   retail:    { low: 0.09,  high: 0.11  },
@@ -389,6 +404,34 @@ const COMMERCIAL_VISITS_PER_MONTH = {
   weekly:   4,
   biweekly: 2,
   monthly:  1,
+};
+
+// How much the monthly sq-ft/building-rate cost (COMMERCIAL_SQFT_RATES,
+// now a monthly total at weekly frequency -- see its own comment) scales
+// for a different frequency. NOT the same ratio as COMMERCIAL_VISITS_PER_
+// MONTH -- a daily contract has 5x the visits of a weekly one, but costs
+// nowhere near 5x as much per month, because each visit is lighter (less
+// buildup since it was just cleaned); a biweekly/monthly visit costs more
+// per visit (more buildup) than a flat 1/2 or 1/4 split of weekly would
+// suggest. Restrooms (COMMERCIAL_RESTROOM_PER_VISIT_RATE) are NOT scaled
+// by this table -- that rate is a genuine per-visit labor-time estimate,
+// unlike this one, so it still scales directly with COMMERCIAL_VISITS_PER_
+// MONTH instead.
+// weekly/three_per_week/daily cross-checked 2026-10-26 against a 2026
+// frequency-tiered commercial cleaning rate chart showing roughly
+// $0.08-$0.12/sq ft/month at weekly, $0.10-$0.18 at 3x/week, $0.15-$0.30
+// at daily (5x/week) -- a ~2.2x daily:weekly ratio on the monthly total,
+// not the 5x ratio of visit counts. twice_weekly/biweekly/monthly are
+// estimated/interpolated between those three anchor points, not
+// independently sourced -- no chart found breaking out those specific
+// cadences on their own.
+const COMMERCIAL_FREQUENCY_MULTIPLIER = {
+  daily:          { low: 2.0,  high: 2.4  },
+  three_per_week: { low: 1.3,  high: 1.45 },
+  twice_weekly:   { low: 1.15, high: 1.25 }, // estimated -- interpolated between weekly and three_per_week
+  weekly:         { low: 1.0,  high: 1.0  }, // baseline -- COMMERCIAL_SQFT_RATES itself IS the weekly monthly rate
+  biweekly:       { low: 0.6,  high: 0.7  }, // estimated -- not independently sourced
+  monthly:        { low: 0.4,  high: 0.5  }, // estimated -- not independently sourced
 };
 
 // Day porter monthly rate (loaded labor including benefits/overhead)
@@ -1370,6 +1413,7 @@ module.exports = {
   COMMERCIAL_SQFT_RATES,
   COMMERCIAL_SERVICE_LEVELS,
   COMMERCIAL_VISITS_PER_MONTH,
+  COMMERCIAL_FREQUENCY_MULTIPLIER,
   DAY_PORTER_DAILY_RATE,
   COMMERCIAL_RESTROOM_PER_VISIT_RATE,
   COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS,

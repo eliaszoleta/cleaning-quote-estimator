@@ -29,6 +29,7 @@ const {
   COMMERCIAL_SQFT_RATES,
   COMMERCIAL_SERVICE_LEVELS,
   COMMERCIAL_VISITS_PER_MONTH,
+  COMMERCIAL_FREQUENCY_MULTIPLIER,
   DAY_PORTER_DAILY_RATE,
   COMMERCIAL_RESTROOM_PER_VISIT_RATE,
   COMMERCIAL_ONE_TIME_CONDITION_MULTIPLIERS,
@@ -463,46 +464,52 @@ function calculateCommercialRecurring(details, stateMultiplier, companyConfig) {
   const sqftRate = COMMERCIAL_SQFT_RATES[buildingType] || COMMERCIAL_SQFT_RATES.office;
   const levelMult = COMMERCIAL_SERVICE_LEVELS[serviceLevel] || COMMERCIAL_SERVICE_LEVELS.standard;
   const visitsPerMonth = COMMERCIAL_VISITS_PER_MONTH[frequency] || 4;
+  const freqMult = COMMERCIAL_FREQUENCY_MULTIPLIER[frequency] || COMMERCIAL_FREQUENCY_MULTIPLIER.weekly;
 
-  // Computed without the after-hours multiplier first so the surcharge line
-  // below can show the true incremental amount -- multiplying the
-  // already-surcharged per-visit rate by 0.15 (the old approach) overstates
-  // the real +15% delta, since 15% of a value that's already ×1.15 is more
-  // than the actual difference between the with- and without-surcharge price.
-  const sqftPerVisitLow = Math.round(sqft * sqftRate.low * levelMult.low * stateMultiplier * markup);
-  const sqftPerVisitHigh = Math.round(sqft * sqftRate.high * levelMult.high * stateMultiplier * markup);
+  // COMMERCIAL_SQFT_RATES is a MONTHLY total at weekly frequency (see its
+  // own comment) -- freqMult scales that monthly figure for a different
+  // frequency directly, replacing the old ×visitsPerMonth multiplication
+  // that treated it as a per-visit rate and overcounted by roughly the
+  // visit count (up to 20x at daily). This is the whole fix for the
+  // 2026-10-26 "$87,620-$112,880/month for a 23,000 sq ft medical office"
+  // report -- see COMMERCIAL_SQFT_RATES' own comment for the full story.
+  const sqftMonthlyLow = Math.round(sqft * sqftRate.low * levelMult.low * freqMult.low * stateMultiplier * markup);
+  const sqftMonthlyHigh = Math.round(sqft * sqftRate.high * levelMult.high * freqMult.high * stateMultiplier * markup);
 
   // Restrooms are priced per restroom per visit, on the ACTUAL count the
   // customer entered -- not a flat one-time surcharge above some assumed
   // "typical for this sqft" baseline (the old approach: a count at or
   // under that baseline never affected the price or appeared in the
   // breakdown at all, even though the customer had explicitly entered it).
-  // Folded into perVisitBase (not added separately after) so it also
-  // scales correctly with visit frequency and the after-hours surcharge
-  // below, same as the sqft-based rate.
+  // Unlike the sqft rate above, this one genuinely IS a per-visit
+  // labor-time estimate, so it still scales directly with visitsPerMonth.
   const restroomPerVisitLow = Math.round(restrooms * COMMERCIAL_RESTROOM_PER_VISIT_RATE.low * stateMultiplier * markup);
   const restroomPerVisitHigh = Math.round(restrooms * COMMERCIAL_RESTROOM_PER_VISIT_RATE.high * stateMultiplier * markup);
+  const restroomMonthlyLow = restroomPerVisitLow * visitsPerMonth;
+  const restroomMonthlyHigh = restroomPerVisitHigh * visitsPerMonth;
 
-  const perVisitBaseLow = sqftPerVisitLow + restroomPerVisitLow;
-  const perVisitBaseHigh = sqftPerVisitHigh + restroomPerVisitHigh;
+  // Derived, display-only -- sqftMonthlyLow/High is the real monthly
+  // figure now (see above), not visitsPerMonth × a true per-visit price,
+  // but the breakdown still shows an effective per-visit number so the
+  // line reads the same way it always has.
+  const sqftPerVisitLow = Math.round(sqftMonthlyLow / visitsPerMonth);
+  const sqftPerVisitHigh = Math.round(sqftMonthlyHigh / visitsPerMonth);
 
   // Two separate lines (not one combined figure) so the customer's own
   // restroom count always shows up in the breakdown on its own, exactly as
   // entered -- not folded invisibly into the sqft line.
   const adjustments = [
-    { label: `${labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType)} @ ${sqft.toLocaleString()} sq ft (${visitsPerMonth}x/month @ $${sqftPerVisitLow}–$${sqftPerVisitHigh}/visit)`, low: sqftPerVisitLow * visitsPerMonth, high: sqftPerVisitHigh * visitsPerMonth },
-    { label: `${restrooms} restroom${restrooms === 1 ? '' : 's'} (${visitsPerMonth}x/month @ $${restroomPerVisitLow}–$${restroomPerVisitHigh}/visit)`, low: restroomPerVisitLow * visitsPerMonth, high: restroomPerVisitHigh * visitsPerMonth },
+    { label: `${labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType)} @ ${sqft.toLocaleString()} sq ft (${visitsPerMonth}x/month @ $${sqftPerVisitLow}–$${sqftPerVisitHigh}/visit)`, low: sqftMonthlyLow, high: sqftMonthlyHigh },
+    { label: `${restrooms} restroom${restrooms === 1 ? '' : 's'} (${visitsPerMonth}x/month @ $${restroomPerVisitLow}–$${restroomPerVisitHigh}/visit)`, low: restroomMonthlyLow, high: restroomMonthlyHigh },
   ];
 
-  const monthlyBaseLow = perVisitBaseLow * visitsPerMonth;
-  const monthlyBaseHigh = perVisitBaseHigh * visitsPerMonth;
+  const monthlyBaseLow = sqftMonthlyLow + restroomMonthlyLow;
+  const monthlyBaseHigh = sqftMonthlyHigh + restroomMonthlyHigh;
 
   let afterHoursMonthlyLow = 0, afterHoursMonthlyHigh = 0;
   if (afterHours) {
-    const perVisitAHLow = Math.round(perVisitBaseLow * 0.15);
-    const perVisitAHHigh = Math.round(perVisitBaseHigh * 0.15);
-    afterHoursMonthlyLow = perVisitAHLow * visitsPerMonth;
-    afterHoursMonthlyHigh = perVisitAHHigh * visitsPerMonth;
+    afterHoursMonthlyLow = Math.round(monthlyBaseLow * 0.15);
+    afterHoursMonthlyHigh = Math.round(monthlyBaseHigh * 0.15);
     adjustments.push({ label: 'After-hours access (+15%)', low: afterHoursMonthlyLow, high: afterHoursMonthlyHigh });
   }
 
@@ -542,7 +549,7 @@ function calculateCommercialRecurring(details, stateMultiplier, companyConfig) {
     serviceType: 'commercial',
     totalLow: finalLow,
     totalHigh: finalHigh,
-    basePrice: (perVisitBaseLow + perVisitBaseHigh) / 2,
+    basePrice: (sqftPerVisitLow + restroomPerVisitLow + sqftPerVisitHigh + restroomPerVisitHigh) / 2,
     adjustments,
     unit: 'per_month',
     recurringMonthlyLow: finalLow,
