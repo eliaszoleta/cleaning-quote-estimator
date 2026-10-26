@@ -118,7 +118,7 @@ export default function OverviewTab({ config, user }) {
   const quickActions = [
     { label: 'Services & Pricing', href: '?tab=services',      Icon: SlidersHorizontal },
     { label: 'Branding & Embed Code', href: '?tab=branding',   Icon: Code2       },
-    { label: 'View All Leads',     href: '?tab=leads',         Icon: UserPlus    },
+    { label: 'All Leads',          href: '?tab=leads',         Icon: UserPlus    },
     { label: 'Help & Docs',        href: '?tab=help',                           Icon: HelpCircle  },
   ];
 
