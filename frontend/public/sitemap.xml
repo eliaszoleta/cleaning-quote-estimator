@@ -1824,6 +1824,36 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/why-scheduling-is-the-biggest-time-drain-in-cleaning-businesses</loc>
+    <lastmod>2026-12-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/how-to-know-every-cleaning-job-actually-got-done</loc>
+    <lastmod>2026-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/building-a-client-complaint-handling-process-cleaning-business</loc>
+    <lastmod>2026-12-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/why-your-cleaning-quotes-arent-converting-follow-up-system</loc>
+    <lastmod>2026-12-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.cleanestimator.com/blog/stop-chasing-payments-automate-cleaning-business-invoicing</loc>
+    <lastmod>2026-12-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- UK/Canada/Australia pilot blogs (auto-generated from src/data/intl/) -->
   <url>
