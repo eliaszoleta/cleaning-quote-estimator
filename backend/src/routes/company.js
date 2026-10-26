@@ -115,6 +115,7 @@ router.get('/:id', requireAuth, async (req, res) => {
       companyName: req.user.metadata?.company_name,
       phone: req.user.metadata?.phone,
       website: req.user.metadata?.website,
+      email: req.user.email,
     });
     console.log(`[GET config] user=${id} created=${created} | ${Object.entries(config.services || {}).map(([k,v]) => `${k}=${v?.enabled}`).join(' ') || 'none'}`);
     // Deliberately does NOT send the welcome email here, even though this

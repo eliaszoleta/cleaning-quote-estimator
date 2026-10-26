@@ -100,7 +100,12 @@ const DEFAULT_COMPANY_CONFIG = {
   // Owner-provided phone/website, collected once at signup and used to
   // detect duplicate accounts (see companyConfig.js's findDuplicateCompany)
   // -- distinct from ctaPhone/ctaEmail below, which are the contact info
-  // shown to visitors on the results page and are optional/edited any time.
+  // shown to visitors on the results page and are optional/edited any
+  // time. getOrCreateCompanyConfig pre-fills ctaPhone/ctaEmail from this
+  // same signup phone + the Auth account's own email on a brand-new
+  // account (a real starting value instead of a blank field), but they
+  // stay independently editable from that point on -- unlike phone/website
+  // above, which aren't user-editable at all after signup.
   phone: '',
   website: '',
   logo: '',
