@@ -1,8 +1,8 @@
 const { listAllCompanyConfigs, listAllCompanyConfigsWithOwnerInfo, patchCompanyConfig } = require('./companyConfig');
 const { sendTrialCheckin1Email, sendActivationReminderEmail, sendLegacyTrialExpiredEmail } = require('./email');
 const { computeSubscriptionStatus, ALWAYS_ACTIVE_EMAIL } = require('./subscriptionStatus');
+const { NEW_TRIAL_DAYS, LEGACY_TRIAL_DAYS } = require('../config/trialConfig');
 
-const TRIAL_DAYS = 30;
 const ACTIVATION_REMINDER_DELAY_HOURS = 6;
 
 function getSupabase() {
@@ -41,14 +41,16 @@ async function getOwnerEmail(companyId) {
 // webhook to notice it. See checkLegacyTrialExpired below, which restores
 // that one case specifically.
 //
-// Two trial models coexist here:
+// Two trial models coexist here, with two different total lengths:
 // - Current accounts: a real Stripe-managed trial (card collected at
-//   signup, see subscription.js's POST /checkout). sub.currentPeriodEnd is
-//   the trial end date Stripe itself is tracking, so daysElapsed is derived
-//   from that instead of a locally-tracked start date.
+//   signup, see subscription.js's POST /checkout, which grants
+//   NEW_TRIAL_DAYS). sub.currentPeriodEnd is the trial end date Stripe
+//   itself is tracking, so daysElapsed is derived from that instead of a
+//   locally-tracked start date.
 // - Legacy accounts: the old no-card trial (trialStartedAt set, never
-//   touched Stripe) that predates the Checkout-based signup flow. Same
-//   day-7 check-in, just measured from trialStartedAt instead.
+//   touched Stripe) that predates the Checkout-based signup flow, running
+//   against its own original LEGACY_TRIAL_DAYS promise. Same day-7
+//   check-in, just measured from trialStartedAt instead.
 //
 // No cron infrastructure exists in this app (no Railway cron service, no
 // node-cron dependency) -- this runs on a plain setInterval from
@@ -75,11 +77,13 @@ async function checkTrialReminders() {
 
     const daysElapsed = isLegacyTrial
       ? (Date.now() - new Date(sub.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24)
-      : TRIAL_DAYS - Math.max(0, Math.ceil((new Date(sub.currentPeriodEnd) - Date.now()) / (1000 * 60 * 60 * 24)));
-    // Upper bound keeps a long-stale legacy trial (already past its 30
-    // days, no card to charge, quietly never converted) from getting a
-    // "how's week 1 going?" email months late.
-    if (daysElapsed < 7 || daysElapsed > TRIAL_DAYS) continue;
+      : NEW_TRIAL_DAYS - Math.max(0, Math.ceil((new Date(sub.currentPeriodEnd) - Date.now()) / (1000 * 60 * 60 * 24)));
+    // Upper bound keeps a long-stale legacy trial (already past its
+    // LEGACY_TRIAL_DAYS, no card to charge, quietly never converted) from
+    // getting a "how's week 1 going?" email months late. Each path is
+    // checked against its own real trial length, not the other one's.
+    const totalTrialDays = isLegacyTrial ? LEGACY_TRIAL_DAYS : NEW_TRIAL_DAYS;
+    if (daysElapsed < 7 || daysElapsed > totalTrialDays) continue;
 
     try {
       const email = await getOwnerEmail(companyId);

@@ -402,7 +402,7 @@ app.listen(PORT, () => {
 
   // No cron infrastructure in this app (no Railway cron service, no
   // node-cron dependency) -- this is a single always-on Railway service
-  // (railway.toml), so a plain setInterval is enough to keep the 30-day
+  // (railway.toml), so a plain setInterval is enough to keep the free-
   // trial reminder emails going out on time without adding a new
   // dependency or requiring a separate scheduled service to be configured.
   checkTrialReminders().catch(err => console.error('checkTrialReminders (startup run) failed:', err.message));

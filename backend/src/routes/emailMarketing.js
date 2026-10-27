@@ -330,7 +330,7 @@ router.post('/audience/preview', async (req, res) => {
 // POST /api/admin/email-marketing/companies/grant-legacy-winback-trial —
 // a deliberate, explicit write, separate from the read-only audience
 // preview/resolution above on purpose: this is the one action that actually
-// makes the "legacy_winback_fresh_trial" template's 30-day-trial promise
+// makes the "legacy_winback_fresh_trial" template's 14-day-trial promise
 // true. Sets config.subscription.winbackTrialEligible = true on every
 // company in the "legacy no-card signups" segment (same predicate as
 // resolveAudience's companyLegacyNoCardOnly filter) that doesn't already

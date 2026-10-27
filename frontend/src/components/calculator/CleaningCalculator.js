@@ -640,7 +640,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>Clean Estimator — Internal Pricing Tool</span>
               </div>
               <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.55, margin: 0 }}>
-                Unlimited calculations, instant results on screen — 30 days free.
+                Unlimited calculations, instant results on screen — 14 days free.
               </p>
             </div>
             <a

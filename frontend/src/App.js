@@ -211,7 +211,7 @@ function ActivateAfterConfirm({ onDone }) {
           Email confirmed. When you're ready, we'll take you to a secure checkout page to activate Clean Estimator.
         </p>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: '#2563eb', padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, margin: '14px 0 22px' }}>
-          <Zap size={13} /> 30 days free, then $25/month
+          <Zap size={13} /> 14 days free, then $25/month
         </div>
         {error && (
           <p style={{ color: '#dc2626', fontSize: 13, marginBottom: 14 }}>

@@ -4,6 +4,7 @@ const { getCompanyConfig, saveCompanyConfig, patchCompanyConfig, getOrCreateComp
 const { computeSubscriptionStatus } = require('../services/subscriptionStatus');
 const { sendCompanyWelcomeEmail, sendSubscriptionReactivatedEmail, sendPaymentFailedEmail, sendSubscriptionCanceledEmail } = require('../services/email');
 const { DEFAULT_COMPANY_CONFIG } = require('../config/defaults');
+const { NEW_TRIAL_DAYS, LEGACY_TRIAL_DAYS } = require('../config/trialConfig');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
@@ -118,16 +119,18 @@ router.post('/checkout', async (req, res) => {
     //    immediately, same as before.
     // 2. Legacy no-card trial (trialStartedAt set, never touched Stripe) --
     //    adding a card now shouldn't forfeit whatever real free days are
-    //    still left, nor grant extra ones beyond that. If those days have
+    //    still left (against that trial's own original LEGACY_TRIAL_DAYS
+    //    promise), nor grant extra ones beyond that. If those days have
     //    already run out, this collapses to the same "charge immediately"
     //    behavior as case 1 -- UNLESS winbackTrialEligible was explicitly
-    //    set (see below), which grants a genuine fresh 30 days instead.
-    // 3. Brand new account, no trial ever started -- the full 30-day trial.
+    //    set (see below), which grants a genuine fresh NEW_TRIAL_DAYS instead.
+    // 3. Brand new account, no trial ever started -- the full NEW_TRIAL_DAYS
+    //    trial.
     let trialPeriodDays = null;
     if (!config.subscription?.stripeSubscriptionId) {
       if (config.subscription?.trialStartedAt) {
         const daysElapsed = (Date.now() - new Date(config.subscription.trialStartedAt).getTime()) / (1000 * 60 * 60 * 24);
-        const daysLeft = Math.ceil(30 - daysElapsed);
+        const daysLeft = Math.ceil(LEGACY_TRIAL_DAYS - daysElapsed);
         if (daysLeft > 0) trialPeriodDays = daysLeft;
         // winbackTrialEligible: set only by the admin's explicit "grant a
         // fresh trial" action on the Email Marketing tab (see
@@ -135,14 +138,14 @@ router.post('/checkout', async (req, res) => {
         // scoped to a specific win-back campaign -- never set automatically.
         // Exists because this account's real legacy trial is fully spent
         // (daysLeft <= 0 above), but the win-back email promises "a new
-        // 30-day trial," which must actually be true when they click
-        // through, not just marketing copy. Doesn't reset itself after use;
-        // once this account has a stripeSubscriptionId the outer `if` above
-        // stops this whole block from running again, so there's no way to
-        // re-use it for a second free trial by canceling and resubscribing.
-        else if (config.subscription?.winbackTrialEligible) trialPeriodDays = 30;
+        // NEW_TRIAL_DAYS-day trial," which must actually be true when they
+        // click through, not just marketing copy. Doesn't reset itself after
+        // use; once this account has a stripeSubscriptionId the outer `if`
+        // above stops this whole block from running again, so there's no way
+        // to re-use it for a second free trial by canceling and resubscribing.
+        else if (config.subscription?.winbackTrialEligible) trialPeriodDays = NEW_TRIAL_DAYS;
       } else {
-        trialPeriodDays = 30;
+        trialPeriodDays = NEW_TRIAL_DAYS;
       }
     }
 

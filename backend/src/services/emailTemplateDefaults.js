@@ -65,7 +65,7 @@ module.exports = [
     variables: [
       { name: 'embedCode', example: '<iframe ...>...</iframe>' },
       { name: 'embedCodeHtml', example: '(HTML-escaped embed code, for the &lt;pre&gt; block)' },
-      { name: 'statusLine', example: 'Your account is live and your 30-day free trial has started.' },
+      { name: 'statusLine', example: 'Your account is live and your 14-day free trial has started.' },
     ],
     text: [
       'Welcome to Clean Estimator!',
@@ -235,7 +235,7 @@ module.exports = [
       'Finish setting up my account:',
       'https://www.cleanestimator.com/company',
       '',
-      "Your 30-day trial doesn't start until you do, so nothing's running out in the meantime.",
+      "Your 14-day trial doesn't start until you do, so nothing's running out in the meantime.",
       '',
       'If you ran into an issue or just changed your mind, just reply and let me know — happy to help.',
       '',
@@ -262,7 +262,7 @@ module.exports = [
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Your 30-day trial doesn't start until you do, so nothing's running out in the meantime.
+    Your 14-day trial doesn't start until you do, so nothing's running out in the meantime.
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
@@ -413,7 +413,7 @@ module.exports = [
       '',
       "The embeddable widget is still part of the same plan too, whenever you do have a website -- same account, same login, nothing to redo.",
       '',
-      "It's $25/month flat, with a 30-day free trial if you haven't already used yours. Reply to this email if you have any questions -- happy to help.",
+      "It's $25/month flat, with a 14-day free trial if you haven't already used yours. Reply to this email if you have any questions -- happy to help.",
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -438,7 +438,7 @@ module.exports = [
   </p>
 
   <p style="font-size:13px;color:#666666;line-height:1.6;margin:0 0 20px;">
-    It's $25/month flat, with a 30-day free trial if you haven't already used yours. Reply to this email if you have any questions — happy to help.
+    It's $25/month flat, with a 14-day free trial if you haven't already used yours. Reply to this email if you have any questions — happy to help.
   </p>
   ${FOOTER_HTML}
 </div>`,
@@ -448,25 +448,25 @@ module.exports = [
     // Same "not auto-triggered, seeded for a manual campaign" shape as
     // legacy_calculator_mode_reminder above, targeting the same "Legacy no-
     // card signups only" audience filter -- but this one is specifically for
-    // accounts whose old no-card trial already ran its full 30 days, never
-    // got a card added, and (per the request that created this template)
+    // accounts whose old no-card trial already ran its full LEGACY_TRIAL_DAYS,
+    // never got a card added, and (per the request that created this template)
     // never received the Calculator Mode pitch either. The subject is
     // written flat and factual from the start (no "come back!" hook) --
     // already learned the hard way on legacy_calculator_mode_reminder's
     // first subject, which landed in Promotions and had to be rewritten.
     //
-    // IMPORTANT: this template's "new 30-day trial" claim is only true if
-    // the admin has clicked "Grant fresh 30-day trial to this segment" on
+    // IMPORTANT: this template's "new 14-day trial" claim is only true if
+    // the admin has clicked "Grant fresh 14-day trial to this segment" on
     // the Compose/Send panel first (POST /companies/grant-legacy-winback-
     // trial, see emailMarketing.js) -- that sets
     // config.subscription.winbackTrialEligible, which is what makes
-    // subscription.js's checkout route actually grant 30 days instead of
-    // charging immediately (a legacy trial that's already fully elapsed
+    // subscription.js's checkout route actually grant NEW_TRIAL_DAYS instead
+    // of charging immediately (a legacy trial that's already fully elapsed
     // otherwise gets zero trial days on resubscribe, same as any other
     // resubscribe). Sending this email without granting that first makes
     // the subject line a promise the product won't keep.
-    name: 'Legacy no-card signups — fresh 30-day trial win-back',
-    subject: 'Your Clean Estimator account is eligible for a new 30-day trial',
+    name: 'Legacy no-card signups — fresh 14-day trial win-back',
+    subject: 'Your Clean Estimator account is eligible for a new 14-day trial',
     variables: [
       { name: 'companyName', example: 'Sparkle Clean Co' },
       { name: 'signupDateSuffix', example: ' on October 14, 2026' },
@@ -478,7 +478,7 @@ module.exports = [
       '',
       "Since you signed up, we've also added Calculator Mode -- an on-screen, unlimited pricing tool for your own quoting. No website or embed code required; log in, answer a few quick questions about a job, and get an accurate, consistent price in seconds. (If you do have a website, the embeddable calculator widget is still part of the same plan.)",
       '',
-      "And we've reset your trial too: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup.",
+      "And we've reset your trial too: your account now qualifies for a brand-new 14-day free trial, the same as a first-time signup.",
       '',
       'Start my new trial:',
       'https://www.cleanestimator.com/company',
@@ -500,7 +500,7 @@ module.exports = [
   </p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    And we've reset your trial too: your account now qualifies for a brand-new 30-day free trial, the same as a first-time signup.
+    And we've reset your trial too: your account now qualifies for a brand-new 14-day free trial, the same as a first-time signup.
   </p>
 
   <p style="margin:0 0 24px;">

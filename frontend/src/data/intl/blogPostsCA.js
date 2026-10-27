@@ -209,7 +209,7 @@ Commercial cleaning services are subject to GST everywhere in Canada, plus provi
 
 ## Bottom Line
 
-[Use our commercial cleaning cost calculator](/?service=commercial) to get a province-accurate estimate for your space. If you run a cleaning company yourself and want to quote commercial jobs this consistently for your own clients, [try Clean Estimator free for 30 days](/estimator).
+[Use our commercial cleaning cost calculator](/?service=commercial) to get a province-accurate estimate for your space. If you run a cleaning company yourself and want to quote commercial jobs this consistently for your own clients, [try Clean Estimator free for 14 days](/estimator).
     `,
   },
   {
@@ -334,7 +334,7 @@ See [our full Canada house cleaning cost guide](/blog/ca/how-much-does-house-cle
 
 ## Try It Yourself
 
-If you want to quote jobs this consistently — same pricing logic every time, specific to your province, instead of guessing or rebuilding a spreadsheet — [try Clean Estimator free for 30 days](/estimator). It's built around exactly the pricing data used throughout this guide.
+If you want to quote jobs this consistently — same pricing logic every time, specific to your province, instead of guessing or rebuilding a spreadsheet — [try Clean Estimator free for 14 days](/estimator). It's built around exactly the pricing data used throughout this guide.
     `,
   },
 ];
