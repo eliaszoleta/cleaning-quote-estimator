@@ -313,7 +313,7 @@ router.post('/', async (req, res) => {
         return res.status(429).json({
           success: false,
           limitReached: true,
-          error: `This tool is limited to ${PUBLIC_DAILY_LIMIT} free estimate${PUBLIC_DAILY_LIMIT === 1 ? '' : 's'} per day. Need unlimited estimates for your business? Clean Estimator is $25/month with a 14-day free trial.`,
+          error: `This free tool caps out at ${PUBLIC_DAILY_LIMIT} estimate${PUBLIC_DAILY_LIMIT === 1 ? '' : 's'} a day to protect it from bots and spam. If you're pricing jobs for your own cleaning business, Clean Estimator is $25/month with a 14-day free trial for unlimited calculations.`,
         });
       }
     }
