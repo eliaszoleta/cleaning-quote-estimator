@@ -113,13 +113,13 @@ export default function CalculatorPage() {
             Keeping it inside means it moves with the card instead. */}
         <div className={showingResults ? undefined : 'calc-card-sink'} style={showingResults ? undefined : { maxWidth: 720, position: 'relative', background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           {/* See App.js's homepage instance for the full comment on the
-              Oct 2026 instant-results conversion test, reverted back to the
-              normal lead-capture flow here too, and on askUserType's role
-              in the no-partner/instant-results case. PricingUpdateNotice
-              still shows (CleaningCalculator.js's internal condition covers
+              Oct 2026 instant-results conversion test and the later
+              gateLeadByPartner one, both reverted back to the normal
+              lead-capture flow here too. PricingUpdateNotice still shows
+              (CleaningCalculator.js's internal condition covers
               siteLanding pages regardless of skipLeadCapture), so this page
               still doesn't need its own separate copy of it. */}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector gateLeadByPartner showSignupCta askUserType />
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector />
         </div>
 
         <div style={{ marginTop: 48 }}>

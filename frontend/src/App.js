@@ -544,34 +544,24 @@ export default function App() {
         <Header />
         <main>
           <Suspense fallback={<PageFallback />}>
-            {/* Ran as skipLeadCapture+instantResults+showSignupCta+askUserType
-                for about a week (Oct 2026) to test whether an instant
-                on-screen result converted better to a paid signup than the
-                lead-capture form -- reverted back to the normal flow
-                (name/email/phone form -> "check your email" -> estimate
-                email) before any conclusion was drawn. skipLeadCapture and
-                instantResults are still unused (lead capture is now gated
-                per-visitor by gateLeadByPartner instead), but showSignupCta
-                came back with it (2026-10-25, see partner-gated-lead-
-                capture's CLAUDE.md entry): whenever gateLeadByPartner drops
-                a visitor to the instant on-screen result (no partner in
-                their area), ResultsScreen otherwise falls back to a
-                generic, dead-end "Contact Us" card linking to "/" --
-                showSignupCta replaces that with the actual "Own a cleaning
-                business? Start Free Trial" promo, the thing worth showing
-                someone who isn't getting forwarded to a partner anyway.
-                askUserType came back too (2026-10-27): that same no-
-                partner/instant-results path was skipping the lead-capture
-                step (and the "I am a..." question baked into it) entirely,
-                which meant ResultsScreen's homeowner-vs-business midpoint-
-                price logic never actually had an answer to check and
-                defaulted to showing the midpoint to every on-screen
-                visitor, homeowners included -- askUserType swaps the
-                lead step for the single "I am a..." question in that same
-                no-partner case so that logic has a real answer again.
-                showCountrySelector is unrelated to any of this, a
+            {/* Ran as skipLeadCapture+instantResults (Oct 2026) and then as
+                gateLeadByPartner+showSignupCta+askUserType (2026-10-25 to
+                2026-10-27, see partner-gated-lead-capture's CLAUDE.md
+                entry) -- both were zero-friction, instant-on-screen-result
+                experiments that got turned back off again, this one
+                deliberately (2026-10-27): always show the normal lead-
+                capture form (name/email/phone -> "check your email" ->
+                estimate email) regardless of whether a partner covers this
+                visitor's area, instead of dropping a no-partner visitor
+                straight to an on-screen result. gateLeadByPartner's
+                mechanism itself is untouched in CleaningCalculator.js (an
+                opt-in prop, just not passed here anymore) in case it's
+                wanted again; showSignupCta and askUserType existed purely
+                to patch problems that only existed on that now-unused
+                no-partner/instant-results path, so neither is passed
+                either. showCountrySelector is unrelated to any of this, a
                 separate, still-wanted feature. */}
-            <CleaningCalculator showCountrySelector gateLeadByPartner showSignupCta askUserType />
+            <CleaningCalculator showCountrySelector />
             <SEOContent />
           </Suspense>
         </main>

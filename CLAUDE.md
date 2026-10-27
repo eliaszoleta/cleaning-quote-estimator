@@ -53,6 +53,8 @@ Commits:
 
 To revert: `git revert 251af8e` on production, `git revert be93a3e` on sync (or cherry-pick one revert's content to the other, same as any other dual-branch change). This also un-fixes the embedded/siteLanding partner-lookup bug described above -- if the user only wants the gating undone but wants to keep that bug fix, say so explicitly rather than reverting wholesale.
 
+**Status (2026-10-27): the gating itself is currently OFF.** The user changed their mind and asked to bring back always-on lead capture on the 4 public pages -- rather than a literal `git revert` (which would also undo the embedded/siteLanding bug fix above), `gateLeadByPartner` was just stopped being passed from the 4 call sites, keeping the bug fix and leaving `gateLeadByPartner`'s mechanism itself intact and unused in `CleaningCalculator.js` in case it's wanted again. `showSignupCta` and `askUserType` (the latter added 2026-10-27 specifically to ask "I am a..." on the no-partner/instant-results path) were dropped from those same 4 call sites too, since both only ever did anything on that now-unused path. If asked to "bring back the partner gating," re-add `gateLeadByPartner` (and, if the on-screen-result path should show it again, `showSignupCta`/`askUserType`) to the 4 call sites rather than re-deriving this from scratch.
+
 # Blog posts: always write for organic Google search traffic
 
 Standing rule from the user (2026-10-26): every `blogPosts.js` post is written to maximize organic search traffic from Google, not just to answer the source question well. This applies to every post, not just the ones explicitly flagged as "make this SEO optimized" -- treat it as the default, always-on goal for this file. In practice:
