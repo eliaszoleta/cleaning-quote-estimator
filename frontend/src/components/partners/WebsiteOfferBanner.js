@@ -78,9 +78,10 @@ export default function WebsiteOfferBanner() {
     try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch { /* ignore */ }
   };
 
-  // Mobile shows the same compact bottom-corner card FloatingPartnerBanner.js
-  // already uses for its own banner -- already mobile-sized/positioned below
-  // (isMobile branches throughout this component), so nothing else to add.
+  // Disabled on mobile for now (desktop unaffected) -- a direct ask, not a
+  // bug fix; revisit if/when there's a mobile layout for this worth shipping.
+  if (isMobile) return null;
+
   if (!city || !visible) return null;
 
   // Portal to document.body for the same reason as FloatingPartnerBanner --
