@@ -637,7 +637,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
             </div>
             <h3 style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Daily limit reached</h3>
             <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.65, marginBottom: 22 }}>
-              This tool is limited to 1 free estimate a day to prevent bot spam attacks. Want unlimited calculations for your business?
+              This tool is limited to 1 free estimate a day. Want unlimited calculations for your business?
             </p>
             <div style={{ background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: 12, padding: '16px 18px', marginBottom: 20, textAlign: 'left' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
