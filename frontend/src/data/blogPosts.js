@@ -4922,7 +4922,7 @@ Not every "quote calculator" is built the same way. Before adding one to your si
 3. **Copy the embed code** into your site — a Custom HTML / Embed block in Wix, Squarespace, or WordPress, or directly in your site's code if you manage it yourself.
 4. **Start capturing leads** — every completed estimate becomes a lead in your dashboard automatically.
 
-[Clean Estimator](/estimator) does all four of these with a 30-day free trial.
+[Clean Estimator](/estimator) does all four of these with a 14-day free trial.
 
 ## What Happens the Moment Someone Gets an Estimate
 
@@ -4992,7 +4992,7 @@ No — it's what converts the traffic those channels bring you, not a replacemen
 **Is this hard to set up compared to a basic contact form plugin?**
 No — [Clean Estimator](/estimator) embeds with a short snippet of code, same as most contact form plugins, but shows real pricing instead of a blank submission box.
 
-[Try it free for 30 days →](/estimator)
+[Try it free for 14 days →](/estimator)
     `,
   },
   {
@@ -5035,7 +5035,7 @@ Asks a few questions (service, size, location) and shows a real price range imme
 
 If your site only has a contact form today, adding an instant quote calculator is usually the single highest-impact change you can make — it doesn't replace the form, it upgrades it, since a good calculator collects the same contact details a form would, just with a real price shown first. Booking widgets and live chat are worth layering in later, once you're consistently getting quote requests and need to help visitors take the next step faster.
 
-[Clean Estimator](/estimator) covers all 12 major cleaning service types with one embeddable calculator, branded to your business, with lead alerts and a dashboard built in — a 30-day free trial to start.
+[Clean Estimator](/estimator) covers all 12 major cleaning service types with one embeddable calculator, branded to your business, with lead alerts and a dashboard built in — a 14-day free trial to start.
 
 ## FAQ
 
@@ -5089,7 +5089,7 @@ Getting an estimate calculator running on your site doesn't require a developer:
 - Copy the embed code into your website
 - Leads start flowing into your dashboard (and your inbox) automatically
 
-[Clean Estimator](/estimator) covers house cleaning, apartments, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, water damage, airbnb/vacation rental, and post-construction — all 12 in one calculator, with a 30-day free trial.
+[Clean Estimator](/estimator) covers house cleaning, apartments, commercial, carpet, upholstery, air duct, dryer vent, tile & grout, mold remediation, water damage, airbnb/vacation rental, and post-construction — all 12 in one calculator, with a 14-day free trial.
 
 ## FAQ
 
@@ -8172,7 +8172,7 @@ Use a consistent formula — base rate by service type, adjusted for condition, 
 Usually because the pricing logic lives in each estimator's head instead of a shared formula — different people weigh condition, size, and add-ons differently without realizing it.
 
 **Is there a free way to calculate cleaning estimates?**
-[Clean Estimator](/estimator) offers a 30-day free trial with unlimited estimates across all 12 service types, so you can test the formula against your own jobs before committing.
+[Clean Estimator](/estimator) offers a 14-day free trial with unlimited estimates across all 12 service types, so you can test the formula against your own jobs before committing.
 
 **Do I need to already know my pricing to use an estimate calculator?**
 No — you set your own markup and minimum charges on top of researched, location-adjusted base pricing, so you're not starting from a blank spreadsheet.
@@ -8191,7 +8191,7 @@ No — you set your own markup and minimum charges on top of researched, locatio
     content: `
 ## The Short Answer
 
-For a cleaning business pricing jobs across multiple service types, locations, or estimators, a dedicated cleaning estimate calculator is worth it once gut-feel pricing or a spreadsheet starts producing inconsistent quotes. [Clean Estimator](/estimator) is built specifically for this: location-accurate pricing across all 12 cleaning service types, your own markup on top to match your margins, and an instant on-screen number for $25/month with a 30-day free trial.
+For a cleaning business pricing jobs across multiple service types, locations, or estimators, a dedicated cleaning estimate calculator is worth it once gut-feel pricing or a spreadsheet starts producing inconsistent quotes. [Clean Estimator](/estimator) is built specifically for this: location-accurate pricing across all 12 cleaning service types, your own markup on top to match your margins, and an instant on-screen number for $25/month with a 14-day free trial.
 
 ## How Cleaning Businesses Actually Price Jobs
 
@@ -8235,7 +8235,7 @@ Some estimate tools are built primarily as a public, embeddable widget that show
 
 ## Pricing
 
-Clean Estimator is **$25/month**, with a **30-day free trial** and no per-lead fees. Signup takes about two minutes, and you can run your first estimate immediately after — pricing is already built in, so there's nothing to configure first. Customizing your branding and adding the optional website widget is the only part that takes longer (usually under 30 minutes, no developer needed), and it's entirely optional.
+Clean Estimator is **$25/month**, with a **14-day free trial** and no per-lead fees. Signup takes about two minutes, and you can run your first estimate immediately after — pricing is already built in, so there's nothing to configure first. Customizing your branding and adding the optional website widget is the only part that takes longer (usually under 30 minutes, no developer needed), and it's entirely optional.
 
 ## Who This Is Actually For
 
@@ -8250,7 +8250,7 @@ Clean Estimator is **$25/month**, with a **30-day free trial** and no per-lead f
 For a cleaning business pricing jobs across multiple service types or team members, a dedicated calculator built specifically for cleaning pricing logic — like [Clean Estimator](/estimator) — outperforms a general-purpose quoting tool or a manually maintained spreadsheet, since it's built around how cleaning jobs are actually priced by service type, condition, and location.
 
 **How much does cleaning estimate software typically cost?**
-Clean Estimator is $25/month flat, with unlimited estimates and no per-lead charges — a 30-day free trial is available to test it against your own jobs first.
+Clean Estimator is $25/month flat, with unlimited estimates and no per-lead charges — a 14-day free trial is available to test it against your own jobs first.
 
 **Can I use an estimate calculator without putting pricing on my public website?**
 Yes — Clean Estimator runs internally by default, so you get the instant number on your own screen and decide whether or not to ever show pricing publicly. The public calculator widget is available on the same plan but is optional, not required.
@@ -8259,7 +8259,7 @@ Yes — Clean Estimator runs internally by default, so you get the instant numbe
 A calculator built specifically for cleaning businesses should cover your full service mix in one tool — Clean Estimator covers all 12 common cleaning service types (including carpet, upholstery, and restoration services) rather than just standard house cleaning.
 
 **Is there a free trial for cleaning estimate software?**
-Yes — Clean Estimator offers a 30-day free trial with unlimited estimates before you're charged anything.
+Yes — Clean Estimator offers a 14-day free trial with unlimited estimates before you're charged anything.
 
 [Start your free trial →](/estimator)
     `,
@@ -8882,7 +8882,7 @@ Once you're past 15–20 regular turnovers a week, the math usually favors hirin
 
 As soon as more than one person is quoting jobs, pricing consistency becomes the thing that makes or breaks a scaling turnover cleaning business — one estimator quoting a 2BR at $110 and another quoting the same unit at $140 erodes trust fast in a tight host community where people compare notes. [Clean Estimator](/estimator) runs this exact size-based, add-on-aware pricing formula automatically across your whole team, so every quote — Airbnb turnovers included — comes out the same number regardless of who's answering the phone.
 
-[Start your free 30-day trial →](/estimator)
+[Start your free 14-day trial →](/estimator)
     `,
   },
   {
@@ -9340,7 +9340,7 @@ Construction project timelines slip constantly, which means your scheduling need
 
 As you take on more contractor relationships and more crew members quoting jobs, consistent pricing matters just as much here as in any other service — a contractor comparing invoices across projects will notice if quotes vary without a clear reason. [Clean Estimator](/estimator) prices post-construction cleanup on this exact sq-ft-and-scope formula automatically, across your whole team.
 
-[Start your free 30-day trial →](/estimator)
+[Start your free 14-day trial →](/estimator)
     `,
   },
   {

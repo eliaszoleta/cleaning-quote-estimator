@@ -226,7 +226,7 @@ If the cleaning company is VAT-registered, VAT applies to commercial cleaning th
 
 ## Bottom Line
 
-[Use our commercial cleaning cost calculator](/?service=commercial) to get a region-accurate estimate for your premises. If you run a cleaning business yourself and want to quote commercial jobs this consistently for your own clients, [try Clean Estimator free for 30 days](/estimator).
+[Use our commercial cleaning cost calculator](/?service=commercial) to get a region-accurate estimate for your premises. If you run a cleaning business yourself and want to quote commercial jobs this consistently for your own clients, [try Clean Estimator free for 14 days](/estimator).
     `,
   },
   {
@@ -350,7 +350,7 @@ See [our full UK house cleaning cost guide](/blog/uk/how-much-does-house-cleanin
 
 ## Try It Yourself
 
-If you want to quote jobs this consistently — the same pricing logic every time, specific to your region, instead of guessing or rebuilding a spreadsheet — [try Clean Estimator free for 30 days](/estimator). It's built around exactly the pricing data used throughout this guide.
+If you want to quote jobs this consistently — the same pricing logic every time, specific to your region, instead of guessing or rebuilding a spreadsheet — [try Clean Estimator free for 14 days](/estimator). It's built around exactly the pricing data used throughout this guide.
     `,
   },
 ];

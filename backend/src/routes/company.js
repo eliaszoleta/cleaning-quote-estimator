@@ -107,10 +107,10 @@ router.get('/:id', requireAuth, async (req, res) => {
   try {
     // getOrCreateCompanyConfig also runs from GET /api/subscription/status,
     // since the dashboard calls both endpoints in parallel on load with no
-    // ordering guarantee -- sharing this logic (30-day trial on first login,
-    // backfill trialStartedAt on old accounts missing it) means whichever
-    // request wins the race still gets the right answer, instead of the
-    // loser reading "no config yet" and reporting requires_trial_setup.
+    // ordering guarantee -- sharing this logic (seeding companyName/phone/
+    // website/ctaPhone/ctaEmail on first login) means whichever request
+    // wins the race still gets the right answer, instead of the loser
+    // reading "no config yet" and reporting requires_trial_setup.
     const { config, created } = await getOrCreateCompanyConfig(id, {
       companyName: req.user.metadata?.company_name,
       phone: req.user.metadata?.phone,

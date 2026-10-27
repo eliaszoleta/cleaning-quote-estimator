@@ -381,7 +381,7 @@ export async function previewAdminEmailAudience(adminKey, audience) {
 
 // Grants subscription.winbackTrialEligible=true to every company in the
 // "legacy no-card signups" segment that doesn't already have it -- what
-// actually makes the legacy_winback_fresh_trial template's "new 30-day
+// actually makes the legacy_winback_fresh_trial template's "new 14-day
 // trial" promise true at checkout (see subscription.js). Sending that
 // campaign alone does not grant anything; call this once first.
 export async function grantLegacyWinbackTrial(adminKey) {

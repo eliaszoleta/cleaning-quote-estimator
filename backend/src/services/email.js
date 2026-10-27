@@ -966,7 +966,7 @@ async function sendCompanyWelcomeEmail({ to, companyId, subject, statusLine }) {
     vars: {
       embedCode: code,
       embedCodeHtml: code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-      statusLine: statusLine || "Your account is live and your 30-day free trial has started.",
+      statusLine: statusLine || "Your account is live and your 14-day free trial has started.",
     },
     subjectOverride: subject,
     recipientType: 'company',

@@ -115,7 +115,7 @@ export default function AuthPage({ onAuth }) {
           setEmailSent(true);
         } else if (data.session) {
           // Last step to activate: send them straight to Stripe Checkout
-          // (30-day trial applied server-side -- see subscription.js's
+          // (14-day trial applied server-side -- see subscription.js's
           // POST /checkout) instead of dropping them into the dashboard
           // first. window.location.href doesn't navigate away instantly,
           // so redirectingToCheckout keeps this screen showing a clear
@@ -213,7 +213,7 @@ export default function AuthPage({ onAuth }) {
           <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7, marginBottom: 10 }}>We sent a confirmation link to</p>
           <div style={{ display: 'inline-block', background: '#f1f5f9', borderRadius: 6, padding: '6px 16px', fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 24 }}>{email}</div>
           <p style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7, marginBottom: 32 }}>
-            Click the link in the email to confirm your account, then activate your calculator with a quick checkout step — 30 days free before your first charge.
+            Click the link in the email to confirm your account, then activate your calculator with a quick checkout step — 14 days free before your first charge.
           </p>
           <button onClick={() => { setEmailSent(false); setMode('login'); }}
             style={{ width: '100%', padding: '13px 0', borderRadius: 8, border: 'none', background: '#2563eb', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 14px rgba(37,99,235,0.3)' }}>
@@ -271,7 +271,7 @@ export default function AuthPage({ onAuth }) {
             Your account is created. We're taking you to a secure checkout page to activate Clean Estimator.
           </p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: '#2563eb', padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, marginTop: 14 }}>
-            <Zap size={13} /> 30 days free, then $25/month
+            <Zap size={13} /> 14 days free, then $25/month
           </div>
         </div>
       </div>
@@ -342,7 +342,7 @@ export default function AuthPage({ onAuth }) {
           {mode === 'login' ? 'Welcome back' : 'Create your account'}
         </h1>
         <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28, lineHeight: 1.5 }}>
-          {mode === 'login' ? 'Sign in to manage your widget, leads, and billing.' : 'Start your 30-day free trial — card required, not charged until it ends.'}
+          {mode === 'login' ? 'Sign in to manage your widget, leads, and billing.' : 'Start your 14-day free trial — card required, not charged until it ends.'}
         </p>
 
         {/* Toggle */}

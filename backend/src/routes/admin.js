@@ -303,7 +303,7 @@ router.post('/companies/backfill-company-profiles', async (req, res) => {
   }
 });
 
-const TRIAL_EMAIL_SUBJECT = 'Your 30-day free trial is active — here\'s your embed code';
+const TRIAL_EMAIL_SUBJECT = 'Your 14-day free trial is active — here\'s your embed code';
 
 // GET /api/admin/companies/trial-email-preview — read-only. Lists exactly
 // who a broadcast trial-activation email would go to (name, email) and who

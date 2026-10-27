@@ -1,4 +1,4 @@
-const TRIAL_DAYS = 30; // Legacy: for existing accounts that started a free trial without CC
+const { LEGACY_TRIAL_DAYS } = require('../config/trialConfig');
 
 // Elias's own demo/testing account -- used to check real dashboard/widget
 // behavior while working on this app, so it should never show trial-expired
@@ -55,16 +55,18 @@ function computeSubscriptionStatus(config, email) {
 
   // trialStartedAt is a legacy, no-card trial -- nothing sets this anymore
   // (getOrCreateCompanyConfig no longer auto-starts one on first dashboard
-  // load; every account now gets its 30-day trial through Stripe Checkout
-  // itself, see subscription.js's POST /checkout). Kept read-only here so
-  // any account that already has one from before that change keeps running
-  // out normally instead of being retroactively cut off. Checked ahead of
-  // the even older trialType legacy flag on purpose: an account that
-  // somehow has both must not get stuck re-reading the stale trialType flag
-  // forever -- trialStartedAt being present always wins.
+  // load; every account now gets its trial through Stripe Checkout itself,
+  // see subscription.js's POST /checkout, which grants NEW_TRIAL_DAYS, not
+  // this). Kept read-only here so any account that already has one from
+  // before that change keeps running out against its own original
+  // LEGACY_TRIAL_DAYS promise, instead of being retroactively cut short or
+  // extended by whatever the current new-signup trial length happens to be.
+  // Checked ahead of the even older trialType legacy flag on purpose: an
+  // account that somehow has both must not get stuck re-reading the stale
+  // trialType flag forever -- trialStartedAt being present always wins.
   if (trialStart) {
     const daysElapsed = (Date.now() - trialStart.getTime()) / (1000 * 60 * 60 * 24);
-    if (daysElapsed < TRIAL_DAYS) {
+    if (daysElapsed < LEGACY_TRIAL_DAYS) {
       // active stays true -- the embedded public widget (calculate.js
       // checks this same .active flag for both internal Calculator Mode and
       // the live widget) keeps working normally for the rest of these real
@@ -73,7 +75,7 @@ function computeSubscriptionStatus(config, email) {
       // card to keep going" -- deliberately NOT the same flag calculate.js
       // reads, so a company's already-live widget doesn't go dark just
       // because they haven't logged back in and added a card yet.
-      return { active: true, status: 'trialing', needsCardForTrial: true, daysLeft: Math.ceil(TRIAL_DAYS - daysElapsed), currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
+      return { active: true, status: 'trialing', needsCardForTrial: true, daysLeft: Math.ceil(LEGACY_TRIAL_DAYS - daysElapsed), currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
     }
     return { active: false, status: 'expired', daysLeft: 0, currentPeriodEnd: null, stripeCustomerId: sub.stripeCustomerId || null, stripeSubscriptionId: null };
   }

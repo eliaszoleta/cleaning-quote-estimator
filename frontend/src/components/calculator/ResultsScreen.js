@@ -295,7 +295,7 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
                     <span style={{ fontWeight: 700, fontSize: 15, color: COLORS.ink }}>Own a cleaning business?</span>
                   </div>
                   <p style={{ fontSize: 13, color: COLORS.body, margin: '0 0 14px' }}>
-                    This is Clean Estimator's internal pricing tool -- the same unlimited, instant calculator, built for your own quoting. 30-day free trial, cancel anytime.
+                    This is Clean Estimator's internal pricing tool -- the same unlimited, instant calculator, built for your own quoting. 14-day free trial, cancel anytime.
                   </p>
                   <a href="/estimator" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: primaryColor, color: 'white', padding: '11px 22px', borderRadius: RADIUS.sm, textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
                     Start Free Trial <ArrowRight size={14} />
