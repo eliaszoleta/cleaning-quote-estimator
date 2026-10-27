@@ -70,7 +70,7 @@ module.exports = [
     text: [
       'Welcome to Clean Estimator!',
       '',
-      "{{statusLine}} Clean Estimator is your internal pricing tool: log in, switch to Calculator Mode, and run instant, accurate price estimates for your own quoting — no price range shown to a customer, nothing to manage as a lead, just a fast number you can trust.",
+      "{{statusLine}} Clean Estimator is your internal pricing tool: log in, switch to Calculator Mode, and run instant, accurate price estimates for your own quoting.",
       '',
       'Open my calculator →',
       'https://www.cleanestimator.com/company',
@@ -100,7 +100,7 @@ module.exports = [
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Welcome to Clean Estimator!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    {{statusLine}} Clean Estimator is your internal pricing tool: log in, switch to <strong>Calculator Mode</strong>, and run instant, accurate price estimates for your own quoting — no price range shown to a customer, nothing to manage as a lead, just a fast number you can trust.
+    {{statusLine}} Clean Estimator is your internal pricing tool: log in, switch to <strong>Calculator Mode</strong>, and run instant, accurate price estimates for your own quoting.
   </p>
 
   <p style="margin:0 0 24px;">
