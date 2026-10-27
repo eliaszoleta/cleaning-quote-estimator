@@ -28,7 +28,6 @@ import LeadCaptureStep from './steps/LeadCaptureStep';
 import UserTypeStep from './steps/UserTypeStep';
 import ResultsScreen from './ResultsScreen';
 import EstimateSentScreen from './EstimateSentScreen';
-import PricingUpdateNotice from './PricingUpdateNotice';
 
 const SERVICE_STEPS = {
   home_residential: ['service', 'location', 'home', 'lead', 'results'],
@@ -839,20 +838,6 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
 
           {/* Steps */}
           <div style={{ padding: isMobile ? '20px 12px' : embedded && !isWideEmbedded ? '20px 12px' : '32px 40px' }}>
-            {/* skipLeadCapture callers (see its own comment) are
-                RunEstimateTab.js -- the dashboard's internal "Run an
-                Estimate" tool for our own paying subscribers -- so it's fine
-                to show this same refreshed-pricing reassurance about our own
-                data quality there. siteLanding is the public homepage's 3
-                landing-page twins (CalculatorPage/EstimatorPage/
-                ServiceCalculatorPage), our own pages too even though they
-                don't set skipLeadCapture (they went back to the normal
-                lead-capture flow, Oct 2026 -- see showInstantResults' own
-                comment). The other embedded=true callers (EmbedWrapper.js's
-                real third-party embeds, BrandingTab.js's live preview) stay
-                excluded -- that message would be confusing on someone
-                else's site. */}
-            {(!embedded || skipLeadCapture || siteLanding) && currentStep === 'service' && <PricingUpdateNotice country={country} />}
             {currentStep === 'service' && (
               <div style={{ position: 'relative' }}>
                 <ServiceSelect onSelect={handleServiceSelect} primaryColor={primaryColor} companyName={companyName} ctaHeadline={companyConfig?.ctaHeadline} ctaHeadlineEnabled={companyConfig?.ctaHeadlineEnabled} services={companyConfig?.services} embedded={embedded} isMobile={isMobile} country={country} countrySelector={countrySelectorNode} />
