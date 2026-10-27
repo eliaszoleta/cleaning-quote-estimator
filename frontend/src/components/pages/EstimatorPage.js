@@ -109,8 +109,9 @@ export default function EstimatorPage() {
         <div className={showingResults ? undefined : 'calc-card-sink'} style={showingResults ? undefined : { maxWidth: 720, position: 'relative', background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           {/* See App.js's homepage instance for the full comment on the
               Oct 2026 instant-results conversion test, reverted back to the
-              normal lead-capture flow here too. */}
-          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector gateLeadByPartner showSignupCta />
+              normal lead-capture flow here too, and on askUserType's role
+              in the no-partner/instant-results case. */}
+          <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector gateLeadByPartner showSignupCta askUserType />
         </div>
 
         <div style={{ marginTop: 48 }}>
