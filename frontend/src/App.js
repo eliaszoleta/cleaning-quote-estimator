@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
-import { Loader2, Zap } from 'lucide-react';
+import { Loader2, Zap, CheckCircle2 } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { postCheckout } from './utils/api';
 import Header from './components/ui/Header';
@@ -183,6 +183,19 @@ function BlogRouter() {
 function ActivateAfterConfirm({ onDone }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  // Drives the "Email confirmed" badge's one-time pop-in on mount. Starts
+  // false so the entrance transition actually has something to animate
+  // FROM -- without this, the badge would just be present from first
+  // paint, same static feeling as the rest of the card, instead of reading
+  // as something that just happened. A short delay (not 0ms) so the
+  // browser has painted the starting state first; immediately flipping a
+  // CSS transition's target in the same tick as mount can get coalesced
+  // into one frame with no visible transition at all.
+  const [confirmedIn, setConfirmedIn] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setConfirmedIn(true), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleActivate = async () => {
     setLoading(true);
@@ -203,12 +216,30 @@ function ActivateAfterConfirm({ onDone }) {
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: -160, right: -100, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.28) 0%, rgba(37,99,235,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
       <div style={{ background: 'white', borderRadius: 22, padding: '52px 44px', maxWidth: 420, width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.35)', textAlign: 'center' }}>
+        {/* Pops in on mount (see confirmedIn above) so landing here from a
+            "confirm your email" link reads as that confirmation actually
+            just happening, not a static page that always looked like this
+            -- the rest of the card below is the real ask (payment info at
+            checkout), but this part genuinely isn't, so it gets to look
+            and feel different from it. */}
+        <div
+          className={`ce-confirmed-badge${confirmedIn ? ' ce-confirmed-badge-in' : ''}`}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f0fdf4', color: '#16a34a', padding: '6px 14px', borderRadius: 999, fontSize: 13, fontWeight: 700, marginBottom: 20 }}
+        >
+          <CheckCircle2 size={15} strokeWidth={2.4} />
+          Email confirmed
+        </div>
+        <style>{`
+          .ce-confirmed-badge { opacity: 0; transform: scale(0.6) translateY(-6px); transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+          .ce-confirmed-badge-in { opacity: 1; transform: scale(1) translateY(0); }
+          @media (prefers-reduced-motion: reduce) { .ce-confirmed-badge { transition: none; } }
+        `}</style>
         <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 28px' }}>
           {loading ? <Loader2 size={32} color="#2563eb" strokeWidth={1.8} className="spin" /> : <Zap size={30} color="#2563eb" strokeWidth={1.8} />}
         </div>
         <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 10, letterSpacing: '-0.3px' }}>Last step — activate your calculator</h2>
         <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.7 }}>
-          Email confirmed. When you're ready, we'll take you to a secure checkout page to activate Clean Estimator.
+          When you're ready, we'll take you to a secure checkout page to activate Clean Estimator.
         </p>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: '#2563eb', padding: '7px 16px', borderRadius: 999, fontSize: 13, fontWeight: 700, margin: '14px 0 22px' }}>
           <Zap size={13} /> 14 days free, then $25/month
