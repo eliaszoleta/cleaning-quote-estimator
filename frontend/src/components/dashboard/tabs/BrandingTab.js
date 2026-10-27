@@ -108,8 +108,8 @@ export default function BrandingTab({ config, update, autoSave, onSave, saving, 
   const previewConfig = {
     // Missing entirely before -- without a real companyId, POST /api/calculate
     // has no way to tell this apart from a stranger on the public homepage
-    // calculator, so it was silently subject to that tool's 2-estimates/day
-    // IP-based limit (see calculate.js's PUBLIC_DAILY_LIMIT) -- a company
+    // calculator, so it was silently subject to that tool's IP-based daily
+    // limit (see calculate.js's PUBLIC_DAILY_LIMIT) -- a company
     // testing their own Live Preview a few times could get "Daily limit
     // reached" on their own dashboard. The real embedded widget
     // (EmbedWrapper.js) was never affected -- it already sets a real

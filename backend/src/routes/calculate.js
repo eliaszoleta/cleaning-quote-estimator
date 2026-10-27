@@ -103,7 +103,7 @@ async function logLeadEmailEvent(partnerId) {
 // for a free tool protecting a $25/mo plan. Never applies when companyId
 // is set (a company's own embedded widget or their dashboard's Calculator
 // Mode -- both already gated on an active subscription above, not this).
-const PUBLIC_DAILY_LIMIT = 2;
+const PUBLIC_DAILY_LIMIT = 1;
 
 // req.ip (via Express's trust-proxy hop count, set to 1 in index.js) isn't
 // reliable for this app's actual path: the frontend's Vercel rewrite
@@ -313,7 +313,7 @@ router.post('/', async (req, res) => {
         return res.status(429).json({
           success: false,
           limitReached: true,
-          error: `This tool is limited to ${PUBLIC_DAILY_LIMIT} free estimates per day. Need unlimited estimates for your business? Clean Estimator is $25/month with a 30-day free trial.`,
+          error: `This tool is limited to ${PUBLIC_DAILY_LIMIT} free estimate${PUBLIC_DAILY_LIMIT === 1 ? '' : 's'} per day. Need unlimited estimates for your business? Clean Estimator is $25/month with a 30-day free trial.`,
         });
       }
     }
