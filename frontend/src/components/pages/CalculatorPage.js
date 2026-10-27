@@ -115,10 +115,7 @@ export default function CalculatorPage() {
           {/* See App.js's homepage instance for the full comment on the
               Oct 2026 instant-results conversion test and the later
               gateLeadByPartner one, both reverted back to the normal
-              lead-capture flow here too. PricingUpdateNotice still shows
-              (CleaningCalculator.js's internal condition covers
-              siteLanding pages regardless of skipLeadCapture), so this page
-              still doesn't need its own separate copy of it. */}
+              lead-capture flow here too. */}
           <CleaningCalculator embedded siteLanding cardRadius={showingResults ? undefined : 10} onShowResults={setShowingResults} showCountrySelector />
         </div>
 
