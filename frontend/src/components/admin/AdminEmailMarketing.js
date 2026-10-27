@@ -299,7 +299,16 @@ function ComposePanel({ adminKey, templates }) {
   const [recipientLists, setRecipientLists] = useState({ lead: null, company: null, partner: null });
   const [recipientListLoading, setRecipientListLoading] = useState(false);
   const [recipientQuery, setRecipientQuery] = useState('');
-  const [selectedRecipient, setSelectedRecipient] = useState(null);
+  // Array, not a single object -- lets an admin pick several specific
+  // leads/companies/partners by name/email and send the same one-off
+  // content to all of them in one click, instead of only ever sending to
+  // one at a time or having to go through a filtered Bulk/Scheduled
+  // campaign (which targets an audience by criteria, not hand-picked
+  // individuals). Each entry still gets its own independent send-individual
+  // call below (see sendIndividual) -- same per-recipient server-side
+  // lookup and merge-field resolution as a single send always had, just
+  // looped.
+  const [selectedRecipients, setSelectedRecipients] = useState([]);
 
   const loadRecipientList = useCallback(async (mode) => {
     if (mode === 'custom' || recipientLists[mode]) return;
@@ -331,15 +340,20 @@ function ComposePanel({ adminKey, templates }) {
 
   const switchRecipientMode = (mode) => {
     setRecipientMode(mode);
-    setSelectedRecipient(null);
+    setSelectedRecipients([]);
     setRecipientQuery('');
     if (mode !== 'custom') loadRecipientList(mode);
   };
 
+  const addRecipient = (r) => setSelectedRecipients(prev => prev.some(x => x.id === r.id) ? prev : [...prev, r]);
+  const removeRecipient = (id) => setSelectedRecipients(prev => prev.filter(x => x.id !== id));
+
   const currentList = recipientLists[recipientMode] || [];
-  const filteredRecipients = recipientQuery.trim()
+  const selectedIds = new Set(selectedRecipients.map(r => r.id));
+  const filteredRecipients = (recipientQuery.trim()
     ? currentList.filter(r => `${r.name} ${r.email}`.toLowerCase().includes(recipientQuery.trim().toLowerCase()))
-    : currentList;
+    : currentList
+  ).filter(r => !selectedIds.has(r.id));
 
   // Bulk
   const [sources, setSources] = useState({ leads: true, companies: false, partners: false });
@@ -373,7 +387,7 @@ function ComposePanel({ adminKey, templates }) {
 
   useEffect(() => {
     setVarValues({}); setSendResult(null); setPreview(null); setCreateResult(null);
-    setRecipientMode('custom'); setSelectedRecipient(null); setRecipientQuery('');
+    setRecipientMode('custom'); setSelectedRecipients([]); setRecipientQuery('');
   }, [templateId]);
 
   const buildAudience = () => ({
@@ -397,12 +411,32 @@ function ComposePanel({ adminKey, templates }) {
     setSending(true);
     setSendResult(null);
     try {
-      const payload = recipientMode !== 'custom' && selectedRecipient
-        ? { templateId, recipientType: recipientMode, recipientRef: selectedRecipient.id, vars: varValues }
-        : { templateId, to: { email: toEmail, name: toName }, vars: varValues };
-      await sendAdminIndividualEmail(adminKey, payload);
-      setSendResult({ ok: true, msg: `Sent to ${recipientMode !== 'custom' ? selectedRecipient.email : toEmail}` });
-      setToEmail(''); setToName(''); setSelectedRecipient(null); setRecipientQuery('');
+      if (recipientMode === 'custom') {
+        await sendAdminIndividualEmail(adminKey, { templateId, to: { email: toEmail, name: toName }, vars: varValues });
+        setSendResult({ ok: true, msg: `Sent to ${toEmail}` });
+        setToEmail(''); setToName('');
+      } else {
+        // Sequential, not Promise.all -- a transient failure partway
+        // through still reports exactly which recipients did and didn't
+        // get it (failures named below), rather than an all-or-nothing
+        // result that hides which ones actually went out.
+        const failures = [];
+        for (const r of selectedRecipients) {
+          try {
+            await sendAdminIndividualEmail(adminKey, { templateId, recipientType: recipientMode, recipientRef: r.id, vars: varValues });
+          } catch (err) {
+            failures.push(r.email || r.name || r.id);
+          }
+        }
+        const sentCount = selectedRecipients.length - failures.length;
+        setSendResult(
+          failures.length === 0
+            ? { ok: true, msg: `Sent to ${sentCount} recipient${sentCount === 1 ? '' : 's'}.` }
+            : { ok: sentCount > 0, msg: `Sent to ${sentCount} of ${selectedRecipients.length}. Failed: ${failures.join(', ')}` }
+        );
+        setSelectedRecipients([]);
+      }
+      setRecipientQuery('');
     } catch (err) {
       setSendResult({ ok: false, msg: err.message || 'Send failed' });
     } finally {
@@ -410,7 +444,7 @@ function ComposePanel({ adminKey, templates }) {
     }
   };
 
-  const canSendIndividual = recipientMode === 'custom' ? !!toEmail : !!selectedRecipient;
+  const canSendIndividual = recipientMode === 'custom' ? !!toEmail : selectedRecipients.length > 0;
 
   const createCampaign = async () => {
     setCreating(true);
@@ -479,16 +513,26 @@ function ComposePanel({ adminKey, templates }) {
                   <input style={inputStyle} value={toName} onChange={e => setToName(e.target.value)} />
                 </div>
               </div>
-            ) : selectedRecipient ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: theme.contentBg, border: `1px solid ${theme.borderSoft}`, borderRadius: theme.radiusMd, padding: '10px 12px', marginBottom: 12 }}>
-                <div>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: theme.textPrimary }}>{selectedRecipient.name || '(no name)'}</div>
-                  <div style={{ fontSize: 12.5, color: theme.textMuted }}>{selectedRecipient.email}{selectedRecipient.detail ? ` · ${selectedRecipient.detail}` : ''}</div>
-                </div>
-                <button onClick={() => setSelectedRecipient(null)} style={{ ...secondaryBtnStyle, padding: '6px 10px' }}><X size={13} /></button>
-              </div>
             ) : (
               <div style={{ marginBottom: 12 }}>
+                {/* Selected recipients -- a list, not a single card, so
+                    several can be picked and sent to in one go. Each stays
+                    removable individually; the search+picker below stays
+                    visible the whole time (instead of being replaced once
+                    something's picked) so more can be added right after. */}
+                {selectedRecipients.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
+                    {selectedRecipients.map(r => (
+                      <div key={r.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: theme.contentBg, border: `1px solid ${theme.borderSoft}`, borderRadius: theme.radiusMd, padding: '9px 12px' }}>
+                        <div>
+                          <div style={{ fontSize: 13.5, fontWeight: 700, color: theme.textPrimary }}>{r.name || '(no name)'}</div>
+                          <div style={{ fontSize: 12.5, color: theme.textMuted }}>{r.email}{r.detail ? ` · ${r.detail}` : ''}</div>
+                        </div>
+                        <button onClick={() => removeRecipient(r.id)} style={{ ...secondaryBtnStyle, padding: '6px 10px' }}><X size={13} /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div style={{ position: 'relative' }}>
                   <Search size={14} style={{ position: 'absolute', left: 10, top: 11, color: theme.textMuted }} />
                   <input
@@ -506,7 +550,7 @@ function ComposePanel({ adminKey, templates }) {
                   ) : filteredRecipients.slice(0, 50).map(r => (
                     <button
                       key={r.id}
-                      onClick={() => setSelectedRecipient(r)}
+                      onClick={() => addRecipient(r)}
                       style={{
                         display: 'block', width: '100%', textAlign: 'left', padding: '9px 12px', border: 'none',
                         borderBottom: `1px solid ${theme.borderSoft}`, background: 'transparent', cursor: 'pointer',
@@ -523,7 +567,7 @@ function ComposePanel({ adminKey, templates }) {
             {(template.variables || []).length > 0 && (
               <div style={{ marginBottom: 14 }}>
                 <label style={labelStyle}>
-                  Merge fields{recipientMode !== 'custom' ? ' (optional — auto-filled from the selected recipient unless overridden here)' : ''}
+                  Merge fields{recipientMode !== 'custom' ? ' (optional — auto-filled per recipient unless overridden here)' : ''}
                 </label>
                 {template.variables.map(v => (
                   <div key={v.name} style={{ marginBottom: 7 }}>
@@ -538,7 +582,7 @@ function ComposePanel({ adminKey, templates }) {
               </div>
             )}
             <button onClick={sendIndividual} disabled={sending || !canSendIndividual} style={{ ...primaryBtnStyle, opacity: sending ? 0.7 : 1 }}>
-              <Send size={14} /> {sending ? 'Sending…' : 'Send now'}
+              <Send size={14} /> {sending ? 'Sending…' : recipientMode !== 'custom' && selectedRecipients.length > 1 ? `Send to ${selectedRecipients.length} recipients` : 'Send now'}
             </button>
             {sendResult && <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, color: sendResult.ok ? '#16a34a' : '#dc2626' }}>{sendResult.msg}</div>}
           </div>
