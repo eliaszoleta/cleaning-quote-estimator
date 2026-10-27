@@ -230,13 +230,18 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   // array used for the progress bar, so the real lead step still showed up
   // in normal navigation regardless of either toggle.
   const enableLead = !skipLeadCapture && companyConfig?.enableLeadCapture !== false && !noAreaPartner;
-  // askUserType (only ever paired with skipLeadCapture on the public
-  // homepage/landing pages -- never on RunEstimateTab.js, where the viewer
-  // is already a known business owner) swaps the old lead step for the
-  // single "I am a…" question instead of dropping it outright, same
-  // position in the flow. See UserTypeStep.js and ResultsScreen.js's
-  // showSuggestedPrice for why that answer still matters even with no
-  // other contact info collected.
+  // askUserType only has any effect once enableLead above is already
+  // false -- on the public homepage/landing pages that's the noAreaPartner
+  // case (gateLeadByPartner found no partner for this visitor, so lead
+  // capture -- and the on-screen reveal is the only place they'll ever see
+  // a number, see showInstantResults below); never on RunEstimateTab.js,
+  // where the viewer is already a known business owner and skipLeadCapture
+  // alone is enough. Swaps the lead step for the single "I am a…" question
+  // instead of dropping it outright, same position in the flow, so a
+  // visitor who gets the zero-friction on-screen result still answers it
+  // first. See UserTypeStep.js and ResultsScreen.js's midpoint-price line
+  // for why that answer still matters even with no other contact info
+  // collected.
   const steps = serviceType
     ? (enableLead
         ? SERVICE_STEPS[serviceType]
