@@ -155,11 +155,34 @@ function checkIconSvg() {
 
 // ─── 4. Static nav header (visible to Googlebot without JS) ─────────────────
 
+// Mirrors the live Header.js's own max-width:768px collapse (full nav row
+// -> icon + "Get Estimator" pill + a static ☰) purely with CSS visibility,
+// not by removing anything from the markup -- every link, its href, and its
+// text stay in the DOM exactly as before on every viewport, so this changes
+// nothing a crawler sees or indexes. Without this, the static page (visible
+// for the brief window before React hydrates and replaces it with the real,
+// genuinely responsive header) rendered the full 6-item desktop nav at any
+// width, which wrapped into an overlapping mess on a narrow phone -- see the
+// 2026-10-28 report. The ☰ here is inert (no JS yet to attach a click
+// handler to), but it's the same glyph Header.js's real button shows, so
+// there's no visible swap once hydration takes over, just the button
+// becoming clickable.
 function staticHeader() {
   return `<header style="background:white;border-bottom:1px solid #e2e8f0;padding:0 24px">
+  <style>
+    @media (max-width: 768px) {
+      .sh-logo-text, .sh-nav { display: none !important; }
+      .sh-mobile-bar { display: flex !important; }
+    }
+  </style>
   <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px">
-    <a href="/" style="font-size:18px;font-weight:800;color:#0f172a;text-decoration:none">Clean Estimator</a>
-    <nav style="display:flex;gap:24px;align-items:center">
+    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:18px;color:#0f172a" aria-label="Clean Estimator — Free Cleaning Cost Estimator">
+      <span style="width:30px;height:30px;flex-shrink:0;background:${PRIMARY};border-radius:7px;display:flex;align-items:center;justify-content:center" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.287 1.288L3 12l5.8 1.9a2 2 0 0 1 1.288 1.287L12 21l1.9-5.8a2 2 0 0 1 1.287-1.288L21 12l-5.8-1.9a2 2 0 0 1-1.288-1.287Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+      </span>
+      <span class="sh-logo-text">Clean Estimator</span>
+    </a>
+    <nav class="sh-nav" style="display:flex;gap:24px;align-items:center">
       <a href="/cleaning-cost-calculator" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">Cost Calculator</a>
       <a href="/#how-it-works" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">How It Works</a>
       <a href="/blog" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">Blog</a>
@@ -167,6 +190,10 @@ function staticHeader() {
       <a href="/estimator" style="font-size:14px;color:#475569;text-decoration:none;font-weight:500">For Companies</a>
       <a href="/" style="background:${PRIMARY};color:white;padding:8px 18px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700">Get Estimate</a>
     </nav>
+    <div class="sh-mobile-bar" style="display:none;align-items:center;gap:10px">
+      <a href="/estimator" style="background:${PRIMARY};color:white;padding:8px 14px;border-radius:7px;text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap">Get Estimator</a>
+      <span style="font-size:22px;color:#0f172a;line-height:1;padding:6px 4px" aria-hidden="true">☰</span>
+    </div>
   </div>
 </header>`;
 }
