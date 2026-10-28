@@ -388,7 +388,13 @@ img { max-width: 100%; height: auto; }
      a genuinely narrow phone where the tabs DON'T all fit: overflow-x
      stays auto so it's still a scrollable row, just a centered one
      instead of a left-anchored one when nothing's cut off. */
-  .dash-nav { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; padding: 8px 12px; flex-wrap: nowrap; justify-content: center; }
+  /* background + border-bottom -- the base .dash-nav rule is plain white
+     with only a border-RIGHT (meant for the desktop sidebar sitting next
+     to the content). On mobile this becomes a horizontal bar sitting
+     ABOVE the content instead, where a right border does nothing and the
+     nav visually fused into the equally-white page body below it with no
+     separation at all (see the 2026-10-28 report). */
+  .dash-nav { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; padding: 8px 12px; flex-wrap: nowrap; justify-content: center; background: #f8fafc; border-right: none; border-bottom: 1px solid var(--border); }
   .dash-nav-item { width: auto; white-space: nowrap; flex-shrink: 0; }
   .dash-content { padding: 16px; }
   .appearance-layout { flex-direction: column; }
