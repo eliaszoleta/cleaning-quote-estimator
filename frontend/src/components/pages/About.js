@@ -63,7 +63,7 @@ function Step({ number, title, children, isLast }) {
 
 const STATS = [
   { number: '50', label: 'States covered' },
-  { number: '10', label: 'Service types' },
+  { number: String(SERVICE_COUNT), label: 'Service types' },
   { number: '100%', label: 'Free, no signup' },
 ];
 
