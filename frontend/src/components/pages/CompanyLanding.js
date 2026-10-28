@@ -371,25 +371,28 @@ export default function CompanyLanding() {
               <div className="ce-card" style={{ ...cardStyle, borderRadius: 14, padding: 0, overflow: 'hidden' }}>
                 <div style={{ height: 3, background: 'linear-gradient(90deg, #3b82f6, #818cf8)' }} />
                 <div style={{ padding: '30px 28px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                    <Lock size={16} color={PRIMARY} />
-                    <span style={{ fontWeight: 800, fontSize: 16.5, color: '#0f172a' }}>Internal Estimator</span>
+                  <div style={{ width: 52, height: 52, borderRadius: 14, background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
+                    <Lock size={24} color={PRIMARY} strokeWidth={2} />
                   </div>
-                  <div style={{ fontSize: 13, color: '#64748b', marginBottom: 6 }}>
-                    <span style={{ position: 'relative', fontWeight: 700, color: '#78350f', padding: '1px 6px', whiteSpace: 'nowrap' }}>
-                      <span aria-hidden="true" style={{ position: 'absolute', inset: '2px -2px', background: '#fde047', borderRadius: '3px 7px 4px 8px / 5px 3px 6px 4px', transform: 'rotate(-0.6deg)', zIndex: 0 }} />
-                      <span style={{ position: 'relative', zIndex: 1 }}>14-day free trial</span>
-                    </span>
-                    {' '}then
+                  <div style={{ marginBottom: 22 }}>
+                    <span style={{ fontWeight: 800, fontSize: 19, color: '#0f172a', letterSpacing: '-0.3px' }}>Internal Estimator</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap', marginBottom: 22 }}>
-                    <span style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
-                      <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$25</span>
-                      <span style={{ fontSize: 14, color: '#64748b' }}>/month</span>
-                    </span>
-                    <span style={{ fontSize: 13, color: '#64748b' }}>&middot; cancel anytime</span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 2 }}>
+                    <span style={{ fontSize: 42, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$25</span>
                   </div>
-                  <ul style={{ listStyle: 'none', padding: 0, marginBottom: 24, textAlign: 'left' }}>
+                  <div style={{ color: '#94a3b8', fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Per month</div>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f0fdf4', color: '#16a34a', padding: '4px 10px', borderRadius: 999, fontSize: 11.5, fontWeight: 700, marginBottom: 18 }}>
+                    <Zap size={12} /> 14-day free trial
+                  </div>
+                  <a href="/company?mode=signup" className="ce-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
+                    Start Free Trial <Arrow size={15} />
+                  </a>
+                  <div style={{ color: '#94a3b8', fontSize: 11.5, textAlign: 'center', marginBottom: 22 }}>
+                    Card required to start — you won't be charged for 14 days.
+                  </div>
+                  <div style={{ height: 1, background: '#e2e8f0', marginBottom: 20 }} />
+                  <div style={{ fontWeight: 700, fontSize: 12.5, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>Everything included:</div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'left' }}>
                     {PLAN_FEATURES.map(item => (
                       <li key={item} className="ce-plan-feature" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, color: '#374151' }}>
                         <span className="ce-plan-feature-dot" style={{ borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
@@ -399,12 +402,6 @@ export default function CompanyLanding() {
                       </li>
                     ))}
                   </ul>
-                  <a href="/company?mode=signup" className="ce-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 9, textDecoration: 'none', fontWeight: 700, fontSize: 15 }}>
-                    Start Free Trial <Arrow size={15} />
-                  </a>
-                  <div style={{ color: '#94a3b8', fontSize: 11.5, textAlign: 'center', marginTop: 10 }}>
-                    Card required to start — you won't be charged for 14 days.
-                  </div>
                 </div>
               </div>
 
