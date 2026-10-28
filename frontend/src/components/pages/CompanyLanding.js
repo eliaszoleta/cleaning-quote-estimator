@@ -370,28 +370,28 @@ export default function CompanyLanding() {
 
               <div className="ce-card" style={{ ...cardStyle, borderRadius: 14, padding: 0, overflow: 'hidden' }}>
                 <div style={{ height: 3, background: 'linear-gradient(90deg, #3b82f6, #818cf8)' }} />
-                <div style={{ padding: '30px 28px' }}>
-                  <div style={{ width: 52, height: 52, borderRadius: 14, background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
-                    <Lock size={24} color={PRIMARY} strokeWidth={2} />
+                <div style={{ padding: '24px 24px' }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 13, background: 'linear-gradient(135deg, #eff6ff, #dbeafe)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                    <Lock size={22} color={PRIMARY} strokeWidth={2} />
                   </div>
-                  <div style={{ marginBottom: 22 }}>
-                    <span style={{ fontWeight: 800, fontSize: 19, color: '#0f172a', letterSpacing: '-0.3px' }}>Internal Estimator</span>
+                  <div style={{ marginBottom: 10 }}>
+                    <span style={{ fontWeight: 800, fontSize: 18, color: '#0f172a', letterSpacing: '-0.3px' }}>Internal Estimator</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 2 }}>
-                    <span style={{ fontSize: 42, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$25</span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                    <span style={{ fontSize: 38, fontWeight: 900, color: '#0f172a', letterSpacing: '-1.5px' }}>$25</span>
                   </div>
-                  <div style={{ color: '#94a3b8', fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Per month</div>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f0fdf4', color: '#16a34a', padding: '4px 10px', borderRadius: 999, fontSize: 11.5, fontWeight: 700, marginBottom: 18 }}>
+                  <div style={{ color: '#94a3b8', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Per month</div>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f0fdf4', color: '#16a34a', padding: '4px 10px', borderRadius: 999, fontSize: 11.5, fontWeight: 700, marginBottom: 12 }}>
                     <Zap size={12} /> 14-day free trial
                   </div>
-                  <a href="/company?mode=signup" className="ce-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
+                  <a href="/company?mode=signup" className="ce-btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: PRIMARY, color: 'white', padding: '13px 0', borderRadius: 10, textDecoration: 'none', fontWeight: 700, fontSize: 15, marginBottom: 6 }}>
                     Start Free Trial <Arrow size={15} />
                   </a>
-                  <div style={{ color: '#94a3b8', fontSize: 11.5, textAlign: 'center', marginBottom: 22 }}>
+                  <div style={{ color: '#94a3b8', fontSize: 11.5, textAlign: 'center', marginBottom: 14 }}>
                     Card required to start — you won't be charged for 14 days.
                   </div>
-                  <div style={{ height: 1, background: '#e2e8f0', marginBottom: 20 }} />
-                  <div style={{ fontWeight: 700, fontSize: 12.5, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 14 }}>Everything included:</div>
+                  <div style={{ height: 1, background: '#e2e8f0', marginBottom: 14 }} />
+                  <div style={{ fontWeight: 700, fontSize: 12.5, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>Everything included:</div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'left' }}>
                     {PLAN_FEATURES.map(item => (
                       <li key={item} className="ce-plan-feature" style={{ display: 'flex', alignItems: 'flex-start', gap: 9, color: '#374151' }}>
@@ -428,10 +428,10 @@ export default function CompanyLanding() {
           .ce-steps-grid { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; }
           .ce-step-arrow { display: flex; align-items: center; justify-content: center; color: #cbd5e1; }
         }
-        .ce-plan-feature { margin-bottom: 10px; font-size: 14px; line-height: 1.4; }
+        .ce-plan-feature { margin-bottom: 7px; font-size: 14px; line-height: 1.3; }
         .ce-plan-feature-dot { width: 17px; height: 17px; }
         @media (max-width: 480px) {
-          .ce-plan-feature { margin-bottom: 6px; font-size: 13.5px; line-height: 1.3; }
+          .ce-plan-feature { margin-bottom: 5px; font-size: 13.5px; line-height: 1.25; }
           .ce-plan-feature-dot { width: 15px; height: 15px; }
         }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
