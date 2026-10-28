@@ -286,14 +286,14 @@ export default function CompanyLanding() {
           <div style={{ padding: 'clamp(40px, 9vw, 84px) 20px', position: 'relative', overflow: 'hidden' }}>
             <div aria-hidden="true" style={{ position: 'absolute', top: -80, right: '8%', width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.08), transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ maxWidth: 1120, margin: '0 auto', position: 'relative' }}>
-              <div style={{ textAlign: 'center', marginBottom: 14 }}>
+              <div className="ce-onboarding-eyebrow-wrap" style={{ textAlign: 'center', marginBottom: 14 }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: PRIMARY, padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', border: '1px solid #dbeafe' }}>
                   <Sparkles size={12} />
                   Simple onboarding
                 </span>
               </div>
-              <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Start quoting in minutes</h2>
-              <p style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer required — run your first estimate right after signup, then customize your branding and embed the widget on your site whenever you want.</p>
+              <h2 className="ce-onboarding-heading" style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Start quoting in minutes</h2>
+              <p className="ce-onboarding-desc" style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer required — run your first estimate right after signup, then customize your branding and embed the widget on your site whenever you want.</p>
               <div className="ce-steps-grid">
                 {STEPS.map((s, i) => (
                   <React.Fragment key={s.n}>
@@ -322,7 +322,7 @@ export default function CompanyLanding() {
           {/* Testimonials */}
           <div style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', padding: 'clamp(40px, 9vw, 84px) 20px' }}>
             <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-              <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 'clamp(24px, 5vw, 44px)', letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
+              <h2 className="ce-testimonials-heading" style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 'clamp(24px, 5vw, 44px)', letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
                 {TESTIMONIALS.map(t => (
                   <div key={t.name} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
@@ -438,6 +438,10 @@ export default function CompanyLanding() {
           .ce-pricing-desc { margin-bottom: 16px !important; font-size: 14px !important; line-height: 1.5 !important; }
           .ce-trust-badges-grid { gap: 8px !important; }
           .ce-trust-badge-card { padding: 9px 14px !important; }
+          .ce-onboarding-eyebrow-wrap { margin-bottom: 8px !important; }
+          .ce-onboarding-heading { margin-bottom: 6px !important; }
+          .ce-onboarding-desc { margin-bottom: 22px !important; font-size: 14px !important; line-height: 1.5 !important; }
+          .ce-testimonials-heading { margin-bottom: 18px !important; }
         }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
