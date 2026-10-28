@@ -243,6 +243,29 @@ export default function OverviewTab({ config, user }) {
               Embed your estimator on your website to start capturing leads automatically.
             </p>
           </div>
+        ) : isMobile ? (
+          // Stacked cards instead of a 4-column table -- the table's fixed
+          // columns (Name/Service/Estimate/Date side by side) don't fit a
+          // phone width, forcing horizontal scroll/cut-off text (see the
+          // 2026-10-28 report). Each lead becomes one block with the same
+          // info stacked vertically instead.
+          <div>
+            {recentLeads.map((l, i) => (
+              <div key={l.id} style={{ padding: '12px 14px', borderBottom: i < recentLeads.length - 1 ? '1px solid #f8fafc' : 'none' }}>
+                <div style={{ fontWeight: 600, fontSize: 14, color: '#0f172a' }}>{l.name || '(No name)'}</div>
+                <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 6 }}>{l.email}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 12.5, color: '#374151' }}>{serviceTypeLabel(l.service_type, config?.country)}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#16a34a', whiteSpace: 'nowrap' }}>
+                    {l.estimated_price_low && l.estimated_price_high
+                      ? formatPriceRange(l.estimated_price_low, l.estimated_price_high, l.service_type, currencySymbol)
+                      : '—'}
+                  </span>
+                </div>
+                <div style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 3 }}>{formatDateTime(l.created_at)}</div>
+              </div>
+            ))}
+          </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
