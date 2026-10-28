@@ -380,21 +380,24 @@ img { max-width: 100%; height: auto; }
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .dash-main { flex-direction: column; }
-  /* justify-content:center -- at tablet widths (this breakpoint covers
-     phones too) all 6 tabs comfortably fit on one line with room to
-     spare, so the default flex-start packed them against the left edge
-     with a big dead strip of white on the right, looking like a layout
-     bug rather than a deliberate design. Centering here is still safe on
-     a genuinely narrow phone where the tabs DON'T all fit: overflow-x
-     stays auto so it's still a scrollable row, just a centered one
-     instead of a left-anchored one when nothing's cut off. */
+  /* justify-content:flex-start, not center (reverted 2026-10-28) -- center
+     was tried so the row wouldn't look left-packed with dead space on the
+     right when all 6 tabs fit on one line. But on a genuinely narrow phone
+     where the tabs DON'T all fit, centering pushes the overflow out
+     equally on BOTH sides, and the left side's overflow is never reachable
+     by scrolling (scrollLeft can't go negative) -- the first tab
+     (Services)'s icon was permanently clipped out of frame with no way to
+     scroll to it. flex-start keeps the row always fully reachable by
+     scrolling right, at the cost of a bit of dead space on wide screens
+     where it all fits anyway -- a real, unreachable-content bug outweighs
+     that cosmetic tradeoff. */
   /* background + border-bottom -- the base .dash-nav rule is plain white
      with only a border-RIGHT (meant for the desktop sidebar sitting next
      to the content). On mobile this becomes a horizontal bar sitting
      ABOVE the content instead, where a right border does nothing and the
      nav visually fused into the equally-white page body below it with no
      separation at all (see the 2026-10-28 report). */
-  .dash-nav { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; padding: 8px 12px; flex-wrap: nowrap; justify-content: center; background: #f8fafc; border-right: none; border-bottom: 1px solid var(--border); }
+  .dash-nav { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; padding: 8px 12px; flex-wrap: nowrap; justify-content: flex-start; background: #f8fafc; border-right: none; border-bottom: 1px solid var(--border); }
   .dash-nav-item { width: auto; white-space: nowrap; flex-shrink: 0; }
   .dash-content { padding: 16px; }
   .appearance-layout { flex-direction: column; }
