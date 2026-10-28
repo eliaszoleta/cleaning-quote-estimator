@@ -42,9 +42,9 @@ Rejected alternative: payments landing in Clean Estimator's own Stripe account a
   - See the range and pick/type the final price (pre-filled with, e.g., the midpoint, but editable).
   - Optionally edit/add line-item descriptions (service type, any adjustments already shown as line items in the estimate can carry over as invoice line items).
   - Enter/confirm the client's name, email, and the amount due / due date.
-- Submitting creates a real Stripe Invoice **on behalf of the connected account** (`stripe.invoices.create({...}, { stripeAccount: company.connectAccount.stripeAccountId })` — using Connect's "direct charge" pattern so the invoice and its payout genuinely belong to the connected account, not a destination-charge pass-through).
-- Stripe auto-emails the hosted invoice (with its own PDF) to the client, using that connected account's branding.
-- Webhook: listen for `invoice.paid` (and `invoice.payment_failed`) scoped to connected accounts, to update invoice status in our own records so the dashboard can show "Paid" / "Sent" / "Overdue" without polling Stripe.
+- From this same edit step, two independent actions (added 2026-10-28, per the user — not every company wants to collect payment through Stripe at all; some just want a professional invoice copy to send or hand over themselves):
+  - **"Send via Stripe"** — requires the company to have connected Stripe (§1). Creates a real Stripe Invoice **on behalf of the connected account** (`stripe.invoices.create({...}, { stripeAccount: company.connectAccount.stripeAccountId })` — using Connect's "direct charge" pattern so the invoice and its payout genuinely belong to the connected account, not a destination-charge pass-through). Stripe auto-emails the hosted invoice (with its own PDF) to the client, using that connected account's branding. Webhook: listen for `invoice.paid` (and `invoice.payment_failed`) scoped to connected accounts, to update invoice status in our own records so the dashboard can show "Paid" / "Sent" / "Overdue" without polling Stripe.
+  - **"Download PDF"** — works for *every* company, Stripe-connected or not, no API call to Stripe at all. Generates a simple, branded invoice PDF client-side (in the browser, from the same edited price/line-items/client-info already on screen) and triggers a download — e.g. via `jsPDF` or similar, rendering the same invoice preview the edit step already shows. The company can then send it themselves however they want (their own email, print it, text it, whatever) and collect payment outside the platform entirely (Venmo, check, their own payment setup). No Stripe connection, no backend round-trip, no record created in the `invoices` table (it's not a tracked/trackable invoice since we have no visibility into whether it ever got paid) — purely a document generator.
 
 ### 3. Data model additions (Supabase)
 - `config.connectAccount` on the companies row: `{ stripeAccountId, chargesEnabled, payoutsEnabled, detailsSubmitted, onboardedAt }`.
@@ -59,8 +59,8 @@ Rejected alternative: payments landing in Clean Estimator's own Stripe account a
 1. Backend: Connect account creation endpoint + Account Link + `account.updated` webhook handling + `config.connectAccount` storage.
 2. Dashboard: Settings/Subscription tab banner + "Connect Stripe" button + return-from-onboarding handling.
 3. Backend: `invoices` table migration + invoice-creation endpoint (Stripe Invoice API, scoped to the connected account) + `invoice.paid`/`invoice.payment_failed` webhook handling.
-4. Frontend: "Create Invoice" button + price/line-item edit step on `ResultsScreen.js` (dashboard context only).
-5. Frontend: `InvoicesTab.js` list view.
+4. Frontend: "Create Invoice" button + price/line-item edit step on `ResultsScreen.js` (dashboard context only), with both the "Send via Stripe" and "Download PDF" actions — the PDF path can actually ship before Stripe Connect is finished (§2), since it has no dependency on it, if an earlier standalone win is wanted.
+5. Frontend: `InvoicesTab.js` list view (Stripe-sent invoices only — downloaded-PDF invoices aren't tracked here, see §2).
 6. End-to-end test in Stripe test mode: onboard a test connected account, create a test invoice, pay it with a Stripe test card, confirm webhook updates status and the test payout shows on the connected account (not the platform account).
 
 ## Things to double-check before shipping (not yet researched)
