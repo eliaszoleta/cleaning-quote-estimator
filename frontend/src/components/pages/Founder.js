@@ -25,7 +25,7 @@ export default function Founder() {
             Meet the Founder
           </h1>
           <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.55, maxWidth: 640 }}>
-            The person who built Clean Estimator, and why.
+            The person behind Clean Estimator and the vision behind it.
           </p>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default function Founder() {
             <h2 style={{ fontSize: 22, fontWeight: 800, color: COLORS.ink, letterSpacing: '-0.01em', margin: '0 0 3px' }}>Elias Zoleta</h2>
             <p style={{ fontSize: 14.5, color: COLORS.primary, fontWeight: 600, margin: '0 0 12px' }}>Founder, Clean Estimator</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {['3 Years in Cleaning Marketing', 'AI Automation Builder', 'Self-Taught, Claude-Powered'].map(badge => (
+              {['3+ Years in Cleaning Industry Marketing', 'AI Automation & SaaS Development'].map(badge => (
                 <span key={badge} style={{ fontSize: 11.5, fontWeight: 700, color: COLORS.primary, background: COLORS.primaryMuted, border: `1px solid ${COLORS.primaryMutedBorder}`, borderRadius: RADIUS.pill, padding: '5px 12px' }}>
                   {badge}
                 </span>
@@ -61,40 +61,35 @@ export default function Founder() {
 
         <section style={{ marginBottom: 36 }}>
           <p style={{ ...pStyle, fontSize: 16.5, fontWeight: 500, color: COLORS.ink }}>
-            Hi! I built and run Clean Estimator myself — the pricing logic, the lead capture, the embeddable widget partner businesses put on their own sites, and the dashboard behind all of it. Before I built Clean Estimator I was Marketing and Automation Specialist for cleaning companies for 3 years.
+            Hi, I'm Elias. I built Clean Estimator to make cleaning price estimates more accessible while helping cleaning businesses connect with potential customers. I developed the pricing logic, lead capture system, embeddable calculator, and partner dashboard that power the platform.
+          </p>
+          <p style={{ ...pStyle, marginBottom: 0 }}>
+            Before building Clean Estimator, I worked in marketing and automation for cleaning companies, gaining firsthand experience with the challenges businesses face when generating leads and managing their operations.
           </p>
         </section>
 
         <section style={{ marginBottom: 36 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.primary, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>
-            What I Build
+            What I Do
           </div>
           <p style={pStyle}>
-            I build AI-driven automation systems that do real work — qualifying leads, answering questions, booking appointments, and running entire workflows without a person in the loop.
+            I build AI-powered automation systems that help businesses save time, qualify leads, answer customer questions, and book appointments.
           </p>
           <p style={{ ...pStyle, marginBottom: 0 }}>
-            I've spent years building end-to-end marketing automation: workflows, pipelines, funnels, and campaigns for real businesses. I build AI chatbots for websites, WhatsApp, Facebook Messenger, Instagram, and SMS, and voice AI agents that handle inbound calls and book calendar appointments automatically.
+            My work includes marketing funnels, CRM workflows, lead management systems, and AI chat and voice agents for websites, WhatsApp, Facebook Messenger, Instagram, and SMS. I also build automated phone systems that handle inbound calls and schedule appointments.
           </p>
         </section>
 
-        <section style={{ marginBottom: 36 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.primary, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>
-            How I Build
-          </div>
-          <p style={{ ...pStyle, marginBottom: 0 }}>
-            I'm self-trained, and I use Claude as a genuine build partner — I've used it to design, build, and launch full-stack web apps end to end: functionality, UI, copy, databases, dashboards, login portals, payment systems, and the automation layered on top. Clean Estimator is one of them.
-          </p>
-        </section>
-
-        {/* Closing line as a soft tinted pull-quote card, same treatment as
-            About.js's mission statement, so the page ends on a designed
-            beat instead of trailing off as one more plain paragraph. */}
         <section style={{ marginBottom: 44 }}>
-          <div style={{ background: COLORS.primaryMuted, border: `1px solid ${COLORS.primaryMutedBorder}`, borderRadius: RADIUS.xl, padding: 'clamp(20px, 5vw, 26px) clamp(22px, 5vw, 30px)' }}>
-            <p style={{ fontSize: 'clamp(15px, 3.6vw, 18px)', color: COLORS.ink, lineHeight: 1.6, fontWeight: 500, margin: 0 }}>
-              Call it vibe coding if you want — the apps are real, live, and used by real people every day.
-            </p>
+          <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.primary, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>
+            How I Work
           </div>
+          <p style={pStyle}>
+            I combine marketing experience, automation expertise, and modern AI development tools to build practical business solutions. From web applications and customer portals to payment integrations, dashboards, and backend workflows, I focus on building systems that work reliably in real-world use.
+          </p>
+          <p style={{ ...pStyle, marginBottom: 0 }}>
+            Clean Estimator is one example of that approach: a live platform built to serve homeowners, renters, and cleaning businesses.
+          </p>
         </section>
 
         {/* Contact CTA -- same treatment as About.js's, for the same reason:
@@ -106,7 +101,7 @@ export default function Founder() {
               <MessageCircle size={22} color="#93c5fd" strokeWidth={2.1} />
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 800, color: 'white', marginBottom: 10, letterSpacing: '-0.01em' }}>Questions or Feedback?</h2>
-            <p style={{ color: '#cbd5e1', marginBottom: 24, fontSize: 15, lineHeight: 1.6 }}>I'm a small team and I read every message.</p>
+            <p style={{ color: '#cbd5e1', marginBottom: 24, fontSize: 15, lineHeight: 1.6 }}>I'm a small team, and I read every message.</p>
             <a
               href="/contact"
               style={{ display: 'inline-flex', alignItems: 'center', padding: '12px 28px', background: 'white', color: COLORS.ink, borderRadius: RADIUS.sm, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}
