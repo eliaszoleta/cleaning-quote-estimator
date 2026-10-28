@@ -322,7 +322,7 @@ export default function CompanyLanding() {
           {/* Testimonials */}
           <div style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', padding: 'clamp(40px, 9vw, 84px) 20px' }}>
             <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-              <h2 className="ce-testimonials-heading" style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 'clamp(24px, 5vw, 44px)', letterSpacing: '-0.4px' }}>What cleaning companies say</h2>
+              <h2 className="ce-testimonials-heading" style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 'clamp(24px, 5vw, 44px)', letterSpacing: '-0.4px' }}>What Cleaning Companies Say</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
                 {TESTIMONIALS.map(t => (
                   <div key={t.name} className="ce-card" style={{ ...cardStyle, padding: '24px 22px' }}>
