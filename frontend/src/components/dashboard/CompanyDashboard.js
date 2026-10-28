@@ -867,16 +867,16 @@ export default function CompanyDashboard({ user, onLogout }) {
               company already paying for the estimator is exactly who's
               likely to not have a real site yet. */}
           {!websiteOfferDismissed && (
-            <div style={{ background: 'linear-gradient(90deg, #1e3a8a, #1d4ed8)', padding: '10px 44px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 16, position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'white', fontSize: 13, fontWeight: 600, textAlign: 'center' }}>
-                <Globe size={15} style={{ flexShrink: 0 }} />
+            <div style={{ background: 'linear-gradient(90deg, #1e3a8a, #1d4ed8)', padding: '7px 40px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 10, position: 'relative' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, color: 'white', fontSize: 12.5, fontWeight: 600, textAlign: 'center', lineHeight: 1.3 }}>
+                <Globe size={14} style={{ flexShrink: 0 }} />
                 No website yet? We'll build you a free sample — you decide if you want to keep it.
               </div>
               <a
                 href="/website-for-cleaning-companies"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ background: 'white', color: '#1d4ed8', padding: '6px 14px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 12.5, whiteSpace: 'nowrap', flexShrink: 0 }}
+                style={{ background: 'white', color: '#1d4ed8', padding: '5px 12px', borderRadius: 7, textDecoration: 'none', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0 }}
               >
                 Build My Free Sample Site →
               </a>
