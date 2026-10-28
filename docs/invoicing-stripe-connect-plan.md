@@ -18,7 +18,7 @@ Rejected alternative: payments landing in Clean Estimator's own Stripe account a
 
 1. **Payment methods: card only.** No ACH in v1 — simpler, instant, fewer edge cases (ACH takes days to settle and can fail after the fact). Adding ACH later is low-effort since it's the same Stripe Invoice object, just another `payment_method_types` entry — not a redesign.
 2. **Platform fee: $0.** Clean Estimator takes no cut of invoice payments. Invoicing is just a feature of the existing $25/mo plan. Keeps the pitch simple ("we never touch your client's money, no cut taken") and avoids extra disclosure/fee-logic complexity. Can be turned on later without restructuring anything — it's one parameter (`application_fee_amount`) on invoice creation.
-3. **Onboarding UX: Stripe-hosted redirect flow.** Not the embedded version. Company clicks "Connect Stripe" in the dashboard, fills out their business/bank info on a Stripe-hosted page, gets redirected back to the dashboard when done. Standard, fastest to build, can upgrade to embedded components later without changing the underlying account model.
+3. **Onboarding UX: Stripe-hosted redirect flow, using a Standard Connect account** (corrected 2026-10-28 — see §1 below for why Standard, not Express). Company clicks "Connect Stripe" in the dashboard and is sent to a Stripe-hosted page: if they already have a Stripe account, they just log in and it's linked immediately; if not, they fill out business/bank info once. Either way they're redirected back to the dashboard when done. Fastest to build; can move to Stripe's embedded onboarding components later without changing the underlying account type.
 
 ## What already exists in this codebase (relevant to this build)
 
@@ -31,9 +31,9 @@ Rejected alternative: payments landing in Clean Estimator's own Stripe account a
 ## High-level architecture
 
 ### 1. Connect account creation & onboarding
-- New backend endpoint: `POST /api/company/connect/onboard` — creates a Stripe Connect **Express** account (recommended account type: lets Stripe host the onboarding UI/dashboard, least work for us, standard choice for this kind of platform) tied to the company, stores `stripeAccountId` on `config.connectAccount`.
-- Returns a Stripe-hosted **Account Link** URL; frontend redirects the user there. Stripe collects business info, bank account, identity verification.
-- Stripe redirects back to a `return_url` in our dashboard (e.g. `/company?tab=settings&connect=success`) and a `refresh_url` if the link expires mid-flow.
+- Account type: **Standard** (not Express — corrected 2026-10-28). Standard accounts use Stripe's OAuth-style "Connect with Stripe" flow: if the company already has a Stripe account, they just **log in** with their existing credentials and that real, already-verified account gets linked — no re-entering business/bank info. If they've never used Stripe before, the same button lets them sign up fresh (one-time business + bank info, which is a legal KYC requirement of any payment processor, not something we're adding). Express was the wrong call in the original draft of this plan — it's built for platforms onboarding businesses from scratch and doesn't support "log into your existing account" the way Standard's OAuth flow does. Standard also keeps us further out of the connected account's day-to-day (support, dashboard access) — a better fit for the "stay out of the money-handling business" goal.
+- New backend endpoint: `POST /api/company/connect/onboard` — starts the Standard OAuth flow (`https://connect.stripe.com/oauth/authorize?...` or the current equivalent — verify against live Stripe docs when building, this surface shifts) tied to the company, stores `stripeAccountId` on `config.connectAccount` once authorized.
+- Stripe redirects back to a `redirect_uri` in our dashboard (e.g. `/company?tab=settings&connect=success`) with an authorization code we exchange server-side for the connected account ID.
 - Webhook: listen for `account.updated` events to track `charges_enabled` / `payouts_enabled` / `details_submitted` on that connected account, update `config.connectAccount` accordingly. Until `charges_enabled` is true, the "Convert to Invoice" button stays disabled with a "Finish connecting Stripe" prompt.
 
 ### 2. Estimate → Invoice flow
