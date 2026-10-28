@@ -348,17 +348,17 @@ export default function CompanyLanding() {
             <div style={{ maxWidth: 980, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 56, alignItems: 'center', position: 'relative' }}>
 
               <div>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: PRIMARY, padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', border: '1px solid #dbeafe', marginBottom: 16 }}>
+                <span className="ce-pricing-eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#eff6ff', color: PRIMARY, padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', border: '1px solid #dbeafe', marginBottom: 16 }}>
                   <Tag size={12} />
                   Pricing
                 </span>
-                <h2 style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, color: '#0f172a', marginBottom: 14, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
-                <p style={{ color: '#64748b', fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: 400 }}>
+                <h2 className="ce-pricing-heading" style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, color: '#0f172a', marginBottom: 14, letterSpacing: '-0.4px' }}>Simple, transparent pricing</h2>
+                <p className="ce-pricing-desc" style={{ color: '#64748b', fontSize: 16, lineHeight: 1.65, marginBottom: 28, maxWidth: 400 }}>
                   One plan, everything included, no surprises. Run it as your internal pricing tool from day one, or add it as a calculator widget on your website whenever you're ready, at no extra cost.
                 </p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, maxWidth: 420 }}>
+                <div className="ce-trust-badges-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, maxWidth: 420 }}>
                   {TRUST_BADGES.map(({ Icon, text }) => (
-                    <div key={text} className="ce-card" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'white', border: '1px solid #e2e8f0', borderRadius: 11, padding: '12px 14px' }}>
+                    <div key={text} className="ce-card ce-trust-badge-card" style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'white', border: '1px solid #e2e8f0', borderRadius: 11, padding: '12px 14px' }}>
                       <div style={{ width: 30, height: 30, borderRadius: 9, background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <Icon size={15} color="#16a34a" strokeWidth={2.3} />
                       </div>
@@ -433,6 +433,11 @@ export default function CompanyLanding() {
         @media (max-width: 480px) {
           .ce-plan-feature { margin-bottom: 5px; font-size: 13.5px; line-height: 1.25; }
           .ce-plan-feature-dot { width: 15px; height: 15px; }
+          .ce-pricing-eyebrow { margin-bottom: 10px !important; }
+          .ce-pricing-heading { margin-bottom: 8px !important; }
+          .ce-pricing-desc { margin-bottom: 16px !important; font-size: 14px !important; line-height: 1.5 !important; }
+          .ce-trust-badges-grid { gap: 8px !important; }
+          .ce-trust-badge-card { padding: 9px 14px !important; }
         }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
