@@ -66,5 +66,34 @@ Rejected alternative: payments landing in Clean Estimator's own Stripe account a
 ## Things to double-check before shipping (not yet researched)
 
 - Stripe Connect platform agreement / ToS acceptance requirements on the platform account (Stripe requires platforms to accept Connect's terms; may need a one-time dashboard step on the Clean Estimator Stripe account itself, separate from any code).
-- Whether Express accounts (recommended above) support all needed branding customization for the invoice emails, or whether that requires Standard accounts (more setup burden on the company, full Stripe dashboard access). Express should be sufficient for logo/business name on hosted invoices — confirm against current Stripe docs when building, since this is exactly the kind of detail that drifts over time.
+- Confirm current Stripe docs for the exact Standard OAuth flow (`connect.stripe.com/oauth/authorize` or whatever it's called by the time this is built) and branding-customization options for hosted invoice emails — this surface shifts over time, verify when building rather than trusting this doc.
 - Tax handling on invoices (sales tax / GST / VAT per the existing per-country work in this codebase) — out of scope for this plan, flag separately if the user wants it.
+
+## 7. "How Invoicing Works" page (dashboard-facing, plain language)
+
+The user's own framing (2026-10-28): companies using this feature are trusting it with real money, and most are not technical — they need to understand the mechanics in plain terms before they'll trust it enough to connect their bank account. This page should live inside the dashboard (not the public marketing site) near wherever the "Connect Stripe" button lives, and/or be linked from that button itself ("How does this work?").
+
+Draft copy below, ready to drop into a page once the feature ships — written in the same plain, non-technical style used to explain this to the user during planning:
+
+> ### How getting paid through Clean Estimator works
+>
+> **Short version: your clients' payments go straight to your own bank account. We never touch your money — Stripe does the actual payment handling, the same way it does for thousands of other businesses.**
+>
+> **1. You connect your own Stripe account (one-time, ~2 minutes).**
+> Click "Connect Stripe" in your dashboard. If you already have a Stripe account, you just log in — nothing to fill out. If you don't have one yet, Stripe will ask for your business and bank info once, the same as setting up any payment processor like Square or PayPal for the first time.
+>
+> **2. You turn an estimate into an invoice.**
+> Run an estimate like normal, then hit "Create Invoice." Since an estimate shows a price range, you'll confirm the final number before it becomes a real invoice.
+>
+> **3. We hand it to Stripe — Stripe sends it to your client.**
+> The invoice email comes from Stripe, showing your business name and logo (not "Clean Estimator"). Your client sees a professional invoice with a "Pay Now" button — no accounts or signups needed on their end.
+>
+> **4. Your client pays, the money goes straight to you.**
+> When they pay, the money is deposited directly into your connected bank account. It never passes through Clean Estimator — we don't hold it, see it, or take a cut.
+>
+> **5. Your dashboard updates automatically.**
+> Once Stripe confirms the payment, your invoice list updates to "Paid" — no need to check manually.
+>
+> **Is this safe?** Stripe is used by millions of businesses worldwide (including large companies like Amazon and Shopify) and is fully PCI-compliant, meaning card details are never seen by us or stored on our servers. Clean Estimator only ever sees that an invoice was sent and whether it's been paid — never your client's card number or your bank details.
+
+Add to the build order above: once the core feature (steps 1–6) is working end-to-end, write this page as a real React page component (follow `MethodologyPage.js` as the structural/tone precedent — same plain-language, FAQ-friendly style already used for `/how-we-calculate-prices`), link it from the Connect-Stripe banner/button, and decide placement (dedicated route vs. an expandable section inline in Settings).
