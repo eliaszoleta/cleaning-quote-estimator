@@ -441,7 +441,7 @@ export default function CompanyLanding() {
           .ce-onboarding-eyebrow-wrap { margin-bottom: 8px !important; }
           .ce-onboarding-heading { margin-bottom: 6px !important; }
           .ce-onboarding-desc { margin-bottom: 22px !important; }
-          .ce-testimonials-heading { margin-bottom: 18px !important; }
+          .ce-testimonials-heading { margin-bottom: 18px !important; font-size: 21px !important; white-space: nowrap; }
         }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
         .ce-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px -10px rgba(15,23,42,0.16); border-color: #bfdbfe; }
