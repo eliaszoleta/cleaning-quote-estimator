@@ -293,7 +293,7 @@ export default function CompanyLanding() {
                 </span>
               </div>
               <h2 className="ce-onboarding-heading" style={{ fontSize: 'clamp(24px, 5.5vw, 32px)', fontWeight: 700, textAlign: 'center', color: '#0f172a', marginBottom: 10, letterSpacing: '-0.4px' }}>Start quoting in minutes</h2>
-              <p className="ce-onboarding-desc" style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>Four steps, no developer needed. Run your first estimate after signup, then customize your branding and embed the widget anytime.</p>
+              <p className="ce-onboarding-desc" style={{ textAlign: 'center', color: '#64748b', fontSize: 16, marginBottom: 'clamp(28px, 6vw, 52px)' }}>No developer needed. Easy to use.</p>
               <div className="ce-steps-grid">
                 {STEPS.map((s, i) => (
                   <React.Fragment key={s.n}>
