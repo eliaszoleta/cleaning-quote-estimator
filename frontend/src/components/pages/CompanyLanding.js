@@ -428,11 +428,11 @@ export default function CompanyLanding() {
           .ce-steps-grid { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; }
           .ce-step-arrow { display: flex; align-items: center; justify-content: center; color: #cbd5e1; }
         }
-        .ce-plan-feature { margin-bottom: 7px; font-size: 14px; line-height: 1.3; }
-        .ce-plan-feature-dot { width: 17px; height: 17px; }
+        .ce-plan-feature { margin-bottom: 7px; font-size: 15.5px; line-height: 1.35; }
+        .ce-plan-feature-dot { width: 18px; height: 18px; }
         @media (max-width: 480px) {
-          .ce-plan-feature { margin-bottom: 5px; font-size: 13.5px; line-height: 1.25; }
-          .ce-plan-feature-dot { width: 15px; height: 15px; }
+          .ce-plan-feature { margin-bottom: 5px; font-size: 15px; line-height: 1.3; }
+          .ce-plan-feature-dot { width: 16px; height: 16px; }
           .ce-pricing-eyebrow { margin-bottom: 10px !important; }
           .ce-pricing-heading { margin-bottom: 8px !important; }
           .ce-pricing-desc { margin-bottom: 16px !important; font-size: 14px !important; line-height: 1.5 !important; }
