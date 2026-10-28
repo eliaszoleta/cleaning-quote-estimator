@@ -440,7 +440,7 @@ export default function CompanyLanding() {
           .ce-trust-badge-card { padding: 9px 14px !important; }
           .ce-onboarding-eyebrow-wrap { margin-bottom: 8px !important; }
           .ce-onboarding-heading { margin-bottom: 6px !important; }
-          .ce-onboarding-desc { margin-bottom: 22px !important; font-size: 14px !important; line-height: 1.5 !important; }
+          .ce-onboarding-desc { margin-bottom: 22px !important; }
           .ce-testimonials-heading { margin-bottom: 18px !important; text-align: left !important; }
         }
         .ce-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
