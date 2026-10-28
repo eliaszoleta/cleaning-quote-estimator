@@ -32,6 +32,11 @@ const NAV = [
   { id: 'settings',      Icon: Settings,           label: 'Settings' },
 ];
 
+// Same 4 countries as the header's own <option> labels -- used for the
+// "Switching to X..." overlay's message, which needs the full name even
+// on mobile where the dropdown itself only shows the 2-letter code.
+const COUNTRY_FULL_NAMES = { US: 'the United States', CA: 'Canada', GB: 'the United Kingdom', AU: 'Australia' };
+
 // Shown instead of the dashboard whenever subStatus.active is false --
 // neither Widget Mode nor Calculator Mode render behind this. Account
 // activation now only ever happens through Stripe Checkout (see
@@ -280,6 +285,11 @@ export default function CompanyDashboard({ user, onLogout }) {
     setLocalConfig(prev => prev ? { ...prev, ...partial } : { ...partial });
   }, []);
 
+  // True for the real duration of a header country switch's save round
+  // trip -- drives the header switcher's spinner and the "Switching to
+  // X..." overlay over the main content below it.
+  const [countrySwitching, setCountrySwitching] = useState(false);
+
   const handleGlobalSave = () => {
     if (localConfig) saveConfig(localConfig);
   };
@@ -315,9 +325,15 @@ export default function CompanyDashboard({ user, onLogout }) {
   // service-toggle auto-save already fixed once. saveConfig's PUT merges
   // just the given field into whatever's already saved server-side, so
   // this is safe to fire alongside the same optimistic local update().
+  // Returns the queued promise (not just fire-and-forget) so a caller that
+  // needs to know when the REAL save actually lands -- not just when the
+  // optimistic local update() above happened -- can await it. handleCountryChange
+  // below is the one caller that does.
   const autoSave = useCallback((partial) => {
     update(partial);
-    autoSaveQueue.current = autoSaveQueue.current.then(() => saveConfig(partial));
+    const queued = autoSaveQueue.current.then(() => saveConfig(partial));
+    autoSaveQueue.current = queued;
+    return queued;
   }, [update, saveConfig]);
 
   // Switching country used to flat-out wipe serviceStates/serviceCities
@@ -362,8 +378,9 @@ export default function CompanyDashboard({ user, onLogout }) {
     return out;
   };
 
-  const handleCountryChange = useCallback((newCountry) => {
+  const handleCountryChange = useCallback(async (newCountry) => {
     const oldCountry = localConfig?.country || 'US';
+    if (newCountry === oldCountry) return;
     const statesByCountry = { ...(localConfig?.serviceStatesByCountry || {}), [oldCountry]: localConfig?.serviceStates || [] };
     const citiesByCountry = { ...(localConfig?.serviceCitiesByCountry || {}), [oldCountry]: localConfig?.serviceCities || {} };
 
@@ -387,15 +404,26 @@ export default function CompanyDashboard({ user, onLogout }) {
       };
     });
 
-    autoSave({
-      country: newCountry,
-      serviceStates: statesByCountry[newCountry] || [],
-      serviceCities: citiesByCountry[newCountry] || {},
-      serviceStatesByCountry: statesByCountry,
-      serviceCitiesByCountry: citiesByCountry,
-      services: nextServices,
-      serviceMinimumChargesByCountry: minChargesByCountry,
-    });
+    // Drives the "Switching to X..." overlay below -- covers the real
+    // network round trip (await autoSave's returned promise), not just a
+    // fixed delay, so it stays up exactly as long as the save actually
+    // takes and never flashes past a slow connection or lingers after a
+    // fast one. Matches the same treatment CleaningCalculator.js's own
+    // in-card country selector already gives the public calculator.
+    setCountrySwitching(true);
+    try {
+      await autoSave({
+        country: newCountry,
+        serviceStates: statesByCountry[newCountry] || [],
+        serviceCities: citiesByCountry[newCountry] || {},
+        serviceStatesByCountry: statesByCountry,
+        serviceCitiesByCountry: citiesByCountry,
+        services: nextServices,
+        serviceMinimumChargesByCountry: minChargesByCountry,
+      });
+    } finally {
+      setCountrySwitching(false);
+    }
   }, [localConfig, autoSave]);
 
   useEffect(() => {
@@ -533,7 +561,7 @@ export default function CompanyDashboard({ user, onLogout }) {
   })() : null;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #f8fafc 0%, #eef1f6 100%)' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #f8fafc 0%, #eef1f6 100%)', position: 'relative' }}>
       {/* Header */}
       <header style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #16213b 100%)', color: 'white', height: 60,
@@ -648,13 +676,15 @@ export default function CompanyDashboard({ user, onLogout }) {
             <select
               value={localConfig?.country || 'US'}
               onChange={e => handleCountryChange(e.target.value)}
+              disabled={countrySwitching}
               title="Country"
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: isMobile ? '6px 20px 6px 24px' : '6px 24px 6px 28px', borderRadius: 20,
                 background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)',
                 color: 'white', fontWeight: 700, fontSize: isMobile ? 11.5 : 12.5,
-                cursor: 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
+                cursor: countrySwitching ? 'wait' : 'pointer', outline: 'none', appearance: 'none', WebkitAppearance: 'none',
+                opacity: countrySwitching ? 0.7 : 1,
               }}
             >
               <option value="US" style={{ color: '#111827' }}>{isMobile ? 'US' : 'United States'}</option>
@@ -663,7 +693,9 @@ export default function CompanyDashboard({ user, onLogout }) {
               <option value="AU" style={{ color: '#111827' }}>{isMobile ? 'AU' : 'Australia'}</option>
             </select>
             <div style={{ position: 'absolute', left: isMobile ? 7 : 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
-              <CountryFlag country={localConfig?.country || 'US'} size={14} />
+              {countrySwitching
+                ? <Loader2 size={14} className="spin" color="white" />
+                : <CountryFlag country={localConfig?.country || 'US'} size={14} />}
             </div>
             <ChevronDown
               size={13}
@@ -877,6 +909,30 @@ export default function CompanyDashboard({ user, onLogout }) {
           </main>
         </div>
       </div>
+      )}
+
+      {/* Covers the whole content area below the sticky header for the
+          real duration of handleCountryChange's save round trip -- the
+          header switcher itself already shows its own spinner, so this
+          starts below it rather than hiding it too. localConfig?.country
+          already reflects the TARGET country here, not the old one --
+          autoSave's update() call runs synchronously, before the awaited
+          save resolves, so this always names where the switch is actually
+          headed. Same deliberate "something just changed" beat
+          CleaningCalculator.js's own in-card country selector gives the
+          public calculator, now for the one that actually does something
+          for a logged-in company. */}
+      {countrySwitching && (
+        <div style={{
+          position: 'fixed', top: 60, left: 0, right: 0, bottom: 0,
+          background: 'rgba(248,250,252,0.85)', display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', gap: 10, zIndex: 90,
+        }}>
+          <Loader2 size={26} className="spin" color="#2563eb" />
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>
+            Switching to {COUNTRY_FULL_NAMES[localConfig?.country] || localConfig?.country}…
+          </span>
+        </div>
       )}
 
       {/* First-time welcome pointer -- shown exactly once, on the very
