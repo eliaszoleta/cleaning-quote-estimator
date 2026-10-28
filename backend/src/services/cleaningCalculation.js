@@ -485,6 +485,16 @@ function calculateCommercialRecurring(details, stateMultiplier, companyConfig) {
   const markup = cfg.markup || 1.0;
   const country = companyConfig?.country || 'US';
   const minCharge = cfg.minimumCharge || scaledMinCharge(200, country, 'commercial');
+  // This is the one adjustment label in the whole pricing engine that embeds
+  // a per-unit RATE (not just a quantity/condition description) directly
+  // into its text -- every other service's labels avoid this exact problem
+  // by never baking a currency symbol into the string at all. Was hardcoded
+  // '$' regardless of country, which showed literal dollar signs inside an
+  // otherwise-correct £/C$/A$ estimate (there's no separate exchange-rate
+  // conversion step anywhere in this file -- COMMERCIAL_SQFT_RATES etc. are
+  // already scaled into the right market's own numbers via stateMultiplier,
+  // so this is purely the display symbol, not a recalculation).
+  const currencySymbol = COUNTRIES[country]?.currencySymbol || '$';
 
   const sqftRate = COMMERCIAL_SQFT_RATES[buildingType] || COMMERCIAL_SQFT_RATES.office;
   const levelMult = COMMERCIAL_SERVICE_LEVELS[serviceLevel] || COMMERCIAL_SERVICE_LEVELS.standard;
@@ -524,8 +534,8 @@ function calculateCommercialRecurring(details, stateMultiplier, companyConfig) {
   // restroom count always shows up in the breakdown on its own, exactly as
   // entered -- not folded invisibly into the sqft line.
   const adjustments = [
-    { label: `${labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType)} @ ${sqft.toLocaleString()} sq ft (${visitsPerMonth}x/month @ $${sqftPerVisitLow}–$${sqftPerVisitHigh}/visit)`, low: sqftMonthlyLow, high: sqftMonthlyHigh },
-    { label: `${restrooms} restroom${restrooms === 1 ? '' : 's'} (${visitsPerMonth}x/month @ $${restroomPerVisitLow}–$${restroomPerVisitHigh}/visit)`, low: restroomMonthlyLow, high: restroomMonthlyHigh },
+    { label: `${labelFor(COMMERCIAL_BUILDING_TYPE_LABELS, buildingType)} @ ${sqft.toLocaleString()} sq ft (${visitsPerMonth}x/month @ ${currencySymbol}${sqftPerVisitLow}–${currencySymbol}${sqftPerVisitHigh}/visit)`, low: sqftMonthlyLow, high: sqftMonthlyHigh },
+    { label: `${restrooms} restroom${restrooms === 1 ? '' : 's'} (${visitsPerMonth}x/month @ ${currencySymbol}${restroomPerVisitLow}–${currencySymbol}${restroomPerVisitHigh}/visit)`, low: restroomMonthlyLow, high: restroomMonthlyHigh },
   ];
 
   const monthlyBaseLow = sqftMonthlyLow + restroomMonthlyLow;
