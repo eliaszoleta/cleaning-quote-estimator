@@ -1,6 +1,6 @@
 # Invoicing & Payments — Stripe Connect Plan
 
-Status: **Planning only — nothing built yet.** Written 2026-10-28 to save context before building. Pick this back up by re-reading this file, not by re-deriving the conversation.
+Status: **Planning only — nothing built yet. All v1 decisions below are confirmed, ready to start building.** Written 2026-10-28 to save context before building. Pick this back up by re-reading this file, not by re-deriving the conversation.
 
 ## The goal
 
@@ -14,16 +14,11 @@ This also solves a second concern the user raised: the invoice email does **not*
 
 Rejected alternative: payments landing in Clean Estimator's own Stripe account and being paid out to companies manually/periodically. Explicitly ruled out — too much liability and bookkeeping, and defeats the user's stated goal of staying out of the money-handling business entirely.
 
-## Open decisions — still need the user's answer before/while building
+## Decisions for v1 (confirmed with the user, 2026-10-28)
 
-These were asked but never confirmed due to a tool issue dropping the user's answers mid-session. Re-ask before starting the corresponding piece of work:
-
-1. **Payment methods for v1** — card only, or card + ACH (bank transfer) from day one?
-   - Recommendation: card only for v1 (simpler, fewer edge cases — ACH takes days to settle and can fail after the fact). Adding ACH later is low-effort since it's the same Stripe Invoice object, just another `payment_method_types` entry.
-2. **Platform fee** — does Clean Estimator take a small % cut of each invoice paid (via Stripe's `application_fee_amount`), or $0 (invoicing is just a feature of the existing $25/mo plan)?
-   - Recommendation: $0 for v1. Keeps the pitch simple ("we never touch your client's money, no cut taken") and avoids extra disclosure/fee-logic complexity while this is new. Can be added later without restructuring anything — it's one parameter on invoice creation.
-3. **Onboarding UX** — Stripe-hosted redirect flow (simplest, bounces the user to a Stripe page and back) vs. Stripe's embedded Connect components (onboarding form renders inside our own dashboard UI, more polished, more build effort).
-   - Recommendation: hosted redirect for v1. Standard, fast to build, easy to upgrade to embedded later without changing the underlying account model.
+1. **Payment methods: card only.** No ACH in v1 — simpler, instant, fewer edge cases (ACH takes days to settle and can fail after the fact). Adding ACH later is low-effort since it's the same Stripe Invoice object, just another `payment_method_types` entry — not a redesign.
+2. **Platform fee: $0.** Clean Estimator takes no cut of invoice payments. Invoicing is just a feature of the existing $25/mo plan. Keeps the pitch simple ("we never touch your client's money, no cut taken") and avoids extra disclosure/fee-logic complexity. Can be turned on later without restructuring anything — it's one parameter (`application_fee_amount`) on invoice creation.
+3. **Onboarding UX: Stripe-hosted redirect flow.** Not the embedded version. Company clicks "Connect Stripe" in the dashboard, fills out their business/bank info on a Stripe-hosted page, gets redirected back to the dashboard when done. Standard, fastest to build, can upgrade to embedded components later without changing the underlying account model.
 
 ## What already exists in this codebase (relevant to this build)
 
