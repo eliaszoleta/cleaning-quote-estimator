@@ -94,7 +94,7 @@ function labelForStep(step) {
   return 'Details';
 }
 
-export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, showSignupCta = false, askUserType = false, showCountrySelector = false, cardRadius = null, gateLeadByPartner = false }) {
+export default function CleaningCalculator({ companyConfig = null, embedded = false, initialService = null, siteLanding = false, onShowResults = null, demoPartner = null, skipLeadCapture = false, onShareEmail = null, instantResults = false, showSignupCta = false, askUserType = false, showCountrySelector = false, cardRadius = null, gateLeadByPartner = false, onStepChange = null }) {
   const cardRef = useRef(null);
   // embedded=true normally means "flush, no card look" (a real third-party
   // host embed via EmbedWrapper.js, meant to blend into someone else's
@@ -327,6 +327,13 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
   useEffect(() => {
     onShowResults?.(currentStep === 'results' && !!result);
   }, [currentStep, result, onShowResults]);
+
+  // Lets a caller react to which step is showing (e.g. RunEstimateTab's
+  // mobile-only "Coming Soon" banner, which hides itself once a service has
+  // been picked) without reaching into this component's internal state.
+  useEffect(() => {
+    onStepChange?.(currentStep);
+  }, [currentStep, onStepChange]);
 
   // Lazy-loads the Google Font behind a company's chosen widget font (see
   // BrandingTab.js) the moment it's actually needed, instead of every

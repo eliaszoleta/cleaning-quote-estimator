@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Receipt } from 'lucide-react';
 import CleaningCalculator from '../../calculator/CleaningCalculator';
 import { postEstimateShare } from '../../../utils/api';
@@ -17,6 +17,23 @@ import { COLORS, SHADOWS } from '../../../styles/theme';
 // copy, just the calculator card, mirroring how CalculatorPage.js presents
 // it on the public site.
 export default function RunEstimateTab({ config, user }) {
+  // Viewport-based (not CleaningCalculator's own card-width isMobile) --
+  // this banner lives outside the calculator card, above it, so it needs
+  // its own mobile check at the same 768px cutoff OverviewTab.js and the
+  // rest of the dashboard already use.
+  const mobileQuery = () => window.matchMedia('(max-width: 768px)');
+  const [isMobile, setIsMobile] = useState(() => mobileQuery().matches);
+  useEffect(() => {
+    const mq = mobileQuery();
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  // On mobile only, the teaser banner disappears the instant a service is
+  // picked (per the user) -- on desktop it stays put regardless of step.
+  const [onServiceStep, setOnServiceStep] = useState(true);
+  const showTeaser = !isMobile || onServiceStep;
   // companyId has to be set on the companyConfig object handed to
   // CleaningCalculator -- POST /api/calculate only applies this company's
   // real markup/minimum-charge settings when a companyId is present (it
@@ -49,23 +66,29 @@ export default function RunEstimateTab({ config, user }) {
     <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: 'clamp(24px, 5vw, 64px) clamp(6px, 2.5vw, 16px)' }}>
       <div style={{ width: '100%', maxWidth: 720 }}>
         {/* Same "Coming Soon" teaser as the Overview tab (see OverviewTab.js
-            for the one it mirrors) -- the user wanted it visible here too,
-            since Calculator Mode is where a company actually runs the
-            estimate this feature would turn into an invoice. */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%)', border: '1px solid #ddd6fe', borderRadius: 7, padding: '16px 20px', marginBottom: 16, flexWrap: 'wrap' }}>
-          <div style={{ width: 38, height: 38, borderRadius: 7, background: 'white', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: SHADOWS.sm }}>
-            <Receipt size={18} strokeWidth={2.1} />
-          </div>
-          <div style={{ flex: 1, minWidth: 220 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-              <span style={{ fontSize: 13.5, fontWeight: 700, color: COLORS.ink }}>Invoicing &amp; Direct Payments</span>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed', background: 'white', border: '1px solid #ddd6fe', borderRadius: 20, padding: '2px 8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Coming Soon</span>
+            for the one it mirrors). On mobile only (per the user): a
+            compact single-line-friendly version, and it disappears the
+            instant a service is picked -- CleaningCalculator reports that
+            via onStepChange below. Desktop keeps the original size and
+            stays visible regardless of step. */}
+        {showTeaser && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 14, background: 'linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%)', border: '1px solid #ddd6fe', borderRadius: 7, padding: isMobile ? '10px 12px' : '16px 20px', marginBottom: isMobile ? 12 : 16, flexWrap: isMobile ? 'nowrap' : 'wrap' }}>
+            <div style={{ width: isMobile ? 28 : 38, height: isMobile ? 28 : 38, borderRadius: 7, background: 'white', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: SHADOWS.sm }}>
+              <Receipt size={isMobile ? 14 : 18} strokeWidth={2.1} />
             </div>
-            <p style={{ fontSize: 12.5, color: COLORS.body, margin: 0 }}>
-              Turn an estimate into a real invoice, send it to your client, and get paid straight to your own bank account via your own connected Stripe account — or just download a PDF copy if you'd rather send it and collect payment yourself.
-            </p>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 8, marginBottom: isMobile ? 1 : 2, flexWrap: isMobile ? 'nowrap' : 'wrap' }}>
+                <span style={{ fontSize: isMobile ? 12 : 13.5, fontWeight: 700, color: COLORS.ink, whiteSpace: isMobile ? 'nowrap' : 'normal', overflow: isMobile ? 'hidden' : 'visible', textOverflow: isMobile ? 'ellipsis' : 'clip' }}>Invoicing &amp; Direct Payments</span>
+                <span style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: '#7c3aed', background: 'white', border: '1px solid #ddd6fe', borderRadius: 20, padding: isMobile ? '1px 6px' : '2px 8px', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap', flexShrink: 0 }}>Soon</span>
+              </div>
+              {!isMobile && (
+                <p style={{ fontSize: 12.5, color: COLORS.body, margin: 0 }}>
+                  Turn an estimate into a real invoice, send it to your client, and get paid straight to your own bank account via your own connected Stripe account — or just download a PDF copy if you'd rather send it and collect payment yourself.
+                </p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div style={{ background: 'white', borderRadius: 10, boxShadow: '0 8px 40px rgba(0,0,0,0.10)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
           <CleaningCalculator
@@ -75,6 +98,7 @@ export default function RunEstimateTab({ config, user }) {
             skipLeadCapture={true}
             instantResults={true}
             onShareEmail={handleShareEmail}
+            onStepChange={step => setOnServiceStep(step === 'service')}
           />
         </div>
       </div>
