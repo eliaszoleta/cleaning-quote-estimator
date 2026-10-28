@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, CalendarDays, DollarSign, Inbox, SlidersHorizontal, Code2, HelpCircle, Zap, Check, MapPin, Palette, PlayCircle, Receipt } from 'lucide-react';
+import { UserPlus, CalendarDays, DollarSign, Inbox, SlidersHorizontal, Code2, HelpCircle, Zap, Check, MapPin, Palette, PlayCircle } from 'lucide-react';
 import CountryFlag from '../CountryFlag';
 import { getCompanyLeads, getCompanyEstimateRuns } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
@@ -131,26 +131,6 @@ export default function OverviewTab({ config, user }) {
         <p style={{ color: COLORS.body, fontSize: 14 }}>
           Welcome back{config?.companyName ? `, ${config.companyName}` : ''}.
         </p>
-      </div>
-
-      {/* "Coming soon" teaser -- not a real feature yet (see
-          docs/invoicing-stripe-connect-plan.md), just a heads-up so
-          companies know it's on the way. Static for now, no dismiss state
-          -- revisit once the feature actually ships (either replace this
-          with the real entry point, or remove it). */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%)', border: '1px solid #ddd6fe', borderRadius: 7, padding: '16px 20px', marginBottom: 20, flexWrap: 'wrap' }}>
-        <div style={{ width: 38, height: 38, borderRadius: 7, background: 'white', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: SHADOWS.sm }}>
-          <Receipt size={18} strokeWidth={2.1} />
-        </div>
-        <div style={{ flex: 1, minWidth: 220 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-            <span style={{ fontSize: 13.5, fontWeight: 700, color: COLORS.ink }}>Invoicing &amp; Direct Payments</span>
-            <span style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed', background: 'white', border: '1px solid #ddd6fe', borderRadius: 20, padding: '2px 8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Coming Soon</span>
-          </div>
-          <p style={{ fontSize: 12.5, color: COLORS.body, margin: 0 }}>
-            Turn an estimate into a real invoice, send it to your client, and get paid straight to your own bank account via your own connected Stripe account — or just download a PDF copy if you'd rather send it and collect payment yourself.
-          </p>
-        </div>
       </div>
 
       {/* Setup checklist -- the only thing a brand-new account saw before
