@@ -73,20 +73,18 @@ export default function RunEstimateTab({ config, user }) {
           via onStepChange below. Desktop keeps the original size and stays
           visible regardless of step. */}
       {showTeaser && (
-        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 14, background: 'linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%)', border: '1px solid #ddd6fe', borderRadius: 7, padding: isMobile ? '10px 12px' : '16px 20px', marginBottom: isMobile ? 12 : 16, flexWrap: isMobile ? 'nowrap' : 'wrap' }}>
-          <div style={{ width: isMobile ? 28 : 38, height: isMobile ? 28 : 38, borderRadius: 7, background: 'white', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: SHADOWS.sm }}>
-            <Receipt size={isMobile ? 14 : 18} strokeWidth={2.1} />
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 14, background: 'linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%)', border: '1px solid #ddd6fe', borderRadius: 7, padding: isMobile ? '8px 10px' : '16px 20px', marginBottom: isMobile ? 12 : 16, flexWrap: 'wrap' }}>
+          <div style={{ width: isMobile ? 26 : 38, height: isMobile ? 26 : 38, borderRadius: 7, background: 'white', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: SHADOWS.sm }}>
+            <Receipt size={isMobile ? 13 : 18} strokeWidth={2.1} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 8, marginBottom: isMobile ? 1 : 2, flexWrap: isMobile ? 'nowrap' : 'wrap' }}>
-              <span style={{ fontSize: isMobile ? 12 : 13.5, fontWeight: 700, color: COLORS.ink, whiteSpace: isMobile ? 'nowrap' : 'normal', overflow: isMobile ? 'hidden' : 'visible', textOverflow: isMobile ? 'ellipsis' : 'clip' }}>Invoicing &amp; Direct Payments</span>
-              <span style={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, color: '#7c3aed', background: 'white', border: '1px solid #ddd6fe', borderRadius: 20, padding: isMobile ? '1px 6px' : '2px 8px', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap', flexShrink: 0 }}>Soon</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 8, marginBottom: isMobile ? 1 : 2, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: isMobile ? 11.5 : 13.5, fontWeight: 700, color: COLORS.ink }}>Invoicing &amp; Direct Payments</span>
+              <span style={{ fontSize: isMobile ? 8.5 : 10, fontWeight: 700, color: '#7c3aed', background: 'white', border: '1px solid #ddd6fe', borderRadius: 20, padding: isMobile ? '1px 6px' : '2px 8px', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap', flexShrink: 0 }}>Coming Soon</span>
             </div>
-            {!isMobile && (
-              <p style={{ fontSize: 12.5, color: COLORS.body, margin: 0 }}>
-                Turn an estimate into a real invoice, send it to your client, and get paid straight to your own bank account via your own connected Stripe account — or just download a PDF copy if you'd rather send it and collect payment yourself.
-              </p>
-            )}
+            <p style={{ fontSize: isMobile ? 10.5 : 12.5, color: COLORS.body, margin: 0, lineHeight: isMobile ? 1.3 : 1.5 }}>
+              Turn an estimate into a real invoice, send it to your client, and get paid straight to your own bank account via your own connected Stripe account — or just download a PDF copy if you'd rather send it and collect payment yourself.
+            </p>
           </div>
         </div>
       )}
