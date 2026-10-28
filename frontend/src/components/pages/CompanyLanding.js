@@ -46,15 +46,15 @@ const TESTIMONIALS = [
 ];
 
 const PLAN_FEATURES = [
-  'Unlimited Internal Price Calculations',
-  'Instant Result on Screen',
+  'Unlimited Price Calculations',
+  'Instant On-Screen Results',
   'All 12 Service Calculators',
-  'Email a Result to a Coworker in One Click',
-  'ZIP-Code Local Market Accurate Pricing',
-  'Per-Service Markup Control',
-  'Website Calculator Widget for Lead Capture',
-  'Instant Email Lead Alerts Once It\'s on Your Site',
-  'API Access to Connect to Other Tools You Use',
+  'One-Click Result Sharing with Coworkers',
+  'ZIP-Code-Based Local Pricing',
+  'Per-Service Markups',
+  'Website Widget for Lead Capture',
+  'Instant Email Lead Alerts',
+  'API Access for Integrations',
 ];
 
 const TRUST_BADGES = [
