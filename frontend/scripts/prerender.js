@@ -1575,7 +1575,11 @@ function renderForCompanies(assets) {
     ['James R.', 'Pro Restoration Group — Denver, CO', "The water damage and mold calculators are exactly what we needed. Customers come in already understanding the price range, so there's less sticker shock on-site."],
     ['Maria L.', 'Crystal Clean Commercial — Miami, FL', "Setup took about 20 minutes. The embed is seamless — my website visitors don't even realize it's a third-party tool."],
   ];
-  const planFeatures = ['Unlimited calculator sessions', 'White-label branding', 'Every lead 100% yours, never shared', 'Instant email alerts on every lead', 'Branded follow-up emails to visitors', 'API access', 'All 10 service calculators', 'CSV export', 'Priority support'];
+  // Kept in sync with CompanyLanding.js's own PLAN_FEATURES -- this
+  // array drifted from it for a while (different wording, a stale "All
+  // 10 service calculators" claim after the service count grew to 12),
+  // since nothing enforces the two staying identical.
+  const planFeatures = ['Unlimited Price Calculations', 'Instant On-Screen Results', 'All 12 Service Calculators', 'One-Click Result Sharing with Coworkers', 'ZIP-Code-Based Local Pricing', 'Per-Service Markups', 'Website Widget for Lead Capture', 'Instant Email Lead Alerts', 'API Access for Integrations'];
 
   const body = `<div style="background:linear-gradient(135deg,#0f172a,#1e293b);color:white;padding:64px 32px;border-radius:16px;text-align:center;margin-bottom:48px">
     <div style="display:inline-block;background:rgba(37,99,235,0.25);color:#93c5fd;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:22px;border:1px solid rgba(37,99,235,0.35)">For cleaning companies</div>
