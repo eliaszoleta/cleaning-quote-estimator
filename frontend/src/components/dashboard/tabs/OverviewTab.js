@@ -148,7 +148,7 @@ export default function OverviewTab({ config, user }) {
             <span style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed', background: 'white', border: '1px solid #ddd6fe', borderRadius: 20, padding: '2px 8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Coming Soon</span>
           </div>
           <p style={{ fontSize: 12.5, color: COLORS.body, margin: 0 }}>
-            Turn an estimate into a real invoice, send it to your client, and get paid straight to your own bank account — or just download a PDF copy if you'd rather send it and collect payment yourself.
+            Turn an estimate into a real invoice, send it to your client, and get paid straight to your own bank account via your own connected Stripe account — or just download a PDF copy if you'd rather send it and collect payment yourself.
           </p>
         </div>
       </div>
