@@ -419,34 +419,51 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
               <div
                 key={id}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
+                  display: 'flex', flexDirection: 'column', gap: 10, padding: '10px 12px',
                   borderRadius: 7, marginBottom: 3,
                   background: s.enabled ? 'white' : '#f8fafc',
                   border: `1px solid ${s.enabled ? '#e2e8f0' : '#f1f5f9'}`,
-                  flexWrap: 'wrap', transition: 'all 0.12s',
+                  transition: 'all 0.12s',
                 }}
               >
-                {/* Icon */}
-                <div style={{
-                  width: 34, height: 34, borderRadius: 7, flexShrink: 0,
-                  background: s.enabled ? '#eff6ff' : '#f1f5f9',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <Icon size={16} color={s.enabled ? '#2563eb' : '#cbd5e1'} strokeWidth={2} />
+                {/* Icon + label + toggle, always its own row -- kept
+                    separate from the markup/min inputs below (rather than
+                    one single flex-wrap row with everything in it) so the
+                    toggle can never end up stranded alone on its own
+                    wrapped line on a narrow screen. Nothing in this row has
+                    unbounded width, so it always fits without wrapping. */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 34, height: 34, borderRadius: 7, flexShrink: 0,
+                    background: s.enabled ? '#eff6ff' : '#f1f5f9',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Icon size={16} color={s.enabled ? '#2563eb' : '#cbd5e1'} strokeWidth={2} />
+                  </div>
+
+                  <span style={{ flex: 1, minWidth: 0, fontWeight: 600, fontSize: 14, color: s.enabled ? '#0f172a' : '#94a3b8' }}>
+                    {label}
+                  </span>
+
+                  <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <label style={{ position: 'relative', display: 'inline-block', width: 42, height: 23, cursor: 'pointer' }}>
+                      <input type="checkbox" checked={s.enabled} onChange={() => toggleService(id)}
+                        style={{ opacity: 0, width: 0, height: 0 }} />
+                      <span style={{ position: 'absolute', inset: 0, borderRadius: 23, background: s.enabled ? '#2563eb' : '#cbd5e1', transition: 'background 0.2s' }}>
+                        <span style={{ position: 'absolute', top: 2.5, left: s.enabled ? 21 : 2.5, width: 18, height: 18, borderRadius: '50%', background: 'white', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
+                      </span>
+                    </label>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: s.enabled ? '#2563eb' : '#94a3b8', minWidth: 22 }}>
+                      {s.enabled ? 'On' : 'Off'}
+                    </span>
+                  </div>
                 </div>
 
-                <span style={{ minWidth: 155, fontWeight: 600, fontSize: 14, color: s.enabled ? '#0f172a' : '#94a3b8' }}>
-                  {label}
-                </span>
-
                 {s.enabled && (
-                  // Each label+input is its own non-wrapping pair -- these
-                  // used to be direct children of the outer flexWrap row,
-                  // so on a narrow screen the row could wrap between a
-                  // label and its own input ("Markup" landing on one line,
-                  // its number field dropping to the next). Grouping them
-                  // means wrapping only ever happens BETWEEN whole pairs.
-                  <>
+                  // Each label+input is its own non-wrapping pair, free to
+                  // wrap onto its own row on a narrow screen without
+                  // touching the icon/label/toggle row above.
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', paddingLeft: 46 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
                       <label style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>Markup</label>
                       <input
@@ -465,22 +482,8 @@ export default function ServicesTab({ config, update, patchServices, autoSave })
                         style={{ ...inp, width: 74 }}
                       />
                     </div>
-                  </>
+                  </div>
                 )}
-
-                {/* Toggle */}
-                <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <label style={{ position: 'relative', display: 'inline-block', width: 42, height: 23, cursor: 'pointer' }}>
-                    <input type="checkbox" checked={s.enabled} onChange={() => toggleService(id)}
-                      style={{ opacity: 0, width: 0, height: 0 }} />
-                    <span style={{ position: 'absolute', inset: 0, borderRadius: 23, background: s.enabled ? '#2563eb' : '#cbd5e1', transition: 'background 0.2s' }}>
-                      <span style={{ position: 'absolute', top: 2.5, left: s.enabled ? 21 : 2.5, width: 18, height: 18, borderRadius: '50%', background: 'white', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
-                    </span>
-                  </label>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: s.enabled ? '#2563eb' : '#94a3b8', minWidth: 22 }}>
-                    {s.enabled ? 'On' : 'Off'}
-                  </span>
-                </div>
               </div>
             );
           })}
