@@ -58,7 +58,7 @@ const PLAN_FEATURES = [
 ];
 
 const TRUST_BADGES = [
-  { Icon: ShieldCheck, text: '14-day free trial (card required)' },
+  { Icon: ShieldCheck, text: '14-day free trial' },
   { Icon: Zap,          text: 'First estimate in 2 minutes' },
   { Icon: Check,        text: 'Cancel anytime' },
 ];
