@@ -561,6 +561,7 @@ export default function CleaningCalculator({ companyConfig = null, embedded = fa
           serviceDetails={serviceDetails}
           companyConfig={companyConfig}
           embedded={embedded && !siteLanding}
+          cardRadius={resolvedCardRadius}
           onReset={handleReset}
           demoPartner={demoPartner}
           showSignupCta={showSignupCta}
