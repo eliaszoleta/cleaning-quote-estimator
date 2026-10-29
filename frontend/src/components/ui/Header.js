@@ -85,7 +85,7 @@ const styles = {
   // adding the subtle attention ring.
   estimatorLink: {
     padding: '8px 16px',
-    borderRadius: 999,
+    borderRadius: RADIUS.sm,
     textDecoration: 'none',
     fontSize: 14,
     fontWeight: 700,
