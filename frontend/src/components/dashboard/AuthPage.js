@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, CheckCircle2, Eye, EyeOff, Zap, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { postCheckout } from '../../utils/api';
+import { formatPhoneInput } from '../../utils/formatPhone';
 
 const API_URL = process.env.REACT_APP_API_URL || '';
 
@@ -375,7 +376,7 @@ export default function AuthPage({ onAuth }) {
           {mode === 'signup' && (
             <div>
               <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 7 }}>Phone number</label>
-              <input type="tel" required value={phone} onChange={e => setPhone(e.target.value)}
+              <input type="tel" required value={phone} onChange={e => setPhone(formatPhoneInput(e.target.value))}
                 placeholder="(555) 123-4567" style={inputStyle}
                 onFocus={e => { e.target.style.borderColor = '#2563eb'; e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; e.target.style.background = 'white'; }}
                 onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#fafafa'; }} />
