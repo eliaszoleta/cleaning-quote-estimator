@@ -6,7 +6,23 @@ import { getCachedPartnerMatch } from '../../utils/partnerLookup';
 import PartnerCard from '../partners/PartnerCard';
 import { COLORS, RADIUS, SHADOWS } from '../../styles/theme';
 
-export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner, onShareEmail, showSignupCta = false, userType = null }) {
+export default function ResultsScreen({ result, serviceDetails, companyConfig, embedded, onReset, demoPartner, onShareEmail, showSignupCta = false, userType = null, cardRadius = null }) {
+  // Same cardRadius pattern CleaningCalculator.js's own resolvedCardRadius
+  // already uses for the service-select step, for the same reason (see
+  // its comment): this card used to hardcode RADIUS.xl regardless of what
+  // radius the embedding wrapper (Calculator Mode, Widget Mode, etc.)
+  // actually used, so the green header's square corners -- clipped to
+  // RADIUS.xl by THIS card's own overflow:hidden -- didn't match the
+  // outer wrapper's own, different rounded corner one level up. Relying
+  // on the outer wrapper's overflow:hidden to force the two into
+  // agreement doesn't reliably work once there's a second nested
+  // overflow:hidden box with its own solid background in between (this
+  // card, and the header div inside it) -- it reads as a visible sliver
+  // of the wrapper's background peeking through at the corner, reported
+  // 2026-10-29. Explicitly matching the radius here, the same way the
+  // service-select header already does, fixes it regardless of ancestor
+  // clipping behavior.
+  const resolvedCardRadius = cardRadius != null ? cardRadius : RADIUS.xl;
   const [shared, setShared] = useState(false);
   const [partner, setPartner] = useState(null);
   const rootRef = useRef(null);
@@ -133,9 +149,9 @@ export default function ResultsScreen({ result, serviceDetails, companyConfig, e
       <div ref={rootRef} style={{ padding: embedded ? '0 0 24px' : '40px 16px', background: embedded ? 'white' : COLORS.surfaceMuted, minHeight: embedded ? 'auto' : '100vh' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
-          <div style={{ background: COLORS.surface, borderRadius: RADIUS.xl, overflow: 'hidden', boxShadow: embedded ? 'none' : SHADOWS.lg, border: embedded ? 'none' : `1px solid ${COLORS.border}`, marginBottom: 20 }}>
+          <div style={{ background: COLORS.surface, borderRadius: resolvedCardRadius, overflow: 'hidden', boxShadow: embedded ? 'none' : SHADOWS.lg, border: embedded ? 'none' : `1px solid ${COLORS.border}`, marginBottom: 20 }}>
 
-            <div style={{ background: headerBg, padding: 'clamp(28px, 6vw, 40px) 32px', color: 'white', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ background: headerBg, borderTopLeftRadius: resolvedCardRadius, borderTopRightRadius: resolvedCardRadius, padding: 'clamp(28px, 6vw, 40px) 32px', color: 'white', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: -100, right: -60, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 70%)', pointerEvents: 'none' }} aria-hidden="true" />
               <div style={{ position: 'relative' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, opacity: 0.85, marginBottom: 14, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
