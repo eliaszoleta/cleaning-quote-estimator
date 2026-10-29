@@ -89,9 +89,9 @@ const styles = {
     textDecoration: 'none',
     fontSize: 14,
     fontWeight: 700,
-    color: COLORS.primaryHover,
-    background: COLORS.primaryMuted,
-    border: `1px solid ${COLORS.primary}33`,
+    color: 'white',
+    background: '#475569',
+    border: '1px solid #475569',
     transition: 'all 0.15s',
   },
   cta: {
@@ -224,8 +224,8 @@ export default function Header() {
               href="/estimator"
               className="pulse-cta"
               style={styles.estimatorLink}
-              onMouseEnter={e => { e.target.style.background = '#dbeafe'; }}
-              onMouseLeave={e => { e.target.style.background = COLORS.primaryMuted; }}
+              onMouseEnter={e => { e.target.style.background = '#334155'; }}
+              onMouseLeave={e => { e.target.style.background = '#475569'; }}
             >
               Get Estimator
             </a>
