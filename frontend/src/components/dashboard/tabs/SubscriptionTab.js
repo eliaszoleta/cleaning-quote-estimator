@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Zap, AlertTriangle, Globe, UserPlus, SlidersHorizontal, KeyRound, Send, ClipboardList, Infinity, Loader2, Lock, X } from 'lucide-react';
+import { CheckCircle2, Zap, AlertTriangle, Globe, UserPlus, SlidersHorizontal, Receipt, Send, ClipboardList, Infinity, Loader2, Lock, X } from 'lucide-react';
 import { postCheckout, postPortal, postCompanyFeedback } from '../../../utils/api';
 import { supabase } from '../../../lib/supabase';
 
@@ -28,7 +28,7 @@ const FEATURES = [
   { Icon: ClipboardList,     text: 'All 12 service calculators' },
   { Icon: Globe,             text: 'Calculator widget for your website, included whenever you want public lead capture' },
   { Icon: UserPlus,          text: "Automatic lead capture + instant email alerts once it's on your site" },
-  { Icon: KeyRound,          text: 'API access, so you can connect it to other tools you already use' },
+  { Icon: Receipt,           text: 'Invoicing & Stripe payments — coming soon' },
 ];
 
 export default function SubscriptionTab({ subStatus, onSubRefresh }) {
