@@ -80,7 +80,7 @@ export default function RunEstimateTab({ config, user }) {
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 8, marginBottom: isMobile ? 1 : 2, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: isMobile ? 11.5 : 13.5, fontWeight: 700, color: COLORS.ink }}>Invoicing &amp; Direct Payments</span>
+                <span style={{ fontSize: isMobile ? 11.5 : 13.5, fontWeight: 700, color: COLORS.ink }}>Invoicing &amp; Stripe Payments</span>
                 <span style={{ fontSize: isMobile ? 8.5 : 10, fontWeight: 700, color: '#7c3aed', background: 'white', border: '1px solid #ddd6fe', borderRadius: 20, padding: isMobile ? '1px 6px' : '2px 8px', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap', flexShrink: 0 }}>Coming Soon</span>
               </div>
               <p style={{ fontSize: isMobile ? 10.5 : 12.5, color: COLORS.body, margin: 0, lineHeight: isMobile ? 1.3 : 1.5 }}>
