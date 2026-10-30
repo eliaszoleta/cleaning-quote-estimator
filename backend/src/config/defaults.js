@@ -402,8 +402,21 @@ const COMMERCIAL_SERVICE_LEVELS = {
 // unselectable. three_per_week already existed here but, until the same
 // date, had no matching option in CommercialStep.js's FREQUENCIES array --
 // a real key with no way to ever reach it from the UI.
+//
+// daily FIXED 2026-10-30 (was 20) -- every entry here is "X times/week"
+// (see CommercialStep.js's 'Daily (5x/wk)' label), so they should all
+// convert to a monthly count the same way: real weeks/month (52/12 = 4.33),
+// not a flat 4. three_per_week (13) and twice_weekly (9) already did this
+// correctly (3*4.33=13.0, 2*4.33=8.67->9); daily used 5*4=20 instead of
+// 5*4.33=21.7->22, undercounting it by about 2 visits/month -- an internal
+// inconsistency flagged by a user comparing ChatGPT's review of a Jackson,
+// TN estimate against this codebase. Only matters where visitsPerMonth is
+// a real multiplier (COMMERCIAL_RESTROOM_PER_VISIT_RATE and the display-
+// only per-visit breakdown of the sqft rate) -- the sqft monthly total
+// itself is driven by the separately-sourced COMMERCIAL_FREQUENCY_
+// MULTIPLIER table, not this one, so it's unaffected.
 const COMMERCIAL_VISITS_PER_MONTH = {
-  daily:    20,
+  daily:    22,
   three_per_week: 13,
   twice_weekly: 9,
   weekly:   4,
