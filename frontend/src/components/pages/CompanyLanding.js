@@ -47,7 +47,7 @@ const TESTIMONIALS = [
 
 const PLAN_FEATURES = [
   'Unlimited Price Calculations',
-  'Instant On-Screen Results',
+  'Instant On-Screen Estimate Results',
   'All 12 Service Calculators',
   'One-Click Result Sharing with Coworkers',
   'ZIP-Code-Based Local Pricing',
