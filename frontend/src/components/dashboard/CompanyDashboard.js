@@ -7,6 +7,7 @@ import {
 import { useCompanyConfig } from '../../hooks/useCompanyConfig';
 import { getSubscriptionStatus, verifyCheckout, postCheckout, postPortal, postGeneralFeedback } from '../../utils/api';
 import { supabase } from '../../lib/supabase';
+import { trackMetaEvent } from '../../utils/metaPixel';
 import OverviewTab from './tabs/OverviewTab';
 import BrandingTab from './tabs/BrandingTab';
 import ServicesTab from './tabs/ServicesTab';
@@ -502,6 +503,22 @@ export default function CompanyDashboard({ user, onLogout }) {
       // right after this was kicked off -- see the mount effect's own
       // replaceState and comment for why a deep link shouldn't become the
       // page's new permanent address.
+      //
+      // Fires only on a genuinely confirmed trial/subscription (res.data.active),
+      // not on every call to this endpoint -- verify-checkout itself returns
+      // success with the OLD, non-active status for an incomplete Stripe
+      // session (closed tab, etc.) rather than throwing, so checking .active
+      // here is what actually gates this to a real conversion. This is the
+      // one and only place a company trial-signup gets reported to the Meta
+      // Pixel -- unlike the public calculator's Lead/EstimateCompleted
+      // events, nothing fired anywhere earlier in the signup flow (see
+      // AuthPage.js), so there's no risk of double-counting. Standard
+      // 'StartTrial' event (not a custom one) so it's usable for Lookalike
+      // Audiences/ad optimization the same way Facebook's own standard
+      // events are built for.
+      if (res.data?.active) {
+        trackMetaEvent('StartTrial', { currency: 'USD', value: 25 });
+      }
     } catch (err) {
       console.warn('Checkout verification failed:', err.message);
     }
