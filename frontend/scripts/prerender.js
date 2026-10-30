@@ -1606,7 +1606,7 @@ function renderForCompanies(assets) {
   // array drifted from it for a while (different wording, a stale "All
   // 10 service calculators" claim after the service count grew to 12),
   // since nothing enforces the two staying identical.
-  const planFeatures = ['Unlimited Price Calculations', 'Instant On-Screen Estimate Results', 'All 12 Service Calculators', 'One-Click Result Sharing with Coworkers', 'ZIP-Code-Based Local Pricing', 'Per-Service Markups', 'Website Widget for Lead Capture', 'Instant Email Lead Alerts', 'Turn Estimates Into Invoices (Coming Soon)', 'Stripe Integration to Send Invoices (Coming Soon)'];
+  const planFeatures = ['Unlimited Price Calculations', 'Instant On-Screen Estimate Results', 'All 12 Service Calculators', 'One-Click Result Sharing with Coworkers', 'ZIP-Code-Based Local Pricing', 'Per-Service Markups', 'Website Widget for Lead Capture', 'Instant Email Lead Alerts', 'Invoicing & Stripe Payments (Coming Soon)'];
 
   const body = `<div style="background:linear-gradient(135deg,#0f172a,#1e293b);color:white;padding:64px 32px;border-radius:16px;text-align:center;margin-bottom:48px">
     <div style="display:inline-block;background:rgba(37,99,235,0.25);color:#93c5fd;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:22px;border:1px solid rgba(37,99,235,0.35)">For cleaning companies</div>
