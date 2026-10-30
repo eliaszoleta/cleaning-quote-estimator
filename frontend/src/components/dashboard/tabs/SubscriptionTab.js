@@ -28,7 +28,7 @@ const FEATURES = [
   { Icon: ClipboardList,     text: 'All 12 service calculators' },
   { Icon: Globe,             text: 'Calculator widget for your website, included whenever you want public lead capture' },
   { Icon: UserPlus,          text: "Automatic lead capture + instant email alerts once it's on your site" },
-  { Icon: Receipt,           text: 'Invoicing & Stripe payments — coming soon' },
+  { Icon: Receipt,           text: 'Turn estimate into an invoice — coming soon' },
 ];
 
 export default function SubscriptionTab({ subStatus, onSubRefresh }) {

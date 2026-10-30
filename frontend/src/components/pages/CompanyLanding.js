@@ -54,7 +54,7 @@ const PLAN_FEATURES = [
   'Per-Service Markups',
   'Website Widget for Lead Capture',
   'Instant Email Lead Alerts',
-  'Invoicing & Stripe Payments (Coming Soon)',
+  'Turn Estimate into an Invoice (Coming Soon)',
 ];
 
 const TRUST_BADGES = [
