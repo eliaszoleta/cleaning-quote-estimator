@@ -32,10 +32,15 @@ module.exports = [
     text: [
       'Congratulations, {{businessName}}!',
       '',
-      "You're officially a Clean Estimator partner in {{cityList}}. Your listing is live now -- on the results card, the floating banner, and the estimate email in every city you bought.",
+      "You're officially a Clean Estimator partner in {{cityList}}. Your listing is now live -- reload our website to see it.",
       '',
-      'Next: set up your dashboard',
-      "Go to https://www.cleanestimator.com/client and sign up with this same email address to unlock your KPI dashboard -- impressions, calls, and click-through-rate for every city.",
+      'Leads can reach you in two ways through your placement:',
+      '',
+      "1. Direct calls: Your placement banner displays your phone number throughout the website, including on every blog post they open and every page they view, so they can call you directly.",
+      '',
+      "2. Email lead alerts: When a visitor from your city uses our calculator and opted in to leave their contact details, we automatically send those leads to you via email.",
+      '',
+      'Have an amazing day!',
       '',
       'Clean Estimator - cleanestimator.com',
     ].join('\n'),
@@ -44,16 +49,23 @@ module.exports = [
   <p style="font-size:16px;font-weight:700;margin:0 0 16px;">Congratulations, {{businessName}}!</p>
 
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    You're officially a Clean Estimator partner in <strong>{{cityList}}</strong>. Your listing is live now — on the results card, the floating banner, and the estimate email in every city you bought.
+    You're officially a Clean Estimator partner in <strong>{{cityList}}</strong>. Your listing is now live — reload our website to see it.
   </p>
 
-  <p style="font-size:13px;color:#666666;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">Next: set up your dashboard</p>
+  <p style="font-size:14px;line-height:1.6;margin:0 0 12px;">
+    Leads can reach you in two ways through your placement:
+  </p>
+
+  <p style="font-size:14px;line-height:1.6;margin:0 0 14px;">
+    <strong>1. Direct calls:</strong> Your placement banner displays your phone number throughout the website, including on every blog post they open and every page they view, so they can call you directly.
+  </p>
+
   <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">
-    Go to <a href="https://www.cleanestimator.com/client" style="color:#2563eb;">cleanestimator.com/client</a> and sign up with this same email address to unlock your KPI dashboard — impressions, calls, and click-through-rate for every city.
+    <strong>2. Email lead alerts:</strong> When a visitor from your city uses our calculator and opted in to leave their contact details, we automatically send those leads to you via email.
   </p>
 
-  <p style="margin:8px 0 0;">
-    <a href="https://www.cleanestimator.com/client" style="color:#2563eb;font-size:14px;font-weight:600;">Set up my dashboard →</a>
+  <p style="font-size:14px;line-height:1.6;margin:0;">
+    Have an amazing day!
   </p>
   ${FOOTER_HTML}
 </div>`,
